@@ -1,0 +1,1057 @@
+
+CustomerPilot
+
+Ultimate Goal
+Merchant ko feel hona chahiye
+"CustomerPilot automatically mere customers ko wapas la raha hai."
+Merchant software use nahi kare.
+Merchant sirf revenue dekhe.
+________________________________________
+Customer ko feel hona chahiye
+"Main Cake Connection ka VIP Member hoon."
+Customer ko loyalty card collect karne jaisa nahi,
+VIP club ka member hone jaisa feel hona chahiye.
+Vision
+India's #1 WhatsApp-first AI Customer Retention Platform
+Promise
+Bring Customers Back. Automatically.
+Merchant ko software chalana nahi.
+Merchant ko sirf repeat customers aur revenue dekhna hai.
+
+[1] Example Merchant
+Business
+Cake Connection
+Owner
+Hitesh
+Location
+Vadodara
+Business Type
+Cake Shop
+Current Situation
+Daily Customers : 22
+Repeat Customers : Very Low
+Google Rating : 4.4★
+Google Reviews : 148
+No Loyalty Program
+No CRM
+No WhatsApp Marketing
+________________________________________
+DAY-1
+Merchant Discovery
+Merchant Instagram Reel dekhta hai.
+Aaj 22 Customers aaye.
+
+Kal sirf 6 hi wapas aayenge.
+
+Baaki permanently chale jayenge.
+
+CustomerPilot automatically customers ko wapas lata hai.
+
+Works on WhatsApp.
+
+No App Required.
+
+7 Days FREE Trial.
+Merchant clicks
+Start FREE Trial [Start 7 Days Free Trial pe click karne se Merchant( means hamari website ka user) just email+password se login kar sake( yaha Google ke Login email id already uske Mobile ya Computer me already logged in ho to uske authentication se login ho sake, uske baad Dashdoard open ho , usme Pura complete Signup kar le, and agar complete signup ke bich me kahi kuch bhi hone se computer bandh bhi ho gaya to , jitne steps complete kiye wo saved rahe and jaha se left ho vaha se signup ke steps resume ho]
+________________________________________
+[A] Merchant Signup ( 5 Steps) 
+Merchant enters
+•	Business Name 
+•	Owner Name 
+•	WhatsApp Number 
+•	Email 
+•	Password 
+Done.
+________________________________________
+STEP 1
+Business Information
+Merchant selects
+Business Type
+Cake Shop
+Business Address
+Business Timing
+Done
+________________________________________
+STEP 2
+Merchant WhatsApp Verification
+Merchant enters
+His Business WhatsApp Number
+CustomerPilot sends OTP
+Merchant verifies
+Done
+Now CustomerPilot knows
+Merchant Official WhatsApp Number
+________________________________________
+STEP 3
+Google Business Profile
+Merchant searches
+Cake Connection Vadodara
+Official Google Business appears
+Merchant selects
+Connect
+Done
+Now CustomerPilot stores
+•	Google Place ID 
+•	Review Link 
+•	Google Rating 
+•	Business Name 
+•	Business Photos 
+________________________________________
+STEP 4
+Logo Upload
+Merchant uploads
+Logo
+Business Cover
+Done
+________________________________________
+STEP 5
+Reward Card Setup
+CustomerPilot already shows Default Recommended Rules so merchant can go live in under 5 minutes.
+Example (Default)
+Every ₹500 Purchase
+
+↓
+
+1 Stamp
+Reward
+10 Stamps
+
+↓
+
+FREE 500gm Cake
+Validity
+90 Days
+Google Review
+↓
++1 Stamp
+Google Review + Product Photo
+↓
++2 Bonus Stamps
+Maximum
+3 Bonus Stamps
+________________________________________
+Important
+These are only recommended defaults.
+Merchant can modify EVERYTHING.
+Merchant can customize
+•	Reward Card Name 
+•	Number of Stamps 
+•	Stamp Value 
+•	Reward Name 
+•	Reward Image 
+•	Reward Validity 
+•	Card Theme Color 
+•	Google Review Bonus 
+•	Product Photo Bonus 
+•	Tier Rewards 
+•	Excluded Categories 
+Example
+Cold Drinks
+
+Ice Cream
+
+Packaged Chocolates
+
+↓
+
+No Stamp
+Merchant saves once.
+Never again.
+________________________________________
+STEP 6
+QR Code Generation
+CustomerPilot automatically generates
+•	Table QR 
+•	Counter QR 
+•	A4 Poster 
+•	Sticker QR 
+•	Cake Box QR 
+•	PNG 
+•	PDF 
+Merchant prints them.
+________________________________________
+STEP 7
+Merchant Dashboard Ready
+Merchant sees
+Customers Brought Back
+
+0
+
+Repeat Revenue
+
+₹0
+
+Google Rating
+
+4.4★
+
+AI Status
+
+Learning...
+________________________________________
+STEP 8
+Live System Test (Very Important)
+Before merchant starts using CustomerPilot,
+CustomerPilot performs a complete self-test.
+Example
+Merchant clicks
+Run Live Test
+CustomerPilot automatically checks
+WhatsApp
+✓ Merchant WhatsApp verified?
+✓ Can messages be sent?
+✓ OTP working?
+________________________________________
+Google
+✓ Google Business connected?
+✓ Review URL valid?
+✓ AI Reply permission available?
+________________________________________
+QR
+✓ QR opens correct WhatsApp flow?
+✓ QR is scannable?
+________________________________________
+Queue
+✓ Customer joins queue?
+✓ Merchant receives waiting notification?
+________________________________________
+Reward Engine
+✓ Stamp calculation correct?
+✓ Reward rules valid?
+________________________________________
+Database
+✓ Merchant saved?
+✓ Reward Card saved?
+✓ Queue working?
+________________________________________
+AI
+✓ AI Draft working?
+✓ AI Reply working?
+________________________________________
+Merchant finally sees
+System Health
+
+98%
+
+READY TO GO LIVE
+
+Everything Working Successfully
+Merchant now trusts the platform.
+
+
+[B] Full workflow  :
+
+Day 1 : 
+Customer enters Cake Shop
+Rahul
+Purchases
+Chocolate Cake
+₹850
+Merchant creates bill
+using his own POS.
+CustomerPilot billing software nahi hai. (CustomerPilot never creates GST bill.
+No accounting.
+No tax.
+No billing software.
+)
+Merchant simply smiles and says
+"Sir, Cake Connection VIP Club join kar lijiye. Bilkul FREE hai. Bas QR Scan kariye."
+Merchant kabhi
+"Reward"
+"Stamp"
+"Loyalty"
+ye words pehle nahi bolega.
+Pehle
+VIP Club
+________________________________________
+Customer scans QR
+QR directly opens WhatsApp
+"🎉 You're invited to join the Cake Connection VIP Club. It's completely FREE and takes less than 10 seconds."
+Thank you for visiting us.
+
+Before we activate your FREE VIP Membership,
+
+please confirm your details.
+Button
+Continue
+________________________________________
+Customer taps Continue
+Ab CustomerPilot WhatsApp se available information check karta hai.
+Case A
+WhatsApp Display Name available hai
+Example
+Rahul Patel
+Then
+Is your name
+
+Rahul Patel?
+
+✅ Yes
+
+✏ Edit
+Customer taps
+Yes
+Done
+No typing.
+________________________________________
+Case B
+Display Name unavailable
+ya
+Customer doesn't like it
+Then
+What should we call you?
+
+_____________
+
+Continue
+Customer enters
+Rahul
+Continue
+Done.
+________________________________________
+Ab CustomerPilot permanently stores
+Customer Name
+
+Rahul
+
+Customer WhatsApp
+
++91XXXXXXXXXX
+Ab se har jagah
+Hi Rahul ❤️
+dikh sakta hai.
+Isliye pehle greeting generic honi chahiye.
+Naam baad me.
+Ye bahut important UX correction hai.
+________________________________________
+Customer presses Continue.
+CustomerPilot immediately creates
+Permanent Relationship
+Merchant WhatsApp
+
+↓
+
+CustomerPilot Cloud
+
+↓
+
+Customer WhatsApp
+Ab Merchant Dashboard me
+Live Queue
+Waiting
+
+Rahul
+
+Joined 18 Seconds Ago
+
+Ready For Reward
+Merchant sirf
+Tap
+Enter Reward Amount
+₹850
+Give Reward
+Done.
+________________________________________
+Merchant sees
+Rahul
+
+Waiting
+Live Queue
+________________________________________
+Merchant taps Rahul
+Enter Reward Amount
+850
+Give Reward
+Done
+Total time
+5 seconds
+
+
+
+
+Customer gets
+Congratulations Rahul ❤️
+
+Welcome to
+
+Cake Connection VIP Club.
+
+⭐
+
+1 Stamp Added
+
+1 / 10
+
+View Wallet [Cake Connection VIP Club ⭐ 1/10 Next Reward FREE Cake Google Review Bonus Available]
+Ab emotional attachment create ho gaya.
+________________________________________
+Customer joins
+↓
+Customer name confirmed
+↓
+Permanent WhatsApp relationship created
+↓
+Merchant rewards
+↓
+Wallet created
+
+Merchant never types
+Phone
+Customer Name
+Bill Number
+Nothing
+________________________________________
+Smart Upsell Example:
+Another customer
+₹480
+Merchant enters
+480
+CustomerPilot
+Only ₹20 away
+
+from your first stamp
+
+Suggest
+
+one pastry.
+Merchant
+Sir
+
+₹20 pastry add karenge?
+
+Stamp mil jayega.
+Average Bill increases
+
+
+
+Same Evening
+Merchant Dashboard
+Outcome only
+Customers
+12
+Repeat Revenue
+₹0
+Google Reviews
+0
+AI Status
+Learning
+
+Day 2
+4 PM
+
+CustomerPilot automatically waits.
+Cake consume ho chuka hota hai.
+Ab review request perfect timing pe jaati hai.
+Hi Rahul ❤️
+
+Hope you loved your
+
+Chocolate Truffle Cake.
+
+Would you like AI
+
+to prepare your Google Review?
+
+🎁
+
+Bonus Stamp Available.
+↓
+AI Draft
+↓
+Customer edits
+The Chocolate Truffle Cake
+
+was fresh
+
+beautiful
+
+delicious
+
+Highly Recommended.
+Buttons
+Edit
+Continue to Google
+________________________________________
+Customer edits
+Posts review
+Uploads Cake Photo
+
+CustomerPilot detects review
+Automatically
+Adds
++3 Bonus Stamps
+Customer
+Congratulations
+
+Bonus Added ⭐⭐⭐
+________________________________________
+Merchant
+does nothing
+________________________________________
+AI Auto Reply
+Thank you Rahul ❤️
+
+We are delighted
+
+you loved our cake.
+
+Looking forward
+
+to serving you again.
+Posted automatically
+
+Day 3
+Morning
+Merchant gets WhatsApp
+Good Morning Hitesh ☀️
+
+Yesterday
+
+Customers
+
+21
+
+Repeat Customers
+
+6
+
+Repeat Revenue
+
+₹4250
+
+Google Reviews
+
+3
+
+Rating
+
+4.8
+
+Potential Revenue
+
+₹8500
+Buttons
+Send Reminder
+View Dashboard
+________________________________________
+Merchant
+Send Reminder
+CustomerPilot sends personalized messages
+Automatically
+
+Customers come back
+
+Day 4
+
+Same Customer (Rahul) jo pehle hi Cake Connection VIP Club join kar chuka hai, fir se shop par aata hai.
+
+Purchase: Black Forest Cake - ₹550
+
+Merchant existing POS me billing karta hai.
+CustomerPilot billing software nahi hai.
+
+Merchant:
+"Sir, VIP QR Scan kar dijiye."
+
+Rahul QR scan karta hai.
+
+CustomerPilot identifies:
+- Customer Found ✅
+- Rahul Patel
+- VIP Member
+- Wallet Found
+
+WhatsApp:
+"🎉 Welcome Back Rahul ❤️
+Great to see you again.
+Tap below to collect today's VIP Stamp."
+
+Button: Collect Today's Stamp
+
+Rahul taps button.
+
+Merchant Dashboard:
+- 🟢 Rahul Patel
+- Returning VIP Customer
+- Visit #2
+- Waiting
+- ⭐ Returning VIP
+
+Merchant enters Reward Eligible Amount: ₹550
+
+CustomerPilot:
+Eligible Purchase ₹550
+→ 1 Stamp
+
+Merchant taps "Give Reward".
+
+Customer:
+Congratulations Rahul ❤️
+⭐ 1 Stamp Added
+Progress: 5/10
+Only 5 More Stamps to unlock FREE 500gm Cake
+
+Buttons:
+- View Wallet
+- View Rewards
+
+Dashboard Updates:
+Today's Customers: 18
+Repeat Customers: 7
+Repeat Revenue: ₹3,850
+Repeat Rate: 39%
+
+Wallet:
+Cake Connection VIP Club
+⭐⭐⭐⭐⭐☆☆☆☆☆
+5/10 Stamps
+Current Level: Silver VIP
+Next Reward: FREE 500gm Cake
+Estimated: 5 More Visits
+
+Evening Automation:
+Google Review Already Submitted ✅
+
+No duplicate review request is sent.
+
+
+
+
+Day 5
+Merchant Dashboard
+Repeat Revenue
+
+₹28,500
+
+Google Reviews
+
+17
+
+Average Rating
+
+4.9
+
+Customers Near Reward
+
+8
+
+AI Suggestions
+
+3
+Merchant feels
+Software earns money
+
+Day 7
+Trial Ends
+Merchant sees
+During Trial
+
+You earned
+
+₹38,400
+
+Repeat Revenue
+
+Google Reviews
+
+19
+
+Average Rating
+
+4.9
+
+
+
+Activate CustomerPilot
+
+to continue.
+
+Day 15
+Merchant waits
+Still sees
+Customers asking
+Mera Stamp Wallet?
+Merchant realizes
+CustomerPilot is bringing customers back.
+Merchant purchases
+6 Month Plan
+________________________________________
+Paid Plan Starts
+Now AI becomes fully active
+Daily Morning Reports
+Win Back Campaigns
+Birthday Campaigns
+Festival Campaigns
+Review Automation
+VIP Management
+Referral
+Everything starts.
+
+
+
+Customer Journey
+Rahul
+Month 1
+1 Stamp
+
+↓
+
+3 Stamp
+
+↓
+
+5 Stamp
+
+↓
+
+7 Stamp
+
+↓
+
+10 Stamp
+Gets FREE Cake
+________________________________________
+Customer feels
+Main VIP hoon
+Not
+Main stamp collect kar raha hoon.
+________________________________________
+Birthday
+WhatsApp
+Happy Birthday Rahul 🎂
+
+Today's Gift
+
+FREE Brownie
+________________________________________
+Festival
+Diwali Bonus
+
+Double Stamp Today
+________________________________________
+Inactive
+45 Days
+AI
+Rahul
+
+We Miss You ❤️
+
+Here's a Surprise.
+
+Come Back.
+________________________________________
+Rahul returns
+[1] Standalone Service 1
+Loyalty Stamps Only : Loyalty Stamps
+Customer Purchase
+↓
+VIP Club Join
+↓
+Wallet
+↓
+Stamp
+↓
+Reward
+↓
+Repeat Visit
+
+Merchant gets
+•	QR Join 
+•	Stamp Wallet 
+•	Reward Card 
+•	VIP Club 
+•	Repeat Customers 
+No Google Review features
+No AI Reply
+Ideal for merchants who only want loyalty.
+
+[2] Standalone Service 2:
+
+AI Draft Google Review
+Merchant only purchased
+AI Draft Review.
+Customer buys
+↓
+Merchant says
+Sir,
+
+Google Review dene ke liye
+
+QR Scan kariye.
+↓
+Customer scans
+↓
+CustomerPilot checks
+Subscription
+↓
+Only AI Draft active
+↓
+Customer sees
+AI has prepared
+
+your review.
+Buttons
+✏ Edit
+
+📋 Copy & Post
+↓
+Google opens
+↓
+Customer posts
+↓
+Merchant gets more reviews
+No Loyalty
+No Wallet
+No Auto Reply
+
+[3] Standalone Service 3
+Google Review Auto Reply
+During Trial
+Customer posts review
+↓
+CustomerPilot detects
+↓
+AI Reply generated
+↓
+Posted automatically
+Merchant sees
+AI replied successfully.
+________________________________________
+Paid Plan
+Same automation continues.
+PLUS
+Merchant can press
+Reply to Previous Reviews
+CustomerPilot scans
+Latest Google Reviews
+Maximum
+500
+Latest reviews
+Only those
+without replies
+↓
+AI generates personalized replies
+↓
+Posts automatically
+Merchant suddenly cleans years of pending reviews in one operation.
+[4] Combo Service (All 3 Together - (Flagship))
+
+Customer Purchase
+        │
+        ▼
+Merchant says
+
+"Sir,
+Cake Connection VIP Club
+join kariye.
+FREE hai."
+
+        │
+        ▼
+Customer scans QR
+        │
+        ▼
+WhatsApp opens
+        │
+        ▼
+Customer confirms Name
+        │
+        ▼
+Permanent Merchant ↔ Customer relationship created
+        │
+        ▼
+Live Queue
+        │
+        ▼
+Merchant taps Customer
+        │
+        ▼
+Reward Amount
+        │
+        ▼
+Stamp Added
+        │
+        ▼
+Wallet Updated
+        │
+        ▼
+Next Day AI Review Request
+        │
+        ▼
+Customer Posts Google Review
+        │
+        ▼
+Bonus Stamp Added
+        │
+        ▼
+AI Auto Reply
+        │
+        ▼
+Morning Report
+        │
+        ▼
+Birthday Wishes
+        │
+        ▼
+Festival Campaign
+        │
+        ▼
+Reward Redemption
+        │
+        ▼
+Customer Returns Again
+        │
+        ▼
+Merchant Revenue Grows
+        │
+        ▼
+CustomerPilot Renewal
+
+
+
+
+
+Ideal Business Outcome after 6 Months
+Merchant
+•	Repeat customer percentage significantly increases. 
+•	Google rating improves through more genuine reviews. 
+•	Revenue grows because customers return more often. 
+•	Daily operational effort remains under 5 minutes. 
+Customer
+•	Feels like a VIP member rather than a discount seeker. 
+•	Receives timely, relevant WhatsApp interactions. 
+•	Keeps returning to earn and redeem rewards. 
+•	Develops a stronger emotional connection with the brand. 
+Ye workflow CustomerPilot ke core promise ko achieve karta hai: merchant ke existing billing process ko change kiye bina, WhatsApp ke through customer relationship layer build karna aur repeat business automatically increase karna.
+
+
+[2] StandAlone 3 Feture Services ((1) Loyalty stamps Service  (2) Ai Google Review Draft (3) Google Review AutoReply (4) All 3 Combo 
+[3] SuperPowerful Admin Panel 
+
+
+
+Rules :
+[1] Customer Loyalty QR scan kare to stamp automatically add nahi hoga. 
+•  Merchant ko Approve karna hoga. 
+•  Product Name → Optional 
+•  Purchase Amount → Mandatory 
+•  Approve ke baad hi: 
+•	Stamp add hoga 
+•	VIP Wallet update hoga 
+•	Dashboard update hoga 
+•	Loyalty transaction permanently save hogi. 
+[2] Har approved transaction ke saath ye fields save hongi: 
+•	Date 
+•	Day 
+•	Time 
+•	Customer Name 
+•	Customer WhatsApp 
+•	Product Name 
+•	Purchase Amount 
+•	Stamp Count 
+•	Visit Number 
+•	Approved By 
+•	Status 
+•	Timestamps 
+[3] Dashboard me History Filters bhi add kiye gaye hain (Today, Last 7 Days, Customer, Product, Amount, Staff, Status, etc.).
+[4] "Requirements.txt" me is point ko imrove karne ke liye kya instructions/guide he  wo hamesha check karo , uske hisabse update karna he 
+[5] Google ka Review jo Ai LLM Draft karega uske liye  : Act as a real Indian customer writing a genuine Google review.
+
+Business Details:
+- Business Name: [Business Name]
+- Category: [Category]
+- City: [City]
+- Purchased Product/Service: [Product/Service Name]
+
+Write a natural 3-4 lines Google review in simple Indian English.
+
+STRICT RULES
+
+1. NEVER invent or assume any fact.
+   - Mention the purchased product/service ONLY if [Product/Service Name] is provided.
+   - If it is empty, never guess any product or service. Mention only the business category naturally.
+
+2. Never mention any incorrect product, flavour, service, staff member, offer, price, event, visit history, or experience.
+
+3. Never use relative time references such as:
+   - today
+   - yesterday
+   - recently
+   - last week
+   - first visit
+   - second visit
+   - again
+   - this time
+   unless explicitly provided.
+
+4. Write only from the customer's experience.
+
+5. Keep the tone completely human, casual and believable.
+   Never sound like an advertisement.
+
+6. Naturally mention BOTH:
+   - [Business Name]
+   - [City]
+
+7. Improve local SEO naturally by using ONE OR TWO relevant local search phrases in every review.
+
+Examples (DO NOT always use these):
+- cake shop in [City]
+- birthday cake in [City]
+- custom cake in [City]
+- fresh cakes in [City]
+- designer cakes in [City]
+- anniversary cake in [City]
+- bakery in [City]
+- dessert shop in [City]
+- pastry shop in [City]
+- online cake delivery in [City]
+- same day cake delivery in [City]
+- celebration cakes in [City]
+- delicious cakes in [City]
+
+8. IMPORTANT:
+Rotate SEO keywords naturally.
+Do NOT repeatedly use the same keyword combination.
+Generate different keyword variations every time depending on the review context.
+
+9. Mention only ONE SEO phrase naturally.
+Occasionally use TWO if it fits naturally.
+Never stuff keywords.
+
+10. Vary every review by changing:
+- sentence structure
+- opening sentence
+- vocabulary
+- review angle
+- writing style
+- ending
+- SEO keyword used
+
+11. Focus naturally on one or more:
+- product quality
+- freshness
+- taste
+- service
+- staff behaviour
+- packaging
+- cleanliness
+- value for money
+- overall experience
+
+12. Avoid AI-style and marketing phrases such as:
+- Best in the city
+- World class
+- Premium experience
+- Outstanding
+- Highly recommended to everyone
+- Number one
+- Perfect in every way
+
+unless they naturally fit the customer's experience.
+
+13. Every review must look completely human-written and unique.
+Avoid repeated sentence patterns across multiple generations.
+
+Output ONLY the review text.

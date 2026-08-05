@@ -1,0 +1,620 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String?
+  role      String   @default("merchant") // merchant | staff | super_admin
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  merchant  Merchant?
+}
+
+model Merchant {
+  id                  String    @id @default(cuid())
+  userId              String?   @unique
+  name                String
+  businessType        String?
+  ownerName           String?
+  address             String?
+  businessTiming      String?
+  category            String?
+  timezone            String?
+  whatsappPhone       String?   @unique
+  whatsappInstanceName String?
+  email               String?
+  logoUrl             String?
+  coverUrl            String?
+  plan                String?   @default("trial")
+  status              String?   @default("active")
+  trialEndsAt         DateTime?
+  onboardingCompleted Boolean   @default(false)
+  currentStep         Int       @default(1)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  user                User?     @relation(fields: [userId], references: [id])
+
+  staff                     Staff[]
+  customers                 Customer[]
+  stampCards                StampCard[]
+  customerStampCards        CustomerStampCard[]
+  rewards                   Reward[]
+  bills                     Bill[]
+  redemptions               Redemption[]
+  referrals                 Referral[]
+  auditLogs                 AuditLog[]
+  whatsAppMessages          WhatsAppMessage[]
+  subscriptions             Subscription[]
+  reviews                   Review[]
+  birthdays                 Birthday[]
+  vipTiers                  VipTier[]
+  winBackEscalations        WinBackEscalation[]
+  supportTickets            SupportTicket[]
+  onboardingSteps           OnboardingStep[]
+  waitingCustomers          WaitingCustomer[]
+  fraudAlerts               FraudAlert[]
+  customerMergeLogs         CustomerMergeLog[]
+  merchantTransferLogs      MerchantTransferLog[]
+  rewardWaitlists           RewardWaitlist[]
+  cardRuleChangeLogs        CardRuleChangeLog[]
+  campaignDeliveryLogs      CampaignDeliveryLog[]
+  ownerOverrideLogs         OwnerOverrideLog[]
+  merchantGoogleConnections MerchantGoogleConnection[]
+  googleBusinessReviews     GoogleBusinessReview[]
+  backgroundJobs            BackgroundJob[]
+  Stamp                     Stamp[]
+}
+
+model Staff {
+  id                          String    @id @default(cuid())
+  merchantId                  String
+  name                        String
+  email                       String?
+  phone                       String?
+  pin                         String?
+  role                        String
+  requireManagerApprovalUntil DateTime?
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
+
+  merchant                  Merchant          @relation(fields: [merchantId], references: [id])
+  billsIssued               Bill[]
+  redemptionsApproved       Redemption[]
+  auditLogs                 AuditLog[]        @relation("StaffAuditLogs")
+  waitingCustomersReserved  WaitingCustomer[] @relation("ReservedBy")
+  waitingCustomersClaimed   WaitingCustomer[] @relation("ClaimedBy")
+  waitingCustomersRecovered WaitingCustomer[] @relation("RecoveredBy")
+}
+
+model Customer {
+  id                  String    @id @default(cuid())
+  merchantId          String
+  name                String
+  email               String?
+  phone               String
+  referralCode        String?
+  acquisitionChan     String?
+  notes               String?
+  lifetimeStamps      Int       @default(0)
+  lifetimeSpend       Float     @default(0)
+  lifetimeRedemptions Int       @default(0)
+  currentStreak       Int       @default(0)
+  longestStreak       Int       @default(0)
+  birthday            String?
+  favorite            Boolean   @default(false)
+  vipTier             String?   @default("none")
+  lastActiveAt        DateTime?
+  status              String?
+  whatsappOptIn       Boolean   @default(true)
+  referredById        String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  merchant      Merchant   @relation(fields: [merchantId], references: [id])
+  referredBy    Customer?  @relation("CustomerReferrals", fields: [referredById], references: [id])
+  referralsMade Customer[] @relation("CustomerReferrals")
+
+  stampCards         CustomerStampCard[]
+  stamps             Stamp[]
+  bills              Bill[]
+  redemptions        Redemption[]
+  referrals          Referral[]          @relation("Referrer")
+  referralsReceived  Referral[]          @relation("Friend")
+  whatsAppMessages   WhatsAppMessage[]
+  reviews            Review[]
+  birthdaysList      Birthday[]
+  winBackEscalations WinBackEscalation[]
+  achievements       Achievement[]
+  waitingCustomers   WaitingCustomer[]
+}
+
+model StampCard {
+  id             String   @id @default(cuid())
+  merchantId     String
+  name           String
+  stampsRequired Int
+  rewardName     String
+  stampsPerBill  String?
+  color          String?
+  rewardImageUrl String?
+  stampValue     Float?
+  validityDays   Int?
+  googleReviewBonus Int?
+  photoBonus     Int?
+  tierRewardsEnabled Boolean @default(false)
+  excludedCategories String?
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  merchant      Merchant            @relation(fields: [merchantId], references: [id])
+  customerCards CustomerStampCard[]
+  stamps        Stamp[]
+}
+
+model CustomerStampCard {
+  id              String   @id @default(cuid())
+  customerId      String
+  stampCardId     String
+  merchantId      String
+  stampsCollected Int      @default(0)
+  completed       Boolean  @default(false)
+  redeemed        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  customer  Customer  @relation(fields: [customerId], references: [id])
+  stampCard StampCard @relation(fields: [stampCardId], references: [id])
+  merchant  Merchant  @relation(fields: [merchantId], references: [id])
+  stamps    Stamp[]
+}
+
+model Stamp {
+  id                  String   @id @default(cuid())
+  customerId          String
+  stampCardId         String?
+  customerStampCardId String?
+  merchantId          String
+  source              String
+  billId              String?
+  createdAt           DateTime @default(now())
+
+  customer          Customer           @relation(fields: [customerId], references: [id])
+  stampCard         StampCard?         @relation(fields: [stampCardId], references: [id])
+  customerStampCard CustomerStampCard? @relation(fields: [customerStampCardId], references: [id])
+  merchant          Merchant           @relation(fields: [merchantId], references: [id])
+  bill              Bill?              @relation(fields: [billId], references: [id])
+}
+
+model Reward {
+  id                      String   @id @default(cuid())
+  merchantId              String
+  name                    String
+  description             String?
+  stampsCost              Int
+  stock                   Int      @default(0)
+  active                  Boolean  @default(true)
+  requiresManagerApproval Boolean  @default(false)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  merchant    Merchant     @relation(fields: [merchantId], references: [id])
+  redemptions Redemption[]
+}
+
+model Bill {
+  id            String   @id @default(cuid())
+  merchantId    String
+  customerId    String
+  issuedById    String
+  number        String
+  amount        Float
+  stampsAwarded Int      @default(0)
+  status        String
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  merchant Merchant @relation(fields: [merchantId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+  issuedBy Staff    @relation(fields: [issuedById], references: [id])
+  stamps   Stamp[]
+}
+
+model Redemption {
+  id           String   @id @default(cuid())
+  merchantId   String
+  customerId   String
+  rewardId     String
+  approvedById String?
+  stampsSpent  Int
+  status       String
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+  customer   Customer @relation(fields: [customerId], references: [id])
+  reward     Reward   @relation(fields: [rewardId], references: [id])
+  approvedBy Staff?   @relation(fields: [approvedById], references: [id])
+}
+
+model Referral {
+  id                  String   @id @default(cuid())
+  merchantId          String
+  referrerId          String
+  friendPhone         String
+  friendCustomerId    String?
+  status              String
+  bonusStampsReferrer Int      @default(0)
+  bonusStampsFriend   Int      @default(0)
+  flaggedReason       String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  merchant       Merchant  @relation(fields: [merchantId], references: [id])
+  referrer       Customer  @relation("Referrer", fields: [referrerId], references: [id])
+  friendCustomer Customer? @relation("Friend", fields: [friendCustomerId], references: [id])
+}
+
+model WhatsAppMessage {
+  id            String   @id @default(cuid())
+  merchantId    String
+  customerId    String?
+  toPhone       String
+  template      String
+  body          String
+  status        String
+  metaMessageId String?
+  sentAt        DateTime?
+  errorMessage  String?
+  deliveredAt   DateTime?
+  readAt        DateTime?
+  retryCount    Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  merchant      Merchant @relation(fields: [merchantId], references: [id])
+  customer      Customer? @relation(fields: [customerId], references: [id])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  merchantId String
+  actorType  String
+  actorId    String?
+  staffId    String?
+  action     String
+  entity     String?
+  entityId   String?
+  metadata   String?
+  createdAt  DateTime @default(now())
+
+  merchant Merchant @relation(fields: [merchantId], references: [id])
+  staff    Staff?   @relation("StaffAuditLogs", fields: [staffId], references: [id])
+}
+
+model Plan {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  price       Float
+  currency    String   @default("INR")
+  features    String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id          String    @id @default(cuid())
+  merchantId  String
+  planId      String
+  amount      Float
+  currency    String    @default("INR")
+  status      String
+  renewalDate DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  merchant Merchant @relation(fields: [merchantId], references: [id])
+  plan     Plan     @relation(fields: [planId], references: [id])
+}
+
+model Review {
+  id                 String    @id @default(cuid())
+  merchantId         String
+  customerId         String
+  platform           String?   @default("google")
+  rating             Int
+  aiDraft            String?
+  finalText          String?
+  photoUrl           String?
+  status             String
+  bonusStampsAwarded Int       @default(0)
+  photoBonusStamps   Int       @default(0)
+  requestSource      String?
+  submittedAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  merchant Merchant @relation(fields: [merchantId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+}
+
+model Birthday {
+  id                String    @id @default(cuid())
+  merchantId        String
+  customerId        String
+  birthMonth        Int
+  birthDay          Int
+  vipTier           String?
+  rewardName        String
+  bonusStamps       Int       @default(0)
+  status            String
+  rewardWindowStart DateTime?
+  rewardWindowEnd   DateTime?
+  reminderSentAt    DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  merchant Merchant @relation(fields: [merchantId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+}
+
+model VipTier {
+  id               String   @id @default(cuid())
+  merchantId       String
+  name             String
+  minLifetimeSpend Float
+  perks            String
+  bonusMultiplier  Float    @default(1.0)
+  color            String?
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  merchant Merchant @relation(fields: [merchantId], references: [id])
+}
+
+model WinBackEscalation {
+  id              String    @id @default(cuid())
+  merchantId      String
+  customerId      String
+  stage           String
+  action          String
+  messageTemplate String
+  sentAt          DateTime?
+  outcome         String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  merchant Merchant @relation(fields: [merchantId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  customerId  String
+  type        String
+  label       String
+  description String?
+  earnedAt    DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id])
+}
+
+model SupportTicket {
+  id          String    @id @default(cuid())
+  merchantId  String
+  subject     String
+  category    String
+  priority    String
+  status      String
+  description String?
+  resolution  String?
+  resolvedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  merchant Merchant @relation(fields: [merchantId], references: [id])
+}
+
+model OnboardingStep {
+  id          String   @id @default(cuid())
+  merchantId  String
+  stepKey     String
+  label       String?
+  completed   Boolean  @default(false)
+  skipped     Boolean  @default(false)
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  merchant    Merchant @relation(fields: [merchantId], references: [id])
+}
+
+model WaitingCustomer {
+  id                   String    @id @default(cuid())
+  merchantId           String
+  customerId           String
+  status               String
+  scannedAt            DateTime  @default(now())
+  claimedAt            DateTime?
+  claimedById          String?
+  amount               Float?
+  stampsAwarded        Int?
+  expiresAt            DateTime
+  scanSource           String?
+  reservedAt           DateTime?
+  reservedById         String?
+  reservationExpiresAt DateTime?
+  undoWindowUntil      DateTime?
+  recoveredAt          DateTime?
+  recoveredById        String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  merchant    Merchant @relation(fields: [merchantId], references: [id])
+  customer    Customer @relation(fields: [customerId], references: [id])
+  claimedBy   Staff?   @relation("ClaimedBy", fields: [claimedById], references: [id])
+  reservedBy  Staff?   @relation("ReservedBy", fields: [reservedById], references: [id])
+  recoveredBy Staff?   @relation("RecoveredBy", fields: [recoveredById], references: [id])
+}
+
+model FraudAlert {
+  id         String   @id @default(cuid())
+  merchantId String
+  createdAt  DateTime @default(now())
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+}
+
+model CustomerMergeLog {
+  id         String   @id @default(cuid())
+  merchantId String
+  createdAt  DateTime @default(now())
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+}
+
+model MerchantTransferLog {
+  id               String   @id @default(cuid())
+  merchantId       String
+  oldOwnerId       String?
+  legalAttestation Boolean?
+  createdAt        DateTime @default(now())
+  merchant         Merchant @relation(fields: [merchantId], references: [id])
+}
+
+model RewardWaitlist {
+  id         String   @id @default(cuid())
+  merchantId String
+  createdAt  DateTime @default(now())
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+}
+
+model CardRuleChangeLog {
+  id         String   @id @default(cuid())
+  merchantId String
+  createdAt  DateTime @default(now())
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+}
+
+model CampaignDeliveryLog {
+  id         String   @id @default(cuid())
+  merchantId String
+  createdAt  DateTime @default(now())
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+}
+
+model OwnerOverrideLog {
+  id           String   @id @default(cuid())
+  merchantId   String
+  ownerStaffId String?
+  customerId   String?
+  monthKey     String?
+  overrideType String?
+  createdAt    DateTime @default(now())
+  merchant     Merchant @relation(fields: [merchantId], references: [id])
+}
+
+model MerchantGoogleConnection {
+  id                String    @id @default(cuid())
+  merchantId        String    @unique
+  placeId           String?
+  placeName         String?
+  address           String?
+  googleReviewUrl   String?
+  connectionType    String?   @default("oauth") // "oauth" or "manual_url"
+  oauthAccessToken  String?
+  oauthRefreshToken String?
+  oauthTokenExpiry  DateTime?
+  gbpAccountId      String?
+  gbpLocationId     String?
+  verified          Boolean   @default(false)
+  syncStatus        String?
+  lastSyncedAt      DateTime?
+  createdAt         DateTime  @default(now())
+  merchant          Merchant  @relation(fields: [merchantId], references: [id])
+}
+
+model OTPSession {
+  id             String   @id @default(cuid())
+  phone          String
+  otp            String
+  messageId      String?
+  verified       Boolean  @default(false)
+  deliveryStatus String?
+  attempts       Int      @default(0)
+  maxAttempts    Int      @default(3)
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+}
+
+model DeadLetterQueue {
+  id            String   @id @default(cuid())
+  merchantId    String?
+  originalTable String?
+  originalId    String?
+  payload       String
+  error         String?
+  errorReason   String?
+  retryCount    Int      @default(0)
+  willExpireAt  DateTime?
+  createdAt     DateTime @default(now())
+}
+
+model GoogleBusinessReview {
+  id              String    @id @default(cuid())
+  merchantId      String
+  gbpReviewId     String    // Unique ID from Google API
+  reviewerName    String
+  rating          Int
+  comment         String?
+  reviewReply     String?   // The reply we posted (or already existed)
+  isReplied       Boolean   @default(false)
+  repliedAt       DateTime?
+  status          String    @default("pending") // pending, replied, skipped
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  merchant        Merchant  @relation(fields: [merchantId], references: [id])
+  @@unique([merchantId, gbpReviewId])
+}
+
+model BackgroundJob {
+  id           String    @id @default(cuid())
+  merchantId   String
+  type         String    // e.g. "BULK_REVIEW_REPLY"
+  status       String    @default("pending") // pending, running, completed, failed
+  totalItems   Int       @default(0)
+  processed    Int       @default(0)
+  error        String?
+  startedAt    DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  merchant     Merchant  @relation(fields: [merchantId], references: [id])
+}
+
+model SystemContent {
+  id        String   @id @default(cuid())
+  section   String
+  key       String   @unique
+  value     String
+  category  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

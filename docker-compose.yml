@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: customerpilot-evolution-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-customerpilot}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: customerpilot-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@customerpilot.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+  redis:
+    image: redis:7-alpine
+    container_name: customerpilot-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+
+  redisinsight:
+    image: redislabs/redisinsight:latest
+    container_name: customerpilot-redisinsight
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    volumes:
+      - redisinsight-data:/db
+
+  evolution-api:
+    build:
+      context: ./evolution-api-repo
+      dockerfile: Dockerfile
+    image: customerpilot-evolution:v2.2.0
+    container_name: customerpilot-evolution
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_URL=http://localhost:8080
+      - DOCKER_ENV=true
+      - LOG_LEVEL=ERROR
+      - AUTH_TYPE=apikey
+      - AUTH_API_KEY=${EVOLUTION_API_KEY:-GlobalEvolutionKey123}
+      - REDIS_URI=redis://redis:6379/1
+      - REDIS_PREFIX_KEY=evolution
+      - REDIS_GLOBAL_PREFIX_KEY=evolution
+      - DATABASE_ENABLED=true
+      - DATABASE_CONNECTION_URI=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-customerpilot}?schema=evolution
+      - DATABASE_CONNECTION_CLIENT_NAME=evolution
+    volumes:
+      - evolution-instances:/evolution/instances
+      - evolution-store:/evolution/store
+
+volumes:
+  postgres-data:
+  pgadmin-data:
+  redis-data:
+  redisinsight-data:
+  evolution-instances:
+  evolution-store:

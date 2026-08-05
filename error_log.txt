@@ -1,0 +1,19 @@
+[2026-07-23 09:26:19] SCRIPT_FAILURE: bun install execution failed.
+[2026-07-23 10:04:16] ERROR: bun run db:push failed
+[2026-07-23 10:04:16] SCRIPT_FAILURE: bun run db:push execution failed.
+[2026-07-23 10:22:52] ERROR: bun run db:push failed due to file permissions or lock.
+[2026-07-23 10:22:52] SCRIPT_FAILURE: bun run db:push execution failed.
+[2026-07-23 10:58:50] ERROR: bun run prisma generate failed
+[2026-07-23 10:58:50] SCRIPT_FAILURE: bun run prisma generate failed with code 1
+[2026-07-23 13:08:05] SCRIPT_FAILURE: This command cannot be run due to the error: %1 is not a valid Win32 application.
+[2026-07-23 16:22:17] SCRIPT_FAILURE: This command cannot be run due to the error: %1 is not a valid Win32 application.
+[2026-07-23 16:36:03] ERROR: Merchant Signup API Call Failed: Unable to connect to the remote server
+[2026-07-23 16:38:41] ERROR: Signup API call failed after max retries.
+[2026-07-25 21:26:08] SSH_DROPPED: Connection closed by remote host 200.97.170.53. Resetting local host keys and awaiting hPanel reboot.
+[2026-07-25 23:24:48] INSTANCE_CREATION: Initiated 'CustomerPilot_Main' WhatsApp instance creation in Evolution Manager.
+[2026-07-25 23:33:39] HOSTINGER_AI: Confirmed safe firewall port unblock (80, 443, 3000, 8080) with Hostinger Chat AI for VPS 1828023.
+[2026-07-26 16:22:11] LOCAL_TEST_ENV_SETUP: Configured .env.local for local laptop testing targeting VPS Evolution API at http://200.97.170.53:8080.
+[2026-07-26 16:51:10] PRISMA_FIX: Reset DATABASE_URL to 'file:./dev.db' to match provider sqlite in schema.prisma and ran prisma db push.
+[2026-07-26 16:56:00] PRISMA_EPERM_FIX: Force killed Node processes to release locked dll.node file and successfully ran prisma generate & db push.
+[2026-07-26 17:16:23] LOGIC_PATCH_V3: Successfully replaced 'cleanPhone' variable in 2 files using System.IO classes.
+[2026-07-26 17:25:07] SYNTAX_FIX: Corrected botched variable declaration 'const phone.replace' back to 'const cleanPhone' and fixed regex logic.

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>customerPilot.in — Turn Every Walk-in Into a Lifetime Customer</title>
+<meta name="description" content="customerPilot brings customers back with loyalty rewards, collects Google reviews, and replies to every review — one simple software for local businesses." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --em:#10b981;--em-d:#059669;--sky:#0ea5e9;--ind:#6366f1;--ind-d:#4f46e5;
+    --slate:#0f172a;--slate6:#475569;--slate5:#64748b;--slate4:#94a3b8;--slate3:#cbd5e1;
+    --bg:#fff;--line:#e2e8f0;--amber:#f59e0b;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:var(--slate);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.5}
+  img{max-width:100%}
+  a{text-decoration:none;color:inherit}
+  .wrap{max-width:1150px;margin:0 auto;padding:0 20px}
+  .grad-txt{background:linear-gradient(90deg,var(--em),var(--sky),var(--ind));-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:gs 6s ease infinite}
+  @keyframes gs{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+
+  /* ---------- Buttons ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;font-weight:700;font-size:15px;padding:14px 24px;cursor:pointer;border:none;transition:.2s;text-align:center}
+  .btn-grad{background:linear-gradient(90deg,var(--em),var(--ind));color:#fff;box-shadow:0 10px 25px -8px rgba(16,185,129,.5)}
+  .btn-grad:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .btn-white{background:#fff;color:var(--slate);box-shadow:0 10px 25px -8px rgba(0,0,0,.25)}
+  .btn-white:hover{transform:translateY(-1px)}
+  .btn-ghost{background:rgba(255,255,255,.7);color:var(--slate6);border:1px solid var(--line);backdrop-filter:blur(8px)}
+  .btn-ghost:hover{background:#fff}
+  .btn-dark{background:var(--slate);color:#fff}
+  .btn-dark:hover{background:#1e293b}
+  .btn-lg{padding:16px 30px;font-size:16px}
+  .arrow{transition:transform .2s}
+  .btn:hover .arrow{transform:translateX(3px)}
+
+  /* ---------- Navbar ---------- */
+  nav.top{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:center;padding:12px 16px}
+  .navbox{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:820px;background:rgba(255,255,255,.7);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:18px;padding:10px 14px;box-shadow:0 8px 24px -12px rgba(15,23,42,.15)}
+  .logo{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:800}
+  .logo svg{width:30px;height:30px}
+  .logo .p2{background:linear-gradient(90deg,var(--em),var(--ind));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .navlinks{display:flex;gap:2px}
+  .navlinks a{padding:7px 12px;border-radius:8px;font-size:14px;font-weight:500;color:var(--slate5);transition:.15s}
+  .navlinks a:hover{background:#f1f5f9;color:var(--slate)}
+  .nav-cta{display:flex;gap:8px;align-items:center}
+
+  /* ---------- Hero ---------- */
+  .hero{position:relative;overflow:hidden;padding:130px 0 80px}
+  .aurora{position:absolute;inset:0;z-index:-1;overflow:hidden}
+  .aurora b{position:absolute;display:block;border-radius:50%;filter:blur(70px)}
+  .aurora b:nth-child(1){width:600px;height:600px;left:50%;top:-100px;transform:translateX(-50%);background:rgba(16,185,129,.22);animation:fl 14s ease-in-out infinite}
+  .aurora b:nth-child(2){width:360px;height:360px;right:-40px;top:200px;background:rgba(99,102,241,.2);animation:fl 16s ease-in-out infinite 3s}
+  .aurora b:nth-child(3){width:340px;height:340px;left:-60px;top:280px;background:rgba(14,165,233,.18);animation:fl 18s ease-in-out infinite 6s}
+  @keyframes fl{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-25px) scale(1.08)}}
+  .dots{position:absolute;inset:0;z-index:-1;opacity:.5;background-image:radial-gradient(circle,rgba(99,102,241,.12) 1px,transparent 1px);background-size:28px 28px;mask-image:linear-gradient(180deg,#000 60%,transparent)}
+  .hero-grid{display:grid;grid-template-columns:1fr;gap:50px;align-items:center}
+  @media(min-width:900px){.hero-grid{grid-template-columns:1.1fr .9fr}}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;color:var(--slate6);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  .dot-live{position:relative;width:8px;height:8px}
+  .dot-live i{position:absolute;inset:0;border-radius:50%;background:var(--em)}
+  .dot-live i:first-child{animation:ping 1.6s cubic-bezier(0,0,.2,1) infinite;opacity:.7}
+  @keyframes ping{75%,100%{transform:scale(2.2);opacity:0}}
+  h1.hero-h{font-size:42px;font-weight:800;line-height:1.06;letter-spacing:-.02em;margin-top:24px}
+  @media(min-width:640px){h1.hero-h{font-size:60px}}
+  @media(min-width:900px){h1.hero-h{font-size:68px}}
+  .hero p.lead{font-size:18px;color:var(--slate5);max-width:540px;margin-top:24px}
+  @media(min-width:900px){.hero .lead{margin-left:0;margin-right:0}.hero-center{text-align:left}.hero-center .btn-row{justify-content:flex-start}}
+  .hero-center{text-align:center}
+  .btn-row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:32px}
+  .trust{display:flex;flex-wrap:wrap;justify-content:center;gap:18px;margin-top:30px;font-size:14px;color:var(--slate5)}
+  @media(min-width:900px){.trust{justify-content:flex-start}}
+  .trust span{display:inline-flex;align-items:center;gap:6px}
+  .ck{color:var(--em)}
+
+  /* ---------- Phone mockup ---------- */
+  .phone-wrap{position:relative;display:flex;justify-content:center}
+  .float-card{position:absolute;z-index:20;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-radius:16px;padding:10px 14px;box-shadow:0 12px 30px -10px rgba(15,23,42,.2);display:flex;align-items:center;gap:8px;animation:bob 5s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .float-card .ic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px}
+  .float-card .ic.em{background:linear-gradient(135deg,#34d399,#10b981)}
+  .float-card .ic.ind{background:linear-gradient(135deg,#818cf8,#6366f1)}
+  .float-card small{display:block;font-size:12px;font-weight:800;color:var(--slate)}
+  .float-card .s{font-size:10px;color:var(--slate4)}
+  .fl1{top:40px;left:-10px}
+  .fl2{bottom:80px;right:-10px;animation-delay:1.5s}
+  .phone{width:280px;border-radius:40px;background:#1e293b;padding:10px;box-shadow:0 30px 60px -20px rgba(99,102,241,.4)}
+  @media(min-width:640px){.phone{width:300px}.fl1{left:-30px}.fl2{right:-30px}}
+  .screen{border-radius:28px;overflow:hidden;background:#0b141a}
+  .wa-head{display:flex;align-items:center;gap:10px;background:#202c33;padding:12px 14px}
+  .wa-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#34d399,#6366f1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  .wa-head .nm{color:#fff;font-size:14px;font-weight:600}
+  .wa-head .st{color:#34d399;font-size:10px}
+  .wa-chat{padding:12px;min-height:260px;display:flex;flex-direction:column;gap:8px}
+  .bub{max-width:80%;border-radius:10px;padding:8px 11px;font-size:12px;line-height:1.4;box-shadow:0 1px 2px rgba(0,0,0,.1);opacity:0;animation:pop .4s ease forwards}
+  @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+  .bub.in{background:#202c33;color:#e2e8f0;align-self:flex-start;border-bottom-left-radius:2px}
+  .bub.out{background:#005c4b;color:#e2e8f0;align-self:flex-end;border-bottom-right-radius:2px}
+  .bub .t{display:flex;justify-content:flex-end;gap:3px;margin-top:3px;font-size:9px;color:#94a3b8}
+  .wa-in{display:flex;gap:8px;align-items:center;background:#202c33;padding:8px 10px}
+  .wa-in .field{flex:1;background:#2a3942;border-radius:999px;padding:6px 12px;font-size:12px;color:#64748b}
+  .wa-in .send{width:28px;height:28px;border-radius:50%;background:#00a884;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+
+  /* ---------- Logo marquee ---------- */
+  .strip{border-top:1px solid #f1f5f9;border-bottom:1px solid #f1f5f9;background:rgba(248,250,252,.5);padding:36px 0;overflow:hidden}
+  .strip p{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--slate4);text-align:center;margin-bottom:24px}
+  .marquee{display:flex;gap:48px;width:max-content;animation:mq 28s linear infinite}
+  .marquee:hover{animation-play-state:paused}
+  @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .marquee .lg{display:flex;align-items:center;gap:8px;color:var(--slate4);font-size:16px;font-weight:700;white-space:nowrap}
+  .star{color:#f59e0b}
+
+  /* ---------- Features (3 cards) ---------- */
+  .feat{padding:90px 0}
+  .sec-head{text-align:center;max-width:640px;margin:0 auto}
+  .eyebrow{display:inline-block;background:#ecfdf5;color:var(--em-d);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:5px 12px;border-radius:999px;border:1px solid #d1fae5}
+  h2.sec-h{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:16px}
+  @media(min-width:640px){h2.sec-h{font-size:46px}}
+  .sec-sub{font-size:18px;color:var(--slate5);margin-top:16px}
+  .feat-grid{display:grid;grid-template-columns:1fr;gap:24px;margin-top:56px}
+  @media(min-width:760px){.feat-grid{grid-template-columns:repeat(3,1fr)}}
+  .fcard{background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px;transition:.25s;display:flex;flex-direction:column}
+  .fcard:hover{transform:translateY(-4px);box-shadow:0 20px 40px -16px rgba(15,23,42,.12);border-color:#cbd5e1}
+  .fcard .ico{width:56px;height:56px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;box-shadow:0 8px 16px -6px rgba(0,0,0,.2)}
+  .ico.amber{background:linear-gradient(135deg,#fbbf24,#f59e0b)}
+  .ico.em{background:linear-gradient(135deg,#34d399,#10b981)}
+  .ico.ind{background:linear-gradient(135deg,#60a5fa,#6366f1)}
+  .fcard h3{font-size:21px;font-weight:800;margin-top:20px}
+  .fcard p{color:var(--slate5);margin-top:14px;font-size:15px}
+  .fcard ul{list-style:none;margin-top:16px}
+  .fcard li{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--slate6);margin-bottom:8px}
+  .fcard li .c{color:var(--em);font-weight:700}
+  .stamp-row{display:flex;gap:8px;margin-top:18px}
+  .stamp-row .s{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;background:linear-gradient(135deg,#fbbf24,#f59e0b)}
+  .stars{display:flex;gap:3px;margin-top:16px;align-items:center}
+  .stars small{margin-left:8px;background:#ecfdf5;color:var(--em-d);padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
+  .reply-prev{margin-top:16px;background:#f8fafc;border-radius:12px;padding:10px 12px;font-size:13px;color:var(--slate6)}
+
+  /* ---------- How it works ---------- */
+  .how{background:var(--slate);padding:90px 0;color:#fff}
+  .how .eyebrow{background:rgba(255,255,255,.06);color:#34d399;border-color:rgba(255,255,255,.1)}
+  .steps{display:grid;grid-template-columns:1fr;gap:32px;margin-top:60px}
+  @media(min-width:760px){.steps{grid-template-columns:repeat(3,1fr)}}
+  .step{text-align:center}
+  .step .num{width:56px;height:56px;border-radius:18px;margin:0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;box-shadow:0 8px 20px -4px rgba(0,0,0,.3)}
+  .step .tag{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;margin-top:20px}
+  .step h3{font-size:18px;font-weight:700;margin-top:6px}
+  .step p{font-size:14px;color:#94a3b8;margin-top:8px}
+
+  /* ---------- Stats ---------- */
+  .stats{padding:80px 0}
+  .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:32px;text-align:center}
+  @media(min-width:760px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
+  .stat .v{font-size:38px;font-weight:800;background:linear-gradient(90deg,var(--em),var(--ind));-webkit-background-clip:text;background-clip:text;color:transparent}
+  @media(min-width:760px){.stat .v{font-size:46px}}
+  .stat .l{font-size:14px;color:var(--slate5);margin-top:8px}
+
+  /* ---------- Testimonials ---------- */
+  .testi{background:#f8fafc;padding:90px 0}
+  .testi .eyebrow{background:#fffbeb;color:#b45309;border-color:#fef3c7}
+  .tgrid{display:grid;grid-template-columns:1fr;gap:24px;margin-top:56px}
+  @media(min-width:760px){.tgrid{grid-template-columns:repeat(3,1fr)}}
+  .tcard{background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px;transition:.25s}
+  .tcard:hover{transform:translateY(-4px);box-shadow:0 20px 40px -16px rgba(15,23,42,.1)}
+  .ttop{display:flex;justify-content:space-between;align-items:center}
+  .qmark{font-size:30px;color:#a7f3d0}
+  .metric{background:#ecfdf5;color:var(--em-d);padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700}
+  .tstars{margin-top:10px}
+  .tcard blockquote{font-size:15px;color:#475569;margin-top:14px;line-height:1.6}
+  .tauthor{display:flex;align-items:center;gap:12px;border-top:1px solid #f1f5f9;margin-top:22px;padding-top:18px}
+  .tauthor .a{width:40px;height:40px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
+  .tauthor .n{font-size:14px;font-weight:700}
+  .tauthor .r{font-size:12px;color:var(--slate4)}
+
+  /* ---------- Pricing ---------- */
+  .price{padding:90px 0}
+  .price .eyebrow{background:#f1f5f9;color:var(--slate6)}
+  .pgrid{display:grid;grid-template-columns:1fr;gap:24px;margin-top:56px;align-items:stretch}
+  @media(min-width:760px){.pgrid{grid-template-columns:repeat(3,1fr)}}
+  .pcard{background:#fff;border:1px solid var(--line);border-radius:24px;padding:32px;display:flex;flex-direction:column;position:relative}
+  .pcard.hl{background:var(--slate);color:#fff;border:none;box-shadow:0 30px 60px -20px rgba(15,23,42,.4)}
+  .pcard.hl .tag{color:#94a3b8}
+  .pbadge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,var(--em),var(--ind));color:#fff;padding:5px 16px;border-radius:999px;font-size:12px;font-weight:700;box-shadow:0 8px 16px -4px rgba(99,102,241,.4)}
+  .pcard h3{font-size:19px;font-weight:800}
+  .pcard .tag{font-size:14px;color:var(--slate5);margin-top:4px}
+  .pp{display:flex;align-items:baseline;gap:4px;margin-top:22px}
+  .pp .amt{font-size:40px;font-weight:800}
+  .pp .per{color:var(--slate4)}
+  .pcard .btn{width:100%;margin-top:22px}
+  .pfeat{list-style:none;margin-top:26px}
+  .pfeat li{display:flex;gap:10px;font-size:14px;margin-bottom:12px}
+  .pcard:not(.hl) .pfeat li{color:var(--slate6)}
+  .pcard.hl .pfeat li{color:#cbd5e1}
+  .pfeat .c{color:var(--em);flex-shrink:0;font-weight:700}
+
+  /* ---------- CTA ---------- */
+  .cta-sec{padding:0 20px 90px}
+  .cta{position:relative;overflow:hidden;background:var(--slate);border-radius:40px;padding:60px 30px;text-align:center;color:#fff}
+  @media(min-width:640px){.cta{padding:80px 40px}}
+  .cta .aurora2{position:absolute;inset:0;z-index:0}
+  .cta .aurora2 b{position:absolute;border-radius:50%;filter:blur(70px)}
+  .cta .aurora2 b:nth-child(1){width:300px;height:300px;left:15%;top:-80px;background:rgba(16,185,129,.35);animation:fl 16s infinite}
+  .cta .aurora2 b:nth-child(2){width:300px;height:300px;right:15%;bottom:-80px;background:rgba(99,102,241,.35);animation:fl 16s infinite 5s}
+  .cta .ct{position:relative;z-index:1}
+  .cta h2{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  @media(min-width:640px){.cta h2{font-size:46px}}
+  .cta p{color:#94a3b8;font-size:18px;margin:16px auto 0;max-width:420px}
+  .cta .btn-row{margin-top:32px}
+
+  /* ---------- Footer ---------- */
+  footer{border-top:1px solid var(--line);background:#f8fafc;padding:56px 0 30px}
+  .fgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:32px}
+  @media(min-width:760px){.fgrid{grid-template-columns:2fr 1fr 1fr 1fr}}
+  .fbrand p{color:var(--slate5);font-size:14px;margin-top:16px;max-width:300px}
+  .frate{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 12px;margin-top:16px;font-size:14px;font-weight:600;color:var(--slate6)}
+  footer h4{font-size:14px;font-weight:800}
+  footer ul{list-style:none;margin-top:12px}
+  footer ul li{margin-bottom:8px}
+  footer ul a{font-size:14px;color:var(--slate5)}
+  footer ul a:hover{color:var(--em-d)}
+  .fbottom{border-top:1px solid var(--line);margin-top:40px;padding-top:24px;text-align:center;color:var(--slate4);font-size:14px}
+
+  .hide{display:none!important}
+  @media(max-width:760px){.float-card{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ============ NAVBAR ============ -->
+<nav class="top">
+  <div class="navbox">
+    <a href="#" class="logo">
+      <svg viewBox="0 0 40 40" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="40" y2="40"><stop stop-color="#10b981"/><stop offset=".5" stop-color="#0ea5e9"/><stop offset="1" stop-color="#6366f1"/></linearGradient></defs><rect width="40" height="40" rx="11" fill="url(#lg)"/><path d="M13 20.5l4.5 4.5 9.5-9.5" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      customer<span class="p2">Pilot</span>
+    </a>
+    <div class="navlinks">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#" class="btn btn-ghost" style="padding:9px 14px;font-size:14px">Sign in</a>
+      <a href="#" class="btn btn-dark" style="padding:9px 16px;font-size:14px">Start free →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="aurora"><b></b><b></b><b></b></div>
+  <div class="dots"></div>
+  <div class="wrap hero-center">
+    <div class="hero-grid">
+      <div>
+        <span class="badge"><span class="dot-live"><i></i><i></i></span> Trusted by 1,200+ local shops across India · 5-day free trial</span>
+        <h1 class="hero-h">Turn every walk-in<br><span class="grad-txt">into a lifetime customer.</span></h1>
+        <p class="lead">customerPilot brings your customers back with loyalty rewards, collects 5-star Google reviews, and replies to every review — all from one simple software. You run your shop. <strong style="color:var(--slate)">We bring them back.</strong></p>
+        <div class="btn-row">
+          <a href="#" class="btn btn-grad btn-lg">Start free — no card <span class="arrow">→</span></a>
+          <a href="#how" class="btn btn-ghost btn-lg">See how it works</a>
+        </div>
+        <div class="trust">
+          <span><span class="ck">✓</span> No credit card required</span>
+          <span><span class="ck">✓</span> Setup in 5 minutes</span>
+          <span><span class="ck">✓</span> One simple software</span>
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div class="phone-wrap">
+        <div class="float-card fl1"><div class="ic em">★</div><div><small>New 5★ review</small><div class="s">Priya S. · just now</div></div></div>
+        <div class="float-card fl2"><div class="ic ind">🤖</div><div><small>+2 bonus stamps</small><div class="s">review verified</div></div></div>
+        <div class="phone">
+          <div class="screen">
+            <div class="wa-head">
+              <div class="wa-av">CC</div>
+              <div style="flex:1"><div class="nm">Cake Connection</div><div class="st">online</div></div>
+            </div>
+            <div class="wa-chat" id="chat"></div>
+            <div class="wa-in"><div class="field">Type a message</div><div class="send">➤</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOGO STRIP ============ -->
+<div class="strip">
+  <p>Powering reputation for India's best local businesses</p>
+  <div class="marquee">
+    <span class="lg">★ Sunrise Dental</span><span class="lg">★ Urban Brew</span><span class="lg">★ Glow Salon</span><span class="lg">★ FitZone</span><span class="lg">★ Apex Auto</span><span class="lg">★ GreenLeaf</span>
+    <span class="lg">★ Sunrise Dental</span><span class="lg">★ Urban Brew</span><span class="lg">★ Glow Salon</span><span class="lg">★ FitZone</span><span class="lg">★ Apex Auto</span><span class="lg">★ GreenLeaf</span>
+  </div>
+</div>
+
+<!-- ============ FEATURES (3 cards) ============ -->
+<section class="feat" id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">One simple software</span>
+      <h2 class="sec-h">Three things your shop needs.<br><span style="color:#cbd5e1">That's it.</span></h2>
+      <p class="sec-sub">No complicated setup. No technical work. Just bring customers back, collect reviews, and never miss a reply.</p>
+    </div>
+    <div class="feat-grid">
+      <!-- Loyalty -->
+      <div class="fcard">
+        <div class="ico amber">🏆</div>
+        <h3>Loyalty Rewards</h3>
+        <p>Turn every walk-in into a repeat customer. Customers scan a QR, collect stamps, and come back for their free reward.</p>
+        <ul>
+          <li><span class="c">✓</span> QR scan to collect stamps</li>
+          <li><span class="c">✓</span> 5 stamps = free reward</li>
+          <li><span class="c">✓</span> Customers return again & again</li>
+        </ul>
+        <div class="stamp-row">
+          <span class="s">★</span><span class="s">★</span><span class="s">★</span><span class="s">★</span><span class="s">★</span>
+        </div>
+      </div>
+      <!-- Reviews -->
+      <div class="fcard">
+        <div class="ico em">⭐</div>
+        <h3>Google Reviews</h3>
+        <p>After a purchase, your customer gets a gentle WhatsApp reminder to share their experience and earn bonus stamps.</p>
+        <ul>
+          <li><span class="c">✓</span> Automatic review request</li>
+          <li><span class="c">✓</span> Photo upload encouraged</li>
+          <li><span class="c">✓</span> +2 bonus stamps for reviews</li>
+        </ul>
+        <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><small>+412 this month</small></div>
+      </div>
+      <!-- Replies -->
+      <div class="fcard">
+        <div class="ico ind">💬</div>
+        <h3>Google Review Replies</h3>
+        <p>Every review gets a thoughtful reply — written and posted for you. Your customers always feel heard.</p>
+        <ul>
+          <li><span class="c">✓</span> Replies generated for you</li>
+          <li><span class="c">✓</span> Always on-brand & polite</li>
+          <li><span class="c">✓</span> Posted back to Google</li>
+        </ul>
+        <div class="reply-prev"><strong style="color:var(--slate)">customerPilot:</strong> Thank you so much for your kind words! 💜 See you again soon.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">3 simple steps</span>
+      <h2 class="sec-h">It's this simple.</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="num" style="background:linear-gradient(135deg,#34d399,#10b981)">🛒</div>
+        <div class="tag">Step 1</div>
+        <h3>Customer purchases</h3>
+        <p>A customer buys from your shop. You ask them to scan the QR at the counter.</p>
+      </div>
+      <div class="step">
+        <div class="num" style="background:linear-gradient(135deg,#60a5fa,#0ea5e9)">📱</div>
+        <div class="tag">Step 2</div>
+        <h3>They scan the QR</h3>
+        <p>customerPilot sends a friendly WhatsApp message, collects the stamp, and a review later.</p>
+      </div>
+      <div class="step">
+        <div class="num" style="background:linear-gradient(135deg,#818cf8,#6366f1)">🔄</div>
+        <div class="tag">Step 3</div>
+        <h3>They come back</h3>
+        <p>Stamps, rewards, and reminders keep your customers returning — again and again.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="stats">
+  <div class="wrap">
+    <div class="stats-grid">
+      <div class="stat"><div class="v">4.8L+</div><div class="l">Reviews collected</div></div>
+      <div class="stat"><div class="v">1,200+</div><div class="l">Active merchants</div></div>
+      <div class="stat"><div class="v">34%</div><div class="l">Avg. conversion</div></div>
+      <div class="stat"><div class="v">98.6%</div><div class="l">Delivery rate</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS ============ -->
+<section class="testi">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">⭐ 4.9 from 1,200+ merchants</span>
+      <h2 class="sec-h">Results shops can feel.</h2>
+    </div>
+    <div class="tgrid">
+      <div class="tcard">
+        <div class="ttop"><span class="qmark">"</span><span class="metric">+925% reviews</span></div>
+        <div class="tstars"><span class="star">★★★★★</span></div>
+        <blockquote>40 → 410 Google reviews in 3 months. customerPilot keeps customers coming back with stamps & rewards. My shop is busier than ever.</blockquote>
+        <div class="tauthor"><div class="a" style="background:linear-gradient(135deg,#fb7185,#ec4899)">AM</div><div><div class="n">Dr. Anita Mehta</div><div class="r">Owner, Sunrise Dental</div></div></div>
+      </div>
+      <div class="tcard">
+        <div class="ttop"><span class="qmark">"</span><span class="metric">Weekly returns</span></div>
+        <div class="tstars"><span class="star">★★★★★</span></div>
+        <blockquote>Customers love scanning the QR. The loyalty stamps bring them back every week. It feels like one simple tool — not three.</blockquote>
+        <div class="tauthor"><div class="a" style="background:linear-gradient(135deg,#fbbf24,#f59e0b)">MR</div><div><div class="n">Marco Rossi</div><div class="r">Founder, Urban Brew Café</div></div></div>
+      </div>
+      <div class="tcard">
+        <div class="ttop"><span class="qmark">"</span><span class="metric">5-min setup</span></div>
+        <div class="tstars"><span class="star">★★★★★</span></div>
+        <blockquote>Every Google review gets a reply instantly. My customers feel heard, and I never miss one anymore. Setup took 5 minutes.</blockquote>
+        <div class="tauthor"><div class="a" style="background:linear-gradient(135deg,#c084fc,#8b5cf6)">SL</div><div><div class="n">Sara Lin</div><div class="r">Manager, Glow Salon</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="price" id="pricing">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Pricing</span>
+      <h2 class="sec-h">Simple plans that scale with you.</h2>
+      <p class="sec-sub">Start free. No credit card. Cancel anytime.</p>
+    </div>
+    <div class="pgrid">
+      <div class="pcard">
+        <h3>Starter</h3>
+        <div class="tag">Free forever.</div>
+        <div class="pp"><span class="amt">₹0</span><span class="per">/mo</span></div>
+        <a href="#" class="btn btn-dark">Start free →</a>
+        <ul class="pfeat">
+          <li><span class="c">✓</span> 50 review asks / month</li>
+          <li><span class="c">✓</span> 1 WhatsApp number</li>
+          <li><span class="c">✓</span> Basic analytics</li>
+          <li><span class="c">✓</span> QR review link</li>
+        </ul>
+      </div>
+      <div class="pcard hl">
+        <span class="pbadge">Most popular</span>
+        <h3>Growth</h3>
+        <div class="tag">For growing businesses.</div>
+        <div class="pp"><span class="amt">₹1,999</span><span class="per">/mo</span></div>
+        <a href="#" class="btn btn-grad">Start 14-day trial →</a>
+        <ul class="pfeat">
+          <li><span class="c">✓</span> 1,000 asks / month</li>
+          <li><span class="c">✓</span> AI reply assistant</li>
+          <li><span class="c">✓</span> Smart reminder drips</li>
+          <li><span class="c">✓</span> Advanced analytics</li>
+          <li><span class="c">✓</span> Priority delivery</li>
+        </ul>
+      </div>
+      <div class="pcard">
+        <h3>Scale</h3>
+        <div class="tag">Multi-location brands.</div>
+        <div class="pp"><span class="amt">₹4,999</span><span class="per">/mo</span></div>
+        <a href="#" class="btn btn-dark">Talk to sales →</a>
+        <ul class="pfeat">
+          <li><span class="c">✓</span> Unlimited asks</li>
+          <li><span class="c">✓</span> Multi-location dashboard</li>
+          <li><span class="c">✓</span> Custom AI brand voice</li>
+          <li><span class="c">✓</span> Team roles</li>
+          <li><span class="c">✓</span> Dedicated manager</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta-sec">
+  <div class="wrap">
+    <div class="cta">
+      <div class="aurora2"><b></b><b></b></div>
+      <div class="ct">
+        <h2>Your next 100 five-star reviews<br><span class="grad-txt">are one click away.</span></h2>
+        <p>Join 1,200+ merchants automating their reputation. First 50 asks are free.</p>
+        <div class="btn-row">
+          <a href="#" class="btn btn-white btn-lg">Start free — no card <span class="arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div class="fbrand">
+        <a href="#" class="logo">
+          <svg viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="11" fill="url(#lg)"/><path d="M13 20.5l4.5 4.5 9.5-9.5" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          customer<span class="p2">Pilot</span>
+        </a>
+        <p>Turn every walk-in into a lifetime customer — with loyalty rewards, Google reviews, and replies on autopilot.</p>
+        <div class="frate"><span class="star">★</span> 4.9 · 1,200+ merchants</div>
+      </div>
+      <div><h4>Product</h4><ul><li><a href="#features">Features</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#">Loyalty</a></li><li><a href="#">Reviews</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Careers</a></li><li><a href="#">Contact</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="#">Privacy</a></li><li><a href="#">Terms</a></li><li><a href="#">Security</a></li><li><a href="#">GDPR</a></li></ul></div>
+    </div>
+    <div class="fbottom">© 2026 customerPilot.in · Made with care in India 🇮🇳</div>
+  </div>
+</footer>
+
+<script>
+  // Animated WhatsApp chat bubbles
+  (function(){
+    var msgs=[
+      {d:'in',t:"Hi Hitesh! 🎂 Thanks for visiting today!"},
+      {d:'out',t:"It was great! 😊"},
+      {d:'in',t:"Collect your loyalty stamp 🏆<br><br>Scan complete — <b>1 stamp added!</b>"},
+      {d:'in',t:"⭐ Leave a Google review & earn +2 bonus stamps →"}
+    ];
+    var chat=document.getElementById('chat');
+    if(!chat)return;
+    var i=0;
+    function next(){
+      if(i>=msgs.length){
+        setTimeout(function(){chat.innerHTML='';i=0;next();},3500);
+        return;
+      }
+      var m=msgs[i];
+      var b=document.createElement('div');
+      b.className='bub '+m.d;b.innerHTML=m.t+'<div class="t">'+(i%2?'3:4'+i+' PM':'3:4'+i+' PM')+(m.d==='in'?' <span style="color:#53bdeb">✓✓</span>':'')+'</div>';
+      chat.appendChild(b);
+      i++;
+      setTimeout(next,1500);
+    }
+    next();
+  })();
+</script>
+</body>
+</html>
