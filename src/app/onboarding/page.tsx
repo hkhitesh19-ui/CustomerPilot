@@ -181,7 +181,7 @@ function OnboardingPageContent() {
               logoUploaded: !!m.logoUrl,
               logoDataUrl: m.logoUrl || prev.logoDataUrl,
               googleConnected: isGoogleConnected,
-              googleBusiness: gConn?.placeName || m.name || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara",
+              googleBusiness: gConn?.placeName || (m.name && !m.name.includes("'s Business") ? m.name : "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"),
               googlePlaceId: gConn?.placeId || "ChIJc7ija2zFXzkR8DbOxXEfaM4",
               googleAddress: gConn?.address || m.address || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011",
               googleReviewUrl: gConn?.googleReviewUrl || m.googleReviewLink || "https://g.page/r/CfA2zsVxH2jOEBM/review",
@@ -817,12 +817,12 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
               setData((prev: any) => ({
                 ...prev,
                 googleConnected: true,
-                googleBusiness: conn?.placeName || m?.name || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara",
+                googleBusiness: conn?.placeName || (m?.name && !m?.name.includes("'s Business") ? m.name : "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"),
                 googlePlaceId: conn?.placeId || "ChIJc7ija2zFXzkR8DbOxXEfaM4",
                 googleCid: conn?.gbpAccountId?.replace("accounts/", "") || "14873172342901454576",
                 googleMapsUri: `https://maps.google.com/?cid=14873172342901454576`,
                 googleReviewUrl: conn?.googleReviewUrl || m?.googleReviewLink || "https://g.page/r/CfA2zsVxH2jOEBM/review",
-                googleAddress: conn?.address || m?.address || prev.businessAddress || prev.address || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011"
+                googleAddress: conn?.address || m?.address || prev.businessAddress || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011"
               }))
             }
           })
@@ -987,7 +987,11 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
     }
   }
 
-  const placeName = data.googleBusiness || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"
+  let rawPlaceName = data.googleBusiness || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"
+  if (rawPlaceName.includes("'s Business")) {
+    rawPlaceName = "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"
+  }
+  const placeName = rawPlaceName.split(/[:;|]/)[0].trim()
   const storeAddress = data.googleAddress || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011"
   const placeId = data.googlePlaceId || "ChIJc7ija2zFXzkR8DbOxXEfaM4"
   const mapsCid = data.googleCid || "14873172342901454576"

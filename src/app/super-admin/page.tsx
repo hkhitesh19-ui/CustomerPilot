@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import {
   Layout, Palette, FileText, Users, CreditCard, Flag, Bell,
   Image as ImageIcon, Brain, BarChart3, Heart, Database, Download,
-  Settings, Globe, Shield, Code, Zap, Crown, Store, Check, X, Search
+  Settings, Globe, Shield, Code, Zap, Crown, Store, Check, X, Search, MessageSquare, RefreshCw, RotateCcw
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -33,6 +33,7 @@ export default function SuperAdminPage() {
     { id: "features", label: "Feature Flags", icon: Flag },
     { id: "ai", label: "AI Content Studio", icon: Brain },
     { id: "notifications", label: "Notifications", icon: Bell },
+    { id: "templates", label: "WhatsApp Templates", icon: MessageSquare },
     { id: "media", label: "Media Library", icon: ImageIcon },
     { id: "analytics", label: "Global Analytics", icon: Globe },
     { id: "permissions", label: "Permissions", icon: Shield },
@@ -100,6 +101,7 @@ export default function SuperAdminPage() {
           {activeSection === "features" && <FeatureFlags />}
           {activeSection === "ai" && <AIContentStudio />}
           {activeSection === "notifications" && <NotificationCenter />}
+          {activeSection === "templates" && <AdminTemplateManagement />}
           {activeSection === "media" && <MediaLibrary />}
           {activeSection === "analytics" && <GlobalAnalytics />}
           {activeSection === "permissions" && <PermissionBuilder />}
@@ -601,6 +603,7 @@ function MerchantManagement() {
                 <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Merchant</th>
                 <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Owner & WhatsApp</th>
                 <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Plan</th>
+                <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Review Delay</th>
                 <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Status</th>
                 <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">Customers</th>
                 <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">Bills</th>
@@ -620,6 +623,7 @@ function MerchantManagement() {
                     <div className="text-xs text-stone-400">{m.whatsappPhone}</div>
                   </td>
                   <td className="p-4 text-sm font-semibold text-stone-700">{m.plan}</td>
+                  <td className="p-4 text-sm text-stone-600 font-mono">{m.googleReviewDelayMinutes ?? 30} mins</td>
                   <td className="p-4">
                     <Badge variant="outline" className={
                       m.status === "Active" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
@@ -1016,3 +1020,140 @@ function DocumentationPanel() {
     </div>
   )
 }
+
+// ============================================================
+// Super Admin WhatsApp Template Management Control Center
+// ============================================================
+function AdminTemplateManagement() {
+  const [data, setData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  const loadAdminTemplates = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch("/api/admin/templates")
+      const result = await res.json()
+      if (result.success) {
+        setData(result)
+      }
+    } catch (e) {
+      console.error("Error loading admin templates:", e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadAdminTemplates()
+  }, [])
+
+  const handleResetMerchant = async (merchantId: string, templateKey: string) => {
+    try {
+      const res = await fetch("/api/admin/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ merchantId, templateKey }),
+      })
+      if (res.ok) {
+        loadAdminTemplates()
+      }
+    } catch (e) {
+      console.error("Failed to reset merchant override:", e)
+    }
+  }
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center text-stone-500">
+          <div className="animate-spin w-6 h-6 border-2 border-stone-800 border-t-transparent rounded-full mx-auto mb-2" />
+          Loading system default templates & merchant overrides...
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="bg-white border-stone-200">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-stone-500">System Default Templates</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-stone-900">{data?.systemDefaults?.length || 0} Journey Templates</div>
+            <p className="text-xs text-stone-500 mt-1">Immutable baseline defaults for all merchants</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border-stone-200">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-stone-500">Merchant Custom Overrides</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-emerald-600">{data?.overridesCount || 0} Overrides</div>
+            <p className="text-xs text-stone-500 mt-1">Active merchant personalized journey templates</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="bg-white border-stone-200">
+        <CardHeader>
+          <CardTitle className="text-lg font-bold text-stone-900 flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-emerald-600" />
+            Active Merchant Custom Overrides
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!data?.merchantOverrides || data.merchantOverrides.length === 0 ? (
+            <div className="text-center p-6 text-stone-400 text-sm">
+              No merchant custom overrides saved yet. All merchants are using System Default journey templates.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-stone-50 border-b border-stone-200 text-left text-xs text-stone-500 uppercase font-medium">
+                  <tr>
+                    <th className="p-3">Merchant</th>
+                    <th className="p-3">Template Key</th>
+                    <th className="p-3">Version</th>
+                    <th className="p-3">Custom Wording Preview</th>
+                    <th className="p-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100 text-xs text-stone-700">
+                  {data.merchantOverrides.map((ov: any) => (
+                    <tr key={ov.id} className="hover:bg-stone-50">
+                      <td className="p-3 font-semibold text-stone-900">
+                        {ov.merchant?.name || ov.merchantId}
+                        <div className="text-[10px] text-stone-400 font-normal">{ov.merchant?.ownerName}</div>
+                      </td>
+                      <td className="p-3 font-mono text-emerald-700">{ov.templateKey}</td>
+                      <td className="p-3">
+                        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+                          v{ov.version}
+                        </Badge>
+                      </td>
+                      <td className="p-3 font-mono text-stone-600 max-w-md truncate">{ov.messageBody}</td>
+                      <td className="p-3 text-right">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleResetMerchant(ov.merchantId, ov.templateKey)}
+                          className="h-7 text-xs text-rose-600 border-rose-200 hover:bg-rose-50"
+                        >
+                          <RotateCcw className="w-3 h-3 mr-1" /> Force Reset
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+

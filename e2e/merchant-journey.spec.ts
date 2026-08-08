@@ -35,7 +35,7 @@ test.describe('Merchant Journey', () => {
     // If middleware redirects to login:
     const url = page.url();
     if (url.includes('/login')) {
-      await expect(page.locator('text=Login')).toBeVisible();
+      await expect(page.getByRole('button', { name: /login/i })).toBeVisible();
     } else {
       // If it allows access, check for queue UI
       await expect(page.locator('text=Live Queue')).toBeVisible();

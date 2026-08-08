@@ -1,4 +1,3 @@
-// @ts-nocheck
 // POST /api/bills — create a confirmed bill (POS action).
 // Body: { staffId, customerId, amount, notes? }
 // Awards stamps based on active card rule, marks card as completed if threshold reached,
@@ -8,6 +7,8 @@ import { db } from "@/lib/db"
 import { ok, err, requireMerchant } from "@/lib/api"
 import { awardStampsForBill, stampsForAmount } from "@/lib/stamp-engine"
 import { can, deniedMessage, type Role } from "@/lib/rbac"
+import { CreateBillSchema, zodErrors } from "@/lib/schemas"
+import { scheduleGoogleReviewRequest } from "@/lib/review-scheduler"
 
 export async function POST(req: NextRequest) {
   const merchantId = typeof req.headers.get('x-merchant-id') === 'string' 
@@ -17,16 +18,11 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null)
   if (!body) return err("Invalid JSON body")
 
-  const { staffId, customerId, amount, notes } = body as {
-    staffId?: string
-    customerId?: string
-    amount?: number
-    notes?: string
-  }
-  if (!staffId || !customerId || typeof amount !== "number") {
-    return err("staffId, customerId, amount are required")
-  }
-  if (amount <= 0) return err("Amount must be > 0")
+  const parse = CreateBillSchema.safeParse(body)
+  if (!parse.success) return err(zodErrors(parse.error).join('; '), 400)
+  const { staffId, customerId, amount, notes } = parse.data
+
+  try {
 
   const staff = await db.staff.findUnique({ where: { id: staffId } })
   if (!staff || staff.merchantId !== merchant.id) return err("Staff not found", 404)
@@ -62,16 +58,17 @@ export async function POST(req: NextRequest) {
     where: { merchantId: merchant.id, active: true },
     orderBy: { createdAt: "asc" },
   })
-  const stamps = template ? stampsForAmount(template.stampsPerBill, amount) : 0
+  const stamps = template ? stampsForAmount(template.stampsPerBill ?? "1", amount) : 0
 
-  // Create bill
+  // Create bill — round amount to 2dp to prevent float drift (SQLite has no Decimal type)
+  const safeAmount = Math.round(amount * 100) / 100
   const bill = await db.bill.create({
     data: {
       merchantId: merchant.id,
       customerId: customer.id,
       issuedById: staff.id,
       number,
-      amount,
+      amount: safeAmount,
       stampsAwarded: stamps,
       status: "confirmed",
       notes: notes ?? null,
@@ -119,6 +116,12 @@ export async function POST(req: NextRequest) {
           },
         })
       }
+
+      // Schedule Google Review WhatsApp request based on merchant delay configuration
+      await scheduleGoogleReviewRequest({
+        merchantId: merchant.id,
+        customerId: customer.id,
+      }).catch((e) => console.error("[Bills POST Review Scheduler Error]", e))
     }
   }
 
@@ -136,7 +139,11 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  return ok({ bill, awardResult })
+    return ok({ bill, awardResult })
+  } catch (error: unknown) {
+    console.error('[Bills POST Error]', error)
+    return err('Failed to create bill', 500)
+  }
 }
 
 

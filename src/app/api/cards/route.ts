@@ -1,7 +1,7 @@
 // POST /api/cards — create or edit a stamp card template (manager+).
 import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
-import { ok, err, requireMerchant } from "@/lib/api"
+import { ok, created, err, requireMerchant } from "@/lib/api"
 import { can, deniedMessage, type Role } from "@/lib/rbac"
 
 export async function POST(req: NextRequest) {
@@ -65,5 +65,5 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  return ok({ card })
+  return created({ card })
 }

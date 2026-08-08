@@ -1,16 +1,18 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { SignJWT } from 'jose';
-import { createHash } from 'crypto';
+import bcrypt from 'bcryptjs';
+import { applyAuthRateLimit } from '@/lib/rate-limiter';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-do-not-use-in-prod';
-
-// Simple SHA-256 hash (no bcrypt dep needed for SQLite dev)
-function hashPassword(password: string): string {
-  return createHash('sha256').update(password + 'cpilot_salt_2026').digest('hex');
+if (!process.env.JWT_SECRET) {
+  throw new Error('FATAL: JWT_SECRET environment variable is not set');
 }
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(req: Request) {
+  // Rate limit: max 10 registration attempts per IP per minute
+  const limited = await applyAuthRateLimit(req as any);
+  if (limited) return limited;
   try {
     const { 
       businessName, ownerName, email, password, 
@@ -24,8 +26,8 @@ export async function POST(req: Request) {
     if (!email || !email.trim()) {
       return NextResponse.json({ error: 'Email ID is required' }, { status: 400 });
     }
-    if (!password || password.length < 6) {
-      return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
+    if (!password || password.length < 8) {
+      return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 });
     }
 
     const cleanEmail = email.trim().toLowerCase();
@@ -51,7 +53,7 @@ export async function POST(req: Request) {
       }
     }
 
-    const hashedPassword = hashPassword(password);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create User with password
     const user = await db.user.create({

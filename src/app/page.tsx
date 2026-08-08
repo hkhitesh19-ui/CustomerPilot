@@ -601,19 +601,45 @@ export default function Home() {
       {/* ============ FOOTER ============ */}
       <footer>
         <div className="wrap">
-          <div className="fgrid">
-            <div className="fbrand">
+          <div className="fgrid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
+            <div className="fbrand" style={{ gridColumn: 'span 2' }}>
               <Link href="/" className="no-underline block mb-3">
                 <BrandLogo size="lg" showTagline={true} />
               </Link>
               <p>Turn every walk-in into a lifetime customer — with loyalty rewards, Google reviews, and replies on autopilot.</p>
               <div className="frate"><span style={{ color: '#f59e0b' }}>★</span> 4.9 · 1,200+ merchants</div>
             </div>
-            <div><h4>Product</h4><ul><li><a href="#features">Features</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#">Loyalty</a></li><li><a href="#">Reviews</a></li></ul></div>
-            <div><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Careers</a></li><li><a href="#">Contact</a></li></ul></div>
-            <div><h4>Legal</h4><ul><li><a href="#">Privacy</a></li><li><a href="#">Terms</a></li><li><a href="#">Security</a></li><li><a href="#">GDPR</a></li></ul></div>
+            <div>
+              <h4>Product</h4>
+              <ul>
+                <li><Link href="/pricing">Pricing & Plans</Link></li>
+                <li><Link href="/features/whatsapp-stamp-card">WhatsApp Stamp Cards</Link></li>
+                <li><Link href="/features/google-review-automation">Google Review AI</Link></li>
+                <li><Link href="/compare/vs-traditional-pos">vs Traditional POS</Link></li>
+                <li><Link href="/marketing">Platform Overview</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4>Industries</h4>
+              <ul>
+                <li><Link href="/bakery-loyalty">Bakery Loyalty</Link></li>
+                <li><Link href="/cafe-loyalty">Cafe Stamp Cards</Link></li>
+                <li><Link href="/restaurant-loyalty">Restaurant Retention</Link></li>
+                <li><Link href="/salon-loyalty">Salon & Spa VIP</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4>Legal & Trust</h4>
+              <ul>
+                <li><Link href="/privacy">Privacy Policy</Link></li>
+                <li><Link href="/terms">Terms of Service</Link></li>
+                <li><Link href="/security">Security & Architecture</Link></li>
+                <li><Link href="/contact">Contact Support</Link></li>
+                <li><Link href="/help">Help & Documentation</Link></li>
+              </ul>
+            </div>
           </div>
-          <div className="fbottom">© 2026 customerPilot.in · Made with care in India 🇮🇳</div>
+          <div className="fbottom">© 2026 CustomerPilot · Made with care in India 🇮🇳</div>
         </div>
       </footer>
 

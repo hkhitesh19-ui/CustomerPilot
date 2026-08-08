@@ -52,6 +52,20 @@ export async function GET(req: Request) {
 
     const now = new Date();
 
+    // Promote scheduled WhatsApp messages whose scheduledFor time has passed
+    const promoted = await db.whatsAppMessage.updateMany({
+      where: {
+        status: "scheduled",
+        scheduledFor: { lte: new Date() },
+      },
+      data: {
+        status: "queued",
+      },
+    }).catch(() => ({ count: 0 }))
+    if (promoted.count > 0) {
+      log(`[Scheduled Messages] Promoted ${promoted.count} scheduled messages to queued status.`);
+    }
+
     // Day 2 (Modified for Testing: Created today, but at least 5 minutes ago)
     const day1AgoTargetStart = new Date(now);
     day1AgoTargetStart.setHours(0, 0, 0, 0); // Start of today
@@ -165,13 +179,15 @@ export async function GET(req: Request) {
     log(`Checking Day 15 Win-Back Campaigns (Target: ${day15AgoTargetStart.toDateString()})`);
     
     const allCustomers = await db.customer.findMany({
+      where: { status: { not: 'blocked' }, whatsappOptIn: true },
       include: {
         merchant: true,
         bills: {
           orderBy: { createdAt: 'desc' },
           take: 1
         }
-      }
+      },
+      take: 1000, // Process in batches — a cron job should not load the entire DB at once
     });
 
     let winbacksSent = 0;

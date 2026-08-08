@@ -1,15 +1,18 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { SignJWT } from 'jose';
-import { createHash } from 'crypto';
+import bcrypt from 'bcryptjs';
+import { applyLoginRateLimit } from '@/lib/rate-limiter';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-do-not-use-in-prod';
-
-function hashPassword(password: string): string {
-  return createHash('sha256').update(password + 'cpilot_salt_2026').digest('hex');
+if (!process.env.JWT_SECRET) {
+  throw new Error('FATAL: JWT_SECRET environment variable is not set');
 }
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(req: Request) {
+  // Rate limit: max 5 login attempts per IP per 5 minutes
+  const limited = await applyLoginRateLimit(req as any);
+  if (limited) return limited;
   try {
     const { email, password } = await req.json();
 
@@ -36,9 +39,9 @@ export async function POST(req: Request) {
       }, { status: 401 });
     }
 
-    // 2. Verify password hash
-    const hashedInput = hashPassword(password);
-    if (hashedInput !== user.password) {
+    // 2. Verify password with bcrypt
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
       return NextResponse.json({ 
         error: 'Incorrect password. Please try again.' 
       }, { status: 401 });

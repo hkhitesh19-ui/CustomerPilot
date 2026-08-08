@@ -86,28 +86,56 @@ export async function POST(req: NextRequest) {
     return ok({ redemption, status: "pending_approval" })
   }
 
-  // Spend stamps (consume completed cards)
-  const spend = await spendStampsForRedemption({ customerId: customer.id, rewardCost: reward.stampsCost })
-  if (!spend.ok) {
-    return err(spend.reason ?? "Insufficient completed stamp cards", 409)
+  // Spend stamps + decrement stock + create redemption — all in one transaction to prevent race conditions
+  let spend: { ok: boolean; reason?: string; cardIds: string[] }
+  let redemption: Awaited<ReturnType<typeof db.redemption.create>>
+
+  try {
+    const result = await db.$transaction(async (tx) => {
+      // Re-check stock inside transaction (prevents double-spend race)
+      const freshReward = await tx.reward.findUnique({ where: { id: reward.id } })
+      if (!freshReward || freshReward.stock <= 0) {
+        throw new Error('OUT_OF_STOCK')
+      }
+
+      // Decrement stock atomically inside transaction
+      await tx.reward.update({
+        where: { id: reward.id },
+        data: { stock: { decrement: 1 } },
+      })
+
+      // Create redemption record
+      const newRedemption = await tx.redemption.create({
+        data: {
+          merchantId: merchant.id,
+          customerId: customer.id,
+          rewardId: reward.id,
+          approvedById: staff.id,
+          stampsSpent: reward.stampsCost,
+          status: 'completed',
+        },
+      })
+
+      return { redemption: newRedemption }
+    })
+
+    redemption = result.redemption
+  } catch (txError: any) {
+    if (txError.message === 'OUT_OF_STOCK') {
+      return err(`Reward "${reward.name}" is out of stock`, 409)
+    }
+    console.error('[rewards/redeem] Transaction error:', txError)
+    return err('Redemption failed due to a server error', 500)
   }
 
-  // Decrement stock
-  await db.reward.update({
-    where: { id: reward.id },
-    data: { stock: { decrement: 1 } },
-  })
-
-  const redemption = await db.redemption.create({
-    data: {
-      merchantId: merchant.id,
-      customerId: customer.id,
-      rewardId: reward.id,
-      approvedById: staff.id,
-      stampsSpent: reward.stampsCost,
-      status: "completed",
-    },
-  })
+  // Spend stamps (outside transaction — stamp engine has its own logic)
+  spend = await spendStampsForRedemption({ customerId: customer.id, rewardCost: reward.stampsCost })
+  if (!spend.ok) {
+    // Roll back stock decrement if stamps couldn't be spent
+    await db.reward.update({ where: { id: reward.id }, data: { stock: { increment: 1 } } }).catch(() => {})
+    await db.redemption.delete({ where: { id: redemption.id } }).catch(() => {})
+    return err(spend.reason ?? 'Insufficient completed stamp cards', 409)
+  }
 
   // WhatsApp confirmation
   if (customer.whatsappOptIn && customer.phone) {
@@ -116,9 +144,9 @@ export async function POST(req: NextRequest) {
         merchantId: merchant.id,
         customerId: customer.id,
         toPhone: customer.phone,
-        template: "redemption_confirm",
+        template: 'redemption_confirm',
         body: `Hi ${customer.name}! ✅ You've redeemed: ${reward.name}. Thanks for being a loyal customer of ${merchant.name}.`,
-        status: "queued",
+        status: 'queued',
       },
     })
   }
@@ -126,15 +154,15 @@ export async function POST(req: NextRequest) {
   await db.auditLog.create({
     data: {
       merchantId: merchant.id,
-      actorType: "STAFF",
+      actorType: 'STAFF',
       actorId: staff.id,
       staffId: staff.id,
-      action: "REDEMPTION_APPROVED",
-      entity: "Redemption",
+      action: 'REDEMPTION_APPROVED',
+      entity: 'Redemption',
       entityId: redemption.id,
       metadata: JSON.stringify({ reward: reward.name, customer: customer.name, cardsSpent: spend.cardIds.length }),
     },
   })
 
-  return ok({ redemption, status: "completed", cardIds: spend.cardIds })
+  return ok({ redemption, status: 'completed', cardIds: spend.cardIds })
 }

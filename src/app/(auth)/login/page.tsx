@@ -1,10 +1,19 @@
+import type { Metadata } from 'next';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
-export const metadata = {
-  title: 'Login — CustomerPilot',
-  description: 'Login to your CustomerPilot merchant dashboard.',
+export const metadata: Metadata = {
+  title: 'Merchant Login — CustomerPilot Dashboard',
+  description: 'Login to your CustomerPilot merchant dashboard. Access live customer queues, stamp card analytics, and Google review approvals.',
+  alternates: {
+    canonical: '/login',
+  },
+  openGraph: {
+    title: 'CustomerPilot Merchant Login',
+    description: 'Access your retail loyalty terminal, customer queue, and automated review management.',
+    url: 'https://customerpilot.ai/login',
+  },
 };
 
 export default function LoginPage() {
@@ -55,7 +64,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-slate-600 text-xs mt-6">
-          © 2026 CustomerPilot.in · Made with ❤️ in India 🇮🇳
+          © 2026 CustomerPilot · Made with ❤️ in India 🇮🇳
         </p>
       </div>
     </div>

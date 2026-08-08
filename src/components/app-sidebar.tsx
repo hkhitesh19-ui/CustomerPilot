@@ -56,11 +56,19 @@ export function AppSidebar() {
       <SidebarFooter className="p-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild variant="outline">
-              <Link href="/login">
-                <LogOut className="h-5 w-5" />
-                <span>Sign Out</span>
-              </Link>
+            <SidebarMenuButton 
+              variant="outline" 
+              onClick={async () => {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                // Also clear NextAuth session if present
+                const { signOut } = await import("next-auth/react");
+                await signOut({ redirect: false });
+                window.location.href = '/login';
+              }}
+              className="w-full justify-start cursor-pointer"
+            >
+              <LogOut className="h-5 w-5" />
+              <span>Sign Out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

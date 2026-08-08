@@ -3,10 +3,14 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-import fs from 'fs';
-import path from 'path';
-
 export async function GET() {
+  // ── PRODUCTION GUARD ─────────────────────────────────────────────────────
+  // This endpoint exposes internal DB state for local debugging only.
+  // It must never be accessible in production.
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not available in production' }, { status: 403 });
+  }
+
   try {
     const latestCustomers = await prisma.customer.findMany({
       orderBy: { createdAt: 'desc' },

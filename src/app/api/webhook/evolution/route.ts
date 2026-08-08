@@ -80,10 +80,14 @@ function extractPersonName(pushName: string | null | undefined): string | null {
 
 export async function POST(req: NextRequest) {
   try {
-    // Security: skip in dev, enforce in production
+    // SECURITY: Validate webhook secret on ALL environments — no dev bypass
     const secret = req.headers.get("x-webhook-secret") || req.nextUrl.searchParams.get("secret")
-    const expectedSecret = process.env.EVOLUTION_WEBHOOK_SECRET || "default_webhook_secret"
-    if (process.env.NODE_ENV === "production" && secret !== expectedSecret) {
+    const expectedSecret = process.env.EVOLUTION_WEBHOOK_SECRET
+    if (!expectedSecret) {
+      console.error("[Webhook] EVOLUTION_WEBHOOK_SECRET env var not set — rejecting all requests")
+      return NextResponse.json({ error: "Webhook not configured" }, { status: 500 })
+    }
+    if (secret !== expectedSecret) {
       return NextResponse.json({ error: "Unauthorized webhook payload" }, { status: 401 })
     }
 

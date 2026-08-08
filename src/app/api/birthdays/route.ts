@@ -6,9 +6,10 @@ import { ok, err, requireMerchant } from "@/lib/api"
 import { computeBirthdaySchedule } from "@/lib/birthday-engine"
 
 export async function POST(req: NextRequest) {
-  const merchant = await requireMerchant()
-  const body = await req.json().catch(() => null)
-  if (!body) return err("Invalid JSON body")
+  try {
+    const merchant = await requireMerchant()
+    const body = await req.json().catch(() => null)
+    if (!body) return err("Invalid JSON body")
   const { staffId, customerId, month, day } = body as {
     staffId?: string; customerId?: string; month?: number; day?: number
   }
@@ -74,5 +75,9 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  return ok({ customer: updated, schedule })
+    return ok({ customer: updated, schedule })
+  } catch (error: unknown) {
+    console.error('[Birthdays POST Error]', error)
+    return err('Failed to set birthday', 500)
+  }
 }

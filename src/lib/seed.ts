@@ -17,6 +17,7 @@
 //   - Onboarding checklist (mostly complete)
 
 import { PrismaClient } from "@prisma/client"
+import { SYSTEM_DEFAULT_TEMPLATES } from "./default-templates"
 import { fastStartOnboarding } from "@/lib/onboarding-engine"
 
 const db = new PrismaClient()
@@ -33,7 +34,10 @@ function randomCode(prefix: string) {
 async function main() {
   console.log("🌱 Seeding CustomerPilot V6...")
 
-  // Wipe
+  // Disable foreign keys during table wipe
+  await db.$executeRawUnsafe(`PRAGMA foreign_keys = OFF;`)
+
+  // Wipe all tables cleanly
   await db.waitingCustomer.deleteMany()
   await db.whatsAppMessage.deleteMany()
   await db.auditLog.deleteMany()
@@ -44,17 +48,22 @@ async function main() {
   await db.bill.deleteMany()
   await db.reward.deleteMany()
   await db.stampCard.deleteMany()
-  await db.customer.deleteMany()
-  await db.staff.deleteMany()
-  await db.subscription.deleteMany()
-  await db.merchant.deleteMany()
   await db.review.deleteMany()
   await db.birthday.deleteMany()
   await db.vipTier.deleteMany()
   await db.winBackEscalation.deleteMany()
   await db.achievement.deleteMany()
   await db.supportTicket.deleteMany()
-  await db.onboardingStep.deleteMany()
+  await db.merchantGoogleConnection.deleteMany()
+  await db.googleBusinessReview.deleteMany()
+  await db.backgroundJob.deleteMany()
+  await db.messageTemplate.deleteMany()
+  await db.customer.deleteMany()
+  await db.staff.deleteMany()
+  await db.subscription.deleteMany()
+  await db.merchant.deleteMany()
+
+  await db.$executeRawUnsafe(`PRAGMA foreign_keys = ON;`)
 
   // Merchant (trial → active, onboarding completed)
   const merchant = await db.merchant.create({
@@ -66,6 +75,7 @@ async function main() {
       status: "active",
       trialEndsAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14), // trial ended 14 days ago
       onboardingCompleted: true,
+      googleReviewDelayMinutes: 30,
     },
   })
 
@@ -562,6 +572,50 @@ async function main() {
       scanSource: "qr_whatsapp",
     },
   })
+
+  // -------------------------------------------------------------
+  // System Default WhatsApp Journey Templates Seeding
+  // -------------------------------------------------------------
+  console.log("Seeding System Default WhatsApp Journey Templates...")
+  for (const tmpl of SYSTEM_DEFAULT_TEMPLATES) {
+    const existing = await db.messageTemplate.findFirst({
+      where: {
+        merchantId: null,
+        templateKey: tmpl.templateKey,
+        language: tmpl.language,
+      },
+    })
+
+    if (existing) {
+      await db.messageTemplate.update({
+        where: { id: existing.id },
+        data: {
+          templateName: tmpl.templateName,
+          triggerEvent: tmpl.triggerEvent,
+          category: tmpl.category,
+          messageBody: tmpl.messageBody,
+          variables: JSON.stringify(tmpl.variables),
+          enabled: true,
+        },
+      })
+    } else {
+      await db.messageTemplate.create({
+        data: {
+          merchantId: null,
+          templateKey: tmpl.templateKey,
+          templateName: tmpl.templateName,
+          triggerEvent: tmpl.triggerEvent,
+          category: tmpl.category,
+          messageBody: tmpl.messageBody,
+          language: tmpl.language,
+          variables: JSON.stringify(tmpl.variables),
+          enabled: true,
+          version: 1,
+        },
+      })
+    }
+  }
+  console.log(`✅ System Default Message Templates seeded (${SYSTEM_DEFAULT_TEMPLATES.length} templates).`)
 
   console.log("✅ V6.3 seed complete.")
   console.log(`   Merchant: ${merchant.name} (${merchant.id})`)

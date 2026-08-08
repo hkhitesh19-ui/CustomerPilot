@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-do-not-use-in-prod';
+if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set');
+const JWT_SECRET = process.env.JWT_SECRET;
 
 async function verifyToken(token: string) {
   const secret = new TextEncoder().encode(JWT_SECRET);
@@ -58,33 +59,43 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // ─── Protect /api/dashboard/* ────────────────────────────────
-  if (pathname.startsWith('/api/dashboard')) {
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    try {
-      const payload = await verifyToken(token);
-      const headers = new Headers(request.headers);
-      headers.set('x-merchant-id', payload.merchantId as string);
-      headers.set('x-user-id', payload.userId as string);
-      headers.set('x-user-role', payload.role as string);
-      return NextResponse.next({ request: { headers } });
-    } catch {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-    }
-  }
+  // ─── Protect /api/* routes (except public ones) ───────────────
+  const PUBLIC_API_PREFIXES = [
+    '/api/auth/',
+    '/api/webhook/',
+    '/api/reviews/submit',
+    '/api/reviews/draft',
+    '/api/queue/join',
+    '/api/queue/claim',
+    '/api/queue/reserve',
+    '/api/queue/validate-amount',
+    '/api/qr/',
+    '/api/seed',
+  ];
 
-  // ─── Protect /api/state (merchant data) ──────────────────────
-  if (pathname.startsWith('/api/state')) {
+  const isPublicApi = PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+
+  if (pathname.startsWith('/api/') && !isPublicApi) {
     if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      const authHeader = request.headers.get('authorization');
+      const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+      if (!bearerToken) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
     }
     try {
-      const payload = await verifyToken(token);
+      const actualToken = token || request.headers.get('authorization')?.substring(7) || '';
+      const payload = await verifyToken(actualToken);
       const headers = new Headers(request.headers);
-      headers.set('x-merchant-id', payload.merchantId as string);
-      headers.set('x-user-role', payload.role as string);
+      if (payload.merchantId && payload.merchantId !== 'admin_merchant') {
+        headers.set('x-merchant-id', payload.merchantId as string);
+      }
+      if (payload.userId) {
+        headers.set('x-user-id', payload.userId as string);
+      }
+      if (payload.role) {
+        headers.set('x-user-role', payload.role as string);
+      }
       return NextResponse.next({ request: { headers } });
     } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
@@ -99,7 +110,6 @@ export const config = {
     '/dashboard/:path*',
     '/onboarding/:path*',
     '/super-admin/:path*',
-    '/api/dashboard/:path*',
-    '/api/state/:path*',
+    '/api/:path*',
   ],
 };

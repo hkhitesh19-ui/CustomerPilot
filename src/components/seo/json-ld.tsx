@@ -14,11 +14,6 @@ export function SoftwareApplicationJsonLd() {
       "priceCurrency": "INR",
       "priceValidUntil": "2027-12-31",
       "availability": "https://schema.org/InStock"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "ratingCount": "128"
     }
   }
 
@@ -36,14 +31,14 @@ export function OrganizationJsonLd() {
     "@type": "Organization",
     "name": "CustomerPilot Inc.",
     "url": "https://customerpilot.ai",
-    "logo": "https://customerpilot.ai/logo.png",
+    "logo": "https://customerpilot.ai/cplogo_horizontal.png",
     "sameAs": [
       "https://twitter.com/customerpilot",
       "https://linkedin.com/company/customerpilot"
     ],
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "+91-9876543210",
+      "email": "support@customerpilot.ai",
       "contactType": "customer service"
     }
   }
@@ -67,6 +62,26 @@ export function FAQPageJsonLd({ faqs }: { faqs: Array<{ question: string; answer
         "@type": "Answer",
         "text": faq.answer
       }
+    }))
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  )
+}
+
+export function BreadcrumbJsonLd({ items }: { items: Array<{ name: string; url: string }> }) {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": items.map((item, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": item.name,
+      "item": item.url
     }))
   }
 

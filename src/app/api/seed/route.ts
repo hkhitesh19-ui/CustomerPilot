@@ -4,9 +4,13 @@ import { ok } from "@/lib/api"
 import { execSync } from "child_process"
 
 export async function POST(_req: NextRequest) {
+  // SECURITY: Block in production — this route resets the entire database
+  if (process.env.NODE_ENV === 'production') {
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
+  }
   try {
-    execSync("bun run src/lib/seed.ts", {
-      cwd: "/home/z/my-project",
+    execSync("npx tsx src/lib/seed.ts", {
+      cwd: process.cwd(),
       stdio: "pipe",
       timeout: 30000,
     })

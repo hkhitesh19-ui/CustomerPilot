@@ -1,4 +1,3 @@
-// @ts-nocheck
 // CustomerPilot V5 — Stamp Engine
 // Encapsulates the stamps-based loyalty logic (NOT points).
 //
@@ -56,7 +55,7 @@ export async function awardStampsForBill(opts: {
     return { stampsAwarded: 0, cardId: "", cardCompleted: false, rewardReady: false }
   }
 
-  const stamps = stampsForAmount(template.stampsPerBill, opts.amount)
+  const stamps = stampsForAmount(template.stampsPerBill ?? "1", opts.amount)
 
   // Find or create the customer's active card for this template
   let card = await db.customerStampCard.findFirst({
@@ -74,7 +73,14 @@ export async function awardStampsForBill(opts: {
   }
 
   // Create stamp rows
-  const stampRows = []
+  const stampRows: {
+    customerId: string
+    stampCardId: string
+    customerStampCardId: string
+    billId: string
+    merchantId: string
+    source: string
+  }[] = []
   for (let i = 0; i < stamps; i++) {
     stampRows.push({
       customerId,
@@ -98,12 +104,14 @@ export async function awardStampsForBill(opts: {
     },
   })
 
-  // Update customer lifetime stats
+  // Update customer lifetime stats — round spend to 2dp to avoid float drift
+  // (SQLite has no Decimal type; this is the application-layer precision guard)
+  const safeSpend = Math.round(opts.amount * 100) / 100
   await db.customer.update({
     where: { id: customerId },
     data: {
       lifetimeStamps: { increment: stamps },
-      lifetimeSpend: { increment: opts.amount },
+      lifetimeSpend: { increment: safeSpend },
       lastActiveAt: new Date(),
     },
   })
@@ -183,6 +191,3 @@ export function computeChurnRisk(opts: {
 
   return Math.min(100, score)
 }
-
-
-

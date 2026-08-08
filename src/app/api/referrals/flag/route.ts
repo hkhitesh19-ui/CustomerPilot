@@ -5,11 +5,12 @@ import { ok, err, requireMerchant } from "@/lib/api"
 import { can, deniedMessage, type Role } from "@/lib/rbac"
 
 export async function POST(req: NextRequest) {
-  const merchant = await requireMerchant()
-  const body = await req.json().catch(() => null)
-  if (!body) return err("Invalid JSON body")
-  const { staffId, referralId, reason } = body as { staffId?: string; referralId?: string; reason?: string }
-  if (!staffId || !referralId) return err("staffId and referralId required")
+  try {
+    const merchant = await requireMerchant()
+    const body = await req.json().catch(() => null)
+    if (!body) return err("Invalid JSON body")
+    const { staffId, referralId, reason } = body as { staffId?: string; referralId?: string; reason?: string }
+    if (!staffId || !referralId) return err("staffId and referralId required")
 
   const staff = await db.staff.findUnique({ where: { id: staffId } })
   if (!staff || staff.merchantId !== merchant.id) return err("Staff not found", 404)
@@ -39,4 +40,8 @@ export async function POST(req: NextRequest) {
   })
 
   return ok({ referral: updated })
+  } catch (error: unknown) {
+    console.error('[Referrals Flag Error]', error)
+    return err('Failed to flag referral', 500)
+  }
 }

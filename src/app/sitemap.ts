@@ -6,6 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     "",
     "/marketing",
+    "/pricing",
     "/bakery-loyalty",
     "/restaurant-loyalty",
     "/cafe-loyalty",
@@ -14,15 +15,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/features/google-review-automation",
     "/compare/vs-traditional-pos",
     "/help",
-    "/join",
+    "/signup",
     "/login",
-    "/register",
+    "/privacy",
+    "/terms",
+    "/security",
+    "/contact",
   ]
 
   return routes.map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
-    changeFrequency: route === "" || route === "/marketing" ? "daily" : "weekly",
-    priority: route === "" ? 1.0 : route.startsWith("/features") || route.endsWith("-loyalty") ? 0.9 : 0.7,
+    changeFrequency: route === "" || route === "/marketing" || route === "/pricing" ? "daily" : "weekly",
+    priority: route === "" ? 1.0 : route.startsWith("/features") || route.endsWith("-loyalty") || route === "/pricing" ? 0.9 : 0.7,
   }))
 }

@@ -1,20 +1,48 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { cookies } from 'next/headers';
+import { jwtVerify } from 'jose';
 
-export async function GET() {
+async function requireSuperAdmin(): Promise<{ error: NextResponse } | null> {
+  if (!process.env.JWT_SECRET) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
+  if (!token) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
   try {
-    const merchants = await db.merchant.findMany({
-      include: {
-        _count: {
-          select: {
-            customers: true,
-            bills: true,
-            reviews: true,
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
+    if (payload.role !== 'super_admin') return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
+    return null;
+  } catch {
+    return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
+  }
+}
+
+export async function GET(req: Request) {
+  const authError = await requireSuperAdmin();
+  if (authError) return authError.error;
+  try {
+    const { searchParams } = new URL(req.url)
+    const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
+    const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') ?? '50', 10)))
+    const skip = (page - 1) * pageSize
+
+    const [total, merchants] = await Promise.all([
+      db.merchant.count(),
+      db.merchant.findMany({
+        include: {
+          _count: {
+            select: {
+              customers: true,
+              bills: true,
+              reviews: true,
+            }
           }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+        },
+        orderBy: { createdAt: 'desc' },
+        take: pageSize,
+        skip,
+      }),
+    ]);
 
     const formattedMerchants = merchants.map((m) => ({
       id: m.id,
@@ -32,7 +60,13 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      merchants: formattedMerchants
+      merchants: formattedMerchants,
+      pagination: {
+        total,
+        page,
+        pageSize,
+        hasMore: skip + merchants.length < total,
+      },
     });
   } catch (error: any) {
     console.error('[Admin Merchants API Error]', error);

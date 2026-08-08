@@ -1,19 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Providers } from "@/components/providers";
 import { SoftwareApplicationJsonLd, OrganizationJsonLd } from "@/components/seo/json-ld";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const geistSans = { variable: "font-sans" };
+const geistMono = { variable: "font-mono" };
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.ai";
 
@@ -58,7 +50,7 @@ export const metadata: Metadata = {
     telephone: false,
   },
   alternates: {
-    canonical: baseUrl,
+    canonical: "/",
   },
   openGraph: {
     title: "CustomerPilot — Autonomous WhatsApp Loyalty & Retention SaaS",

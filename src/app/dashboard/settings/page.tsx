@@ -11,7 +11,9 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { Store, Clock, MapPin, User, Tag, Globe, CheckCircle2 } from "lucide-react"
 import { WhatsAppVerification } from "@/components/whatsapp-verification"
+import { WhatsAppTemplateManager } from "@/components/whatsapp-template-manager"
 import { GoogleBusinessIntegration } from "@/components/google-business-integration"
+import { GoogleReviewDelaySettings } from "@/components/google-review-delay-settings"
 import { BrandingSettings } from "@/components/branding-settings"
 import { RewardSetupCard } from "@/components/reward-setup-card"
 import { QRGenerator } from "@/components/qr-generator"
@@ -160,7 +162,9 @@ export default function SettingsPage() {
       </Card>
 
       <WhatsAppVerification merchantId={data?.merchant?.id || ""} />
+      <WhatsAppTemplateManager merchantId={data?.merchant?.id || ""} />
       <GoogleBusinessIntegration merchantId={data?.merchant?.id || ""} />
+      <GoogleReviewDelaySettings merchantId={data?.merchant?.id || ""} />
       <BrandingSettings merchantId={data?.merchant?.id || ""} />
       <RewardSetupCard merchantId={data?.merchant?.id || ""} />
       <QRGenerator merchantId={data?.merchant?.id || ""} />

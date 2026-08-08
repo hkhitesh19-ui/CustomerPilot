@@ -117,10 +117,30 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  const updated = await db.referral.update({
-    where: { id: referral.id },
-    data: { status: "approved", bonusStampsReferrer: BONUS_REFERRER, bonusStampsFriend: BONUS_FRIEND },
-  })
+  // RACE CONDITION FIX: Atomically check + mark referral as approved
+  let updatedReferral: typeof referral
+  try {
+    updatedReferral = await db.$transaction(async (tx) => {
+      // Re-check referral status inside transaction
+      const freshReferral = await tx.referral.findUnique({ where: { id: referral.id } })
+      if (!freshReferral || freshReferral.status === 'approved') {
+        throw new Error('ALREADY_APPROVED')
+      }
+      if (freshReferral.status === 'fraud_flagged') {
+        throw new Error('FRAUD_FLAGGED')
+      }
+
+      return tx.referral.update({
+        where: { id: referral.id },
+        data: { status: 'approved', bonusStampsReferrer: BONUS_REFERRER, bonusStampsFriend: BONUS_FRIEND },
+      })
+    })
+  } catch (txError: any) {
+    if (txError.message === 'ALREADY_APPROVED') return err('Already approved')
+    if (txError.message === 'FRAUD_FLAGGED') return err('Cannot approve a fraud-flagged referral')
+    console.error('[referrals/approve] Transaction error:', txError)
+    return err('Referral approval failed due to a server error', 500)
+  }
 
   await db.auditLog.create({
     data: {
@@ -135,5 +155,5 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  return ok({ referral: updated })
+  return ok({ referral: updatedReferral })
 }

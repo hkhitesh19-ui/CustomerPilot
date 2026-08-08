@@ -72,10 +72,29 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  const updated = await db.birthday.update({
-    where: { id: birthday.id },
-    data: { status: "redeemed" },
-  })
+  // RACE CONDITION FIX: Use transaction to atomically check + mark birthday as redeemed
+  let updatedBirthday: typeof birthday
+  try {
+    updatedBirthday = await db.$transaction(async (tx) => {
+      // Re-check status inside transaction (prevents double-redemption race)
+      const freshBirthday = await tx.birthday.findUnique({ where: { id: birthday.id } })
+      if (!freshBirthday || freshBirthday.status === 'redeemed') {
+        throw new Error('ALREADY_REDEEMED')
+      }
+
+      // Atomically mark as redeemed
+      return tx.birthday.update({
+        where: { id: birthday.id },
+        data: { status: 'redeemed' },
+      })
+    })
+  } catch (txError: any) {
+    if (txError.message === 'ALREADY_REDEEMED') {
+      return err('Birthday reward already redeemed')
+    }
+    console.error('[birthdays/redeem] Transaction error:', txError)
+    return err('Birthday redemption failed due to a server error', 500)
+  }
 
   await db.auditLog.create({
     data: {
@@ -90,5 +109,5 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  return ok({ birthday: updated, bonusStamps: birthday.bonusStamps })
+  return ok({ birthday: updatedBirthday, bonusStamps: birthday.bonusStamps })
 }

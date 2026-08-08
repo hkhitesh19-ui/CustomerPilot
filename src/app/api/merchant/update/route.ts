@@ -18,6 +18,14 @@ export async function PATCH(req: NextRequest) {
   if (body.category !== undefined) allowedUpdates.category = body.category
   if (body.timezone !== undefined) allowedUpdates.timezone = body.timezone
   if (body.whatsappPhone !== undefined) allowedUpdates.whatsappPhone = body.whatsappPhone
+  if (body.googleReviewDelayMinutes !== undefined) {
+    const delay = Number(body.googleReviewDelayMinutes)
+    const validDelays = [0, 5, 15, 30, 45, 60, 120, 180, 240, 360, 480, 720, 1440]
+    if (!Number.isInteger(delay) || !validDelays.includes(delay)) {
+      return err("Invalid Google Review delay option. Must be a valid delay in minutes.", 400)
+    }
+    allowedUpdates.googleReviewDelayMinutes = delay
+  }
 
   try {
     const updated = await db.merchant.update({

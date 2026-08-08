@@ -171,6 +171,17 @@ export class MessageWorker {
     let errors: string[] = []
 
     try {
+      // 0. Promote scheduled messages whose time has arrived (scheduledFor <= now())
+      await db.whatsAppMessage.updateMany({
+        where: {
+          status: "scheduled",
+          scheduledFor: { lte: new Date() },
+        },
+        data: {
+          status: "queued",
+        },
+      }).catch((e) => console.error("[Worker] Scheduled Promotion Error:", e))
+
       // Fetch queued messages (respecting batch size)
       const queuedMessages = await db.whatsAppMessage.findMany({
         where: { status: "queued" },

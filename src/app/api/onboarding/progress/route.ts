@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { jwtVerify } from 'jose';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-do-not-use-in-prod';
+if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set');
+const JWT_SECRET = process.env.JWT_SECRET;
 
 async function getMerchantId(req: NextRequest): Promise<string | null> {
   // Try header first (injected by middleware)

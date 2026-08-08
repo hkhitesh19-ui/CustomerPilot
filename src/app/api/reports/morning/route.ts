@@ -16,7 +16,8 @@ export async function GET(req: NextRequest) {
       }),
       db.customer.findMany({
         where: { merchantId },
-        select: { id: true, lifetimeSpend: true, lifetimeStamps: true }
+        select: { id: true, lifetimeSpend: true, lifetimeStamps: true },
+        take: 500, // For aggregate stats — full scan not needed
       }),
       db.waitingCustomer.count({
         where: { merchantId, status: "waiting" }

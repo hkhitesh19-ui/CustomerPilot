@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { awardStampsForBill } from "@/lib/stamp-engine"
 import { QUEUE_TIMEOUT_BY_BUSINESS, RESERVATION_TIMEOUT_SECONDS, UNDO_WINDOW_SECONDS, canTransition } from "@/lib/queue-state-machine"
 import { CommunicationService } from "@/communication/services/CommunicationService"
+import { scheduleGoogleReviewRequest } from "@/lib/review-scheduler"
 
 export const QUEUE_TIMEOUT_MINUTES = 5
 
@@ -168,7 +169,8 @@ export async function claimFromQueue(opts: {
   if (!merchant) return { ok: false, stampsAwarded: 0, cardCompleted: false, reason: "Merchant not found" }
 
   const billNumber = `CP-${new Date().getFullYear()}-${String(await db.bill.count({ where: { merchantId: merchant.id } }) + 1).padStart(4, "0")}`
-  const billAmount = amount ?? 0
+  // Round to 2dp to prevent float drift — SQLite has no Decimal type (same guard as bills/route.ts)
+  const billAmount = Math.round((amount ?? 0) * 100) / 100
 
   const bill = await db.bill.create({
     data: {
@@ -226,6 +228,11 @@ export async function claimFromQueue(opts: {
           }).catch(e => console.error("[claimFromQueue] Dispatch Error:", e))
         }
       }
+      // Schedule Google Review request based on merchant delay configuration
+      await scheduleGoogleReviewRequest({
+        merchantId: merchant.id,
+        customerId: queueEntry.customerId,
+      }).catch(e => console.error("[claimFromQueue] Review Scheduler Error:", e))
     }
   } else {
     const template = await db.stampCard.findFirst({ where: { merchantId: merchant.id, active: true } })
@@ -241,17 +248,36 @@ export async function claimFromQueue(opts: {
     }
   }
 
-  await db.waitingCustomer.update({
-    where: { id: queueId },
-    data: {
-      status: "claimed",
-      claimedAt: new Date(),
-      claimedById: staffId,
-      amount: billAmount,
-      stampsAwarded,
-      undoWindowUntil: new Date(Date.now() + UNDO_WINDOW_SECONDS * 1000),
-    },
-  })
+  // RACE CONDITION FIX: Atomically verify status is still 'waiting/reserved' and mark as 'claimed'
+  try {
+    await db.$transaction(async (tx) => {
+      const freshEntry = await tx.waitingCustomer.findUnique({ where: { id: queueId } })
+      if (!freshEntry) throw new Error('NOT_FOUND')
+      if (freshEntry.status !== 'waiting' && !(freshEntry.status === 'reserved' && freshEntry.reservedById === staffId)) {
+        throw new Error(`ALREADY_${freshEntry.status.toUpperCase()}`)
+      }
+
+      await tx.waitingCustomer.update({
+        where: { id: queueId },
+        data: {
+          status: 'claimed',
+          claimedAt: new Date(),
+          claimedById: staffId,
+          amount: billAmount,
+          stampsAwarded,
+          undoWindowUntil: new Date(Date.now() + UNDO_WINDOW_SECONDS * 1000),
+        },
+      })
+    })
+  } catch (txError: any) {
+    if (txError.message === 'NOT_FOUND') return { ok: false, stampsAwarded: 0, cardCompleted: false, reason: 'Queue entry not found' }
+    if (txError.message?.startsWith('ALREADY_')) {
+      const status = txError.message.replace('ALREADY_', '').toLowerCase()
+      return { ok: false, stampsAwarded: 0, cardCompleted: false, reason: `Already ${status}` }
+    }
+    console.error('[claimFromQueue] Transaction error:', txError)
+    return { ok: false, stampsAwarded: 0, cardCompleted: false, reason: 'Server error during claim' }
+  }
 
   await db.auditLog.create({
     data: {

@@ -1,5 +1,21 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { cookies } from 'next/headers';
+import { jwtVerify } from 'jose';
+
+async function requireSuperAdmin(): Promise<{ error: NextResponse } | null> {
+  if (!process.env.JWT_SECRET) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
+  if (!token) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
+  try {
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
+    if (payload.role !== 'super_admin') return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
+    return null;
+  } catch {
+    return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
+  }
+}
 
 const DEFAULT_CONTENT: Record<string, { section: string; category: string; value: string; label: string }> = {
   // ─── 1. Merchant Onboarding & Setup Forms (Steps 1 - 5) ─────────
@@ -47,6 +63,8 @@ const DEFAULT_CONTENT: Record<string, { section: string; category: string; value
 };
 
 export async function GET() {
+  const authError = await requireSuperAdmin();
+  if (authError) return authError.error;
   try {
     const customContent = await db.systemContent.findMany();
     const customMap: Record<string, string> = {};
@@ -72,6 +90,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const authError = await requireSuperAdmin();
+  if (authError) return authError.error;
   try {
     const { key, value } = await req.json();
     if (!key) {
@@ -96,6 +116,8 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const authError = await requireSuperAdmin();
+  if (authError) return authError.error;
   try {
     const { searchParams } = new URL(req.url);
     const key = searchParams.get('key');

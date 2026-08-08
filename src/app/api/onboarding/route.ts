@@ -6,11 +6,12 @@ import { ok, err, requireMerchant } from "@/lib/api"
 import { markOnboardingStep, type OnboardingStepKey } from "@/lib/onboarding-engine"
 
 export async function POST(req: NextRequest) {
-  const merchant = await requireMerchant()
-  const body = await req.json().catch(() => null)
-  if (!body) return err("Invalid JSON body")
-  const { staffId, stepKey, skipped } = body as { staffId?: string; stepKey?: string; skipped?: boolean }
-  if (!staffId || !stepKey) return err("staffId and stepKey required")
+  try {
+    const merchant = await requireMerchant()
+    const body = await req.json().catch(() => null)
+    if (!body) return err("Invalid JSON body")
+    const { staffId, stepKey, skipped } = body as { staffId?: string; stepKey?: string; skipped?: boolean }
+    if (!staffId || !stepKey) return err("staffId and stepKey required")
 
   const step = await markOnboardingStep(merchant.id, stepKey as OnboardingStepKey, skipped ?? false)
 
@@ -28,4 +29,8 @@ export async function POST(req: NextRequest) {
   })
 
   return ok({ step })
+  } catch (error: unknown) {
+    console.error('[Onboarding POST Error]', error)
+    return err('Failed to update onboarding step', 500)
+  }
 }

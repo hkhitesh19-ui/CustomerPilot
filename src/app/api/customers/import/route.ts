@@ -15,12 +15,15 @@ function genCode() {
 }
 
 export async function POST(req: NextRequest) {
-  const merchant = await requireMerchant()
-  const body = await req.json().catch(() => null)
-  if (!body) return err("Invalid JSON body")
+  try {
+    const merchant = await requireMerchant()
+    const body = await req.json().catch(() => null)
+    if (!body) return err("Invalid JSON body")
   const { staffId, rows } = body as { staffId?: string; rows?: { name: string; phone: string; email?: string }[] }
 
   if (!staffId || !Array.isArray(rows)) return err("staffId and rows[] required")
+  if (rows.length === 0) return err("rows[] must not be empty")
+  if (rows.length > 500) return err("Maximum 500 rows allowed per import batch", 400)
 
   const staff = await db.staff.findUnique({ where: { id: staffId } })
   if (!staff || staff.merchantId !== merchant.id) return err("Staff not found", 404)
@@ -87,5 +90,9 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  return ok({ results })
+    return ok({ results })
+  } catch (error: unknown) {
+    console.error('[Customers Import Error]', error)
+    return err('Failed to import customers', 500)
+  }
 }

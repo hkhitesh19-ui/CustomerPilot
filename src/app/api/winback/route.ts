@@ -7,11 +7,12 @@ import { ok, err, requireMerchant } from "@/lib/api"
 import { WIN_BACK_STAGES } from "@/lib/winback-engine"
 
 export async function POST(req: NextRequest) {
-  const merchant = await requireMerchant()
-  const body = await req.json().catch(() => null)
-  if (!body) return err("Invalid JSON body")
-  const { staffId, customerId, action } = body as { staffId?: string; customerId?: string; action?: string }
-  if (!staffId || !customerId) return err("staffId and customerId required")
+  try {
+    const merchant = await requireMerchant()
+    const body = await req.json().catch(() => null)
+    if (!body) return err("Invalid JSON body")
+    const { staffId, customerId, action } = body as { staffId?: string; customerId?: string; action?: string }
+    if (!staffId || !customerId) return err("staffId and customerId required")
 
   const customer = await db.customer.findUnique({ where: { id: customerId } })
   if (!customer || customer.merchantId !== merchant.id) return err("Customer not found", 404)
@@ -92,4 +93,8 @@ export async function POST(req: NextRequest) {
   })
 
   return ok({ escalation, stage: nextStage })
+  } catch (error: unknown) {
+    console.error('[Winback POST Error]', error)
+    return err('Failed to process win-back action', 500)
+  }
 }

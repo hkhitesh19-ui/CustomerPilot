@@ -4,7 +4,8 @@ import { cookies } from "next/headers"
 import { jwtVerify } from "jose"
 import QRCode from "qrcode"
 
-const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-key-do-not-use-in-prod"
+if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set');
+const JWT_SECRET = process.env.JWT_SECRET;
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
 const PUBLIC_WEBHOOK_URL = process.env.WHATSAPP_WEBHOOK_URL ||
@@ -92,10 +93,20 @@ export async function GET(req: Request) {
       const connectRes = await fetch(`${EVOLUTION_API_URL}/instance/connect/${instanceName}`, { headers }).catch(() => null)
       const connectData = connectRes && connectRes.ok ? await connectRes.json().catch(() => null) : null
 
-      const qrBase64: string | null = connectData?.qrcode?.base64 || connectData?.base64 || null
+      let qrBase64: string | null = connectData?.qrcode?.base64 || connectData?.base64 || null
+      const rawCode: string | null = connectData?.qrcode?.code || connectData?.code || null
       const pairingCode: string | null = connectData?.qrcode?.pairingCode || connectData?.pairingCode || null
 
-      if (qrBase64) console.log(`[WhatsApp Connect] ✓ QR refreshed from /connect — length: ${qrBase64.length}`)
+      if (rawCode) {
+        try {
+          qrBase64 = await QRCode.toDataURL(rawCode, { width: 800, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
+          console.log(`[WhatsApp Connect] ✓ Generated Super High Res QR Code natively from /connect`)
+        } catch (err) {
+          console.warn(`[WhatsApp Connect] Failed to generate high-res QR, falling back to Evolution API's base64`, err)
+        }
+      } else if (qrBase64) {
+        console.log(`[WhatsApp Connect] ✓ QR refreshed from /connect — length: ${qrBase64.length}`)
+      }
 
       // Persist instanceName
       if (merchant.whatsappInstanceName !== instanceName) {
@@ -158,7 +169,7 @@ export async function GET(req: Request) {
 
     if (rawCode) {
       try {
-        qrBase64 = await QRCode.toDataURL(rawCode, { width: 800, margin: 2 })
+        qrBase64 = await QRCode.toDataURL(rawCode, { width: 800, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
         console.log(`[WhatsApp Connect] ✓ Generated Super High Res QR Code natively`)
       } catch (err) {
         console.warn(`[WhatsApp Connect] Failed to generate high-res QR, falling back to Evolution API's base64`, err)

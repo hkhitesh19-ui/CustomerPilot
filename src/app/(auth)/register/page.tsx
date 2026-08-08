@@ -1,4 +1,18 @@
+import type { Metadata } from 'next';
 import { AuthForm } from '@/components/auth/AuthForm';
+
+export const metadata: Metadata = {
+  title: 'Merchant Registration — CustomerPilot Free Trial',
+  description: 'Sign up for CustomerPilot and activate WhatsApp stamp cards, automated rewards, and 5-star Google review generation for your local business.',
+  alternates: {
+    canonical: '/register',
+  },
+  openGraph: {
+    title: 'Register as Merchant — CustomerPilot',
+    description: 'Set up your store loyalty engine in 2 minutes. Start 14-day free trial.',
+    url: 'https://customerpilot.ai/register',
+  },
+};
 
 export default function RegisterPage() {
   return (

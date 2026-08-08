@@ -3,6 +3,17 @@ import { db } from "@/lib/db"
 
 export async function POST(req: NextRequest) {
   try {
+    // SECURITY: Validate webhook secret on ALL environments — no dev bypass
+    const secret = req.headers.get('x-webhook-secret') || req.nextUrl.searchParams.get('secret')
+    const expectedSecret = process.env.EVOLUTION_WEBHOOK_SECRET
+    if (!expectedSecret) {
+      console.error('[Webhook] EVOLUTION_WEBHOOK_SECRET env var not set — rejecting all requests')
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
+    }
+    if (secret !== expectedSecret) {
+      return NextResponse.json({ error: 'Unauthorized webhook payload' }, { status: 401 })
+    }
+
     const payload = await req.json().catch(() => null)
     
     // Quick validation of the webhook payload structure
