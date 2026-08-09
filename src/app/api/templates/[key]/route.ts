@@ -2,6 +2,7 @@ import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
 import { ok, err } from "@/lib/api"
 import { validateTemplateVariables, sanitizeTemplate } from "@/lib/variable-engine"
+import { SYSTEM_DEFAULT_TEMPLATES } from "@/lib/default-templates"
 
 // GET /api/templates/[key] — Get single template details + version history
 export async function GET(
@@ -18,9 +19,7 @@ export async function GET(
       include: { history: { orderBy: { version: "desc" } } },
     })
 
-    const systemDefault = await db.messageTemplate.findFirst({
-      where: { merchantId: null, templateKey: key },
-    })
+    const systemDefault = SYSTEM_DEFAULT_TEMPLATES.find((t) => t.templateKey === key)
 
     if (!override && !systemDefault) {
       return err("Template not found", 404)
@@ -67,10 +66,7 @@ export async function PATCH(
   }
 
   try {
-    // Find system default for metadata reference
-    const systemDefault = await db.messageTemplate.findFirst({
-      where: { merchantId: null, templateKey: key },
-    })
+    const systemDefault = SYSTEM_DEFAULT_TEMPLATES.find((t) => t.templateKey === key)
 
     const existingOverride = await db.messageTemplate.findFirst({
       where: { merchantId, templateKey: key },
@@ -157,9 +153,7 @@ export async function DELETE(
       await db.messageTemplate.delete({ where: { id: existing.id } })
     }
 
-    const systemDefault = await db.messageTemplate.findFirst({
-      where: { merchantId: null, templateKey: key },
-    })
+    const systemDefault = SYSTEM_DEFAULT_TEMPLATES.find((t) => t.templateKey === key)
 
     return ok({
       message: "Template reset to system default successfully",

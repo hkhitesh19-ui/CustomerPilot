@@ -120,7 +120,13 @@ export function GoogleBusinessIntegration({ merchantId }: { merchantId: string }
                 </div>
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-lg text-slate-100">{connection.placeName || merchant?.name || "Connected Profile"}</h3>
+                    <h3 className="font-bold text-lg text-slate-100">
+                      {(() => {
+                        const rawName = connection.placeName || merchant?.name || "Connected Profile";
+                        const match = rawName.match(/^[^:,;|]+/);
+                        return match ? match[0].trim() : rawName;
+                      })()}
+                    </h3>
                     <span className="px-2 py-0.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 rounded-md border border-emerald-500/30">
                       Verified
                     </span>

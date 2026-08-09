@@ -150,7 +150,7 @@ export function WhatsAppVerification({ merchantId }: { merchantId: string }) {
       <CardContent className="space-y-4">
           <div className="space-y-3">
             <Label>Official WhatsApp Number</Label>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Input 
                 value={phone} 
                 onChange={(e) => setPhone(e.target.value)}

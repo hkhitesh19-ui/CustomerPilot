@@ -3,16 +3,15 @@ import { db } from "@/lib/db"
 import { ok, err } from "@/lib/api"
 import { SYSTEM_DEFAULT_TEMPLATES } from "@/lib/default-templates"
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   const merchantId = req.headers.get("x-merchant-id")
   if (!merchantId) return err("Unauthorized", 401)
 
   try {
-    // 1. Fetch system defaults (merchantId === null)
-    const systemDefaults = await db.messageTemplate.findMany({
-      where: { merchantId: null },
-      orderBy: { templateKey: "asc" },
-    })
+    // 1. Fetch system defaults directly from codebase
+    const systemDefaults = SYSTEM_DEFAULT_TEMPLATES
 
     // 2. Fetch merchant custom overrides
     const merchantOverrides = await db.messageTemplate.findMany({

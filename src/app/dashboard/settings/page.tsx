@@ -90,7 +90,7 @@ export default function SettingsPage() {
   if (isLoading) return <div className="p-8 animate-pulse text-muted-foreground">Loading settings...</div>
 
   return (
-    <div className="space-y-6 max-w-4xl relative">
+    <div className="space-y-6 w-full max-w-5xl mx-auto relative">
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950 -z-10 pointer-events-none" />
       
       <div>

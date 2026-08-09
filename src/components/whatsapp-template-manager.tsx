@@ -70,8 +70,8 @@ export function WhatsAppTemplateManager({ merchantId }: { merchantId: string }) 
         headers: { "x-merchant-id": effectiveMerchantId },
       })
       const result = await res.json()
-      if (result.success) {
-        setTemplates(result.templates || [])
+      if (result.ok) {
+        setTemplates(result.data?.templates || [])
       }
     } catch (e) {
       toast({
@@ -99,8 +99,8 @@ export function WhatsAppTemplateManager({ merchantId }: { merchantId: string }) 
         headers: { "x-merchant-id": effectiveMerchantId },
       })
       const result = await res.json()
-      if (result.success && result.history) {
-        setEditingTemplate((prev) => (prev ? { ...prev, history: result.history } : prev))
+      if (result.ok && result.data?.history) {
+        setEditingTemplate((prev) => (prev ? { ...prev, history: result.data.history } : prev))
       }
     } catch (e) {}
   }
@@ -144,7 +144,7 @@ export function WhatsAppTemplateManager({ merchantId }: { merchantId: string }) 
       })
 
       const result = await res.json()
-      if (!res.ok || !result.success) {
+      if (!res.ok || !result.ok) {
         throw new Error(result.error || "Failed to save template")
       }
 
@@ -173,7 +173,7 @@ export function WhatsAppTemplateManager({ merchantId }: { merchantId: string }) 
         headers: { "x-merchant-id": effectiveMerchantId },
       })
       const result = await res.json()
-      if (!res.ok || !result.success) throw new Error(result.error || "Failed to reset")
+      if (!res.ok || !result.ok) throw new Error(result.error || "Failed to reset")
 
       toast({
         title: "Template Reset to Default",
@@ -252,8 +252,8 @@ export function WhatsAppTemplateManager({ merchantId }: { merchantId: string }) 
           </div>
 
           {/* Search & Category Filter */}
-          <div className="mt-6 flex flex-col md:flex-row gap-3">
-            <div className="relative flex-1">
+          <div className="mt-6 flex flex-col gap-4">
+            <div className="relative w-full">
               <Search className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
               <Input
                 value={searchQuery}
@@ -268,7 +268,7 @@ export function WhatsAppTemplateManager({ merchantId }: { merchantId: string }) 
               )}
             </div>
 
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
+            <div className="flex items-center flex-wrap gap-2 max-w-full">
               {CATEGORIES.map((cat) => (
                 <Button
                   key={cat.id}
