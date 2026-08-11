@@ -21,59 +21,52 @@ export function ReviewEditor({
   const [copied, setCopied] = useState(false)
   const [isEditingExisting, setIsEditingExisting] = useState(!!existingReviewText)
 
-  const copyToClipboard = (text: string) => {
-    let success = false;
-    
+  const fallbackCopy = (text: string) => {
     try {
-      // 1. Modern Clipboard API (Works in HTTPS)
-      if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).catch(() => {})
-        success = true;
+      // First try to use the visible textarea if possible (for mobile reliability)
+      const existingTextArea = document.getElementById("review-draft-textarea") as HTMLTextAreaElement;
+      if (existingTextArea) {
+        existingTextArea.focus();
+        existingTextArea.select();
+        existingTextArea.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        existingTextArea.blur();
+      } else {
+        const textArea = document.createElement("textarea")
+        textArea.value = text
+        textArea.style.position = "fixed"
+        textArea.style.left = "-999999px"
+        document.body.appendChild(textArea)
+        textArea.select()
+        document.execCommand("copy")
+        document.body.removeChild(textArea)
       }
-    } catch(e) {}
-
-    // 2. Fallback for HTTP (Pinggy local testing) or unsupported browsers
-    if (!success) {
-      try {
-        // Try using the actual visible textarea if it exists - most reliable for mobile HTTP
-        const existingTextArea = document.getElementById("review-draft-textarea") as HTMLTextAreaElement;
-        if (existingTextArea) {
-          existingTextArea.focus();
-          existingTextArea.select();
-          existingTextArea.setSelectionRange(0, 99999); // For mobile devices
-          document.execCommand("copy");
-          existingTextArea.blur();
-        } else {
-          // Hidden textarea fallback
-          const textArea = document.createElement("textarea")
-          textArea.value = text
-          textArea.style.position = "fixed"
-          textArea.style.top = "0"
-          textArea.style.left = "0"
-          textArea.style.opacity = "0"
-          document.body.appendChild(textArea)
-          textArea.focus()
-          textArea.select()
-          textArea.setSelectionRange(0, 99999)
-          document.execCommand("copy")
-          document.body.removeChild(textArea)
-        }
-      } catch (e) {
-        console.warn("DOM copy warning:", e)
-      }
+    } catch (e) {
+      console.error("ExecCommand copy failed", e)
     }
+  }
 
-    setCopied(true)
+  const copyTextToClipboard = (text: string) => {
+    try {
+      if (typeof window !== "undefined" && window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(() => fallbackCopy(text))
+      } else {
+        fallbackCopy(text)
+      }
+    } catch {
+      fallbackCopy(text)
+    }
   }
 
   const googleLink = merchant.googleReviewLink 
     || (merchant.googlePlaceId ? `https://search.google.com/local/writereview?placeid=${merchant.googlePlaceId}` : "https://maps.google.com")
 
-  const handleCopyAndPostClick = (e: React.MouseEvent) => {
-    e.preventDefault(); // Stop default navigation so copy can finish
+  const handleCopyAndPostClick = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault()
 
-    // 1. Copy draft text to clipboard immediately in user click gesture
-    copyToClipboard(draft)
+    // 1. Copy draft text to clipboard
+    copyTextToClipboard(draft)
+    setCopied(true)
 
     // 2. Record review submission asynchronously
     fetch('/api/reviews/record-google-post', {
@@ -87,8 +80,10 @@ export function ReviewEditor({
       })
     }).catch(err => console.error("Error recording review post:", err))
 
-    // 3. Open link safely in the same synchronous click execution context
-    window.open(googleLink, '_blank');
+    // 3. Directly navigate tab to Google Review URL (Impossible to block)
+    setTimeout(() => {
+      window.location.href = googleLink
+    }, 100)
   }
 
   return (
