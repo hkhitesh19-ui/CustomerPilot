@@ -346,3 +346,15 @@ ext() function to explicitly POST the merchant's configured reward card details 
 - **Why This Won't Recur**: The fix is now at the **source of truth** (state machine), not at an unreliable heuristic (message ordering). The webhook's state machine has always been correct — what was missing was the state being set.
 - **Production Safety**: ✅ The `botState` auto-expires after 24 hours (`hoursSinceUpdate > 24`) so stale states will not cause infinite loops.
 - **Status**: ✅ Permanently Resolved. Verified by DB log analysis.
+
+---
+
+## [11 Aug 2026] Issue: AI Review "Copy & Post" Button Fails to Copy Text on Mobile/HTTP
+- **Symptom**: Customer receives AI Review Draft link, clicks "Copy & Post to Google", the Google Review page opens, but the draft content is NOT copied to the clipboard.
+- **Root Cause**:
+  1. The Pinggy local tunnel link was HTTP (Not Secure), which completely disables the modern `navigator.clipboard` API in mobile browsers.
+  2. The fallback mechanism relied on creating a hidden `textarea` and calling `document.execCommand("copy")`. However, because the button was an `<a>` tag with an `href`, the browser immediately started navigating away in the same execution cycle, causing the copy command to be aborted or ignored due to the race condition.
+- **Resolution**:
+  1. **Race Condition Fix**: Added `e.preventDefault()` to the click handler to halt the immediate link navigation. After the synchronous DOM copy completes, the link is manually opened using `window.open(googleLink, '_blank')`.
+  2. **Robust Fallback**: Instead of dynamically injecting a hidden textarea (which mobile browsers often block from copying), the fallback logic now targets the *already visible* `textarea` on the page (`id="review-draft-textarea"`) to perform the selection and copy. This is highly reliable across all mobile browsers even in non-secure HTTP environments.
+- **Status**: ✅ Resolved. The copy mechanism is now synchronous and blocks navigation until the clipboard is populated.

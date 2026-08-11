@@ -22,33 +22,45 @@ export function ReviewEditor({
   const [isEditingExisting, setIsEditingExisting] = useState(!!existingReviewText)
 
   const copyToClipboard = (text: string) => {
+    let success = false;
+    
     try {
-      // 1. Synchronous DOM textarea copy (Works 100% inside native click event)
-      const textArea = document.createElement("textarea")
-      textArea.value = text
-      textArea.style.position = "fixed"
-      textArea.style.top = "0"
-      textArea.style.left = "0"
-      textArea.style.width = "2em"
-      textArea.style.height = "2em"
-      textArea.style.padding = "0"
-      textArea.style.border = "none"
-      textArea.style.outline = "none"
-      textArea.style.boxShadow = "none"
-      textArea.style.background = "transparent"
-      document.body.appendChild(textArea)
-      textArea.focus()
-      textArea.select()
-      textArea.setSelectionRange(0, text.length)
-      document.execCommand("copy")
-      document.body.removeChild(textArea)
-    } catch (e) {
-      console.warn("DOM copy warning:", e)
-    }
+      // 1. Modern Clipboard API (Works in HTTPS)
+      if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {})
+        success = true;
+      }
+    } catch(e) {}
 
-    // 2. Modern Clipboard API as secondary
-    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(text).catch(() => {})
+    // 2. Fallback for HTTP (Pinggy local testing) or unsupported browsers
+    if (!success) {
+      try {
+        // Try using the actual visible textarea if it exists - most reliable for mobile HTTP
+        const existingTextArea = document.getElementById("review-draft-textarea") as HTMLTextAreaElement;
+        if (existingTextArea) {
+          existingTextArea.focus();
+          existingTextArea.select();
+          existingTextArea.setSelectionRange(0, 99999); // For mobile devices
+          document.execCommand("copy");
+          existingTextArea.blur();
+        } else {
+          // Hidden textarea fallback
+          const textArea = document.createElement("textarea")
+          textArea.value = text
+          textArea.style.position = "fixed"
+          textArea.style.top = "0"
+          textArea.style.left = "0"
+          textArea.style.opacity = "0"
+          document.body.appendChild(textArea)
+          textArea.focus()
+          textArea.select()
+          textArea.setSelectionRange(0, 99999)
+          document.execCommand("copy")
+          document.body.removeChild(textArea)
+        }
+      } catch (e) {
+        console.warn("DOM copy warning:", e)
+      }
     }
 
     setCopied(true)
@@ -57,7 +69,9 @@ export function ReviewEditor({
   const googleLink = merchant.googleReviewLink 
     || (merchant.googlePlaceId ? `https://search.google.com/local/writereview?placeid=${merchant.googlePlaceId}` : "https://maps.google.com")
 
-  const handleCopyAndPostClick = () => {
+  const handleCopyAndPostClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Stop default navigation so copy can finish
+
     // 1. Copy draft text to clipboard immediately in user click gesture
     copyToClipboard(draft)
 
@@ -72,6 +86,9 @@ export function ReviewEditor({
         rating: 5
       })
     }).catch(err => console.error("Error recording review post:", err))
+
+    // 3. Open link safely in the same synchronous click execution context
+    window.open(googleLink, '_blank');
   }
 
   return (
@@ -135,6 +152,7 @@ export function ReviewEditor({
             </div>
             
             <textarea
+              id="review-draft-textarea"
               className="w-full h-32 bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none transition-all text-sm leading-relaxed"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
