@@ -58,6 +58,18 @@ export async function scheduleGoogleReviewRequest({
       }
     })
 
+    // ✅ CRITICAL FIX: If message is sent immediately (queued/no delay),
+    // set botState right away. If delayed (scheduled), cron will set it on dispatch.
+    if (status === "queued" || !scheduledFor) {
+      await db.customer.update({
+        where: { id: customer.id },
+        data: {
+          botState: "AWAITING_REVIEW_CONSENT",
+          botStateUpdatedAt: new Date()
+        }
+      }).catch(() => {})
+    }
+
     return { scheduled: true, messageId: msg.id, status, scheduledFor, delayMinutes }
   } catch (error) {
     console.error("[scheduleGoogleReviewRequest Error]", error)

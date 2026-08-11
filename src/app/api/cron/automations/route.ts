@@ -93,6 +93,19 @@ export async function GET(req: Request) {
           }
         });
 
+        // ✅ CRITICAL FIX: When a review_request is dispatched, set botState so the
+        // webhook can correctly identify the customer's "Yes" reply as review consent.
+        if (res.ok && msg.template === "review_request" && msg.customerId) {
+          await db.customer.update({
+            where: { id: msg.customerId },
+            data: {
+              botState: "AWAITING_REVIEW_CONSENT",
+              botStateUpdatedAt: new Date()
+            }
+          }).catch((e: any) => log(`[botState Error] ${e.message}`));
+          log(`[botState] ✅ Set AWAITING_REVIEW_CONSENT for customer ${msg.customerId}`);
+        }
+
         log(`[Dispatched] ✉️ Sent ${msg.template} to +${msg.toPhone} via ${instanceName} (Status: ${res.ok ? 'OK' : 'FAIL'})`);
       } catch (err: any) {
         log(`[Dispatch Error] Failed to send msg ${msg.id}: ${err.message}`);

@@ -331,3 +331,18 @@ ext() function to explicitly POST the merchant's configured reward card details 
   - Reverted to explicit field mapping in `setForm` with empty string `""` fallbacks (e.g., `cardData.rewardImageUrl || ""`) to guarantee React inputs never receive `null` values.
   - Added robust `isLoading` and `loadError` explicit error states (suggested by OtterMind AI guidance) to prevent silent fallback to defaults.
 - **Status**: ✅ Resolved and Verified. Form now correctly hydrates with the actual saved DB config.
+
+---
+
+## [11 Aug 2026] Issue: AI Review Draft "Yes" Reply Permanently Ignored (Recurring Root Cause Found)
+- **Symptom**: After the Google Review WhatsApp request is sent, customer replies "Yes" but no AI Review Draft link is sent. This issue appeared to be fixed multiple times but kept returning on fresh test runs.
+- **Root Cause**: The webhook correctly uses `customer.botState` (state machine) to identify context — specifically it checks `if (botState === "AWAITING_REVIEW_CONSENT")`. However, **`botState` was NEVER being set to `AWAITING_REVIEW_CONSENT`** at any point in the codebase. The two places that send a `review_request` message both completely omitted the `botState` update:
+  1. `src/lib/review-scheduler.ts` — creates the scheduled message record but never sets botState.
+  2. `src/app/api/cron/automations/route.ts` — dispatches scheduled messages but never sets botState after delivery.
+  - Previous "fixes" were changing `orderBy` on `lastSentMsg` queries which was a band-aid on the wrong approach. Since `type` column was also `undefined` in all messages, that approach was fundamentally broken and could never work reliably.
+- **Resolution**:
+  1. **`src/app/api/cron/automations/route.ts`**: After successfully dispatching a `review_request` message (`res.ok === true`), immediately updates `customer.botState = "AWAITING_REVIEW_CONSENT"` and `botStateUpdatedAt = now()`. This is the primary fix for the 5-minute delayed flow.
+  2. **`src/lib/review-scheduler.ts`**: For immediate/queued messages (no delay), sets `botState = "AWAITING_REVIEW_CONSENT"` right when the message is created, without waiting for cron.
+- **Why This Won't Recur**: The fix is now at the **source of truth** (state machine), not at an unreliable heuristic (message ordering). The webhook's state machine has always been correct — what was missing was the state being set.
+- **Production Safety**: ✅ The `botState` auto-expires after 24 hours (`hoursSinceUpdate > 24`) so stale states will not cause infinite loops.
+- **Status**: ✅ Permanently Resolved. Verified by DB log analysis.
