@@ -41,7 +41,8 @@ export function useDashboardState() {
       if (!res.ok) {
         throw new Error("Failed to fetch dashboard state")
       }
-      const data = await res.json()
+      const data = await res.json().catch(() => null)
+      if (!data) throw new Error("Invalid response format from server")
       return data.data as DashboardState
     },
     refetchInterval: 30000, // Poll every 30s for Live Queue freshness

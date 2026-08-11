@@ -30,12 +30,12 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
         const res = await fetch(`/api/qr/generate?type=${selectedType}`, {
           headers: { "x-merchant-id": merchantId }
         })
-        const json = await res.json()
-        if (res.ok && isMounted) {
+        const json = await res.json().catch(() => null)
+        if (res.ok && json && isMounted) {
           // The API returns data wrapped in { ok: true, data: ... }
           setQrData(json.data || json)
         } else if (!res.ok && isMounted) {
-          toast({ title: "Error", description: json.error || "Failed to generate QR", variant: "destructive" })
+          toast({ title: "Error", description: json?.error || "Failed to generate QR", variant: "destructive" })
         }
       } catch (e: any) {
         if (isMounted) toast({ title: "Error", description: e.message, variant: "destructive" })

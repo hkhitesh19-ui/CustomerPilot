@@ -11,11 +11,13 @@ export async function GET(
 ) {
   const merchantId = req.headers.get("x-merchant-id")
   if (!merchantId) return err("Unauthorized", 401)
+  const isSystem = merchantId === "system"
+  const targetMerchantId = isSystem ? null : merchantId
   const { key } = await params
 
   try {
     const override = await db.messageTemplate.findFirst({
-      where: { merchantId, templateKey: key },
+      where: { merchantId: targetMerchantId, templateKey: key },
       include: { history: { orderBy: { version: "desc" } } },
     })
 
@@ -44,6 +46,8 @@ export async function PATCH(
 ) {
   const merchantId = req.headers.get("x-merchant-id")
   if (!merchantId) return err("Unauthorized", 401)
+  const isSystem = merchantId === "system"
+  const targetMerchantId = isSystem ? null : merchantId
   const { key } = await params
 
   const body = await req.json().catch(() => null)
@@ -69,7 +73,7 @@ export async function PATCH(
     const systemDefault = SYSTEM_DEFAULT_TEMPLATES.find((t) => t.templateKey === key)
 
     const existingOverride = await db.messageTemplate.findFirst({
-      where: { merchantId, templateKey: key },
+      where: { merchantId: targetMerchantId, templateKey: key },
     })
 
     let templateRecord
@@ -92,25 +96,25 @@ export async function PATCH(
           templateId: existingOverride.id,
           version: nextVersion,
           messageBody: sanitizedBody,
-          changedBy: "MERCHANT",
+          changedBy: isSystem ? "SUPERADMIN" : "MERCHANT",
           changeReason: body.changeReason || "Merchant template update",
         },
       })
     } else {
       templateRecord = await db.messageTemplate.create({
         data: {
-          merchantId,
+          merchantId: targetMerchantId,
           templateKey: key,
           templateName: systemDefault?.templateName || key,
           triggerEvent: systemDefault?.triggerEvent || "Custom journey message",
           category: systemDefault?.category || "MARKETING",
           messageBody: sanitizedBody,
           language: "en",
-          variables: systemDefault?.variables || JSON.stringify(validation.foundVars),
+          variables: JSON.stringify(systemDefault?.variables || validation.foundVars),
           enabled: body.enabled !== undefined ? Boolean(body.enabled) : true,
           version: 1,
-          createdBy: "MERCHANT",
-          updatedBy: "MERCHANT",
+          createdBy: isSystem ? "SUPERADMIN" : "MERCHANT",
+          updatedBy: isSystem ? "SUPERADMIN" : "MERCHANT",
         },
       })
 
@@ -119,8 +123,8 @@ export async function PATCH(
           templateId: templateRecord.id,
           version: 1,
           messageBody: sanitizedBody,
-          changedBy: "MERCHANT",
-          changeReason: "Initial merchant customization",
+          changedBy: isSystem ? "SUPERADMIN" : "MERCHANT",
+          changeReason: "Initial template customization",
         },
       })
     }
@@ -142,11 +146,13 @@ export async function DELETE(
 ) {
   const merchantId = req.headers.get("x-merchant-id")
   if (!merchantId) return err("Unauthorized", 401)
+  const isSystem = merchantId === "system"
+  const targetMerchantId = isSystem ? null : merchantId
   const { key } = await params
 
   try {
     const existing = await db.messageTemplate.findFirst({
-      where: { merchantId, templateKey: key },
+      where: { merchantId: targetMerchantId, templateKey: key },
     })
 
     if (existing) {

@@ -1,0 +1,5 @@
+At the very beginning of any new session or conversation, before executing any tasks, 
+you MUST silently read the following files to establish your context: 
+1. InstructionFlow.md, 
+2. RESOLVED_ISSUES_LOG.md, 
+3. ANTIGRAVITY_TASK_PROMPTS.md

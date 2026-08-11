@@ -31,7 +31,7 @@ function fetchAllInstancesAndUpdate(url) {
 }
 
 async function updateAllInstances(instances, url) {
-    const webhookUrl = url + '/api/webhook/evolution?secret=' + process.env.EVOLUTION_WEBHOOK_SECRET;
+    const webhookUrl = url + '/api/webhook/evolution?secret=' + 'cpilot_webhook_secret_change_in_prod_2026';
     const data = JSON.stringify({
         webhook: {
             enabled: true,

@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { Store, Clock, MapPin, User, Tag, Globe, CheckCircle2 } from "lucide-react"
+import { Store, Clock, MapPin, User, Tag, Globe, CheckCircle2, Sparkles } from "lucide-react"
 import { WhatsAppVerification } from "@/components/whatsapp-verification"
 import { WhatsAppTemplateManager } from "@/components/whatsapp-template-manager"
 import { GoogleBusinessIntegration } from "@/components/google-business-integration"
@@ -18,6 +18,7 @@ import { BrandingSettings } from "@/components/branding-settings"
 import { RewardSetupCard } from "@/components/reward-setup-card"
 import { QRGenerator } from "@/components/qr-generator"
 import { GoLiveValidator } from "@/components/go-live-validator"
+import { AutomationTimerSettings } from "@/components/automation-timer-settings"
 
 export default function SettingsPage() {
   const { data, isLoading } = useDashboardState()
@@ -47,7 +48,8 @@ export default function SettingsPage() {
         businessTiming: data.merchant.businessTiming || "",
         category: data.merchant.category || "",
         timezone: data.merchant.timezone || "Asia/Kolkata",
-      })
+        vipUpgradeBonusStamps: data.merchant.vipUpgradeBonusStamps ?? 1,
+      } as any)
     }
   }, [data?.merchant])
 
@@ -157,6 +159,19 @@ export default function SettingsPage() {
               />
             </div>
             
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-amber-400"/> VIP Upgrade Bonus Stamps</Label>
+              <Input 
+                type="number"
+                min="0"
+                max="10"
+                value={(formData as any).vipUpgradeBonusStamps ?? 1} 
+                onChange={(e) => handleChange("vipUpgradeBonusStamps", e.target.value)}
+                placeholder="E.g., 1"
+              />
+              <p className="text-[10px] text-slate-500 mt-1">Advance bonus stamps awarded when a customer upgrades their VIP tier.</p>
+            </div>
+            
           </div>
         </CardContent>
       </Card>
@@ -165,6 +180,7 @@ export default function SettingsPage() {
       <WhatsAppTemplateManager merchantId={data?.merchant?.id || ""} />
       <GoogleBusinessIntegration merchantId={data?.merchant?.id || ""} />
       <GoogleReviewDelaySettings merchantId={data?.merchant?.id || ""} />
+      <AutomationTimerSettings merchantId={data?.merchant?.id || ""} />
       <BrandingSettings merchantId={data?.merchant?.id || ""} />
       <RewardSetupCard merchantId={data?.merchant?.id || ""} />
       <QRGenerator merchantId={data?.merchant?.id || ""} />

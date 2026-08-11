@@ -217,6 +217,28 @@ function OnboardingPageContent() {
       if (currentKey) {
         await saveStepProgress(currentKey, step + 1)
       }
+      // If we are completing Step 5 (Rewards), save the card setup to the backend
+      if (step === 5) {
+        try {
+          await fetch("/api/cards/setup", {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+              "x-merchant-id": data.merchantId 
+            },
+            body: JSON.stringify({
+              name: data.cardName,
+              stampsRequired: data.stampsRequired,
+              rewardName: data.rewardName,
+              stampValue: 500, // default if not set
+              validityDays: 90, // default
+            })
+          })
+        } catch (e) {
+          console.error("Failed to save reward card setup:", e)
+        }
+      }
+
       setStep(step + 1)
       setError("")
     }

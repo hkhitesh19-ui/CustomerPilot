@@ -232,8 +232,15 @@ The system gives the merchant exactly 7 days to test the magic of CustomerPilot.
 *   **Dashboard Gatekeeper**: `src/app/dashboard/layout.tsx` (Middleware).
     *   Checks `merchant.trialEndsAt` and `merchant.subscriptionStatus`.
     *   If expired, renders the Payment Gateway / Upgrade UI instead of the dashboard.
-*   **API Gatekeeper**: `src/app/api/webhook/evolution/route.ts` & `src/app/api/cron/automations/route.ts`
-    *   Before processing any WhatsApp message or sending review requests, it checks the merchant's active status. If expired, it silently drops the event.
+*   **API Gatekeeper**: `src/app/api/webhook/evolution/route.ts` & `src/lib/template-engine.ts`
+
+- **Purpose**: Runs daily via pinggy or Vercel cron to execute logic requiring delays (like Winbacks or morning reports).
+- **Dynamic Template Engine**: All WhatsApp messages (Welcome, Queue Duplicate, Name Confirmation, Reviews, Stamp Earned, Reward Unlocked, Winbacks, Morning Reports) now use a centralized Dynamic Template Engine (`getCompiledTemplate`).
+  - **Priority 1:** Merchant Custom Override (`MessageTemplate` where `merchantId` is set).
+  - **Priority 2:** System Default Override (`MessageTemplate` where `merchantId` is `null` — editable by SuperAdmin).
+  - **Priority 3:** Hardcoded `SYSTEM_DEFAULT_TEMPLATES` inside `src/lib/default-templates.ts`.
+- **Review Requests**:
+  - Sends AI-generated Google review links (`REVIEW_DRAFT`).
 
 ---
 
@@ -299,6 +306,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   ├── reviews/               # 1-Click AI Auto-Reply & List APIs
 │   │   │   ├── onboarding/            # 9-Step Onboarding Engine State APIs
 │   │   │   ├── webhook/               # Evolution API & WhatsApp Incoming Webhooks
+│   │   │   ├── queue/                 # Live Waitlist & Queue Management APIs
 │   │   │   └── google-business/       # Google OAuth 2.0 Auth Callback & Sync APIs
 │   │   ├── bakery-loyalty/page.tsx    # Industry Landing Page: Bakery Loyalty
 │   │   ├── cafe-loyalty/page.tsx      # Industry Landing Page: Cafe Loyalty

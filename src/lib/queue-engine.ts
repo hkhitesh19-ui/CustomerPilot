@@ -42,6 +42,8 @@ export async function joinQueue(opts: {
         referralCode,
         whatsappOptIn: true,
         lastActiveAt: new Date(),
+        botState: "AWAITING_NAME_CONFIRMATION",
+        botStateUpdatedAt: new Date(),
       },
     })
 

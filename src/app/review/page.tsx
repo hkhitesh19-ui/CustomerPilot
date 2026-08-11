@@ -4,8 +4,17 @@ import { ReviewEditor } from "@/components/review/ReviewEditor"
 
 export const dynamic = "force-dynamic"
 
-// Basic fallback draft if AI fails
-const FALLBACK_DRAFT = "The products were fresh, beautiful, and absolutely delicious. Highly recommended!"
+function getSmartFallbackReview(bizName: string, category: string, city: string, product: string): string {
+  const item = product ? product : (category.toLowerCase().includes('cake') || category.toLowerCase().includes('bakery') ? 'cake' : 'order')
+  const templates = [
+    `Ordered ${product ? product : 'from ' + bizName} in ${city} and really loved the quality! The sponge was very soft, fresh, and perfectly balanced in sweetness. Good service and packaging. Definitely a great bakery in ${city}.`,
+    `Tried ${bizName} in ${city} and had a wonderful experience. The ${item} was super fresh, delicious, and beautifully presented. Staff was polite and the overall service was smooth. Highly recommended cake shop in ${city}!`,
+    `Great experience with ${bizName} in ${city}! The ${item} was very fresh with authentic taste and great texture. If you are looking for a reliable bakery in ${city}, this place is a solid option.`,
+    `Very satisfied with my purchase from ${bizName}, ${city}. The ${item} was fresh, flavorful, and packed neatly. Excellent quality and friendly customer service. One of the best places for cakes in ${city}!`
+  ]
+  const randomIndex = Math.floor(Math.random() * templates.length)
+  return templates[randomIndex]
+}
 
 export default async function ReviewPage({
   searchParams,
@@ -65,7 +74,8 @@ export default async function ReviewPage({
   const cleanBizName = (merchant.name || "Cake Connection").trim()
 
   // Generate dynamic AI draft using Gemini with Strict Indian Review Prompt
-  let dynamicDraft = FALLBACK_DRAFT
+  const smartFallback = getSmartFallbackReview(cleanBizName, businessCategory, city, productName)
+  let dynamicDraft = smartFallback
   try {
     const apiKey = process.env.GEMINI_API_KEY
     if (apiKey) {
@@ -176,10 +186,13 @@ Output ONLY the review text.`
       
       const result = await model.generateContent(prompt)
       const response = await result.response
-      dynamicDraft = response.text().trim().replace(/^["']|["']$/g, '')
+      const generatedText = response.text().trim().replace(/^["']|["']$/g, '')
+      if (generatedText && generatedText.length > 20) {
+        dynamicDraft = generatedText
+      }
     }
   } catch (error) {
-    console.error("AI Generation failed, using fallback:", error)
+    console.error("Gemini AI generation rate limit/fallback active, using smart Indian review draft")
   }
 
   let googlePlaceId: string | null = googleConnection?.placeId || null

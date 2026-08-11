@@ -14,7 +14,15 @@ export async function GET(req: Request) {
 
     // 1. Fetch all active merchants who have Google Business Profiles connected
     const connections = await db.merchantGoogleConnection.findMany({
-      where: { syncStatus: "active" },
+      where: { 
+        syncStatus: "active",
+        merchant: {
+          OR: [
+            { trialEndsAt: null },
+            { trialEndsAt: { gt: new Date() } }
+          ]
+        }
+      },
       include: { merchant: true }
     })
 

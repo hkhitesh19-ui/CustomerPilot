@@ -28,8 +28,8 @@ export function GoLiveValidator({ merchantId }: { merchantId: string }) {
       const res = await fetch("/api/merchant/go-live-test", {
         headers: { "x-merchant-id": merchantId }
       })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error || "Failed to validate")
+      const json = await res.json().catch(() => null)
+      if (!res.ok || !json) throw new Error(json?.error || "Failed to validate")
       
       setResults(json)
       

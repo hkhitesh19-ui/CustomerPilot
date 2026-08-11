@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
   ] = await Promise.all([
     db.staff.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "asc" }, take: 100 }),
     db.customer.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 500 }),
-    db.stampCard.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "asc" }, take: 50 }),
+    db.stampCard.findMany({ where: { merchantId: merchant.id, active: true }, orderBy: { updatedAt: "desc" }, take: 10 }),
     db.customerStampCard.findMany({ where: { merchantId: merchant.id }, include: { stamps: true }, orderBy: { createdAt: "desc" }, take: 500 }),
     db.reward.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "asc" }, take: 100 }),
     db.bill.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 200 }),

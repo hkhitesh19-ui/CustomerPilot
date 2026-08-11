@@ -120,7 +120,7 @@ export async function searchPlaces(
     includedTypes?: string[]
   }
 ): Promise<SearchResult> {
-  const cleanQuery = query.trim()
+  const cleanQuery = query?.trim()
   if (!cleanQuery) {
     throw new Error("SEARCH_QUERY_REQUIRED")
   }

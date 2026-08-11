@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Copy, ExternalLink, Star } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Copy, Check, ExternalLink, Star } from "lucide-react"
 import { useSystemContent } from "@/hooks/useSystemContent"
 
 export function ReviewEditor({ 
@@ -22,42 +21,45 @@ export function ReviewEditor({
   const [copied, setCopied] = useState(false)
   const [isEditingExisting, setIsEditingExisting] = useState(!!existingReviewText)
 
-  const copyTextToClipboard = (text: string) => {
+  const copyToClipboard = (text: string) => {
     try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).catch(() => fallbackCopy(text))
-      } else {
-        fallbackCopy(text)
-      }
-    } catch {
-      fallbackCopy(text)
-    }
-  }
-
-  const fallbackCopy = (text: string) => {
-    try {
+      // 1. Synchronous DOM textarea copy (Works 100% inside native click event)
       const textArea = document.createElement("textarea")
       textArea.value = text
       textArea.style.position = "fixed"
-      textArea.style.left = "-999999px"
+      textArea.style.top = "0"
+      textArea.style.left = "0"
+      textArea.style.width = "2em"
+      textArea.style.height = "2em"
+      textArea.style.padding = "0"
+      textArea.style.border = "none"
+      textArea.style.outline = "none"
+      textArea.style.boxShadow = "none"
+      textArea.style.background = "transparent"
       document.body.appendChild(textArea)
+      textArea.focus()
       textArea.select()
+      textArea.setSelectionRange(0, text.length)
       document.execCommand("copy")
       document.body.removeChild(textArea)
     } catch (e) {
-      console.error("ExecCommand copy failed", e)
+      console.warn("DOM copy warning:", e)
     }
+
+    // 2. Modern Clipboard API as secondary
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {})
+    }
+
+    setCopied(true)
   }
 
   const googleLink = merchant.googleReviewLink 
     || (merchant.googlePlaceId ? `https://search.google.com/local/writereview?placeid=${merchant.googlePlaceId}` : "https://maps.google.com")
 
-  const handleCopyAndPostClick = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault()
-
-    // 1. Copy draft text to clipboard
-    copyTextToClipboard(draft)
-    setCopied(true)
+  const handleCopyAndPostClick = () => {
+    // 1. Copy draft text to clipboard immediately in user click gesture
+    copyToClipboard(draft)
 
     // 2. Record review submission asynchronously
     fetch('/api/reviews/record-google-post', {
@@ -70,11 +72,6 @@ export function ReviewEditor({
         rating: 5
       })
     }).catch(err => console.error("Error recording review post:", err))
-
-    // 3. Directly navigate tab to Google Review URL (Impossible to block)
-    setTimeout(() => {
-      window.location.href = googleLink
-    }, 100)
   }
 
   return (
@@ -101,10 +98,11 @@ export function ReviewEditor({
           {existingReviewText && (
             <div className="bg-amber-950/40 border border-amber-800/60 rounded-xl p-3 text-xs text-amber-200 flex flex-col gap-2">
               <div>
-                {getContent('review_policy_notice', '📌 Google Policy Notice: Google allows 1 review per account. Clicking below will open your existing Google review in edit mode.')}
+                {getContent('review_policy_notice', '📌 Google Policy: Google allows 1 review per account. Clicking below will open your review in Edit mode — simply paste the text to update!')}
               </div>
               <div className="flex gap-2 pt-1">
                 <button
+                  type="button"
                   onClick={() => { setDraft(existingReviewText); setIsEditingExisting(true); }}
                   className={`px-2.5 py-1 rounded-md font-medium transition-all ${isEditingExisting ? "bg-amber-500 text-slate-950" : "bg-slate-800 text-slate-300"}`}
                 >
@@ -112,6 +110,7 @@ export function ReviewEditor({
                 </button>
                 {initialDraft && (
                   <button
+                    type="button"
                     onClick={() => { setDraft(initialDraft); setIsEditingExisting(false); }}
                     className={`px-2.5 py-1 rounded-md font-medium transition-all ${!isEditingExisting ? "bg-emerald-500 text-white" : "bg-slate-800 text-slate-300"}`}
                   >
@@ -131,11 +130,12 @@ export function ReviewEditor({
           <div className="space-y-2">
             <div className="flex justify-between items-center ml-1">
               <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                {isEditingExisting ? "Your Review (Edit to update)" : "AI Draft (Feel free to edit)"}
+                {isEditingExisting ? "Your Review (Edit to update)" : "AI DRAFT (FEEL FREE TO EDIT)"}
               </label>
             </div>
+            
             <textarea
-              className="w-full h-32 bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none transition-all"
+              className="w-full h-32 bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none transition-all text-sm leading-relaxed"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
             />
@@ -146,24 +146,29 @@ export function ReviewEditor({
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleCopyAndPostClick}
-            className={`w-full h-14 text-lg font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer decoration-0 ${
-              copied ? "bg-emerald-500 hover:bg-emerald-600 text-white" : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-[0_0_20px_-5px_rgba(16,185,129,0.5)] hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.7)]"
+            className={`w-full h-14 text-lg font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer no-underline ${
+              copied 
+                ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_0_20px_-3px_rgba(16,185,129,0.7)]" 
+                : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-[0_0_20px_-5px_rgba(16,185,129,0.5)] hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.7)]"
             }`}
           >
             {copied ? (
-              <span>Copied! Opening Google...</span>
+              <>
+                <Check className="w-5 h-5" />
+                <span>Copied! Opening Google...</span>
+              </>
             ) : (
               <>
                 <Copy className="w-5 h-5" />
                 <span>{getContent('review_copy_button', isEditingExisting ? "Copy & Update on Google" : "Copy & Post to Google")}</span>
-                <ExternalLink className="w-5 h-5 opacity-70 ml-1" />
+                <ExternalLink className="w-5 h-5 opacity-75 ml-1" />
               </>
             )}
           </a>
           
-          <p className="text-center text-xs text-slate-500 mt-2">
+          <p className="text-center text-xs text-slate-500 mt-2 leading-relaxed">
             {isEditingExisting 
-              ? "Updating your review refreshes your VIP status and sends an updated AI reply on Google!" 
+              ? "💡 Google will open your previous review. Select the text, paste this new draft, and hit Post!" 
               : "After posting, our system will automatically add Bonus Stamps to your VIP Wallet! 🎁"}
           </p>
         </div>
@@ -171,4 +176,5 @@ export function ReviewEditor({
     </div>
   )
 }
-// Force rebuild 2
+
+

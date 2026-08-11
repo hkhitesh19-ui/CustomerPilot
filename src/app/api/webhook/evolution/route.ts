@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { joinQueue } from "@/lib/queue-engine"
+import { getCompiledTemplate } from "@/lib/template-engine"
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
@@ -156,6 +157,12 @@ export async function POST(req: NextRequest) {
           continue
         }
 
+        // ── Subscription Gatekeeper ───────────────────────────────────────
+        if (merchant.trialEndsAt && new Date(merchant.trialEndsAt) < new Date()) {
+          console.warn(`[Webhook] 🚫 Merchant ${merchant.id} subscription expired. Dropping message.`);
+          continue;
+        }
+
         // Use merchant's dedicated Evolution instance
         const merchantInstance = merchant.whatsappInstanceName || webhookInstance
 
@@ -189,7 +196,8 @@ export async function POST(req: NextRequest) {
           }
         })
 
-        const isTriggerMsg = /vip\s*club|checking\s*in|stamps?|join|reward|counter/i.test(text)
+        // STRICT MATCH: Only trigger auto-onboarding if the text strictly matches the QR Code generated text
+        const isTriggerMsg = /Checking in for my VIP Club stamps/i.test(text)
 
         // Determine public base URL from request headers (Pinggy / Tunnel support for mobile links)
         const requestHost = req.headers.get("x-forwarded-host") || req.headers.get("host")
@@ -200,37 +208,53 @@ export async function POST(req: NextRequest) {
 
         // ── 1. CONTEXT AWARE REPLIES (Review & Name) ──────────────────────
         if (!isTriggerMsg && existingCustomer && text.length > 0 && text.length < 50) {
-          const lastSentMsg = await db.whatsAppMessage.findFirst({
-            where: {
-              merchantId: merchant.id,
-              toPhone: { contains: last10Phone },
-              status: { in: ["sent", "delivered", "read"] }
-            },
-            orderBy: { createdAt: "desc" }
-          })
+          let botState = existingCustomer.botState || "IDLE";
+          
+          // Handle 24-hour state expiration
+          if (existingCustomer.botStateUpdatedAt) {
+            const hoursSinceUpdate = (new Date().getTime() - new Date(existingCustomer.botStateUpdatedAt).getTime()) / (1000 * 60 * 60);
+            if (hoursSinceUpdate > 24 && botState !== "IDLE") {
+              botState = "IDLE";
+              // Non-blocking state reset
+              db.customer.update({ where: { id: existingCustomer.id }, data: { botState: "IDLE" } }).catch(()=>{});
+            }
+          }
 
-          if (lastSentMsg) {
+          if (botState !== "IDLE") {
             const cleanText = text.trim().toLowerCase()
-            const isAffirmative = ["yes", "y", "sure", "yeah", "ok", "yes please", "yes!"].includes(cleanText) || cleanText.includes("yes")
+            const isAffirmative = ["yes", "y", "sure", "yeah", "ok", "okay", "yep", "yes please", "yes!"].includes(cleanText) || cleanText.includes("yes")
 
             // A. Google Review Flow
-            if (lastSentMsg.template === "review_request" && isAffirmative) {
-               console.log(`[Webhook] Google Review AI Draft triggered for ${customerPhone}`)
-               const reviewUrl = `${publicBaseUrl}/review?c=${existingCustomer.id}&m=${merchant.id}`
-               const draftMsg = `Awesome! 🌟 Here is a draft review prepared by AI:\n\n*"The cake was fresh, beautiful, and absolutely delicious. Highly recommended!"*\n\nTap the link below to Edit or Post it on Google:\n${reviewUrl}`
+            if (botState === "AWAITING_REVIEW_CONSENT") {
+               // Reset state immediately
+               await db.customer.update({ where: { id: existingCustomer.id }, data: { botState: "IDLE" } })
                
-               const res = await sendEvolutionMessage(customerPhone, draftMsg, merchantInstance)
-               if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "REVIEW_DRAFT", draftMsg, res.data?.key?.id)
-               continue
+               if (isAffirmative) {
+                 console.log(`[Webhook] Google Review AI Draft triggered for ${customerPhone}`)
+                 const reviewUrl = `${publicBaseUrl}/review?c=${existingCustomer.id}&m=${merchant.id}`
+                 const draftMsg = await getCompiledTemplate(merchant.id, "REVIEW_DRAFT", { reviewUrl })
+                 
+                 const res = await sendEvolutionMessage(customerPhone, draftMsg, merchantInstance)
+                 if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "REVIEW_DRAFT", draftMsg, res.data?.key?.id)
+                 continue
+               }
             }
 
             // B. Name Confirmation Flow
-            if (lastSentMsg.template === "qr_welcome") {
+            if (botState === "AWAITING_NAME_CONFIRMATION") {
+               // Reset state immediately
+               await db.customer.update({ where: { id: existingCustomer.id }, data: { botState: "IDLE" } })
+
                let nameGuess = text
                if (isAffirmative) {
                   nameGuess = existingCustomer.name || extractPersonName(pushName) || "VIP Member"
                } else {
                   nameGuess = text.split(" ").slice(0, 2).join(" ")
+                  // Ignore common non-name conversational words
+                  const genericWords = ["hi", "hello", "hey", "thanks", "thank you", "no", "what", "how", "please", "sir", "madam", "okay", "ok", "yep"]
+                  if (genericWords.includes(nameGuess.toLowerCase())) {
+                     nameGuess = extractPersonName(pushName) || "VIP Member"
+                  }
                }
 
                await db.customer.update({
@@ -239,7 +263,10 @@ export async function POST(req: NextRequest) {
                })
                console.log(`[Webhook] ✏️ Name captured for ${customerPhone}: "${nameGuess}"`)
 
-               const nameConfirmMsg = `✅ *Got it! Welcome, ${nameGuess}!* 🎉\n\nYour FREE VIP Membership is now active at *${merchant.name}*.\n\nYou're in the queue. Our team will add your first stamp after billing. 🌟`
+               const nameConfirmMsg = await getCompiledTemplate(merchant.id, "NAME_CONFIRMED", {
+                 customerName: nameGuess,
+                 merchantName: merchant.name || "our store"
+               })
                const res = await sendEvolutionMessage(customerPhone, nameConfirmMsg, merchantInstance)
                if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "NAME_CONFIRMED", nameConfirmMsg, res.data?.key?.id)
                continue
@@ -265,7 +292,9 @@ export async function POST(req: NextRequest) {
 
         if (alreadyWaiting) {
           console.log(`[Webhook] Customer ${customerPhone} already in queue`)
-          const alreadyMsg = `👋 You're already in the queue at *${merchant.name}*!\n\nPlease wait — our team will serve you shortly. 🙏`
+          const alreadyMsg = await getCompiledTemplate(merchant.id, "QUEUE_DUPLICATE", {
+            merchantName: merchant.name || "our store"
+          })
           const res = await sendEvolutionMessage(customerPhone, alreadyMsg, merchantInstance)
           if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "QUEUE_DUPLICATE", alreadyMsg, res.data?.key?.id)
           continue
@@ -301,14 +330,28 @@ export async function POST(req: NextRequest) {
           if (result.isNewCustomer) {
             if (detectedName) {
               // CASE A from Requirements.txt: Display name detected — confirm it
-              welcomeMsg = `🎉 *You're invited to join the ${bizName} VIP Club.*\n\nIt's completely FREE and takes less than 10 seconds. Thank you for visiting us! 🙏\n\n*How it works:*\n⭐ Every ₹${stampValue} purchase = 1 Stamp\n🎁 Collect ${stampsRequired} Stamps → Claim *${rewardName}*\n🌟 Leave a Google Review → Earn Bonus Stamps!\n\nIs your name *${detectedName}*?\n\nReply *YES* to confirm, or type your name below:`
+              welcomeMsg = await getCompiledTemplate(merchant.id, "QR_WELCOME_NEW_DETECTED", {
+                businessName: bizName,
+                rewardPoints: stampValue,
+                requiredStamp: stampsRequired,
+                rewardName,
+                detectedName
+              })
             } else {
               // CASE B from Requirements.txt: No usable name — ask for it
-              welcomeMsg = `🎉 *You're invited to join the ${bizName} VIP Club.*\n\nIt's completely FREE and takes less than 10 seconds. Thank you for visiting us! 🙏\n\n*How it works:*\n⭐ Every ₹${stampValue} purchase = 1 Stamp\n🎁 Collect ${stampsRequired} Stamps → Claim *${rewardName}*\n🌟 Leave a Google Review → Earn Bonus Stamps!\n\nBefore we activate your FREE VIP Membership, *please share your name.*\n\nReply with your name (e.g. Rahul):`
+              welcomeMsg = await getCompiledTemplate(merchant.id, "QR_WELCOME_NEW_UNKNOWN", {
+                businessName: bizName,
+                rewardPoints: stampValue,
+                requiredStamp: stampsRequired,
+                rewardName
+              })
             }
           } else {
             const customerName = existingCustomer?.name || "there"
-            welcomeMsg = `👋 Welcome back, *${customerName}*! ❤️\n\nYou're in the queue at *${bizName}*.\n\nOur team will add your stamps after billing. Thank you for being a loyal VIP member! 🌟`
+            welcomeMsg = await getCompiledTemplate(merchant.id, "QR_WELCOME_RETURNING", {
+              customerName,
+              businessName: bizName
+            })
           }
 
           // GAP 1 FIX: Send via MERCHANT'S dedicated instance (not hardcoded default)

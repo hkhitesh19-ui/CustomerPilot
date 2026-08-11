@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { scheduleGoogleReviewRequest } from '@/lib/review-scheduler';
+import { getCompiledTemplate } from "@/lib/template-engine";
+import { getVipTierForSpend, VIP_TIER_LABELS } from "@/lib/vip-engine";
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
@@ -41,6 +44,7 @@ async function sendWhatsAppNotification(merchantId: string, toPhone: string, tex
         template: "STAMP_AWARDED",
         body: text.substring(0, 500),
         status: res.ok ? "sent" : "failed",
+        sentAt: res.ok ? new Date() : null,
         metaMessageId: data?.key?.id || `stamp_${Date.now()}`,
         errorMessage: errorMsg
       }
@@ -85,13 +89,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'Customer has already been processed' }, { status: 400 });
     }
 
-    // 2. Fetch active StampCard for merchant
+    // 2. Fetch active StampCard and Merchant for merchant
     const stampCard = await db.stampCard.findFirst({
       where: { merchantId, active: true }
     });
+    const merchant = await db.merchant.findUnique({ where: { id: merchantId } });
 
-    if (!stampCard) {
-      return NextResponse.json({ success: false, error: 'No active reward program found for this merchant' }, { status: 400 });
+    if (!stampCard || !merchant) {
+      return NextResponse.json({ success: false, error: 'No active reward program or merchant found' }, { status: 400 });
     }
 
     const stampValue = stampCard.stampValue || 500;
@@ -114,7 +119,7 @@ export async function POST(req: Request) {
     let visitNumber = 1;
 
     // 4. Perform database transaction
-    await db.$transaction(async (tx) => {
+    const transactionResult = await db.$transaction(async (tx) => {
       // Mark waiting customer as completed
       await tx.waitingCustomer.update({
         where: { id: waitingCustomerId },
@@ -164,8 +169,11 @@ export async function POST(req: Request) {
         }
       });
 
+      // Calculate Old VIP Tier before updating spend
+      const oldTier = getVipTierForSpend(waitingCustomer.customer.lifetimeSpend || 0);
+
       // Update Customer Lifetime Spend & Stamps
-      await tx.customer.update({
+      const updatedCustomer = await tx.customer.update({
         where: { id: waitingCustomer.customerId },
         data: {
           lifetimeSpend: { increment: parsedAmount },
@@ -173,9 +181,29 @@ export async function POST(req: Request) {
           lastActiveAt: new Date()
         }
       });
+      
+      // Calculate New VIP Tier after update
+      const newTier = getVipTierForSpend(updatedCustomer.lifetimeSpend);
+      let vipBonusStamps = 0;
+      let isUpgraded = false;
+
+      // Check if upgraded to a strictly higher tier (using minLifetimeSpend as rank)
+      if (newTier.minLifetimeSpend > oldTier.minLifetimeSpend) {
+        isUpgraded = true;
+        vipBonusStamps = merchant.vipUpgradeBonusStamps || 0;
+        
+        // Update VIP tier name in customer record
+        await tx.customer.update({
+          where: { id: waitingCustomer.customerId },
+          data: { vipTier: newTier.name }
+        });
+      }
+
+      // Total stamps to award = pos stamps + vip upgrade bonus
+      const totalStampsToAward = stampsToAward + vipBonusStamps;
 
       // Update Customer Stamp Wallet
-      if (stampsToAward > 0) {
+      if (totalStampsToAward > 0) {
         let customerCard = await tx.customerStampCard.findFirst({
           where: { 
             merchantId, 
@@ -196,7 +224,7 @@ export async function POST(req: Request) {
           });
         }
 
-        const totalStampsNow = customerCard.stampsCollected + stampsToAward;
+        const totalStampsNow = customerCard.stampsCollected + totalStampsToAward;
         const isCompleted = totalStampsNow >= stampCard.stampsRequired;
 
         await tx.customerStampCard.update({
@@ -207,7 +235,7 @@ export async function POST(req: Request) {
           }
         });
 
-        for (let i = 0; i < stampsToAward; i++) {
+        for (let i = 0; i < totalStampsToAward; i++) {
           await tx.stamp.create({
             data: {
               customerId: waitingCustomer.customerId,
@@ -215,32 +243,76 @@ export async function POST(req: Request) {
               stampCardId: stampCard.id,
               customerStampCardId: customerCard.id,
               billId: bill.id,
-              source: 'POS'
+              source: i < stampsToAward ? 'POS' : 'VIP_BONUS'
             }
           });
         }
       }
+      
+      return { isUpgraded, vipBonusStamps, newTier };
     });
 
     // 5. Send instant WhatsApp notification to customer (Day 1 / Day 4 Requirements.txt)
     if (waitingCustomer.customer?.phone) {
-      const merchant = await db.merchant.findUnique({ where: { id: merchantId } });
       const merchantName = merchant?.name || "our store";
+      // Ensure we get the ACTIVE (uncompleted) stamp card, or the most recent one if they just completed it
       const customerCard = await db.customerStampCard.findFirst({
-        where: { merchantId, customerId: waitingCustomer.customerId, stampCardId: stampCard.id }
+        where: { merchantId, customerId: waitingCustomer.customerId, stampCardId: stampCard.id },
+        orderBy: { createdAt: 'desc' }
       });
-      const totalStamps = customerCard?.stampsCollected || stampsToAward;
+      // Handle the fact that transaction result is now returned
+      const { isUpgraded, vipBonusStamps, newTier } = transactionResult;
+      
+      const totalStampsToAward = stampsToAward + vipBonusStamps;
+      // We check if the customerCard is completed in THIS transaction.
+      // `transactionResult` tells us they were upgraded, but we also want to know if the card completed.
+      // Wait, `customerCard` fetched here is the most recently created card. 
+      // If `totalStampsToAward > 0`, the transaction updated the card.
+      const totalStamps = customerCard?.stampsCollected || totalStampsToAward;
       const stampsRequired = stampCard.stampsRequired || 10;
       const rewardName = stampCard.rewardName || "FREE 500gm Cake";
       const remaining = Math.max(0, stampsRequired - totalStamps);
       const custName = waitingCustomer.customer.name || "there";
 
-      const notifyMsg = totalStamps >= stampsRequired
-        ? `🎉 *CONGRATULATIONS ${custName.toUpperCase()}!* ❤️\n\nWelcome to *${merchantName} VIP Club*.\n\nYou've collected all *${stampsRequired}/${stampsRequired} Stamps*! 🏆 (Visit #${visitNumber})\n\n🎁 *YOUR REWARD:* ${rewardName}\nShow this message at the counter to claim your FREE treat! 🌟`
-        : `⭐ *Congratulations ${custName}!* ❤️\n\nWelcome back to *${merchantName} VIP Club* (Visit #${visitNumber}).\n\n✅ *${stampsToAward} Stamp${stampsToAward > 1 ? "s" : ""} Added*\n📊 *Wallet:* ${totalStamps} / ${stampsRequired} Stamps\n🎁 *Next Reward:* ${rewardName} (${remaining} more stamp${remaining !== 1 ? "s" : ""} needed)\n\nThank you for visiting us! 🙏`;
+      // If this specific card reached the required stamps, trigger REWARD_UNLOCKED
+      const notifyMsg = (customerCard && customerCard.completed && customerCard.stampsCollected === stampsRequired && totalStampsToAward > 0) || totalStamps >= stampsRequired
+        ? await getCompiledTemplate(merchantId, "REWARD_UNLOCKED", {
+            customerName: custName.toUpperCase(),
+            merchantName,
+            requiredStamp: stampsRequired,
+            visitNumber,
+            rewardName,
+            couponCode: Math.random().toString(36).substring(2, 8).toUpperCase()
+          })
+        : await getCompiledTemplate(merchantId, "STAMP_EARNED", {
+            customerName: custName,
+            merchantName,
+            visitNumber,
+            stampCount: stampsToAward,
+            totalStamps,
+            requiredStamp: stampsRequired,
+            rewardName,
+            remainingStamps: remaining
+          });
 
       // Non-blocking background dispatch
       sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, notifyMsg);
+
+      if (isUpgraded) {
+        const upgradeMsg = await getCompiledTemplate(merchantId, "VIP_UPGRADE", {
+          customerName: custName,
+          merchantName,
+          tierName: VIP_TIER_LABELS[newTier.name as any] || newTier.name.toUpperCase(),
+          bonusStamps: vipBonusStamps.toString()
+        });
+        sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, upgradeMsg);
+      }
+
+      // FIX: Schedule Google Review request based on merchant delay configuration
+      scheduleGoogleReviewRequest({
+        merchantId,
+        customerId: waitingCustomer.customerId,
+      }).catch(e => console.error("[Award API] Review Scheduler Error:", e));
     }
 
     return NextResponse.json({ 

@@ -44,8 +44,8 @@ export function BrandingSettings({ merchantId }: { merchantId: string }) {
         },
         body: formData,
       })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error || "Upload failed")
+      const json = await res.json().catch(() => null)
+      if (!res.ok || !json) throw new Error(json?.error || "Upload failed")
       
       toast({ title: "Uploaded", description: json.message })
       refetch()

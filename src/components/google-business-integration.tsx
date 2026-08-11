@@ -41,10 +41,10 @@ export function GoogleBusinessIntegration({ merchantId }: { merchantId: string }
       const res = await fetch(`/api/google-business/search?q=${encodeURIComponent(searchQuery)}`, {
         headers: { "x-merchant-id": merchantId }
       })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error || "Failed to search")
-      setSearchResults(json.results || [])
-      if (json.results?.length === 0) {
+      const json = await res.json().catch(() => null)
+      if (!res.ok) throw new Error(json?.error || "Failed to search")
+      setSearchResults(json?.results || [])
+      if (json?.results?.length === 0) {
         toast({ title: "No results", description: "Try searching with city name (e.g. 'Central Cafe Mumbai')" })
       }
     } catch (e: any) {
@@ -67,7 +67,7 @@ export function GoogleBusinessIntegration({ merchantId }: { merchantId: string }
           reviewUrl: place.formattedAddress?.startsWith("http") ? place.formattedAddress : undefined
         }),
       })
-      const json = await res.json()
+      const json = await res.json().catch(() => null)
       if (!res.ok) throw new Error(json.error || "Failed to connect")
       
       toast({ title: "Connected!", description: json.message })

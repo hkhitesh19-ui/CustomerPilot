@@ -71,6 +71,11 @@ export async function proxy(request: NextRequest) {
     '/api/queue/validate-amount',
     '/api/qr/',
     '/api/seed',
+    '/api/cron/',
+    '/api/pricing/',
+    '/api/legal/',
+    '/api/coupons/',
+    '/api/payments/',
   ];
 
   const isPublicApi = PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix));

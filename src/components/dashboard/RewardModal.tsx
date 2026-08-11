@@ -13,12 +13,14 @@ interface RewardModalProps {
   waitingCustomer: any | null;
   onSuccess: () => void;
   merchantId?: string;
+  stampValue?: number;
 }
 
-export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merchantId = "" }: RewardModalProps) {
+export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merchantId = "", stampValue }: RewardModalProps) {
   const [amount, setAmount] = useState('');
   const [productName, setProductName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
   const [error, setError] = useState('');
   const [upsellInfo, setUpsellInfo] = useState<{
     shortfall: number;
@@ -39,8 +41,13 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
   };
 
   const parsedAmt = parseFloat(amount) || 0;
-  const STAMP_THRESHOLD = 500; // Default ₹500
-  const realTimeShortfall = parsedAmt > 0 && parsedAmt < STAMP_THRESHOLD ? STAMP_THRESHOLD - parsedAmt : 0;
+  const STAMP_THRESHOLD = stampValue && stampValue > 0 ? stampValue : 300; // Dynamic from merchant setting
+  
+  // Compute shortfall to earn next stamp threshold
+  const remainder = parsedAmt % STAMP_THRESHOLD;
+  const realTimeShortfall = parsedAmt > 0 && remainder > 0 ? STAMP_THRESHOLD - remainder : (parsedAmt > 0 && parsedAmt < STAMP_THRESHOLD ? STAMP_THRESHOLD - parsedAmt : 0);
+  const nextTargetAmount = parsedAmt + realTimeShortfall;
+  const currentStampsCount = Math.floor(parsedAmt / STAMP_THRESHOLD);
 
   const isReturningVIP = (waitingCustomer.customer?.lifetimeStamps || 0) > 0 || (waitingCustomer.customer?.bills?.length || 0) > 0;
 
@@ -85,6 +92,37 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
     } catch (err: any) {
       setError(err.message);
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRemove = async () => {
+    if (!confirm('Are you sure you want to remove this customer from the queue?')) return;
+    setError('');
+    setIsRemoving(true);
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/queue/remove', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-merchant-id': merchantId,
+        },
+        body: JSON.stringify({
+          waitingCustomerId: waitingCustomer.id,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to remove from queue');
+
+      onSuccess();
+      handleClose();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsRemoving(false);
       setLoading(false);
     }
   };
@@ -220,15 +258,21 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
               {realTimeShortfall > 0 && (
                 <div className="p-3 rounded-lg bg-indigo-950/40 border border-indigo-500/30 flex items-center justify-between text-xs animate-fadeIn">
                   <div className="flex items-center gap-2 text-indigo-300">
-                    <Sparkles className="w-4 h-4 text-indigo-400" />
-                    <span>Only <strong>₹{realTimeShortfall}</strong> away from 1 Stamp!</span>
+                    <Sparkles className="w-4 h-4 text-indigo-400 shrink-0" />
+                    <span>
+                      {currentStampsCount > 0 ? (
+                        <>🎉 <strong>{currentStampsCount} Stamp{currentStampsCount > 1 ? 's' : ''}</strong> earned! Only <strong>₹{realTimeShortfall}</strong> away from Stamp #{currentStampsCount + 1}!</>
+                      ) : (
+                        <>Only <strong>₹{realTimeShortfall}</strong> away from 1 Stamp!</>
+                      )}
+                    </span>
                   </div>
                   <button
                     type="button"
-                    onClick={() => setAmount(STAMP_THRESHOLD.toString())}
-                    className="text-[11px] bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-2 py-1 rounded transition-colors"
+                    onClick={() => setAmount(nextTargetAmount.toString())}
+                    className="text-[11px] bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-2 py-1 rounded transition-colors whitespace-nowrap ml-2"
                   >
-                    Make ₹{STAMP_THRESHOLD}
+                    Make ₹{nextTargetAmount}
                   </button>
                 </div>
               )}
@@ -236,11 +280,14 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
               {error && <p className="text-sm text-red-400 bg-red-950/50 p-2.5 rounded border border-red-900">{error}</p>}
 
               <DialogFooter className="fixed bottom-0 left-0 w-full p-4 bg-slate-950 border-t border-slate-800 md:relative md:border-none md:p-0 md:bg-transparent md:flex md:justify-end gap-2 z-50">
+                <Button type="button" variant="ghost" onClick={handleRemove} disabled={loading} className="text-red-400 hover:text-red-300 hover:bg-red-950/30 w-full md:w-auto md:mr-auto">
+                  {isRemoving ? 'Removing...' : 'Dismiss'}
+                </Button>
                 <Button type="button" variant="outline" onClick={handleClose} disabled={loading} className="border-slate-800 text-slate-400 w-full md:w-auto">
                   Cancel
                 </Button>
                 <Button type="submit" disabled={loading || !amount} className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold w-full md:w-auto">
-                  {loading ? 'Processing...' : 'Give Reward'}
+                  {loading && !isRemoving ? 'Processing...' : 'Give Reward'}
                 </Button>
               </DialogFooter>
             </form>

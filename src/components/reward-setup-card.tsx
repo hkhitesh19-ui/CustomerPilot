@@ -9,13 +9,18 @@ import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/hooks/use-toast"
 import { Gift, Sparkles, RefreshCw, Award, Image as ImageIcon } from "lucide-react"
 
+import { useDashboardState } from "@/hooks/use-dashboard-state"
+
 export function RewardSetupCard({ merchantId }: { merchantId: string }) {
+  const { refetch } = useDashboardState()
+
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [isDefault, setIsDefault] = useState(true)
+  const [isDefault, setIsDefault] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
-  const [form, setForm] = useState({
+  const defaultForm = {
     id: "",
     name: "Loyalty Stamp Card",
     stampsRequired: 10,
@@ -28,59 +33,87 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
     tierRewardsEnabled: false,
     excludedCategories: "",
     rewardImageUrl: ""
-  })
+  }
+
+  const [form, setForm] = useState(defaultForm)
 
   useEffect(() => {
-    let isMounted = true
+    let cancelled = false
+
     async function loadSetup() {
-      if (!merchantId) return
       try {
+        setLoading(true)
+        setLoadError(null)
+
         const res = await fetch("/api/cards/setup", {
-          headers: { "x-merchant-id": merchantId }
+          cache: "no-store",
         })
-        const json = await res.json()
-        if (res.ok && json.card && isMounted) {
+
+        const json = await res.json().catch(() => null)
+
+        if (!res.ok) {
+          throw new Error(json?.error ?? `Setup request failed: ${res.status}`)
+        }
+
+        if (!json?.data?.card) {
+          throw new Error("No active reward card was returned")
+        }
+
+        if (!cancelled) {
+          const cardData = json.data.card
           setForm({
-            id: json.card.id || "",
-            name: json.card.name || "Loyalty Stamp Card",
-            stampsRequired: json.card.stampsRequired ?? 10,
-            rewardName: json.card.rewardName || "FREE 500gm Cake",
-            stampValue: json.card.stampValue ?? 500,
-            validityDays: json.card.validityDays ?? 90,
-            googleReviewBonus: json.card.googleReviewBonus ?? 1,
-            photoBonus: json.card.photoBonus ?? 1,
-            color: json.card.color || "#6366f1",
-            tierRewardsEnabled: Boolean(json.card.tierRewardsEnabled),
-            excludedCategories: json.card.excludedCategories || "",
-            rewardImageUrl: json.card.rewardImageUrl || ""
+            id: cardData.id || "",
+            name: cardData.name || "Loyalty Stamp Card",
+            stampsRequired: cardData.stampsRequired ?? 10,
+            rewardName: cardData.rewardName || "FREE 500gm Cake",
+            stampValue: cardData.stampValue ?? 500,
+            validityDays: cardData.validityDays ?? 90,
+            googleReviewBonus: cardData.googleReviewBonus ?? 1,
+            photoBonus: cardData.photoBonus ?? 1,
+            color: cardData.color || "#6366f1",
+            tierRewardsEnabled: Boolean(cardData.tierRewardsEnabled),
+            excludedCategories: cardData.excludedCategories || "",
+            rewardImageUrl: cardData.rewardImageUrl || ""
           })
-          setIsDefault(json.isDefault ?? false)
+          setIsDefault(Boolean(json.data.isDefault))
         }
       } catch (error) {
-        console.error("[RewardSetupCard] Fetch Error:", error)
+        if (!cancelled) {
+          setLoadError(
+            error instanceof Error ? error.message : "Unable to load setup"
+          )
+        }
       } finally {
-        if (isMounted) setLoading(false)
+        if (!cancelled) {
+          setLoading(false)
+        }
       }
     }
+
     loadSetup()
-    return () => { isMounted = false }
-  }, [merchantId])
+
+    return () => {
+      cancelled = true
+    }
+  }, []) // runs once on mount
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
     try {
+      // No x-merchant-id header — server reads from JWT cookie
       const res = await fetch("/api/cards/setup", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-merchant-id": merchantId },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form)
       })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error || "Failed to save configuration")
+      const json = await res.json().catch(() => null)
+      if (!res.ok) throw new Error(json?.error || "Failed to save configuration")
 
       toast({ title: "Saved Successfully", description: "Reward Card rules updated." })
       setIsDefault(false)
-      if (json.card?.id) setForm(prev => ({ ...prev, id: json.card.id }))
+      if (json.data?.card?.id) setForm(prev => ({ ...prev, id: json.data.card.id }))
+      if (refetch) refetch()
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" })
     } finally {
@@ -91,8 +124,23 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
   if (loading) {
     return (
       <Card className="border-border">
-        <CardContent className="p-6 flex items-center justify-center">
-          <RefreshCw className="w-6 h-6 animate-spin text-muted-foreground" />
+        <CardContent className="p-6 flex flex-col items-center justify-center gap-4 text-muted-foreground">
+          <RefreshCw className="w-6 h-6 animate-spin" />
+          <p className="text-sm">Loading reward setup...</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (loadError) {
+    return (
+      <Card className="border-border border-red-500/20 bg-red-500/5">
+        <CardContent className="p-6 flex flex-col items-center justify-center gap-4 text-red-500">
+          <p className="text-sm font-medium">Failed to load configuration</p>
+          <p className="text-xs opacity-80">{loadError}</p>
+          <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+            Retry
+          </Button>
         </CardContent>
       </Card>
     )

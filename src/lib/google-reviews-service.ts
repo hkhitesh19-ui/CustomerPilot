@@ -132,9 +132,13 @@ export async function fetchGoogleReviews(merchantId: string, maxLimit: number = 
     } catch (err: any) {
       console.error(`[GBP API] Error fetching reviews for merchant ${merchantId}:`, err.message)
     }
+    
+    // Crucial Bug Fix: If we attempted to use a real API token and it failed (or returned 0 reviews),
+    // we MUST return an empty array. Do NOT fall through to generating fake mock data in production.
+    return []
   }
 
-  // Fallback / Demo Simulation
+  // Fallback / Demo Simulation (Only executes if there is NO real token or if it's a mock token)
   return generateMockReviews(merchantId, maxLimit > 6 ? 6 : maxLimit)
 }
 

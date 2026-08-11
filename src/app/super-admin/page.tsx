@@ -7,6 +7,8 @@ import {
   Image as ImageIcon, Brain, BarChart3, Heart, Database, Download,
   Settings, Globe, Shield, Code, Zap, Crown, Store, Check, X, Search, MessageSquare, RefreshCw, RotateCcw
 } from "lucide-react"
+import { WhatsAppTemplateManager } from "@/components/whatsapp-template-manager"
+import { SubscriptionPlansManager } from "@/components/super-admin/subscription-plans-manager"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -651,28 +653,7 @@ function MerchantManagement() {
 // Subscription Management
 // ============================================================
 function SubscriptionManagement() {
-  return (
-    <div className="grid md:grid-cols-4 gap-4">
-      {[
-        { plan: "Starter", active: 8924, mrr: 891576 },
-        { plan: "Pro", active: 5214, mrr: 13020858 },
-        { plan: "Enterprise", active: 187, mrr: 1866813 },
-        { plan: "Trials", active: 1892, mrr: 0 },
-      ].map((s, i) => (
-        <Card key={i}>
-          <CardContent className="p-6 text-center">
-            <div className="text-sm text-stone-500">{s.plan}</div>
-            <div className="text-3xl font-bold text-stone-900 mt-2">{s.active.toLocaleString("en-IN")}</div>
-            <div className="text-xs text-stone-400 mt-1">active subscriptions</div>
-            <div className="mt-4 pt-4 border-t border-stone-100">
-              <div className="text-xs text-stone-500">MRR Contribution</div>
-              <div className="text-lg font-semibold text-emerald-600">₹{(s.mrr / 100000).toFixed(1)}L</div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  )
+  return <SubscriptionPlansManager />
 }
 
 // ============================================================
@@ -1081,8 +1062,8 @@ function AdminTemplateManagement() {
             <CardTitle className="text-sm font-medium text-stone-500">System Default Templates</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-stone-900">{data?.systemDefaults?.length || 0} Journey Templates</div>
-            <p className="text-xs text-stone-500 mt-1">Immutable baseline defaults for all merchants</p>
+            <div className="text-2xl font-bold text-stone-900">{data?.systemDefaults?.length || 0} Base Templates</div>
+            <p className="text-xs text-stone-500 mt-1">Global baselines used if no custom override exists</p>
           </CardContent>
         </Card>
 
@@ -1097,7 +1078,9 @@ function AdminTemplateManagement() {
         </Card>
       </div>
 
-      <Card className="bg-white border-stone-200">
+      <WhatsAppTemplateManager merchantId="system" />
+
+      <Card className="bg-white border-stone-200 mt-8">
         <CardHeader>
           <CardTitle className="text-lg font-bold text-stone-900 flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-emerald-600" />

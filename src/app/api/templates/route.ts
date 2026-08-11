@@ -9,13 +9,15 @@ export async function GET(req: NextRequest) {
   const merchantId = req.headers.get("x-merchant-id")
   if (!merchantId) return err("Unauthorized", 401)
 
+  const isSystem = merchantId === "system"
+
   try {
     // 1. Fetch system defaults directly from codebase
     const systemDefaults = SYSTEM_DEFAULT_TEMPLATES
 
-    // 2. Fetch merchant custom overrides
+    // 2. Fetch merchant custom overrides (or system overrides if isSystem)
     const merchantOverrides = await db.messageTemplate.findMany({
-      where: { merchantId },
+      where: { merchantId: isSystem ? null : merchantId },
     })
 
     const merchantMap = new Map(merchantOverrides.map((m) => [m.templateKey, m]))

@@ -120,6 +120,7 @@ export default function QueuePage() {
         waitingCustomer={selectedWaitingCustomer}
         onSuccess={() => refetch()}
         merchantId={data?.merchant?.id || ""}
+        stampValue={data?.stampCards?.[0]?.stampValue || 300}
       />
     </div>
   )

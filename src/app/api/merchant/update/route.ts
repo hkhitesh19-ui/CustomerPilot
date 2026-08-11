@@ -26,6 +26,32 @@ export async function PATCH(req: NextRequest) {
     }
     allowedUpdates.googleReviewDelayMinutes = delay
   }
+  if (body.vipUpgradeBonusStamps !== undefined) {
+    const bonus = Number(body.vipUpgradeBonusStamps)
+    if (Number.isInteger(bonus) && bonus >= 0) {
+      allowedUpdates.vipUpgradeBonusStamps = bonus
+    }
+  }
+  if (body.winbackDays1 !== undefined) {
+    const d = Number(body.winbackDays1)
+    if (Number.isInteger(d) && d > 0) allowedUpdates.winbackDays1 = d
+  }
+  if (body.winbackDays2 !== undefined) {
+    const d = Number(body.winbackDays2)
+    if (Number.isInteger(d) && d > 0) allowedUpdates.winbackDays2 = d
+  }
+  if (body.winbackDays3 !== undefined) {
+    const d = Number(body.winbackDays3)
+    if (Number.isInteger(d) && d > 0) allowedUpdates.winbackDays3 = d
+  }
+  if (body.expiryWarningDays !== undefined) {
+    const d = Number(body.expiryWarningDays)
+    if (Number.isInteger(d) && d > 0) allowedUpdates.expiryWarningDays = d
+  }
+  if (body.almostThereInactivityDays !== undefined) {
+    const d = Number(body.almostThereInactivityDays)
+    if (Number.isInteger(d) && d > 0) allowedUpdates.almostThereInactivityDays = d
+  }
 
   try {
     const updated = await db.merchant.update({

@@ -16,6 +16,13 @@ export const VARIABLE_DICTIONARY: Record<string, VariableDefinition> = {
     category: "customer",
     mockValue: "Rahul Sharma",
   },
+  detectedName: {
+    key: "detectedName",
+    label: "Detected WhatsApp Name",
+    description: "Name automatically detected from WhatsApp profile",
+    category: "customer",
+    mockValue: "Aarav",
+  },
   phone: {
     key: "phone",
     label: "Customer Phone",
@@ -79,6 +86,20 @@ export const VARIABLE_DICTIONARY: Record<string, VariableDefinition> = {
     category: "loyalty",
     mockValue: "3",
   },
+  totalStamps: {
+    key: "totalStamps",
+    label: "Total Wallet Stamps",
+    description: "Total stamps customer currently holds",
+    category: "loyalty",
+    mockValue: "2",
+  },
+  visitNumber: {
+    key: "visitNumber",
+    label: "Visit Number",
+    description: "How many times customer has visited",
+    category: "loyalty",
+    mockValue: "2",
+  },
   requiredStamp: {
     key: "requiredStamp",
     label: "Stamps Required",
@@ -128,6 +149,13 @@ export const VARIABLE_DICTIONARY: Record<string, VariableDefinition> = {
     category: "system",
     mockValue: "https://g.page/r/sample/review",
   },
+  reviewUrl: {
+    key: "reviewUrl",
+    label: "AI Review Draft Link",
+    description: "CustomerPilot AI auto-drafted review link",
+    category: "system",
+    mockValue: "http://localhost:3000/review?c=123&m=abc",
+  },
   referralLink: {
     key: "referralLink",
     label: "Customer Referral Link",
@@ -155,6 +183,20 @@ export const VARIABLE_DICTIONARY: Record<string, VariableDefinition> = {
     description: "6-digit authentication pin",
     category: "system",
     mockValue: "482910",
+  },
+  count: {
+    key: "count",
+    label: "General Count",
+    description: "Count of items/customers for reports",
+    category: "system",
+    mockValue: "10",
+  },
+  revenue: {
+    key: "revenue",
+    label: "Revenue",
+    description: "Revenue amount for reports",
+    category: "merchant",
+    mockValue: "5500",
   },
 }
 

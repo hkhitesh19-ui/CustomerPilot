@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getMessageWorker } from '@/lib/message-worker';
+import { getCompiledTemplate } from "@/lib/template-engine";
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
@@ -52,18 +54,49 @@ export async function GET(req: Request) {
 
     const now = new Date();
 
-    // Promote scheduled WhatsApp messages whose scheduledFor time has passed
-    const promoted = await db.whatsAppMessage.updateMany({
+    // Process scheduled / queued WhatsApp messages whose scheduledFor time has arrived
+    const pendingMessages = await db.whatsAppMessage.findMany({
       where: {
-        status: "scheduled",
-        scheduledFor: { lte: new Date() },
+        status: { in: ["scheduled", "queued"] },
+        OR: [
+          { scheduledFor: null },
+          { scheduledFor: { lte: now } }
+        ]
       },
-      data: {
-        status: "queued",
-      },
-    }).catch(() => ({ count: 0 }))
-    if (promoted.count > 0) {
-      log(`[Scheduled Messages] Promoted ${promoted.count} scheduled messages to queued status.`);
+      take: 20
+    });
+
+    log(`[Pending Messages] Found ${pendingMessages.length} pending messages to dispatch.`);
+
+    for (const msg of pendingMessages) {
+      try {
+        const merchant = await db.merchant.findUnique({ where: { id: msg.merchantId } });
+        const instanceName = merchant?.whatsappInstanceName || (merchant?.whatsappPhone ? `CP_M${merchant.whatsappPhone.replace(/\D/g, "")}` : "CP_M919033304707");
+
+        const res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
+          body: JSON.stringify({
+            number: msg.toPhone,
+            text: msg.body
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+
+        await db.whatsAppMessage.update({
+          where: { id: msg.id },
+          data: {
+            status: res.ok ? "sent" : "failed",
+            sentAt: res.ok ? new Date() : null,
+            metaMessageId: data?.key?.id || `${msg.template}_${Date.now()}`,
+            errorMessage: res.ok ? null : (data.message || `HTTP ${res.status}`)
+          }
+        });
+
+        log(`[Dispatched] ✉️ Sent ${msg.template} to +${msg.toPhone} via ${instanceName} (Status: ${res.ok ? 'OK' : 'FAIL'})`);
+      } catch (err: any) {
+        log(`[Dispatch Error] Failed to send msg ${msg.id}: ${err.message}`);
+      }
     }
 
     // Day 2 (Modified for Testing: Created today, but at least 5 minutes ago)
@@ -90,6 +123,12 @@ export async function GET(req: Request) {
         createdAt: {
           gte: day1AgoTargetStart,
           lte: day1AgoTargetEnd
+        },
+        merchant: {
+          OR: [
+            { trialEndsAt: null },
+            { trialEndsAt: { gt: new Date() } }
+          ]
         }
       },
       include: {
@@ -114,9 +153,9 @@ export async function GET(req: Request) {
         continue;
       }
       
-      // CRITICAL FIX: Prevent spamming if already sent recently
+      // CRITICAL FIX: Prevent spamming if EVER sent
       const recentlySentReview = await db.whatsAppMessage.findFirst({
-         where: { toPhone: bill.customer.phone, template: 'review_request', createdAt: { gte: day1AgoTargetStart } }
+         where: { toPhone: bill.customer.phone, template: 'review_request' }
       });
       if (recentlySentReview) {
          log(`[Skip Review Request] Already sent review_request to ${bill.customer.name} recently.`);
@@ -124,10 +163,18 @@ export async function GET(req: Request) {
       }
 
       reviewsRequested++;
-      const reviewMsg = `Hi ${bill.customer.name} ❤️\n\nHope you loved your recent purchase from *${bill.merchant.name}*!\n\nWould you like AI to prepare your Google Review? Reply *YES* to see the draft and unlock a 🎁 *Bonus Stamp* on your VIP Card!`;
+      const reviewMsg = await getCompiledTemplate(bill.merchantId, "REVIEW_REQUEST", {
+        customerName: bill.customer.name,
+        merchantName: bill.merchant.name
+      });
       
       log(`[WhatsApp -> ${bill.customer.name}] Review Request sent.`);
       await sendWhatsApp(bill.merchantId, bill.customer.phone, reviewMsg, 'review_request', bill.customerId);
+
+      await db.customer.update({
+        where: { id: bill.customerId },
+        data: { botState: 'AWAITING_REVIEW_CONSENT', botStateUpdatedAt: new Date() }
+      });
     }
 
     // -------------------------------------------------------------
@@ -135,7 +182,13 @@ export async function GET(req: Request) {
     // -------------------------------------------------------------
     log(`Checking Day 3 Merchant Morning Reports`);
     const merchants = await db.merchant.findMany({
-      where: { status: { in: ['active', 'trialing', 'trial'] } }
+      where: { 
+        status: { in: ['active', 'trialing', 'trial'] },
+        OR: [
+          { trialEndsAt: null },
+          { trialEndsAt: { gt: new Date() } }
+        ]
+      }
     });
 
     let reportsSent = 0;
@@ -166,7 +219,11 @@ export async function GET(req: Request) {
         const repeatBills = yesterdayBills.filter(b => b.notes?.includes('Visit #') && !b.notes?.includes('Visit #1'));
         reportsSent++;
 
-        const morningMsg = `Good Morning ${merchant.ownerName || merchant.name} ☀️\n\n📊 *Yesterday's Performance Summary:*\n👥 Total Customers: *${yesterdayBills.length}*\n🔄 Repeat Customers: *${repeatBills.length}*\n💰 Revenue Earned: *₹${revenue}*\n⭐ Reviews Received: *${yesterdayBills.length > 2 ? 3 : 1}*\n\nPotential Repeat Revenue waiting: *₹${revenue * 2}*\n\nLog in to your CustomerPilot Dashboard to send Win-Back reminders! 🚀`;
+        const morningMsg = await getCompiledTemplate(merchant.id, "MORNING_REPORT", {
+          customerName: merchant.ownerName || merchant.name,
+          count: yesterdayBills.length,
+          revenue
+        });
 
         log(`[WhatsApp -> Merchant ${merchant.name}] Morning Report sent.`);
         await sendWhatsApp(merchant.id, merchant.whatsappPhone, morningMsg, 'morning_report');
@@ -174,44 +231,145 @@ export async function GET(req: Request) {
     }
 
     // -------------------------------------------------------------
-    // 3. DAY 15: Automated Win-Back Campaign
+    // 3. Automated Win-Back Campaigns & 7-Day Reminder
     // -------------------------------------------------------------
-    log(`Checking Day 15 Win-Back Campaigns (Target: ${day15AgoTargetStart.toDateString()})`);
+    log(`Checking Advanced Automation Engine...`);
     
     const allCustomers = await db.customer.findMany({
-      where: { status: { not: 'blocked' }, whatsappOptIn: true },
+      where: { 
+        status: { not: 'blocked' }, 
+        whatsappOptIn: true,
+        merchant: {
+          OR: [
+            { trialEndsAt: null },
+            { trialEndsAt: { gt: new Date() } }
+          ]
+        }
+      },
       include: {
         merchant: true,
         bills: {
           orderBy: { createdAt: 'desc' },
           take: 1
+        },
+        stampCards: {
+          where: { completed: false },
+          include: { stampCard: true }
         }
       },
       take: 1000, // Process in batches — a cron job should not load the entire DB at once
     });
 
     let winbacksSent = 0;
+    let remindersSent = 0;
+    let expiryWarningsSent = 0;
+
     for (const customer of allCustomers) {
+      const merchant = customer.merchant;
+      const targetExpiryWarningDays = (merchant as any).expiryWarningDays ?? 7;
+      const targetAlmostThereDays = (merchant as any).almostThereInactivityDays ?? 7;
+      const targetWinback1 = (merchant as any).winbackDays1 ?? 30;
+      const targetWinback2 = (merchant as any).winbackDays2 ?? 60;
+      const targetWinback3 = (merchant as any).winbackDays3 ?? 90;
+
+      const activeStampCard = customer.stampCards.find(c => !c.completed);
+      
+      // EXPIRY WARNING: Check if active stamp card expires in configured expiryWarningDays
+      if (activeStampCard && activeStampCard.stampCard.validityDays) {
+        const createdAt = new Date(activeStampCard.createdAt);
+        const expiryDate = new Date(createdAt);
+        expiryDate.setDate(createdAt.getDate() + activeStampCard.stampCard.validityDays);
+        
+        const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntilExpiry === targetExpiryWarningDays) {
+          // Check if already sent
+          const alreadySentExpiry = await db.whatsAppMessage.findFirst({
+            where: { toPhone: customer.phone, template: 'EXPIRY_WARNING_7_DAY', customerId: customer.id }
+          });
+          if (!alreadySentExpiry) {
+            expiryWarningsSent++;
+            const expiryMsg = await getCompiledTemplate(customer.merchantId, "EXPIRY_WARNING_7_DAY", {
+              customerName: customer.name,
+              merchantName: customer.merchant.name,
+              rewardName: activeStampCard.stampCard.rewardName || "Free Reward",
+              stampsCollected: activeStampCard.stampsCollected,
+              validityDaysLeft: targetExpiryWarningDays
+            });
+            log(`[WhatsApp -> ${customer.name}] Expiry Warning (${targetExpiryWarningDays} days) sent.`);
+            await sendWhatsApp(customer.merchantId, customer.phone, expiryMsg, 'EXPIRY_WARNING_7_DAY', customer.id);
+          }
+        }
+      }
+
       if (customer.bills.length > 0) {
         const lastBillDate = customer.bills[0].createdAt;
-        if (lastBillDate >= day15AgoTargetStart && lastBillDate <= day15AgoTargetEnd) {
-          winbacksSent++;
-          const winbackMsg = `Hi ${customer.name} ❤️\n\nWe miss you at *${customer.merchant.name}*! 😊\n\nIt's been 15 days since your last visit. We've unlocked a *Bonus Surprise Stamp* for your next visit!\n\nCome back and claim your reward! 🎁`;
+        const daysSinceLastVisit = Math.floor((now.getTime() - lastBillDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        // Almost There Reminder (Only 2 Stamps left & inactive for configured days)
+        if (daysSinceLastVisit === targetAlmostThereDays && activeStampCard && activeStampCard.stampsCollected === (activeStampCard.stampCard.stampsRequired - 2)) {
+          const createdAt = new Date(activeStampCard.createdAt);
+          const expiryDate = new Date(createdAt);
+          if (activeStampCard.stampCard.validityDays) {
+            expiryDate.setDate(createdAt.getDate() + activeStampCard.stampCard.validityDays);
+          } else {
+            expiryDate.setDate(createdAt.getDate() + 365); 
+          }
+          const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
           
-          log(`[WhatsApp -> ${customer.name}] Win-Back 15-day message sent.`);
-          await sendWhatsApp(customer.merchantId, customer.phone, winbackMsg, 'win_back_15', customer.id);
+          if (daysUntilExpiry > 0) {
+            const alreadySentAlmostThere = await db.whatsAppMessage.findFirst({
+              where: { toPhone: customer.phone, template: 'ALMOST_THERE_REMINDER', customerId: customer.id }
+            });
+            
+            if (!alreadySentAlmostThere) {
+              remindersSent++;
+              const almostThereMsg = await getCompiledTemplate(customer.merchantId, "ALMOST_THERE_REMINDER", {
+                customerName: customer.name,
+                merchantName: customer.merchant.name,
+                remainingStamps: 2,
+                validityDaysLeft: daysUntilExpiry
+              });
+              log(`[WhatsApp -> ${customer.name}] Almost There (2 stamps left) reminder sent.`);
+              await sendWhatsApp(customer.merchantId, customer.phone, almostThereMsg, 'ALMOST_THERE_REMINDER', customer.id);
+            }
+          }
+        }
+
+        // Win-back Campaigns (Configurable Days: winbackDays1, winbackDays2, winbackDays3 or default 15)
+        let winbackTemplateKey = null;
+        if (daysSinceLastVisit === 15) winbackTemplateKey = "WINBACK_15_DAY";
+        else if (daysSinceLastVisit === targetWinback1) winbackTemplateKey = "WINBACK_30_DAY";
+        else if (daysSinceLastVisit === targetWinback2) winbackTemplateKey = "WINBACK_60_DAY";
+        else if (daysSinceLastVisit === targetWinback3) winbackTemplateKey = "WINBACK_90_DAY";
+
+        if (winbackTemplateKey) {
+          const alreadySent = await db.whatsAppMessage.findFirst({
+            where: { toPhone: customer.phone, template: winbackTemplateKey, customerId: customer.id }
+          });
+          if (!alreadySent) {
+            winbacksSent++;
+            const winbackMsg = await getCompiledTemplate(customer.merchantId, winbackTemplateKey, {
+              customerName: customer.name,
+              merchantName: customer.merchant.name
+            });
+            log(`[WhatsApp -> ${customer.name}] ${winbackTemplateKey} message sent.`);
+            await sendWhatsApp(customer.merchantId, customer.phone, winbackMsg, winbackTemplateKey, customer.id);
+          }
         }
       }
     }
 
-    log('Day 1 to Day 15 Automation Engine completed successfully.');
+    log('Day 1 to Day 90 Automation Engine completed successfully.');
 
     return NextResponse.json({ 
       success: true, 
       stats: {
         reviewsRequested,
         reportsSent,
-        winbacksSent
+        winbacksSent,
+        remindersSent,
+        expiryWarningsSent
       },
       logs 
     });

@@ -2,6 +2,7 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { TopNav } from "@/components/top-nav"
+import { SubscriptionGuard } from "@/components/subscription-guard"
 
 export default function DashboardLayout({
   children,
@@ -18,7 +19,9 @@ export default function DashboardLayout({
           
           <TopNav />
           <main className="flex-1 overflow-auto p-4 md:p-8 relative z-10">
-            {children}
+            <SubscriptionGuard>
+              {children}
+            </SubscriptionGuard>
           </main>
         </div>
       </div>

@@ -312,6 +312,13 @@ export class MessageWorker {
         },
       })
 
+      if (result.success && message.template === "review_request" && message.customerId) {
+        await db.customer.update({
+          where: { id: message.customerId },
+          data: { botState: "AWAITING_REVIEW_CONSENT", botStateUpdatedAt: new Date() }
+        }).catch(console.error);
+      }
+
       return result.success
     } catch (error: any) {
       console.error(`[Worker] Failed to process message ${message.id}:`, error.message)
