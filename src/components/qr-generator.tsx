@@ -68,7 +68,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <QrCode className="w-5 h-5 text-indigo-500" />
-          Step 6: Commercial QR Generation
+          Commercial QR Generation
         </CardTitle>
         <CardDescription>
           Generate branded QR codes for your store counters, tables, posters, packaging, and cake boxes.

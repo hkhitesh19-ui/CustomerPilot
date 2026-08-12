@@ -153,7 +153,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Gift className="w-5 h-5 text-indigo-500" />
-              Step 5: Reward Card Setup
+              Reward Card Setup
             </CardTitle>
             <CardDescription>
               Configure your merchant loyalty rules, stamp requirements, and bonus stamp triggers.

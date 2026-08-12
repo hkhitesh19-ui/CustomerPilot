@@ -750,9 +750,9 @@ function MerchantManagement() {
               </div>
             )}
 
-            {/* Step 5 Rules */}
+            {/* Reward Card Rules */}
             <div className="space-y-4">
-              <h4 className="font-semibold text-stone-800 text-sm border-b pb-1">🎁 Step 5: Reward Card & Bonus Rules</h4>
+              <h4 className="font-semibold text-stone-800 text-sm border-b pb-1">🎁 Reward Card & Bonus Rules</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label className="text-xs text-stone-600">Reward Description</Label>
@@ -804,9 +804,9 @@ function MerchantManagement() {
               </div>
             </div>
 
-            {/* Step 6 Rules */}
+            {/* Loyalty Cycle Categories */}
             <div className="space-y-4">
-              <h4 className="font-semibold text-stone-800 text-sm border-b pb-1">👑 Step 6: 10-Level Loyalty Cycle Category Titles</h4>
+              <h4 className="font-semibold text-stone-800 text-sm border-b pb-1">👑 10-Level Loyalty Cycle Category Titles</h4>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                 {editForm.categories?.map((cat: string, idx: number) => (
                   <div key={idx} className="space-y-1">

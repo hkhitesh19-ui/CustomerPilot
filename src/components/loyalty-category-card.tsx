@@ -74,7 +74,7 @@ export function LoyaltyCategoryCard({ merchantId, initialCategoryJson }: Props) 
           <div>
             <CardTitle className="text-slate-200 flex items-center gap-2">
               <Crown className="w-5 h-5 text-amber-400" />
-              Step 6: Loyalty Cycle Categories (10 Levels)
+              Loyalty Cycle Categories (10 Levels)
             </CardTitle>
             <CardDescription className="text-slate-400 mt-1">
               Configure titles for 10 customer loyalty levels. New customers start at Level 1 (VIP) upon QR scan, and automatically upgrade upon completing each loyalty stamp card cycle!
