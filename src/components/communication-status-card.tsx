@@ -15,7 +15,7 @@ export function CommunicationStatusCard() {
       <CardContent>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm">Evolution Status</span>
+            <span className="text-sm">WhatsappAPI Status</span>
             <span className="text-sm font-semibold text-green-600 bg-green-100 dark:bg-green-900/30 px-2 rounded-full">Connected</span>
           </div>
           <div className="flex items-center justify-between">
