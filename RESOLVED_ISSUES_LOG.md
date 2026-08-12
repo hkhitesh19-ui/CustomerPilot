@@ -366,3 +366,20 @@ ext() function to explicitly POST the merchant's configured reward card details 
   - **Production Fix:** On the live HTTPS production domain (e.g., `https://app.customerpilot.com`), the single-button approach works perfectly because `window.isSecureContext === true` and `navigator.clipboard.writeText()` is fully available.
   - **Code State:** Restored to clean single-button approach using `<a>` tag with `onClick` that tries `navigator.clipboard.writeText()` first (HTTPS), then falls back to `execCommand` on visible textarea (HTTP best-effort).
 - **Status**: ✅ Root cause permanently identified. **Not a code bug — a browser security policy on HTTP.** Will work correctly on production HTTPS deployment. Local testing should be done via `http://localhost:3000` on PC browser.
+
+---
+
+## [12 Aug 2026] Issue: WhatsApp Delivery Instance Mismatch & AI Owner Reply SEO Optimization + Save Edits Feature
+- **Symptom**: 
+  1. WhatsApp reward confirmation messages after Google Review post were saved in DB as "sent" but not actually delivered to the customer's phone.
+  2. Initial AI Owner Reply drafts displayed non-SEO fallback text (`"Thank you for the amazing review!"`).
+  3. Dashboard Reviews Studio lacked a dedicated "Save Edits" option for merchants to persist custom-edited replies to the database.
+- **Root Cause**:
+  1. `record-google-post/route.ts` used an ad-hoc instance name resolution fallback (`CP_M${phone}`), which differed from the active connected instance name (`CP_M_${merchantId}`). Evolution API rejected the delivery due to the instance mismatch.
+  2. The initial AI reply generation used a non-SEO fallback string when Gemini API was rate-limited or unconfigured.
+  3. Dashboard UI lacked a handler and backend route (`/api/reviews/update-reply`) to persist merchant text edits.
+- **Resolution**:
+  1. **Centralized WhatsApp Engine ([whatsapp-service.ts](file:///f:/CustomerPilot_ByGLM_July2026/src/lib/whatsapp-service.ts)):** Created `resolveWhatsappInstanceName()` as the single source of truth across all routes for merchant instance resolution. Refactored `record-google-post/route.ts` and `cron/automations/route.ts` to use `sendCentralWhatsAppMessage()`. Delivered WhatsApp reward message with Evolution API status 201.
+  2. **SEO Optimization ([ai-review-reply.ts](file:///f:/CustomerPilot_ByGLM_July2026/src/lib/ai-review-reply.ts)):** Enforced strict SEO rules (Merchant Name, City/Area, Category keywords, warm Indian hospitality tone) in both the Gemini prompt and the default fallback.
+  3. **Merchant Customization & Save Edits ([update-reply/route.ts](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/reviews/update-reply/route.ts) & [reviews/page.tsx](file:///f:/CustomerPilot_ByGLM_July2026/src/app/dashboard/reviews/page.tsx)):** Created `/api/reviews/update-reply` route and added an explicit `💾 Save Edits` button next to `Regenerate` in the Dashboard Reviews UI.
+- **Status**: ✅ Resolved and Verified by user manual testing.
