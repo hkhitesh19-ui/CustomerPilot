@@ -454,5 +454,18 @@ ext() function to explicitly POST the merchant's configured reward card details 
   - Attached standalone `handlePrintStandeePDF` popup window to Onboarding wizard in [`onboarding/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/onboarding/page.tsx) to render crisp A4 Counter Standee with uncropped merchant logo and automatic PDF print trigger.
 - **Status**: ✅ Implemented, Verified, and Pushed to Remote Repository per user explicit approval.
 
+---
+
+## [12 Aug 2026] Issue: Google Review AutoReply Studio Not Fetching Submitted Customer Reviews
+- **Symptom**: When a customer (e.g., Hitesh) posted a Google Review via the public review page link, the review did not appear in the 1-Click GoogleReview AutoReply Studio (`http://localhost:3000/dashboard/reviews`).
+- **Root Cause**:
+  1. **Proxy Middleware Block (401 Unauthorized):** In [`proxy.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/proxy.ts), `/api/reviews/record-google-post` was missing from `PUBLIC_API_PREFIXES`. When unauthenticated public customers submitted reviews, Next.js middleware blocked the call with HTTP `401 Unauthorized`.
+  2. **Route Variable Reference Errors:** In [`record-google-post/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/reviews/record-google-post/route.ts), variables `reqBody` (instead of `body`) and `bonusCount` (instead of `totalBonusCount`) were referenced, causing runtime `ReferenceError` crashes on execution.
+- **Resolution**:
+  1. Updated `PUBLIC_API_PREFIXES` in [`proxy.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/proxy.ts) to `/api/reviews/` to grant public access for all customer review submissions.
+  2. Fixed variable declarations in [`record-google-post/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/reviews/record-google-post/route.ts), replacing `reqBody` with `body` and assigning `bonusCount = totalBonusCount`.
+  3. Verified review submission end-to-end (HTTP 200 OK); review and AI owner reply are now successfully stored in `GoogleBusinessReview` and displayed in the AutoReply Studio.
+- **Status**: ✅ Resolved and Verified.
+
 
 
