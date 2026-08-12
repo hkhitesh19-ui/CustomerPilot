@@ -10,6 +10,7 @@ export async function POST(req: Request) {
       locationOrArea: "Vadodara",
       category: "bakery",
       customerReview: comment || "Great products and service!",
+      rating: Number(rating || 5)
     })
 
     return NextResponse.json({ ok: true, reply })

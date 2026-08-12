@@ -191,7 +191,8 @@ export async function POST(req: Request) {
       merchantName: merchant.name || "Cake Connection",
       locationOrArea: city,
       category: merchant.category || "Cake Shop",
-      customerReview: finalReviewText
+      customerReview: finalReviewText,
+      rating: Number(rating)
     });
 
     // 5. Post AI Owner Auto-Reply back to Google Business Profile API & Update DB
