@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Copy, Check, ExternalLink, Star } from "lucide-react"
+import { Copy, Check, ExternalLink, Star, ChevronRight } from "lucide-react"
 import { useSystemContent } from "@/hooks/useSystemContent"
 
 export function ReviewEditor({ 
@@ -20,41 +20,48 @@ export function ReviewEditor({
   const [draft, setDraft] = useState(defaultText)
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>('idle')
   const [isEditingExisting, setIsEditingExisting] = useState(!!existingReviewText)
-
-  // OtterMind Fix: useRef to directly target the visible, live textarea element
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const googleLink = merchant.googleReviewLink 
     || (merchant.googlePlaceId ? `https://search.google.com/local/writereview?placeid=${merchant.googlePlaceId}` : "https://maps.google.com")
 
-  const handleCopyAndPostClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // ✅ CRITICAL (OtterMind Fix): Do NOT call e.preventDefault()!
-    // The <a> tag's natural navigation PRESERVES the user-gesture token,
-    // which authorizes the clipboard write on iOS Safari & Android Chrome.
-    // Calling preventDefault() breaks this shared gesture context.
+  // ✅ PERMANENT FIX (OtterMind "Additional Safeguard #2"):
+  // On HTTP + Mobile, copying AND navigating in a single gesture is IMPOSSIBLE
+  // because the browser's user-activation token is invalidated by navigation.
+  // Solution: TWO SEPARATE user gestures — Step 1 ONLY copies, Step 2 ONLY opens Google.
 
+  const fallbackCopy = (ta: HTMLTextAreaElement) => {
+    try {
+      ta.focus()
+      ta.select()
+      ta.setSelectionRange(0, ta.value.length)
+      const success = document.execCommand('copy')
+      setCopyStatus(success ? 'copied' : 'failed')
+    } catch {
+      setCopyStatus('failed')
+    }
+  }
+
+  const handleCopyClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // This button ONLY copies. No navigation. Full gesture token reserved for clipboard.
+    e.preventDefault()
     const ta = textareaRef.current
     if (!ta) return
 
-    // 1. Focus + Select all text in the VISIBLE, ALREADY-IN-DOM textarea
-    //    iOS Safari only allows execCommand('copy') on visible, focused elements.
-    ta.focus()
-    ta.select()
-    ta.setSelectionRange(0, ta.value.length)
-
-    // 2. Execute copy synchronously — SAME JS task as the click event
-    //    No setTimeout, no async, no Promise — must be in the same execution context.
-    let copied = false
-    try {
-      copied = document.execCommand('copy')
-    } catch {
-      copied = false
+    // Try modern clipboard API first (works reliably on HTTPS)
+    if (typeof window !== "undefined" && window.isSecureContext && navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(ta.value)
+        .then(() => setCopyStatus('copied'))
+        .catch(() => fallbackCopy(ta))
+      return
     }
 
-    // 3. Set visual feedback state — this does NOT block the <a> navigation
-    setCopyStatus(copied ? 'copied' : 'failed')
+    // HTTP fallback: execCommand on the VISIBLE, FOCUSED, LIVE textarea
+    fallbackCopy(ta)
+  }
 
-    // 4. Record review asynchronously (fire-and-forget)
+  const handleGoogleOpen = () => {
+    // Record the review submission (fire-and-forget)
     fetch('/api/reviews/record-google-post', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -65,12 +72,7 @@ export function ReviewEditor({
         rating: 5
       })
     }).catch(err => console.error("Error recording review post:", err))
-
-    // 5. The <a> tag's default href navigation fires AFTER this handler returns.
-    //    This is the key: navigation shares the user-activation token with the copy above.
   }
-
-  const copied = copyStatus === 'copied'
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
@@ -92,7 +94,7 @@ export function ReviewEditor({
           </p>
         </div>
 
-        <div className="p-8 space-y-6">
+        <div className="p-8 space-y-5">
           {existingReviewText && (
             <div className="bg-amber-950/40 border border-amber-800/60 rounded-xl p-3 text-xs text-amber-200 flex flex-col gap-2">
               <div>
@@ -119,89 +121,104 @@ export function ReviewEditor({
             </div>
           )}
 
-          <div className="flex justify-center gap-1 mb-2">
+          <div className="flex justify-center gap-1">
             {[1, 2, 3, 4, 5].map(i => (
               <Star key={i} className="w-8 h-8 text-amber-400 fill-amber-400" />
             ))}
           </div>
           
           <div className="space-y-2">
-            <div className="flex justify-between items-center ml-1">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                {isEditingExisting ? "Your Review (Edit to update)" : "AI DRAFT (FEEL FREE TO EDIT)"}
-              </label>
-            </div>
-            
-            {/* OtterMind Fix: 
-                - ref={textareaRef} for direct DOM access during click
-                - fontSize 16px: prevents iOS auto-zoom on focus (which breaks selection)
-                - WebkitUserSelect 'all': makes entire content a single tap-to-select region on iOS
-                - userSelect 'all': same for Android Chrome */}
+            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider ml-1 block">
+              {isEditingExisting ? "Your Review (Edit to update)" : "AI DRAFT (FEEL FREE TO EDIT)"}
+            </label>
             <textarea
               ref={textareaRef}
               id="review-draft-textarea"
-              className="w-full h-32 bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none transition-all leading-relaxed"
+              className="w-full h-36 bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none transition-all leading-relaxed"
               style={{ 
-                fontSize: '16px', // Prevents iOS Safari auto-zoom on focus
-                WebkitUserSelect: 'all', // iOS: makes full content one-tap selectable
-                userSelect: 'all'  // Android Chrome
+                fontSize: '16px',        // Prevents iOS Safari auto-zoom on focus
+                WebkitUserSelect: 'all', // iOS: one-tap selects entire content
+                userSelect: 'all'        // Android Chrome: same
               }}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
             />
           </div>
 
-          {/* OtterMind Fix:
-              - This MUST be an <a> tag, NOT a <button>
-              - No e.preventDefault() — let natural <a> navigation run
-              - touchAction 'manipulation': removes 300ms tap delay on Android
-              - WebkitTapHighlightColor transparent: prevents flash interrupting gesture */}
-          <a 
-            href={googleLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={handleCopyAndPostClick}
-            style={{
-              touchAction: 'manipulation',
-              WebkitTapHighlightColor: 'transparent',
-            }}
-            className={`w-full h-14 text-lg font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer no-underline ${
-              copied 
-                ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_0_20px_-3px_rgba(16,185,129,0.7)]" 
-                : copyStatus === 'failed'
-                ? "bg-amber-600 hover:bg-amber-700 text-white"
-                : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-[0_0_20px_-5px_rgba(16,185,129,0.5)] hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.7)]"
-            }`}
-          >
-            {copied ? (
-              <>
-                <Check className="w-5 h-5" />
-                <span>Copied! Opening Google...</span>
-              </>
-            ) : copyStatus === 'failed' ? (
-              <>
-                <ExternalLink className="w-5 h-5" />
-                <span>Open Google (copy manually if needed)</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-5 h-5" />
-                <span>{getContent('review_copy_button', isEditingExisting ? "Copy & Update on Google" : "Copy & Post to Google")}</span>
-                <ExternalLink className="w-5 h-5 opacity-75 ml-1" />
-              </>
-            )}
-          </a>
+          {/* ── STEP 1: Copy button — ONLY copies, zero navigation ── */}
+          <div className="space-y-1">
+            <p className="text-xs text-slate-500 text-center font-medium">⬇ Step 1 of 2</p>
+            <button
+              type="button"
+              onClick={handleCopyClick}
+              style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' } as React.CSSProperties}
+              className={`w-full h-14 text-base font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer border-0 ${
+                copyStatus === 'copied'
+                  ? "bg-emerald-600 text-white shadow-[0_0_20px_-3px_rgba(16,185,129,0.7)]"
+                  : copyStatus === 'failed'
+                  ? "bg-amber-600 text-white"
+                  : "bg-slate-700 hover:bg-slate-600 text-white"
+              }`}
+            >
+              {copyStatus === 'copied' ? (
+                <>
+                  <Check className="w-5 h-5" />
+                  <span>✓ Review Text Copied!</span>
+                </>
+              ) : copyStatus === 'failed' ? (
+                <>
+                  <Copy className="w-5 h-5" />
+                  <span>Copy Failed — Long-press text to copy</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-5 h-5" />
+                  <span>Tap to Copy Review Text</span>
+                </>
+              )}
+            </button>
+          </div>
 
-          {/* Fallback instruction shown only when copy fails */}
-          {copyStatus === 'failed' && (
-            <p className="text-center text-xs text-amber-400 mt-1 leading-relaxed">
-              💡 Tap the text above to select it, long-press → Copy, then paste in Google Review.
+          {/* ── STEP 2: Open Google — pure <a> tag, ONLY navigates ── */}
+          <div className="space-y-1">
+            <p className="text-xs text-slate-500 text-center font-medium">⬇ Step 2 of 2</p>
+            <a
+              href={googleLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleGoogleOpen}
+              style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' } as React.CSSProperties}
+              className={`w-full h-14 text-base font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-300 no-underline ${
+                copyStatus === 'copied'
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-[0_0_20px_-5px_rgba(16,185,129,0.6)] cursor-pointer"
+                  : "bg-slate-800 text-slate-500 pointer-events-none"
+              }`}
+            >
+              <ExternalLink className="w-5 h-5" />
+              <span>
+                {copyStatus === 'copied' 
+                  ? (isEditingExisting ? "Open Google → Update Review" : "Open Google → Paste & Post!")
+                  : "Open Google  (Copy text first ↑)"}
+              </span>
+              {copyStatus === 'copied' && <ChevronRight className="w-4 h-4 opacity-80" />}
+            </a>
+          </div>
+
+          {copyStatus === 'copied' && (
+            <p className="text-center text-xs text-emerald-400 leading-relaxed">
+              💡 Text copied! Tap "Open Google" above → long-press in the review box → Paste
             </p>
           )}
-          
-          <p className="text-center text-xs text-slate-500 mt-2 leading-relaxed">
+
+          {copyStatus === 'failed' && (
+            <p className="text-center text-xs text-amber-400 leading-relaxed">
+              💡 Auto-copy failed on this browser. Tap and hold the text box → Select All → Copy, then open Google.
+            </p>
+          )}
+
+          <p className="text-center text-xs text-slate-600 leading-relaxed pt-1">
             {isEditingExisting 
-              ? "💡 Google will open your previous review. Select the text, paste this new draft, and hit Post!" 
+              ? "After pasting your new review text, click Save on Google." 
               : "After posting, our system will automatically add Bonus Stamps to your VIP Wallet! 🎁"}
           </p>
         </div>
@@ -209,6 +226,3 @@ export function ReviewEditor({
     </div>
   )
 }
-
-
-
