@@ -30,6 +30,7 @@ export async function GET(req: Request) {
       db.merchant.count(),
       db.merchant.findMany({
         include: {
+          stampCards: { where: { active: true }, orderBy: { updatedAt: 'desc' }, take: 1 },
           _count: {
             select: {
               customers: true,
@@ -51,6 +52,10 @@ export async function GET(req: Request) {
       whatsappPhone: m.whatsappPhone || 'N/A',
       plan: (m.plan || 'trial').toUpperCase(),
       status: (m.status || 'active').charAt(0).toUpperCase() + (m.status || 'active').slice(1),
+      googleReviewDelayMinutes: m.googleReviewDelayMinutes ?? 30,
+      vipUpgradeBonusStamps: m.vipUpgradeBonusStamps ?? 1,
+      loyaltyCategoryNames: m.loyaltyCategoryNames || null,
+      stampCard: m.stampCards[0] || null,
       customers: m._count.customers,
       bills: m._count.bills,
       reviews: m._count.reviews,

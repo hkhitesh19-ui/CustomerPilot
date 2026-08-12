@@ -556,13 +556,17 @@ function CMSPanel() {
 }
 
 // ============================================================
-// Merchant Management (Live Database Integration)
+// Merchant Management (Live Database Integration + SuperAdmin Overrides)
 // ============================================================
 function MerchantManagement() {
   const [merchants, setMerchants] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedMerchant, setSelectedMerchant] = useState<any | null>(null)
+  const [editForm, setEditForm] = useState<any>({})
+  const [saving, setSaving] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
 
-  useEffect(() => {
+  const loadMerchants = () => {
     fetch("/api/admin/merchants")
       .then((res) => res.json())
       .then((data) => {
@@ -572,7 +576,80 @@ function MerchantManagement() {
       })
       .catch((err) => console.error("Error fetching admin merchants:", err))
       .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    loadMerchants()
   }, [])
+
+  const handleOpenEdit = (m: any) => {
+    setSelectedMerchant(m)
+    let cats = ["VIP", "Silver", "Gold", "Platinum", "Diamond", "Royal", "Elite", "Prestige", "Ambassador", "Legend"]
+    if (m.loyaltyCategoryNames) {
+      try {
+        const parsed = JSON.parse(m.loyaltyCategoryNames)
+        if (Array.isArray(parsed) && parsed.length >= 10) cats = parsed
+      } catch {}
+    }
+    setEditForm({
+      vipUpgradeBonusStamps: m.vipUpgradeBonusStamps ?? 1,
+      googleReviewBonus: m.stampCard?.googleReviewBonus ?? 1,
+      photoBonus: m.stampCard?.photoBonus ?? 2,
+      stampValue: m.stampCard?.stampValue ?? 450,
+      stampsRequired: m.stampCard?.stampsRequired ?? 9,
+      validityDays: m.stampCard?.validityDays ?? 100,
+      rewardName: m.stampCard?.rewardName || "FREE 500gm Cake",
+      categories: cats
+    })
+  }
+
+  const handleSaveMerchantRules = async () => {
+    if (!selectedMerchant) return
+    setSaving(true)
+    setSaveSuccess(false)
+    try {
+      await fetch("/api/merchant/update", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-merchant-id": selectedMerchant.id
+        },
+        body: JSON.stringify({
+          vipUpgradeBonusStamps: Number(editForm.vipUpgradeBonusStamps),
+          loyaltyCategoryNames: JSON.stringify(editForm.categories)
+        })
+      })
+
+      await fetch("/api/cards/setup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-merchant-id": selectedMerchant.id
+        },
+        body: JSON.stringify({
+          id: selectedMerchant.stampCard?.id,
+          name: selectedMerchant.stampCard?.name || "Loyalty Stamp Card",
+          rewardName: editForm.rewardName,
+          stampsRequired: Number(editForm.stampsRequired),
+          stampValue: Number(editForm.stampValue),
+          validityDays: Number(editForm.validityDays),
+          googleReviewBonus: Number(editForm.googleReviewBonus),
+          photoBonus: Number(editForm.photoBonus)
+        })
+      })
+
+      setSaveSuccess(true)
+      loadMerchants()
+      setTimeout(() => {
+        setSaveSuccess(false)
+        setSelectedMerchant(null)
+      }, 1200)
+    } catch (e: any) {
+      alert("Error saving rules: " + (e?.message || e))
+    } finally {
+      setSaving(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -596,56 +673,168 @@ function MerchantManagement() {
   }
 
   return (
-    <Card>
-      <CardContent className="p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-stone-50 border-b border-stone-200">
-              <tr>
-                <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Merchant</th>
-                <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Owner & WhatsApp</th>
-                <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Plan</th>
-                <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Review Delay</th>
-                <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Status</th>
-                <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">Customers</th>
-                <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">Bills</th>
-                <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">MRR</th>
-                <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-stone-100">
-              {merchants.map((m: any, i: number) => (
-                <tr key={m.id || i} className="hover:bg-stone-50">
-                  <td className="p-4 font-medium text-sm text-stone-900">
-                    {m.name}
-                    <div className="text-[11px] text-stone-400 font-normal">ID: {m.id}</div>
-                  </td>
-                  <td className="p-4 text-sm text-stone-600">
-                    <div>{m.ownerName}</div>
-                    <div className="text-xs text-stone-400">{m.whatsappPhone}</div>
-                  </td>
-                  <td className="p-4 text-sm font-semibold text-stone-700">{m.plan}</td>
-                  <td className="p-4 text-sm text-stone-600 font-mono">{m.googleReviewDelayMinutes ?? 30} mins</td>
-                  <td className="p-4">
-                    <Badge variant="outline" className={
-                      m.status === "Active" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                      m.status === "Trial" ? "bg-blue-50 text-blue-700 border-blue-200" :
-                      "bg-rose-50 text-rose-700 border-rose-200"
-                    }>{m.status}</Badge>
-                  </td>
-                  <td className="p-4 text-right text-sm font-medium">{m.customers}</td>
-                  <td className="p-4 text-right text-sm text-stone-600">{m.bills}</td>
-                  <td className="p-4 text-right text-sm font-medium text-emerald-600">₹{m.mrr.toLocaleString("en-IN")}</td>
-                  <td className="p-4 text-right">
-                    <Button size="sm" variant="outline" onClick={() => window.open(`/dashboard`, '_blank')}>Manage</Button>
-                  </td>
+    <div className="space-y-6">
+      <Card>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-stone-50 border-b border-stone-200">
+                <tr>
+                  <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Merchant</th>
+                  <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Owner & WhatsApp</th>
+                  <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Plan</th>
+                  <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Review Delay</th>
+                  <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Status</th>
+                  <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">Customers</th>
+                  <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">Bills</th>
+                  <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">MRR</th>
+                  <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">SuperAdmin Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-stone-100">
+                {merchants.map((m: any, i: number) => (
+                  <tr key={m.id || i} className="hover:bg-stone-50">
+                    <td className="p-4 font-medium text-sm text-stone-900">
+                      {m.name}
+                      <div className="text-[11px] text-stone-400 font-normal">ID: {m.id}</div>
+                    </td>
+                    <td className="p-4 text-sm text-stone-600">
+                      <div>{m.ownerName}</div>
+                      <div className="text-xs text-stone-400">{m.whatsappPhone}</div>
+                    </td>
+                    <td className="p-4 text-sm font-semibold text-stone-700">{m.plan}</td>
+                    <td className="p-4 text-sm text-stone-600 font-mono">{m.googleReviewDelayMinutes ?? 30} mins</td>
+                    <td className="p-4">
+                      <Badge variant="outline" className={
+                        m.status === "Active" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                        m.status === "Trial" ? "bg-blue-50 text-blue-700 border-blue-200" :
+                        "bg-rose-50 text-rose-700 border-rose-200"
+                      }>{m.status}</Badge>
+                    </td>
+                    <td className="p-4 text-right text-sm font-medium">{m.customers}</td>
+                    <td className="p-4 text-right text-sm text-stone-600">{m.bills}</td>
+                    <td className="p-4 text-right text-sm font-medium text-emerald-600">₹{m.mrr.toLocaleString("en-IN")}</td>
+                    <td className="p-4 text-right space-x-2">
+                      <Button size="sm" variant="secondary" onClick={() => handleOpenEdit(m)}>
+                        ⚙️ Edit Rules
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => window.open(`/dashboard`, '_blank')}>
+                        Manage
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* SuperAdmin Rule Override Modal */}
+      {selectedMerchant && (
+        <div className="fixed inset-0 bg-stone-950/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-stone-200 pb-4">
+              <div>
+                <h3 className="text-xl font-bold text-stone-900 flex items-center gap-2">
+                  👑 SuperAdmin Rule Override — {selectedMerchant.name}
+                </h3>
+                <p className="text-xs text-stone-500">Modify Reward Rules, Bonus Stamps, and 10-Level Loyalty Cycle Categories for this merchant.</p>
+              </div>
+              <Button size="sm" variant="ghost" onClick={() => setSelectedMerchant(null)}>✕</Button>
+            </div>
+
+            {saveSuccess && (
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-3 rounded-lg text-sm font-medium flex items-center gap-2">
+                <Check className="w-4 h-4" /> All merchant rules updated successfully in Database!
+              </div>
+            )}
+
+            {/* Step 5 Rules */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-stone-800 text-sm border-b pb-1">🎁 Step 5: Reward Card & Bonus Rules</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-xs text-stone-600">Reward Description</Label>
+                  <Input
+                    value={editForm.rewardName}
+                    onChange={(e) => setEditForm({ ...editForm, rewardName: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-stone-600">Min Purchase / Stamp (₹)</Label>
+                  <Input
+                    type="number"
+                    value={editForm.stampValue}
+                    onChange={(e) => setEditForm({ ...editForm, stampValue: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-stone-600">Stamp Goal (Stamps)</Label>
+                  <Input
+                    type="number"
+                    value={editForm.stampsRequired}
+                    onChange={(e) => setEditForm({ ...editForm, stampsRequired: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-stone-600">Google Review Bonus Stamps</Label>
+                  <Input
+                    type="number"
+                    value={editForm.googleReviewBonus}
+                    onChange={(e) => setEditForm({ ...editForm, googleReviewBonus: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-stone-600">Photo Review Bonus Stamps</Label>
+                  <Input
+                    type="number"
+                    value={editForm.photoBonus}
+                    onChange={(e) => setEditForm({ ...editForm, photoBonus: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-stone-600">VIP Upgrade Bonus Stamps</Label>
+                  <Input
+                    type="number"
+                    value={editForm.vipUpgradeBonusStamps}
+                    onChange={(e) => setEditForm({ ...editForm, vipUpgradeBonusStamps: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Step 6 Rules */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-stone-800 text-sm border-b pb-1">👑 Step 6: 10-Level Loyalty Cycle Category Titles</h4>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                {editForm.categories?.map((cat: string, idx: number) => (
+                  <div key={idx} className="space-y-1">
+                    <Label className="text-[11px] text-amber-700 font-semibold">Level {idx + 1}</Label>
+                    <Input
+                      value={cat}
+                      onChange={(e) => {
+                        const copy = [...editForm.categories]
+                        copy[idx] = e.target.value
+                        setEditForm({ ...editForm, categories: copy })
+                      }}
+                      className="text-xs"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-stone-200">
+              <Button variant="outline" onClick={() => setSelectedMerchant(null)}>Cancel</Button>
+              <Button onClick={handleSaveMerchantRules} disabled={saving} className="bg-stone-900 text-white hover:bg-stone-800">
+                {saving ? "Saving to DB..." : "💾 Save Merchant Rules (SuperAdmin)"}
+              </Button>
+            </div>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   )
 }
 
