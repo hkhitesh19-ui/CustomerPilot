@@ -1,5 +1,3 @@
-import { db } from "@/lib/db"
-
 export const DEFAULT_10_LOYALTY_CATEGORIES = [
   "VIP",         // Level 1: 0 completed cards (Default on Registration)
   "Silver",      // Level 2: 1 completed card
@@ -34,6 +32,8 @@ export function resolveLoyaltyCategoryName(
 }
 
 export async function updateCustomerLoyaltyCategory(merchantId: string, customerId: string): Promise<string> {
+  const { db } = await import("@/lib/db")
+
   const merchant = await db.merchant.findUnique({
     where: { id: merchantId },
     select: { loyaltyCategoryNames: true }
