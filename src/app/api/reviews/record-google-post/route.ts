@@ -72,7 +72,7 @@ export async function POST(req: Request) {
     const configuredBonus = template?.googleReviewBonus ?? 1;
     const configuredPhotoBonus = template?.photoBonus ?? 2;
 
-    const photoAttached = Boolean(reqBody?.photoUrl || reqBody?.hasPhoto || reqBody?.photoAttached);
+    const photoAttached = Boolean(body?.photoUrl || body?.hasPhoto || body?.photoAttached);
     const photoBonusCount = photoAttached ? configuredPhotoBonus : 0;
 
     // Check if customer already submitted a Google Review previously (Upsert support)
@@ -84,6 +84,7 @@ export async function POST(req: Request) {
     const isFirstTimeReview = !existingReview;
     const reviewBonusCount = isFirstTimeReview ? configuredBonus : 0;
     const totalBonusCount = reviewBonusCount + photoBonusCount;
+    const bonusCount = totalBonusCount;
 
     let reviewRecord;
     if (existingReview) {
@@ -93,7 +94,7 @@ export async function POST(req: Request) {
           rating: Number(rating),
           aiDraft: finalReviewText,
           finalText: finalReviewText,
-          photoUrl: reqBody?.photoUrl || null,
+          photoUrl: body?.photoUrl || null,
           photoBonusStamps: photoBonusCount,
           bonusStampsAwarded: totalBonusCount,
           status: "submitted",
@@ -108,7 +109,7 @@ export async function POST(req: Request) {
           rating: Number(rating),
           aiDraft: finalReviewText,
           finalText: finalReviewText,
-          photoUrl: reqBody?.photoUrl || null,
+          photoUrl: body?.photoUrl || null,
           photoBonusStamps: photoBonusCount,
           bonusStampsAwarded: totalBonusCount,
           platform: "google",
