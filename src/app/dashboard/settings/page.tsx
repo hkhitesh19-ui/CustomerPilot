@@ -138,15 +138,18 @@ export default function SettingsPage() {
 
             <div className="space-y-2">
               <Label className="flex items-center gap-2"><Tag className="w-4 h-4"/> Business Type</Label>
-              <Select value={formData.businessType} onValueChange={(v) => handleChange("businessType", v)}>
+              <Select value={formData.businessType?.toUpperCase() || ""} onValueChange={(v) => handleChange("businessType", v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="RESTAURANT">Restaurant / Cafe</SelectItem>
-                  <SelectItem value="RETAIL">Retail Store</SelectItem>
-                  <SelectItem value="SALON">Salon / Spa</SelectItem>
-                  <SelectItem value="OTHER">Other</SelectItem>
+                  <SelectItem value="BAKERY">Bakery 🥐</SelectItem>
+                  <SelectItem value="RESTAURANT">Restaurant / Cafe ☕</SelectItem>
+                  <SelectItem value="RETAIL">Retail Store 🛍️</SelectItem>
+                  <SelectItem value="SALON">Salon / Spa 💇</SelectItem>
+                  <SelectItem value="GYM">Gym 💪</SelectItem>
+                  <SelectItem value="CLINIC">Clinic 🏥</SelectItem>
+                  <SelectItem value="OTHER">Other 📦</SelectItem>
                 </SelectContent>
               </Select>
             </div>
