@@ -202,9 +202,15 @@ export async function POST(req: Request) {
       // Total stamps to award = pos stamps + vip upgrade bonus
       const totalStampsToAward = stampsToAward + vipBonusStamps;
 
-      // Update Customer Stamp Wallet
-      if (totalStampsToAward > 0) {
-        let customerCard = await tx.customerStampCard.findFirst({
+      // 4. Update Customer Stamp Wallet & Handle Loyalty Cycle Completion
+      let cycleCompletedInTx = false;
+      let cycleVipBonusAwarded = 0;
+
+      const configuredVipBonus = merchant.vipUpgradeBonusStamps || 0;
+
+      for (let i = 0; i < stampsToAward; i++) {
+        // Find or create active (uncompleted) card for customer
+        let activeCard = await tx.customerStampCard.findFirst({
           where: { 
             merchantId, 
             customerId: waitingCustomer.customerId,
@@ -213,8 +219,8 @@ export async function POST(req: Request) {
           }
         });
 
-        if (!customerCard) {
-          customerCard = await tx.customerStampCard.create({
+        if (!activeCard) {
+          activeCard = await tx.customerStampCard.create({
             data: {
               merchantId,
               customerId: waitingCustomer.customerId,
@@ -224,32 +230,100 @@ export async function POST(req: Request) {
           });
         }
 
-        const totalStampsNow = customerCard.stampsCollected + totalStampsToAward;
-        const isCompleted = totalStampsNow >= stampCard.stampsRequired;
+        // Add 1 POS stamp
+        const newCount = activeCard.stampsCollected + 1;
+        const isCardFinished = newCount >= stampCard.stampsRequired;
 
         await tx.customerStampCard.update({
-          where: { id: customerCard.id },
+          where: { id: activeCard.id },
           data: {
-            stampsCollected: totalStampsNow,
-            completed: isCompleted
+            stampsCollected: newCount,
+            completed: isCardFinished
           }
         });
 
-        for (let i = 0; i < totalStampsToAward; i++) {
+        await tx.stamp.create({
+          data: {
+            customerId: waitingCustomer.customerId,
+            merchantId,
+            stampCardId: stampCard.id,
+            customerStampCardId: activeCard.id,
+            billId: bill.id,
+            source: 'POS'
+          }
+        });
+
+        // 🌟 LOYALTY CYCLE FINISHED EVENT:
+        // When previous loyalty cycle completes (stamp goal reached),
+        // award configured VIP Upgrade Bonus Stamps to kickstart next cycle!
+        if (isCardFinished) {
+          cycleCompletedInTx = true;
+
+          if (configuredVipBonus > 0) {
+            // Create fresh new card for next cycle
+            const nextCycleCard = await tx.customerStampCard.create({
+              data: {
+                merchantId,
+                customerId: waitingCustomer.customerId,
+                stampCardId: stampCard.id,
+                stampsCollected: configuredVipBonus,
+                completed: configuredVipBonus >= stampCard.stampsRequired
+              }
+            });
+
+            for (let v = 0; v < configuredVipBonus; v++) {
+              await tx.stamp.create({
+                data: {
+                  customerId: waitingCustomer.customerId,
+                  merchantId,
+                  stampCardId: stampCard.id,
+                  customerStampCardId: nextCycleCard.id,
+                  billId: bill.id,
+                  source: 'VIP_BONUS'
+                }
+              });
+            }
+
+            // Increment customer lifetime stamps for VIP bonus
+            await tx.customer.update({
+              where: { id: waitingCustomer.customerId },
+              data: { lifetimeStamps: { increment: configuredVipBonus } }
+            });
+
+            cycleVipBonusAwarded += configuredVipBonus;
+          }
+        }
+      }
+
+      // Handle standalone VIP Tier Upgrade bonus (if tier upgraded without card completion)
+      if (isUpgraded && !cycleCompletedInTx && vipBonusStamps > 0) {
+        let activeCard = await tx.customerStampCard.findFirst({
+          where: { merchantId, customerId: waitingCustomer.customerId, stampCardId: stampCard.id, completed: false }
+        });
+        if (!activeCard) {
+          activeCard = await tx.customerStampCard.create({
+            data: { merchantId, customerId: waitingCustomer.customerId, stampCardId: stampCard.id, stampsCollected: 0 }
+          });
+        }
+        await tx.customerStampCard.update({
+          where: { id: activeCard.id },
+          data: { stampsCollected: { increment: vipBonusStamps } }
+        });
+        for (let v = 0; v < vipBonusStamps; v++) {
           await tx.stamp.create({
             data: {
               customerId: waitingCustomer.customerId,
               merchantId,
               stampCardId: stampCard.id,
-              customerStampCardId: customerCard.id,
+              customerStampCardId: activeCard.id,
               billId: bill.id,
-              source: i < stampsToAward ? 'POS' : 'VIP_BONUS'
+              source: 'VIP_BONUS'
             }
           });
         }
       }
       
-      return { isUpgraded, vipBonusStamps, newTier };
+      return { isUpgraded, vipBonusStamps: cycleVipBonusAwarded || vipBonusStamps, newTier, cycleCompletedInTx };
     });
 
     // 5. Send instant WhatsApp notification to customer (Day 1 / Day 4 Requirements.txt)
