@@ -162,20 +162,6 @@ export default function SettingsPage() {
                 placeholder="E.g., Italian Cuisine, Barber Shop"
               />
             </div>
-            
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-amber-400"/> VIP Upgrade Bonus Stamps</Label>
-              <Input 
-                type="number"
-                min="0"
-                max="10"
-                value={(formData as any).vipUpgradeBonusStamps ?? 1} 
-                onChange={(e) => handleChange("vipUpgradeBonusStamps", e.target.value)}
-                placeholder="E.g., 1"
-              />
-              <p className="text-[10px] text-slate-500 mt-1">Advance bonus stamps awarded when a customer upgrades their VIP tier.</p>
-            </div>
-            
           </div>
         </CardContent>
       </Card>

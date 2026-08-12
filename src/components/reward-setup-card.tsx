@@ -29,6 +29,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
     validityDays: 90,
     googleReviewBonus: 1,
     photoBonus: 1,
+    vipUpgradeBonusStamps: 1,
     color: "#6366f1",
     tierRewardsEnabled: false,
     excludedCategories: "",
@@ -70,6 +71,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
             validityDays: cardData.validityDays ?? 90,
             googleReviewBonus: cardData.googleReviewBonus ?? 1,
             photoBonus: cardData.photoBonus ?? 1,
+            vipUpgradeBonusStamps: cardData.vipUpgradeBonusStamps ?? 1,
             color: cardData.color || "#6366f1",
             tierRewardsEnabled: Boolean(cardData.tierRewardsEnabled),
             excludedCategories: cardData.excludedCategories || "",
@@ -268,6 +270,46 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                 onChange={e => setForm({ ...form, photoBonus: Number(e.target.value) })}
               />
               <p className="text-xs text-muted-foreground">Extra bonus stamps if they attach a photo with their review</p>
+            </div>
+
+            <div className="space-y-2 col-span-1 md:col-span-2 p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <Label htmlFor="vip-upgrade-bonus" className="font-semibold text-slate-200">
+                    VIP Tier Upgrade Bonus Stamp Rule
+                  </Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${form.vipUpgradeBonusStamps > 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+                    {form.vipUpgradeBonusStamps > 0 ? `ACTIVE (+${form.vipUpgradeBonusStamps} Stamp)` : "DEACTIVATED (0 Stamps)"}
+                  </span>
+                  <Switch
+                    checked={form.vipUpgradeBonusStamps > 0}
+                    onCheckedChange={(checked) => setForm({ ...form, vipUpgradeBonusStamps: checked ? 1 : 0 })}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+                <div className="sm:col-span-2">
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Advance bonus stamps awarded when a customer reaches a higher VIP spend tier (e.g. crossing ₹2,500 lifetime spend threshold).
+                    Toggle OFF or set to <strong>0</strong> to deactivate this bonus rule entirely.
+                  </p>
+                </div>
+                <div>
+                  <Input
+                    id="vip-upgrade-bonus"
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={form.vipUpgradeBonusStamps}
+                    onChange={e => setForm({ ...form, vipUpgradeBonusStamps: Math.max(0, Number(e.target.value)) })}
+                    className="bg-slate-900 border-slate-700 text-slate-100"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 

@@ -31,20 +31,26 @@ export async function GET(req: NextRequest) {
       return err("Unauthorized", 401)
     }
 
-    const card = await db.stampCard.findFirst({
-      where: { merchantId, active: true },
-      orderBy: { updatedAt: "desc" }  // always get the most recently SAVED card
-    })
+    const [card, merchant] = await Promise.all([
+      db.stampCard.findFirst({
+        where: { merchantId, active: true },
+        orderBy: { updatedAt: "desc" }  // always get the most recently SAVED card
+      }),
+      db.merchant.findUnique({
+        where: { id: merchantId },
+        select: { vipUpgradeBonusStamps: true }
+      })
+    ])
 
     console.log(`[CardSetup GET] Card found for merchant ${merchantId}:`, card ? `id=${card.id} stamps=${card.stampsRequired} val=${card.stampValue}` : "NULL → will return DEFAULTS")
 
     if (!card) {
-      return ok({ card: RECOMMENDED_DEFAULTS, isDefault: true }, {
+      return ok({ card: { ...RECOMMENDED_DEFAULTS, vipUpgradeBonusStamps: merchant?.vipUpgradeBonusStamps ?? 1 }, isDefault: true }, {
         headers: { "Cache-Control": "no-store, private" }
       })
     }
 
-    return ok({ card, isDefault: false }, {
+    return ok({ card: { ...card, vipUpgradeBonusStamps: merchant?.vipUpgradeBonusStamps ?? 1 }, isDefault: false }, {
       headers: { "Cache-Control": "no-store, private" }
     })
   } catch (error: any) {
@@ -71,6 +77,7 @@ export async function POST(req: NextRequest) {
       validityDays,
       googleReviewBonus,
       photoBonus,
+      vipUpgradeBonusStamps,
       color,
       tierRewardsEnabled,
       excludedCategories,
@@ -79,6 +86,14 @@ export async function POST(req: NextRequest) {
 
     if (!name || !rewardName || !stampsRequired) {
       return err("Card name, reward name, and required stamps are mandatory", 400)
+    }
+
+    // Save vipUpgradeBonusStamps to Merchant record if provided
+    if (vipUpgradeBonusStamps !== undefined) {
+      await db.merchant.update({
+        where: { id: merchantId },
+        data: { vipUpgradeBonusStamps: Math.max(0, Number(vipUpgradeBonusStamps)) }
+      }).catch(() => {})
     }
 
     // Find the canonical active card for this merchant
