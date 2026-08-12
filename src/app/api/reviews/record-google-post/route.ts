@@ -70,6 +70,10 @@ export async function POST(req: Request) {
     // Fetch Merchant's Active Reward Card Config first
     const template = await db.stampCard.findFirst({ where: { merchantId, active: true } });
     const configuredBonus = template?.googleReviewBonus ?? 1;
+    const configuredPhotoBonus = template?.photoBonus ?? 2;
+
+    const photoAttached = Boolean(reqBody?.photoUrl || reqBody?.hasPhoto || reqBody?.photoAttached);
+    const photoBonusCount = photoAttached ? configuredPhotoBonus : 0;
 
     // Check if customer already submitted a Google Review previously (Upsert support)
     const existingReview = await db.review.findFirst({
@@ -78,7 +82,8 @@ export async function POST(req: Request) {
     });
 
     const isFirstTimeReview = !existingReview;
-    const bonusCount = isFirstTimeReview ? configuredBonus : 0; // Award dynamic bonus stamps per merchant's Step 5 settings
+    const reviewBonusCount = isFirstTimeReview ? configuredBonus : 0;
+    const totalBonusCount = reviewBonusCount + photoBonusCount;
 
     let reviewRecord;
     if (existingReview) {
@@ -88,6 +93,9 @@ export async function POST(req: Request) {
           rating: Number(rating),
           aiDraft: finalReviewText,
           finalText: finalReviewText,
+          photoUrl: reqBody?.photoUrl || null,
+          photoBonusStamps: photoBonusCount,
+          bonusStampsAwarded: totalBonusCount,
           status: "submitted",
           submittedAt: new Date()
         }
@@ -100,10 +108,12 @@ export async function POST(req: Request) {
           rating: Number(rating),
           aiDraft: finalReviewText,
           finalText: finalReviewText,
+          photoUrl: reqBody?.photoUrl || null,
+          photoBonusStamps: photoBonusCount,
+          bonusStampsAwarded: totalBonusCount,
           platform: "google",
           status: "submitted",
-          submittedAt: new Date(),
-          bonusStampsAwarded: bonusCount
+          submittedAt: new Date()
         }
       });
     }
