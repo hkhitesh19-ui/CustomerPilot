@@ -4,6 +4,7 @@ import { awardStampsForBill } from "@/lib/stamp-engine"
 import { QUEUE_TIMEOUT_BY_BUSINESS, RESERVATION_TIMEOUT_SECONDS, UNDO_WINDOW_SECONDS, canTransition } from "@/lib/queue-state-machine"
 import { CommunicationService } from "@/communication/services/CommunicationService"
 import { scheduleGoogleReviewRequest } from "@/lib/review-scheduler"
+import { resolveLoyaltyCategoryName } from "@/lib/loyalty-category-service"
 
 export const QUEUE_TIMEOUT_MINUTES = 5
 
@@ -31,6 +32,11 @@ export async function joinQueue(opts: {
   const isNewCustomer = !customer
 
   if (!customer) {
+    const merchant = await db.merchant.findUnique({
+      where: { id: merchantId },
+      select: { loyaltyCategoryNames: true }
+    })
+    const initialCategory = resolveLoyaltyCategoryName(merchant?.loyaltyCategoryNames, 0)
     const customerName = name || `Customer ${phone.slice(-4)}`
     const referralCode = "CP-" + Math.random().toString(36).slice(2, 6).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase()
     customer = await db.customer.create({
@@ -38,6 +44,7 @@ export async function joinQueue(opts: {
         merchantId,
         name: customerName,
         phone,
+        vipTier: initialCategory,
         acquisitionChan: "qr_scan",
         referralCode,
         whatsappOptIn: true,

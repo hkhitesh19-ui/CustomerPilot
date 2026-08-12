@@ -16,6 +16,7 @@ import { GoogleBusinessIntegration } from "@/components/google-business-integrat
 import { GoogleReviewDelaySettings } from "@/components/google-review-delay-settings"
 import { BrandingSettings } from "@/components/branding-settings"
 import { RewardSetupCard } from "@/components/reward-setup-card"
+import { LoyaltyCategoryCard } from "@/components/loyalty-category-card"
 import { QRGenerator } from "@/components/qr-generator"
 import { GoLiveValidator } from "@/components/go-live-validator"
 import { AutomationTimerSettings } from "@/components/automation-timer-settings"
@@ -182,6 +183,7 @@ export default function SettingsPage() {
       <GoogleReviewDelaySettings merchantId={data?.merchant?.id || ""} />
       <AutomationTimerSettings merchantId={data?.merchant?.id || ""} />
       <BrandingSettings merchantId={data?.merchant?.id || ""} />
+      <LoyaltyCategoryCard merchantId={data?.merchant?.id || ""} initialCategoryJson={(data?.merchant as any)?.loyaltyCategoryNames} />
       <RewardSetupCard merchantId={data?.merchant?.id || ""} />
       <QRGenerator merchantId={data?.merchant?.id || ""} />
       <GoLiveValidator merchantId={data?.merchant?.id || ""} />

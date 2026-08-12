@@ -32,6 +32,9 @@ export async function PATCH(req: NextRequest) {
       allowedUpdates.vipUpgradeBonusStamps = bonus
     }
   }
+  if (body.loyaltyCategoryNames !== undefined) {
+    allowedUpdates.loyaltyCategoryNames = String(body.loyaltyCategoryNames)
+  }
   if (body.winbackDays1 !== undefined) {
     const d = Number(body.winbackDays1)
     if (Number.isInteger(d) && d > 0) allowedUpdates.winbackDays1 = d

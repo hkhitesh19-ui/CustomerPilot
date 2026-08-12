@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { scheduleGoogleReviewRequest } from '@/lib/review-scheduler';
-import { getCompiledTemplate } from "@/lib/template-engine";
+import { getCompiledTemplate } from "@/lib/communication-service";
+import { resolveLoyaltyCategoryName } from "@/lib/loyalty-category-service";
 import { getVipTierForSpend, VIP_TIER_LABELS } from "@/lib/vip-engine";
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
@@ -258,6 +259,16 @@ export async function POST(req: Request) {
         // award configured VIP Upgrade Bonus Stamps to kickstart next cycle!
         if (isCardFinished) {
           cycleCompletedInTx = true;
+
+          // Automatically upgrade Customer Loyalty Level Category (Level 1: VIP -> Level 2: Silver -> Level 3: Gold...)
+          const totalCompletedCards = await tx.customerStampCard.count({
+            where: { merchantId, customerId: waitingCustomer.customerId, completed: true }
+          });
+          const nextCategoryName = resolveLoyaltyCategoryName(merchant.loyaltyCategoryNames, totalCompletedCards);
+          await tx.customer.update({
+            where: { id: waitingCustomer.customerId },
+            data: { vipTier: nextCategoryName }
+          });
 
           if (configuredVipBonus > 0) {
             // Create fresh new card for next cycle

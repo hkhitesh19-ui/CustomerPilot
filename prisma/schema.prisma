@@ -40,6 +40,7 @@ model Merchant {
   currentStep               Int                       @default(1)
   googleReviewDelayMinutes  Int                       @default(30)
   vipUpgradeBonusStamps     Int                       @default(1)
+  loyaltyCategoryNames      String?
   winbackDays1              Int                       @default(30)
   winbackDays2              Int                       @default(60)
   winbackDays3              Int                       @default(90)
