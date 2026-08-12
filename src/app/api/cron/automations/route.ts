@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getMessageWorker } from '@/lib/message-worker';
 import { getCompiledTemplate } from "@/lib/template-engine";
+import { resolveWhatsappInstanceName } from '@/lib/whatsapp-service';
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
@@ -9,7 +10,7 @@ const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_9
 async function sendWhatsApp(merchantId: string, toPhone: string, text: string, template: string, customerId?: string) {
   try {
     const merchant = await db.merchant.findUnique({ where: { id: merchantId } })
-    const instanceName = merchant?.whatsappInstanceName || (merchant?.whatsappPhone ? `CP_M${merchant.whatsappPhone.replace(/\D/g, "")}` : "CP_M919033304707")
+    const instanceName = merchant ? resolveWhatsappInstanceName(merchant) : `CP_M_${merchantId}`
     
     const res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
       method: "POST",
@@ -71,7 +72,7 @@ export async function GET(req: Request) {
     for (const msg of pendingMessages) {
       try {
         const merchant = await db.merchant.findUnique({ where: { id: msg.merchantId } });
-        const instanceName = merchant?.whatsappInstanceName || (merchant?.whatsappPhone ? `CP_M${merchant.whatsappPhone.replace(/\D/g, "")}` : "CP_M919033304707");
+        const instanceName = merchant ? resolveWhatsappInstanceName(merchant) : `CP_M_${msg.merchantId}`;
 
         const res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
           method: "POST",

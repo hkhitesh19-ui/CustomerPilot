@@ -8,30 +8,43 @@ export async function generateAIReviewReply(params: {
   category: string
   customerReview: string
 }): Promise<string> {
-  // Wait, if no key, just return a fallback text (to avoid crashes in demo mode)
+  const storeName = params.merchantName || "Cake Connection"
+  const location = params.locationOrArea || "Vadodara"
+  const categoryStr = params.category || "fresh cakes and bakery items"
+
+  // SEO-Rich fallback if Gemini API is unavailable or rate-limited
+  const seoFallback = `Thank you so much for your wonderful 5-star review of ${storeName} in ${location}! We are thrilled that you loved our ${categoryStr}. Looking forward to serving you again soon!`
+
   if (!process.env.GEMINI_API_KEY) {
-    return "Thank you so much for your kind words! We look forward to serving you again."
+    return seoFallback
   }
 
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" })
     
-    const prompt = `Act as a warm, humble, genuine Indian business owner of ${params.merchantName} in ${params.locationOrArea} responding to a customer's Google review. 
-Customer Review: "${params.customerReview}"
-Category: ${params.category}
+    const prompt = `Act as a warm, humble, genuine Indian business owner of ${storeName} located in ${location} responding to a customer's 5-star Google review.
 
-Draft a 2-3 line appreciative, warm, human-like owner reply in simple natural Indian English. Naturally mention the business name and express genuine gratitude. Keep it short, personal, and polite. Never sound like a generic robot or copy-paste template. Output ONLY the reply text.`
+Customer Review: "${params.customerReview}"
+Category: ${categoryStr}
+
+CRITICAL SEO & BRANDING RULES FOR OWNER REPLY:
+1. Must naturally include the Merchant Name: "${storeName}"
+2. Must naturally include the Location/City/Area: "${location}"
+3. Must naturally mention primary product keywords (e.g., fresh cakes, bakery, sweets, desserts) suitable for ${categoryStr}
+4. Tone: Warm, humble Indian hospitality ("Dhanyawad / Thank you ❤️").
+5. Length: 2-3 short, impactful sentences (40-70 words).
+6. Output ONLY the reply text, no quotes, no extra headings.`
 
     const result = await model.generateContent(prompt)
     const response = await result.response
     const text = response.text().trim()
     
-    // Remove any conversational intro the AI might generate like "Here is a draft:"
+    // Remove any conversational intro the AI might generate
     const cleanText = text.replace(/^(Here is a draft|Sure|Here's a response):/i, "").replace(/^"/, "").replace(/"$/, "").trim()
     
-    return cleanText
+    return cleanText || seoFallback
   } catch (error: any) {
     console.error("[AI Reply Engine] Failed to generate reply:", error)
-    return "Thank you for the amazing review! It means a lot to us."
+    return seoFallback
   }
 }

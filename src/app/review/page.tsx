@@ -192,7 +192,7 @@ Output ONLY the review text.`
       }
     }
   } catch (error) {
-    console.error("Gemini AI generation rate limit/fallback active, using smart Indian review draft")
+    console.warn("[ReviewPage] Gemini AI unavailable (rate limit or network), using fallback draft.", error)
   }
 
   let googlePlaceId: string | null = googleConnection?.placeId || null

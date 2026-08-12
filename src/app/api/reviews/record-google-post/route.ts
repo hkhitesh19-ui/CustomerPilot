@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { generateAIReviewReply } from '@/lib/ai-review-reply';
 import { postReviewReplyToGBP } from '@/lib/google-reviews-service';
+import { sendCentralWhatsAppMessage } from '@/lib/whatsapp-service';
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080";
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!";
@@ -9,8 +10,10 @@ const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_9
 async function sendWhatsApp(merchantId: string, toPhone: string, text: string, template: string, customerId?: string) {
   try {
     const merchant = await db.merchant.findUnique({ where: { id: merchantId } });
-    const instanceName = merchant?.whatsappInstanceName || (merchant?.whatsappPhone ? `CP_M${merchant.whatsappPhone.replace(/\D/g, "")}` : "CP_M919033304707");
+    const instanceName = merchant?.whatsappInstanceName || `CP_M_${merchantId}`;
     
+    console.log(`[Review Post Action] 🚀 Attempting WhatsApp send via instance: ${instanceName} to +${toPhone}`);
+
     const res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
@@ -21,6 +24,8 @@ async function sendWhatsApp(merchantId: string, toPhone: string, text: string, t
     });
     const data = await res.json().catch(() => ({}));
     
+    const isSuccess = res.ok && data?.key?.id;
+
     await db.whatsAppMessage.create({
       data: {
         merchantId,
@@ -28,12 +33,17 @@ async function sendWhatsApp(merchantId: string, toPhone: string, text: string, t
         toPhone,
         template,
         body: text.substring(0, 500),
-        status: res.ok ? "sent" : "failed",
+        status: isSuccess ? "sent" : "failed",
+        errorMessage: isSuccess ? null : JSON.stringify(data),
         metaMessageId: data?.key?.id || `${template}_${Date.now()}`
       }
     }).catch(() => {});
     
-    console.log(`[Review Post Action] ✉️ Sent ${template} to +${toPhone} via ${instanceName}`);
+    if (isSuccess) {
+      console.log(`[Review Post Action] ✅ Sent ${template} to +${toPhone} via ${instanceName}`);
+    } else {
+      console.error(`[Review Post Action] ❌ Evolution API send failed (${res.status}):`, data);
+    }
   } catch (e: any) {
     console.error(`[Review Post Action] WhatsApp error for ${template}:`, e.message);
   }
@@ -199,12 +209,23 @@ export async function POST(req: Request) {
     const walletUrl = `${appUrl}/wallet?c=${customer.id}&m=${merchant.id}`;
     const customerMsg = `🎉 *Congratulations ${customer.name || "VIP"}!* ⭐\n\nThank you for posting your Google Review! We have credited 🎁 *+${bonusCount} Bonus Stamps* to your VIP Card!\n\nCheck your updated VIP Wallet:\n${walletUrl}`;
     
-    await sendWhatsApp(merchant.id, customer.phone, customerMsg, 'review_bonus_reward', customer.id);
+    await sendCentralWhatsAppMessage({
+      merchantId: merchant.id,
+      toPhone: customer.phone,
+      text: customerMsg,
+      template: 'review_bonus_reward',
+      customerId: customer.id
+    });
 
     // 7. Send WhatsApp notification to Merchant
     if (merchant.whatsappPhone) {
       const merchantMsg = `⭐ *New 5-Star Google Review Received!* ⭐\n\n👤 *Customer:* ${customer.name}\n💬 *Review:* "${finalReviewText}"\n\n🤖 *AI Auto-Reply Sent:* "${replyText}"`;
-      await sendWhatsApp(merchant.id, merchant.whatsappPhone, merchantMsg, 'merchant_review_alert');
+      await sendCentralWhatsAppMessage({
+        merchantId: merchant.id,
+        toPhone: merchant.whatsappPhone,
+        text: merchantMsg,
+        template: 'merchant_review_alert'
+      });
     }
 
     return NextResponse.json({
