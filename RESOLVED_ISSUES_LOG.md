@@ -443,4 +443,16 @@ ext() function to explicitly POST the merchant's configured reward card details 
   - Replaced circular image crop with `object-fit: contain`, generous `max-height: 85px`, and subtle drop shadow card styling so the merchant's brand logo is 100% visible, sharp, and prominent.
 - **Status**: ✅ Implemented, Verified, and Pushed to Remote Repository per user explicit approval.
 
+---
+
+## [12 Aug 2026] Feature: Dashboard Communication Engine Label Rename & Onboarding Print Standee PDF Fix
+- **Symptom / Requirement**: 
+  1. Communication Engine card on Dashboard (`/dashboard`) required renaming "Evolution Status" to "WhatsappAPI Status".
+  2. Onboarding wizard ("Print Standee (PDF)" button on Step 7 / Step 3) called raw `window.print()`, printing distorted dark UI instead of clean standee PDF.
+- **Resolution**:
+  - Renamed "Evolution Status" to "WhatsappAPI Status" in [`communication-status-card.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/communication-status-card.tsx).
+  - Attached standalone `handlePrintStandeePDF` popup window to Onboarding wizard in [`onboarding/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/onboarding/page.tsx) to render crisp A4 Counter Standee with uncropped merchant logo and automatic PDF print trigger.
+- **Status**: ✅ Implemented, Verified, and Pushed to Remote Repository per user explicit approval.
+
+
 
