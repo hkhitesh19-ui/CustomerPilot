@@ -33,10 +33,10 @@ export async function GET(req: NextRequest) {
 
     if (!merchant) return NextResponse.json({ error: "Merchant not found" }, { status: 404 })
 
-    const hasGoogleConnection = merchant.merchantGoogleConnections.length > 0
+    const hasGoogleConnection = !!merchant.merchantGoogleConnections
     
     // Auto-verify existing connection
-    if (hasGoogleConnection && !merchant.merchantGoogleConnections[0].verified) {
+    if (hasGoogleConnection && !(merchant.merchantGoogleConnections as any)?.verified) {
       await db.merchantGoogleConnection.update({
         where: { merchantId },
         data: { verified: true, syncStatus: 'active' }
