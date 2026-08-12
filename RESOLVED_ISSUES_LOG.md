@@ -485,6 +485,17 @@ ext() function to explicitly POST the merchant's configured reward card details 
 - **Resolution**: Added fallback default operators (`value={form.vipUpgradeBonusStamps ?? 0}`, `value={form.name ?? ""}`, etc.) across all `<Input>` components in [`reward-setup-card.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/reward-setup-card.tsx) so `value` is guaranteed to be a defined string/number from initial render to unmount.
 - **Status**: ✅ Resolved and Verified locally.
 
+---
+
+## [12 Aug 2026] Feature: Refactor Next Level Kickstart Bonus Stamps (Level Completion Bonus)
+- **Symptom / Requirement**: Per merchant rule specification, advance bonus stamps should NOT trigger on lifetime spend thresholds (e.g. ₹2,500 rupees), but must trigger EXCLUSIVELY when a customer completes their Previous Loyalty Level/Card (e.g. Level 1 complete → Level 2 starts with pre-added bonus stamps).
+- **Resolution**:
+  1. Refactored [`award/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/rewards/award/route.ts) to remove standalone spend-threshold bonus stamp generation. Bonus stamps now trigger exclusively inside the `isCardFinished` block when a customer completes a card, creating the next level card pre-funded with `LEVEL_UP_BONUS` stamps.
+  2. Updated UI label and description in [`reward-setup-card.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/reward-setup-card.tsx) to **"Next Level Kickstart Bonus Stamps (Level Completion Bonus)"** with clear status badge (`ACTIVE (+X Stamp on Next Level)` / `DEACTIVATED (0 Stamps)`).
+- **Status**: ✅ Refactored, Verified, and Tested locally.
+
+
+
 
 
 
