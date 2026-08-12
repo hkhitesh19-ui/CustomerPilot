@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { Copy, Check, ExternalLink, Star } from "lucide-react"
 import { useSystemContent } from "@/hooks/useSystemContent"
 
@@ -18,57 +18,43 @@ export function ReviewEditor({
   const { getContent } = useSystemContent()
   const defaultText = existingReviewText || initialDraft || `The products were fresh, beautiful, and absolutely delicious. Highly recommended!`
   const [draft, setDraft] = useState(defaultText)
-  const [copied, setCopied] = useState(false)
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>('idle')
   const [isEditingExisting, setIsEditingExisting] = useState(!!existingReviewText)
 
-  const fallbackCopy = (text: string) => {
-    try {
-      // First try to use the visible textarea if possible (for mobile reliability)
-      const existingTextArea = document.getElementById("review-draft-textarea") as HTMLTextAreaElement;
-      if (existingTextArea) {
-        existingTextArea.focus();
-        existingTextArea.select();
-        existingTextArea.setSelectionRange(0, 99999);
-        document.execCommand("copy");
-        existingTextArea.blur();
-      } else {
-        const textArea = document.createElement("textarea")
-        textArea.value = text
-        textArea.style.position = "fixed"
-        textArea.style.left = "-999999px"
-        document.body.appendChild(textArea)
-        textArea.select()
-        document.execCommand("copy")
-        document.body.removeChild(textArea)
-      }
-    } catch (e) {
-      console.error("ExecCommand copy failed", e)
-    }
-  }
-
-  const copyTextToClipboard = (text: string) => {
-    try {
-      if (typeof window !== "undefined" && window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).catch(() => fallbackCopy(text))
-      } else {
-        fallbackCopy(text)
-      }
-    } catch {
-      fallbackCopy(text)
-    }
-  }
+  // OtterMind Fix: useRef to directly target the visible, live textarea element
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const googleLink = merchant.googleReviewLink 
     || (merchant.googlePlaceId ? `https://search.google.com/local/writereview?placeid=${merchant.googlePlaceId}` : "https://maps.google.com")
 
-  const handleCopyAndPostClick = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault()
+  const handleCopyAndPostClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // ✅ CRITICAL (OtterMind Fix): Do NOT call e.preventDefault()!
+    // The <a> tag's natural navigation PRESERVES the user-gesture token,
+    // which authorizes the clipboard write on iOS Safari & Android Chrome.
+    // Calling preventDefault() breaks this shared gesture context.
 
-    // 1. Copy draft text to clipboard
-    copyTextToClipboard(draft)
-    setCopied(true)
+    const ta = textareaRef.current
+    if (!ta) return
 
-    // 2. Record review submission asynchronously
+    // 1. Focus + Select all text in the VISIBLE, ALREADY-IN-DOM textarea
+    //    iOS Safari only allows execCommand('copy') on visible, focused elements.
+    ta.focus()
+    ta.select()
+    ta.setSelectionRange(0, ta.value.length)
+
+    // 2. Execute copy synchronously — SAME JS task as the click event
+    //    No setTimeout, no async, no Promise — must be in the same execution context.
+    let copied = false
+    try {
+      copied = document.execCommand('copy')
+    } catch {
+      copied = false
+    }
+
+    // 3. Set visual feedback state — this does NOT block the <a> navigation
+    setCopyStatus(copied ? 'copied' : 'failed')
+
+    // 4. Record review asynchronously (fire-and-forget)
     fetch('/api/reviews/record-google-post', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -80,11 +66,11 @@ export function ReviewEditor({
       })
     }).catch(err => console.error("Error recording review post:", err))
 
-    // 3. Directly navigate tab to Google Review URL (Impossible to block)
-    setTimeout(() => {
-      window.location.href = googleLink
-    }, 100)
+    // 5. The <a> tag's default href navigation fires AFTER this handler returns.
+    //    This is the key: navigation shares the user-activation token with the copy above.
   }
+
+  const copied = copyStatus === 'copied'
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
@@ -146,22 +132,44 @@ export function ReviewEditor({
               </label>
             </div>
             
+            {/* OtterMind Fix: 
+                - ref={textareaRef} for direct DOM access during click
+                - fontSize 16px: prevents iOS auto-zoom on focus (which breaks selection)
+                - WebkitUserSelect 'all': makes entire content a single tap-to-select region on iOS
+                - userSelect 'all': same for Android Chrome */}
             <textarea
+              ref={textareaRef}
               id="review-draft-textarea"
-              className="w-full h-32 bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none transition-all text-sm leading-relaxed"
+              className="w-full h-32 bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none transition-all leading-relaxed"
+              style={{ 
+                fontSize: '16px', // Prevents iOS Safari auto-zoom on focus
+                WebkitUserSelect: 'all', // iOS: makes full content one-tap selectable
+                userSelect: 'all'  // Android Chrome
+              }}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
             />
           </div>
 
+          {/* OtterMind Fix:
+              - This MUST be an <a> tag, NOT a <button>
+              - No e.preventDefault() — let natural <a> navigation run
+              - touchAction 'manipulation': removes 300ms tap delay on Android
+              - WebkitTapHighlightColor transparent: prevents flash interrupting gesture */}
           <a 
             href={googleLink}
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleCopyAndPostClick}
+            style={{
+              touchAction: 'manipulation',
+              WebkitTapHighlightColor: 'transparent',
+            }}
             className={`w-full h-14 text-lg font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer no-underline ${
               copied 
                 ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_0_20px_-3px_rgba(16,185,129,0.7)]" 
+                : copyStatus === 'failed'
+                ? "bg-amber-600 hover:bg-amber-700 text-white"
                 : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-[0_0_20px_-5px_rgba(16,185,129,0.5)] hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.7)]"
             }`}
           >
@@ -169,6 +177,11 @@ export function ReviewEditor({
               <>
                 <Check className="w-5 h-5" />
                 <span>Copied! Opening Google...</span>
+              </>
+            ) : copyStatus === 'failed' ? (
+              <>
+                <ExternalLink className="w-5 h-5" />
+                <span>Open Google (copy manually if needed)</span>
               </>
             ) : (
               <>
@@ -178,6 +191,13 @@ export function ReviewEditor({
               </>
             )}
           </a>
+
+          {/* Fallback instruction shown only when copy fails */}
+          {copyStatus === 'failed' && (
+            <p className="text-center text-xs text-amber-400 mt-1 leading-relaxed">
+              💡 Tap the text above to select it, long-press → Copy, then paste in Google Review.
+            </p>
+          )}
           
           <p className="text-center text-xs text-slate-500 mt-2 leading-relaxed">
             {isEditingExisting 
@@ -189,5 +209,6 @@ export function ReviewEditor({
     </div>
   )
 }
+
 
 

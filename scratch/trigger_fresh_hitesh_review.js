@@ -48,7 +48,7 @@ async function resetAndTriggerFreshReview() {
   const data = await res.json().catch(() => ({}));
   console.log(`Evolution API response (${res.status}):`, data);
 
-  // 3. Record outgoing message
+  // 3. Record outgoing message and update botState
   await prisma.whatsAppMessage.create({
     data: {
       merchantId: customer.merchantId,
@@ -61,6 +61,17 @@ async function resetAndTriggerFreshReview() {
       metaMessageId: data?.key?.id || `review_req_${Date.now()}`
     }
   });
+
+  if (res.ok) {
+    await prisma.customer.update({
+      where: { id: customer.id },
+      data: {
+        botState: "AWAITING_REVIEW_CONSENT",
+        botStateUpdatedAt: new Date()
+      }
+    });
+    console.log("✅ Set botState = AWAITING_REVIEW_CONSENT for Hitesh");
+  }
 
   console.log("✅ Fresh Google Review Step 1 successfully sent to Hitesh!");
 }
