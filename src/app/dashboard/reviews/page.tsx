@@ -27,6 +27,9 @@ export default function ReviewsManagementPage() {
   const [reviews, setReviews] = useState<ReviewItem[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<"all" | "pending" | "5star" | "blocked">("all")
+  const [generatingId, setGeneratingId] = useState<string | null>(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [draftReplies, setDraftReplies] = useState<Record<string, string>>({})
   const [savingId, setSavingId] = useState<string | null>(null)
 
   // Fetch Reviews
