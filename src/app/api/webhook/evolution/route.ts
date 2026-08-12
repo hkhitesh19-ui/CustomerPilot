@@ -199,12 +199,14 @@ export async function POST(req: NextRequest) {
         // STRICT MATCH: Only trigger auto-onboarding if the text strictly matches the QR Code generated text
         const isTriggerMsg = /Checking in for my VIP Club stamps/i.test(text)
 
-        // Determine public base URL from request headers (Pinggy / Tunnel support for mobile links)
+        // Determine public base URL — Priority: env NEXT_PUBLIC_APP_URL > x-forwarded-host
+        // autoPinggySync.js keeps NEXT_PUBLIC_APP_URL always in sync with current Pinggy session
         const requestHost = req.headers.get("x-forwarded-host") || req.headers.get("host")
         const requestProto = req.headers.get("x-forwarded-proto") || "https"
-        const publicBaseUrl = (requestHost && !requestHost.includes("localhost"))
-          ? `${requestProto}://${requestHost}`
-          : (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000")
+        const publicBaseUrl = process.env.NEXT_PUBLIC_APP_URL
+          || ((requestHost && !requestHost.includes("localhost"))
+            ? `${requestProto}://${requestHost}`
+            : "http://localhost:3000")
 
         // ── 1. CONTEXT AWARE REPLIES (Review & Name) ──────────────────────
         if (!isTriggerMsg && existingCustomer && text.length > 0 && text.length < 50) {

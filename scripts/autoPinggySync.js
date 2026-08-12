@@ -97,6 +97,27 @@ function startPinggy() {
             urlFound = true;
             const extractedUrl = match[0];
             console.log('[PinggySync] Found Pinggy URL:', extractedUrl);
+
+            // ── KEY FIX: Update NEXT_PUBLIC_APP_URL in .env.local ──────────────────
+            // This ensures review links generated during this session use the CURRENT Pinggy URL
+            try {
+                const fs = require('fs');
+                const path = require('path');
+                const envPath = path.join(__dirname, '..', '.env.local');
+                let envContent = fs.readFileSync(envPath, 'utf8');
+                
+                if (envContent.includes('NEXT_PUBLIC_APP_URL=')) {
+                    envContent = envContent.replace(/NEXT_PUBLIC_APP_URL=.*/g, `NEXT_PUBLIC_APP_URL=${extractedUrl}`);
+                } else {
+                    envContent += `\nNEXT_PUBLIC_APP_URL=${extractedUrl}`;
+                }
+                
+                fs.writeFileSync(envPath, envContent, 'utf8');
+                console.log(`[PinggySync] ✅ Updated NEXT_PUBLIC_APP_URL=${extractedUrl} in .env.local`);
+            } catch (e) {
+                console.error('[PinggySync] Failed to update .env.local:', e.message);
+            }
+
             fetchAllInstancesAndUpdate(extractedUrl);
         }
     };
