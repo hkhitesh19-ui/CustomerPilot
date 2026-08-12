@@ -383,3 +383,17 @@ ext() function to explicitly POST the merchant's configured reward card details 
   2. **SEO Optimization ([ai-review-reply.ts](file:///f:/CustomerPilot_ByGLM_July2026/src/lib/ai-review-reply.ts)):** Enforced strict SEO rules (Merchant Name, City/Area, Category keywords, warm Indian hospitality tone) in both the Gemini prompt and the default fallback.
   3. **Merchant Customization & Save Edits ([update-reply/route.ts](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/reviews/update-reply/route.ts) & [reviews/page.tsx](file:///f:/CustomerPilot_ByGLM_July2026/src/app/dashboard/reviews/page.tsx)):** Created `/api/reviews/update-reply` route and added an explicit `💾 Save Edits` button next to `Regenerate` in the Dashboard Reviews UI.
 - **Status**: ✅ Resolved and Verified by user manual testing.
+
+---
+
+## [12 Aug 2026] Feature: 3-Tier Sentiment-Aware AI Owner Auto-Reply System (Local SEO & Rating-Driven)
+- **Symptom / Requirement**: 
+  The AI Owner Reply engine needed distinct, intelligent responses for 1-2 star (negative), 3 star (moderate/neutral), and 4-5 star (positive) Google reviews matching the customer's specific review length and wordings while embedding Local SEO keywords.
+- **Resolution**:
+  - Refactored `generateAIReviewReply` in [`ai-review-reply.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/lib/ai-review-reply.ts) to accept dynamic `rating` (1-5).
+  - Implemented 3 distinct prompt guidance tiers:
+    - **1-2 Stars (Negative):** Empathetic, humble, deeply apologetic, non-defensive tone addressing specific complaint wordings, incorporating brand/city name for reputation management, and offering direct WhatsApp resolution.
+    - **3 Stars (Moderate):** Balanced, constructive tone acknowledging positive aspects & areas of improvement, embedding merchant name/city/keywords for SEO, and inviting back for a 5-star experience.
+    - **4-5 Stars (Positive):** Warm, celebratory tone with maximum Local SEO keyword density (Merchant Name, City/Area, Category Delicacies).
+  - Updated all API invocation sites (`generate-ai-reply/route.ts`, `record-google-post/route.ts`, `cron/google-reviews/route.ts`) to pass `rating`.
+- **Status**: ✅ Implemented, Verified, and Pushed to Remote Repository per user explicit approval.
