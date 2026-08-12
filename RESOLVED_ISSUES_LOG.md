@@ -477,6 +477,16 @@ ext() function to explicitly POST the merchant's configured reward card details 
   3. Consolidated all loyalty reward rules into `RewardSetupCard` by removing duplicate orphan controls from the Business Information card.
 - **Status**: ✅ Implemented and Verified locally.
 
+---
+
+## [12 Aug 2026] Issue: Settings Page React Uncontrolled-to-Controlled Input Console Error
+- **Symptom**: React printed a console warning on `/dashboard/settings`: *"A component is changing an uncontrolled input to be controlled. This is likely caused by the value changing from undefined to a defined value."* at line 302 of `reward-setup-card.tsx`.
+- **Root Cause**: `form` state properties (such as `vipUpgradeBonusStamps`) initialized as `undefined` before API state loading completed, causing React to treat the HTML `<input>` as uncontrolled, then switching to controlled when state populated.
+- **Resolution**: Added fallback default operators (`value={form.vipUpgradeBonusStamps ?? 0}`, `value={form.name ?? ""}`, etc.) across all `<Input>` components in [`reward-setup-card.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/reward-setup-card.tsx) so `value` is guaranteed to be a defined string/number from initial render to unmount.
+- **Status**: ✅ Resolved and Verified locally.
+
+
+
 
 
 
