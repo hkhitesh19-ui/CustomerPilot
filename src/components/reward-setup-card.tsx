@@ -175,7 +175,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
               <Label htmlFor="card-name">Card Title</Label>
               <Input
                 id="card-name"
-                value={form.name}
+                value={form.name ?? ""}
                 onChange={e => setForm({ ...form, name: e.target.value })}
                 placeholder="e.g. VIP Club Card"
                 required
@@ -186,7 +186,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
               <Label htmlFor="reward-name">Reward Description</Label>
               <Input
                 id="reward-name"
-                value={form.rewardName}
+                value={form.rewardName ?? ""}
                 onChange={e => setForm({ ...form, rewardName: e.target.value })}
                 placeholder="e.g. FREE 500gm Cake"
                 required
@@ -201,7 +201,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                   id="stamp-val"
                   type="number"
                   className="pl-7"
-                  value={form.stampValue}
+                  value={form.stampValue ?? 500}
                   onChange={e => setForm({ ...form, stampValue: Number(e.target.value) })}
                   required
                 />
@@ -214,7 +214,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
               <Input
                 id="stamps-req"
                 type="number"
-                value={form.stampsRequired}
+                value={form.stampsRequired ?? 10}
                 onChange={e => setForm({ ...form, stampsRequired: Number(e.target.value) })}
                 required
               />
@@ -226,7 +226,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
               <Input
                 id="validity"
                 type="number"
-                value={form.validityDays}
+                value={form.validityDays ?? 90}
                 onChange={e => setForm({ ...form, validityDays: Number(e.target.value) })}
                 required
               />
@@ -238,12 +238,12 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                 <input
                   type="color"
                   id="theme-color"
-                  value={form.color}
+                  value={form.color ?? "#6366f1"}
                   onChange={e => setForm({ ...form, color: e.target.value })}
                   className="w-10 h-10 rounded cursor-pointer border"
                 />
                 <Input
-                  value={form.color}
+                  value={form.color ?? "#6366f1"}
                   onChange={e => setForm({ ...form, color: e.target.value })}
                   className="font-mono"
                 />
@@ -255,7 +255,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
               <Input
                 id="google-bonus"
                 type="number"
-                value={form.googleReviewBonus}
+                value={form.googleReviewBonus ?? 0}
                 onChange={e => setForm({ ...form, googleReviewBonus: Number(e.target.value) })}
               />
               <p className="text-xs text-muted-foreground">Bonus stamps awarded when a customer posts a 5-star Google review</p>
@@ -266,7 +266,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
               <Input
                 id="photo-bonus"
                 type="number"
-                value={form.photoBonus}
+                value={form.photoBonus ?? 0}
                 onChange={e => setForm({ ...form, photoBonus: Number(e.target.value) })}
               />
               <p className="text-xs text-muted-foreground">Extra bonus stamps if they attach a photo with their review</p>
@@ -281,11 +281,11 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                   </Label>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${form.vipUpgradeBonusStamps > 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
-                    {form.vipUpgradeBonusStamps > 0 ? `ACTIVE (+${form.vipUpgradeBonusStamps} Stamp)` : "DEACTIVATED (0 Stamps)"}
+                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${(form.vipUpgradeBonusStamps ?? 0) > 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+                    {(form.vipUpgradeBonusStamps ?? 0) > 0 ? `ACTIVE (+${form.vipUpgradeBonusStamps ?? 0} Stamp)` : "DEACTIVATED (0 Stamps)"}
                   </span>
                   <Switch
-                    checked={form.vipUpgradeBonusStamps > 0}
+                    checked={(form.vipUpgradeBonusStamps ?? 0) > 0}
                     onCheckedChange={(checked) => setForm({ ...form, vipUpgradeBonusStamps: checked ? 1 : 0 })}
                   />
                 </div>
@@ -304,7 +304,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                     type="number"
                     min="0"
                     max="10"
-                    value={form.vipUpgradeBonusStamps}
+                    value={form.vipUpgradeBonusStamps ?? 0}
                     onChange={e => setForm({ ...form, vipUpgradeBonusStamps: Math.max(0, Number(e.target.value)) })}
                     className="bg-slate-900 border-slate-700 text-slate-100"
                   />
@@ -317,7 +317,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
             <Label htmlFor="excluded-cat">Excluded Categories (Comma Separated)</Label>
             <Input
               id="excluded-cat"
-              value={form.excludedCategories}
+              value={form.excludedCategories ?? ""}
               onChange={e => setForm({ ...form, excludedCategories: e.target.value })}
               placeholder="e.g. Cigarettes, Alcohol, Discounted Items"
             />
