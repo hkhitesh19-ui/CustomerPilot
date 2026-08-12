@@ -67,6 +67,10 @@ export async function POST(req: Request) {
 
     const finalReviewText = reviewText || "The cake was fresh, beautiful, and absolutely delicious. Highly recommended!";
 
+    // Fetch Merchant's Active Reward Card Config first
+    const template = await db.stampCard.findFirst({ where: { merchantId, active: true } });
+    const configuredBonus = template?.googleReviewBonus ?? 1;
+
     // Check if customer already submitted a Google Review previously (Upsert support)
     const existingReview = await db.review.findFirst({
       where: { merchantId, customerId },
@@ -74,7 +78,7 @@ export async function POST(req: Request) {
     });
 
     const isFirstTimeReview = !existingReview;
-    const bonusCount = isFirstTimeReview ? 2 : 0; // Award bonus stamps ONLY on first review submission
+    const bonusCount = isFirstTimeReview ? configuredBonus : 0; // Award dynamic bonus stamps per merchant's Step 5 settings
 
     let reviewRecord;
     if (existingReview) {
@@ -142,8 +146,7 @@ export async function POST(req: Request) {
     }
 
     // 3. Award Bonus Stamps to customer stamp card (Only for first-time reviews)
-    if (isFirstTimeReview) {
-      const template = await db.stampCard.findFirst({ where: { merchantId, active: true } });
+    if (isFirstTimeReview && bonusCount > 0) {
       if (template) {
         let card = await db.customerStampCard.findFirst({
           where: { customerId: customer.id, stampCardId: template.id, completed: false, redeemed: false }
