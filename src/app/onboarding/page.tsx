@@ -1685,6 +1685,133 @@ function OnboardStep7Print({ data, setData }: any) {
   const rewardOffer = data.rewardName || "FREE Special Treat"
   const logoUrl = data.logoDataUrl || ""
 
+  const handlePrintStandeePDF = () => {
+    if (!qrUrl) {
+      alert("QR code is not generated yet. Please wait a moment.")
+      return
+    }
+
+    const logoHtml = logoUrl
+      ? `<div style="display:flex; justify-content:center; align-items:center; min-height:80px; margin:0 auto 16px auto;">
+           <img src="${logoUrl}" style="max-height:85px; max-width:240px; width:auto; height:auto; object-fit:contain; filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.12)); border-radius:12px; background:#ffffff; padding:6px; border:1px solid #e2e8f0;" />
+         </div>`
+      : `<div style="width:70px; height:70px; border-radius:50%; background:#6366f1; color:white; font-size:24px; font-weight:bold; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto;">CP</div>`
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Print Counter Standee - ${businessName}</title>
+          <style>
+            @page { size: A4 portrait; margin: 0; }
+            body {
+              font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+              background: #f8fafc;
+              margin: 0;
+              padding: 40px 20px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+              box-sizing: border-box;
+            }
+            .standee-card {
+              width: 380px;
+              background: white;
+              border-radius: 24px;
+              border: 4px solid #6366f1;
+              padding: 36px 28px;
+              text-align: center;
+              box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+            }
+            .badge {
+              background: #6366f1;
+              color: white;
+              font-size: 11px;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 1.2px;
+              padding: 6px 16px;
+              border-radius: 20px;
+              display: inline-block;
+              margin-bottom: 18px;
+            }
+            .store-name {
+              font-size: 24px;
+              font-weight: 800;
+              color: #0f172a;
+              margin: 4px 0 4px 0;
+              letter-spacing: -0.5px;
+            }
+            .tagline {
+              font-size: 13px;
+              color: #64748b;
+              margin-bottom: 22px;
+              font-weight: 600;
+            }
+            .qr-box {
+              background: white;
+              padding: 16px;
+              border-radius: 20px;
+              border: 2px solid #e2e8f0;
+              display: inline-block;
+              box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+            }
+            .qr-img {
+              width: 230px;
+              height: 230px;
+              display: block;
+            }
+            .footer-text {
+              margin-top: 22px;
+              font-size: 13px;
+              color: #334155;
+              font-weight: 700;
+            }
+            .powered-by {
+              margin-top: 12px;
+              font-size: 10px;
+              color: #94a3b8;
+              text-transform: uppercase;
+              letter-spacing: 1.5px;
+              font-weight: 600;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="standee-card">
+            <div class="badge">VIP Loyalty Club</div>
+            ${logoHtml}
+            <div class="store-name">${businessName}</div>
+            <div class="tagline">Scan QR Code to Earn Stamps & Get ${rewardOffer}!</div>
+            
+            <div class="qr-box">
+              <img src="${qrUrl}" class="qr-img" />
+            </div>
+
+            <div class="footer-text">📲 Point your camera to check-in on WhatsApp</div>
+            <div class="powered-by">Powered by CustomerPilot</div>
+          </div>
+          <script>
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+              }, 400);
+            };
+          </script>
+        </body>
+      </html>
+    `
+
+    const printWin = window.open("", "_blank", "width=600,height=850")
+    if (printWin) {
+      printWin.document.write(printContent)
+      printWin.document.close()
+    } else {
+      alert("Please allow pop-ups for this site to print/save PDF.")
+    }
+  }
+
   return (
     <div className="p-6 sm:p-8 space-y-6">
       <div className="text-center">
@@ -1716,7 +1843,7 @@ function OnboardStep7Print({ data, setData }: any) {
       </div>
 
       <div className="flex justify-center gap-3">
-        <Button onClick={() => window.print()} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-5 px-6 gap-2">
+        <Button onClick={handlePrintStandeePDF} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-5 px-6 gap-2 shadow-lg">
           <Printer className="w-5 h-5" /> Print Standee (PDF) 🖨️
         </Button>
       </div>
