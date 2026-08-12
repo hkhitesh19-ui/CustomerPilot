@@ -217,6 +217,28 @@ function OnboardingPageContent() {
       if (currentKey) {
         await saveStepProgress(currentKey, step + 1)
       }
+
+      // Step 1: Save Business Info to merchant profile in DB
+      if (step === 1 && data.merchantId) {
+        try {
+          await fetch("/api/merchant/update", {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "x-merchant-id": data.merchantId,
+            },
+            body: JSON.stringify({
+              name: data.businessName,
+              ownerName: data.ownerName,
+              businessType: data.businessType,
+              address: data.businessAddress,
+            }),
+          })
+        } catch (e) {
+          console.error("Failed to save business info:", e)
+        }
+      }
+
       // If we are completing Step 5 (Rewards), save the card setup to the backend
       if (step === 5) {
         try {
