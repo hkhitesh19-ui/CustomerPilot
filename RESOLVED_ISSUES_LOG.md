@@ -397,3 +397,26 @@ ext() function to explicitly POST the merchant's configured reward card details 
     - **4-5 Stars (Positive):** Warm, celebratory tone with maximum Local SEO keyword density (Merchant Name, City/Area, Category Delicacies).
   - Updated all API invocation sites (`generate-ai-reply/route.ts`, `record-google-post/route.ts`, `cron/google-reviews/route.ts`) to pass `rating`.
 - **Status**: ✅ Implemented, Verified, and Pushed to Remote Repository per user explicit approval.
+
+---
+
+## [12 Aug 2026] Feature: 10-Level Loyalty Cycle Category Progression & Previous Cycle VIP Bonus Stamp Allocation
+- **Symptom / Requirement**: 
+  1. Merchant needed 10 customizable Loyalty Cycle Level titles (Default: `VIP`, `Silver`, `Gold`, `Platinum`, `Diamond`, `Royal`, `Elite`, `Prestige`, `Ambassador`, `Legend`) with automatic level progression upon each completed stamp card.
+  2. Merchant's `vipUpgradeBonusStamps` was not being awarded at the exact moment a customer finished their previous loyalty cycle card.
+- **Resolution**:
+  - Added `loyaltyCategoryNames` JSON field to `Merchant` model in [`schema.prisma`](file:///f:/CustomerPilot_ByGLM_July2026/prisma/schema.prisma) and created [`loyalty-category-service.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/lib/loyalty-category-service.ts).
+  - Created [`LoyaltyCategoryCard`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/loyalty-category-card.tsx) UI in Merchant Setup (`/dashboard/settings`) allowing merchants to customize all 10 Level titles.
+  - Refactored [`rewards/award/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/rewards/award/route.ts) to detect `isCardFinished` (Loyalty Cycle Completed), automatically upgrade customer's `vipTier` level title, and credit configured `vipUpgradeBonusStamps` onto their new next-cycle card!
+- **Status**: ✅ Implemented, Verified, and Pushed to Remote Repository per user explicit approval.
+
+---
+
+## [12 Aug 2026] Feature: Photo Review Bonus Stamp Detection & Dynamic Allocation
+- **Symptom / Requirement**: 
+  System needed to detect whether a customer attached a product/store photo with their Google Review and dynamically award Step 5's configured `photoBonus` stamps (e.g. 2 stamps) in addition to the standard Google Review bonus stamp.
+- **Resolution**:
+  - Updated [`record-google-post/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/reviews/record-google-post/route.ts) to check `photoUrl` / `photoAttached`.
+  - Configured total bonus count as `googleReviewBonus + photoBonus` when photo attachment is detected, persisting `photoBonusStamps` to `db.review` and updating customer stamp wallet.
+- **Status**: ✅ Implemented, Verified, and Pushed to Remote Repository per user explicit approval.
+
