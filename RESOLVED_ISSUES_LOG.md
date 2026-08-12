@@ -467,5 +467,17 @@ ext() function to explicitly POST the merchant's configured reward card details 
   3. Verified review submission end-to-end (HTTP 200 OK); review and AI owner reply are now successfully stored in `GoogleBusinessReview` and displayed in the AutoReply Studio.
 - **Status**: ✅ Resolved, Verified, and Pushed to Remote Repository per user explicit approval.
 
+---
+
+## [12 Aug 2026] Feature: VIP Tier Upgrade Bonus Stamp Rule Merchant UI Controls (View, Modify, Deactivate)
+- **Symptom / Requirement**: Merchant needed full visibility and control over the VIP Tier Upgrade Bonus Stamp Rule inside the Reward Setup Card (`/dashboard/settings`), including the ability to view current status, modify bonus stamp count, and toggle the rule ON or OFF (deactivate to 0 stamps).
+- **Resolution**:
+  1. Updated [`/api/cards/setup/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/cards/setup/route.ts) to seamlessly fetch and update `merchant.vipUpgradeBonusStamps` alongside active card configuration.
+  2. Built a dedicated, highlighted control card section inside [`reward-setup-card.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/reward-setup-card.tsx) with a real-time status badge (`ACTIVE (+X Stamp)` / `DEACTIVATED (0 Stamps)`), a toggle switch (ON/OFF), and a numeric input box.
+  3. Consolidated all loyalty reward rules into `RewardSetupCard` by removing duplicate orphan controls from the Business Information card.
+- **Status**: ✅ Implemented and Verified locally.
+
+
+
 
 
