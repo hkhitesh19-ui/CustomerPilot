@@ -420,3 +420,27 @@ ext() function to explicitly POST the merchant's configured reward card details 
   - Configured total bonus count as `googleReviewBonus + photoBonus` when photo attachment is detected, persisting `photoBonusStamps` to `db.review` and updating customer stamp wallet.
 - **Status**: ✅ Implemented, Verified, and Pushed to Remote Repository per user explicit approval.
 
+---
+
+## [12 Aug 2026] Feature: SuperAdmin Merchant Rule Override Control Panel & Database Integrity
+- **Symptom / Requirement**: 
+  SuperAdmin needed full capability to view, configure, and modify all 10-level loyalty categories, Step 5 reward rules, and bonus stamps for any registered merchant directly from the SuperAdmin Command Center (`/super-admin`) with zero DB errors.
+- **Resolution**:
+  - Enhanced [`admin/merchants/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/admin/merchants/route.ts) to include full merchant configurations and stamp card rules.
+  - Built SuperAdmin Merchant Rule Override Modal in [`super-admin/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/super-admin/page.tsx) with direct POST/PATCH handlers to `/api/merchant/update` and `/api/cards/setup`.
+- **Status**: ✅ Implemented, Verified, and Pushed to Remote Repository per user explicit approval.
+
+---
+
+## [12 Aug 2026] Feature: Commercial QR Generator Refactoring & High-Res Uncropped Logo PDF Print Output
+- **Symptom / Requirement**: 
+  1. Commercial QR Generator in Settings required simplification to dedicated Counter Standee.
+  2. "Print / Save PDF" feature needed a clean A4 print popup window instead of printing the dark dashboard UI.
+  3. Merchant logo was being cropped by a 50% circular border and needed prominent, uncropped high-resolution presentation.
+- **Resolution**:
+  - Refactored [`qr-generator.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/qr-generator.tsx) to focus exclusively on Counter Standee.
+  - Built standalone `handlePrintPDF` popup print window with clean A4 layout, automatic `window.print()` trigger, and PDF export support.
+  - Replaced circular image crop with `object-fit: contain`, generous `max-height: 85px`, and subtle drop shadow card styling so the merchant's brand logo is 100% visible, sharp, and prominent.
+- **Status**: ✅ Implemented, Verified, and Pushed to Remote Repository per user explicit approval.
+
+
