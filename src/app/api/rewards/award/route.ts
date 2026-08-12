@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { scheduleGoogleReviewRequest } from '@/lib/review-scheduler';
-import { getCompiledTemplate } from "@/lib/communication-service";
+import { getCompiledTemplate } from "@/lib/template-engine";
 import { resolveLoyaltyCategoryName } from "@/lib/loyalty-category-service";
 import { getVipTierForSpend, VIP_TIER_LABELS } from "@/lib/vip-engine";
 
