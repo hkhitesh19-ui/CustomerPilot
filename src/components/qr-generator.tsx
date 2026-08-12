@@ -52,8 +52,10 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
 
     const storeName = qrData?.merchant?.name || "Merchant Store"
     const logoHtml = qrData?.merchant?.logoUrl
-      ? `<img src="${qrData.merchant.logoUrl}" style="width:70px; height:70px; border-radius:50%; object-fit:cover; margin:0 auto 12px auto; border:3px solid #6366f1;" />`
-      : `<div style="width:70px; height:70px; border-radius:50%; background:#6366f1; color:white; font-size:24px; font-weight:bold; display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto;">CP</div>`
+      ? `<div style="display:flex; justify-content:center; align-items:center; min-height:80px; margin: 0 auto 16px auto;">
+           <img src="${qrData.merchant.logoUrl}" style="max-height:85px; max-width:240px; width:auto; height:auto; object-fit:contain; filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.12)); border-radius:12px; background:#ffffff; padding:6px; border:1px solid #e2e8f0;" />
+         </div>`
+      : `<div style="width:70px; height:70px; border-radius:50%; background:#6366f1; color:white; font-size:24px; font-weight:bold; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto;">CP</div>`
 
     const printContent = `
       <!DOCTYPE html>
@@ -74,11 +76,11 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
               box-sizing: border-box;
             }
             .standee-card {
-              width: 360px;
+              width: 380px;
               background: white;
               border-radius: 24px;
               border: 4px solid #6366f1;
-              padding: 36px 24px;
+              padding: 36px 28px;
               text-align: center;
               box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
             }
@@ -88,56 +90,58 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
               font-size: 11px;
               font-weight: 700;
               text-transform: uppercase;
-              letter-spacing: 1px;
+              letter-spacing: 1.2px;
               padding: 6px 16px;
               border-radius: 20px;
               display: inline-block;
-              margin-bottom: 16px;
+              margin-bottom: 18px;
             }
             .store-name {
-              font-size: 22px;
+              font-size: 24px;
               font-weight: 800;
               color: #0f172a;
-              margin: 8px 0 4px 0;
+              margin: 4px 0 4px 0;
+              letter-spacing: -0.5px;
             }
             .tagline {
               font-size: 13px;
               color: #64748b;
-              margin-bottom: 20px;
-              font-weight: 500;
+              margin-bottom: 22px;
+              font-weight: 600;
             }
             .qr-box {
               background: white;
               padding: 16px;
-              border-radius: 18px;
+              border-radius: 20px;
               border: 2px solid #e2e8f0;
               display: inline-block;
-              box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+              box-shadow: 0 6px 16px rgba(0,0,0,0.06);
             }
             .qr-img {
-              width: 220px;
-              height: 220px;
+              width: 230px;
+              height: 230px;
               display: block;
             }
             .footer-text {
-              margin-top: 20px;
-              font-size: 12px;
-              color: #475569;
-              font-weight: 600;
+              margin-top: 22px;
+              font-size: 13px;
+              color: #334155;
+              font-weight: 700;
             }
             .powered-by {
-              margin-top: 10px;
+              margin-top: 12px;
               font-size: 10px;
               color: #94a3b8;
               text-transform: uppercase;
               letter-spacing: 1.5px;
+              font-weight: 600;
             }
           </style>
         </head>
         <body>
           <div class="standee-card">
             <div class="badge">VIP Loyalty Club</div>
-            <div>${logoHtml}</div>
+            ${logoHtml}
             <div class="store-name">${storeName}</div>
             <div class="tagline">Scan QR Code to Earn Stamps & Claim Rewards!</div>
             
@@ -159,7 +163,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       </html>
     `
 
-    const printWin = window.open("", "_blank", "width=600,height=800")
+    const printWin = window.open("", "_blank", "width=600,height=850")
     if (printWin) {
       printWin.document.write(printContent)
       printWin.document.close()
@@ -191,17 +195,24 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
               <Sparkles className="w-3 h-3" /> Ready to Print
             </div>
 
-            {/* Merchant Branding Header */}
-            <div className="flex items-center gap-2 mb-3">
+            {/* Prominent Un-cropped Merchant Logo */}
+            <div className="flex flex-col items-center justify-center mb-3 mt-2 min-h-[70px]">
               {qrData?.merchant?.logoUrl ? (
-                <img src={qrData.merchant.logoUrl} alt="Logo" className="w-8 h-8 rounded-full object-cover border" />
+                <img
+                  src={qrData.merchant.logoUrl}
+                  alt="Store Logo"
+                  className="max-h-20 max-w-[220px] w-auto h-auto object-contain rounded-xl shadow-md border border-slate-200/80 p-1.5 bg-white"
+                />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs">
+                <div className="w-12 h-12 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-md">
                   CP
                 </div>
               )}
-              <span className="font-bold text-base">{qrData?.merchant?.name || "Merchant Store"}</span>
             </div>
+
+            <span className="font-bold text-lg text-slate-900 dark:text-slate-100 mb-1">
+              {qrData?.merchant?.name || "Merchant Store"}
+            </span>
 
             <p className="text-xs text-muted-foreground mb-4 font-medium">Scan to Collect Stamps & Claim Rewards!</p>
 
@@ -225,18 +236,18 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
           <div className="space-y-4">
             <div>
               <h3 className="text-lg font-semibold">Counter Standee</h3>
-              <p className="text-sm text-muted-foreground">High-resolution QR code standee optimized for store checkout counters.</p>
+              <p className="text-sm text-muted-foreground">High-resolution QR code standee with prominent brand logo display for store checkout counters.</p>
             </div>
 
             <div className="space-y-2 text-xs text-muted-foreground border p-3 rounded-lg bg-muted/20">
               <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-500" /> High-Prominence Un-cropped Brand Logo
+              </div>
+              <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-green-500" /> Auto-attached to Merchant WhatsApp Pipeline
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-500" /> High-Resolution Vector Output
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-500" /> Embedded Merchant Logo & Theme
+                <CheckCircle2 className="w-4 h-4 text-green-500" /> High-Resolution Print / PDF Vector Standee
               </div>
             </div>
 
@@ -244,7 +255,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
               <Button onClick={handleDownloadPNG} disabled={loading || !qrData} className="flex-1">
                 <Download className="w-4 h-4 mr-2" /> Download PNG
               </Button>
-              <Button onClick={handlePrintPDF} variant="outline" disabled={loading || !qrData} className="flex-1 bg-indigo-600 text-white hover:bg-indigo-700 border-none">
+              <Button onClick={handlePrintPDF} variant="outline" disabled={loading || !qrData} className="flex-1 bg-indigo-600 text-white hover:bg-indigo-700 border-none shadow-md">
                 <Printer className="w-4 h-4 mr-2" /> Print / Save PDF
               </Button>
             </div>
