@@ -3,21 +3,11 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { QrCode, Download, RefreshCw, Printer, Sparkles, CheckCircle2 } from "lucide-react"
 
-const QR_TYPES = [
-  { id: "counter", label: "Counter Stand", desc: "Best for Checkout Counters" },
-  { id: "table", label: "Table Standee", desc: "For Dining Tables & Seating" },
-  { id: "poster", label: "Store Poster", desc: "For Window & Entrance Display" },
-  { id: "sticker", label: "Packaging Sticker", desc: "For Delivery Bags & Boxes" },
-  { id: "cake_box", label: "Cake Box Seal", desc: "Special seal for bakery products" },
-]
-
 export function QRGenerator({ merchantId }: { merchantId: string }) {
   const { toast } = useToast()
-  const [selectedType, setSelectedType] = useState("counter")
   const [loading, setLoading] = useState(true)
   const [qrData, setQrData] = useState<any>(null)
 
@@ -27,12 +17,11 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       if (!merchantId) return
       setLoading(true)
       try {
-        const res = await fetch(`/api/qr/generate?type=${selectedType}`, {
+        const res = await fetch(`/api/qr/generate?type=counter`, {
           headers: { "x-merchant-id": merchantId }
         })
         const json = await res.json().catch(() => null)
         if (res.ok && json && isMounted) {
-          // The API returns data wrapped in { ok: true, data: ... }
           setQrData(json.data || json)
         } else if (!res.ok && isMounted) {
           toast({ title: "Error", description: json?.error || "Failed to generate QR", variant: "destructive" })
@@ -45,22 +34,142 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
     }
     loadQR()
     return () => { isMounted = false }
-  }, [selectedType, toast, merchantId])
+  }, [toast, merchantId])
 
   const handleDownloadPNG = () => {
     if (!qrData?.qrDataUrl) return
     const link = document.createElement("a")
     link.href = qrData.qrDataUrl
-    link.download = `CustomerPilot-${selectedType}-QR.png`
+    link.download = `CustomerPilot-Counter-Stand-QR.png`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-    toast({ title: "Downloaded PNG", description: `${qrData.title} downloaded successfully.` })
+    toast({ title: "Downloaded PNG", description: "Counter Stand QR downloaded successfully." })
   }
 
   const handlePrintPDF = () => {
-    toast({ title: "Preparing High-Res Printable PDF", description: "Format optimized for commercial printing with logo overlay." })
-    window.print()
+    if (!qrData?.qrDataUrl) return
+
+    const storeName = qrData?.merchant?.name || "Merchant Store"
+    const logoHtml = qrData?.merchant?.logoUrl
+      ? `<img src="${qrData.merchant.logoUrl}" style="width:70px; height:70px; border-radius:50%; object-fit:cover; margin:0 auto 12px auto; border:3px solid #6366f1;" />`
+      : `<div style="width:70px; height:70px; border-radius:50%; background:#6366f1; color:white; font-size:24px; font-weight:bold; display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto;">CP</div>`
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Print Counter Stand QR - ${storeName}</title>
+          <style>
+            @page { size: A4 portrait; margin: 0; }
+            body {
+              font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+              background: #f8fafc;
+              margin: 0;
+              padding: 40px 20px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+              box-sizing: border-box;
+            }
+            .standee-card {
+              width: 360px;
+              background: white;
+              border-radius: 24px;
+              border: 4px solid #6366f1;
+              padding: 36px 24px;
+              text-align: center;
+              box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+            }
+            .badge {
+              background: #6366f1;
+              color: white;
+              font-size: 11px;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              padding: 6px 16px;
+              border-radius: 20px;
+              display: inline-block;
+              margin-bottom: 16px;
+            }
+            .store-name {
+              font-size: 22px;
+              font-weight: 800;
+              color: #0f172a;
+              margin: 8px 0 4px 0;
+            }
+            .tagline {
+              font-size: 13px;
+              color: #64748b;
+              margin-bottom: 20px;
+              font-weight: 500;
+            }
+            .qr-box {
+              background: white;
+              padding: 16px;
+              border-radius: 18px;
+              border: 2px solid #e2e8f0;
+              display: inline-block;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            }
+            .qr-img {
+              width: 220px;
+              height: 220px;
+              display: block;
+            }
+            .footer-text {
+              margin-top: 20px;
+              font-size: 12px;
+              color: #475569;
+              font-weight: 600;
+            }
+            .powered-by {
+              margin-top: 10px;
+              font-size: 10px;
+              color: #94a3b8;
+              text-transform: uppercase;
+              letter-spacing: 1.5px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="standee-card">
+            <div class="badge">VIP Loyalty Club</div>
+            <div>${logoHtml}</div>
+            <div class="store-name">${storeName}</div>
+            <div class="tagline">Scan QR Code to Earn Stamps & Claim Rewards!</div>
+            
+            <div class="qr-box">
+              <img src="${qrData.qrDataUrl}" class="qr-img" />
+            </div>
+
+            <div class="footer-text">📲 Point your camera to check-in on WhatsApp</div>
+            <div class="powered-by">Powered by CustomerPilot</div>
+          </div>
+          <script>
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+              }, 400);
+            };
+          </script>
+        </body>
+      </html>
+    `
+
+    const printWin = window.open("", "_blank", "width=600,height=800")
+    if (printWin) {
+      printWin.document.write(printContent)
+      printWin.document.close()
+    } else {
+      toast({
+        title: "Pop-up Blocked",
+        description: "Please allow pop-ups for this site to print/save PDF.",
+        variant: "destructive"
+      })
+    }
   }
 
   return (
@@ -71,20 +180,10 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
           Commercial QR Generation
         </CardTitle>
         <CardDescription>
-          Generate branded QR codes for your store counters, tables, posters, packaging, and cake boxes.
+          Generate and print your branded Counter Stand QR code for store checkout counters.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <Tabs value={selectedType} onValueChange={setSelectedType} className="w-full">
-          <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full h-auto p-1 gap-1">
-            {QR_TYPES.map(t => (
-              <TabsTrigger key={t.id} value={t.id} className="text-xs py-2">
-                {t.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-
         <div className="grid md:grid-cols-2 gap-6 items-center">
           {/* Printable Preview Card */}
           <div className="flex flex-col items-center justify-center p-6 border-2 border-indigo-500/30 rounded-2xl bg-gradient-to-b from-indigo-50/50 to-background dark:from-indigo-950/20 text-center shadow-lg relative overflow-hidden">
@@ -118,15 +217,15 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
             </div>
 
             <p className="text-[11px] font-mono text-muted-foreground mt-3 uppercase tracking-wider">
-              {qrData?.title || "Counter Standee"}
+              Counter Standee
             </p>
           </div>
 
           {/* Details & Actions */}
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold">{QR_TYPES.find(t => t.id === selectedType)?.label}</h3>
-              <p className="text-sm text-muted-foreground">{QR_TYPES.find(t => t.id === selectedType)?.desc}</p>
+              <h3 className="text-lg font-semibold">Counter Standee</h3>
+              <p className="text-sm text-muted-foreground">High-resolution QR code standee optimized for store checkout counters.</p>
             </div>
 
             <div className="space-y-2 text-xs text-muted-foreground border p-3 rounded-lg bg-muted/20">
@@ -145,7 +244,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
               <Button onClick={handleDownloadPNG} disabled={loading || !qrData} className="flex-1">
                 <Download className="w-4 h-4 mr-2" /> Download PNG
               </Button>
-              <Button onClick={handlePrintPDF} variant="outline" disabled={loading || !qrData} className="flex-1">
+              <Button onClick={handlePrintPDF} variant="outline" disabled={loading || !qrData} className="flex-1 bg-indigo-600 text-white hover:bg-indigo-700 border-none">
                 <Printer className="w-4 h-4 mr-2" /> Print / Save PDF
               </Button>
             </div>
