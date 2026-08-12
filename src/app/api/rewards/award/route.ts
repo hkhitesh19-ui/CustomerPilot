@@ -185,23 +185,17 @@ export async function POST(req: Request) {
       
       // Calculate New VIP Tier after update
       const newTier = getVipTierForSpend(updatedCustomer.lifetimeSpend);
-      let vipBonusStamps = 0;
       let isUpgraded = false;
 
       // Check if upgraded to a strictly higher tier (using minLifetimeSpend as rank)
       if (newTier.minLifetimeSpend > oldTier.minLifetimeSpend) {
         isUpgraded = true;
-        vipBonusStamps = merchant.vipUpgradeBonusStamps || 0;
-        
         // Update VIP tier name in customer record
         await tx.customer.update({
           where: { id: waitingCustomer.customerId },
           data: { vipTier: newTier.name }
         });
       }
-
-      // Total stamps to award = pos stamps + vip upgrade bonus
-      const totalStampsToAward = stampsToAward + vipBonusStamps;
 
       // 4. Update Customer Stamp Wallet & Handle Loyalty Cycle Completion
       let cycleCompletedInTx = false;
@@ -255,8 +249,8 @@ export async function POST(req: Request) {
         });
 
         // 🌟 LOYALTY CYCLE FINISHED EVENT:
-        // When previous loyalty cycle completes (stamp goal reached),
-        // award configured VIP Upgrade Bonus Stamps to kickstart next cycle!
+        // When previous loyalty level/card completes (stamp goal reached),
+        // award configured Next Level Kickstart Bonus Stamps to pre-fund the next level!
         if (isCardFinished) {
           cycleCompletedInTx = true;
 
@@ -271,7 +265,7 @@ export async function POST(req: Request) {
           });
 
           if (configuredVipBonus > 0) {
-            // Create fresh new card for next cycle
+            // Create fresh new card for next level/cycle pre-funded with bonus stamps
             const nextCycleCard = await tx.customerStampCard.create({
               data: {
                 merchantId,
@@ -290,12 +284,12 @@ export async function POST(req: Request) {
                   stampCardId: stampCard.id,
                   customerStampCardId: nextCycleCard.id,
                   billId: bill.id,
-                  source: 'VIP_BONUS'
+                  source: 'LEVEL_UP_BONUS'
                 }
               });
             }
 
-            // Increment customer lifetime stamps for VIP bonus
+            // Increment customer lifetime stamps for level completion bonus
             await tx.customer.update({
               where: { id: waitingCustomer.customerId },
               data: { lifetimeStamps: { increment: configuredVipBonus } }
@@ -305,36 +299,8 @@ export async function POST(req: Request) {
           }
         }
       }
-
-      // Handle standalone VIP Tier Upgrade bonus (if tier upgraded without card completion)
-      if (isUpgraded && !cycleCompletedInTx && vipBonusStamps > 0) {
-        let activeCard = await tx.customerStampCard.findFirst({
-          where: { merchantId, customerId: waitingCustomer.customerId, stampCardId: stampCard.id, completed: false }
-        });
-        if (!activeCard) {
-          activeCard = await tx.customerStampCard.create({
-            data: { merchantId, customerId: waitingCustomer.customerId, stampCardId: stampCard.id, stampsCollected: 0 }
-          });
-        }
-        await tx.customerStampCard.update({
-          where: { id: activeCard.id },
-          data: { stampsCollected: { increment: vipBonusStamps } }
-        });
-        for (let v = 0; v < vipBonusStamps; v++) {
-          await tx.stamp.create({
-            data: {
-              customerId: waitingCustomer.customerId,
-              merchantId,
-              stampCardId: stampCard.id,
-              customerStampCardId: activeCard.id,
-              billId: bill.id,
-              source: 'VIP_BONUS'
-            }
-          });
-        }
-      }
       
-      return { isUpgraded, vipBonusStamps: cycleVipBonusAwarded || vipBonusStamps, newTier, cycleCompletedInTx };
+      return { isUpgraded, vipBonusStamps: cycleVipBonusAwarded, newTier, cycleCompletedInTx };
     });
 
     // 5. Send instant WhatsApp notification to customer (Day 1 / Day 4 Requirements.txt)

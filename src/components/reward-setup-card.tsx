@@ -277,12 +277,12 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-amber-400" />
                   <Label htmlFor="vip-upgrade-bonus" className="font-semibold text-slate-200">
-                    VIP Tier Upgrade Bonus Stamp Rule
+                    Next Level Kickstart Bonus Stamps (Level Completion Bonus)
                   </Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${(form.vipUpgradeBonusStamps ?? 0) > 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
-                    {(form.vipUpgradeBonusStamps ?? 0) > 0 ? `ACTIVE (+${form.vipUpgradeBonusStamps ?? 0} Stamp)` : "DEACTIVATED (0 Stamps)"}
+                    {(form.vipUpgradeBonusStamps ?? 0) > 0 ? `ACTIVE (+${form.vipUpgradeBonusStamps ?? 0} Stamp on Next Level)` : "DEACTIVATED (0 Stamps)"}
                   </span>
                   <Switch
                     checked={(form.vipUpgradeBonusStamps ?? 0) > 0}
@@ -294,8 +294,8 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
                 <div className="sm:col-span-2">
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Advance bonus stamps awarded when a customer reaches a higher VIP spend tier (e.g. crossing ₹2,500 lifetime spend threshold).
-                    Toggle OFF or set to <strong>0</strong> to deactivate this bonus rule entirely.
+                    Advance bonus stamps pre-credited when a customer completes their previous level/card and unlocks the next loyalty level (e.g. Level 1 complete → Level 2 starts with pre-added bonus stamps).
+                    Toggle OFF or set to <strong>0</strong> to start new levels at 0 stamps.
                   </p>
                 </div>
                 <div>
