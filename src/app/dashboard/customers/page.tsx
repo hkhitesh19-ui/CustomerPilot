@@ -26,7 +26,8 @@ import {
   Sparkles,
   ChevronRight,
   X,
-  Phone
+  Phone,
+  Trash2
 } from "lucide-react"
 import { useState, useMemo } from "react"
 import { Input } from "@/components/ui/input"
@@ -41,6 +42,32 @@ export default function CustomersPage() {
   const [sortBy, setSortBy] = useState<"recent" | "spend" | "visits" | "stamps" | "name" | "churn" | "contact">("recent")
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc")
   const [selectedCustomer, setSelectedCustomer] = useState<any | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  const handleDeleteCustomer = async (customerId: string, customerName: string) => {
+    if (!confirm(`Are you sure you want to PERMANENTLY DELETE customer "${customerName}"?\n\nThis will wipe out all visits, bills, stamps, stamp cards, queue records, and WhatsApp messages for fresh manual testing.`)) {
+      return
+    }
+
+    try {
+      setDeletingId(customerId)
+      const res = await fetch(`/api/customers/${customerId}`, {
+        method: "DELETE"
+      })
+      const result = await res.json()
+      if (result.ok) {
+        alert(`✅ Customer "${customerName}" deleted successfully! All history reset.`)
+        if (selectedCustomer?.id === customerId) setSelectedCustomer(null)
+        refetch()
+      } else {
+        alert(`❌ Error deleting customer: ${result.error}`)
+      }
+    } catch (e: any) {
+      alert(`❌ Error deleting customer: ${e.message}`)
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   const handleSort = (field: "recent" | "spend" | "visits" | "stamps" | "name" | "churn" | "contact") => {
     if (sortBy === field) {
@@ -719,6 +746,15 @@ export default function CustomersPage() {
                             >
                               Details
                             </button>
+                            <button
+                              onClick={() => handleDeleteCustomer(customer.id, customer.name || customer.phone)}
+                              disabled={deletingId === customer.id}
+                              className="inline-flex items-center gap-1 text-xs font-semibold text-rose-400 hover:text-rose-200 bg-rose-500/10 hover:bg-rose-600/30 border border-rose-500/30 px-2.5 py-1.5 rounded-xl transition-all disabled:opacity-50"
+                              title="Delete Customer & Wipe History for Reset"
+                            >
+                              <Trash2 className="h-3.5 w-3.5 text-rose-400" />
+                              {deletingId === customer.id ? "Deleting..." : "Delete"}
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -856,6 +892,14 @@ export default function CustomersPage() {
                         className="px-3 py-2 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-700"
                       >
                         Details
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCustomer(customer.id, customer.name || customer.phone)}
+                        disabled={deletingId === customer.id}
+                        className="p-2 text-xs font-semibold text-rose-400 hover:text-rose-200 bg-rose-500/10 hover:bg-rose-600/30 rounded-xl border border-rose-500/30 disabled:opacity-50"
+                        title="Delete Customer & Reset Data"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   </div>
