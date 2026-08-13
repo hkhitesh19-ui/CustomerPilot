@@ -47,8 +47,10 @@ export default function DashboardHome() {
   const liveQueueCount = data.waitingCustomers.length
   
   const activeSubscription = data.subscriptions.find((s: any) => s.status === "active") || { planId: "FREE", status: "none" }
-  const merchantCreatedAt = new Date(data.merchant.createdAt)
-  const trialDaysLeft = Math.max(0, 14 - Math.floor((new Date().getTime() - merchantCreatedAt.getTime()) / (1000 * 60 * 60 * 24)))
+  const trialEndsAt = data.merchant?.trialEndsAt ? new Date(data.merchant.trialEndsAt) : null
+  const trialDaysLeft = trialEndsAt
+    ? Math.max(0, Math.ceil((trialEndsAt.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))
+    : 0
 
   const aiSupportTickets = data.supportTickets.filter((t: any) => t.status === "open").length
   const recentActivities = data.auditLogs.slice(0, 5)
