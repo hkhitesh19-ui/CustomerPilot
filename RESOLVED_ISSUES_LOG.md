@@ -520,6 +520,16 @@ ext() function to explicitly POST the merchant's configured reward card details 
   3. Executed full clean data reset for test customer `Hitesh` (+91 9033304707), clearing all previous test records for fresh end-to-end testing.
 - **Status**: ✅ Implemented, Documented, and Verified locally.
 
+---
+
+## [13 Aug 2026] Issue: Mismatch Between Dashboard Header Trial Days and Sidebar Remaining Days
+- **Symptom**: Dashboard Overview header displayed `"Trial: 9 days left"` while Left Sidebar displayed `"5 Days Remaining"` (`Valid till: 17 Aug 2026`).
+- **Root Cause**: [`src/app/dashboard/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/dashboard/page.tsx) had a hardcoded `14` days formula (`14 - Math.floor((now - createdAt) / 1 day)`), whereas [`app-sidebar.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/app-sidebar.tsx) calculated exact remaining days dynamically from `merchant.trialEndsAt`.
+- **Resolution**: Updated [`src/app/dashboard/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/dashboard/page.tsx) to calculate `trialDaysLeft` directly from `merchant.trialEndsAt`, guaranteeing 100% synchronization across header, sidebar, and subscription pages (`5 Days Remaining`).
+- **Status**: ✅ Resolved and Verified locally.
+
+
+
 
 
 
