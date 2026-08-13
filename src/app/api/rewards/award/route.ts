@@ -1,3 +1,10 @@
+// ════════════════════════════════════════════════════════════════════════════════
+// ⚠️ ARCHITECTURAL RULE — SINGLE SOURCE OF TRUTH FOR BONUS STAMPS:
+// Advance Bonus Stamps are ONLY awarded inside the `isCardFinished` block when a customer
+// completes their Previous Loyalty Level / Card (Next Level Kickstart Bonus).
+// DO NOT add spend-threshold bonus stamp logic or multipliers anywhere else in this file.
+// ════════════════════════════════════════════════════════════════════════════════
+
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { scheduleGoogleReviewRequest } from '@/lib/review-scheduler';
@@ -8,11 +15,11 @@ import { getVipTierForSpend, VIP_TIER_LABELS } from "@/lib/vip-engine";
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
 
-async function sendWhatsAppNotification(merchantId: string, toPhone: string, text: string) {
+async function sendWhatsAppNotification(merchantId: string, toPhone: string, text: string, templateKey: string = "STAMP_AWARDED") {
   try {
     const merchant = await db.merchant.findUnique({ where: { id: merchantId } })
     const defaultInstance = process.env.EVOLUTION_INSTANCE_NAME || "CustomerPilot_Main"
-    const instanceName = merchant?.whatsappInstanceName || (merchant?.whatsappPhone ? `CP_M${merchant.whatsappPhone.replace(/\\D/g, "")}` : defaultInstance)
+    const instanceName = merchant?.whatsappInstanceName || (merchant?.whatsappPhone ? `CP_M${merchant.whatsappPhone.replace(/\D/g, "")}` : defaultInstance)
     
     let res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
       method: "POST",
@@ -42,7 +49,7 @@ async function sendWhatsAppNotification(merchantId: string, toPhone: string, tex
       data: {
         merchantId,
         toPhone,
-        template: "STAMP_AWARDED",
+        template: templateKey,
         body: text.substring(0, 500),
         status: res.ok ? "sent" : "failed",
         sentAt: res.ok ? new Date() : null,
@@ -51,7 +58,7 @@ async function sendWhatsAppNotification(merchantId: string, toPhone: string, tex
       }
     }).catch(() => {})
     
-    console.log(`[Award API] ✉️ Stamp notification processed for +${toPhone}`)
+    console.log(`[Award API] ✉️ WhatsApp notification (${templateKey}) processed for +${toPhone}`)
   } catch (e: any) {
     console.error("[Award API] WhatsApp send error:", e.message)
   }
@@ -300,63 +307,67 @@ export async function POST(req: Request) {
         }
       }
       
-      return { isUpgraded, vipBonusStamps: cycleVipBonusAwarded, newTier, cycleCompletedInTx };
+      return { 
+        isUpgraded, 
+        vipBonusStamps: cycleVipBonusAwarded, 
+        newTier, 
+        cycleCompletedInTx,
+        completedCardReward: stampCard.rewardName || "FREE Reward",
+        completedCardStampsRequired: stampCard.stampsRequired || 7
+      };
     });
 
     // 5. Send instant WhatsApp notification to customer (Day 1 / Day 4 Requirements.txt)
     if (waitingCustomer.customer?.phone) {
       const merchantName = merchant?.name || "our store";
-      // Ensure we get the ACTIVE (uncompleted) stamp card, or the most recent one if they just completed it
-      const customerCard = await db.customerStampCard.findFirst({
-        where: { merchantId, customerId: waitingCustomer.customerId, stampCardId: stampCard.id },
-        orderBy: { createdAt: 'desc' }
-      });
-      // Handle the fact that transaction result is now returned
-      const { isUpgraded, vipBonusStamps, newTier } = transactionResult;
-      
-      const totalStampsToAward = stampsToAward + vipBonusStamps;
-      // We check if the customerCard is completed in THIS transaction.
-      // `transactionResult` tells us they were upgraded, but we also want to know if the card completed.
-      // Wait, `customerCard` fetched here is the most recently created card. 
-      // If `totalStampsToAward > 0`, the transaction updated the card.
-      const totalStamps = customerCard?.stampsCollected || totalStampsToAward;
-      const stampsRequired = stampCard.stampsRequired || 10;
-      const rewardName = stampCard.rewardName || "FREE 500gm Cake";
-      const remaining = Math.max(0, stampsRequired - totalStamps);
+      const { vipBonusStamps, newTier, cycleCompletedInTx, completedCardReward, completedCardStampsRequired } = transactionResult;
       const custName = waitingCustomer.customer.name || "there";
 
-      // If this specific card reached the required stamps, trigger REWARD_UNLOCKED
-      const notifyMsg = (customerCard && customerCard.completed && customerCard.stampsCollected === stampsRequired && totalStampsToAward > 0) || totalStamps >= stampsRequired
-        ? await getCompiledTemplate(merchantId, "REWARD_UNLOCKED", {
-            customerName: custName.toUpperCase(),
-            merchantName,
-            requiredStamp: stampsRequired,
-            visitNumber,
-            rewardName,
-            couponCode: Math.random().toString(36).substring(2, 8).toUpperCase()
-          })
-        : await getCompiledTemplate(merchantId, "STAMP_EARNED", {
+      if (cycleCompletedInTx) {
+        // EVENT 1: CARD COMPLETED -> Send REWARD_UNLOCKED WhatsApp Notification!
+        const rewardMsg = await getCompiledTemplate(merchantId, "REWARD_UNLOCKED", {
+          customerName: custName.toUpperCase(),
+          merchantName,
+          requiredStamp: completedCardStampsRequired,
+          visitNumber,
+          rewardName: completedCardReward,
+          couponCode: Math.random().toString(36).substring(2, 8).toUpperCase()
+        });
+        sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, rewardMsg, "REWARD_UNLOCKED");
+
+        // EVENT 2: NEXT LEVEL UNLOCKED -> If Next Level Kickstart Bonus was awarded, send LEVEL_COMPLETE WhatsApp Notification!
+        if (vipBonusStamps > 0) {
+          const levelMsg = await getCompiledTemplate(merchantId, "LEVEL_COMPLETE", {
             customerName: custName,
             merchantName,
-            visitNumber,
-            stampCount: stampsToAward,
-            totalStamps,
-            requiredStamp: stampsRequired,
-            rewardName,
-            remainingStamps: remaining
+            nextLevelName: VIP_TIER_LABELS[newTier.name as any] || newTier.name.toUpperCase(),
+            kickstartStamps: vipBonusStamps.toString()
           });
+          sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, levelMsg, "LEVEL_COMPLETE");
+        }
+      } else {
+        // STANDARD STAMP AWARDED (Card not completed yet)
+        const customerCard = await db.customerStampCard.findFirst({
+          where: { merchantId, customerId: waitingCustomer.customerId, stampCardId: stampCard.id, completed: false },
+          orderBy: { createdAt: 'desc' }
+        });
 
-      // Non-blocking background dispatch
-      sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, notifyMsg);
+        const totalStamps = customerCard?.stampsCollected || stampsToAward;
+        const stampsRequired = stampCard.stampsRequired || 7;
+        const remaining = Math.max(0, stampsRequired - totalStamps);
 
-      if (isUpgraded) {
-        const upgradeMsg = await getCompiledTemplate(merchantId, "VIP_UPGRADE", {
+        const stampMsg = await getCompiledTemplate(merchantId, "STAMP_EARNED", {
           customerName: custName,
           merchantName,
-          tierName: VIP_TIER_LABELS[newTier.name as any] || newTier.name.toUpperCase(),
-          bonusStamps: vipBonusStamps.toString()
+          visitNumber,
+          stampCount: stampsToAward,
+          totalStamps,
+          requiredStamp: stampsRequired,
+          rewardName: stampCard.rewardName || "FREE Reward",
+          remainingStamps: remaining
         });
-        sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, upgradeMsg);
+
+        sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, stampMsg, "STAMP_AWARDED");
       }
 
       // FIX: Schedule Google Review request based on merchant delay configuration

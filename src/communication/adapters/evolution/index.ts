@@ -75,7 +75,7 @@ export class EvolutionService {
     const bizName = metadata.bizName || "our store"
     const stamps = variables.stamps || 1
     const totalStamps = variables.totalStamps || stamps
-    const stampsRequired = variables.stampsRequired || 10
+    const stampsRequired = variables.stampsRequired || variables.requiredStamp || 7
     const rewardName = variables.rewardName || "FREE special treat"
     const stampValue = variables.stampValue || 500
 

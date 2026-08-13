@@ -172,13 +172,13 @@ export const SYSTEM_DEFAULT_TEMPLATES: SystemTemplateDefinition[] = [
       "⚠️ *Action Required {{customerName}}*!\n\nYour {{stampsCollected}} stamps at *{{merchantName}}* will expire in exactly *7 days*.\n\nDon't lose your progress towards your *{{rewardName}}*! Visit us this week to keep your stamps active. ⏳",
   },
   {
-    templateKey: "VIP_UPGRADE",
-    templateName: "VIP Tier Upgrade & Bonus",
-    triggerEvent: "Sent when customer reaches a new VIP tier",
+    templateKey: "LEVEL_COMPLETE",
+    templateName: "Level Complete & Next Level Kickstart",
+    triggerEvent: "Sent when customer completes a card and unlocks next loyalty level with kickstart bonus",
     category: "MARKETING",
     language: "en",
-    variables: ["customerName", "merchantName", "tierName", "bonusStamps"],
+    variables: ["customerName", "merchantName", "nextLevelName", "kickstartStamps"],
     messageBody:
-      "🌟 *VIP UPGRADE ALERT* 🌟\n\nCongratulations {{customerName}}! You've just reached the *{{tierName}}* tier at *{{merchantName}}*! 🎉\n\nAs a welcome gift, we've added *{{bonusStamps}} Advance Bonus Stamp(s)* to your card! Enjoy your new perks. 👑",
+      "🏆 *LEVEL COMPLETE!* 🌟\n\nCongratulations {{customerName}}! You've unlocked *{{nextLevelName}}* at *{{merchantName}}*!\n\n🎁 Your new level card has been activated with *+{{kickstartStamps}} Advance Bonus Stamp(s)* pre-credited! Keep collecting to win your next reward! 🚀",
   },
 ]
