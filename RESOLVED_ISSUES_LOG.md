@@ -494,6 +494,24 @@ ext() function to explicitly POST the merchant's configured reward card details 
   2. Updated UI label and description in [`reward-setup-card.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/reward-setup-card.tsx) to **"Next Level Kickstart Bonus Stamps (Level Completion Bonus)"** with clear status badge (`ACTIVE (+X Stamp on Next Level)` / `DEACTIVATED (0 Stamps)`).
 - **Status**: ✅ Refactored, Verified, and Tested locally.
 
+---
+
+## [13 Aug 2026] Issue & Architectural Guard: Reward Completion WhatsApp Dispatch & Single Source of Truth Enforcement
+- **Symptom**: 
+  1. `REWARD_UNLOCKED` WhatsApp message was missing when customer completed a 7/7 stamp card because evaluation checked post-transaction card state (which was newly created Card #2 with 1 stamp) instead of `cycleCompletedInTx`.
+  2. Legacy spend-threshold bonus stamp logic was present in a separate code block (`vip-engine.ts`), creating duplicate triggers.
+  3. Outgoing `whatsAppMessage` DB records logged hardcoded `"STAMP_AWARDED"` for all template dispatches.
+- **Root Cause**: Fragmented bonus stamp calculation and async state checks after database transaction.
+- **Resolution**:
+  1. Added explicit Architectural Banner Guard in [`award/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/rewards/award/route.ts) enforcing a **Single Source of Truth** for bonus stamps exclusively inside `isCardFinished`.
+  2. Added `@deprecated` guard on `applyVipBonusStamps` in [`vip-engine.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/lib/vip-engine.ts).
+  3. Refactored WhatsApp dispatch in [`award/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/rewards/award/route.ts) to send `REWARD_UNLOCKED` upon `cycleCompletedInTx: true` + `LEVEL_COMPLETE` notification for kickstart bonus stamps.
+  4. Updated `sendWhatsAppNotification` signature to accurately persist `templateKey` in DB logs.
+  5. Updated fallback `stampsRequired` default in evolution adapter to 7.
+- **Status**: ✅ Resolved, Guarded, and Verified locally.
+
+
+
 
 
 
