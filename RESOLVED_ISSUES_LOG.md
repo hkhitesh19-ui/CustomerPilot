@@ -510,6 +510,18 @@ ext() function to explicitly POST the merchant's configured reward card details 
   5. Updated fallback `stampsRequired` default in evolution adapter to 7.
 - **Status**: ✅ Resolved, Guarded, and Verified locally.
 
+---
+
+## [13 Aug 2026] Feature: SuperAdmin / Merchant Customer Delete & Clean Testing Reset Capability
+- **Symptom / Requirement**: User needed the capability to delete customers and wipe all associated testing data (bills, stamps, stamp cards, queue records, reviews, achievements, and WhatsApp messages) directly from the dashboard to perform clean manual testing from scratch.
+- **Resolution**:
+  1. Built API endpoint [`DELETE /api/customers/[id]`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/customers/[id]/route.ts) with full database transaction cascading deletes across all 11 customer-related tables.
+  2. Integrated a red **Delete Customer** action button in both Desktop table view and Mobile card view inside [`/dashboard/customers`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/dashboard/customers/page.tsx) with confirmation modal prompt.
+  3. Executed full clean data reset for test customer `Hitesh` (+91 9033304707), clearing all previous test records for fresh end-to-end testing.
+- **Status**: ✅ Implemented, Documented, and Verified locally.
+
+
+
 
 
 
