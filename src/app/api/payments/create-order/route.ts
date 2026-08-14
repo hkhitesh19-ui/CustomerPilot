@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     let basePrice = plan?.price || Number(body.amount) || 999;
     let discount = 0;
-    let appliedCoupon = null;
+    let appliedCoupon: string | null = null;
 
     // 2. Validate coupon if provided
     if (couponCode) {
