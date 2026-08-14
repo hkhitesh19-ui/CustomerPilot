@@ -196,43 +196,43 @@ export function SubscriptionPlansManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-stone-900 flex items-center gap-2">
-            <CreditCard className="w-6 h-6 text-emerald-600" />
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <CreditCard className="w-5 h-5 text-indigo-400" />
             Plans, Pricing, Coupons & Legal Settings
           </h2>
-          <p className="text-sm text-stone-500">
+          <p className="text-xs text-slate-400 mt-1">
             Control dynamic subscription pricing (30/180/365 days), promo coupons, and Merchant Terms of Service in real-time.
           </p>
         </div>
       </div>
 
       <Tabs defaultValue="pricing" className="w-full">
-        <TabsList className="grid grid-cols-3 max-w-md bg-stone-200">
-          <TabsTrigger value="pricing" className="flex items-center gap-1.5 text-xs font-semibold">
+        <TabsList className="grid grid-cols-3 max-w-md bg-slate-950 border border-slate-800">
+          <TabsTrigger value="pricing" className="flex items-center gap-1.5 text-xs font-semibold data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
             <CreditCard className="w-4 h-4" /> Pricing Plans (3)
           </TabsTrigger>
-          <TabsTrigger value="coupons" className="flex items-center gap-1.5 text-xs font-semibold">
+          <TabsTrigger value="coupons" className="flex items-center gap-1.5 text-xs font-semibold data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
             <Tag className="w-4 h-4" /> Coupons & Offers
           </TabsTrigger>
-          <TabsTrigger value="legal" className="flex items-center gap-1.5 text-xs font-semibold">
+          <TabsTrigger value="legal" className="flex items-center gap-1.5 text-xs font-semibold data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
             <FileText className="w-4 h-4" /> Terms & Conditions
           </TabsTrigger>
         </TabsList>
 
         {/* 1. PRICING PLANS TAB */}
         <TabsContent value="pricing" className="mt-4 space-y-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-3">
+          <Card className="bg-slate-900/80 border-slate-800/80 shadow-xl backdrop-blur-xl">
+            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-slate-800/60">
               <div>
-                <CardTitle className="text-base font-bold">Dynamic Subscription Plans</CardTitle>
-                <CardDescription className="text-xs">
+                <CardTitle className="text-base font-bold text-white">Dynamic Subscription Plans</CardTitle>
+                <CardDescription className="text-xs text-slate-400">
                   Changes made here update instantly across Homepage Pricing and Merchant Checkout.
                 </CardDescription>
               </div>
               <Button
                 onClick={handleSavePlans}
                 disabled={savingPlans}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 text-xs"
+                className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg"
               >
                 {savingPlans ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Save All Pricing Changes
@@ -244,14 +244,14 @@ export function SubscriptionPlansManager() {
               ) : (
                 <div className="grid md:grid-cols-3 gap-4">
                   {plans.map((p, idx) => (
-                    <div key={p.id || idx} className="p-4 rounded-xl border border-stone-200 bg-white space-y-3 shadow-sm">
+                    <div key={p.id || idx} className="p-4 rounded-2xl border border-slate-800 bg-slate-950 space-y-3 shadow-lg">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-sm text-stone-900">{p.name}</span>
-                        <Badge variant="outline" className="text-[10px] font-mono">{p.days} Days</Badge>
+                        <span className="font-extrabold text-sm text-white">{p.name}</span>
+                        <Badge variant="outline" className="text-[10px] font-mono bg-indigo-500/10 text-indigo-300 border-indigo-500/30">{p.days} Days</Badge>
                       </div>
 
                       <div className="space-y-1">
-                        <Label className="text-xs text-stone-600">Plan Title</Label>
+                        <Label className="text-xs text-slate-400">Plan Title</Label>
                         <Input
                           value={p.name}
                           onChange={(e) => {
@@ -259,13 +259,13 @@ export function SubscriptionPlansManager() {
                             copy[idx].name = e.target.value
                             setPlans(copy)
                           }}
-                          className="h-8 text-xs font-semibold"
+                          className="h-8 text-xs font-semibold bg-slate-900 border-slate-800 text-white"
                         />
                       </div>
 
                       <div className="grid grid-cols-2 gap-2">
                         <div className="space-y-1">
-                          <Label className="text-xs text-stone-600">Selling Price (₹)</Label>
+                          <Label className="text-xs text-slate-400">Selling Price (₹)</Label>
                           <Input
                             type="number"
                             value={p.price}
@@ -274,11 +274,11 @@ export function SubscriptionPlansManager() {
                               copy[idx].price = Number(e.target.value)
                               setPlans(copy)
                             }}
-                            className="h-8 text-xs font-bold text-emerald-600"
+                            className="h-8 text-xs font-extrabold text-emerald-400 bg-slate-900 border-slate-800"
                           />
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs text-stone-600">Original Price (₹)</Label>
+                          <Label className="text-xs text-slate-400">Original Price (₹)</Label>
                           <Input
                             type="number"
                             value={p.originalPrice || ""}
@@ -287,14 +287,14 @@ export function SubscriptionPlansManager() {
                               copy[idx].originalPrice = Number(e.target.value)
                               setPlans(copy)
                             }}
-                            className="h-8 text-xs text-stone-500 line-through"
+                            className="h-8 text-xs text-slate-400 line-through bg-slate-900 border-slate-800"
                           />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-2">
                         <div className="space-y-1">
-                          <Label className="text-xs text-stone-600">Discount %</Label>
+                          <Label className="text-xs text-slate-400">Discount %</Label>
                           <Input
                             type="number"
                             value={p.discountPercent || 0}
@@ -303,11 +303,11 @@ export function SubscriptionPlansManager() {
                               copy[idx].discountPercent = Number(e.target.value)
                               setPlans(copy)
                             }}
-                            className="h-8 text-xs font-semibold text-amber-600"
+                            className="h-8 text-xs font-semibold text-amber-400 bg-slate-900 border-slate-800"
                           />
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs text-stone-600">Badge Tag</Label>
+                          <Label className="text-xs text-slate-400">Badge Tag</Label>
                           <Input
                             value={p.badge || ""}
                             onChange={(e) => {
