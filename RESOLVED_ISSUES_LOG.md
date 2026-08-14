@@ -586,6 +586,20 @@ ext() function to explicitly POST the merchant's configured reward card details 
 
 **Verification**: `npx tsc --noEmit` — 0 errors. Committed as `c49a7de` on `feature/superanalytics-customers-crm-20260810`.
 
+---
+
+## [14 Aug 2026] Security: Evolution WhatsApp API Secrets & Fallback IP Full Hardening (Commit 62e2312)
+- **Symptom / Risk**: Fallback string values for `EVOLUTION_API_KEY` (`"Evo_Api_Key_Secure_998877!"`) and `EVOLUTION_API_URL` (`"http://200.97.170.53:8080"`) were present in multiple source files as fallbacks if environment variables were not loaded.
+- **Root Cause**: Leftover development convenience fallbacks that failed open rather than failing closed.
+- **Resolution**:
+  1. Updated [`src/app/api/webhook/evolution/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/webhook/evolution/route.ts), [`cron/automations`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/cron/automations/route.ts), [`rewards/award`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/rewards/award/route.ts), [`reviews/record-google-post`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/reviews/record-google-post/route.ts), [`whatsapp/connect`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/whatsapp/connect/route.ts), [`whatsapp/disconnect`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/whatsapp/disconnect/route.ts), [`whatsapp/status`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/whatsapp/status/route.ts), and [`whatsapp-service.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/lib/whatsapp-service.ts) to strictly use `process.env.EVOLUTION_API_URL` and `process.env.EVOLUTION_API_KEY` without fallbacks, failing closed if unset.
+  2. Updated all maintenance scripts ([`autoPinggySync.js`](file:///f:/CustomerPilot_ByGLM_July2026/scripts/autoPinggySync.js), [`autoWebhookSync.js`](file:///f:/CustomerPilot_ByGLM_July2026/scripts/autoWebhookSync.js), [`forceSync.js`](file:///f:/CustomerPilot_ByGLM_July2026/scripts/forceSync.js), [`testWebhookState.js`](file:///f:/CustomerPilot_ByGLM_July2026/scripts/testWebhookState.js)) to parse dynamic hosts from `process.env.EVOLUTION_API_URL` and load credentials from `.env`.
+  3. Cleaned JSDoc comments and test scratch files.
+  4. Verified zero occurrences across the entire codebase via `git grep -n "Evo_Api_Key\|200.97.170.53" src/` (0 matches).
+- **Status**: ✅ Resolved, Documented, and Committed locally (`62e2312`).
+
+
+
 
 
 
