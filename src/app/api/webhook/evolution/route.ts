@@ -3,8 +3,8 @@ import { db } from "@/lib/db"
 import { joinQueue } from "@/lib/queue-engine"
 import { getCompiledTemplate } from "@/lib/template-engine"
 
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 
 /**
  * GAP 1 FIX: sendEvolutionMessage now uses the merchant's DEDICATED instance (CP_M919033304707)
@@ -16,6 +16,10 @@ async function sendEvolutionMessage(
   instanceName: string
 ) {
   try {
+    if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
+      console.error("[Webhook] EVOLUTION_API_URL or EVOLUTION_API_KEY not configured — skipping outbound WhatsApp dispatch")
+      return { ok: false, data: null }
+    }
     const res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },

@@ -5,8 +5,8 @@ import { jwtVerify } from "jose"
 
 if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set');
 const JWT_SECRET = process.env.JWT_SECRET;
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 
 async function getAuthMerchant(req: Request) {
   const merchantHeader = req.headers.get("x-merchant-id")

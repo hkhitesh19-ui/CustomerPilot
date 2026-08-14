@@ -2,7 +2,8 @@ require('dotenv').config();
 const { spawn } = require('child_process');
 const http = require('http');
 
-const API_KEY = 'Evo_Api_Key_Secure_998877!';
+const API_KEY = process.env.EVOLUTION_API_KEY || '';
+const EVOLUTION_URL = new URL(process.env.EVOLUTION_API_URL || 'http://localhost:8080');
 const RENEWAL_INTERVAL = 55 * 60 * 1000; // 55 minutes
 
 let currentPinggyProcess = null;
@@ -10,8 +11,8 @@ let currentPinggyProcess = null;
 function fetchAllInstancesAndUpdate(url) {
     console.log(`[PinggySync] Updating instances with new URL: ${url}`);
     const options = {
-        hostname: '200.97.170.53',
-        port: 8080,
+        hostname: EVOLUTION_URL.hostname,
+        port: EVOLUTION_URL.port || 80,
         path: '/instance/fetchInstances',
         method: 'GET',
         headers: { 'apikey': API_KEY }
@@ -50,8 +51,8 @@ async function updateAllInstances(instances, url) {
         if (!instance.name) continue;
         await new Promise((resolve) => {
             const req = http.request({
-                hostname: '200.97.170.53',
-                port: 8080,
+                hostname: EVOLUTION_URL.hostname,
+                port: EVOLUTION_URL.port || 80,
                 path: '/webhook/set/' + instance.name,
                 method: 'POST',
                 headers: {

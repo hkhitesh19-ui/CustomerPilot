@@ -1,9 +1,10 @@
+require('dotenv').config();
 const https = require('https');
 const http = require('http');
 
-const EVOLUTION_API_URL = 'http://200.97.170.53:8080';
-const INSTANCE_NAME = '89554948-3b67-48c4-b98d-f7b56e021cc6';
-const API_KEY = 'Evo_Api_Key_Secure_998877!';
+const EVOLUTION_URL = new URL(process.env.EVOLUTION_API_URL || 'http://localhost:8080');
+const INSTANCE_NAME = process.env.EVOLUTION_INSTANCE_NAME || '89554948-3b67-48c4-b98d-f7b56e021cc6';
+const API_KEY = process.env.EVOLUTION_API_KEY || '';
 
 function updateEvolutionWebhook(url) {
     const webhookUrl = `${url}/api/webhook/evolution`;
@@ -37,8 +38,8 @@ function updateEvolutionWebhook(url) {
     });
 
     const options = {
-        hostname: '200.97.170.53',
-        port: 8080,
+        hostname: EVOLUTION_URL.hostname,
+        port: EVOLUTION_URL.port || 80,
         path: `/webhook/set/${INSTANCE_NAME}`,
         method: 'POST',
         headers: {

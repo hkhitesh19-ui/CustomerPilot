@@ -34,11 +34,12 @@ async function main() {
     }
   };
 
+  const webhookSecret = process.env.EVOLUTION_WEBHOOK_SECRET || 'cpilot_webhook_secret_change_in_prod_2026';
   const res = await fetch('http://localhost:3000/api/webhook/evolution', {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',
-      'apikey': 'Evo_Api_Key_Secure_998877!' // or whatever the default is
+      'x-webhook-secret': webhookSecret
     },
     body: JSON.stringify(payload)
   });

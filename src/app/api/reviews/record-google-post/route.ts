@@ -4,11 +4,15 @@ import { generateAIReviewReply } from '@/lib/ai-review-reply';
 import { postReviewReplyToGBP } from '@/lib/google-reviews-service';
 import { sendCentralWhatsAppMessage } from '@/lib/whatsapp-service';
 
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080";
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!";
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
 
 async function sendWhatsApp(merchantId: string, toPhone: string, text: string, template: string, customerId?: string) {
   try {
+    if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
+      console.error("[Review Post Action] EVOLUTION_API_URL or EVOLUTION_API_KEY not configured — skipping WhatsApp dispatch");
+      return { ok: false };
+    }
     const merchant = await db.merchant.findUnique({ where: { id: merchantId } });
     const instanceName = merchant?.whatsappInstanceName || `CP_M_${merchantId}`;
     

@@ -1,11 +1,12 @@
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
 
 const logFilePath = path.join(__dirname, '..', 'cloudflared.log');
 const logFilePath2 = path.join(__dirname, '..', 'cloudflared2.log'); 
-const EVOLUTION_API_URL = 'http://200.97.170.53:8080';
-const API_KEY = 'Evo_Api_Key_Secure_998877!';
+const EVOLUTION_URL = new URL(process.env.EVOLUTION_API_URL || 'http://localhost:8080');
+const API_KEY = process.env.EVOLUTION_API_KEY || '';
 
 let extractedUrl = null;
 
@@ -27,8 +28,8 @@ function waitForUrl() {
 
 function fetchAllInstancesAndUpdate(url) {
     const options = {
-        hostname: '200.97.170.53',
-        port: 8080,
+        hostname: EVOLUTION_URL.hostname,
+        port: EVOLUTION_URL.port || 80,
         path: '/instance/fetchInstances',
         method: 'GET',
         headers: {
@@ -89,8 +90,8 @@ async function updateAllInstances(instances, url) {
         
         const success = await new Promise((resolve) => {
             const options = {
-                hostname: '200.97.170.53',
-                port: 8080,
+                hostname: EVOLUTION_URL.hostname,
+                port: EVOLUTION_URL.port || 80,
                 path: `/webhook/set/${instance.name}`,
                 method: 'POST',
                 headers: {

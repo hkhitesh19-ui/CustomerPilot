@@ -12,11 +12,15 @@ import { getCompiledTemplate } from "@/lib/template-engine";
 import { resolveLoyaltyCategoryName } from "@/lib/loyalty-category-service";
 import { getVipTierForSpend, VIP_TIER_LABELS } from "@/lib/vip-engine";
 
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 
 async function sendWhatsAppNotification(merchantId: string, toPhone: string, text: string, templateKey: string = "STAMP_AWARDED") {
   try {
+    if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
+      console.error("[Award API] EVOLUTION_API_URL or EVOLUTION_API_KEY not configured — skipping notification dispatch")
+      return { ok: false, error: "Evolution API credentials not configured" }
+    }
     const merchant = await db.merchant.findUnique({ where: { id: merchantId } })
     const defaultInstance = process.env.EVOLUTION_INSTANCE_NAME || "CustomerPilot_Main"
     const instanceName = merchant?.whatsappInstanceName || (merchant?.whatsappPhone ? `CP_M${merchant.whatsappPhone.replace(/\D/g, "")}` : defaultInstance)

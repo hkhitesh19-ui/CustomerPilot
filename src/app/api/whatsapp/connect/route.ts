@@ -6,12 +6,12 @@ import QRCode from "qrcode"
 
 if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set');
 const JWT_SECRET = process.env.JWT_SECRET;
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 const PUBLIC_WEBHOOK_URL = process.env.WHATSAPP_WEBHOOK_URL ||
   (process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes("localhost")
     ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/evolution`
-    : "https://tgmgj-2409-4090-10b6-1435-a500-8d84-1af9-59f7.run.pinggy-free.link/api/webhook/evolution")
+    : "")
 
 function buildInstanceName(whatsappPhone?: string | null, merchantId?: string): string {
   if (whatsappPhone) {

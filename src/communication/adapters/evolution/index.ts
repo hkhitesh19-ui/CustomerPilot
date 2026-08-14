@@ -3,7 +3,7 @@ import { db } from "@/lib/db"
 
 /**
  * Real Evolution API Integration
- * Communicates with the actual Evolution API Docker container at 200.97.170.53:8080
+ * Communicates with the Evolution API Docker container via process.env.EVOLUTION_API_URL
  * Multi-Tenant Support: Naming convention CP_M + CountryCode + Number (e.g. CP_M917203824012)
  */
 export class EvolutionService {
@@ -12,8 +12,8 @@ export class EvolutionService {
   private defaultInstanceName: string
 
   constructor() {
-    this.baseUrl = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
-    this.apiKey = process.env.EVOLUTION_API_KEY || process.env.EVOLUTION_GLOBAL_API_KEY || "429683C4C977415CAAFCCE10F7D57E11"
+    this.baseUrl = process.env.EVOLUTION_API_URL || ""
+    this.apiKey = process.env.EVOLUTION_API_KEY || process.env.EVOLUTION_GLOBAL_API_KEY || ""
     this.defaultInstanceName = process.env.EVOLUTION_INSTANCE_NAME || "CustomerPilot_Main"
   }
 

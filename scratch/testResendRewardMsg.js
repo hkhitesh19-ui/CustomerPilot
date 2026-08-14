@@ -1,8 +1,9 @@
 const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
 
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080";
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!";
+require('dotenv').config();
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
 
 async function testResend() {
   const customer = await db.customer.findFirst({ where: { phone: { contains: '9033304707' } } });
