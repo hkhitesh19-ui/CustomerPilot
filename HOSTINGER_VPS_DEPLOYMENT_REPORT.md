@@ -130,10 +130,12 @@ During the live deployment on the VPS, 4 specific issues were encountered and re
 
 | Route / Service | Endpoint | HTTP Status | Verification Result |
 | :--- | :--- | :---: | :--- |
-| **Landing Page** | `http://200.97.170.53/` | `200 OK` | ✅ Verified (Hero, WhatsApp preview, CTA buttons rendered) |
-| **SuperAdmin Login** | `http://200.97.170.53/login` | `200 OK` | ✅ Verified (Credentials active: `admin@customerpilot.in`) |
-| **SuperAdmin Center**| `http://200.97.170.53/super-admin` | `200 OK` | ✅ Verified (Full analytics & merchant controls active) |
-| **Merchant Signup** | `http://200.97.170.53/signup` | `200 OK` | ✅ Verified (Onboarding wizard active) |
+| **Secure HTTPS Live Domain** | `https://customerpilot.in` | `200 OK` | ✅ Verified (SSL Active, Auto-redirect from HTTP) |
+| **Landing Page (WWW)** | `https://www.customerpilot.in` | `200 OK` | ✅ Verified (SSL Active) |
+| **SuperAdmin Login** | `https://customerpilot.in/login` | `200 OK` | ✅ Verified (Credentials active: `admin@customerpilot.in`) |
+| **SuperAdmin Command Center**| `https://customerpilot.in/super-admin` | `200 OK` | ✅ Verified (Full analytics & merchant controls active) |
+| **Merchant Signup** | `https://customerpilot.in/signup` | `200 OK` | ✅ Verified (Onboarding wizard active) |
+| **Direct VPS IP** | `http://200.97.170.53/` | `200 OK` | ✅ Verified (Nginx reverse proxy active) |
 | **Evolution API** | `http://200.97.170.53:8080/manager/`| `200 OK` | ✅ Verified (WhatsApp QR manager operational) |
 | **Background Cron** | `localCronRunner.js` | `Online` | ✅ Verified (Day 1-90 automations & reviews polling) |
 
