@@ -540,6 +540,51 @@ ext() function to explicitly POST the merchant's configured reward card details 
   4. Updated [`SubscriptionPlansManager`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/super-admin/subscription-plans-manager.tsx) to match the dark slate glassmorphism design.
 - **Status**: ✅ Redesigned, Documented, and Verified locally.
 
+---
+
+## [14 Aug 2026] Security: All 6 Pre-Launch Security Fixes Implemented (Commit c49a7de)
+
+### Fix 1 — Soft-Delete for Customer / Stamp / Reward
+- **Symptom**: Customer DELETE API performed hard cascading deletes across 11 tables. No recovery possible if accidental deletion. Schema had no `deletedAt` field on `Customer`, `Stamp`, or `Reward`.
+- **Root Cause**: `DELETE /api/customers/[id]` was built for testing reset purposes — hard deletes were intentional for dev but inappropriate for production.
+- **Resolution**:
+  1. Added `deletedAt DateTime?` to `Customer`, `Stamp`, and `Reward` models in [`prisma/schema.prisma`](file:///f:/CustomerPilot_ByGLM_July2026/prisma/schema.prisma). Added `@@index([merchantId, deletedAt])` on `Customer`.
+  2. Applied schema via `npx prisma db push`.
+  3. Rewrote [`DELETE /api/customers/[id]`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/customers/%5Bid%5D/route.ts) to set `deletedAt = now()` on Customer and all associated Stamps. Data preserved for audit trail.
+  4. Added `deletedAt: null` filter to all customer queries: [`state/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/state/route.ts), [`cron/automations`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/cron/automations/route.ts), [`customers/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/customers/route.ts), [`customers/import`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/customers/import/route.ts), [`webhook/evolution`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/webhook/evolution/route.ts).
+- **Status**: ✅ Resolved and Verified.
+
+### Fix 2 — OTP Rate-Limit & Expiry Tightened
+- **Symptom**: OTP config was too permissive: 20 OTPs per 60-min window, 10-min expiry, 10 max verify attempts — allowing brute-force enumeration.
+- **Root Cause**: Config was set for development/testing convenience and never tightened for production.
+- **Resolution**: Updated `OTP_CONFIG` in [`src/lib/whatsapp-business-api.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/lib/whatsapp-business-api.ts): `expirySeconds: 300` (5 min), `rateLimitMinutes: 10`, `maxOtpPerPhonePerWindow: 3`, `maxVerificationAttempts: 5`, `resendCooldownSeconds: 60`.
+- **Status**: ✅ Resolved and Verified.
+
+### Fix 3 — WhatsApp Inbound Text Sanitization
+- **Symptom**: Inbound WhatsApp message text (from customers) was used directly in DB writes and LLM calls without any sanitization — vulnerable to prompt injection and oversized payloads.
+- **Root Cause**: No sanitization step existed in the webhook handler.
+- **Resolution**: Added `sanitizeInboundText()` helper in [`webhook/evolution/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/webhook/evolution/route.ts). Trims, limits to 500 chars, strips `<>"'\`` and null bytes. Applied to both `text` (message body) and `pushName` (customer display name).
+- **Status**: ✅ Resolved and Verified.
+
+### Fix 4 — Remove Hardcoded Razorpay Keys
+- **Symptom**: `create-order/route.ts` had a hardcoded real Razorpay test key (`"u3nuKxrh3ljRBYuEApMJ0okC"`) as a fallback. `verify/route.ts` had `"rzp_secret_placeholder"` fallback with a dev bypass that skipped signature verification.
+- **Root Cause**: Keys were hardcoded for dev convenience, never removed.
+- **Resolution**: Both [`create-order`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/payments/create-order/route.ts) and [`verify`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/payments/verify/route.ts) now require env vars exclusively. Return HTTP 500 with clear error if not set. Dev bypass removed from verify.
+- **Status**: ✅ Resolved and Verified.
+
+### Fix 5 — Payment Route Authentication Gap (findFirst Fallback)
+- **Symptom**: `/api/payments/` was in `PUBLIC_API_PREFIXES` (proxy.ts), bypassing JWT middleware. Routes then fell back to `db.merchant.findFirst()` which could return the wrong merchant in multi-tenant.
+- **Root Cause**: Payments added to public prefixes for convenience during development.
+- **Resolution**: Removed `/api/payments/` from `PUBLIC_API_PREFIXES` in [`src/proxy.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/proxy.ts). JWT middleware now runs on payment routes and injects `x-merchant-id`. Both routes now use `getAuthenticatedMerchant()` / `requireMerchant()` exclusively — no `findFirst()` fallback.
+- **Status**: ✅ Resolved and Verified.
+
+### Fix 6 — AI Endpoint Rate Limiting
+- **Symptom**: `/api/reviews/generate-ai-reply`, `/api/google-business/bulk-reply`, and `/api/google-business/bulk-reply/start` had zero rate limiting. Any authenticated merchant could spam Groq API calls and run up costs.
+- **Root Cause**: Rate limiting was only applied to auth endpoints, not AI generation endpoints.
+- **Resolution**: Added `aiLimiter` (20 calls/min per merchantId) and `bulkAiLimiter` (5 calls/min per merchantId) to [`src/lib/rate-limiter.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/lib/rate-limiter.ts). Exported `applyAiRateLimit()` and `applyBulkAiRateLimit()` helpers. Applied to all 3 AI routes.
+- **Status**: ✅ Resolved and Verified.
+
+**Verification**: `npx tsc --noEmit` — 0 errors. Committed as `c49a7de` on `feature/superanalytics-customers-crm-20260810`.
 
 
 
