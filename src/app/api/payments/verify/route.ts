@@ -1,69 +1,65 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import crypto from "crypto";
 import { db } from "@/lib/db";
-import { getAuthenticatedMerchant, requireMerchant, err, ok } from "@/lib/api";
+import { requireMerchant, err, ok } from "@/lib/api";
 
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || "rzp_secret_placeholder";
+// SECURITY: No hardcoded key fallback — require env var at runtime
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 
 export async function POST(req: NextRequest) {
   try {
+    // SECURITY: Payment secret must be configured
+    if (!RAZORPAY_KEY_SECRET) {
+      console.error("[Razorpay Verify] RAZORPAY_KEY_SECRET env var not set")
+      return err("Payment system not configured. Please contact support.", 500)
+    }
+
     const body = await req.json().catch(() => null);
     if (!body) return err("Invalid JSON body");
 
-    const { 
-      razorpay_order_id, 
-      razorpay_payment_id, 
-      razorpay_signature, 
-      planId, 
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      planId,
       durationDays,
-      merchantId
     } = body;
-
-    // Resolve merchant safely
-    let merchant = await getAuthenticatedMerchant();
-    if (!merchant && merchantId) {
-      merchant = await db.merchant.findUnique({ where: { id: merchantId } });
-    }
-    if (!merchant) {
-      const headerId = req.headers.get("x-merchant-id");
-      if (headerId) {
-        merchant = await db.merchant.findUnique({ where: { id: headerId } });
-      }
-    }
-    if (!merchant) {
-      merchant = await db.merchant.findFirst({ orderBy: { createdAt: "asc" } });
-    }
-    if (!merchant) {
-      return err("No active merchant account found", 401);
-    }
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return err("Missing payment details", 400);
     }
 
-    // Validate Signature
+    // SECURITY: Merchant resolved ONLY from server-injected JWT header (proxy.ts)
+    // /api/payments/ is now a protected route — no findFirst() fallback needed
+    const merchant = await requireMerchant();
+
+    // Validate Razorpay signature
     const bodyString = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto
       .createHmac("sha256", RAZORPAY_KEY_SECRET)
-      .update(bodyString.toString())
+      .update(bodyString)
       .digest("hex");
 
-    // Allow dev bypass if secret is the placeholder (so the user can test UI without actual keys)
     const isSignatureValid = expectedSignature === razorpay_signature;
-    const isDevBypass = RAZORPAY_KEY_SECRET === "rzp_secret_placeholder";
 
-    if (!isSignatureValid && !isDevBypass) {
-      console.warn('[payments/verify] Invalid Razorpay signature — possible fraud attempt', { merchantId: merchant.id, razorpay_order_id });
+    if (!isSignatureValid) {
+      console.warn("[payments/verify] Invalid Razorpay signature — possible fraud attempt", {
+        merchantId: merchant.id,
+        razorpay_order_id,
+      });
       return err("Invalid payment signature", 400);
     }
 
-    const daysToAdd = durationDays ? parseInt(durationDays) : 30;
+    const daysToAdd = durationDays ? parseInt(String(durationDays), 10) : 30;
+    if (isNaN(daysToAdd) || daysToAdd <= 0 || daysToAdd > 3650) {
+      return err("Invalid durationDays value", 400);
+    }
 
-    // Extend from today, or from current expiry if they are renewing early
+    // Extend from today, or from current expiry if renewing early
     const currentExpiry = merchant.trialEndsAt ? new Date(merchant.trialEndsAt) : new Date();
     const baseDate = currentExpiry > new Date() ? currentExpiry : new Date();
-    
-    const newExpiryDate = new Date(baseDate.setDate(baseDate.getDate() + daysToAdd));
+    const newExpiryDate = new Date(baseDate);
+    newExpiryDate.setDate(newExpiryDate.getDate() + daysToAdd);
 
     const updatedMerchant = await db.merchant.update({
       where: { id: merchant.id },
@@ -73,22 +69,27 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Record the payment
+    // Audit log the payment activation
     await db.auditLog.create({
       data: {
         merchantId: merchant.id,
-        actorType: 'SYSTEM',
+        actorType: "SYSTEM",
         actorId: merchant.id,
-        action: 'SUBSCRIPTION_ACTIVATED',
-        entity: 'Merchant',
+        action: "SUBSCRIPTION_ACTIVATED",
+        entity: "Merchant",
         entityId: merchant.id,
-        metadata: JSON.stringify({ plan: planId, durationDays: daysToAdd, razorpay_order_id, razorpay_payment_id }),
+        metadata: JSON.stringify({
+          plan: planId,
+          durationDays: daysToAdd,
+          razorpay_order_id,
+          razorpay_payment_id,
+        }),
       },
-    }).catch(() => {});
+    }).catch(() => {}); // Non-critical — don't fail payment on audit log error
 
-    return ok({ 
-      message: "Payment verified successfully", 
-      merchant: { plan: updatedMerchant.plan, trialEndsAt: updatedMerchant.trialEndsAt } 
+    return ok({
+      message: "Payment verified successfully",
+      merchant: { plan: updatedMerchant.plan, trialEndsAt: updatedMerchant.trialEndsAt },
     });
 
   } catch (error: any) {

@@ -74,7 +74,8 @@ export async function proxy(request: NextRequest) {
     '/api/pricing/',
     '/api/legal/',
     '/api/coupons/',
-    '/api/payments/',
+    // SECURITY FIX: /api/payments/ removed from public — payments require merchant auth
+    // Both create-order and verify are called from the authenticated /dashboard context
   ];
 
   const isPublicApi = PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix));

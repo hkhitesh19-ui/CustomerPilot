@@ -146,6 +146,7 @@ model Customer {
   referredById        String?
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
+  deletedAt           DateTime?           // Soft-delete: set instead of hard delete
   achievements        Achievement[]
   bills               Bill[]
   birthdaysList       Birthday[]
@@ -167,6 +168,7 @@ model Customer {
   @@index([merchantId, phone])
   @@index([merchantId, status])
   @@index([merchantId, lastActiveAt])
+  @@index([merchantId, deletedAt])
 }
 
 model StampCard {
@@ -222,6 +224,7 @@ model Stamp {
   source              String
   billId              String?
   createdAt           DateTime           @default(now())
+  deletedAt           DateTime?          // Soft-delete: set instead of hard delete
   bill                Bill?              @relation(fields: [billId], references: [id])
   merchant            Merchant           @relation(fields: [merchantId], references: [id])
   customerStampCard   CustomerStampCard? @relation(fields: [customerStampCardId], references: [id])
@@ -243,6 +246,7 @@ model Reward {
   requiresManagerApproval Boolean      @default(false)
   createdAt               DateTime     @default(now())
   updatedAt               DateTime     @updatedAt
+  deletedAt               DateTime?    // Soft-delete: set instead of hard delete
   redemptions             Redemption[]
   merchant                Merchant     @relation(fields: [merchantId], references: [id])
 

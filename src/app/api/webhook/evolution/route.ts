@@ -79,6 +79,21 @@ function extractPersonName(pushName: string | null | undefined): string | null {
   return cleaned
 }
 
+/**
+ * SECURITY FIX: Sanitize inbound WhatsApp text before any DB write or LLM call.
+ * - Trims whitespace
+ * - Limits to 500 characters (prevents oversized payloads)
+ * - Strips dangerous characters that could cause XSS or prompt injection
+ */
+function sanitizeInboundText(raw: string): string {
+  if (!raw || typeof raw !== "string") return ""
+  return raw
+    .trim()
+    .slice(0, 500)
+    .replace(/[<>"'`]/g, "")  // Strip HTML/injection chars
+    .replace(/\0/g, "")        // Strip null bytes
+}
+
 export async function POST(req: NextRequest) {
   try {
     // SECURITY: Validate webhook secret on ALL environments — no dev bypass
@@ -127,16 +142,17 @@ export async function POST(req: NextRequest) {
 
         if (!customerPhone || customerPhone.length < 10) continue
 
-        // Extract message text
-        const text = (
+        // Extract and sanitize message text (SECURITY: sanitize before DB/LLM use)
+        const rawText = (
           msg.message?.conversation ||
           msg.message?.extendedTextMessage?.text ||
           msg.message?.buttonsResponseMessage?.selectedDisplayText ||
           ""
-        ).trim()
+        )
+        const text = sanitizeInboundText(rawText)
 
-        // Extract WhatsApp display name
-        const pushName: string = msg.pushName || msg.key?.pushName || ""
+        // Extract WhatsApp display name (sanitized)
+        const pushName: string = sanitizeInboundText(msg.pushName || msg.key?.pushName || "")
 
         console.log(`[Webhook] 📥 Incoming from: +${customerPhone} (${pushName}) | Text: ${text.substring(0, 80)}`)
 
@@ -192,7 +208,8 @@ export async function POST(req: NextRequest) {
         const existingCustomer = await db.customer.findFirst({
           where: {
             merchantId: merchant.id,
-            phone: { contains: last10Phone }
+            phone: { contains: last10Phone },
+            deletedAt: null  // Ignore soft-deleted customers
           }
         })
 

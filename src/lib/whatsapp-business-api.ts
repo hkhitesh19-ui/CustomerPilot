@@ -93,11 +93,11 @@ const DEFAULT_CONFIG: WhatsAppConfig = {
 // OTP Configuration
 export const OTP_CONFIG = {
   length: 4,
-  expirySeconds: 600,        // 10 minutes (testing mode)
-  maxVerificationAttempts: 10,
-  resendCooldownSeconds: 10,
-  rateLimitMinutes: 60,      // Max OTPs per phone in this window
-  maxOtpPerPhonePerWindow: 20,
+  expirySeconds: 300,           // 5 minutes (production standard)
+  maxVerificationAttempts: 5,   // Max 5 wrong attempts before session is invalidated
+  resendCooldownSeconds: 60,    // 60s cooldown between resend attempts
+  rateLimitMinutes: 10,         // Sliding window for rate limiting
+  maxOtpPerPhonePerWindow: 3,   // Max 3 OTPs per phone per 10-min window
 }
 
 // Retry Configuration

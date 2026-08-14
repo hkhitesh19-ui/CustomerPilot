@@ -2,11 +2,16 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { postReviewReplyToGBP } from "@/lib/google-reviews-service"
 import { generateAIReviewReply } from "@/lib/ai-review-reply"
+import { applyBulkAiRateLimit } from "@/lib/rate-limiter"
 
 export async function POST(req: NextRequest) {
   try {
     const merchantId = req.headers.get("x-merchant-id")
     if (!merchantId) return NextResponse.json({ error: "Missing merchantId" }, { status: 400 })
+
+    // Rate limit: max 5 bulk AI operations per merchant per minute
+    const limited = await applyBulkAiRateLimit(merchantId)
+    if (limited) return limited
 
     const { jobId } = await req.json()
     if (!jobId) return NextResponse.json({ error: "Missing jobId" }, { status: 400 })

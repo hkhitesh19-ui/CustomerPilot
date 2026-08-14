@@ -7,37 +7,32 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const keyId = process.env.RAZORPAY_KEY_ID || "rzp_test_TAyBShtPsT7nSS";
-    const keySecret = process.env.RAZORPAY_KEY_SECRET || "u3nuKxrh3ljRBYuEApMJ0okC";
+    const keyId = process.env.RAZORPAY_KEY_ID
+    const keySecret = process.env.RAZORPAY_KEY_SECRET
+
+    // SECURITY: Never fall back to hardcoded keys. Fail loudly in all environments.
+    if (!keyId || !keySecret) {
+      console.error("[Razorpay] RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET env var not set")
+      return err("Payment system not configured. Please contact support.", 500)
+    }
 
     const razorpay = new Razorpay({
       key_id: keyId,
       key_secret: keySecret,
-    });
+    })
 
     const body = await req.json().catch(() => ({}));
-    const { planId, couponCode, merchantId } = body;
+    const { planId, couponCode, merchantId: bodyMerchantId } = body;
 
     if (!planId) {
       return err("Missing planId", 400);
     }
 
-    // Resolve merchant safely
-    let merchant = await getAuthenticatedMerchant();
-    if (!merchant && merchantId) {
-      merchant = await db.merchant.findUnique({ where: { id: merchantId } });
-    }
+    // SECURITY: Resolve merchant ONLY from server-injected header (JWT-verified by proxy.ts)
+    // DO NOT fall back to findFirst() — that could return the wrong merchant in multi-tenant.
+    const merchant = await getAuthenticatedMerchant();
     if (!merchant) {
-      const headerId = req.headers.get("x-merchant-id");
-      if (headerId) {
-        merchant = await db.merchant.findUnique({ where: { id: headerId } });
-      }
-    }
-    if (!merchant) {
-      merchant = await db.merchant.findFirst({ orderBy: { createdAt: "asc" } });
-    }
-    if (!merchant) {
-      return err("No active merchant account found", 401);
+      return err("Unauthorized: valid merchant session required", 401);
     }
 
     // 1. Fetch official plan from database

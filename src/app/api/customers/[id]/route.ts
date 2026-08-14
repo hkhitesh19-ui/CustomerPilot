@@ -22,70 +22,52 @@ export async function DELETE(
       return NextResponse.json({ ok: false, error: "Customer not found" }, { status: 404 });
     }
 
-    // Cascade delete all associated records for clean testing reset
+    if (customer.deletedAt) {
+      return NextResponse.json({ ok: false, error: "Customer is already deleted" }, { status: 409 });
+    }
+
+    const now = new Date();
+
+    // ─── Soft-delete: mark records with deletedAt timestamp ──────────────
+    // We do NOT hard-delete data. This preserves audit trail and allows recovery.
     await db.$transaction(async (tx) => {
-      // 1. Stamps
-      await tx.stamp.deleteMany({ where: { customerId } });
-
-      // 2. Customer Stamp Cards
-      await tx.customerStampCard.deleteMany({ where: { customerId } });
-
-      // 3. Bills
-      await tx.bill.deleteMany({ where: { customerId } });
-
-      // 4. Waiting Customers (Queue entries)
-      await tx.waitingCustomer.deleteMany({ where: { customerId } });
-
-      // 5. Redemptions
-      await tx.redemption.deleteMany({ where: { customerId } });
-
-      // 6. Referrals
-      await tx.referral.deleteMany({
-        where: { OR: [{ referrerId: customerId }, { friendCustomerId: customerId }] }
+      // 1. Soft-delete all Stamps
+      await tx.stamp.updateMany({
+        where: { customerId, deletedAt: null },
+        data: { deletedAt: now }
       });
 
-      // 7. Reviews
-      await tx.review.deleteMany({ where: { customerId } });
+      // 2. Soft-delete the Customer record itself
+      await tx.customer.update({
+        where: { id: customerId },
+        data: {
+          deletedAt: now,
+          status: "DELETED",
+          botState: "IDLE",
+        }
+      });
 
-      // 8. Fraud Alerts
-      await tx.fraudAlert.deleteMany({ where: { customerId } });
-
-      // 9. Achievements
-      await tx.achievement.deleteMany({ where: { customerId } });
-
-      // 10. WhatsApp Messages (by phone or customerId)
-      if (customer.phone) {
-        await tx.whatsAppMessage.deleteMany({
-          where: {
-            OR: [
-              { customerId },
-              { toPhone: customer.phone },
-              { toPhone: `+${customer.phone}` },
-              { toPhone: customer.phone.replace(/^91/, '') }
-            ]
-          }
-        });
-      }
-
-      // 11. Delete Customer record
-      await tx.customer.delete({ where: { id: customerId } });
-
-      // Audit log
+      // 3. Audit log — record who deleted and when
       await tx.auditLog.create({
         data: {
           merchantId: merchant.id,
-          actorType: "SUPERADMIN",
-          action: "CUSTOMER_DELETED",
+          actorType: "STAFF",
+          action: "CUSTOMER_SOFT_DELETED",
           entity: "Customer",
           entityId: customerId,
-          metadata: JSON.stringify({ name: customer.name, phone: customer.phone })
+          metadata: JSON.stringify({
+            name: customer.name,
+            phone: customer.phone,
+            deletedAt: now.toISOString(),
+            reason: "Manual reset via dashboard"
+          })
         }
       });
     });
 
     return NextResponse.json({
       ok: true,
-      message: `Customer ${customer.name || customer.phone} and all associated data deleted successfully.`
+      message: `Customer ${customer.name || customer.phone} has been soft-deleted. Data is preserved for audit trail.`
     });
   } catch (error: any) {
     console.error("[Customer DELETE Error]", error);

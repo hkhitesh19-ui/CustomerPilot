@@ -251,7 +251,8 @@ export async function GET(req: Request) {
     
     const allCustomers = await db.customer.findMany({
       where: { 
-        status: { not: 'blocked' }, 
+        status: { not: 'blocked' },
+        deletedAt: null,
         whatsappOptIn: true,
         merchant: {
           OR: [
