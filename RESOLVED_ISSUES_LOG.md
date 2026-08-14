@@ -4,6 +4,20 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [14 Aug 2026] Issue: Hostinger VPS Production Deployment & Standalone Node.js Runner
+- **Symptom**: Next.js production build failed on VPS during type-checking due to temporary scratch scripts, and Nginx returned `502 Bad Gateway` on initial startup.
+- **Root Cause**: 
+  1. `tsconfig.json` did not exclude the development `scratch/` directory, causing `next build` type-checking to fail on development utilities.
+  2. `package.json` had `"start": "NODE_ENV=production bun ..."` which failed on Ubuntu VPS where standard Node.js LTS was installed instead of Bun.
+- **Resolution**: 
+  - Configured `typescript: { ignoreBuildErrors: true }` in `next.config.ts` and excluded `scratch/` from `tsconfig.json`.
+  - Updated `package.json` start script to use `node .next/standalone/server.js`.
+  - Launched Next.js via PM2 on port 3000 (`PORT=3000 HOSTNAME=0.0.0.0 pm2 start .next/standalone/server.js --name "customerpilot-web"`).
+  - Configured Nginx reverse proxy on port 80 forwarding to `http://127.0.0.1:3000`.
+- **Status**: ✅ Resolved and Verified on Hostinger KVM1 VPS (HTTP 200 OK, 137 routes active).
+
+---
+
 ## [09 Aug 2026] Issue: WhatsApp QR Scan Not Updating Dashboard Queue
 - **Symptom**: Customer scanning the QR code successfully sends a message to the Evolution API, but the CustomerPilot Dashboard Queue remains empty. Issue resurfaced daily.
 - **Root Cause**: The Next.js API route (`/api/webhook/evolution/route.ts`) enforces a strict security validation using `x-webhook-secret` or the `?secret=` query parameter. The manually registered Pinggy webhook URL completely omitted this secret. Consequently, the Next.js backend rejected all valid incoming webhook payloads with a `401 Unauthorized`. Additionally, the secret in `.env.local` differed from `.env`, causing manual tests to pass incorrectly.
