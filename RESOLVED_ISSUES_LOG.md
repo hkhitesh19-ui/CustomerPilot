@@ -2,6 +2,26 @@
 
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
+## [15 Aug 2026] Issue: Global Support Phone Number (+91 90333 04707), Homepage Light Theme on All Pages & Core Engines Copy
+- **Symptom**: 
+  1. Support and WhatsApp contact numbers needed updating to `+91 90333 04707` globally across all widgets, pages, and deep links.
+  2. Pricing, Contact, Privacy, Terms, Security, and Help pages used a dark slate-950 theme that didn't match the modern light theme of the Homepage.
+  3. Feature sections required updated naming and structured copy for:
+     - *Loyalty Rewards (Bring Customers Back)*
+     - *Magic SEO Optimized Google Reviews - Increase GoogleReviews Very Fast*
+     - *1-Click GoogleReview AutoReply*
+- **Root Cause**: 
+  - Earlier legal & auxiliary pages were developed using dark-mode utility classes.
+  - Previous test support phone numbers were hardcoded in multiple components and deep link generators.
+- **Resolution**: 
+  - Updated all WhatsApp deep links, widgets, footers, and support contact cards to **`+91 90333 04707`** (`919033304707`).
+  - Redesigned `/pricing`, `/contact`, `/privacy`, `/terms`, `/security`, `/help`, and feature comparison pages in the crisp Homepage Light Theme.
+  - Integrated the exact requested headlines, descriptions, and feature bullet points for all 3 core retention engines across `src/app/page.tsx`, `src/components/pricing-client.tsx`, and feature deep-dive routes.
+  - Built and verified production bundle with all 137 routes passing with HTTP 200.
+- **Status**: ✅ Resolved and Verified Locally.
+
+---
+
 ## [15 Aug 2026] Issue: Homepage & Global UI/UX Overhaul, Mobile Responsive Header, 7-Day Trial Alignment & WhatsApp Floating Widget
 - **Symptom**: 
   1. Mobile header buttons overflowed out of view on mobile screens.
