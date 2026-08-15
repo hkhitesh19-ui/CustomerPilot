@@ -53,9 +53,9 @@ export function RestaurantLoyaltyClient() {
       </div>
 
       <div className="text-center pt-4">
-        <Link href="/register">
+        <Link href="/signup">
           <Button size="lg">
-            Start 14-Day Restaurant Trial <ArrowRight className="w-4 h-4 ml-2" />
+            Start 7 Days Free Trial Today <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </Link>
       </div>

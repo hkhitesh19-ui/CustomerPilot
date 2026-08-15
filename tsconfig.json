@@ -39,6 +39,10 @@
   "exclude": [
     "examples", 
     "node_modules",
-    "evolution-api-repo"
+    "evolution-api-repo",
+    "scratch",
+    "scripts",
+    "tests",
+    "e2e"
   ]
 }

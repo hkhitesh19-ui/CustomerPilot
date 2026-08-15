@@ -24,7 +24,7 @@ export async function GET() {
 - **Salons & Spas**: Service booking check-ins, VIP multiplier stamps.
 
 ## Pricing & Deployment
-- **Trial**: 14-Day Full-Featured Free Trial (No Credit Card Required)
+- **Trial**: 7-Day Full-Featured Free Trial (No Credit Card Required)
 - **Pro Monthly**: ₹2,999 / month unlimited WhatsApp notifications & AI auto-replies
 - **Enterprise**: Custom multi-location chain management
 `

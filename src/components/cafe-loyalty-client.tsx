@@ -46,9 +46,9 @@ export function CafeLoyaltyClient() {
       </div>
 
       <div className="text-center pt-4">
-        <Link href="/register">
+        <Link href="/signup">
           <Button size="lg">
-            Start 14-Day Cafe Trial <ArrowRight className="w-4 h-4 ml-2" />
+            Start 7 Days Free Trial Today <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </Link>
       </div>

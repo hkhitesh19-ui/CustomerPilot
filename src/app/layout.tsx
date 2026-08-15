@@ -88,7 +88,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { SplashScreen } from "@/components/splash-screen";
+import { WhatsAppFloatingWidget } from "@/components/whatsapp-widget";
 
 export default function RootLayout({
   children,
@@ -105,8 +105,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <Providers>
-          <SplashScreen />
           {children}
+          <WhatsAppFloatingWidget />
           <Toaster />
         </Providers>
       </body>

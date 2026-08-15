@@ -7,7 +7,8 @@ import Link from "next/link"
 import {
   Store, MessageSquare, Search, Upload, Gift, QrCode as QrIcon, Zap,
   Check, ArrowRight, ArrowLeft, Loader2, UserCheck,
-  Printer, AlertCircle, CircleDot, Star, Rocket, X, Shield
+  Printer, AlertCircle, CircleDot, Star, Rocket, X, Shield,
+  Menu, ChevronDown, Calculator, TrendingUp, Sparkles, Phone
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -110,6 +111,28 @@ export default function Home() {
   const [error, setError] = useState("")
   const [workerStatus, setWorkerStatus] = useState<any>(null)
 
+  // Navigation & Drawer States
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [productsOpen, setProductsOpen] = useState(false)
+  const [solutionsOpen, setSolutionsOpen] = useState(false)
+
+  // ROI Calculator State
+  const [roiCustomers, setRoiCustomers] = useState("250")
+  const [roiAvgBill, setRoiAvgBill] = useState("350")
+  const [roiRepeatRate, setRoiRepeatRate] = useState("30")
+
+  const calcROI = () => {
+    const c = parseInt(roiCustomers) || 0
+    const b = parseInt(roiAvgBill) || 0
+    const r = parseInt(roiRepeatRate) || 0
+    const monthlyRevenue = Math.round(c * b * (r / 100) * 1.8) // 1.8x repeat frequency boost
+    const planCost = 2499
+    const roi = monthlyRevenue > 0 ? Math.round(((monthlyRevenue - planCost) / planCost) * 100) : 0
+    return { monthlyRevenue, roi }
+  }
+
+  const { monthlyRevenue, roi } = calcROI()
+
   // Animated Chat Messages State for Phone Mockup
   const [chatMessages, setChatMessages] = useState<Array<{ d: 'in' | 'out', t: string, time: string }>>([])
 
@@ -172,219 +195,340 @@ export default function Home() {
   }
 
   return (
-    <div className="hp-body">
+    <div className="hp-body font-sans text-slate-900 bg-white min-h-screen selection:bg-emerald-500 selection:text-white">
       <style>{`
         :root {
           --em:#10b981;--em-d:#059669;--sky:#0ea5e9;--ind:#6366f1;--ind-d:#4f46e5;
           --slate:#0f172a;--slate6:#475569;--slate5:#64748b;--slate4:#94a3b8;--slate3:#cbd5e1;
           --bg:#fff;--line:#e2e8f0;--amber:#f59e0b;
         }
-        .hp-body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--slate); background: var(--bg); line-height: 1.5; min-height: 100vh; }
-        .wrap { max-width: 1150px; margin: 0 auto; padding: 0 20px; }
-        .grad-txt { background: linear-gradient(90deg, var(--em), var(--sky), var(--ind)); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 200% auto; animation: gs 6s ease infinite; }
-        @keyframes gs { 0%,100%{background-position:0 50%} 50%{background-position:100% 50%} }
+        .wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .grad-txt { background: linear-gradient(90deg, var(--em), var(--sky), var(--ind)); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .btn-grad { background: linear-gradient(90deg, var(--em), var(--ind)); color: #fff; box-shadow: 0 10px 25px -8px rgba(16,185,129,.5); }
         .btn-grad:hover { filter: brightness(1.08); transform: translateY(-1px); }
         .btn-white { background: #fff; color: var(--slate); box-shadow: 0 10px 25px -8px rgba(0,0,0,.25); }
         .btn-white:hover { transform: translateY(-1px); }
         .btn-ghost { background: rgba(255,255,255,.7); color: var(--slate6); border: 1px solid var(--line); backdrop-filter: blur(8px); }
-        .btn-ghost:hover { background: #fff; }
+        .btn-ghost:hover { background: #fff; color: var(--slate); }
         .btn-dark { background: var(--slate); color: #fff; }
         .btn-dark:hover { background: #1e293b; }
         .arrow { transition: transform .2s; display: inline-block; }
         .btn:hover .arrow { transform: translateX(3px); }
 
-        nav.top { position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; justify-content: center; padding: 14px 20px; }
-        .navbox { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 980px; background: rgba(255,255,255,.92); backdrop-filter: blur(20px); border: 1px solid rgba(226,232,240,.9); border-radius: 20px; padding: 8px 20px; box-shadow: 0 10px 30px -10px rgba(15,23,42,.12); }
-        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--slate); }
-        .logo img { max-height: 60px; width: auto; object-fit: contain; }
-
-        .hero { position: relative; overflow: hidden; padding: 130px 0 80px; }
+        .hero { position: relative; overflow: hidden; padding: 120px 0 70px; }
+        @media(min-width:768px){ .hero { padding: 140px 0 90px; } }
         .aurora { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-        .aurora b { position: absolute; display: block; border-radius: 50%; filter: blur(70px); }
-        .aurora b:nth-child(1) { width: 600px; height: 600px; left: 50%; top: -100px; transform: translateX(-50%); background: rgba(16,185,129,.22); animation: fl 14s ease-in-out infinite; }
-        .aurora b:nth-child(2) { width: 360px; height: 360px; right: -40px; top: 200px; background: rgba(99,102,241,.2); animation: fl 16s ease-in-out infinite 3s; }
-        .aurora b:nth-child(3) { width: 340px; height: 340px; left: -60px; top: 280px; background: rgba(14,165,233,.18); animation: fl 18s ease-in-out infinite 6s; }
+        .aurora b { position: absolute; display: block; border-radius: 50%; filter: blur(80px); }
+        .aurora b:nth-child(1) { width: 600px; height: 600px; left: 50%; top: -100px; transform: translateX(-50%); background: rgba(16,185,129,.18); animation: fl 14s ease-in-out infinite; }
+        .aurora b:nth-child(2) { width: 360px; height: 360px; right: -40px; top: 200px; background: rgba(99,102,241,.15); animation: fl 16s ease-in-out infinite 3s; }
+        .aurora b:nth-child(3) { width: 340px; height: 340px; left: -60px; top: 280px; background: rgba(14,165,233,.15); animation: fl 18s ease-in-out infinite 6s; }
         @keyframes fl { 0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-25px) scale(1.08)} }
-        .dots { position: absolute; inset: 0; z-index: 0; opacity: .5; background-image: radial-gradient(circle, rgba(99,102,241,.12) 1px, transparent 1px); background-size: 28px 28px; mask-image: linear-gradient(180deg, #000 60%, transparent); pointer-events: none; }
-        .hero-grid { display: grid; grid-template-columns: 1fr; gap: 50px; align-items: center; position: relative; z-index: 1; }
-        @media(min-width:900px){ .hero-grid { grid-template-columns: 1.1fr .9fr; } }
+        .dots { position: absolute; inset: 0; z-index: 0; opacity: .4; background-image: radial-gradient(circle, rgba(99,102,241,.12) 1px, transparent 1px); background-size: 28px 28px; mask-image: linear-gradient(180deg, #000 60%, transparent); pointer-events: none; }
+        .hero-grid { display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center; position: relative; z-index: 1; }
+        @media(min-width:960px){ .hero-grid { grid-template-columns: 1.15fr .85fr; } }
         
-        .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.8); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 14px; color: var(--slate6); box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+        .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.9); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; color: var(--slate6); box-shadow: 0 2px 8px rgba(0,0,0,.04); }
         .dot-live { position: relative; width: 8px; height: 8px; }
         .dot-live i { position: absolute; inset: 0; border-radius: 50%; background: var(--em); }
         .dot-live i:first-child { animation: ping 1.6s cubic-bezier(0,0,.2,1) infinite; opacity: .7; }
         @keyframes ping { 75%,100%{transform:scale(2.2);opacity:0} }
 
-        h1.hero-h { font-size: 42px; font-weight: 800; line-height: 1.06; letter-spacing: -.02em; margin-top: 24px; color: var(--slate); }
-        @media(min-width:640px){ h1.hero-h { font-size: 60px; } }
-        @media(min-width:900px){ h1.hero-h { font-size: 68px; } }
-        .hero p.lead { font-size: 18px; color: var(--slate5); max-width: 540px; margin-top: 24px; }
+        h1.hero-h { font-size: 36px; font-weight: 800; line-height: 1.1; letter-spacing: -.02em; margin-top: 20px; color: var(--slate); }
+        @media(min-width:640px){ h1.hero-h { font-size: 52px; } }
+        @media(min-width:960px){ h1.hero-h { font-size: 60px; } }
+        .hero p.lead { font-size: 16px; color: var(--slate5); max-width: 540px; margin-top: 20px; line-height: 1.6; }
+        @media(min-width:640px){ .hero p.lead { font-size: 18px; } }
         
-        .btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
-        .trust { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 30px; font-size: 14px; color: var(--slate5); }
+        .btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+        .trust { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 26px; font-size: 13px; color: var(--slate5); font-weight: 500; }
         .trust span { display: inline-flex; align-items: center; gap: 6px; }
         .ck { color: var(--em); font-weight: 700; }
 
         .phone-wrap { position: relative; display: flex; justify-content: center; }
-        .float-card { position: absolute; z-index: 20; background: rgba(255,255,255,.85); backdrop-filter: blur(12px); border-radius: 16px; padding: 10px 14px; box-shadow: 0 12px 30px -10px rgba(15,23,42,.2); display: flex; align-items: center; gap: 8px; animation: bob 5s ease-in-out infinite; }
+        .float-card { position: absolute; z-index: 20; background: rgba(255,255,255,.92); backdrop-filter: blur(12px); border-radius: 16px; padding: 10px 14px; box-shadow: 0 12px 30px -10px rgba(15,23,42,.2); display: flex; align-items: center; gap: 8px; animation: bob 5s ease-in-out infinite; }
         @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
         .float-card .ic { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; }
         .float-card .ic.em { background: linear-gradient(135deg, #34d399, #10b981); }
         .float-card .ic.ind { background: linear-gradient(135deg, #818cf8, #6366f1); }
         .float-card small { display: block; font-size: 12px; font-weight: 800; color: var(--slate); }
         .float-card .s { font-size: 10px; color: var(--slate4); }
-        .fl1 { top: 40px; left: -10px; }
-        .fl2 { bottom: 80px; right: -10px; animation-delay: 1.5s; }
-        @media(min-width:640px){ .fl1{left:-30px} .fl2{right:-30px} }
+        .fl1 { top: 30px; left: -10px; }
+        .fl2 { bottom: 60px; right: -10px; animation-delay: 1.5s; }
+        @media(min-width:640px){ .fl1{left:-20px} .fl2{right:-20px} }
 
-        .phone { width: 280px; border-radius: 40px; background: #1e293b; padding: 10px; box-shadow: 0 30px 60px -20px rgba(99,102,241,.4); }
+        .phone { width: 270px; border-radius: 36px; background: #1e293b; padding: 10px; box-shadow: 0 30px 60px -20px rgba(99,102,241,.35); }
         @media(min-width:640px){ .phone { width: 300px; } }
-        .screen { border-radius: 28px; overflow: hidden; background: #0b141a; }
+        .screen { border-radius: 26px; overflow: hidden; background: #0b141a; }
         .wa-head { display: flex; align-items: center; gap: 10px; background: #202c33; padding: 12px 14px; }
-        .wa-av { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #34d399, #6366f1); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
-        .wa-head .nm { color: #fff; font-size: 14px; font-weight: 600; }
+        .wa-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #34d399, #6366f1); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+        .wa-head .nm { color: #fff; font-size: 13px; font-weight: 600; }
         .wa-head .st { color: #34d399; font-size: 10px; }
-        .wa-chat { padding: 12px; min-height: 260px; display: flex; flex-direction: column; gap: 8px; }
+        .wa-chat { padding: 12px; min-height: 250px; display: flex; flex-direction: column; gap: 8px; }
         .bub { max-width: 85%; border-radius: 10px; padding: 8px 11px; font-size: 12px; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,.1); opacity: 0; animation: pop .4s ease forwards; }
         @keyframes pop { from{opacity:0;transform:translateY(8px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
         .bub.in { background: #202c33; color: #e2e8f0; align-self: flex-start; border-bottom-left-radius: 2px; }
         .bub.out { background: #005c4b; color: #e2e8f0; align-self: flex-end; border-bottom-right-radius: 2px; }
         .bub .t { display: flex; justify-content: flex-end; gap: 3px; margin-top: 3px; font-size: 9px; color: #94a3b8; }
         .wa-in { display: flex; gap: 8px; align-items: center; background: #202c33; padding: 8px 10px; }
-        .wa-in .field { flex: 1; background: #2a3942; border-radius: 999px; padding: 6px 12px; font-size: 12px; color: #64748b; }
-        .wa-in .send { width: 28px; height: 28px; border-radius: 50%; background: #00a884; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+        .wa-in .field { flex: 1; background: #2a3942; border-radius: 999px; padding: 6px 12px; font-size: 11px; color: #64748b; }
+        .wa-in .send { width: 26px; height: 26px; border-radius: 50%; background: #00a884; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; }
 
-        .strip { border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; background: rgba(248,250,252,.5); padding: 36px 0; overflow: hidden; }
-        .strip p { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--slate4); text-align: center; margin-bottom: 24px; }
+        .strip { border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; background: rgba(248,250,252,.7); padding: 30px 0; overflow: hidden; }
+        .strip p { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--slate4); text-align: center; margin-bottom: 20px; }
         .marquee { display: flex; gap: 48px; width: max-content; animation: mq 28s linear infinite; }
         .marquee:hover { animation-play-state: paused; }
         @keyframes mq { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-        .marquee .lg { display: flex; align-items: center; gap: 8px; color: var(--slate4); font-size: 16px; font-weight: 700; white-space: nowrap; }
+        .marquee .lg { display: flex; align-items: center; gap: 8px; color: var(--slate5); font-size: 15px; font-weight: 700; white-space: nowrap; }
 
-        .feat { padding: 90px 0; }
-        .sec-head { text-align: center; max-width: 640px; margin: 0 auto; }
-        .eyebrow { display: inline-block; background: #ecfdf5; color: var(--em-d); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 5px 12px; border-radius: 999px; border: 1px solid #d1fae5; }
-        h2.sec-h { font-size: 30px; font-weight: 800; letter-spacing: -.02em; margin-top: 16px; color: var(--slate); }
-        @media(min-width:640px){ h2.sec-h { font-size: 46px; } }
-        .sec-sub { font-size: 18px; color: var(--slate5); margin-top: 16px; }
-        .feat-grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 56px; }
-        @media(min-width:760px){ .feat-grid { grid-template-columns: repeat(3, 1fr); } }
+        .feat { padding: 80px 0; }
+        .sec-head { text-align: center; max-width: 680px; margin: 0 auto; }
+        .eyebrow { display: inline-block; background: #ecfdf5; color: var(--em-d); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 4px 12px; border-radius: 999px; border: 1px solid #d1fae5; }
+        h2.sec-h { font-size: 28px; font-weight: 800; letter-spacing: -.02em; margin-top: 14px; color: var(--slate); }
+        @media(min-width:640px){ h2.sec-h { font-size: 42px; } }
+        .sec-sub { font-size: 16px; color: var(--slate5); margin-top: 14px; line-height: 1.6; }
+        .feat-grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 48px; }
+        @media(min-width:768px){ .feat-grid { grid-template-columns: repeat(3, 1fr); } }
         .fcard { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 28px; transition: .25s; display: flex; flex-direction: column; }
         .fcard:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -16px rgba(15,23,42,.12); border-color: #cbd5e1; }
-        .fcard .ico { width: 56px; height: 56px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #fff; box-shadow: 0 8px 16px -6px rgba(0,0,0,.2); }
+        .fcard .ico { width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; box-shadow: 0 8px 16px -6px rgba(0,0,0,.15); }
         .ico.amber { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
         .ico.em { background: linear-gradient(135deg, #34d399, #10b981); }
         .ico.ind { background: linear-gradient(135deg, #60a5fa, #6366f1); }
-        .fcard h3 { font-size: 21px; font-weight: 800; margin-top: 20px; color: var(--slate); }
-        .fcard p { color: var(--slate5); margin-top: 14px; font-size: 15px; }
+        .fcard h3 { font-size: 20px; font-weight: 800; margin-top: 20px; color: var(--slate); }
+        .fcard p { color: var(--slate5); margin-top: 12px; font-size: 14px; line-height: 1.6; }
         .fcard ul { list-style: none; margin-top: 16px; }
-        .fcard li { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--slate6); margin-bottom: 8px; }
+        .fcard li { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--slate6); margin-bottom: 8px; }
         .fcard li .c { color: var(--em); font-weight: 700; }
         .stamp-row { display: flex; gap: 8px; margin-top: 18px; }
-        .stamp-row .s { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #fff; background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+        .stamp-row .s { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; background: linear-gradient(135deg, #fbbf24, #f59e0b); }
         .stars { display: flex; gap: 3px; margin-top: 16px; align-items: center; }
         .stars small { margin-left: 8px; background: #ecfdf5; color: var(--em-d); padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
-        .reply-prev { margin-top: 16px; background: #f8fafc; border-radius: 12px; padding: 10px 12px; font-size: 13px; color: var(--slate6); }
+        .reply-prev { margin-top: 16px; background: #f8fafc; border-radius: 12px; padding: 10px 12px; font-size: 12px; color: var(--slate6); }
 
-        .how { background: var(--slate); padding: 90px 0; color: #fff; }
+        .how { background: var(--slate); padding: 80px 0; color: #fff; }
         .how .eyebrow { background: rgba(255,255,255,.06); color: #34d399; border-color: rgba(255,255,255,.1); }
-        .steps { display: grid; grid-template-columns: 1fr; gap: 32px; margin-top: 60px; }
-        @media(min-width:760px){ .steps { grid-template-columns: repeat(3, 1fr); } }
+        .steps { display: grid; grid-template-columns: 1fr; gap: 28px; margin-top: 50px; }
+        @media(min-width:768px){ .steps { grid-template-columns: repeat(3, 1fr); } }
         .step { text-align: center; }
-        .step .num { width: 56px; height: 56px; border-radius: 18px; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 22px; box-shadow: 0 8px 20px -4px rgba(0,0,0,.3); }
-        .step .tag { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #64748b; margin-top: 20px; }
+        .step .num { width: 52px; height: 52px; border-radius: 16px; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; box-shadow: 0 8px 20px -4px rgba(0,0,0,.3); }
+        .step .tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #64748b; margin-top: 18px; }
         .step h3 { font-size: 18px; font-weight: 700; margin-top: 6px; }
-        .step p { font-size: 14px; color: #94a3b8; margin-top: 8px; }
+        .step p { font-size: 13px; color: #94a3b8; margin-top: 8px; line-height: 1.5; }
 
-        .stats { padding: 80px 0; }
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; text-align: center; }
-        @media(min-width:760px){ .stats-grid { grid-template-columns: repeat(4, 1fr); } }
-        .stat .v { font-size: 38px; font-weight: 800; background: linear-gradient(90deg, var(--em), var(--ind)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        @media(min-width:760px){ .stat .v { font-size: 46px; } }
-        .stat .l { font-size: 14px; color: var(--slate5); margin-top: 8px; }
+        .stats { padding: 70px 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; text-align: center; }
+        @media(min-width:768px){ .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+        .stat .v { font-size: 34px; font-weight: 800; background: linear-gradient(90deg, var(--em), var(--ind)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        @media(min-width:768px){ .stat .v { font-size: 42px; } }
+        .stat .l { font-size: 13px; color: var(--slate5); margin-top: 6px; font-weight: 600; }
 
-        .testi { background: #f8fafc; padding: 90px 0; }
+        .testi { background: #f8fafc; padding: 80px 0; }
         .testi .eyebrow { background: #fffbeb; color: #b45309; border-color: #fef3c7; }
-        .tgrid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 56px; }
-        @media(min-width:760px){ .tgrid { grid-template-columns: repeat(3, 1fr); } }
-        .tcard { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 28px; transition: .25s; }
+        .tgrid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 48px; }
+        @media(min-width:768px){ .tgrid { grid-template-columns: repeat(3, 1fr); } }
+        .tcard { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 26px; transition: .25s; }
         .tcard:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -16px rgba(15,23,42,.1); }
         .ttop { display: flex; justify-content: space-between; align-items: center; }
-        .qmark { font-size: 30px; color: #a7f3d0; }
+        .qmark { font-size: 28px; color: #a7f3d0; }
         .metric { background: #ecfdf5; color: var(--em-d); padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
-        .tstars { margin-top: 10px; color: #f59e0b; }
-        .tcard blockquote { font-size: 15px; color: #475569; margin-top: 14px; line-height: 1.6; }
-        .tauthor { display: flex; align-items: center; gap: 12px; border-top: 1px solid #f1f5f9; margin-top: 22px; padding-top: 18px; }
-        .tauthor .a { width: 40px; height: 40px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
-        .tauthor .n { font-size: 14px; font-weight: 700; }
-        .tauthor .r { font-size: 12px; color: var(--slate4); }
+        .tstars { margin-top: 10px; color: #f59e0b; font-size: 14px; }
+        .tcard blockquote { font-size: 14px; color: #475569; margin-top: 12px; line-height: 1.6; }
+        .tauthor { display: flex; align-items: center; gap: 12px; border-top: 1px solid #f1f5f9; margin-top: 20px; padding-top: 16px; }
+        .tauthor .a { width: 38px; height: 38px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+        .tauthor .n { font-size: 13px; font-weight: 700; color: var(--slate); }
+        .tauthor .r { font-size: 11px; color: var(--slate4); }
 
-        .price { padding: 90px 0; }
-        .price .eyebrow { background: #f1f5f9; color: var(--slate6); }
-        .pgrid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 56px; align-items: stretch; }
-        @media(min-width:760px){ .pgrid { grid-template-columns: repeat(3, 1fr); } }
-        .pcard { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 32px; display: flex; flex-direction: column; position: relative; }
-        .pcard.hl { background: var(--slate); color: #fff; border: none; box-shadow: 0 30px 60px -20px rgba(15,23,42,.4); }
-        .pcard.hl .tag { color: #94a3b8; }
-        .pbadge { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, var(--em), var(--ind)); color: #fff; padding: 5px 16px; border-radius: 999px; font-size: 12px; font-weight: 700; box-shadow: 0 8px 16px -4px rgba(99,102,241,.4); }
-        .pcard h3 { font-size: 19px; font-weight: 800; }
-        .pcard .tag { font-size: 14px; color: var(--slate5); margin-top: 4px; }
-        .pp { display: flex; align-items: baseline; gap: 4px; margin-top: 22px; }
-        .pp .amt { font-size: 40px; font-weight: 800; }
-        .pp .per { color: var(--slate4); }
-        .pcard .btn { width: 100%; margin-top: 22px; }
-        .pfeat { list-style: none; margin-top: 26px; }
-        .pfeat li { display: flex; gap: 10px; font-size: 14px; margin-bottom: 12px; }
-        .pcard:not(.hl) .pfeat li { color: var(--slate6); }
-        .pcard.hl .pfeat li { color: #cbd5e1; }
-        .pfeat .c { color: var(--em); flex-shrink: 0; font-weight: 700; }
-
-        .cta-sec { padding: 0 20px 90px; }
-        .cta { position: relative; overflow: hidden; background: var(--slate); border-radius: 40px; padding: 60px 30px; text-align: center; color: #fff; }
-        @media(min-width:640px){ .cta { padding: 80px 40px; } }
+        .cta-sec { padding: 0 20px 80px; }
+        .cta { position: relative; overflow: hidden; background: var(--slate); border-radius: 32px; padding: 50px 24px; text-align: center; color: #fff; }
+        @media(min-width:640px){ .cta { padding: 70px 40px; border-radius: 40px; } }
         .cta .aurora2 { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
         .cta .aurora2 b { position: absolute; border-radius: 50%; filter: blur(70px); }
         .cta .aurora2 b:nth-child(1) { width: 300px; height: 300px; left: 15%; top: -80px; background: rgba(16,185,129,.35); animation: fl 16s infinite; }
         .cta .aurora2 b:nth-child(2) { width: 300px; height: 300px; right: 15%; bottom: -80px; background: rgba(99,102,241,.35); animation: fl 16s infinite 5s; }
         .cta .ct { position: relative; z-index: 1; }
-        .cta h2 { font-size: 32px; font-weight: 800; letter-spacing: -.02em; }
-        @media(min-width:640px){ .cta h2 { font-size: 46px; } }
-        .cta p { color: #94a3b8; font-size: 18px; margin: 16px auto 0; max-width: 420px; }
-        .cta .btn-row { margin-top: 32px; justify-content: center; }
+        .cta h2 { font-size: 28px; font-weight: 800; letter-spacing: -.02em; }
+        @media(min-width:640px){ .cta h2 { font-size: 42px; } }
+        .cta p { color: #94a3b8; font-size: 16px; margin: 14px auto 0; max-width: 440px; }
+        .cta .btn-row { margin-top: 28px; justify-content: center; }
 
-        footer { border-top: 1px solid var(--line); background: #f8fafc; padding: 56px 0 30px; }
-        .fgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
-        @media(min-width:760px){ .fgrid { grid-template-columns: 2fr 1fr 1fr 1fr; } }
-        .fbrand p { color: var(--slate5); font-size: 14px; margin-top: 16px; max-width: 300px; }
-        .frate { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 6px 12px; margin-top: 16px; font-size: 14px; font-weight: 600; color: var(--slate6); }
-        footer h4 { font-size: 14px; font-weight: 800; color: var(--slate); }
+        footer { border-top: 1px solid var(--line); background: #f8fafc; padding: 50px 0 30px; }
+        .fgrid { display: grid; grid-template-columns: 1fr; gap: 32px; }
+        @media(min-width:640px){ .fgrid { grid-template-columns: repeat(2, 1fr); } }
+        @media(min-width:960px){ .fgrid { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+        .fbrand p { color: var(--slate5); font-size: 13px; margin-top: 14px; max-width: 320px; line-height: 1.6; }
+        .frate { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 6px 12px; margin-top: 14px; font-size: 13px; font-weight: 600; color: var(--slate6); }
+        footer h4 { font-size: 13px; font-weight: 800; color: var(--slate); text-transform: uppercase; letter-spacing: .05em; }
         footer ul { list-style: none; margin-top: 12px; }
         footer ul li { margin-bottom: 8px; }
-        footer ul a { font-size: 14px; color: var(--slate5); text-decoration: none; }
+        footer ul a { font-size: 13px; color: var(--slate5); text-decoration: none; transition: color .15s; }
         footer ul a:hover { color: var(--em-d); }
-        .fbottom { border-top: 1px solid var(--line); margin-top: 40px; padding-top: 24px; text-align: center; color: var(--slate4); font-size: 14px; }
+        .fbottom { border-top: 1px solid var(--line); margin-top: 40px; padding-top: 24px; text-align: center; color: var(--slate4); font-size: 13px; }
       `}</style>
 
-      {/* ============ NAVBAR ============ */}
-      <nav className="top">
-        <div className="navbox">
-          <Link href="/" className="no-underline flex-shrink-0">
-            <BrandLogo size="md" showTagline={true} />
+      {/* ============ FIXED STICKY NAVBAR ============ */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
+          {/* Logo */}
+          <Link href="/" className="no-underline flex-shrink-0 flex items-center">
+            <BrandLogo size="sm" />
           </Link>
-          <div className="hidden sm:flex gap-1">
-            <a href="#features" className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">Features</a>
-            <a href="#how" className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">How it works</a>
-            <a href="#pricing" className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">Pricing</a>
-          </div>
-          <div className="flex gap-2 items-center">
-            <Link href="/login" className="btn btn-ghost text-xs sm:text-sm py-2 px-3">Sign in</Link>
-            <Link href="/signup" className="btn btn-dark text-xs sm:text-sm py-2 px-4">Start free →</Link>
+
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+            {/* Products Dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setProductsOpen(true)}
+              onMouseLeave={() => setProductsOpen(false)}
+            >
+              <button className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
+                Products <ChevronDown className="w-4 h-4 opacity-60" />
+              </button>
+              {productsOpen && (
+                <div className="absolute top-full left-0 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <Link href="/features/whatsapp-stamp-card" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                    <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <Gift className="w-3.5 h-3.5 text-emerald-500" /> WhatsApp Stamp Cards
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">5-second tap-to-claim loyalty cards</span>
+                  </Link>
+                  <Link href="/features/google-review-automation" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                    <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <Star className="w-3.5 h-3.5 text-amber-500" /> Google Review AI
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Auto review asks & photo bonuses</span>
+                  </Link>
+                  <Link href="#features" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                    <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <MessageSquare className="w-3.5 h-3.5 text-indigo-500" /> 1-Click AI AutoReply
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Gemini AI owner reply drafts</span>
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Solutions Dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setSolutionsOpen(true)}
+              onMouseLeave={() => setSolutionsOpen(false)}
+            >
+              <button className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
+                Solutions <ChevronDown className="w-4 h-4 opacity-60" />
+              </button>
+              {solutionsOpen && (
+                <div className="absolute top-full left-0 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <Link href="/bakery-loyalty" className="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 transition text-xs font-semibold text-slate-800">
+                    🍰 Bakery Loyalty Engine
+                  </Link>
+                  <Link href="/cafe-loyalty" className="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 transition text-xs font-semibold text-slate-800">
+                    ☕ Cafe & Coffee Cards
+                  </Link>
+                  <Link href="/restaurant-loyalty" className="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 transition text-xs font-semibold text-slate-800">
+                    🍽️ Restaurant Retention
+                  </Link>
+                  <Link href="/salon-loyalty" className="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 transition text-xs font-semibold text-slate-800">
+                    💇 Salon & Spa VIP Club
+                  </Link>
+                  <Link href="#industries" className="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 transition text-xs font-semibold text-slate-800">
+                    🛍️ All Retail Categories →
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <Link href="/pricing" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
+              Pricing
+            </Link>
+            <Link href="#roi" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
+              Calculate ROI
+            </Link>
+          </nav>
+
+          {/* Right Action Buttons */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link href="/login" className="text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 px-2 sm:px-3 py-1.5 rounded-lg transition">
+              Sign In
+            </Link>
+            <Link
+              href="/signup"
+              className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-1"
+            >
+              <span className="hidden sm:inline">Start 7 Days Free Trial Today</span>
+              <span className="sm:hidden">Start Free</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+
+            {/* Mobile Hamburger Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition focus:outline-hidden"
+              aria-label="Toggle Navigation Menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
-      </nav>
 
-      {/* ============ HERO ============ */}
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-b border-slate-200 px-6 py-5 space-y-4 shadow-xl animate-in slide-in-from-top duration-200">
+            <div className="space-y-1">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2">Products</div>
+              <Link href="/features/whatsapp-stamp-card" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                <Gift className="w-4 h-4 text-emerald-500" /> WhatsApp Stamp Cards
+              </Link>
+              <Link href="/features/google-review-automation" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                <Star className="w-4 h-4 text-amber-500" /> Google Review AI
+              </Link>
+              <Link href="#features" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                <MessageSquare className="w-4 h-4 text-indigo-500" /> 1-Click AI AutoReply
+              </Link>
+            </div>
+
+            <div className="space-y-1 border-t border-slate-100 pt-3">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2">Solutions</div>
+              <Link href="/bakery-loyalty" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-slate-800">
+                🍰 Bakery Loyalty
+              </Link>
+              <Link href="/cafe-loyalty" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-slate-800">
+                ☕ Cafe Stamp Cards
+              </Link>
+              <Link href="/restaurant-loyalty" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-slate-800">
+                🍽️ Restaurant Retention
+              </Link>
+              <Link href="/salon-loyalty" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-slate-800">
+                💇 Salon & Spa VIP
+              </Link>
+            </div>
+
+            <div className="space-y-1 border-t border-slate-100 pt-3">
+              <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-bold text-slate-900">
+                ⚡ View Transparent Pricing
+              </Link>
+              <Link href="#roi" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-bold text-slate-900">
+                📊 Calculate Your Store ROI
+              </Link>
+              <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-slate-600">
+                📞 Merchant Support & Help
+              </Link>
+            </div>
+
+            <div className="pt-2">
+              <Link
+                href="/signup"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full bg-slate-900 text-white font-bold text-xs py-3 rounded-xl text-center block shadow-md"
+              >
+                Start 7 Days Free Trial Today →
+              </Link>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* ============ HERO (Item 8 copy) ============ */}
       <section className="hero">
         <div className="aurora"><b></b><b></b><b></b></div>
         <div className="dots"></div>
@@ -392,18 +536,27 @@ export default function Home() {
           <div className="hero-grid">
             <div>
               <span className="badge">
-                <span className="dot-live"><i></i><i></i></span> Trusted by 1,200+ local shops across India · 5-day free trial
+                <span className="dot-live"><i></i><i></i></span> India&apos;s #1 Customer Retention Platform for Local Businesses
               </span>
-              <h1 className="hero-h">Turn every walk-in<br/><span className="grad-txt">into a lifetime customer.</span></h1>
-              <p className="lead">customerPilot brings your customers back with loyalty rewards, collects 5-star Google reviews, and replies to every review — all from one simple software. You run your shop. <strong style={{ color: 'var(--slate)' }}>We bring them back.</strong></p>
+              <h1 className="hero-h">
+                Turn Every Walk-in<br />
+                <span className="grad-txt">Into a Lifetime Customer.</span>
+              </h1>
+              <p className="lead">
+                Customer scans QR. You tap. Reward delivered in 5 seconds. No POS replacement. No GST software. Just pure customer love.
+              </p>
               <div className="btn-row">
-                <Link href="/signup" className="btn btn-grad py-4 px-7 text-base font-bold">Start free — no card <span className="arrow">→</span></Link>
-                <a href="#how" className="btn btn-ghost py-4 px-6 text-base font-bold">See how it works</a>
+                <Link href="/signup" className="btn btn-grad py-3.5 sm:py-4 px-6 sm:px-7 text-sm sm:text-base font-bold rounded-xl flex items-center gap-2">
+                  Start 7 Days Free Trial Today <span className="arrow">→</span>
+                </Link>
+                <Link href="/pricing" className="btn btn-ghost py-3.5 sm:py-4 px-5 sm:px-6 text-sm sm:text-base font-bold rounded-xl">
+                  View Transparent Pricing
+                </Link>
               </div>
               <div className="trust">
                 <span><span className="ck">✓</span> No credit card required</span>
                 <span><span className="ck">✓</span> Setup in 5 minutes</span>
-                <span><span className="ck">✓</span> One simple software</span>
+                <span><span className="ck">✓</span> 7-Day full access</span>
               </div>
             </div>
 
@@ -435,19 +588,229 @@ export default function Home() {
 
       {/* ============ LOGO STRIP ============ */}
       <div className="strip">
-        <p>Powering reputation for India's best local businesses</p>
+        <p>Powering reputation for India&apos;s best local businesses</p>
         <div className="marquee">
-          <span className="lg">★ Sunrise Dental</span><span className="lg">★ Urban Brew</span><span className="lg">★ Glow Salon</span><span className="lg">★ FitZone</span><span className="lg">★ Apex Auto</span><span className="lg">★ GreenLeaf</span>
-          <span className="lg">★ Sunrise Dental</span><span className="lg">★ Urban Brew</span><span className="lg">★ Glow Salon</span><span className="lg">★ FitZone</span><span className="lg">★ Apex Auto</span><span className="lg">★ GreenLeaf</span>
+          <span className="lg">★ Sunrise Dental</span><span className="lg">★ Urban Brew</span><span className="lg">★ Glow Salon</span><span className="lg">★ FitZone Gym</span><span className="lg">★ Cake Connection</span><span className="lg">★ GreenLeaf Organic</span>
+          <span className="lg">★ Sunrise Dental</span><span className="lg">★ Urban Brew</span><span className="lg">★ Glow Salon</span><span className="lg">★ FitZone Gym</span><span className="lg">★ Cake Connection</span><span className="lg">★ GreenLeaf Organic</span>
         </div>
       </div>
 
-      {/* ============ FEATURES ============ */}
-      <section className="feat" id="features">
+      {/* ============ BUILT FOR EVERY LOCAL BUSINESS (Item 9) ============ */}
+      <section id="industries" className="py-20 bg-slate-50/70 border-b border-slate-200/60">
+        <div className="wrap">
+          <div className="sec-head">
+            <span className="eyebrow">Industry Solutions</span>
+            <h2 className="sec-h">Built for Every Local Business</h2>
+            <p className="sec-sub">Works with your existing billing. Cash, UPI, Card, or No Bill.</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-12">
+            <Link href="/bakery-loyalty" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
+              <div className="text-3xl mb-3">🎂</div>
+              <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Bakeries & Cakes</h3>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                Award slice bonuses, birthday cake loyalty stamps, and photo review bonus stamps on WhatsApp.
+              </p>
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 mt-4 group-hover:translate-x-1 transition-transform">
+                Explore Bakery Solution →
+              </span>
+            </Link>
+
+            <Link href="/cafe-loyalty" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
+              <div className="text-3xl mb-3">☕</div>
+              <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Cafes & Coffee Bars</h3>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                Buy 5 coffees get 1 free espresso. Automated 14-day &apos;We miss you&apos; WhatsApp offers.
+              </p>
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 mt-4 group-hover:translate-x-1 transition-transform">
+                Explore Cafe Solution →
+              </span>
+            </Link>
+
+            <Link href="/restaurant-loyalty" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
+              <div className="text-3xl mb-3">🍽️</div>
+              <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Restaurants & Dining</h3>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                Table counter scan, VIP dessert rewards, and automated 5-star Google review triggers.
+              </p>
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 mt-4 group-hover:translate-x-1 transition-transform">
+                Explore Restaurant Solution →
+              </span>
+            </Link>
+
+            <Link href="/salon-loyalty" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
+              <div className="text-3xl mb-3">💇</div>
+              <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Salons & Spas</h3>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                Haircut stamp cards, bridal package points, and automated appointment re-engagement.
+              </p>
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 mt-4 group-hover:translate-x-1 transition-transform">
+                Explore Salon Solution →
+              </span>
+            </Link>
+
+            <Link href="/signup" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
+              <div className="text-3xl mb-3">🛍️</div>
+              <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Retail & Boutiques</h3>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                Fashion VIP tiers, seasonal sale alerts, and instant cashier tap-to-claim rewards.
+              </p>
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 mt-4 group-hover:translate-x-1 transition-transform">
+                Start Retail Free Trial →
+              </span>
+            </Link>
+
+            <Link href="/bakery-loyalty" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
+              <div className="text-3xl mb-3">🍬</div>
+              <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Sweet Shops & Mithai</h3>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                Festival reward stamps, corporate gifting bonus cards, and automated festival offers.
+              </p>
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 mt-4 group-hover:translate-x-1 transition-transform">
+                Explore Mithai Solution →
+              </span>
+            </Link>
+
+            <Link href="/signup" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
+              <div className="text-3xl mb-3">🏥</div>
+              <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Clinics & Dental</h3>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                Routine check-up reminder cards, patient review collection, and VIP care plans.
+              </p>
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 mt-4 group-hover:translate-x-1 transition-transform">
+                Start Clinic Free Trial →
+              </span>
+            </Link>
+
+            <Link href="/signup" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
+              <div className="text-3xl mb-3">💪</div>
+              <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Gyms & Fitness</h3>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                Attendance check-in stamps, membership renewal multipliers, and friend referral rewards.
+              </p>
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 mt-4 group-hover:translate-x-1 transition-transform">
+                Start Fitness Free Trial →
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ CALCULATE YOUR ROI (Item 10) ============ */}
+      <section id="roi" className="py-20 bg-white">
+        <div className="wrap">
+          <div className="sec-head">
+            <span className="eyebrow">⚡ Live Profit Estimator</span>
+            <h2 className="sec-h">Calculate Your ROI</h2>
+            <p className="sec-sub">See how much CustomerPilot can add to your monthly revenue.</p>
+          </div>
+
+          <div className="max-w-4xl mx-auto mt-12 bg-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              {/* Inputs */}
+              <div className="space-y-6">
+                <div>
+                  <div className="flex justify-between text-xs font-semibold text-slate-300 mb-2">
+                    <span>Customers Per Month</span>
+                    <span className="text-emerald-400 font-bold">{roiCustomers} customers</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="50"
+                    max="2000"
+                    step="25"
+                    value={roiCustomers}
+                    onChange={(e) => setRoiCustomers(e.target.value)}
+                    className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+                    <span>50</span>
+                    <span>1,000</span>
+                    <span>2,000</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-xs font-semibold text-slate-300 mb-2">
+                    <span>Average Bill Amount (₹)</span>
+                    <span className="text-emerald-400 font-bold">₹{roiAvgBill}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="100"
+                    max="3000"
+                    step="50"
+                    value={roiAvgBill}
+                    onChange={(e) => setRoiAvgBill(e.target.value)}
+                    className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+                    <span>₹100</span>
+                    <span>₹1,500</span>
+                    <span>₹3,000</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-xs font-semibold text-slate-300 mb-2">
+                    <span>Estimated Repeat Rate Boost (%)</span>
+                    <span className="text-emerald-400 font-bold">{roiRepeatRate}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="10"
+                    max="60"
+                    step="5"
+                    value={roiRepeatRate}
+                    onChange={(e) => setRoiRepeatRate(e.target.value)}
+                    className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+                    <span>10%</span>
+                    <span>35%</span>
+                    <span>60%</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Output Result Card */}
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/80 rounded-2xl p-6 sm:p-8 flex flex-col justify-center space-y-4">
+                <div>
+                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Potential Monthly Revenue Increase</div>
+                  <div className="text-3xl sm:text-4xl font-extrabold text-emerald-400 mt-1">
+                    ₹{monthlyRevenue.toLocaleString("en-IN")}
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-700/80 pt-4">
+                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Expected ROI on CustomerPilot</div>
+                  <div className="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+                    {roi}% ROI
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-slate-400 leading-relaxed pt-2">
+                  ⚡ Based on 1.8x repeat frequency increase with CustomerPilot WhatsApp stamp cards.
+                </p>
+
+                <Link
+                  href="/signup"
+                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm py-3 rounded-xl text-center shadow-lg transition-all"
+                >
+                  Start 7 Days Free Trial Today →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ FEATURES (The 3 Engines) ============ */}
+      <section className="feat bg-slate-50/50" id="features">
         <div className="wrap">
           <div className="sec-head">
             <span className="eyebrow">One simple software</span>
-            <h2 className="sec-h">Three things your shop needs.<br/><span style={{ color: '#cbd5e1' }}>That's it.</span></h2>
+            <h2 className="sec-h">Three things your shop needs.<br/><span style={{ color: '#cbd5e1' }}>That&apos;s it.</span></h2>
             <p className="sec-sub">No complicated setup. No technical work. Just bring customers back, collect reviews, and never miss a reply.</p>
           </div>
           <div className="feat-grid">
@@ -458,7 +821,7 @@ export default function Home() {
               <ul>
                 <li><span className="c">✓</span> QR scan to collect stamps</li>
                 <li><span className="c">✓</span> 5 stamps = free reward</li>
-                <li><span className="c">✓</span> Customers return again & again</li>
+                <li><span className="c">✓</span> Customers return again &amp; again</li>
               </ul>
               <div className="stamp-row">
                 <span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span>
@@ -480,10 +843,10 @@ export default function Home() {
             <div className="fcard">
               <div className="ico ind">💬</div>
               <h3>1-Click GoogleReview AutoReply</h3>
-              <p>Gemini AI drafts personalized owner replies for every review. Store owners review & publish to Google Maps in 1-Click!</p>
+              <p>Gemini AI drafts personalized owner replies for every review. Store owners review &amp; publish to Google Maps in 1-Click!</p>
               <ul>
                 <li><span className="c">✓</span> Gemini AI drafts generated in 1 second</li>
-                <li><span className="c">✓</span> 1-Click Copy & Post on Google Maps</li>
+                <li><span className="c">✓</span> 1-Click Copy &amp; Post on Google Maps</li>
                 <li><span className="c">✓</span> Dead-Letter Queue quota safety</li>
               </ul>
               <div className="reply-prev"><strong style={{ color: 'var(--slate)' }}>1-Click AutoReply:</strong> Thank you so much for your kind words! 💜 See you again soon.</div>
@@ -497,26 +860,26 @@ export default function Home() {
         <div className="wrap">
           <div className="sec-head">
             <span className="eyebrow">3 simple steps</span>
-            <h2 className="sec-h">It's this simple.</h2>
+            <h2 className="sec-h text-white">5 Seconds. That&apos;s It.</h2>
           </div>
           <div className="steps">
             <div className="step">
               <div className="num" style={{ background: 'linear-gradient(135deg,#34d399,#10b981)' }}>🛒</div>
               <div className="tag">Step 1</div>
               <h3>Customer purchases</h3>
-              <p>A customer buys from your shop. You ask them to scan the QR at the counter.</p>
+              <p>A customer buys from your shop. You ask them to scan the counter QR standee.</p>
             </div>
             <div className="step">
               <div className="num" style={{ background: 'linear-gradient(135deg,#60a5fa,#0ea5e9)' }}>📱</div>
               <div className="tag">Step 2</div>
-              <h3>They scan the QR</h3>
-              <p>customerPilot sends a friendly WhatsApp message, collects the stamp, and a review later.</p>
+              <h3>WhatsApp Opens</h3>
+              <p>CustomerPilot opens WhatsApp, registers their stamp in 5 seconds, and invites a 5★ review.</p>
             </div>
             <div className="step">
               <div className="num" style={{ background: 'linear-gradient(135deg,#818cf8,#6366f1)' }}>🔄</div>
               <div className="tag">Step 3</div>
               <h3>They come back</h3>
-              <p>Stamps, rewards, and reminders keep your customers returning — again and again.</p>
+              <p>Stamps, reward perks, and automated win-back reminders keep your customers returning.</p>
             </div>
           </div>
         </div>
@@ -543,19 +906,19 @@ export default function Home() {
           </div>
           <div className="tgrid">
             <div className="tcard">
-              <div className="ttop"><span className="qmark">"</span><span className="metric">+925% reviews</span></div>
+              <div className="ttop"><span className="qmark">&quot;</span><span className="metric">+925% reviews</span></div>
               <div className="tstars">★★★★★</div>
-              <blockquote>40 → 410 Google reviews in 3 months. customerPilot keeps customers coming back with stamps & rewards. My shop is busier than ever.</blockquote>
+              <blockquote>40 → 410 Google reviews in 3 months. CustomerPilot keeps customers coming back with stamps &amp; rewards. My clinic is busier than ever.</blockquote>
               <div className="tauthor"><div className="a" style={{ background: 'linear-gradient(135deg,#fb7185,#ec4899)' }}>AM</div><div><div className="n">Dr. Anita Mehta</div><div className="r">Owner, Sunrise Dental</div></div></div>
             </div>
             <div className="tcard">
-              <div className="ttop"><span className="qmark">"</span><span className="metric">Weekly returns</span></div>
+              <div className="ttop"><span className="qmark">&quot;</span><span className="metric">Weekly returns</span></div>
               <div className="tstars">★★★★★</div>
               <blockquote>Customers love scanning the QR. The loyalty stamps bring them back every week. It feels like one simple tool — not three.</blockquote>
               <div className="tauthor"><div className="a" style={{ background: 'linear-gradient(135deg,#fbbf24,#f59e0b)' }}>MR</div><div><div className="n">Marco Rossi</div><div className="r">Founder, Urban Brew Café</div></div></div>
             </div>
             <div className="tcard">
-              <div className="ttop"><span className="qmark">"</span><span className="metric">5-min setup</span></div>
+              <div className="ttop"><span className="qmark">&quot;</span><span className="metric">5-min setup</span></div>
               <div className="tstars">★★★★★</div>
               <blockquote>Every Google review gets a reply instantly. My customers feel heard, and I never miss one anymore. Setup took 5 minutes.</blockquote>
               <div className="tauthor"><div className="a" style={{ background: 'linear-gradient(135deg,#c084fc,#8b5cf6)' }}>SL</div><div><div className="n">Sara Lin</div><div className="r">Manager, Glow Salon</div></div></div>
@@ -565,18 +928,18 @@ export default function Home() {
       </section>
 
       {/* ============ PRICING REDIRECT BANNER ============ */}
-      <section className="price" id="pricing">
+      <section className="price py-16 bg-white border-t border-slate-200/60" id="pricing">
         <div className="wrap">
           <div className="sec-head">
             <span className="eyebrow" style={{ background: '#ecfdf5', color: '#059669', border: '1px solid #d1fae5' }}>
-              ⚡ CustomerPilot Pricing & Plans
+              ⚡ 7-Day Free Trial · Founding Merchant Seats
             </span>
             <h2 className="sec-h">Simple Plans That Scale With You.</h2>
             <p className="sec-sub">100% of AI Features Included. Pay strictly based on your VIP Member Capacity.</p>
           </div>
           <div style={{ textAlign: 'center', marginTop: '36px', display: 'flex', justifyContent: 'center' }}>
-            <Link href="/pricing" className="btn btn-grad text-base py-4 px-8 font-bold" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-              <span>View Full Pricing & 100 Founding Merchant Program ➔</span>
+            <Link href="/pricing" className="btn btn-grad text-sm sm:text-base py-3.5 sm:py-4 px-6 sm:px-8 font-bold rounded-xl" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <span>View Full Pricing &amp; 100 Founding Merchant Program ➔</span>
             </Link>
           </div>
         </div>
@@ -589,9 +952,11 @@ export default function Home() {
             <div className="aurora2"><b></b><b></b></div>
             <div className="ct">
               <h2>Your next 100 five-star reviews<br/><span className="grad-txt">are one click away.</span></h2>
-              <p>Join 1,200+ merchants automating their reputation. First 50 asks are free.</p>
+              <p>Join 1,200+ merchants automating their reputation. Start 7 Days Free Trial Today.</p>
               <div className="btn-row">
-                <button onClick={openWizard} className="btn btn-white text-base py-4 px-7 font-bold">Start free — no card <span className="arrow">→</span></button>
+                <Link href="/signup" className="btn btn-white text-sm sm:text-base py-3.5 sm:py-4 px-6 sm:px-7 font-bold rounded-xl">
+                  Start 7 Days Free Trial Today <span className="arrow">→</span>
+                </Link>
               </div>
             </div>
           </div>
@@ -601,18 +966,28 @@ export default function Home() {
       {/* ============ FOOTER ============ */}
       <footer>
         <div className="wrap">
-          <div className="fgrid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
-            <div className="fbrand" style={{ gridColumn: 'span 2' }}>
+          <div className="fgrid">
+            <div className="fbrand">
               <Link href="/" className="no-underline block mb-3">
-                <BrandLogo size="lg" showTagline={true} />
+                <BrandLogo size="md" />
               </Link>
               <p>Turn every walk-in into a lifetime customer — with loyalty rewards, Google reviews, and replies on autopilot.</p>
               <div className="frate"><span style={{ color: '#f59e0b' }}>★</span> 4.9 · 1,200+ merchants</div>
+              <div className="mt-4">
+                <a
+                  href="https://wa.me/917203824012?text=Hi%20CustomerPilot%20Team%2C%20I%20need%20assistance%20with%20CustomerPilot."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200 transition"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" /> 24/7 WhatsApp Support: +91 72038 24012
+                </a>
+              </div>
             </div>
             <div>
               <h4>Product</h4>
               <ul>
-                <li><Link href="/pricing">Pricing & Plans</Link></li>
+                <li><Link href="/pricing">Pricing &amp; Plans</Link></li>
                 <li><Link href="/features/whatsapp-stamp-card">WhatsApp Stamp Cards</Link></li>
                 <li><Link href="/features/google-review-automation">Google Review AI</Link></li>
                 <li><Link href="/compare/vs-traditional-pos">vs Traditional POS</Link></li>
@@ -625,21 +1000,21 @@ export default function Home() {
                 <li><Link href="/bakery-loyalty">Bakery Loyalty</Link></li>
                 <li><Link href="/cafe-loyalty">Cafe Stamp Cards</Link></li>
                 <li><Link href="/restaurant-loyalty">Restaurant Retention</Link></li>
-                <li><Link href="/salon-loyalty">Salon & Spa VIP</Link></li>
+                <li><Link href="/salon-loyalty">Salon &amp; Spa VIP</Link></li>
               </ul>
             </div>
             <div>
-              <h4>Legal & Trust</h4>
+              <h4>Legal &amp; Trust</h4>
               <ul>
                 <li><Link href="/privacy">Privacy Policy</Link></li>
                 <li><Link href="/terms">Terms of Service</Link></li>
-                <li><Link href="/security">Security & Architecture</Link></li>
+                <li><Link href="/security">Security &amp; Architecture</Link></li>
                 <li><Link href="/contact">Contact Support</Link></li>
-                <li><Link href="/help">Help & Documentation</Link></li>
+                <li><Link href="/help">Help &amp; Documentation</Link></li>
               </ul>
             </div>
           </div>
-          <div className="fbottom">© 2026 CustomerPilot · Made with care in India 🇮🇳</div>
+          <div className="fbottom">© {new Date().getFullYear()} CustomerPilot Inc. · Made with ❤️ in India · support@customerpilot.in</div>
         </div>
       </footer>
 

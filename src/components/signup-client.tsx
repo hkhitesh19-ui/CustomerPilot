@@ -68,7 +68,7 @@ export function SignupClient() {
     "WhatsApp-first loyalty system",
     "Auto Google Review collection",
     "AI-powered customer retention",
-    "14-day FREE trial, no credit card",
+    "7-Day FREE trial, no credit card",
   ]
 
   return (
@@ -84,7 +84,7 @@ export function SignupClient() {
       <header className="relative z-10 border-b border-stone-200/80 bg-white/80 backdrop-blur-md py-2">
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/cplogo.png" alt="CustomerPilot" className="h-11 sm:h-14 w-auto object-contain transition-transform hover:scale-105 drop-shadow-sm" />
+            <img src="/cplogo_horizontal.png" alt="CustomerPilot" className="h-9 sm:h-11 w-auto object-contain transition-transform hover:scale-105" />
           </Link>
           <div className="flex items-center gap-3">
             <span className="text-xs text-stone-500 hidden sm:inline">Already registered?</span>
@@ -102,7 +102,7 @@ export function SignupClient() {
           <div className="md:col-span-6 lg:col-span-5 space-y-6 text-left pt-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 shadow-sm">
               <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-xs font-bold text-emerald-800">14-Day FREE Trial • No Credit Card</span>
+              <span className="text-xs font-bold text-emerald-800">7-Day FREE Trial • No Credit Card</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-stone-900 tracking-tight leading-tight">
@@ -146,7 +146,7 @@ export function SignupClient() {
 
               <div className="mb-6">
                 <h2 className="text-2xl font-black text-stone-900">Create Merchant Account</h2>
-                <p className="text-stone-500 text-xs mt-1">Start your 14-day free trial in under 2 minutes</p>
+                <p className="text-stone-500 text-xs mt-1">Start 7 Days Free Trial Today in under 2 minutes</p>
               </div>
 
               {error && (
@@ -291,7 +291,7 @@ export function SignupClient() {
                   disabled={loading}
                   className="w-full h-11 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow-lg transition-all"
                 >
-                  {loading ? "Setting up merchant account..." : "Start 14-Day Free Trial →"}
+                  {loading ? "Setting up merchant account..." : "Start 7 Days Free Trial Today →"}
                 </Button>
               </form>
             </div>

@@ -21,24 +21,22 @@ export function BrandLogo({
     setMounted(true)
   }, [])
 
-  // Height sizing classes for cropped transparent cplogo_horizontal.png
+  // Responsive height sizing classes for cropped transparent cplogo_horizontal.png
   const heightClass =
     size === "sm"
-      ? "h-10 sm:h-11"
+      ? "h-8 sm:h-9"
       : size === "md"
-      ? "h-12 sm:h-14"
+      ? "h-9 sm:h-11"
       : size === "lg"
-      ? "h-16 sm:h-20"
-      : "h-20 sm:h-24"
-
-  const animationClass = animateOnLoad && mounted ? "animate-logo-entrance" : ""
+      ? "h-12 sm:h-14"
+      : "h-16 sm:h-20"
 
   return (
     <div className={`inline-flex items-center select-none relative group ${className}`}>
       <img
         src="/cplogo_horizontal.png"
         alt="CustomerPilot - Turns Every Walkins into LifeTime Customers"
-        className={`${heightClass} w-auto max-w-full object-contain ${animationClass} transition-transform duration-300 group-hover:scale-105`}
+        className={`${heightClass} w-auto max-w-full object-contain transition-transform duration-200 group-hover:scale-102`}
       />
     </div>
   )

@@ -163,7 +163,7 @@ export function PricingClient() {
         {/* Hero Section */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5" /> 14-Day Free Trial · No Credit Card Required
+            <Sparkles className="w-3.5 h-3.5" /> 7-Day Free Trial · No Credit Card Required
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white">
             Transparent, High-ROI Pricing for Growing Merchants
@@ -273,7 +273,7 @@ export function PricingClient() {
                 <div className="pt-6">
                   <Link href="/signup">
                     <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">
-                      Start 14-Day Trial
+                      Start 7 Days Free Trial Today
                     </Button>
                   </Link>
                 </div>
@@ -287,7 +287,7 @@ export function PricingClient() {
           <div className="space-y-1">
             <Lock className="w-5 h-5 text-emerald-400 mx-auto" />
             <h4 className="text-xs font-bold text-white">No Credit Card Needed</h4>
-            <p className="text-[11px] text-slate-400">14 days full access free</p>
+            <p className="text-[11px] text-slate-400">7 days full access free</p>
           </div>
           <div className="space-y-1">
             <ShieldCheck className="w-5 h-5 text-blue-400 mx-auto" />

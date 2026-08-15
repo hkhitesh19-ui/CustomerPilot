@@ -2,21 +2,20 @@ import type { Metadata } from "next"
 import { SignupClient } from "@/components/signup-client"
 
 export const metadata: Metadata = {
-  title: "Merchant Signup & 14-Day Free Trial — CustomerPilot",
-  description: "Create your CustomerPilot merchant account in 2 minutes. Activate WhatsApp digital stamp cards, cashier tap-to-claim terminals, and AI Google review responses.",
+  title: "Merchant Signup & 7-Day Free Trial — CustomerPilot",
+  description: "Create your merchant account in under 2 minutes. Start 7 Days Free Trial Today with no credit card required.",
   keywords: [
-    "Merchant Registration",
-    "CustomerPilot Signup",
-    "WhatsApp Loyalty Signup",
-    "Bakery Loyalty System Trial",
-    "Restaurant Retention Free Trial",
+    "Merchant Signup",
+    "CustomerPilot Free Trial",
+    "WhatsApp Loyalty Setup",
+    "Retail CRM Registration",
   ],
   alternates: {
     canonical: "/signup",
   },
   openGraph: {
-    title: "CustomerPilot Merchant Registration",
-    description: "Start your 14-day free trial. Bring walk-ins back to your retail store with WhatsApp stamp cards and Google Review AI responses.",
+    title: "Start Your 7-Day CustomerPilot Free Trial",
+    description: "Start 7 Days Free Trial Today. Bring walk-ins back to your retail store with WhatsApp stamp cards and Google Review AI responses.",
     url: "https://customerpilot.ai/signup",
   },
 }

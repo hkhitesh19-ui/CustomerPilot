@@ -98,7 +98,7 @@ export function MarketingClient() {
           >
             <Button size="lg" asChild className="bg-stone-900 text-white hover:bg-stone-800 px-8 h-14 text-base">
               <a href="/signup">
-                Start 14-Day Free Trial
+                Start 7 Days Free Trial Today
                 <ArrowRight className="w-4 h-4 ml-2" />
               </a>
             </Button>
@@ -269,10 +269,10 @@ export function MarketingClient() {
       <section className="py-24 bg-stone-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">Ready to Turn Walk-ins into Regulars?</h2>
-          <p className="text-stone-400 mb-8">14 days free. No credit card. Setup in 2 minutes.</p>
+          <p className="text-stone-400 mb-8">7 days free. No credit card. Setup in 2 minutes.</p>
           <Button size="lg" asChild className="bg-yellow-400 text-stone-900 hover:bg-yellow-300 px-8 h-14 text-base">
             <a href="/signup">
-              Start Your Free Trial
+              Start 7 Days Free Trial Today
               <ArrowRight className="w-4 h-4 ml-2" />
             </a>
           </Button>

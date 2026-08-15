@@ -38,7 +38,7 @@ export default function ContactPage() {
             <Mail className="w-6 h-6 text-emerald-400" />
             <h3 className="font-bold text-white text-base">Email Support</h3>
             <p className="text-xs text-slate-400">For merchant onboarding, billing inquiries, and technical support:</p>
-            <p className="text-sm font-semibold text-emerald-400">support@customerpilot.ai</p>
+            <p className="text-sm font-semibold text-emerald-400">support@customerpilot.in</p>
           </div>
 
           <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">

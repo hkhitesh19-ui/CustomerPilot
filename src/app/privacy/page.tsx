@@ -81,7 +81,7 @@ export default function PrivacyPage() {
           <section className="space-y-2">
             <h2 className="text-lg font-bold text-white">7. Contact Us</h2>
             <p>
-              For privacy inquiries, data deletion requests, or merchant support, please contact our Data Protection Team at <a href="mailto:privacy@customerpilot.ai" className="text-emerald-400 underline">privacy@customerpilot.ai</a> or <a href="mailto:support@customerpilot.ai" className="text-emerald-400 underline">support@customerpilot.ai</a>.
+              For privacy inquiries, data deletion requests, or merchant support, please contact our Data Protection Team at <a href="mailto:support@customerpilot.in" className="text-emerald-400 underline font-semibold">support@customerpilot.in</a>.
             </p>
           </section>
         </div>
