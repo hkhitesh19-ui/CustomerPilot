@@ -2,6 +2,18 @@
 
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
+## [15 Aug 2026] Issue: Integration of Spotbay.in Inter Typography & Preview /home2 Route
+- **Symptom**: The typography needed to match the ultra-clean, modern geometric font stack of `https://www.spotbay.in/`.
+- **Root Cause**: The layout previously used generic font fallbacks without explicitly loading the variable `Inter` font weights.
+- **Resolution**: 
+  - Inspected `https://www.spotbay.in/` stylesheets and extracted the exact font stack (`Inter`, `Inter Fallback`, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif).
+  - Integrated `next/font/google` with variable `Inter` subset in `src/app/layout.tsx` and updated `src/app/globals.css`.
+  - Added font antialiasing and tight geometric letter-spacing across all headings and body elements.
+  - Rebuilt and verified `/home2` and `/` with HTTP 200.
+- **Status**: ✅ Resolved and Verified Locally.
+
+---
+
 ## [15 Aug 2026] Issue: Global Support Phone Number (+91 90333 04707), Homepage Light Theme on All Pages & Core Engines Copy
 - **Symptom**: 
   1. Support and WhatsApp contact numbers needed updating to `+91 90333 04707` globally across all widgets, pages, and deep links.
