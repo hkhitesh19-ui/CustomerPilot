@@ -750,7 +750,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
                   <Input
                     value={data.whatsappNumber}
                     onChange={e => setData({ ...data, whatsappNumber: e.target.value })}
-                    placeholder="e.g., 917203824012"
+                    placeholder="e.g., 919033304707"
                     disabled={data.otpSent}
                   />
                   <Button

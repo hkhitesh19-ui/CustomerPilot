@@ -6,7 +6,7 @@ import { ok, err } from "@/lib/api"
 
 // The WhatsApp number connected to our Evolution API instance
 // Messages to this same number will NOT show (WhatsApp self-message limitation)
-const EVOLUTION_OWNER_NUMBER = "917203824012"
+const EVOLUTION_OWNER_NUMBER = "919033304707"
 
 export async function POST(req: NextRequest) {
   try {

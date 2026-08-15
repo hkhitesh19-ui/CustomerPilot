@@ -71,7 +71,7 @@ const initialData: WizardData = {
   password: "",
   businessType: "bakery",
   businessAddress: "Vadodara, Gujarat",
-  whatsappNumber: "917203824012",
+  whatsappNumber: "919033304707",
   otpVerified: false,
   otpSessionId: "",
   otpSent: false,
@@ -814,42 +814,57 @@ export default function Home() {
             <p className="sec-sub">No complicated setup. No technical work. Just bring customers back, collect reviews, and never miss a reply.</p>
           </div>
           <div className="feat-grid">
+            {/* Engine 1: Loyalty Rewards */}
             <div className="fcard">
               <div className="ico amber">🏆</div>
-              <h3>Loyalty Rewards</h3>
-              <p>Turn every walk-in into a repeat customer. Customers scan a QR, collect stamps, and come back for their free reward.</p>
-              <ul>
-                <li><span className="c">✓</span> QR scan to collect stamps</li>
-                <li><span className="c">✓</span> 5 stamps = free reward</li>
-                <li><span className="c">✓</span> Customers return again &amp; again</li>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">Loyalty Rewards (Bring Customers Back)</h3>
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                Perfect for bakeries, cafes, and salons wanting to convert single-time walk-ins into 10x repeat regulars.
+              </p>
+              <ul className="space-y-1.5 mt-4 text-xs text-slate-700">
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Digital Loyalty Card</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> VIP Club Engine</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Birthday Rewards Engine</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Repeat Visit Tracking</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Instant QR-based Membership</li>
               </ul>
-              <div className="stamp-row">
+              <div className="stamp-row mt-4">
                 <span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span>
               </div>
             </div>
 
+            {/* Engine 2: Magic SEO Optimized Google Reviews */}
             <div className="fcard">
               <div className="ico em">⭐</div>
-              <h3>Google Reviews</h3>
-              <p>After a purchase, your customer gets a gentle WhatsApp reminder to share their experience and earn bonus stamps.</p>
-              <ul>
-                <li><span className="c">✓</span> Automatic review request</li>
-                <li><span className="c">✓</span> Photo upload encouraged</li>
-                <li><span className="c">✓</span> +2 bonus stamps for reviews</li>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">Magic SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</h3>
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                After a purchase, your customer gets a gentle WhatsApp reminder to share their experience and earn bonus stamps. Automatically collect authentic 4 and 5-star Google reviews right after a customer purchase on WhatsApp.
+              </p>
+              <ul className="space-y-1.5 mt-4 text-xs text-slate-700">
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> AI Review Draft Engine</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> WhatsApp Review Flow</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 1-Click Copy &amp; Post</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Live Review Analytics</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Organic Rating Booster</li>
               </ul>
-              <div className="stars"><span style={{ color: '#f59e0b' }}>★★★★★</span><small>+412 this month</small></div>
+              <div className="stars mt-4"><span style={{ color: '#f59e0b' }}>★★★★★</span><small className="bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full text-[10px]">+412 this month</small></div>
             </div>
 
+            {/* Engine 3: 1-Click GoogleReview AutoReply */}
             <div className="fcard">
               <div className="ico ind">💬</div>
-              <h3>1-Click GoogleReview AutoReply</h3>
-              <p>Gemini AI drafts personalized owner replies for every review. Store owners review &amp; publish to Google Maps in 1-Click!</p>
-              <ul>
-                <li><span className="c">✓</span> Gemini AI drafts generated in 1 second</li>
-                <li><span className="c">✓</span> 1-Click Copy &amp; Post on Google Maps</li>
-                <li><span className="c">✓</span> Dead-Letter Queue quota safety</li>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">1-Click GoogleReview AutoReply</h3>
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                AI automatically drafts appreciative, context-aware owner responses. Store owners review &amp; publish on Google Maps in 1-Click!
+              </p>
+              <ul className="space-y-1.5 mt-4 text-xs text-slate-700">
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Gemini AI Context-Aware Drafts in 1 Second</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 1-Click Copy &amp; Publish to Google Maps</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Smart Sentiment &amp; Keyword Adaptation</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Dead-Letter Queue Quota Safety</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Zero Missed Reviews Guarantee</li>
               </ul>
-              <div className="reply-prev"><strong style={{ color: 'var(--slate)' }}>1-Click AutoReply:</strong> Thank you so much for your kind words! 💜 See you again soon.</div>
+              <div className="reply-prev mt-4 text-xs bg-slate-50 border border-slate-100 p-2.5 rounded-xl"><strong style={{ color: 'var(--slate)' }}>1-Click AutoReply:</strong> &quot;Thank you so much for your kind words! 💜 See you again soon.&quot;</div>
             </div>
           </div>
         </div>
@@ -975,12 +990,12 @@ export default function Home() {
               <div className="frate"><span style={{ color: '#f59e0b' }}>★</span> 4.9 · 1,200+ merchants</div>
               <div className="mt-4">
                 <a
-                  href="https://wa.me/917203824012?text=Hi%20CustomerPilot%20Team%2C%20I%20need%20assistance%20with%20CustomerPilot."
+                  href="https://wa.me/919033304707?text=Hi%20CustomerPilot%20Team%2C%20I%20need%20assistance%20with%20CustomerPilot."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200 transition"
                 >
-                  <MessageSquare className="w-3.5 h-3.5" /> 24/7 WhatsApp Support: +91 72038 24012
+                  <MessageSquare className="w-3.5 h-3.5" /> 24/7 WhatsApp Support: +91 90333 04707
                 </a>
               </div>
             </div>
@@ -1795,7 +1810,7 @@ function Step6QRCode({ data, setData }: any) {
   useEffect(() => {
     const generateQR = async () => {
       try {
-        const phone = (data.whatsappNumber || "917203824012").replace(/\D/g, "")
+        const phone = (data.whatsappNumber || "919033304707").replace(/\D/g, "")
         const businessName = data.businessName || "Cake Connection"
         const textMessage = `🎉 Hi ${businessName}! I want to join your VIP Club & collect my first loyalty stamp!`
         

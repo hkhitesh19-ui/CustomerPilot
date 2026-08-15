@@ -151,7 +151,7 @@ function JoinContent() {
                 type="button"
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 text-base shadow-md gap-2"
                 onClick={() => {
-                  const phone = "917203824012"
+                  const phone = "919033304707"
                   const bizName = stampCard?.name || "Cake Connection"
                   const msg = `🎉 Hi ${bizName}! I want to join the VIP Club & collect my first loyalty stamp!`
                   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank")

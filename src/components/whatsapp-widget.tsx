@@ -9,7 +9,7 @@ interface WhatsAppWidgetProps {
 }
 
 export function WhatsAppFloatingWidget({
-  phoneNumber = "917203824012",
+  phoneNumber = "919033304707",
   message = "Hi CustomerPilot Team, I want to know more about CustomerPilot for my business.",
 }: WhatsAppWidgetProps) {
   const [showTooltip, setShowTooltip] = useState(true)

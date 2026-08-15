@@ -4,7 +4,7 @@ import { db } from "@/lib/db"
 /**
  * Real Evolution API Integration
  * Communicates with the Evolution API Docker container via process.env.EVOLUTION_API_URL
- * Multi-Tenant Support: Naming convention CP_M + CountryCode + Number (e.g. CP_M917203824012)
+ * Multi-Tenant Support: Naming convention CP_M + CountryCode + Number (e.g. CP_M919033304707)
  */
 export class EvolutionService {
   private baseUrl: string
@@ -26,7 +26,7 @@ export class EvolutionService {
 
   /**
    * Resolves the dedicated instanceName for a merchant
-   * Format: CP_M917203824012 (CP_M + CountryCode + WhatsApp Phone Number)
+   * Format: CP_M919033304707 (CP_M + CountryCode + WhatsApp Phone Number)
    */
   async getMerchantInstanceName(merchantId?: string): Promise<string> {
     if (!merchantId) return this.defaultInstanceName
@@ -105,7 +105,7 @@ export class EvolutionService {
   }
 
   /**
-   * Sends a text message using the merchant's dedicated instance (CP_M917203824012)
+   * Sends a text message using the merchant's dedicated instance (CP_M919033304707)
    */
   async sendMessage(merchantId: string, payload: MessagePayload): Promise<DeliveryResult> {
     const instanceName = await this.getMerchantInstanceName(merchantId)
