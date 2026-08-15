@@ -2,6 +2,19 @@
 
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
+## [15 Aug 2026] Issue: Homepage Business Growth Intelligence Dashboard & 3 Growth Pillars Integration
+- **Symptom**: Homepage needed a high-impact, outcome-focused Analytics section ("Know Which Customers Are Coming Back — And Why") to demonstrate real-world store growth instead of generic data tables.
+- **Root Cause**: Analytics was previously positioned as an administrative software tool rather than a growth engine that shows customer lifecycle progress and repeat revenue.
+- **Resolution**: 
+  - Designed and added the **"Business Growth Intelligence"** dashboard mockup section on `src/app/page.tsx`.
+  - Added 6 clean performance KPI cards: Customer Growth (1,248), Returning Regulars (486), Loyalty Members (732), Google Reviews (4.8★), Repeat Visits (326), and Rewards Claimed (184).
+  - Added the Predictable Customer Lifecycle funnel strip (New Walk-ins → Returning → Loyal VIPs → Repeat Revenue).
+  - Integrated the 3 Actionable Growth Pillars: *Track Repeat Business & Inactivity*, *Measure Loyalty Program & Rewards*, and *Monitor Your Google Reputation*.
+  - Built and verified production bundle with all 138 routes passing.
+- **Status**: ✅ Resolved and Verified Locally.
+
+---
+
 ## [15 Aug 2026] Issue: Merging /home2 4-Pillars Section & Spotbay.in Inter Typography into Main Homepage (/)
 - **Symptom**: User verified and approved the `/home2` 4-pillars section and Spotbay.in typography, requesting it to be merged directly into the Main Homepage (`/`) and applied across all site pages.
 - **Root Cause**: The 4-pillars section was initially created on a temporary preview route `/home2` for user testing.
