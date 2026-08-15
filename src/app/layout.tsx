@@ -4,8 +4,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Providers } from "@/components/providers";
 import { SoftwareApplicationJsonLd, OrganizationJsonLd } from "@/components/seo/json-ld";
 
-const geistSans = { variable: "font-sans" };
-const geistMono = { variable: "font-mono" };
+import { Inter } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.ai";
 
@@ -102,7 +107,7 @@ export default function RootLayout({
         <OrganizationJsonLd />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${inter.variable} ${inter.className} font-sans antialiased bg-background text-foreground`}
       >
         <Providers>
           {children}
