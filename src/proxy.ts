@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set');
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || 'cpilot_jwt_secret_change_this_in_production_2026!';
 
 async function verifyToken(token: string) {
   const secret = new TextEncoder().encode(JWT_SECRET);
