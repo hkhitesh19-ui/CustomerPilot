@@ -2,6 +2,28 @@
 
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
+## [15 Aug 2026] Issue: Homepage & Global UI/UX Overhaul, Mobile Responsive Header, 7-Day Trial Alignment & WhatsApp Floating Widget
+- **Symptom**: 
+  1. Mobile header buttons overflowed out of view on mobile screens.
+  2. A 2-second blocking splash screen and flashing entrance animation made page loads feel slow and cheap.
+  3. Header lacked Products, Solutions, and Pricing dropdown navigation.
+  4. Trial duration was inconsistent across files (14-day and 5-day mixed).
+  5. Privacy policy contained outdated `.ai` email addresses instead of single `support@customerpilot.in`.
+  6. Homepage was missing industry solutions grid and interactive ROI calculator from the marketing page.
+- **Root Cause**: 
+  - The navbar used fixed horizontal spacing with full logo text and multiple inline buttons without responsive media query collapsing.
+  - An artificial `setTimeout(2000)` was mounted in `SplashScreen` on every page render.
+  - Trial copy was hardcoded inconsistently across marketing, auth, pricing, and industry landing pages.
+- **Resolution**: 
+  - Replaced blocking `SplashScreen` with instant rendering and streamlined `BrandLogo` with responsive sizing.
+  - Implemented modern sticky header with desktop dropdowns (Products, Solutions, Pricing) and mobile hamburger slide-out drawer.
+  - Added sticky floating `WhatsAppFloatingWidget` with official WhatsApp SVG icon linking directly to merchant support (`+91 72038 24012`).
+  - Unified all trial copy across all components and pages to strictly **"Start 7 Days Free Trial Today"** / **"7-Day Free Trial"**.
+  - Updated `/privacy`, `/terms`, and `/contact` to exclusively list **`support@customerpilot.in`**.
+  - Added the **"Built for Every Local Business"** 8-industry grid and **"Calculate Your ROI"** interactive calculator to `src/app/page.tsx`.
+  - Built and verified production bundle with all 137 routes passing.
+- **Status**: ✅ Resolved and Verified Locally.
+
 ---
 
 ## [14 Aug 2026] Issue: Hostinger VPS Production Deployment & Standalone Node.js Runner
