@@ -2,6 +2,18 @@
 
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
+## [15 Aug 2026] Issue: Merging /home2 4-Pillars Section & Spotbay.in Inter Typography into Main Homepage (/)
+- **Symptom**: User verified and approved the `/home2` 4-pillars section and Spotbay.in typography, requesting it to be merged directly into the Main Homepage (`/`) and applied across all site pages.
+- **Root Cause**: The 4-pillars section was initially created on a temporary preview route `/home2` for user testing.
+- **Resolution**: 
+  - Merged the complete 4-Pillars store owner advantage section into `src/app/page.tsx`.
+  - Configured global variable `Inter` typography in `src/app/layout.tsx` and `src/app/globals.css`, cascading across `/`, `/pricing`, `/signup`, `/contact`, `/privacy`, and all modules.
+  - Set `/home2` to seamlessly redirect to `/`.
+  - Built and verified production bundle with all 138 routes passing.
+- **Status**: ✅ Resolved and Verified Locally.
+
+---
+
 ## [15 Aug 2026] Issue: Integration of Spotbay.in Inter Typography & Preview /home2 Route
 - **Symptom**: The typography needed to match the ultra-clean, modern geometric font stack of `https://www.spotbay.in/`.
 - **Root Cause**: The layout previously used generic font fallbacks without explicitly loading the variable `Inter` font weights.
