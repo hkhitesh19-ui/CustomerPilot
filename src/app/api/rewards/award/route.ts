@@ -8,6 +8,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { scheduleGoogleReviewRequest } from '@/lib/review-scheduler';
+import { hasModule } from '@/lib/feature-gate';
 import { getCompiledTemplate } from "@/lib/template-engine";
 import { resolveLoyaltyCategoryName } from "@/lib/loyalty-category-service";
 import { getVipTierForSpend, VIP_TIER_LABELS } from "@/lib/vip-engine";
@@ -374,11 +375,13 @@ export async function POST(req: Request) {
         sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, stampMsg, "STAMP_AWARDED");
       }
 
-      // FIX: Schedule Google Review request based on merchant delay configuration
-      scheduleGoogleReviewRequest({
-        merchantId,
-        customerId: waitingCustomer.customerId,
-      }).catch(e => console.error("[Award API] Review Scheduler Error:", e));
+      // Schedule Google Review request only if merchant has REVIEWS module enabled
+      if (hasModule(merchant, "REVIEWS")) {
+        scheduleGoogleReviewRequest({
+          merchantId,
+          customerId: waitingCustomer.customerId,
+        }).catch(e => console.error("[Award API] Review Scheduler Error:", e));
+      }
     }
 
     return NextResponse.json({ 

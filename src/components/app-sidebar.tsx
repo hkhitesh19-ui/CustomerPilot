@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation"
 import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, Zap, Sparkles, ChevronRight } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { useDashboardState } from "@/hooks/use-dashboard-state"
+import { hasModule, type Module } from "@/lib/feature-gate"
 
 import {
   Sidebar,
@@ -18,9 +19,9 @@ import {
 const navigation = [
   { name: "Home", href: "/dashboard", icon: LayoutDashboard },
   // HIDING UNTIL GOOGLE API APPROVAL
-  // { name: "Google Reviews AI", href: "/dashboard/reviews", icon: Star },
-  { name: "Live Queue", href: "/dashboard/queue", icon: Clock },
-  { name: "Rewards", href: "/dashboard/rewards", icon: Gift },
+  // { name: "Google Reviews AI", href: "/dashboard/reviews", icon: Star, module: "AUTOREPLY" as Module },
+  { name: "Live Queue", href: "/dashboard/queue", icon: Clock, module: "LOYALTY" as Module },
+  { name: "Rewards", href: "/dashboard/rewards", icon: Gift, module: "LOYALTY" as Module },
   { name: "Customers CRM", href: "/dashboard/customers", icon: Users },
   { name: "Subscription", href: "/dashboard/subscription", icon: Crown },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
@@ -74,16 +75,18 @@ export function AppSidebar() {
 
       <SidebarContent className="py-4">
         <SidebarMenu>
-          {navigation.map((item) => (
-            <SidebarMenuItem key={item.name}>
-              <SidebarMenuButton asChild isActive={pathname === item.href}>
-                <Link href={item.href}>
-                  <item.icon className="h-5 w-5" />
-                  <span>{item.name}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {navigation
+            .filter((item) => !item.module || hasModule(merchant, item.module))
+            .map((item) => (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton asChild isActive={pathname === item.href}>
+                  <Link href={item.href}>
+                    <item.icon className="h-5 w-5" />
+                    <span>{item.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
         </SidebarMenu>
       </SidebarContent>
 

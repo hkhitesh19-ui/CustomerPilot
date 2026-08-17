@@ -46,6 +46,7 @@ model Merchant {
   winbackDays3              Int                       @default(90)
   expiryWarningDays         Int                       @default(7)
   almostThereInactivityDays Int                       @default(7)
+  enabledModules            String                    @default("LOYALTY,REVIEWS,AUTOREPLY")
   createdAt                 DateTime                  @default(now())
   updatedAt                 DateTime                  @updatedAt
   auditLogs                 AuditLog[]
@@ -374,6 +375,7 @@ model Plan {
   popular         Boolean        @default(false)
   currency        String         @default("INR")
   features        String
+  enabledModules  String         @default("LOYALTY,REVIEWS,AUTOREPLY")
   active          Boolean        @default(true)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt

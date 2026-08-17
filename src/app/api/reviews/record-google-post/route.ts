@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { generateAIReviewReply } from '@/lib/ai-review-reply';
 import { postReviewReplyToGBP } from '@/lib/google-reviews-service';
 import { sendCentralWhatsAppMessage } from '@/lib/whatsapp-service';
+import { hasModule } from '@/lib/feature-gate';
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
@@ -123,45 +124,73 @@ export async function POST(req: Request) {
       });
     }
 
-    // Check existing GoogleBusinessReview for this customer
-    const existingGbpReview = await db.googleBusinessReview.findFirst({
-      where: {
-        merchantId,
-        reviewerName: customer.name || "VIP Member"
-      },
-      orderBy: { createdAt: "desc" }
-    });
+    let replyText: string | null = null;
 
-    let gbpReview;
-    if (existingGbpReview) {
-      gbpReview = await db.googleBusinessReview.update({
-        where: { id: existingGbpReview.id },
-        data: {
-          rating: Number(rating),
-          comment: finalReviewText,
-          status: "pending",
-          isReplied: false,
-          reviewReply: null,
-          createdAt: new Date()
-        }
-      });
-    } else {
-      gbpReview = await db.googleBusinessReview.create({
-        data: {
+    // Google Business Review & AI Auto-Reply (Only if AUTOREPLY module is enabled)
+    if (hasModule(merchant, "AUTOREPLY")) {
+      // Check existing GoogleBusinessReview for this customer
+      const existingGbpReview = await db.googleBusinessReview.findFirst({
+        where: {
           merchantId,
-          gbpReviewId: `g_rev_${customerId}_${Date.now()}`,
-          reviewerName: customer.name || "VIP Member",
-          rating: Number(rating),
-          comment: finalReviewText,
-          status: "pending",
-          isReplied: false,
-          createdAt: new Date()
+          reviewerName: customer.name || "VIP Member"
+        },
+        orderBy: { createdAt: "desc" }
+      });
+
+      let gbpReview;
+      if (existingGbpReview) {
+        gbpReview = await db.googleBusinessReview.update({
+          where: { id: existingGbpReview.id },
+          data: {
+            rating: Number(rating),
+            comment: finalReviewText,
+            status: "pending",
+            isReplied: false,
+            reviewReply: null,
+            createdAt: new Date()
+          }
+        });
+      } else {
+        gbpReview = await db.googleBusinessReview.create({
+          data: {
+            merchantId,
+            gbpReviewId: `g_rev_${customerId}_${Date.now()}`,
+            reviewerName: customer.name || "VIP Member",
+            rating: Number(rating),
+            comment: finalReviewText,
+            status: "pending",
+            isReplied: false,
+            createdAt: new Date()
+          }
+        });
+      }
+
+      // Generate AI Owner Auto-Reply
+      const city = merchant.address?.split(',').pop()?.trim() || "Vadodara";
+      replyText = await generateAIReviewReply({
+        merchantName: merchant.name || "Cake Connection",
+        locationOrArea: city,
+        category: merchant.category || "Cake Shop",
+        customerReview: finalReviewText,
+        rating: Number(rating)
+      });
+
+      // Post AI Owner Auto-Reply back to Google Business Profile API & Update DB
+      const postSuccess = await postReviewReplyToGBP(merchant.id, gbpReview.gbpReviewId, replyText);
+
+      await db.googleBusinessReview.update({
+        where: { id: gbpReview.id },
+        data: {
+          isReplied: true,
+          reviewReply: replyText,
+          repliedAt: new Date(),
+          status: postSuccess ? "replied" : "pending"
         }
       });
     }
 
-    // 3. Award Bonus Stamps to customer stamp card (Only for first-time reviews)
-    if (isFirstTimeReview && bonusCount > 0) {
+    // Award Bonus Stamps to customer stamp card (Only for first-time reviews if LOYALTY module is enabled)
+    if (hasModule(merchant, "LOYALTY") && isFirstTimeReview && bonusCount > 0) {
       if (template) {
         let card = await db.customerStampCard.findFirst({
           where: { customerId: customer.id, stampCardId: template.id, completed: false, redeemed: false }
@@ -199,29 +228,6 @@ export async function POST(req: Request) {
         });
       }
     }
-
-    // 4. Generate AI Owner Auto-Reply
-    const city = merchant.address?.split(',').pop()?.trim() || "Vadodara";
-    const replyText = await generateAIReviewReply({
-      merchantName: merchant.name || "Cake Connection",
-      locationOrArea: city,
-      category: merchant.category || "Cake Shop",
-      customerReview: finalReviewText,
-      rating: Number(rating)
-    });
-
-    // 5. Post AI Owner Auto-Reply back to Google Business Profile API & Update DB
-    const postSuccess = await postReviewReplyToGBP(merchant.id, gbpReview.gbpReviewId, replyText);
-
-    await db.googleBusinessReview.update({
-      where: { id: gbpReview.id },
-      data: {
-        isReplied: true,
-        reviewReply: replyText,
-        repliedAt: new Date(),
-        status: postSuccess ? "replied" : "pending"
-      }
-    });
 
     // 6. Send WhatsApp confirmation to Customer (Bonus Stamps added)
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";

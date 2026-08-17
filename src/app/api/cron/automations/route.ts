@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 import { getMessageWorker } from '@/lib/message-worker';
 import { getCompiledTemplate } from "@/lib/template-engine";
 import { resolveWhatsappInstanceName } from '@/lib/whatsapp-service';
+import { hasModule } from '@/lib/feature-gate';
+
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
@@ -162,6 +164,12 @@ export async function GET(req: Request) {
       if (processedCustomersForReview.has(bill.customerId)) continue;
       processedCustomersForReview.add(bill.customerId);
 
+      // Only send review requests if merchant has REVIEWS module enabled
+      if (!hasModule(bill.merchant, "REVIEWS")) {
+        log(`[Skip Review Request] Merchant ${bill.merchant.name} does not have REVIEWS module.`);
+        continue;
+      }
+
       // Requirements.txt Day 4 Rule: Skip if customer already submitted a Google review
       const existingReview = await db.review.findFirst({
         where: { customerId: bill.customerId }
@@ -284,6 +292,9 @@ export async function GET(req: Request) {
     let expiryWarningsSent = 0;
 
     for (const customer of allCustomers) {
+      // Only process loyalty automations if merchant has LOYALTY module enabled
+      if (!hasModule(customer.merchant, "LOYALTY")) continue;
+
       const merchant = customer.merchant;
       const targetExpiryWarningDays = (merchant as any).expiryWarningDays ?? 7;
       const targetAlmostThereDays = (merchant as any).almostThereInactivityDays ?? 7;

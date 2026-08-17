@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { hasModule, type Module } from "@/lib/feature-gate"
 
 // ─── Types ────────────────────────────────────────────────────
 interface WizardData {
@@ -55,16 +56,24 @@ interface WizardData {
   testStampsAwarded: number
 }
 
-const stepKeys = [
-  "business_info",
-  "whatsapp_verify",
-  "google_business",
-  "logo_upload",
-  "reward_setup",
-  "qr_code",
-  "print_standee",
-  "system_test",
+const ALL_STEPS = [
+  { stepKey: "business_info",   requiredModules: [] as Module[] },
+  { stepKey: "whatsapp_verify", requiredModules: ["LOYALTY", "REVIEWS"] as Module[] },
+  { stepKey: "google_business", requiredModules: ["REVIEWS", "AUTOREPLY"] as Module[] },
+  { stepKey: "logo_upload",     requiredModules: ["LOYALTY"] as Module[] },
+  { stepKey: "reward_setup",    requiredModules: ["LOYALTY"] as Module[] },
+  { stepKey: "qr_code",         requiredModules: ["LOYALTY"] as Module[] },
+  { stepKey: "print_standee",   requiredModules: ["LOYALTY"] as Module[] },
+  { stepKey: "system_test",     requiredModules: ["LOYALTY"] as Module[] },
 ]
+
+function getFilteredStepKeys(enabledModules: string): string[] {
+  return ALL_STEPS
+    .filter(s => s.requiredModules.length === 0 || s.requiredModules.some(m => hasModule({ enabledModules }, m)))
+    .map(s => s.stepKey)
+}
+
+const stepKeys = ALL_STEPS.map(s => s.stepKey)
 
 // ─── Helper: save step to DB ──────────────────────────────────
 async function saveStepProgress(stepKey: string, currentStep: number) {
@@ -143,6 +152,7 @@ function OnboardingPageContent() {
     testCustomerClaimed: false,
     testStampsAwarded: 0,
   })
+  const [merchantModules, setMerchantModules] = useState("LOYALTY,REVIEWS,AUTOREPLY")
 
   // Load merchant data from API
   useEffect(() => {
@@ -186,6 +196,10 @@ function OnboardingPageContent() {
               googleAddress: gConn?.address || m.address || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011",
               googleReviewUrl: gConn?.googleReviewUrl || m.googleReviewLink || "https://g.page/r/CfA2zsVxH2jOEBM/review",
             }))
+            // Load merchant's enabled modules for conditional step filtering
+            if (m.enabledModules) {
+              setMerchantModules(m.enabledModules)
+            }
           }
         }
       } catch (e) {
@@ -199,27 +213,37 @@ function OnboardingPageContent() {
 
   const activationScore = calculateActivationScore(data)
 
-  const steps = [
-    { num: 1, label: "Business", icon: Store, stepKey: "business_info" },
-    { num: 2, label: "WhatsApp", icon: MessageSquare, stepKey: "whatsapp_verify" },
-    { num: 3, label: "Google", icon: Search, stepKey: "google_business" },
-    { num: 4, label: "Logo", icon: Upload, stepKey: "logo_upload" },
-    { num: 5, label: "Rewards", icon: Gift, stepKey: "reward_setup" },
-    { num: 6, label: "QR Code", icon: QrIcon, stepKey: "qr_code" },
-    { num: 7, label: "Print", icon: Printer, stepKey: "print_standee" },
-    { num: 8, label: "Test", icon: UserCheck, stepKey: "system_test" },
+  // Filter steps based on merchant's enabled modules
+  const filteredStepKeys = getFilteredStepKeys(merchantModules)
+
+  const ALL_STEP_CONFIGS = [
+    { label: "Business", icon: Store, stepKey: "business_info" },
+    { label: "WhatsApp", icon: MessageSquare, stepKey: "whatsapp_verify" },
+    { label: "Google", icon: Search, stepKey: "google_business" },
+    { label: "Logo", icon: Upload, stepKey: "logo_upload" },
+    { label: "Rewards", icon: Gift, stepKey: "reward_setup" },
+    { label: "QR Code", icon: QrIcon, stepKey: "qr_code" },
+    { label: "Print", icon: Printer, stepKey: "print_standee" },
+    { label: "Test", icon: UserCheck, stepKey: "system_test" },
   ]
 
+  const steps = ALL_STEP_CONFIGS
+    .filter(s => filteredStepKeys.includes(s.stepKey))
+    .map((s, i) => ({ ...s, num: i + 1 }))
+
+  const totalSteps = steps.length
+  const currentStepConfig = steps[step - 1]
+  const currentStepKey = currentStepConfig?.stepKey || "business_info"
+
   const next = async () => {
-    if (step < 8) {
+    if (step < totalSteps) {
       // Save current step completion to DB
-      const currentKey = steps[step - 1]?.stepKey
-      if (currentKey) {
-        await saveStepProgress(currentKey, step + 1)
+      if (currentStepKey) {
+        await saveStepProgress(currentStepKey, step + 1)
       }
 
-      // Step 1: Save Business Info to merchant profile in DB
-      if (step === 1 && data.merchantId) {
+      // Step-specific saves based on stepKey (not step number)
+      if (currentStepKey === "business_info" && data.merchantId) {
         try {
           await fetch("/api/merchant/update", {
             method: "PATCH",
@@ -239,8 +263,8 @@ function OnboardingPageContent() {
         }
       }
 
-      // If we are completing Step 5 (Rewards), save the card setup to the backend
-      if (step === 5) {
+      // If completing Rewards step, save card setup
+      if (currentStepKey === "reward_setup") {
         try {
           await fetch("/api/cards/setup", {
             method: "POST",
@@ -252,8 +276,8 @@ function OnboardingPageContent() {
               name: data.cardName,
               stampsRequired: data.stampsRequired,
               rewardName: data.rewardName,
-              stampValue: 500, // default if not set
-              validityDays: 90, // default
+              stampValue: 500,
+              validityDays: 90,
             })
           })
         } catch (e) {
@@ -269,8 +293,9 @@ function OnboardingPageContent() {
   const back = () => { setStep(step - 1); setError("") }
 
   const handleLaunch = async () => {
-    // Save final step
-    await saveStepProgress("system_test", 8)
+    // Save final step (the last visible step for this merchant's plan)
+    const lastStepKey = steps[steps.length - 1]?.stepKey || "system_test"
+    await saveStepProgress(lastStepKey, totalSteps)
     router.push("/dashboard")
   }
 
@@ -362,14 +387,14 @@ function OnboardingPageContent() {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
             >
-              {step === 1 && <OnboardStep1Business data={data} setData={setData} />}
-              {step === 2 && <OnboardStep2WhatsApp data={data} setData={setData} error={error} setError={setError} />}
-              {step === 3 && <OnboardStep3Google data={data} setData={setData} error={error} setError={setError} nextStep={next} />}
-              {step === 4 && <OnboardStep4Logo data={data} setData={setData} />}
-              {step === 5 && <OnboardStep5Rewards data={data} setData={setData} />}
-              {step === 6 && <OnboardStep6QR data={data} setData={setData} />}
-              {step === 7 && <OnboardStep7Print data={data} setData={setData} />}
-              {step === 8 && <OnboardStep8Test data={data} setData={setData} error={error} setError={setError} />}
+              {currentStepKey === "business_info" && <OnboardStep1Business data={data} setData={setData} />}
+              {currentStepKey === "whatsapp_verify" && <OnboardStep2WhatsApp data={data} setData={setData} error={error} setError={setError} />}
+              {currentStepKey === "google_business" && <OnboardStep3Google data={data} setData={setData} error={error} setError={setError} nextStep={next} />}
+              {currentStepKey === "logo_upload" && <OnboardStep4Logo data={data} setData={setData} />}
+              {currentStepKey === "reward_setup" && <OnboardStep5Rewards data={data} setData={setData} />}
+              {currentStepKey === "qr_code" && <OnboardStep6QR data={data} setData={setData} />}
+              {currentStepKey === "print_standee" && <OnboardStep7Print data={data} setData={setData} />}
+              {currentStepKey === "system_test" && <OnboardStep8Test data={data} setData={setData} error={error} setError={setError} />}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -392,7 +417,7 @@ function OnboardingPageContent() {
               </span>
             )}
 
-            {step < 8 ? (
+            {step < totalSteps ? (
               <Button
                 onClick={next}
                 disabled={!canProceedToNext(step, data)}

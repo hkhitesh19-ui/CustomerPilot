@@ -74,6 +74,7 @@ async function seed() {
         "Live Counter Queue",
         "Basic Customer Analytics"
       ]),
+      enabledModules: "LOYALTY,REVIEWS,AUTOREPLY",
       active: true
     },
     {
@@ -94,6 +95,7 @@ async function seed() {
         "Photo Review Bonus Stamps",
         "Priority WhatsApp Delivery"
       ]),
+      enabledModules: "LOYALTY,REVIEWS,AUTOREPLY",
       active: true
     },
     {
@@ -114,6 +116,125 @@ async function seed() {
         "Custom Store Branding & Posters",
         "Maximum Savings Guarantee"
       ]),
+      enabledModules: "LOYALTY,REVIEWS,AUTOREPLY",
+      active: true
+    },
+    // ─── Standalone Service Plans ───
+    {
+      planKey: "loyalty_monthly",
+      name: "Loyalty Rewards — Monthly",
+      description: "Digital stamp cards, QR check-in, birthday rewards, and automated win-backs.",
+      days: 30,
+      price: 499,
+      originalPrice: 799,
+      discountPercent: 37,
+      badge: "Loyalty Only",
+      popular: false,
+      features: JSON.stringify([
+        "Digital Loyalty Stamp Card",
+        "QR Counter Check-In",
+        "Birthday Rewards Engine",
+        "VIP Tier Upgrades",
+        "Automated 30/60/90 Day Win-Backs",
+        "Basic Customer Analytics"
+      ]),
+      enabledModules: "LOYALTY",
+      active: true
+    },
+    {
+      planKey: "loyalty_yearly",
+      name: "Loyalty Rewards — Annual",
+      description: "Full year of loyalty automation at maximum savings.",
+      days: 365,
+      price: 3999,
+      originalPrice: 5988,
+      discountPercent: 33,
+      badge: "Loyalty Only — Annual",
+      popular: false,
+      features: JSON.stringify([
+        "Everything in Loyalty Monthly",
+        "365-Day Unlimited Automation",
+        "VIP Customer CRM & Export",
+        "Custom Store Branding"
+      ]),
+      enabledModules: "LOYALTY",
+      active: true
+    },
+    {
+      planKey: "reviews_monthly",
+      name: "Magic Google Reviews — Monthly",
+      description: "Automated WhatsApp review collection with AI-drafted 5-star reviews.",
+      days: 30,
+      price: 399,
+      originalPrice: 699,
+      discountPercent: 43,
+      badge: "Reviews Only",
+      popular: false,
+      features: JSON.stringify([
+        "WhatsApp Review Request Automation",
+        "AI-Drafted Customer Reviews",
+        "5-Star Review Filter",
+        "Google Maps Deep Link",
+        "Review Analytics Dashboard"
+      ]),
+      enabledModules: "REVIEWS",
+      active: true
+    },
+    {
+      planKey: "reviews_yearly",
+      name: "Magic Google Reviews — Annual",
+      description: "Full year of automated review collection at maximum savings.",
+      days: 365,
+      price: 2999,
+      originalPrice: 4788,
+      discountPercent: 37,
+      badge: "Reviews Only — Annual",
+      popular: false,
+      features: JSON.stringify([
+        "Everything in Reviews Monthly",
+        "365-Day Unlimited Review Collection",
+        "Priority WhatsApp Delivery"
+      ]),
+      enabledModules: "REVIEWS",
+      active: true
+    },
+    {
+      planKey: "autoreply_monthly",
+      name: "1-Click AutoReply — Monthly",
+      description: "AI-powered Google review replies published in 1-Click to Google Maps.",
+      days: 30,
+      price: 299,
+      originalPrice: 499,
+      discountPercent: 40,
+      badge: "AutoReply Only",
+      popular: false,
+      features: JSON.stringify([
+        "Google Business Profile Connect",
+        "Gemini AI Context-Aware Replies",
+        "1-Click Publish to Google Maps",
+        "Smart Sentiment Adaptation",
+        "Bulk Reply Engine",
+        "Review Sync Dashboard"
+      ]),
+      enabledModules: "AUTOREPLY",
+      active: true
+    },
+    {
+      planKey: "autoreply_yearly",
+      name: "1-Click AutoReply — Annual",
+      description: "Full year of AI review replies at maximum savings.",
+      days: 365,
+      price: 1999,
+      originalPrice: 3588,
+      discountPercent: 44,
+      badge: "AutoReply Only — Annual",
+      popular: false,
+      features: JSON.stringify([
+        "Everything in AutoReply Monthly",
+        "365-Day Unlimited AI Replies",
+        "Dead-Letter Queue Safety"
+      ]),
+      enabledModules: "AUTOREPLY",
       active: true
     }
   ];

@@ -61,11 +61,23 @@ export async function POST(req: NextRequest) {
     const newExpiryDate = new Date(baseDate);
     newExpiryDate.setDate(newExpiryDate.getDate() + daysToAdd);
 
+    // Resolve plan to set merchant's enabledModules
+    let enabledModules = "LOYALTY,REVIEWS,AUTOREPLY";
+    if (planId) {
+      const planRecord = await db.plan.findFirst({
+        where: { OR: [{ id: planId }, { planKey: planId }] }
+      });
+      if (planRecord?.enabledModules) {
+        enabledModules = planRecord.enabledModules;
+      }
+    }
+
     const updatedMerchant = await db.merchant.update({
       where: { id: merchant.id },
       data: {
         plan: planId || "subscribed",
         trialEndsAt: newExpiryDate,
+        enabledModules,
       },
     });
 
