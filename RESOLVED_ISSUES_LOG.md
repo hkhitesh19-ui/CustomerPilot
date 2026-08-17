@@ -2,6 +2,25 @@
 
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
+## [17 Aug 2026] Issue: Standalone Service Selling with Feature Flag Gating System
+- **Symptom**: CustomerPilot was previously sold exclusively as a combined bundle. The merchant requested the capability to sell all 3 core services (Loyalty Rewards, MagicQRAiDraftGoogleReview, 1ClickAutoReply) independently as standalone products without disturbing the existing combined flow.
+- **Root Cause**: The codebase lacked a modular entitlement system; all active merchants had 100% full access hardcoded across APIs, onboarding wizard, and dashboard.
+- **Resolution**: 
+  - Added `enabledModules` field (`@default("LOYALTY,REVIEWS,AUTOREPLY")`) to `Merchant` and `Plan` models in `prisma/schema.prisma` with zero backward-compatibility risk.
+  - Created centralized `src/lib/feature-gate.ts` helper (`hasModule`, `getEnabledModules`, `getModulesForPlan`).
+  - Decoupled API event chains:
+    - `src/app/api/rewards/award/route.ts`: Only invokes `scheduleGoogleReviewRequest` if `REVIEWS` module is enabled.
+    - `src/app/api/reviews/record-google-post/route.ts`: Only credits bonus stamps if `LOYALTY` is enabled; only creates GBP reviews & drafts AI replies if `AUTOREPLY` is enabled.
+    - `src/app/api/cron/automations/route.ts`: Day 2 review requests gated behind `REVIEWS`; win-back/expiry automations gated behind `LOYALTY`.
+    - `src/app/api/payments/verify/route.ts`: Dynamically sets merchant's `enabledModules` upon plan purchase.
+  - Implemented dynamic module-aware onboarding in `src/app/onboarding/page.tsx` (skipping irrelevant steps for single-module merchants).
+  - Gated dashboard sidebar navigation in `src/components/app-sidebar.tsx` based on active merchant modules.
+  - Added 6 standalone plan SKUs to `scripts/seedPricingAndTerms.js` and synced SQLite database.
+  - Built and verified production bundle with all 138 routes passing.
+- **Status**: ✅ Resolved and Verified Locally.
+
+---
+
 ## [15 Aug 2026] Issue: Homepage Business Growth Intelligence Dashboard & 3 Growth Pillars Integration
 - **Symptom**: Homepage needed a high-impact, outcome-focused Analytics section ("Know Which Customers Are Coming Back — And Why") to demonstrate real-world store growth instead of generic data tables.
 - **Root Cause**: Analytics was previously positioned as an administrative software tool rather than a growth engine that shows customer lifecycle progress and repeat revenue.
