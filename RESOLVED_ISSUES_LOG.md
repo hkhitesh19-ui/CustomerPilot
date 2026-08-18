@@ -2,6 +2,21 @@
 
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
+## [18 Aug 2026] Issue: 6-Month & 1-Year Pricing Structure for Standalone Services and CustomerPilot Complete Capacity Tiers
+- **Symptom**: Pricing structure needed clear, high-converting 6-Month and 1-Year options for all 3 standalone services (WhatsApp Loyalty Rewards, Magic AI Google Reviews, 1-Click AI AutoReply) as well as the 4th bundle service (CustomerPilot Complete), with explicit capacity scaling tiers (Starter Growth, Pro Scaling, Enterprise).
+- **Root Cause**: The pricing UI and database plans previously lacked explicit 6-month standalone SKUs and an interactive billing cycle switcher.
+- **Resolution**: 
+  - Updated `scripts/seedPricingAndTerms.js` with 6-Month (`180` days) and 1-Year (`365` days) SKUs for all 3 standalone services and CustomerPilot Complete.
+  - Added interactive `[6 Months Plan | 1 Year Plan (Save Up to 43%)]` toggle to `src/components/pricing-client.tsx`.
+  - Configured CustomerPilot Complete capacity plans:
+    - **Starter Growth Plan (6 Months)**: ₹4,999 (Up to 500 VIP Members)
+    - **Pro Scaling Plan (1 Year)**: ₹8,999 (Up to 2,500 VIP Members — Most Popular)
+    - **High-Volume / Enterprise Plan (1 Year)**: ₹14,999 (Unlimited VIP Members & Multi-Outlet)
+  - Synced database and verified production bundle with all 138 routes passing.
+- **Status**: ✅ Resolved and Verified Locally.
+
+---
+
 ## [17 Aug 2026] Issue: Standalone Service Selling with Feature Flag Gating System
 - **Symptom**: CustomerPilot was previously sold exclusively as a combined bundle. The merchant requested the capability to sell all 3 core services (Loyalty Rewards, MagicQRAiDraftGoogleReview, 1ClickAutoReply) independently as standalone products without disturbing the existing combined flow.
 - **Root Cause**: The codebase lacked a modular entitlement system; all active merchants had 100% full access hardcoded across APIs, onboarding wizard, and dashboard.
