@@ -258,7 +258,7 @@ export function MarketingClient() {
           <div className="pt-2">
             <Button asChild size="lg" className="bg-yellow-400 text-stone-900 hover:bg-yellow-300 font-extrabold text-base px-8 h-14 shadow-xl">
               <a href="/pricing">
-                View Full Pricing & 100 Founding Merchant Program ➔
+                View Full Pricing & Plans ➔
               </a>
             </Button>
           </div>

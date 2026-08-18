@@ -14,14 +14,6 @@ import { Badge } from "@/components/ui/badge"
 import { BrandLogo } from "@/components/brand-logo"
 
 export function PricingClient() {
-  const foundingCounters = {
-    platinum: { total: 10, remaining: 7, claimed: 3, discount: "50%", freeDuration: "2 Years FREE", limit: "Unlimited VIP Members" },
-    gold: { total: 40, remaining: 29, claimed: 11, discount: "35%", freeDuration: "1 Year FREE", limit: "Up to 25,000 VIP Members" },
-    silver: { total: 50, remaining: 46, claimed: 4, discount: "20%", freeDuration: "6 Months FREE", limit: "Up to 10,000 VIP Members" },
-  }
-
-  const totalSeatsLeft = foundingCounters.platinum.remaining + foundingCounters.gold.remaining + foundingCounters.silver.remaining
-
   const [billingCycle, setBillingCycle] = useState<"6mo" | "1year">("1year")
 
   const outcomeCards = [
@@ -206,25 +198,6 @@ export function PricingClient() {
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
             Choose the outcome engine that fits your store. All plans include 100% WhatsApp-native digital stamp cards, cashier tap-to-claim terminals, and AI Google review automation.
           </p>
-        </div>
-
-        {/* Founding Merchant Seats Banner */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-amber-50 via-orange-50 to-amber-100/60 border border-amber-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-1.5 text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start gap-2">
-              <Flame className="w-5 h-5 text-amber-600 animate-pulse" />
-              <span className="text-amber-800 font-extrabold text-xs uppercase tracking-wider">Founding Merchant Program</span>
-            </div>
-            <p className="text-slate-900 font-black text-lg sm:text-xl">Only {totalSeatsLeft} Lifetime Discount Seats Remaining</p>
-            <p className="text-xs text-slate-600">Lock in 20% to 50% lifetime subscription discounts before public launch.</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/signup?founding=platinum">
-              <Button size="sm" className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-md">
-                Claim Platinum Seat (7 Left)
-              </Button>
-            </Link>
-          </div>
         </div>
 
         {/* Outcome Cards Grid */}
