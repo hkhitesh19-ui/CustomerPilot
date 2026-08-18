@@ -48,6 +48,22 @@ export default function SubscriptionPage() {
   const [plans, setPlans] = useState<PlanItem[]>([])
   const [loadingPlans, setLoadingPlans] = useState(true)
   const [selectedPlan, setSelectedPlan] = useState<PlanItem | null>(null)
+  const [categoryTab, setCategoryTab] = useState<"complete" | "standalone">("complete")
+  const [billingCycle, setBillingCycle] = useState<"6mo" | "1year">("1year")
+
+  // Filter plans according to selected tab and billing cycle
+  const displayedPlans = plans.filter((p) => {
+    const isStandalone = p.planKey?.startsWith("loyalty_") || p.planKey?.startsWith("reviews_") || p.planKey?.startsWith("autoreply_")
+    
+    if (categoryTab === "complete") {
+      // Exclude standalone plans; show capacity scaling plans
+      return !isStandalone && p.planKey !== "starter_30"
+    } else {
+      // Standalone services: filter by selected billing cycle (180 days for 6mo, 365 days for 1year)
+      const targetDays = billingCycle === "6mo" ? 180 : 365
+      return isStandalone && p.days === targetDays
+    }
+  })
 
   // Coupon state
   const [couponCode, setCouponCode] = useState("")
@@ -311,16 +327,77 @@ export default function SubscriptionPage() {
       ) : (
         <div className="space-y-8">
           {/* 1. Plans Cards Grid */}
-          <div>
-            <div className="mb-4">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <span>Step 1: Select Your Plan</span>
-              </h2>
-              <p className="text-xs text-slate-400">Click on any card to select it for checkout.</p>
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                  <span>Step 1: Select Your Plan</span>
+                </h2>
+                <p className="text-xs text-slate-400">Choose a full capacity scaling bundle or an individual standalone engine.</p>
+              </div>
+
+              {/* Category Switcher */}
+              <div className="flex items-center gap-2">
+                <div className="inline-flex items-center p-1 rounded-xl bg-slate-900 border border-slate-800 shadow-inner">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCategoryTab("complete")
+                      const defaultPlan = plans.find(p => p.planKey === "enterprise_365") || plans.find(p => !p.planKey?.startsWith("loyalty_") && !p.planKey?.startsWith("reviews_") && !p.planKey?.startsWith("autoreply_"))
+                      setSelectedPlan(defaultPlan || null)
+                    }}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${categoryTab === "complete" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-400 hover:text-white"}`}
+                  >
+                    ⭐ Complete Bundle Plans
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCategoryTab("standalone")
+                      const defaultStandalone = plans.find(p => p.planKey === "loyalty_yearly") || plans.find(p => p.planKey?.startsWith("loyalty_"))
+                      setSelectedPlan(defaultStandalone || null)
+                    }}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${categoryTab === "standalone" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-400 hover:text-white"}`}
+                  >
+                    🛠️ Standalone Services
+                  </button>
+                </div>
+              </div>
             </div>
 
+            {/* Standalone Billing Cycle Sub-Filter */}
+            {categoryTab === "standalone" && (
+              <div className="flex items-center justify-center">
+                <div className="inline-flex items-center p-1 rounded-xl bg-slate-950 border border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBillingCycle("6mo")
+                      const matched = plans.find(p => p.days === 180 && (p.planKey?.startsWith("loyalty_") || p.planKey?.startsWith("reviews_") || p.planKey?.startsWith("autoreply_")))
+                      if (matched) setSelectedPlan(matched)
+                    }}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${billingCycle === "6mo" ? "bg-slate-800 text-white shadow-xs" : "text-slate-400 hover:text-white"}`}
+                  >
+                    6 Months (₹499)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBillingCycle("1year")
+                      const matched = plans.find(p => p.days === 365 && (p.planKey?.startsWith("loyalty_") || p.planKey?.startsWith("reviews_") || p.planKey?.startsWith("autoreply_")))
+                      if (matched) setSelectedPlan(matched)
+                    }}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${billingCycle === "1year" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-400 hover:text-white"}`}
+                  >
+                    <span>1 Year (₹899)</span>
+                    <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-500 text-white">Save 44%</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {plans.map((plan) => {
+              {displayedPlans.map((plan) => {
                 const isSelected = selectedPlan?.id === plan.id
                 const effectivePrice = getEffectivePrice(plan)
 
