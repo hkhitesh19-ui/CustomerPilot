@@ -2,6 +2,17 @@
 
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
+## [18 Aug 2026] Issue: Removal of Founding Merchant Program Banner from Pricing & Homepage
+- **Symptom**: The "Founding Merchant Program" banner ("Only 82 Lifetime Discount Seats Remaining... Claim Platinum Seat") was obsolete and needed to be completely removed from the `/pricing` page and related homepage CTAs.
+- **Root Cause**: The banner was a promotional pre-launch artifact.
+- **Resolution**: 
+  - Removed the Founding Merchant banner block and unused `foundingCounters` state from `src/components/pricing-client.tsx`.
+  - Updated homepage pricing redirect banner and button text to `"View Full Pricing & Plans ➔"`.
+  - Built and verified production bundle (138/138 routes passing).
+- **Status**: ✅ Resolved and Verified Locally.
+
+---
+
 ## [18 Aug 2026] Issue: Synchronized Pricing & Standalone Tabs on Merchant Dashboard Subscription Page
 - **Symptom**: The merchant requested that the exact same pricing structure from `/pricing` (including Standalone Services and CustomerPilot Complete Capacity Tiers) be available directly on the merchant dashboard at `/dashboard/subscription` and all across the platform.
 - **Root Cause**: The `/dashboard/subscription` page previously rendered an unorganized flat list of database plans without Category tabs or standalone sub-filters.
