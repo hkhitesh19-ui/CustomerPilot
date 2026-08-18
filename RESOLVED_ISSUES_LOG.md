@@ -2,6 +2,20 @@
 
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
+## [18 Aug 2026] Issue: Synchronized Pricing & Standalone Tabs on Merchant Dashboard Subscription Page
+- **Symptom**: The merchant requested that the exact same pricing structure from `/pricing` (including Standalone Services and CustomerPilot Complete Capacity Tiers) be available directly on the merchant dashboard at `/dashboard/subscription` and all across the platform.
+- **Root Cause**: The `/dashboard/subscription` page previously rendered an unorganized flat list of database plans without Category tabs or standalone sub-filters.
+- **Resolution**: 
+  - Updated `src/app/dashboard/subscription/page.tsx` with:
+    - **Category Switcher**: `[⭐ Complete Bundle Plans | 🛠️ Standalone Services]`.
+    - **Standalone Billing Cycle Sub-Filter**: `[6 Months (₹499) | 1 Year (₹899) (Save 44%)]`.
+    - **Complete Bundle Capacity Tiers**: Starter Growth Plan (6 Months, ₹1,449), Pro Scaling Plan (1 Year, ₹2,799), High-Volume / Enterprise Plan (1 Year, ₹4,999).
+  - Integrated dynamic plan selection, coupon validation, terms agreement, and Razorpay checkout.
+  - Built and verified production bundle (138/138 routes passing).
+- **Status**: ✅ Resolved and Verified Locally.
+
+---
+
 ## [18 Aug 2026] Issue: 6-Month & 1-Year Pricing Structure for Standalone Services and CustomerPilot Complete Capacity Tiers
 - **Symptom**: Pricing structure needed clear, high-converting 6-Month and 1-Year options for all 3 standalone services (WhatsApp Loyalty Rewards, Magic AI Google Reviews, 1-Click AI AutoReply) as well as the 4th bundle service (CustomerPilot Complete), with explicit capacity scaling tiers (Starter Growth, Pro Scaling, Enterprise).
 - **Root Cause**: The pricing UI and database plans previously lacked explicit 6-month standalone SKUs and user-defined price points.
