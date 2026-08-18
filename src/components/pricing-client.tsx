@@ -22,51 +22,68 @@ export function PricingClient() {
 
   const totalSeatsLeft = foundingCounters.platinum.remaining + foundingCounters.gold.remaining + foundingCounters.silver.remaining
 
+  const [billingCycle, setBillingCycle] = useState<"6mo" | "1year">("1year")
+
   const outcomeCards = [
     {
       icon: "❤️",
-      title: "Loyalty Rewards (Bring Customers Back)",
+      title: "WhatsApp Loyalty Rewards",
       subtitle: "Digital Loyalty Stamps & VIP Club",
       badge: "Repeat Visit Engine",
       description: "Perfect for bakeries, cafes, and salons wanting to convert single-time walk-ins into 10x repeat regulars.",
+      price6Mo: "₹2,499",
+      period6Mo: "for 6 months (₹416/mo)",
+      price1Yr: "₹3,999",
+      period1Yr: "for 1 year (₹333/mo)",
+      savings: "Save 20% Yearly",
       features: [
-        "Digital Loyalty Card",
-        "VIP Club Engine",
+        "Digital Loyalty Card on WhatsApp",
+        "VIP Club Engine & Tier Upgrades",
         "Birthday Rewards Engine",
-        "Repeat Visit Tracking",
-        "Instant QR-based Membership",
+        "14-Day Inactivity Win-Backs",
+        "Cashier 1-Tap Counter Queue",
       ],
       btnText: "Start 7 Days Free Trial Today →",
       popular: false,
     },
     {
       icon: "⭐",
-      title: "Magic SEO Optimized Google Reviews",
+      title: "Magic AI Google Reviews",
       subtitle: "AI Draft & WhatsApp Review Flow",
       badge: "Local SEO Growth",
       description: "Automatically collect authentic 4 & 5-star Google reviews right after a customer purchase on WhatsApp.",
+      price6Mo: "₹1,999",
+      period6Mo: "for 6 months (₹333/mo)",
+      price1Yr: "₹2,999",
+      period1Yr: "for 1 year (₹250/mo)",
+      savings: "Save 25% Yearly",
       features: [
-        "AI Review Draft Engine",
-        "WhatsApp Review Flow",
-        "1-Click Copy & Post",
-        "Live Review Analytics",
-        "Organic Rating Booster",
+        "Automated WhatsApp Review Prompts",
+        "Gemini AI 5-Star Review Drafts",
+        "1-Click Copy & Post to Google Maps",
+        "Live Review Growth Analytics",
+        "Organic Neighborhood SEO Booster",
       ],
       btnText: "Start 7 Days Free Trial Today →",
       popular: false,
     },
     {
       icon: "🤖",
-      title: "1-Click GoogleReview AutoReply",
+      title: "1-Click AI AutoReply",
       subtitle: "Gemini AI Draft & 1-Click Post",
       badge: "Owner Assistant Mode",
       description: "AI automatically drafts appreciative, context-aware owner responses. Store owners review & publish on Google Maps in 1-Click!",
+      price6Mo: "₹1,499",
+      period6Mo: "for 6 months (₹250/mo)",
+      price1Yr: "₹1,999",
+      period1Yr: "for 1 year (₹166/mo)",
+      savings: "Save 33% Yearly",
       features: [
-        "Gemini AI Contextual Reply",
-        "1-Click Copy & Post on Google Maps",
-        "Personalized Tone & Name Mention",
+        "Google Business Profile Connect",
+        "Gemini AI Contextual Owner Reply",
+        "1-Click Publish to Google Maps",
+        "Smart Sentiment & Tone Adaptation",
         "Bulk Unreplied Review Handler",
-        "Dead-Letter Queue Quota Safety",
       ],
       btnText: "Start 7 Days Free Trial Today →",
       popular: false,
@@ -75,14 +92,20 @@ export function PricingClient() {
       icon: "🚀",
       title: "CustomerPilot Complete",
       subtitle: "Loyalty + AI Reviews + 1-Click AutoReply",
-      badge: "⭐ MOST POPULAR",
-      description: "All 3 outcome engines combined into one single unified AI customer retention system.",
+      badge: "⭐ BEST VALUE BUNDLE",
+      description: "All 3 outcome engines combined into one single unified AI customer retention & reputation system.",
+      price6Mo: "₹4,999",
+      period6Mo: "for 6 months (₹833/mo)",
+      price1Yr: "₹8,999",
+      period1Yr: "for 1 year (₹750/mo)",
+      savings: "Save ₹2,000+ Yearly",
       features: [
-        "Full Digital Loyalty Stamp Engine",
+        "Full WhatsApp Loyalty Stamp Engine",
         "Full AI Draft Google Review Flow",
         "Full 1-Click GoogleReview AutoReply",
-        "VIP Customer Database Ownership",
-        "Priority Founder Support",
+        "VIP Customer CRM & Export",
+        "Free Counter Standee Custom Poster",
+        "Priority WhatsApp Founder Support",
       ],
       btnText: "Start 7 Days Free Trial Today →",
       popular: true,
@@ -94,51 +117,59 @@ export function PricingClient() {
       name: "Starter Growth Plan",
       capacity: "Up to 500 VIP Members",
       duration: "6 Months",
-      price: "₹999",
+      price: "₹4,999",
       period: "for 6 months",
-      badge: "Ideal for New Shops",
+      badge: "Ideal for Growing Shops",
       popular: false,
       features: [
-        "500 active VIP members limit",
-        "Unlimited WhatsApp stamps",
-        "Counter QR standee printable",
-        "Standard WhatsApp templates",
-        "Basic morning intelligence report",
+        "Up to 500 Active VIP Members",
+        "All 3 Engines Included",
+        "Unlimited WhatsApp Stamps",
+        "AI Google Review 5-Star Filter",
+        "1-Click Google Maps AutoReply",
+        "Counter QR Standee Printable",
+        "Daily Morning Intelligence Report",
       ],
     },
     {
       name: "Pro Scaling Plan",
-      capacity: "Up to 2,000 VIP Members",
+      capacity: "Up to 2,500 VIP Members",
       duration: "1 Year",
-      price: "₹2,499",
-      period: "per year",
-      badge: "⚡ Best Value for Retail",
+      price: "₹8,999",
+      period: "per year (₹750/mo)",
+      badge: "⭐ Best Value for Retail",
       popular: true,
       features: [
-        "2,000 active VIP members limit",
-        "Customizable WhatsApp templates",
-        "Gemini AI review reply generator",
-        "Live queue cashier tablet mode",
-        "Priority WhatsApp support",
+        "Up to 2,500 Active VIP Members",
+        "All 3 Engines Included",
+        "365-Day Unlimited Automation",
+        "Gemini AI Review Reply Generator",
+        "Customizable WhatsApp Templates",
+        "VIP Tier Upgrades & Bonus Stamps",
+        "Live Queue Cashier Tablet Mode",
+        "Priority WhatsApp Helpdesk (+91 90333 04707)",
       ],
     },
     {
       name: "High-Volume / Enterprise",
       capacity: "Unlimited VIP Members",
-      duration: "Multi-Year / Lifetime",
-      price: "₹4,999",
+      duration: "1 Year",
+      price: "₹14,999",
       period: "per year",
       badge: "Busy Outlets & Chains",
       popular: false,
       features: [
-        "Unlimited VIP customer capacity",
-        "Multi-outlet store switcher",
-        "Custom brand domain & logo",
-        "Dedicated account manager",
-        "Custom ERP/POS sync assistance",
+        "Unlimited VIP Customer Capacity",
+        "All 3 Engines Included",
+        "Multi-Outlet Store Switcher",
+        "Custom Brand Domain & Logo",
+        "Dedicated Account Manager",
+        "Custom ERP/POS Sync Assistance",
+        "Maximum ROI Guarantee",
       ],
     },
   ]
+
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-emerald-500 selection:text-white flex flex-col justify-between">
@@ -196,24 +227,60 @@ export function PricingClient() {
         </div>
 
         {/* Outcome Cards Grid */}
-        <div className="space-y-6">
-          <div className="text-center space-y-1">
+        <div className="space-y-8">
+          <div className="text-center space-y-3">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Select by Desired Business Outcome</h2>
-            <p className="text-xs text-slate-500">Deploy only the modules your store requires today.</p>
+            <p className="text-xs text-slate-500">Deploy only the standalone modules your store requires today, or get the complete bundle.</p>
+
+            {/* Billing Cycle Switcher */}
+            <div className="inline-flex items-center p-1 rounded-2xl bg-slate-100 border border-slate-200 shadow-inner">
+              <button
+                onClick={() => setBillingCycle("6mo")}
+                className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${billingCycle === "6mo" ? "bg-white text-slate-900 shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
+              >
+                6 Months Plan
+              </button>
+              <button
+                onClick={() => setBillingCycle("1year")}
+                className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${billingCycle === "1year" ? "bg-slate-900 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
+              >
+                <span>1 Year Plan</span>
+                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">Save Up to 43%</span>
+              </button>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {outcomeCards.map((card, idx) => (
               <Card key={idx} className={`bg-white border-slate-200 shadow-xs hover:shadow-xl transition-all rounded-3xl flex flex-col justify-between ${card.popular ? "ring-2 ring-emerald-500 shadow-emerald-500/10" : ""}`}>
-                <CardHeader className="space-y-2 p-6">
+                <CardHeader className="space-y-3 p-6">
                   <div className="flex items-center justify-between">
                     <span className="text-3xl">{card.icon}</span>
                     <Badge variant={card.popular ? "default" : "secondary"} className={`text-[10px] ${card.popular ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-700"}`}>
                       {card.badge}
                     </Badge>
                   </div>
-                  <CardTitle className="text-base sm:text-lg text-slate-900 font-bold leading-snug">{card.title}</CardTitle>
-                  <p className="text-xs text-slate-500 leading-relaxed">{card.description}</p>
+                  <div>
+                    <CardTitle className="text-base sm:text-lg text-slate-900 font-bold leading-snug">{card.title}</CardTitle>
+                    <p className="text-[11px] text-slate-400 font-medium">{card.subtitle}</p>
+                  </div>
+
+                  {/* Dynamic Pricing Tag */}
+                  <div className="pt-1">
+                    <div className="text-2xl sm:text-3xl font-black text-slate-900">
+                      {billingCycle === "1year" ? card.price1Yr : card.price6Mo}
+                    </div>
+                    <p className="text-[11px] text-slate-500">
+                      {billingCycle === "1year" ? card.period1Yr : card.period6Mo}
+                    </p>
+                    {billingCycle === "1year" && card.savings && (
+                      <span className="inline-block mt-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">
+                        {card.savings}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-slate-500 leading-relaxed pt-1">{card.description}</p>
                 </CardHeader>
 
                 <CardContent className="space-y-4 p-6 pt-0">

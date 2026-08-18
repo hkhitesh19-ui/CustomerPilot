@@ -55,80 +55,106 @@ For legal inquiries or business support, contact **support@customerpilot.in**.
 async function seed() {
   console.log("Seeding Plans, Coupons, and Terms...");
 
-  // 1. Seed Plans
+  // 1. Seed Plans (6 Months & 1 Year for Standalone + Complete)
   const plans = [
+    // ─── CustomerPilot Complete Capacity Plans ───
     {
       planKey: "starter_30",
-      name: "1 Month (30 Days)",
-      description: "Essential loyalty & review growth for small retail stores & cafes.",
+      name: "Complete Starter Trial (30 Days)",
+      description: "Introductory 30-day full-featured access for new retail stores.",
       days: 30,
       price: 999,
       originalPrice: 1499,
       discountPercent: 33,
-      badge: "Starter",
+      badge: "Starter Trial",
       popular: false,
       features: JSON.stringify([
-        "Loyalty QR Code Automation",
-        "WhatsApp Smart Engine",
-        "Google Review 5-Star Filter",
-        "Live Counter Queue",
-        "Basic Customer Analytics"
+        "Up to 500 VIP Members",
+        "WhatsApp Stamp Card Engine",
+        "Magic Google Review AI Flow",
+        "1-Click AutoReply Assistant",
+        "Counter QR Standee Printable",
+        "Daily Morning Intelligence"
       ]),
       enabledModules: "LOYALTY,REVIEWS,AUTOREPLY",
       active: true
     },
     {
       planKey: "growth_180",
-      name: "6 Months (180 Days)",
-      description: "Most popular choice for fast-growing businesses looking for high retention.",
+      name: "Starter Growth Plan (6 Months)",
+      description: "Full CustomerPilot Complete suite for up to 500 VIP members.",
       days: 180,
       price: 4999,
       originalPrice: 8999,
       discountPercent: 44,
-      badge: "Most Popular",
-      popular: true,
+      badge: "Ideal for Growing Shops",
+      popular: false,
       features: JSON.stringify([
-        "Everything in 1 Month Plan",
+        "Up to 500 Active VIP Members",
+        "Unlimited WhatsApp Stamps",
+        "AI Google Review 5-Star Filter",
+        "1-Click Google Maps AutoReply",
         "Automated 30/60/90 Day Win-Backs",
-        "VIP Tier Upgrades & Bonus Stamps",
-        "7-Day Expiry & Milestone Alerts",
-        "Photo Review Bonus Stamps",
-        "Priority WhatsApp Delivery"
+        "Printable Counter Standee",
+        "Basic Morning Intelligence"
       ]),
       enabledModules: "LOYALTY,REVIEWS,AUTOREPLY",
       active: true
     },
     {
       planKey: "enterprise_365",
-      name: "1 Year (365 Days)",
-      description: "Maximum savings & annual peace of mind for established merchants.",
+      name: "Pro Scaling Plan (1 Year)",
+      description: "Full CustomerPilot Complete suite for up to 2,500 VIP members.",
       days: 365,
       price: 8999,
       originalPrice: 17999,
       discountPercent: 50,
-      badge: "Best Value",
-      popular: false,
+      badge: "⭐ Most Popular",
+      popular: true,
       features: JSON.stringify([
-        "Everything in 6 Months Plan",
-        "Full 365-Day Unlimited Automation",
-        "VIP Customer CRM & Export",
-        "Dedicated Account Manager Support",
-        "Custom Store Branding & Posters",
-        "Maximum Savings Guarantee"
+        "Up to 2,500 Active VIP Members",
+        "365-Day Unlimited Automation",
+        "Gemini AI Review Reply Generator",
+        "Customizable WhatsApp Templates",
+        "VIP Tier Upgrades & Bonus Stamps",
+        "Live Queue Cashier Tablet Mode",
+        "Priority WhatsApp Helpdesk (+91 90333 04707)"
       ]),
       enabledModules: "LOYALTY,REVIEWS,AUTOREPLY",
       active: true
     },
-    // ─── Standalone Service Plans ───
     {
-      planKey: "loyalty_monthly",
-      name: "Loyalty Rewards — Monthly",
+      planKey: "enterprise_unlimited_365",
+      name: "High-Volume / Enterprise (1 Year)",
+      description: "Unlimited capacity & multi-outlet retention system for busy retail brands.",
+      days: 365,
+      price: 14999,
+      originalPrice: 24999,
+      discountPercent: 40,
+      badge: "Busy Outlets & Chains",
+      popular: false,
+      features: JSON.stringify([
+        "Unlimited VIP Customer Capacity",
+        "Multi-Outlet Store Switcher",
+        "Custom Brand Domain & Logo",
+        "Dedicated Account Manager",
+        "Custom ERP/POS Sync Assistance",
+        "Maximum ROI Guarantee"
+      ]),
+      enabledModules: "LOYALTY,REVIEWS,AUTOREPLY",
+      active: true
+    },
+
+    // ─── Standalone Service 1: WhatsApp Loyalty Rewards ───
+    {
+      planKey: "loyalty_6mo",
+      name: "WhatsApp Loyalty Rewards — 6 Months",
       description: "Digital stamp cards, QR check-in, birthday rewards, and automated win-backs.",
-      days: 30,
-      price: 499,
-      originalPrice: 799,
+      days: 180,
+      price: 2499,
+      originalPrice: 3999,
       discountPercent: 37,
-      badge: "Loyalty Only",
+      badge: "Loyalty Only (6 Mo)",
       popular: false,
       features: JSON.stringify([
         "Digital Loyalty Stamp Card",
@@ -143,32 +169,35 @@ async function seed() {
     },
     {
       planKey: "loyalty_yearly",
-      name: "Loyalty Rewards — Annual",
-      description: "Full year of loyalty automation at maximum savings.",
+      name: "WhatsApp Loyalty Rewards — 1 Year",
+      description: "Full year of loyalty automation at maximum annual savings.",
       days: 365,
       price: 3999,
-      originalPrice: 5988,
-      discountPercent: 33,
-      badge: "Loyalty Only — Annual",
+      originalPrice: 6999,
+      discountPercent: 43,
+      badge: "Loyalty Only (1 Year)",
       popular: false,
       features: JSON.stringify([
-        "Everything in Loyalty Monthly",
+        "Everything in Loyalty 6 Months",
         "365-Day Unlimited Automation",
         "VIP Customer CRM & Export",
-        "Custom Store Branding"
+        "Custom Store Branding",
+        "Priority WhatsApp Support"
       ]),
       enabledModules: "LOYALTY",
       active: true
     },
+
+    // ─── Standalone Service 2: Magic SEO Optimized Google Reviews ───
     {
-      planKey: "reviews_monthly",
-      name: "Magic Google Reviews — Monthly",
+      planKey: "reviews_6mo",
+      name: "Magic AI Google Reviews — 6 Months",
       description: "Automated WhatsApp review collection with AI-drafted 5-star reviews.",
-      days: 30,
-      price: 399,
-      originalPrice: 699,
-      discountPercent: 43,
-      badge: "Reviews Only",
+      days: 180,
+      price: 1999,
+      originalPrice: 2999,
+      discountPercent: 33,
+      badge: "Reviews Only (6 Mo)",
       popular: false,
       features: JSON.stringify([
         "WhatsApp Review Request Automation",
@@ -182,31 +211,34 @@ async function seed() {
     },
     {
       planKey: "reviews_yearly",
-      name: "Magic Google Reviews — Annual",
-      description: "Full year of automated review collection at maximum savings.",
+      name: "Magic AI Google Reviews — 1 Year",
+      description: "Full year of automated review collection at maximum annual savings.",
       days: 365,
       price: 2999,
-      originalPrice: 4788,
-      discountPercent: 37,
-      badge: "Reviews Only — Annual",
+      originalPrice: 4999,
+      discountPercent: 40,
+      badge: "Reviews Only (1 Year)",
       popular: false,
       features: JSON.stringify([
-        "Everything in Reviews Monthly",
+        "Everything in Reviews 6 Months",
         "365-Day Unlimited Review Collection",
-        "Priority WhatsApp Delivery"
+        "Priority WhatsApp Delivery",
+        "Review Sentiment Reports"
       ]),
       enabledModules: "REVIEWS",
       active: true
     },
+
+    // ─── Standalone Service 3: 1-Click GoogleReview AutoReply ───
     {
-      planKey: "autoreply_monthly",
-      name: "1-Click AutoReply — Monthly",
+      planKey: "autoreply_6mo",
+      name: "1-Click AI AutoReply — 6 Months",
       description: "AI-powered Google review replies published in 1-Click to Google Maps.",
-      days: 30,
-      price: 299,
-      originalPrice: 499,
+      days: 180,
+      price: 1499,
+      originalPrice: 2499,
       discountPercent: 40,
-      badge: "AutoReply Only",
+      badge: "AutoReply Only (6 Mo)",
       popular: false,
       features: JSON.stringify([
         "Google Business Profile Connect",
@@ -221,18 +253,19 @@ async function seed() {
     },
     {
       planKey: "autoreply_yearly",
-      name: "1-Click AutoReply — Annual",
-      description: "Full year of AI review replies at maximum savings.",
+      name: "1-Click AI AutoReply — 1 Year",
+      description: "Full year of AI review replies at maximum annual savings.",
       days: 365,
       price: 1999,
-      originalPrice: 3588,
-      discountPercent: 44,
-      badge: "AutoReply Only — Annual",
+      originalPrice: 3499,
+      discountPercent: 43,
+      badge: "AutoReply Only (1 Year)",
       popular: false,
       features: JSON.stringify([
-        "Everything in AutoReply Monthly",
+        "Everything in AutoReply 6 Months",
         "365-Day Unlimited AI Replies",
-        "Dead-Letter Queue Safety"
+        "Dead-Letter Queue Safety",
+        "Multi-Location Google Support"
       ]),
       enabledModules: "AUTOREPLY",
       active: true
