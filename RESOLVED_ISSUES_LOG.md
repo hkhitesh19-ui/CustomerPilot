@@ -2,6 +2,25 @@
 
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
+## [22 Aug 2026] Issue: Updated Homepage Hero Headline & Subheadline
+- **Symptom**: The homepage hero section needed clear, benefit-driven messaging targeting the 3 core pillars (Bring Customers Back, Google Reviews, AutoReply) without requiring customers to download an app.
+- **Root Cause**: Hero copy previously featured a general walk-in headline.
+- **Resolution**: 
+  - Updated `src/app/page.tsx` and `src/components/marketing-client.tsx` Hero headline to:
+    ```text
+    Bring Your Customers Back.
+    Get More Google Reviews.
+    Reply Automatically.
+    ```
+  - Updated Hero subheadline to:
+    ```text
+    CustomerPilot helps local businesses bring customers back with loyalty rewards, AI-powered Google Review assistance, and automated review replies — without requiring customers to download an app.
+    ```
+  - Built and verified production bundle (138/138 routes passing) and confirmed server status 200 OK.
+- **Status**: ✅ Resolved and Verified Locally.
+
+---
+
 ## [22 Aug 2026] Issue: Updated 1-Month, 6-Month, and 1-Year Pricing Structure (Standalone & Capacity Tiers)
 - **Symptom**: The pricing structure needed to be updated with new price points and daily breakdowns across both Standalone modules and Capacity bundles:
   - Standalone: 1 Month = ₹149, 6 Months = ₹649, 1 Year = ₹999 (₹3/day Billed yearly).
