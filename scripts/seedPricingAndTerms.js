@@ -63,9 +63,9 @@ async function seed() {
       name: "Complete Starter Trial (30 Days)",
       description: "Introductory 30-day full-featured access for new retail stores.",
       days: 30,
-      price: 299,
-      originalPrice: 499,
-      discountPercent: 40,
+      price: 399,
+      originalPrice: 599,
+      discountPercent: 33,
       badge: "Starter Trial",
       popular: false,
       features: JSON.stringify([
@@ -82,11 +82,11 @@ async function seed() {
     {
       planKey: "growth_180",
       name: "Starter Growth Plan (6 Months)",
-      description: "Full CustomerPilot Complete suite for up to 500 VIP customers.",
+      description: "Full CustomerPilot Complete suite for up to 500 VIP customers (₹10/day).",
       days: 180,
-      price: 1449,
-      originalPrice: 2499,
-      discountPercent: 42,
+      price: 1799,
+      originalPrice: 2999,
+      discountPercent: 40,
       badge: "Ideal for Growing Shops",
       popular: false,
       features: JSON.stringify([
@@ -104,11 +104,11 @@ async function seed() {
     {
       planKey: "enterprise_365",
       name: "Pro Scaling Plan (1 Year)",
-      description: "Full CustomerPilot Complete suite for up to 1,500 VIP customers.",
+      description: "Full CustomerPilot Complete suite for up to 1,500 VIP customers (₹8/day).",
       days: 365,
-      price: 2799,
+      price: 2899,
       originalPrice: 4999,
-      discountPercent: 44,
+      discountPercent: 42,
       badge: "⭐ Most Popular",
       popular: true,
       features: JSON.stringify([
@@ -126,7 +126,7 @@ async function seed() {
     {
       planKey: "enterprise_unlimited_365",
       name: "High-Volume / Enterprise (1 Year)",
-      description: "Unlimited capacity & multi-outlet retention system for busy retail brands.",
+      description: "Unlimited capacity & multi-outlet retention system for busy retail brands (₹14/day).",
       days: 365,
       price: 4999,
       originalPrice: 8999,
@@ -147,14 +147,35 @@ async function seed() {
 
     // ─── Standalone Service 1: WhatsApp Loyalty Rewards ───
     {
+      planKey: "loyalty_monthly",
+      name: "WhatsApp Loyalty Rewards — 1 Month",
+      description: "Digital stamp cards, QR check-in, birthday rewards, and automated win-backs.",
+      days: 30,
+      price: 149,
+      originalPrice: 249,
+      discountPercent: 40,
+      badge: "Loyalty (1 Mo)",
+      popular: false,
+      features: JSON.stringify([
+        "Digital Loyalty Stamp Card",
+        "QR Counter Check-In",
+        "Birthday Rewards Engine",
+        "VIP Tier Upgrades",
+        "Automated 30/60/90 Day Win-Backs",
+        "Basic Customer Analytics"
+      ]),
+      enabledModules: "LOYALTY",
+      active: true
+    },
+    {
       planKey: "loyalty_6mo",
       name: "WhatsApp Loyalty Rewards — 6 Months",
       description: "Digital stamp cards, QR check-in, birthday rewards, and automated win-backs.",
       days: 180,
-      price: 499,
-      originalPrice: 899,
-      discountPercent: 44,
-      badge: "Loyalty Only (6 Mo)",
+      price: 649,
+      originalPrice: 999,
+      discountPercent: 35,
+      badge: "Loyalty (6 Mo)",
       popular: false,
       features: JSON.stringify([
         "Digital Loyalty Stamp Card",
@@ -170,12 +191,12 @@ async function seed() {
     {
       planKey: "loyalty_yearly",
       name: "WhatsApp Loyalty Rewards — 1 Year",
-      description: "Full year of loyalty automation at maximum annual savings.",
+      description: "Full year of loyalty automation (₹3/day Billed yearly).",
       days: 365,
-      price: 899,
-      originalPrice: 1599,
+      price: 999,
+      originalPrice: 1788,
       discountPercent: 44,
-      badge: "Loyalty Only (1 Year)",
+      badge: "Loyalty (1 Year)",
       popular: false,
       features: JSON.stringify([
         "Everything in Loyalty 6 Months",
@@ -190,14 +211,34 @@ async function seed() {
 
     // ─── Standalone Service 2: Magic SEO Optimized Google Reviews ───
     {
+      planKey: "reviews_monthly",
+      name: "Magic AI Google Reviews — 1 Month",
+      description: "Automated WhatsApp review collection with AI-drafted 5-star reviews.",
+      days: 30,
+      price: 149,
+      originalPrice: 249,
+      discountPercent: 40,
+      badge: "Reviews (1 Mo)",
+      popular: false,
+      features: JSON.stringify([
+        "WhatsApp Review Request Automation",
+        "AI-Drafted Customer Reviews",
+        "5-Star Review Filter",
+        "Google Maps Deep Link",
+        "Review Analytics Dashboard"
+      ]),
+      enabledModules: "REVIEWS",
+      active: true
+    },
+    {
       planKey: "reviews_6mo",
       name: "Magic AI Google Reviews — 6 Months",
       description: "Automated WhatsApp review collection with AI-drafted 5-star reviews.",
       days: 180,
-      price: 499,
-      originalPrice: 899,
-      discountPercent: 44,
-      badge: "Reviews Only (6 Mo)",
+      price: 649,
+      originalPrice: 999,
+      discountPercent: 35,
+      badge: "Reviews (6 Mo)",
       popular: false,
       features: JSON.stringify([
         "WhatsApp Review Request Automation",
@@ -212,12 +253,12 @@ async function seed() {
     {
       planKey: "reviews_yearly",
       name: "Magic AI Google Reviews — 1 Year",
-      description: "Full year of automated review collection at maximum annual savings.",
+      description: "Full year of automated review collection (₹3/day Billed yearly).",
       days: 365,
-      price: 899,
-      originalPrice: 1599,
+      price: 999,
+      originalPrice: 1788,
       discountPercent: 44,
-      badge: "Reviews Only (1 Year)",
+      badge: "Reviews (1 Year)",
       popular: false,
       features: JSON.stringify([
         "Everything in Reviews 6 Months",
@@ -231,14 +272,35 @@ async function seed() {
 
     // ─── Standalone Service 3: 1-Click GoogleReview AutoReply ───
     {
+      planKey: "autoreply_monthly",
+      name: "1-Click AI AutoReply — 1 Month",
+      description: "AI-powered Google review replies published in 1-Click to Google Maps.",
+      days: 30,
+      price: 149,
+      originalPrice: 249,
+      discountPercent: 40,
+      badge: "AutoReply (1 Mo)",
+      popular: false,
+      features: JSON.stringify([
+        "Google Business Profile Connect",
+        "Gemini AI Context-Aware Replies",
+        "1-Click Publish to Google Maps",
+        "Smart Sentiment Adaptation",
+        "Bulk Reply Engine",
+        "Review Sync Dashboard"
+      ]),
+      enabledModules: "AUTOREPLY",
+      active: true
+    },
+    {
       planKey: "autoreply_6mo",
       name: "1-Click AI AutoReply — 6 Months",
       description: "AI-powered Google review replies published in 1-Click to Google Maps.",
       days: 180,
-      price: 499,
-      originalPrice: 899,
-      discountPercent: 44,
-      badge: "AutoReply Only (6 Mo)",
+      price: 649,
+      originalPrice: 999,
+      discountPercent: 35,
+      badge: "AutoReply (6 Mo)",
       popular: false,
       features: JSON.stringify([
         "Google Business Profile Connect",
@@ -254,12 +316,12 @@ async function seed() {
     {
       planKey: "autoreply_yearly",
       name: "1-Click AI AutoReply — 1 Year",
-      description: "Full year of AI review replies at maximum annual savings.",
+      description: "Full year of AI review replies (₹3/day Billed yearly).",
       days: 365,
-      price: 899,
-      originalPrice: 1599,
+      price: 999,
+      originalPrice: 1788,
       discountPercent: 44,
-      badge: "AutoReply Only (1 Year)",
+      badge: "AutoReply (1 Year)",
       popular: false,
       features: JSON.stringify([
         "Everything in AutoReply 6 Months",

@@ -49,18 +49,18 @@ export default function SubscriptionPage() {
   const [loadingPlans, setLoadingPlans] = useState(true)
   const [selectedPlan, setSelectedPlan] = useState<PlanItem | null>(null)
   const [categoryTab, setCategoryTab] = useState<"complete" | "standalone">("complete")
-  const [billingCycle, setBillingCycle] = useState<"6mo" | "1year">("1year")
+  const [billingCycle, setBillingCycle] = useState<"1mo" | "6mo" | "1year">("1year")
 
   // Filter plans according to selected tab and billing cycle
   const displayedPlans = plans.filter((p) => {
     const isStandalone = p.planKey?.startsWith("loyalty_") || p.planKey?.startsWith("reviews_") || p.planKey?.startsWith("autoreply_")
     
     if (categoryTab === "complete") {
-      // Exclude standalone plans; show capacity scaling plans
-      return !isStandalone && p.planKey !== "starter_30"
+      // Show all Complete bundle capacity plans
+      return !isStandalone
     } else {
-      // Standalone services: filter by selected billing cycle (180 days for 6mo, 365 days for 1year)
-      const targetDays = billingCycle === "6mo" ? 180 : 365
+      // Standalone services: filter by selected billing cycle (30 days for 1mo, 180 days for 6mo, 365 days for 1year)
+      const targetDays = billingCycle === "1mo" ? 30 : billingCycle === "6mo" ? 180 : 365
       return isStandalone && p.days === targetDays
     }
   })
@@ -372,13 +372,24 @@ export default function SubscriptionPage() {
                   <button
                     type="button"
                     onClick={() => {
+                      setBillingCycle("1mo")
+                      const matched = plans.find(p => p.days === 30 && (p.planKey?.startsWith("loyalty_") || p.planKey?.startsWith("reviews_") || p.planKey?.startsWith("autoreply_")))
+                      if (matched) setSelectedPlan(matched)
+                    }}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${billingCycle === "1mo" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-400 hover:text-white"}`}
+                  >
+                    1 Month (₹149)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
                       setBillingCycle("6mo")
                       const matched = plans.find(p => p.days === 180 && (p.planKey?.startsWith("loyalty_") || p.planKey?.startsWith("reviews_") || p.planKey?.startsWith("autoreply_")))
                       if (matched) setSelectedPlan(matched)
                     }}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${billingCycle === "6mo" ? "bg-slate-800 text-white shadow-xs" : "text-slate-400 hover:text-white"}`}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${billingCycle === "6mo" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-400 hover:text-white"}`}
                   >
-                    6 Months (₹499)
+                    6 Months (₹649)
                   </button>
                   <button
                     type="button"
@@ -387,16 +398,16 @@ export default function SubscriptionPage() {
                       const matched = plans.find(p => p.days === 365 && (p.planKey?.startsWith("loyalty_") || p.planKey?.startsWith("reviews_") || p.planKey?.startsWith("autoreply_")))
                       if (matched) setSelectedPlan(matched)
                     }}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${billingCycle === "1year" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-400 hover:text-white"}`}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${billingCycle === "1year" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-400 hover:text-white"}`}
                   >
-                    <span>1 Year (₹899)</span>
-                    <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-500 text-white">Save 44%</span>
+                    <span>1 Year (₹999)</span>
+                    <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-500 text-white">₹3/day</span>
                   </button>
                 </div>
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className={`grid gap-6 ${categoryTab === "complete" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" : "grid-cols-1 md:grid-cols-3"}`}>
               {displayedPlans.map((plan) => {
                 const isSelected = selectedPlan?.id === plan.id
                 const effectivePrice = getEffectivePrice(plan)

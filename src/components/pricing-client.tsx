@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { BrandLogo } from "@/components/brand-logo"
 
 export function PricingClient() {
-  const [billingCycle, setBillingCycle] = useState<"6mo" | "1year">("1year")
+  const [billingCycle, setBillingCycle] = useState<"1mo" | "6mo" | "1year">("1year")
 
   const outcomeCards = [
     {
@@ -23,13 +23,15 @@ export function PricingClient() {
       subtitle: "Digital Loyalty Stamps & VIP Club",
       badge: "Repeat Visit Engine",
       description: "Perfect for bakeries, cafes, and salons wanting to convert single-time walk-ins into 10x repeat regulars.",
-      price6Mo: "₹499",
-      period6Mo: "for 6 months (₹83/mo)",
-      price1Yr: "₹899",
-      period1Yr: "for 1 year (₹75/mo)",
-      savings: "Save 44% Yearly",
+      price1Mo: "₹149",
+      period1Mo: "for 1 month",
+      price6Mo: "₹649",
+      period6Mo: "for 6 months",
+      price1Yr: "₹999",
+      period1Yr: "for 1 year (₹3/day)",
+      savings: "₹3/day (Billed yearly)",
       features: [
-        "Digital Loyalty Card on WhatsApp",
+        "Digital WhatsApp Stamp Card",
         "VIP Club Engine & Tier Upgrades",
         "Birthday Rewards Engine",
         "14-Day Inactivity Win-Backs",
@@ -44,16 +46,18 @@ export function PricingClient() {
       subtitle: "AI Draft & WhatsApp Review Flow",
       badge: "Local SEO Growth",
       description: "Automatically collect authentic 4 & 5-star Google reviews right after a customer purchase on WhatsApp.",
-      price6Mo: "₹499",
-      period6Mo: "for 6 months (₹83/mo)",
-      price1Yr: "₹899",
-      period1Yr: "for 1 year (₹75/mo)",
-      savings: "Save 44% Yearly",
+      price1Mo: "₹149",
+      period1Mo: "for 1 month",
+      price6Mo: "₹649",
+      period6Mo: "for 6 months",
+      price1Yr: "₹999",
+      period1Yr: "for 1 year (₹3/day)",
+      savings: "₹3/day (Billed yearly)",
       features: [
-        "Automated WhatsApp Review Prompts",
+        "WhatsApp Post-Purchase Prompts",
         "Gemini AI 5-Star Review Drafts",
         "1-Click Copy & Post to Google Maps",
-        "Live Review Growth Analytics",
+        "Review Growth Analytics",
         "Organic Neighborhood SEO Booster",
       ],
       btnText: "Start 7 Days Free Trial Today →",
@@ -65,17 +69,19 @@ export function PricingClient() {
       subtitle: "Gemini AI Draft & 1-Click Post",
       badge: "Owner Assistant Mode",
       description: "AI automatically drafts appreciative, context-aware owner responses. Store owners review & publish on Google Maps in 1-Click!",
-      price6Mo: "₹499",
-      period6Mo: "for 6 months (₹83/mo)",
-      price1Yr: "₹899",
-      period1Yr: "for 1 year (₹75/mo)",
-      savings: "Save 44% Yearly",
+      price1Mo: "₹149",
+      period1Mo: "for 1 month",
+      price6Mo: "₹649",
+      period6Mo: "for 6 months",
+      price1Yr: "₹999",
+      period1Yr: "for 1 year (₹3/day)",
+      savings: "₹3/day (Billed yearly)",
       features: [
         "Google Business Profile Connect",
-        "Gemini AI Contextual Owner Reply",
+        "Contextual AI Owner Replies",
         "1-Click Publish to Google Maps",
-        "Smart Sentiment & Tone Adaptation",
-        "Bulk Unreplied Review Handler",
+        "Bulk Reply Engine",
+        "Smart Sentiment Adaptation",
       ],
       btnText: "Start 7 Days Free Trial Today →",
       popular: false,
@@ -86,11 +92,13 @@ export function PricingClient() {
       subtitle: "Loyalty + AI Reviews + 1-Click AutoReply",
       badge: "⭐ BEST VALUE BUNDLE",
       description: "All 3 outcome engines combined into one single unified AI customer retention & reputation system.",
-      price6Mo: "₹1,449",
-      period6Mo: "for 6 months (₹241/mo)",
-      price1Yr: "₹2,799",
-      period1Yr: "for 1 year (₹233/mo)",
-      savings: "Save ₹1,500+ Yearly",
+      price1Mo: "₹399",
+      period1Mo: "for 30 days (Trial)",
+      price6Mo: "₹1,799",
+      period6Mo: "for 6 months (₹10/day)",
+      price1Yr: "₹2,899",
+      period1Yr: "for 1 year (₹8/day)",
+      savings: "₹8/day (Save ₹1,500+ Yearly)",
       features: [
         "Full WhatsApp Loyalty Stamp Engine",
         "Full AI Draft Google Review Flow",
@@ -106,11 +114,27 @@ export function PricingClient() {
 
   const capacityPlans = [
     {
+      name: "Complete Starter Trial",
+      capacity: "Up to 500 VIP Customers",
+      duration: "30 Days",
+      price: "₹399",
+      period: "for 30 days",
+      badge: "Starter Trial",
+      popular: false,
+      features: [
+        "Up to 500 VIP Customers",
+        "All 3 Engines Included",
+        "Basic WhatsApp Automation",
+        "Counter Standee Printable PDF",
+        "Daily Morning Intelligence",
+      ],
+    },
+    {
       name: "Starter Growth Plan",
       capacity: "Up to 500 VIP Customers",
       duration: "6 Months",
-      price: "₹1,449",
-      period: "for 6 months (₹241/mo)",
+      price: "₹1,799",
+      period: "for 6 months (₹10/day)",
       badge: "Ideal for Growing Shops",
       popular: false,
       features: [
@@ -119,17 +143,17 @@ export function PricingClient() {
         "Unlimited WhatsApp Stamps",
         "AI Google Review 5-Star Filter",
         "1-Click Google Maps AutoReply",
-        "Counter QR Standee Printable",
-        "Daily Morning Intelligence Report",
+        "Automated 30/60/90 Day Win-Backs",
+        "Printable Counter Standee",
       ],
     },
     {
       name: "Pro Scaling Plan",
       capacity: "Up to 1,500 VIP Customers",
       duration: "1 Year",
-      price: "₹2,799",
-      period: "per year (₹233/mo)",
-      badge: "⭐ Best Value for Retail",
+      price: "₹2,899",
+      period: "per year (₹8/day)",
+      badge: "⭐ Most Popular",
       popular: true,
       features: [
         "Up to 1,500 VIP Customers",
@@ -147,7 +171,7 @@ export function PricingClient() {
       capacity: "Unlimited VIP Customers",
       duration: "1 Year",
       price: "₹4,999",
-      period: "per year (₹416/mo)",
+      period: "per year (₹14/day)",
       badge: "Busy Outlets & Chains",
       popular: false,
       features: [
@@ -161,6 +185,7 @@ export function PricingClient() {
       ],
     },
   ]
+
 
 
 
@@ -209,53 +234,63 @@ export function PricingClient() {
             {/* Billing Cycle Switcher */}
             <div className="inline-flex items-center p-1 rounded-2xl bg-slate-100 border border-slate-200 shadow-inner">
               <button
-                onClick={() => setBillingCycle("6mo")}
-                className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${billingCycle === "6mo" ? "bg-white text-slate-900 shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
+                onClick={() => setBillingCycle("1mo")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${billingCycle === "1mo" ? "bg-white text-slate-900 shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
               >
-                6 Months Plan
+                1 Month (₹149)
+              </button>
+              <button
+                onClick={() => setBillingCycle("6mo")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${billingCycle === "6mo" ? "bg-white text-slate-900 shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
+              >
+                6 Months (₹649)
               </button>
               <button
                 onClick={() => setBillingCycle("1year")}
                 className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${billingCycle === "1year" ? "bg-slate-900 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
               >
-                <span>1 Year Plan</span>
-                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">Save Up to 43%</span>
+                <span>1 Year (₹999)</span>
+                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">₹3/day</span>
               </button>
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {outcomeCards.map((card, idx) => (
-              <Card key={idx} className={`bg-white border-slate-200 shadow-xs hover:shadow-xl transition-all rounded-3xl flex flex-col justify-between ${card.popular ? "ring-2 ring-emerald-500 shadow-emerald-500/10" : ""}`}>
-                <CardHeader className="space-y-3 p-6">
-                  <div className="flex items-center justify-between">
-                    <span className="text-3xl">{card.icon}</span>
-                    <Badge variant={card.popular ? "default" : "secondary"} className={`text-[10px] ${card.popular ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-700"}`}>
-                      {card.badge}
-                    </Badge>
-                  </div>
-                  <div>
-                    <CardTitle className="text-base sm:text-lg text-slate-900 font-bold leading-snug">{card.title}</CardTitle>
-                    <p className="text-[11px] text-slate-400 font-medium">{card.subtitle}</p>
-                  </div>
+            {outcomeCards.map((card, idx) => {
+              const currentPrice = billingCycle === "1year" ? card.price1Yr : billingCycle === "6mo" ? card.price6Mo : card.price1Mo
+              const currentPeriod = billingCycle === "1year" ? card.period1Yr : billingCycle === "6mo" ? card.period6Mo : card.period1Mo
 
-                  {/* Dynamic Pricing Tag */}
-                  <div className="pt-1">
-                    <div className="text-2xl sm:text-3xl font-black text-slate-900">
-                      {billingCycle === "1year" ? card.price1Yr : card.price6Mo}
+              return (
+                <Card key={idx} className={`bg-white border-slate-200 shadow-xs hover:shadow-xl transition-all rounded-3xl flex flex-col justify-between ${card.popular ? "ring-2 ring-emerald-500 shadow-emerald-500/10" : ""}`}>
+                  <CardHeader className="space-y-3 p-6">
+                    <div className="flex items-center justify-between">
+                      <span className="text-3xl">{card.icon}</span>
+                      <Badge variant={card.popular ? "default" : "secondary"} className={`text-[10px] ${card.popular ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-700"}`}>
+                        {card.badge}
+                      </Badge>
                     </div>
-                    <p className="text-[11px] text-slate-500">
-                      {billingCycle === "1year" ? card.period1Yr : card.period6Mo}
-                    </p>
-                    {billingCycle === "1year" && card.savings && (
-                      <span className="inline-block mt-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">
-                        {card.savings}
-                      </span>
-                    )}
-                  </div>
+                    <div>
+                      <CardTitle className="text-base sm:text-lg text-slate-900 font-bold leading-snug">{card.title}</CardTitle>
+                      <p className="text-[11px] text-slate-400 font-medium">{card.subtitle}</p>
+                    </div>
 
-                  <p className="text-xs text-slate-500 leading-relaxed pt-1">{card.description}</p>
-                </CardHeader>
+                    {/* Dynamic Pricing Tag */}
+                    <div className="pt-1">
+                      <div className="text-2xl sm:text-3xl font-black text-slate-900">
+                        {currentPrice}
+                      </div>
+                      <p className="text-[11px] text-slate-500">
+                        {currentPeriod}
+                      </p>
+                      {billingCycle === "1year" && card.savings && (
+                        <span className="inline-block mt-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">
+                          {card.savings}
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-xs text-slate-500 leading-relaxed pt-1">{card.description}</p>
+                  </CardHeader>
 
                 <CardContent className="space-y-4 p-6 pt-0">
                   <ul className="space-y-2 text-xs text-slate-700">
@@ -274,7 +309,7 @@ export function PricingClient() {
                   </Link>
                 </CardContent>
               </Card>
-            ))}
+            )})}
           </div>
         </div>
 
