@@ -2,6 +2,21 @@
 
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
+## [22 Aug 2026] Issue: Updated 1-Month, 6-Month, and 1-Year Pricing Structure (Standalone & Capacity Tiers)
+- **Symptom**: The pricing structure needed to be updated with new price points and daily breakdowns across both Standalone modules and Capacity bundles:
+  - Standalone: 1 Month = ₹149, 6 Months = ₹649, 1 Year = ₹999 (₹3/day Billed yearly).
+  - Complete Bundles: Starter Trial (30 Days) = ₹399, Starter Growth (6 Months) = ₹1,799 (₹10/day), Pro Scaling (1 Year) = ₹2,899 (₹8/day), Enterprise (1 Year) = ₹4,999 (₹14/day).
+- **Root Cause**: The product pricing strategy was adjusted to include accessible 1-month standalone entries and optimized yearly pricing.
+- **Resolution**: 
+  - Updated `scripts/seedPricingAndTerms.js` with all 1-Month, 6-Month, and 1-Year plan SKUs.
+  - Re-seeded the SQLite database using `node scripts/seedPricingAndTerms.js`.
+  - Updated `src/components/pricing-client.tsx` with a 3-way toggle (`1 Month`, `6 Months`, `1 Year`) and updated price tags/breakdowns.
+  - Updated `src/app/dashboard/subscription/page.tsx` standalone sub-filter pills (`1 Month (₹149)`, `6 Months (₹649)`, `1 Year (₹999)`) and capacity tier grid.
+  - Built and verified production bundle (138/138 routes passing).
+- **Status**: ✅ Resolved and Verified Locally.
+
+---
+
 ## [18 Aug 2026] Issue: Removal of Founding Merchant Program Banner from Pricing & Homepage
 - **Symptom**: The "Founding Merchant Program" banner ("Only 82 Lifetime Discount Seats Remaining... Claim Platinum Seat") was obsolete and needed to be completely removed from the `/pricing` page and related homepage CTAs.
 - **Root Cause**: The banner was a promotional pre-launch artifact.
