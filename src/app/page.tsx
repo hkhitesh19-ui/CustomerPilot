@@ -539,11 +539,12 @@ export default function Home() {
                 <span className="dot-live"><i></i><i></i></span> India&apos;s #1 Customer Retention Platform for Local Businesses
               </span>
               <h1 className="hero-h">
-                Turn Every Walk-in<br />
-                <span className="grad-txt">Into a Lifetime Customer.</span>
+                Bring Your Customers Back.<br />
+                Get More Google Reviews.<br />
+                <span className="grad-txt">Reply Automatically.</span>
               </h1>
               <p className="lead">
-                Customer scans QR. You tap. Reward delivered in 5 seconds. No POS replacement. No GST software. Just pure customer love.
+                CustomerPilot helps local businesses bring customers back with loyalty rewards, AI-powered Google Review assistance, and automated review replies — without requiring customers to download an app.
               </p>
               <div className="btn-row">
                 <Link href="/signup" className="btn btn-grad py-3.5 sm:py-4 px-6 sm:px-7 text-sm sm:text-base font-bold rounded-xl flex items-center gap-2">
