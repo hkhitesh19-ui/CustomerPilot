@@ -23,6 +23,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { hasModule, type Module } from "@/lib/feature-gate"
+import { getRecommendedCampaign } from "@/lib/industry-campaigns"
 
 // ─── Types ────────────────────────────────────────────────────
 interface WizardData {
@@ -178,6 +179,8 @@ function OnboardingPageContent() {
             const gConn = gConns[0]
             const isGoogleConnected = gConns.length > 0 || !!m.googleReviewLink
 
+            const recCampaign = getRecommendedCampaign(m.businessType || "bakery")
+
             setData(prev => ({
               ...prev,
               merchantId: m.id,
@@ -188,6 +191,8 @@ function OnboardingPageContent() {
               businessAddress: m.address || "",
               whatsappNumber: m.whatsappPhone || "",
               cardName: m.name ? `${m.name} VIP Club` : "VIP Club",
+              stampsRequired: recCampaign.totalStamps || 10,
+              rewardName: recCampaign.rewardName || "FREE Special Treat",
               logoUploaded: !!m.logoUrl,
               logoDataUrl: m.logoUrl || prev.logoDataUrl,
               googleConnected: isGoogleConnected,

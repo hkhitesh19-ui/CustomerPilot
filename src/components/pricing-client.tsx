@@ -55,7 +55,7 @@ export function PricingClient() {
       savings: "₹3/day (Billed yearly)",
       features: [
         "WhatsApp Post-Purchase Prompts",
-        "Gemini AI 5-Star Review Drafts",
+        "Smart AI 5-Star Review Drafts",
         "1-Click Copy & Post to Google Maps",
         "Review Growth Analytics",
         "Organic Neighborhood SEO Booster",
@@ -66,7 +66,7 @@ export function PricingClient() {
     {
       icon: "🤖",
       title: "1-Click AI AutoReply",
-      subtitle: "Gemini AI Draft & 1-Click Post",
+      subtitle: "Smart AI Draft & 1-Click Post",
       badge: "Owner Assistant Mode",
       description: "AI automatically drafts appreciative, context-aware owner responses. Store owners review & publish on Google Maps in 1-Click!",
       price1Mo: "₹149",
@@ -159,7 +159,7 @@ export function PricingClient() {
         "Up to 1,500 VIP Customers",
         "All 3 Engines Included",
         "365-Day Unlimited Automation",
-        "Gemini AI Review Reply Generator",
+        "AI Review Reply Generator",
         "Customizable WhatsApp Templates",
         "VIP Tier Upgrades & Bonus Stamps",
         "Live Queue Cashier Tablet Mode",

@@ -73,22 +73,25 @@ export function MarketingClient() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-stone-900 leading-tight tracking-tight"
           >
-            Bring Your Customers Back.
+            Turn Every Walk-in
             <br />
-            Get More Google Reviews.
-            <br />
-            <span className="bg-gradient-to-r from-yellow-500 to-amber-600 bg-clip-text text-transparent">Reply Automatically.</span>
+            Into a <span className="bg-gradient-to-r from-yellow-500 to-amber-600 bg-clip-text text-transparent">Lifetime Customer</span>
           </motion.h1>
 
-          {/* Subheadline */}
-          <motion.p
+          {/* Subheadline & Hook */}
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="mt-6 text-base md:text-lg text-stone-600 max-w-3xl mx-auto leading-relaxed"
+            className="mt-6 max-w-3xl mx-auto space-y-3"
           >
-            CustomerPilot helps local businesses bring customers back with loyalty rewards, AI-powered Google Review assistance, and automated review replies — without requiring customers to download an app.
-          </motion.p>
+            <p className="text-lg md:text-xl font-bold text-stone-800 tracking-tight">
+              Bring Your Customers Back. Get More Google Reviews. Reply Automatically.
+            </p>
+            <p className="text-sm md:text-base text-stone-600 leading-relaxed">
+              CustomerPilot helps local businesses bring customers back with loyalty rewards, AI-powered Google Review assistance, and automated review replies — without requiring customers to download an app.
+            </p>
+          </motion.div>
 
           {/* CTAs */}
           <motion.div

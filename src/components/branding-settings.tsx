@@ -102,6 +102,67 @@ export function BrandingSettings({ merchantId }: { merchantId: string }) {
           </div>
         </div>
 
+        {/* CustomerPilot Branding Settings */}
+        <div className="space-y-4 p-4 border rounded-lg bg-muted/30 mt-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-semibold text-sm">CustomerPilot Branding</h4>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Display subtle &quot;Powered by CustomerPilot&quot; badge on customer check-in and review screens.
+              </p>
+            </div>
+            <input
+              type="checkbox"
+              checked={merchant?.showPoweredBy ?? true}
+              onChange={async (e) => {
+                try {
+                  const res = await fetch("/api/merchant/branding", {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ showPoweredBy: e.target.checked }),
+                  })
+                  if (res.ok) {
+                    toast({ title: "Branding updated" })
+                    refetch()
+                  }
+                } catch {
+                  toast({ title: "Error updating branding", variant: "destructive" })
+                }
+              }}
+              className="w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+            />
+          </div>
+
+          <div className="flex items-center justify-between pt-3 border-t border-slate-800/40">
+            <div>
+              <h4 className="font-semibold text-sm">Business Owner CTA</h4>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Include &quot;Want this for your business?&quot; link for prospective merchant acquisition.
+              </p>
+            </div>
+            <input
+              type="checkbox"
+              checked={merchant?.ctaEnabled ?? true}
+              onChange={async (e) => {
+                try {
+                  const res = await fetch("/api/merchant/branding", {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ctaEnabled: e.target.checked }),
+                  })
+                  if (res.ok) {
+                    toast({ title: "Branding updated" })
+                    refetch()
+                  }
+                } catch {
+                  toast({ title: "Error updating branding", variant: "destructive" })
+                }
+              }}
+              className="w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+            />
+          </div>
+        </div>
+
       </CardContent>
     </Card>
   )

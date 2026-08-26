@@ -47,6 +47,12 @@ model Merchant {
   expiryWarningDays         Int                       @default(7)
   almostThereInactivityDays Int                       @default(7)
   enabledModules            String                    @default("LOYALTY,REVIEWS,AUTOREPLY")
+  // Growth Engine fields
+  showPoweredBy             Boolean                   @default(true)
+  ctaEnabled                Boolean                   @default(true)
+  merchantReferralCode      String?                   @unique
+  walletCredit              Int                       @default(0)
+  communityUrl              String?
   createdAt                 DateTime                  @default(now())
   updatedAt                 DateTime                  @updatedAt
   auditLogs                 AuditLog[]
@@ -60,9 +66,13 @@ model Merchant {
   customerStampCards        CustomerStampCard[]
   fraudAlerts               FraudAlert[]
   googleBusinessReviews     GoogleBusinessReview[]
+  growthReports             GrowthReport[]
+  growthSnapshots           GrowthSnapshot[]
   incidents                 Incident[]
   user                      User?                     @relation(fields: [userId], references: [id])
   merchantGoogleConnections MerchantGoogleConnection?
+  merchantReferralsMade     MerchantReferral[]        @relation("MerchantReferrer")
+  merchantReferralsReceived MerchantReferral[]        @relation("MerchantReferred")
   merchantTransferLogs      MerchantTransferLog[]
   messageTemplates          MessageTemplate[]
   onboardingSteps           OnboardingStep[]
@@ -144,6 +154,7 @@ model Customer {
   lastActiveAt        DateTime?
   status              String?
   whatsappOptIn       Boolean             @default(true)
+  walletCredit        Int                 @default(0)
   referredById        String?
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
@@ -305,6 +316,9 @@ model Referral {
   status              String
   bonusStampsReferrer Int       @default(0)
   bonusStampsFriend   Int       @default(0)
+  rewardType          String?   // "stamps" | "credit" | "coupon"
+  rewardAmount        Int       @default(50)
+  qualifyingEvent     String?   // "QUALIFYING_PURCHASE"
   flaggedReason       String?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
@@ -745,4 +759,67 @@ model TemplateVersionHistory {
   template     MessageTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
 
   @@index([templateId])
+}
+
+// ─── Growth Engine Models ────────────────────────────────────────
+
+model MerchantReferral {
+  id                  String    @id @default(cuid())
+  referrerMerchantId  String
+  referredMerchantId  String?
+  referralCode        String    @unique
+  referredEmail       String?
+  referredPhone       String?
+  status              String    @default("INVITED") // INVITED | SIGNED_UP | ACTIVATED | PAID | REWARDED
+  referrerReward      Int       @default(100)
+  referredReward      Int       @default(100)
+  qualifyingEvent     String?   // "first_paid_subscription"
+  createdAt           DateTime  @default(now())
+  convertedAt         DateTime?
+  rewardedAt          DateTime?
+  updatedAt           DateTime  @updatedAt
+  referrerMerchant    Merchant  @relation("MerchantReferrer", fields: [referrerMerchantId], references: [id])
+  referredMerchant    Merchant? @relation("MerchantReferred", fields: [referredMerchantId], references: [id])
+
+  @@index([referrerMerchantId])
+  @@index([referralCode])
+  @@index([status])
+}
+
+model GrowthSnapshot {
+  id               String   @id @default(cuid())
+  merchantId       String
+  snapshotDate     DateTime
+  totalCustomers   Int      @default(0)
+  totalStamps      Int      @default(0)
+  totalRedemptions Int      @default(0)
+  totalReviews     Int      @default(0)
+  repeatVisits     Int      @default(0)
+  googleReviewCount Int     @default(0)
+  createdAt        DateTime @default(now())
+  merchant         Merchant @relation(fields: [merchantId], references: [id])
+
+  @@unique([merchantId, snapshotDate])
+  @@index([merchantId])
+}
+
+model GrowthReport {
+  id              String    @id @default(cuid())
+  merchantId      String
+  reportMonth     String    // "2026-08"
+  periodStart     DateTime
+  periodEnd       DateTime
+  newCustomers    Int       @default(0)
+  stampsIssued    Int       @default(0)
+  rewardsRedeemed Int       @default(0)
+  reviewsReceived Int       @default(0)
+  repliesPosted   Int       @default(0)
+  repeatVisits    Int       @default(0)
+  shareImageUrl   String?
+  sharedAt        DateTime?
+  createdAt       DateTime  @default(now())
+  merchant        Merchant  @relation(fields: [merchantId], references: [id])
+
+  @@unique([merchantId, reportMonth])
+  @@index([merchantId])
 }

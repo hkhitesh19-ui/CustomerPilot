@@ -112,7 +112,28 @@ async function WalletDataFetcher({ customerId }: { customerId: string }) {
         </div>
 
         {/* Bonus Actions */}
-        <div className="animate-in fade-in slide-in-from-bottom-12 duration-700 delay-300 fill-mode-both">
+        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-300 fill-mode-both">
+          {/* Invite a Friend Card */}
+          <div className="bg-gradient-to-r from-emerald-950/50 to-teal-950/50 border border-emerald-500/30 rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs mb-0.5">
+                <span>🎁</span>
+                <span>Invite a Friend, Get ₹50 / Bonus Stamp</span>
+              </div>
+              <p className="text-[11px] text-emerald-300/80">
+                Share with a friend. When they visit, you both get rewards!
+              </p>
+            </div>
+            <a
+              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Hi! Join me at ${customer.merchant.name} on CustomerPilot loyalty rewards and get a special welcome treat! 🎁`)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="bg-emerald-500 hover:bg-emerald-600 text-stone-950 font-bold text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 flex-shrink-0 transition-colors"
+            >
+              Invite <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+
           <a 
             href={googleReviewUrl} 
             target="_blank"
@@ -130,6 +151,16 @@ async function WalletDataFetcher({ customerId }: { customerId: string }) {
             </div>
           </a>
         </div>
+
+      {/* Powered by CustomerPilot */}
+      <div className="mt-6 pt-4 border-t border-slate-800/50 text-center space-y-1">
+        <p className="text-[10px] text-slate-500">
+          Powered by <a href="/for-business" className="text-indigo-400 hover:text-indigo-300 font-semibold">CustomerPilot</a> 🚀
+        </p>
+        <p className="text-[9px] text-slate-600">
+          <a href="/for-business" className="hover:text-slate-400 transition-colors">Want this for your business?</a>
+        </p>
+      </div>
 
       </div>
     </div>

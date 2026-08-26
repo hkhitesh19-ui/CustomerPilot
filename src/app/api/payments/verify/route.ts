@@ -99,6 +99,75 @@ export async function POST(req: NextRequest) {
       },
     }).catch(() => {}); // Non-critical — don't fail payment on audit log error
 
+    // ─── Growth Engine: Reward Merchant Referral (Qualifying Event: First Paid Subscription) ───
+    try {
+      const referral = await db.merchantReferral.findFirst({
+        where: {
+          referredMerchantId: merchant.id,
+          status: { in: ["INVITED", "SIGNED_UP", "ACTIVATED"] },
+        },
+      });
+
+      if (referral) {
+        // Credit Referrer
+        await db.merchant.update({
+          where: { id: referral.referrerMerchantId },
+          data: { walletCredit: { increment: referral.referrerReward || 100 } },
+        });
+
+        // Credit Referred Merchant
+        await db.merchant.update({
+          where: { id: merchant.id },
+          data: { walletCredit: { increment: referral.referredReward || 100 } },
+        });
+
+        // Mark Referral as Rewarded
+        await db.merchantReferral.update({
+          where: { id: referral.id },
+          data: {
+            status: "REWARDED",
+            qualifyingEvent: "first_paid_subscription",
+            convertedAt: referral.convertedAt || new Date(),
+            rewardedAt: new Date(),
+          },
+        });
+      }
+    } catch (refErr) {
+      console.warn("[Growth Engine] Merchant referral reward processing error (non-fatal):", refErr);
+    }
+
+    // ─── Growth Engine: Auto-Create Baseline Growth Snapshot ───
+    try {
+      const existingSnapshot = await db.growthSnapshot.findFirst({
+        where: { merchantId: merchant.id },
+      });
+
+      if (!existingSnapshot) {
+        const [totalCustomers, totalStamps, totalRedemptions, totalReviews, totalGoogleReviews] = await Promise.all([
+          db.customer.count({ where: { merchantId: merchant.id, deletedAt: null } }),
+          db.stamp.count({ where: { merchantId: merchant.id } }),
+          db.redemption.count({ where: { merchantId: merchant.id } }),
+          db.review.count({ where: { merchantId: merchant.id } }),
+          db.googleBusinessReview.count({ where: { merchantId: merchant.id } }),
+        ]);
+
+        await db.growthSnapshot.create({
+          data: {
+            merchantId: merchant.id,
+            snapshotDate: new Date(),
+            totalCustomers,
+            totalStamps,
+            totalRedemptions,
+            totalReviews: totalReviews + totalGoogleReviews,
+            repeatVisits: 0,
+            googleReviewCount: totalGoogleReviews,
+          },
+        });
+      }
+    } catch (snapErr) {
+      console.warn("[Growth Engine] Baseline snapshot creation error (non-fatal):", snapErr);
+    }
+
     return ok({
       message: "Payment verified successfully",
       merchant: { plan: updatedMerchant.plan, trialEndsAt: updatedMerchant.trialEndsAt },

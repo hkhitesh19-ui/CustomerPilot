@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Building2, User, Phone, Mail, Lock, ArrowRight, CheckCircle2, Sparkles, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-export function SignupClient() {
+function SignupForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const refCode = searchParams.get("ref") || ""
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -53,6 +55,20 @@ export function SignupClient() {
       if (!res.ok) {
         setError(data.error || "Registration failed. Please try again.")
         return
+      }
+
+      // Track merchant referral if ref code present
+      if (refCode && data.merchantId) {
+        try {
+          await fetch("/api/merchant-referrals/track", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ referralCode: refCode, merchantId: data.merchantId }),
+          })
+        } catch (e) {
+          // Non-blocking: referral tracking failure should not block signup
+          console.warn("Referral tracking failed:", e)
+        }
       }
 
       // Success: JWT cookie is set, redirect to onboarding wizard
@@ -312,5 +328,13 @@ export function SignupClient() {
         </div>
       </footer>
     </div>
+  )
+}
+
+export function SignupClient() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center animate-pulse">Loading...</div>}>
+      <SignupForm />
+    </Suspense>
   )
 }

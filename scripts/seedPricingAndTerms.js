@@ -114,7 +114,7 @@ async function seed() {
       features: JSON.stringify([
         "Up to 1,500 VIP Customers",
         "365-Day Unlimited Automation",
-        "Gemini AI Review Reply Generator",
+        "AI Review Reply Generator",
         "Customizable WhatsApp Templates",
         "VIP Tier Upgrades & Bonus Stamps",
         "Live Queue Cashier Tablet Mode",
@@ -283,7 +283,7 @@ async function seed() {
       popular: false,
       features: JSON.stringify([
         "Google Business Profile Connect",
-        "Gemini AI Context-Aware Replies",
+        "Smart AI Context-Aware Replies",
         "1-Click Publish to Google Maps",
         "Smart Sentiment Adaptation",
         "Bulk Reply Engine",
@@ -304,7 +304,7 @@ async function seed() {
       popular: false,
       features: JSON.stringify([
         "Google Business Profile Connect",
-        "Gemini AI Context-Aware Replies",
+        "Smart AI Context-Aware Replies",
         "1-Click Publish to Google Maps",
         "Smart Sentiment Adaptation",
         "Bulk Reply Engine",

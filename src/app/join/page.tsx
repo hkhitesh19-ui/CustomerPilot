@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { QrCode, Sparkles, CheckCircle2, RefreshCw, Award, MessageSquare, Clock, ShieldCheck } from "lucide-react"
+import { PoweredByCustomerPilot } from "@/components/powered-by-customerpilot"
 
 function JoinContent() {
   const searchParams = useSearchParams()
@@ -224,6 +225,7 @@ function JoinContent() {
         )}
 
       </div>
+      <PoweredByCustomerPilot />
     </div>
   )
 }

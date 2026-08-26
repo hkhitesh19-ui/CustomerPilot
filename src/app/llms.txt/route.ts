@@ -8,7 +8,7 @@ export async function GET() {
 ## Core Capabilities
 - **WhatsApp Digital Stamp Cards**: Instant customer check-in without app downloads. Customers scan store QR code and track stamps via WhatsApp.
 - **Tap-to-Claim Live Queue Engine**: Cashiers claim waiting customers in 5 seconds with 10-second optimistic reservation lock and AI amount outlier validation.
-- **5-Star Google Review Automation**: Auto-detects 5-star Google reviews, awards bonus stamps, and generates Gemini AI response drafts for merchant approval.
+- **5-Star Google Review Automation**: Auto-detects 5-star Google reviews, awards bonus stamps, and generates AI response drafts for merchant approval.
 - **Morning Intelligence Reports**: Aggregates daily revenue, repeat customer %, pending reviews, and AI growth recommendations delivered to merchant dashboard.
 - **Zero-Cognitive Merchant Experience**: Designed so merchants never manage complex POS systems—the software works autonomously behind the scenes.
 

@@ -784,6 +784,20 @@ ext() function to explicitly POST the merchant's configured reward card details 
   4. Verified zero occurrences across the entire codebase via `git grep -n "Evo_Api_Key\|200.97.170.53" src/` (0 matches).
 - **Status**: ✅ Resolved, Documented, and Committed locally (`62e2312`).
 
+---
+
+## [26 Aug 2026] Feature Implementation: CustomerPilot Growth Engine (Sprints 1 to 5)
+- **Symptom / Need**: CustomerPilot needed a complete viral growth flywheel so each customer check-in and merchant onboard naturally attracts new customers and merchants without external marketing spend.
+- **Root Cause**: Platform was solely focused on core retention mechanics (stamps, reviews, replies) with no built-in merchant-to-merchant referral loops, passive branding distribution, social review shareables, or customer referral cash rewards.
+- **Resolution**:
+  - **Database Schema (`prisma/schema.prisma`)**: Added `MerchantReferral`, `GrowthSnapshot`, `GrowthReport` models; added `showPoweredBy`, `ctaEnabled`, `merchantReferralCode`, `walletCredit`, and `communityUrl` to `Merchant`; added `walletCredit` and reward fields to `Customer` and `Referral`. Successfully pushed via `prisma db push`.
+  - **Sprint 1 (Foundation)**: Built `<PoweredByCustomerPilot />` component, added to `/join`, `/q/wallet`, and `/review`; created `/for-business` landing page; built Merchant Referral system (`/api/merchant-referrals`, `/api/merchant-referrals/track`, `/r/[code]`, `/dashboard/referrals`); updated `/signup?ref=CODE`; created industry campaign recommendations (`src/lib/industry-campaigns.ts`); created Growth Overview dashboard (`/dashboard/growth`); updated `AppSidebar` with collapsible Growth, Marketing, and Referrals sections.
+  - **Sprint 2 (Social Proof)**: Built Growth Snapshot API (`/api/growth/snapshot`); automated Day-0 baseline creation upon subscription in `/api/payments/verify`; created Case Study comparison dashboard (`/dashboard/growth/case-study`); built Review Share Card API (`/api/reviews/share-card`), component (`<ReviewShareCard />`), and gallery (`/dashboard/marketing/review-cards`); integrated 1-Click Share Card modal into `/dashboard/reviews`.
+  - **Sprint 3 (Reporting)**: Built Monthly Growth Report engine (`/api/growth/monthly-report`), dashboard (`/dashboard/growth/report`), and share card (`<GrowthReportCard />`); scheduled monthly automated aggregation in `/api/cron/automations`.
+  - **Sprint 4 (Content & Community)**: Built Success Story generator (`/api/growth/success-story`, `/dashboard/marketing/success-story`); created Growth Community hub (`/dashboard/growth/community`).
+  - **Sprint 5 (Viral Loop)**: Enhanced Customer Referral approvals (`/api/referrals/approve`) to award ₹50 `walletCredit`; added duplicate fraud detection; built Customer Referrals dashboard (`/dashboard/referrals/customer-referrals`); added "Invite a Friend" viral card to customer wallet (`/q/wallet/[customerId]`).
+- **Status**: ✅ Resolved, Fully Built, and Verified (Production Build 154/154 pages passing).
+
 
 
 

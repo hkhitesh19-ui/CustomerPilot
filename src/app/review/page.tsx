@@ -211,6 +211,7 @@ Output ONLY the review text.`
   const existingReviewText = existingReview?.finalText || existingReview?.aiDraft || null
   
   return (
+    <>
     <ReviewEditor 
       initialDraft={dynamicDraft}
       existingReviewText={existingReviewText}
@@ -226,6 +227,15 @@ Output ONLY the review text.`
         name: customer.name
       }} 
     />
+    <div className="mt-6 pt-4 border-t border-slate-200/20 text-center space-y-1">
+      <p className="text-[10px] text-slate-500">
+        Powered by <a href="/for-business" className="text-indigo-400 hover:text-indigo-300 font-semibold">CustomerPilot</a> 🚀
+      </p>
+      <p className="text-[9px] text-slate-600">
+        <a href="/for-business" className="hover:text-slate-400 transition-colors">Want this for your business?</a>
+      </p>
+    </div>
+    </>
   )
 }
 // Force rebuild 2

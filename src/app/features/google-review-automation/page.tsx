@@ -2,12 +2,12 @@ import type { Metadata } from "next"
 import { GoogleReviewAutomationClient } from "@/components/google-review-automation-client"
 
 export const metadata: Metadata = {
-  title: "Google Review Automation & Gemini AI Response Generator — CustomerPilot",
+  title: "Google Review Automation & AI Response Generator — CustomerPilot",
   description: "Incentivize 5-star Google reviews with bonus loyalty stamps and automate personalized AI reply drafts for 1-click merchant approval.",
   keywords: [
     "Google Review Automation",
     "Local SEO Review Generation",
-    "Gemini AI Review Reply",
+    "AI Review Reply Generator",
     "Google Business Profile Automation",
     "Restaurant Google Reviews India",
   ],

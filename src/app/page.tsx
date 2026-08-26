@@ -402,7 +402,7 @@ export default function Home() {
                     <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
                       <MessageSquare className="w-3.5 h-3.5 text-indigo-500" /> 1-Click AI AutoReply
                     </span>
-                    <span className="text-[11px] text-slate-500 mt-0.5">Gemini AI owner reply drafts</span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">AI owner reply drafts</span>
                   </Link>
                 </div>
               )}
@@ -539,11 +539,13 @@ export default function Home() {
                 <span className="dot-live"><i></i><i></i></span> India&apos;s #1 Customer Retention Platform for Local Businesses
               </span>
               <h1 className="hero-h">
-                Bring Your Customers Back.<br />
-                Get More Google Reviews.<br />
-                <span className="grad-txt">Reply Automatically.</span>
+                Turn Every Walk-in<br />
+                <span className="grad-txt">Into a Lifetime Customer.</span>
               </h1>
-              <p className="lead">
+              <p className="mt-4 text-base sm:text-lg font-bold text-slate-800 tracking-tight">
+                Bring Your Customers Back. Get More Google Reviews. Reply Automatically.
+              </p>
+              <p className="lead mt-2">
                 CustomerPilot helps local businesses bring customers back with loyalty rewards, AI-powered Google Review assistance, and automated review replies — without requiring customers to download an app.
               </p>
               <div className="btn-row">
@@ -1002,7 +1004,7 @@ export default function Home() {
                 AI automatically drafts appreciative, context-aware owner responses. Store owners review &amp; publish on Google Maps in 1-Click!
               </p>
               <ul className="space-y-1.5 mt-4 text-xs text-slate-700">
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Gemini AI Context-Aware Drafts in 1 Second</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> AI Context-Aware Drafts in 1 Second</li>
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 1-Click Copy &amp; Publish to Google Maps</li>
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Smart Sentiment &amp; Keyword Adaptation</li>
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Dead-Letter Queue Quota Safety</li>

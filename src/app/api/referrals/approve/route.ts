@@ -63,7 +63,10 @@ export async function POST(req: NextRequest) {
   }
   await db.customer.update({
     where: { id: referrer.id },
-    data: { lifetimeStamps: { increment: BONUS_REFERRER } },
+    data: { 
+      lifetimeStamps: { increment: BONUS_REFERRER },
+      walletCredit: { increment: referral.rewardAmount || 50 }
+    },
   })
 
   // Award to friend if linked
@@ -90,7 +93,10 @@ export async function POST(req: NextRequest) {
     if (friend) {
       await db.customer.update({
         where: { id: friend.id },
-        data: { lifetimeStamps: { increment: BONUS_FRIEND } },
+        data: { 
+          lifetimeStamps: { increment: BONUS_FRIEND },
+          walletCredit: { increment: referral.rewardAmount || 50 }
+        },
       })
       // WhatsApp
       await db.whatsAppMessage.create({

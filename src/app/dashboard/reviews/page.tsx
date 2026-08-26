@@ -4,12 +4,14 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Star, MessageSquare, Copy, ExternalLink, Sparkles, RefreshCw,
-  CheckCircle2, Clock, ShieldAlert, AlertTriangle, Send, Filter, Check
+  CheckCircle2, Clock, ShieldAlert, AlertTriangle, Send, Filter, Check, Share2
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { ReviewShareCard } from "@/components/review-share-card"
+import { useDashboardState } from "@/hooks/use-dashboard-state"
 
 interface ReviewItem {
   id: string
@@ -25,6 +27,8 @@ interface ReviewItem {
 
 export default function ReviewsManagementPage() {
   const [reviews, setReviews] = useState<ReviewItem[]>([])
+  const { data: dashboardData } = useDashboardState()
+  const [sharingReview, setSharingReview] = useState<ReviewItem | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<"all" | "pending" | "5star" | "blocked">("all")
   const [generatingId, setGeneratingId] = useState<string | null>(null)
@@ -199,7 +203,7 @@ export default function ReviewsManagementPage() {
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">1-Click GoogleReview AutoReply Studio</h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Manage 5-star Google reviews & post Gemini AI owner replies in 1-Click (Pre-Approval Phase).
+            Manage 5-star Google reviews & post AI owner replies in 1-Click (Pre-Approval Phase).
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -219,7 +223,7 @@ export default function ReviewsManagementPage() {
               <span>Mode: 1-Click AI Reply Assistant (Pre-Approval Phase)</span>
             </div>
             <p className="text-xs text-slate-300">
-              Gemini AI automatically drafts personalized 5-star replies for every review. Click <strong className="text-emerald-400">"1-Click Copy & Post"</strong> to update on Google Maps in 10 seconds!
+              AI automatically drafts personalized 5-star replies for every review. Click <strong className="text-emerald-400">"1-Click Copy & Post"</strong> to update on Google Maps in 10 seconds!
             </p>
           </div>
           <Button
@@ -317,11 +321,11 @@ export default function ReviewsManagementPage() {
                   </p>
                 )}
 
-                {/* Gemini AI Reply Draft Box */}
+                {/* AI Reply Draft Box */}
                 <div className="space-y-2 pt-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> Gemini AI Owner Reply Draft (SEO-Optimized & Editable):
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> AI Owner Reply Draft (SEO-Optimized & Editable):
                     </span>
                     <div className="flex items-center gap-1">
                       <Button
@@ -362,6 +366,15 @@ export default function ReviewsManagementPage() {
                   <Button
                     size="sm"
                     variant="outline"
+                    onClick={() => setSharingReview(item)}
+                    className="border-indigo-500/30 text-indigo-300 hover:bg-indigo-950/40 text-xs gap-1.5"
+                  >
+                    <Share2 className="w-3.5 h-3.5" /> Share Card
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant="outline"
                     onClick={() => handleTestProgrammaticPush(item)}
                     className="border-slate-700 text-slate-300 hover:bg-slate-800 text-xs"
                   >
@@ -392,6 +405,22 @@ export default function ReviewsManagementPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* Share Card Modal */}
+      {sharingReview && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <ReviewShareCard
+            review={{
+              rating: sharingReview.rating,
+              comment: sharingReview.comment || "",
+              authorName: sharingReview.reviewerName,
+              createdAt: sharingReview.createdAt,
+            }}
+            merchantName={dashboardData?.merchant?.name || "Our Store"}
+            onClose={() => setSharingReview(null)}
+          />
         </div>
       )}
     </div>

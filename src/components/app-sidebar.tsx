@@ -1,7 +1,8 @@
 "use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, Zap, Sparkles, ChevronRight } from "lucide-react"
+import { useState } from "react"
+import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, ChevronRight, TrendingUp, BarChart3, FileText, Image, Share2, UserPlus, ChevronDown } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { useDashboardState } from "@/hooks/use-dashboard-state"
 import { hasModule, type Module } from "@/lib/feature-gate"
@@ -16,16 +17,68 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-const navigation = [
+const mainNav = [
   { name: "Home", href: "/dashboard", icon: LayoutDashboard },
   // HIDING UNTIL GOOGLE API APPROVAL
   // { name: "Google Reviews AI", href: "/dashboard/reviews", icon: Star, module: "AUTOREPLY" as Module },
   { name: "Live Queue", href: "/dashboard/queue", icon: Clock, module: "LOYALTY" as Module },
   { name: "Rewards", href: "/dashboard/rewards", icon: Gift, module: "LOYALTY" as Module },
   { name: "Customers CRM", href: "/dashboard/customers", icon: Users },
+]
+
+const growthNav = [
+  { name: "Growth Overview", href: "/dashboard/growth", icon: TrendingUp },
+  { name: "Growth Report", href: "/dashboard/growth/report", icon: BarChart3 },
+  { name: "Case Study", href: "/dashboard/growth/case-study", icon: FileText },
+]
+
+const marketingNav = [
+  { name: "Review Cards", href: "/dashboard/marketing/review-cards", icon: Image },
+  { name: "Success Story", href: "/dashboard/marketing/success-story", icon: FileText },
+]
+
+const referralNav = [
+  { name: "Refer a Business", href: "/dashboard/referrals", icon: Share2 },
+  { name: "Customer Referrals", href: "/dashboard/referrals/customer-referrals", icon: UserPlus },
+]
+
+const bottomNav = [
   { name: "Subscription", href: "/dashboard/subscription", icon: Crown },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
+
+function NavGroup({ label, items, pathname }: { label: string; items: typeof growthNav; pathname: string }) {
+  const isAnyActive = items.some(item => pathname.startsWith(item.href))
+  const [open, setOpen] = useState(isAnyActive)
+
+  return (
+    <div className="mt-1">
+      <button
+        onClick={() => setOpen(!open)}
+        className={`w-full flex items-center justify-between px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-colors ${
+          isAnyActive ? "text-indigo-400" : "text-slate-500 hover:text-slate-300"
+        }`}
+      >
+        <span>{label}</span>
+        <ChevronDown className={`w-3 h-3 transition-transform ${open ? "rotate-0" : "-rotate-90"}`} />
+      </button>
+      {open && (
+        <SidebarMenu>
+          {items.map((item) => (
+            <SidebarMenuItem key={item.name}>
+              <SidebarMenuButton asChild isActive={pathname === item.href}>
+                <Link href={item.href}>
+                  <item.icon className="h-4 w-4" />
+                  <span className="text-[13px]">{item.name}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      )}
+    </div>
+  )
+}
 
 export function AppSidebar() {
   const pathname = usePathname()
@@ -73,9 +126,10 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="py-4">
+      <SidebarContent className="py-4 overflow-y-auto">
+        {/* Main Navigation */}
         <SidebarMenu>
-          {navigation
+          {mainNav
             .filter((item) => !item.module || hasModule(merchant, item.module))
             .map((item) => (
               <SidebarMenuItem key={item.name}>
@@ -88,6 +142,31 @@ export function AppSidebar() {
               </SidebarMenuItem>
             ))}
         </SidebarMenu>
+
+        {/* Growth Section */}
+        <NavGroup label="Growth" items={growthNav} pathname={pathname} />
+
+        {/* Marketing Section */}
+        <NavGroup label="Marketing" items={marketingNav} pathname={pathname} />
+
+        {/* Referrals Section */}
+        <NavGroup label="Referrals" items={referralNav} pathname={pathname} />
+
+        {/* Bottom items */}
+        <div className="mt-2 pt-2 border-t border-slate-800/50">
+          <SidebarMenu>
+            {bottomNav.map((item) => (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton asChild isActive={pathname === item.href}>
+                  <Link href={item.href}>
+                    <item.icon className="h-5 w-5" />
+                    <span>{item.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </div>
       </SidebarContent>
 
       <SidebarFooter className="p-3 border-t border-slate-800/80 space-y-2">

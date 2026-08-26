@@ -57,7 +57,7 @@ export default function HealthMonitorPage() {
           <StatusItem label="Webhook Ingestion" isHealthy={health.webhook} icon={Globe} />
           <StatusItem label="Queue Worker" isHealthy={health.worker} icon={Activity} />
           <StatusItem label="Google Business API" isHealthy={health.google} icon={Globe} />
-          <StatusItem label="Gemini AI Engine" isHealthy={health.ai} icon={Server} />
+          <StatusItem label="Smart AI Response Engine" isHealthy={health.ai} icon={Server} />
         </CardContent>
       </Card>
     </div>

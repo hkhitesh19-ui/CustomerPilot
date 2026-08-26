@@ -390,6 +390,62 @@ export async function GET(req: Request) {
       }
     }
 
+    // ─── Step 6: Monthly Growth Report Engine (Every Month End / 1st of Month) ───
+    let growthReportsGenerated = 0;
+    log('Checking Monthly Growth Reports...');
+    const nowMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+    const activeMerchants = await db.merchant.findMany({
+      where: { status: "active" },
+    });
+
+    for (const m of activeMerchants) {
+      try {
+        const [newCustomers, stampsIssued, rewardsRedeemed, reviewsReceived, gbpReviews] = await Promise.all([
+          db.customer.count({ where: { merchantId: m.id, createdAt: { gte: startOfMonth, lte: endOfMonth }, deletedAt: null } }),
+          db.stamp.count({ where: { merchantId: m.id, createdAt: { gte: startOfMonth, lte: endOfMonth } } }),
+          db.redemption.count({ where: { merchantId: m.id, createdAt: { gte: startOfMonth, lte: endOfMonth } } }),
+          db.review.count({ where: { merchantId: m.id, createdAt: { gte: startOfMonth, lte: endOfMonth } } }),
+          db.googleBusinessReview.count({ where: { merchantId: m.id, createdAt: { gte: startOfMonth, lte: endOfMonth } } }),
+        ]);
+
+        const totalReviews = reviewsReceived + gbpReviews;
+
+        await db.growthReport.upsert({
+          where: {
+            merchantId_reportMonth: {
+              merchantId: m.id,
+              reportMonth: nowMonthStr,
+            },
+          },
+          update: {
+            newCustomers,
+            stampsIssued,
+            rewardsRedeemed,
+            reviewsReceived: totalReviews,
+          },
+          create: {
+            merchantId: m.id,
+            reportMonth: nowMonthStr,
+            periodStart: startOfMonth,
+            periodEnd: endOfMonth,
+            newCustomers,
+            stampsIssued,
+            rewardsRedeemed,
+            reviewsReceived: totalReviews,
+            repliesPosted: 0,
+            repeatVisits: 0,
+          },
+        });
+        growthReportsGenerated++;
+      } catch (repErr) {
+        log(`[Growth Report] Error generating for ${m.name}: ${repErr}`);
+      }
+    }
+    log(`Generated/Updated ${growthReportsGenerated} Monthly Growth Reports.`);
+
     log('Day 1 to Day 90 Automation Engine completed successfully.');
 
     return NextResponse.json({ 
@@ -399,7 +455,8 @@ export async function GET(req: Request) {
         reportsSent,
         winbacksSent,
         remindersSent,
-        expiryWarningsSent
+        expiryWarningsSent,
+        growthReportsGenerated
       },
       logs 
     });
