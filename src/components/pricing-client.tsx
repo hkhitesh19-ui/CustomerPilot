@@ -332,21 +332,11 @@ export function PricingClient() {
         </div>
 
         {/* Trust Badges */}
-        <div className="border-t border-slate-200 pt-10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div className="border-t border-slate-200 pt-10 grid grid-cols-1 sm:grid-cols-2 gap-6 text-center max-w-2xl mx-auto">
           <div className="space-y-1 p-4 rounded-2xl bg-slate-50 border border-slate-100">
             <Lock className="w-5 h-5 text-emerald-600 mx-auto mb-2" />
             <h4 className="text-xs font-bold text-slate-900">No Credit Card Needed</h4>
             <p className="text-[11px] text-slate-500">7 days full access free</p>
-          </div>
-          <div className="space-y-1 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-            <ShieldCheck className="w-5 h-5 text-blue-600 mx-auto mb-2" />
-            <h4 className="text-xs font-bold text-slate-900">Cancel Anytime</h4>
-            <p className="text-[11px] text-slate-500">Zero lock-in contracts</p>
-          </div>
-          <div className="space-y-1 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-            <RefreshCw className="w-5 h-5 text-amber-600 mx-auto mb-2" />
-            <h4 className="text-xs font-bold text-slate-900">High ROI Guaranteed</h4>
-            <p className="text-[11px] text-slate-500">Boosts repeat visits 40%</p>
           </div>
           <div className="space-y-1 p-4 rounded-2xl bg-slate-50 border border-slate-100">
             <Users className="w-5 h-5 text-purple-600 mx-auto mb-2" />
