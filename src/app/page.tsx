@@ -2178,6 +2178,12 @@ function Step6QRCode({ data, setData }: any) {
               </Button>
             </div>
           </div>
+
+          {/* CustomerPilot Branding with Logo */}
+          <div className="pt-3 mt-2 border-t border-slate-100 flex items-center justify-center gap-2">
+            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Powered by</span>
+            <img src="/cplogo_horizontal.png" alt="CustomerPilot" className="h-5 w-auto object-contain" />
+          </div>
         </div>
       )}
     </div>
@@ -2262,10 +2268,10 @@ function Step7PrintQR({ data, setData }: any) {
             <p className="text-[10px] text-slate-300">No App Required • Takes 5 Seconds on WhatsApp</p>
           </div>
 
-          {/* Footer Badge */}
-          <div className="pt-2 flex items-center justify-center gap-1.5 text-[10px] text-slate-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-            <span>Powered by CustomerPilot • Official WhatsApp VIP Engine</span>
+          {/* CustomerPilot Branding with Logo */}
+          <div className="pt-3 border-t border-white/20 flex items-center justify-center gap-2">
+            <span className="text-[10px] text-slate-300 font-semibold uppercase tracking-wider">Powered by</span>
+            <img src="/cplogo_horizontal.png" alt="CustomerPilot" className="h-5 w-auto object-contain bg-white/15 rounded px-1.5 py-0.5" />
           </div>
         </div>
       </div>

@@ -25,7 +25,7 @@ CustomerPilot provides an AI-powered customer retention, WhatsApp loyalty stamp 
 
 ### 3. Subscriptions, Payments & Billing
 - **Free Trial:** New merchants receive a complimentary 7-Day trial period with full access to all features.
-- **Paid Plans:** CustomerPilot offers 30-Day, 180-Day, and 365-Day subscription plans billed securely via Razorpay.
+- **Paid Plans:** CustomerPilot offers 180-Day (6 Months) and 365-Day (1 Year) subscription plans billed securely via Razorpay.
 - **Service Continuity:** If a subscription expires without renewal, access enters a read-only state, and background automations (QR scanning & cron messages) are paused until renewed.
 - **Refund Policy:** Subscriptions are non-refundable once activated, as system infrastructure and WhatsApp server capacity are provisioned immediately upon purchase.
 
@@ -55,30 +55,16 @@ For legal inquiries or business support, contact **support@customerpilot.in**.
 async function seed() {
   console.log("Seeding Plans, Coupons, and Terms...");
 
-  // 1. Seed Plans (Exact User-Defined Pricing: Standalone + Capacity Tiers)
+  // Deactivate any legacy 30-day plans in DB
+  await prisma.plan.updateMany({
+    where: { days: 30 },
+    data: { active: false }
+  });
+  console.log("Deactivated legacy 30-day plans in database.");
+
+  // 1. Seed Plans (6 Months and 1 Year Plans Only)
   const plans = [
     // ─── CustomerPilot Complete Capacity Plans ───
-    {
-      planKey: "starter_30",
-      name: "Complete Starter Trial (30 Days)",
-      description: "Introductory 30-day full-featured access for new retail stores.",
-      days: 30,
-      price: 399,
-      originalPrice: 599,
-      discountPercent: 33,
-      badge: "Starter Trial",
-      popular: false,
-      features: JSON.stringify([
-        "Up to 500 VIP Customers",
-        "WhatsApp Stamp Card Engine",
-        "Magic Google Review AI Flow",
-        "1-Click AutoReply Assistant",
-        "Counter QR Standee Printable",
-        "Daily Morning Intelligence"
-      ]),
-      enabledModules: "LOYALTY,REVIEWS,AUTOREPLY",
-      active: true
-    },
     {
       planKey: "growth_180",
       name: "Starter Growth Plan (6 Months)",
@@ -147,27 +133,6 @@ async function seed() {
 
     // ─── Standalone Service 1: WhatsApp Loyalty Rewards ───
     {
-      planKey: "loyalty_monthly",
-      name: "WhatsApp Loyalty Rewards — 1 Month",
-      description: "Digital stamp cards, QR check-in, birthday rewards, and automated win-backs.",
-      days: 30,
-      price: 149,
-      originalPrice: 249,
-      discountPercent: 40,
-      badge: "Loyalty (1 Mo)",
-      popular: false,
-      features: JSON.stringify([
-        "Digital Loyalty Stamp Card",
-        "QR Counter Check-In",
-        "Birthday Rewards Engine",
-        "VIP Tier Upgrades",
-        "Automated 30/60/90 Day Win-Backs",
-        "Basic Customer Analytics"
-      ]),
-      enabledModules: "LOYALTY",
-      active: true
-    },
-    {
       planKey: "loyalty_6mo",
       name: "WhatsApp Loyalty Rewards — 6 Months",
       description: "Digital stamp cards, QR check-in, birthday rewards, and automated win-backs.",
@@ -211,26 +176,6 @@ async function seed() {
 
     // ─── Standalone Service 2: Magic SEO Optimized Google Reviews ───
     {
-      planKey: "reviews_monthly",
-      name: "Magic AI Google Reviews — 1 Month",
-      description: "Automated WhatsApp review collection with AI-drafted 5-star reviews.",
-      days: 30,
-      price: 149,
-      originalPrice: 249,
-      discountPercent: 40,
-      badge: "Reviews (1 Mo)",
-      popular: false,
-      features: JSON.stringify([
-        "WhatsApp Review Request Automation",
-        "AI-Drafted Customer Reviews",
-        "5-Star Review Filter",
-        "Google Maps Deep Link",
-        "Review Analytics Dashboard"
-      ]),
-      enabledModules: "REVIEWS",
-      active: true
-    },
-    {
       planKey: "reviews_6mo",
       name: "Magic AI Google Reviews — 6 Months",
       description: "Automated WhatsApp review collection with AI-drafted 5-star reviews.",
@@ -271,27 +216,6 @@ async function seed() {
     },
 
     // ─── Standalone Service 3: 1-Click GoogleReview AutoReply ───
-    {
-      planKey: "autoreply_monthly",
-      name: "1-Click AI AutoReply — 1 Month",
-      description: "AI-powered Google review replies published in 1-Click to Google Maps.",
-      days: 30,
-      price: 149,
-      originalPrice: 249,
-      discountPercent: 40,
-      badge: "AutoReply (1 Mo)",
-      popular: false,
-      features: JSON.stringify([
-        "Google Business Profile Connect",
-        "Smart AI Context-Aware Replies",
-        "1-Click Publish to Google Maps",
-        "Smart Sentiment Adaptation",
-        "Bulk Reply Engine",
-        "Review Sync Dashboard"
-      ]),
-      enabledModules: "AUTOREPLY",
-      active: true
-    },
     {
       planKey: "autoreply_6mo",
       name: "1-Click AI AutoReply — 6 Months",

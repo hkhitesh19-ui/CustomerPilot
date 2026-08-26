@@ -1724,6 +1724,12 @@ function OnboardStep6QR({ data, setData }: any) {
               </Button>
             </div>
           </div>
+
+          {/* CustomerPilot Branding with Logo */}
+          <div className="pt-3 mt-2 border-t border-slate-100 flex items-center justify-center gap-2">
+            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Powered by</span>
+            <img src="/cplogo_horizontal.png" alt="CustomerPilot" className="h-5 w-auto object-contain" />
+          </div>
         </div>
       )}
     </div>
@@ -1842,7 +1848,10 @@ function OnboardStep7Print({ data, setData }: any) {
             </div>
 
             <div class="footer-text">📲 Point your camera to check-in on WhatsApp</div>
-            <div class="powered-by">Powered by CustomerPilot</div>
+            <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid #e2e8f0;">
+              <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:1.2px;">Powered by</span>
+              <img src="/cplogo_horizontal.png" style="height:22px; width:auto; object-fit:contain;" alt="CustomerPilot" />
+            </div>
           </div>
           <script>
             window.onload = () => {
@@ -1890,6 +1899,12 @@ function OnboardStep7Print({ data, setData }: any) {
             <p className="text-xs text-amber-300 font-bold uppercase">★ Exclusive Member Offer ★</p>
             <p className="text-sm font-extrabold">Earn Stamps & Get {rewardOffer}!</p>
             <p className="text-[10px] text-slate-300">No App Required • 5 Seconds on WhatsApp</p>
+          </div>
+
+          {/* CustomerPilot Branding with Logo */}
+          <div className="pt-3 border-t border-white/20 flex items-center justify-center gap-2">
+            <span className="text-[10px] text-slate-300 font-semibold uppercase tracking-wider">Powered by</span>
+            <img src="/cplogo_horizontal.png" alt="CustomerPilot" className="h-5 w-auto object-contain bg-white/15 rounded px-1.5 py-0.5" />
           </div>
         </div>
       </div>

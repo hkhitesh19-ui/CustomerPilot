@@ -150,7 +150,10 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
             </div>
 
             <div class="footer-text">📲 Point your camera to check-in on WhatsApp</div>
-            <div class="powered-by">Powered by CustomerPilot</div>
+            <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid #e2e8f0;">
+              <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:1.2px;">Powered by</span>
+              <img src="/cplogo_horizontal.png" style="height:22px; width:auto; object-fit:contain;" alt="CustomerPilot" />
+            </div>
           </div>
           <script>
             window.onload = () => {
@@ -227,9 +230,11 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
               ) : null}
             </div>
 
-            <p className="text-[11px] font-mono text-muted-foreground mt-3 uppercase tracking-wider">
-              Counter Standee
-            </p>
+            {/* CustomerPilot Branding with Logo */}
+            <div className="pt-3 mt-2 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-center gap-2">
+              <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Powered by</span>
+              <img src="/cplogo_horizontal.png" alt="CustomerPilot" className="h-5 w-auto object-contain" />
+            </div>
           </div>
 
           {/* Details & Actions */}
