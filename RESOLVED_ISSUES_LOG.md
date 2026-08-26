@@ -798,6 +798,30 @@ ext() function to explicitly POST the merchant's configured reward card details 
   - **Sprint 5 (Viral Loop)**: Enhanced Customer Referral approvals (`/api/referrals/approve`) to award ₹50 `walletCredit`; added duplicate fraud detection; built Customer Referrals dashboard (`/dashboard/referrals/customer-referrals`); added "Invite a Friend" viral card to customer wallet (`/q/wallet/[customerId]`).
 - **Status**: ✅ Resolved, Fully Built, and Verified (Production Build 154/154 pages passing).
 
+---
+
+## [26 Aug 2026] Feature: CustomerPilot Logo & Brand Name on Merchant QR Standees
+- **Symptom**: Generated merchant counter QR codes and printable standees did not prominently display the official CustomerPilot logo and brand name alongside "Powered by".
+- **Root Cause**: The QR generator component and onboarding Step 6/7 previews only rendered a text string `"Powered by CustomerPilot"` without embedding the transparent horizontal logo asset.
+- **Resolution**:
+  1. Updated `src/app/onboarding/page.tsx` (`OnboardStep6QR` and `OnboardStep7Print`) to embed `/cplogo_horizontal.png` with brand name on interactive QR cards and printable standee PDFs.
+  2. Updated `src/components/qr-generator.tsx` so both the printable PDF standee and on-screen counter standee preview embed the CustomerPilot horizontal logo.
+  3. Updated `src/app/page.tsx` homepage interactive onboarding demo steps 6 and 7 with the CustomerPilot brand logo.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
+## [26 Aug 2026] UX / Pricing Enforcement: Enforce 6 Months & 1 Year Pricing Only
+- **Symptom**: Pricing pages and subscription checkout offered a 30-day (1-month) plan option and redundant marketing badges ("Cancel Anytime", "High ROI Guaranteed").
+- **Root Cause**: Earlier pricing schemes included introductory 30-day options across Complete and Standalone plans.
+- **Resolution**:
+  1. Updated `src/components/pricing-client.tsx` to remove 30-day toggle switcher, outcome cards, and "Complete Starter Trial (30 Days)" capacity plan.
+  2. Removed "Cancel Anytime / Zero lock-in contracts" and "High ROI Guaranteed / Boosts repeat visits 40%" trust badges from `src/components/pricing-client.tsx`.
+  3. Updated `src/app/dashboard/subscription/page.tsx` to strictly filter out 30-day plans and display only 6 Months (180 Days) and 1 Year (365 Days) options.
+  4. Updated `scripts/seedPricingAndTerms.js` to deactivate legacy 30-day plans in the database and re-seeded `Plan` records.
+  5. Built and verified production bundle (154/154 pages passing).
+- **Status**: ✅ Resolved and Verified.
+
 
 
 
