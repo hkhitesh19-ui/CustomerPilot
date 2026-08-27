@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/features/whatsapp-stamp-card",
     "/features/google-review-automation",
     "/compare/vs-traditional-pos",
+    "/for-business",
     "/help",
     "/signup",
     "/login",
