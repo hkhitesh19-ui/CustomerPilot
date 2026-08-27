@@ -7,7 +7,7 @@ import {
   Image as ImageIcon, Brain, BarChart3, Heart, Database, Download,
   Settings, Globe, Shield, Code, Zap, Crown, Store, Check, X, Search,
   MessageSquare, RefreshCw, RotateCcw, Activity, Server, Cpu, Sparkles,
-  Layers, ArrowUpRight, Lock, CheckCircle2, ChevronRight
+  Layers, ArrowUpRight, Lock, CheckCircle2, ChevronRight, Trash2, AlertTriangle, Eye, UserX
 } from "lucide-react"
 import { WhatsAppTemplateManager } from "@/components/whatsapp-template-manager"
 import { SubscriptionPlansManager } from "@/components/super-admin/subscription-plans-manager"
@@ -655,6 +655,17 @@ function MerchantManagement() {
   const [saving, setSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
 
+  // Customer List & Deletion Modal State
+  const [customerModalMerchant, setCustomerModalMerchant] = useState<any | null>(null)
+  const [merchantCustomers, setMerchantCustomers] = useState<any[]>([])
+  const [loadingCustomers, setLoadingCustomers] = useState(false)
+  const [customerSearch, setCustomerSearch] = useState("")
+  const [deletingCustomerId, setDeletingCustomerId] = useState<string | null>(null)
+
+  // Deleting & Resetting Progress States
+  const [deletingMerchantId, setDeletingMerchantId] = useState<string | null>(null)
+  const [resettingMerchantId, setResettingMerchantId] = useState<string | null>(null)
+
   const loadMerchants = () => {
     fetch("/api/admin/merchants")
       .then((res) => res.json())
@@ -740,6 +751,136 @@ function MerchantManagement() {
     }
   }
 
+  // 1. SuperAdmin: Permanently Delete Entire Merchant
+  const handleDeleteMerchant = async (merchantId: string, merchantName: string) => {
+    const confirmation = confirm(
+      `⚠️ PERMANENT MERCHANT DELETION (SUPERADMIN):\n\n` +
+      `Are you sure you want to PERMANENTLY DELETE merchant:\n"${merchantName}" (ID: ${merchantId})?\n\n` +
+      `This will completely wipe:\n` +
+      `• Merchant account and credentials\n` +
+      `• All customers, stamps, and visits\n` +
+      `• All bills, reviews, and WhatsApp messages\n` +
+      `• Stamp cards, reward configs, and QR stands\n\n` +
+      `This action CANNOT be undone!`
+    )
+    if (!confirmation) return
+
+    try {
+      setDeletingMerchantId(merchantId)
+      const res = await fetch(`/api/admin/merchants?id=${merchantId}`, {
+        method: "DELETE"
+      })
+      const result = await res.json()
+      if (result.success) {
+        alert(`✅ ${result.message}`)
+        loadMerchants()
+      } else {
+        alert(`❌ Error deleting merchant: ${result.error}`)
+      }
+    } catch (e: any) {
+      alert(`❌ Failed to delete merchant: ${e.message}`)
+    } finally {
+      setDeletingMerchantId(null)
+    }
+  }
+
+  // 2. SuperAdmin: Reset / Wipe Customer Data for a Merchant
+  const handleResetMerchantCustomers = async (merchantId: string, merchantName: string) => {
+    const confirmation = confirm(
+      `🧹 RESET MERCHANT CUSTOMERS (SUPERADMIN):\n\n` +
+      `Are you sure you want to WIPE ALL CUSTOMER DATA for:\n"${merchantName}"?\n\n` +
+      `This will reset:\n` +
+      `• All test customers, visits, and stamps back to 0\n` +
+      `• All customer bills, redemptions, and WhatsApp queues\n\n` +
+      `Merchant account, QR codes, and reward settings will REMAIN INTACT for fresh testing.`
+    )
+    if (!confirmation) return
+
+    try {
+      setResettingMerchantId(merchantId)
+      const res = await fetch("/api/admin/merchants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "reset_customers",
+          merchantId
+        })
+      })
+      const result = await res.json()
+      if (result.success) {
+        alert(`✅ ${result.message}`)
+        loadMerchants()
+        if (customerModalMerchant?.id === merchantId) {
+          setMerchantCustomers([])
+        }
+      } else {
+        alert(`❌ Error resetting customers: ${result.error}`)
+      }
+    } catch (e: any) {
+      alert(`❌ Failed to reset customers: ${e.message}`)
+    } finally {
+      setResettingMerchantId(null)
+    }
+  }
+
+  // 3. SuperAdmin: Open Customers Modal to View & Delete Individual Customers
+  const handleViewCustomers = async (merchant: any) => {
+    setCustomerModalMerchant(merchant)
+    setLoadingCustomers(true)
+    setCustomerSearch("")
+    try {
+      const res = await fetch(`/api/admin/merchants?action=customers&merchantId=${merchant.id}`)
+      const data = await res.json()
+      if (data.success) {
+        setMerchantCustomers(data.customers || [])
+      }
+    } catch (e: any) {
+      alert(`❌ Error loading customers: ${e.message}`)
+    } finally {
+      setLoadingCustomers(false)
+    }
+  }
+
+  // 4. SuperAdmin: Delete Single Individual Customer
+  const handleDeleteIndividualCustomer = async (customerId: string, customerName: string) => {
+    if (!confirm(`Are you sure you want to delete customer "${customerName}" from "${customerModalMerchant?.name}"?`)) {
+      return
+    }
+
+    try {
+      setDeletingCustomerId(customerId)
+      const res = await fetch("/api/admin/merchants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "delete_customer",
+          customerId
+        })
+      })
+      const result = await res.json()
+      if (result.success) {
+        setMerchantCustomers((prev) => prev.filter((c) => c.id !== customerId))
+        loadMerchants()
+      } else {
+        alert(`❌ Error deleting customer: ${result.error}`)
+      }
+    } catch (e: any) {
+      alert(`❌ Failed to delete customer: ${e.message}`)
+    } finally {
+      setDeletingCustomerId(null)
+    }
+  }
+
+  const filteredCustomers = merchantCustomers.filter((c) => {
+    if (!customerSearch.trim()) return true
+    const q = customerSearch.toLowerCase()
+    return (
+      c.name?.toLowerCase().includes(q) ||
+      c.phone?.toLowerCase().includes(q) ||
+      c.email?.toLowerCase().includes(q)
+    )
+  })
+
   if (loading) {
     return (
       <Card className="bg-slate-900/80 border-slate-800 text-white">
@@ -763,7 +904,20 @@ function MerchantManagement() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-2xl">
+      {/* Fleet Header Summary */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-black text-white flex items-center gap-2">
+            <Store className="w-5 h-5 text-indigo-400" />
+            Registered Merchants Fleet ({merchants.length})
+          </h2>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Manage live merchants, edit loyalty rules, reset test customer data, or permanently delete merchant accounts.
+          </p>
+        </div>
+      </div>
+
+      <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-2xl overflow-hidden">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -774,42 +928,100 @@ function MerchantManagement() {
                   <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Plan</th>
                   <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Review Delay</th>
                   <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Status</th>
-                  <th className="text-right p-4 text-xs font-bold text-slate-400 uppercase">Customers</th>
+                  <th className="text-center p-4 text-xs font-bold text-slate-400 uppercase">Customers</th>
                   <th className="text-right p-4 text-xs font-bold text-slate-400 uppercase">Bills</th>
                   <th className="text-right p-4 text-xs font-bold text-slate-400 uppercase">MRR</th>
                   <th className="text-right p-4 text-xs font-bold text-slate-400 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 text-sm">
-                {merchants.map((m: any, i: number) => (
-                  <tr key={m.id || i} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="p-4 font-bold text-white">
-                      {m.name}
-                      <div className="text-[11px] text-slate-500 font-mono">ID: {m.id}</div>
-                    </td>
-                    <td className="p-4 text-slate-300">
-                      <div>{m.ownerName}</div>
-                      <div className="text-xs text-slate-400 font-mono">{m.whatsappPhone}</div>
-                    </td>
-                    <td className="p-4 font-extrabold text-indigo-400">{m.plan}</td>
-                    <td className="p-4 text-slate-300 font-mono text-xs">{m.googleReviewDelayMinutes ?? 30} mins</td>
-                    <td className="p-4">
-                      <Badge variant="outline" className={
-                        m.status === "Active" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" :
-                        m.status === "Trial" ? "bg-blue-500/10 text-blue-400 border-blue-500/30" :
-                        "bg-rose-500/10 text-rose-400 border-rose-500/30"
-                      }>{m.status}</Badge>
-                    </td>
-                    <td className="p-4 text-right font-bold text-slate-200">{m.customers}</td>
-                    <td className="p-4 text-right text-slate-400">{m.bills}</td>
-                    <td className="p-4 text-right font-extrabold text-emerald-400">₹{m.mrr.toLocaleString("en-IN")}</td>
-                    <td className="p-4 text-right space-x-2">
-                      <Button size="sm" onClick={() => handleOpenEdit(m)} className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md">
-                        ⚙️ Edit Rules
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
+                {merchants.map((m: any, i: number) => {
+                  const isDeleting = deletingMerchantId === m.id
+                  const isResetting = resettingMerchantId === m.id
+
+                  return (
+                    <tr key={m.id || i} className="hover:bg-slate-800/40 transition-colors">
+                      <td className="p-4 font-bold text-white">
+                        {m.name}
+                        <div className="text-[11px] text-slate-500 font-mono">ID: {m.id}</div>
+                      </td>
+                      <td className="p-4 text-slate-300">
+                        <div>{m.ownerName}</div>
+                        <div className="text-xs text-slate-400 font-mono">{m.whatsappPhone}</div>
+                      </td>
+                      <td className="p-4 font-extrabold text-indigo-400">{m.plan}</td>
+                      <td className="p-4 text-slate-300 font-mono text-xs">{m.googleReviewDelayMinutes ?? 30} mins</td>
+                      <td className="p-4">
+                        <Badge variant="outline" className={
+                          m.status === "Active" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" :
+                          m.status === "Trial" ? "bg-blue-500/10 text-blue-400 border-blue-500/30" :
+                          "bg-rose-500/10 text-rose-400 border-rose-500/30"
+                        }>{m.status}</Badge>
+                      </td>
+                      <td className="p-4 text-center">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleViewCustomers(m)}
+                          className="h-7 px-2.5 rounded-lg bg-slate-800/80 hover:bg-indigo-600/30 text-slate-200 hover:text-indigo-300 border border-slate-700 text-xs font-bold gap-1"
+                          title="View & manage customers"
+                        >
+                          <Users className="w-3.5 h-3.5 text-indigo-400" />
+                          <span>{m.customers}</span>
+                        </Button>
+                      </td>
+                      <td className="p-4 text-right text-slate-400">{m.bills}</td>
+                      <td className="p-4 text-right font-extrabold text-emerald-400">₹{m.mrr.toLocaleString("en-IN")}</td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                          {/* 1. Edit Rules */}
+                          <Button
+                            size="sm"
+                            onClick={() => handleOpenEdit(m)}
+                            className="h-8 px-2.5 bg-indigo-600/80 hover:bg-indigo-600 text-white font-bold text-xs shadow-xs"
+                            title="Edit reward rules & cycle categories"
+                          >
+                            ⚙️ Rules
+                          </Button>
+
+                          {/* 2. Reset Customers / Wipe Data */}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleResetMerchantCustomers(m.id, m.name)}
+                            disabled={isResetting || isDeleting}
+                            className="h-8 px-2.5 border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold text-xs"
+                            title="Wipe test customers & stamps back to 0"
+                          >
+                            {isResetting ? (
+                              <RotateCcw className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                            ) : (
+                              <span>🧹 Reset</span>
+                            )}
+                          </Button>
+
+                          {/* 3. Delete Merchant */}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDeleteMerchant(m.id, m.name)}
+                            disabled={isDeleting || isResetting}
+                            className="h-8 px-2.5 border-rose-500/40 bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-400 font-bold text-xs transition-colors"
+                            title="Permanently delete merchant account & data"
+                          >
+                            {isDeleting ? (
+                              <Trash2 className="w-3.5 h-3.5 animate-spin text-rose-400" />
+                            ) : (
+                              <span className="flex items-center gap-1">
+                                <Trash2 className="w-3 h-3" /> Delete
+                              </span>
+                            )}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -921,6 +1133,142 @@ function MerchantManagement() {
               <Button variant="outline" onClick={() => setSelectedMerchant(null)} className="border-slate-700 text-slate-300">Cancel</Button>
               <Button onClick={handleSaveMerchantRules} disabled={saving} className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg">
                 {saving ? "Saving to DB..." : "💾 Save Merchant Rules (SuperAdmin)"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SuperAdmin View & Delete Customers Modal */}
+      {customerModalMerchant && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                  <Users className="w-5 h-5 text-indigo-400" />
+                  Customers Fleet — {customerModalMerchant.name}
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  View and manage individual customers, stamps, visits, or delete specific test users.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleResetMerchantCustomers(customerModalMerchant.id, customerModalMerchant.name)}
+                  className="border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-bold gap-1"
+                >
+                  🧹 Wipe All Customers
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setCustomerModalMerchant(null)}
+                  className="text-slate-400 hover:text-white"
+                >
+                  ✕
+                </Button>
+              </div>
+            </div>
+
+            {/* Modal Search Bar */}
+            <div className="p-4 bg-slate-950/50 border-b border-slate-800/80 flex items-center justify-between gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Input
+                  placeholder="Search customer by name, phone, or email..."
+                  value={customerSearch}
+                  onChange={(e) => setCustomerSearch(e.target.value)}
+                  className="pl-9 bg-slate-900 border-slate-800 text-xs text-white"
+                />
+              </div>
+              <span className="text-xs text-slate-400 font-medium">
+                Showing {filteredCustomers.length} of {merchantCustomers.length} customers
+              </span>
+            </div>
+
+            {/* Modal Customers Table */}
+            <div className="flex-1 overflow-y-auto p-0 custom-scrollbar">
+              {loadingCustomers ? (
+                <div className="p-12 text-center text-slate-400">
+                  <div className="animate-spin w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full mx-auto mb-2" />
+                  Loading customers from database...
+                </div>
+              ) : filteredCustomers.length === 0 ? (
+                <div className="p-12 text-center text-slate-500 text-sm">
+                  {merchantCustomers.length === 0 ? "No customers registered for this merchant yet." : "No matching customers found."}
+                </div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-950 sticky top-0 border-b border-slate-800/80 text-xs text-slate-400 uppercase">
+                    <tr>
+                      <th className="text-left p-3.5">Customer</th>
+                      <th className="text-left p-3.5">Phone & Email</th>
+                      <th className="text-center p-3.5">Stamps</th>
+                      <th className="text-center p-3.5">Visits</th>
+                      <th className="text-right p-3.5">Spend (₹)</th>
+                      <th className="text-left p-3.5">Joined</th>
+                      <th className="text-right p-3.5">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/50">
+                    {filteredCustomers.map((c: any) => {
+                      const isDeletingCust = deletingCustomerId === c.id
+
+                      return (
+                        <tr key={c.id} className="hover:bg-slate-800/30 transition-colors">
+                          <td className="p-3.5 font-bold text-white">
+                            {c.name || "Customer"}
+                            <div className="text-[10px] text-slate-500 font-mono">ID: {c.id.substring(0, 10)}...</div>
+                          </td>
+                          <td className="p-3.5 text-slate-300 font-mono text-xs">
+                            <div>{c.phone}</div>
+                            {c.email && <div className="text-[11px] text-slate-500">{c.email}</div>}
+                          </td>
+                          <td className="p-3.5 text-center font-extrabold text-amber-400">{c.stamps}</td>
+                          <td className="p-3.5 text-center text-slate-300">{c.visits}</td>
+                          <td className="p-3.5 text-right font-bold text-emerald-400">₹{c.spend?.toLocaleString("en-IN") || 0}</td>
+                          <td className="p-3.5 text-slate-400 text-xs">
+                            {new Date(c.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                          </td>
+                          <td className="p-3.5 text-right">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDeleteIndividualCustomer(c.id, c.name || c.phone)}
+                              disabled={isDeletingCust}
+                              className="h-7 px-2 border-rose-500/40 bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-400 text-xs font-bold gap-1"
+                              title="Delete customer"
+                            >
+                              {isDeletingCust ? (
+                                <Trash2 className="w-3 h-3 animate-spin text-rose-400" />
+                              ) : (
+                                <>
+                                  <Trash2 className="w-3 h-3" />
+                                  <span>Delete</span>
+                                </>
+                              )}
+                            </Button>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-slate-800 bg-slate-950/60 flex justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setCustomerModalMerchant(null)}
+                className="border-slate-700 text-slate-300 text-xs"
+              >
+                Close
               </Button>
             </div>
           </div>

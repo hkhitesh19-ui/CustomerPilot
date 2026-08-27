@@ -822,6 +822,24 @@ ext() function to explicitly POST the merchant's configured reward card details 
   5. Built and verified production bundle (154/154 pages passing).
 - **Status**: ✅ Resolved and Verified.
 
+---
+
+## [27 Aug 2026] Feature: SuperAdmin 1-Click Merchant Deletion & Customer Data Reset
+- **Symptom**: SuperAdmin had no direct mechanism in the SuperAdmin Panel to wipe test customers for a merchant or permanently delete an entire merchant account and all its cascaded records.
+- **Root Cause**: SuperAdmin Fleet table only offered `Edit Rules` modal without backend `DELETE` / reset endpoints.
+- **Resolution**:
+  1. Updated `src/app/api/admin/merchants/route.ts` with:
+     - `DELETE /api/admin/merchants?id=merchantId`: Runs a complete Prisma `$transaction` deleting all dependent relations (stamps, bills, redemptions, reviews, WhatsApp queues, customer records, etc.) and the merchant itself.
+     - `POST /api/admin/merchants` with `{ action: 'reset_customers', merchantId }`: Wipes all customer-level activity data back to 0 while keeping merchant settings, QR codes, and credentials intact.
+     - `POST /api/admin/merchants` with `{ action: 'delete_customer', customerId }`: Deletes individual test customers.
+     - `GET /api/admin/merchants?action=customers&merchantId=X`: Returns live customer fleet for any merchant.
+  2. Updated `src/app/super-admin/page.tsx` (`MerchantManagement`):
+     - Added **"👥 Customers (X)"** button that opens a Customer Management Modal with search and individual **"🗑️ Delete"** button.
+     - Added **"🧹 Reset"** button for 1-click test customer wiping.
+     - Added **"🗑️ Delete"** button with full confirmation warning for permanent merchant account deletion.
+  3. Verified clean build and live server responses.
+- **Status**: ✅ Resolved and Verified.
+
 
 
 
