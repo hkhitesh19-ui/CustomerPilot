@@ -840,6 +840,19 @@ ext() function to explicitly POST the merchant's configured reward card details 
   3. Verified clean build and live server responses.
 - **Status**: ✅ Resolved and Verified.
 
+---
+
+## [27 Aug 2026] Pricing & Capacity Update: Starter Growth (1,000 VIP) & Pro Scaling (2,500 VIP)
+- **Symptom / Requirement**: User requested updating capacity limits on pricing plans:
+  1. Starter Growth Plan: Up to 1,000 VIP Customers (updated from 500)
+  2. Pro Scaling Plan: Up to 2,500 VIP Customers (updated from 1,500)
+- **Resolution**:
+  1. Updated `src/components/pricing-client.tsx` capacity card titles, badges, and features list.
+  2. Updated `scripts/seedPricingAndTerms.js` plan descriptions and features JSON array.
+  3. Re-seeded database `Plan` records via `node scripts/seedPricingAndTerms.js`.
+  4. Triggered production build.
+- **Status**: ✅ Resolved and Verified.
+
 
 
 

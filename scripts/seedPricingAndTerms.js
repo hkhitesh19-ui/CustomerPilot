@@ -68,7 +68,7 @@ async function seed() {
     {
       planKey: "growth_180",
       name: "Starter Growth Plan (6 Months)",
-      description: "Full CustomerPilot Complete suite for up to 500 VIP customers (₹10/day).",
+      description: "Full CustomerPilot Complete suite for up to 1,000 VIP customers (₹10/day).",
       days: 180,
       price: 1799,
       originalPrice: 2999,
@@ -76,7 +76,7 @@ async function seed() {
       badge: "Ideal for Growing Shops",
       popular: false,
       features: JSON.stringify([
-        "Up to 500 VIP Customers",
+        "Up to 1,000 VIP Customers",
         "Unlimited WhatsApp Stamps",
         "AI Google Review 5-Star Filter",
         "1-Click Google Maps AutoReply",
@@ -90,7 +90,7 @@ async function seed() {
     {
       planKey: "enterprise_365",
       name: "Pro Scaling Plan (1 Year)",
-      description: "Full CustomerPilot Complete suite for up to 1,500 VIP customers (₹8/day).",
+      description: "Full CustomerPilot Complete suite for up to 2,500 VIP customers (₹8/day).",
       days: 365,
       price: 2899,
       originalPrice: 4999,
@@ -98,7 +98,7 @@ async function seed() {
       badge: "⭐ Most Popular",
       popular: true,
       features: JSON.stringify([
-        "Up to 1,500 VIP Customers",
+        "Up to 2,500 VIP Customers",
         "365-Day Unlimited Automation",
         "AI Review Reply Generator",
         "Customizable WhatsApp Templates",

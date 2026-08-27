@@ -107,14 +107,14 @@ export function PricingClient() {
   const capacityPlans = [
     {
       name: "Starter Growth Plan",
-      capacity: "Up to 500 VIP Customers",
+      capacity: "Up to 1,000 VIP Customers",
       duration: "6 Months",
       price: "₹1,799",
       period: "for 6 months (₹10/day)",
       badge: "Ideal for Growing Shops",
       popular: false,
       features: [
-        "Up to 500 VIP Customers",
+        "Up to 1,000 VIP Customers",
         "All 3 Engines Included",
         "Unlimited WhatsApp Stamps",
         "AI Google Review 5-Star Filter",
@@ -125,14 +125,14 @@ export function PricingClient() {
     },
     {
       name: "Pro Scaling Plan",
-      capacity: "Up to 1,500 VIP Customers",
+      capacity: "Up to 2,500 VIP Customers",
       duration: "1 Year",
       price: "₹2,899",
       period: "per year (₹8/day)",
       badge: "⭐ Most Popular",
       popular: true,
       features: [
-        "Up to 1,500 VIP Customers",
+        "Up to 2,500 VIP Customers",
         "All 3 Engines Included",
         "365-Day Unlimited Automation",
         "AI Review Reply Generator",
