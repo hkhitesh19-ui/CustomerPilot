@@ -876,6 +876,20 @@ ext() function to explicitly POST the merchant's configured reward card details 
   3. Re-built and verified production server.
 - **Status**: ✅ Resolved and Verified.
 
+---
+
+## [27 Aug 2026] Auth Fix: Google OAuth 2.0 Secure Response Handling & OIDC Scopes (Error 400 invalid_request)
+- **Symptom**: Clicking "Continue with Google Account" on `/signup` produced Google error: `Access blocked: Authorization Error - You can't sign in to this app because it doesn't comply with Google's OAuth 2.0 policy for keeping apps secure (Error 400: invalid_request)`.
+- **Root Cause**:
+  1. `src/app/api/auth/google/route.ts` was passing raw legacy URL scope strings (`https://www.googleapis.com/auth/userinfo.profile`) mixed with manual string concatenation which violated Google's updated OAuth 2.0 Secure Response Handling parameter validation policies.
+  2. Protocol/host dynamic resolution was inconsistent with the client request headers.
+- **Resolution**:
+  1. Updated `src/app/api/auth/google/route.ts` to use official OIDC space-separated scopes (`openid email profile`).
+  2. Implemented `URLSearchParams` constructor for RFC-compliant query parameter encoding.
+  3. Dynamic host/protocol detection (`http://` on localhost, `https://` on domains) ensuring exact redirect URI matching.
+  4. Triggered Next.js production build and verified server on port 3000.
+- **Status**: ✅ Resolved and Verified.
+
 
 
 

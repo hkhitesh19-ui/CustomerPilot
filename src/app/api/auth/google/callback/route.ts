@@ -9,7 +9,9 @@ export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const code = url.searchParams.get("code");
-    const appUrl = url.origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const host = req.headers.get("host") || "localhost:3000";
+    const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https";
+    const appUrl = `${protocol}://${host}`;
 
     if (!code) {
       return NextResponse.redirect(`${appUrl}/signup?error=no_code_provided`);

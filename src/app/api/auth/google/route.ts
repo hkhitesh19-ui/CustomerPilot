@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   try {
-    const url = new URL(req.url);
-    const appUrl = url.origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const host = req.headers.get("host") || "localhost:3000";
+    const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https";
+    const appUrl = `${protocol}://${host}`;
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const redirectUri = `${appUrl}/api/auth/google/callback`;
 
@@ -11,22 +12,20 @@ export async function GET(req: Request) {
       return NextResponse.redirect(`${appUrl}/signup?error=google_auth_not_configured`);
     }
 
-    const scopes = [
-      "openid",
-      "https://www.googleapis.com/auth/userinfo.profile",
-      "https://www.googleapis.com/auth/userinfo.email"
-    ].join(" ");
-
+    const scope = "openid email profile";
     const state = "signup_" + Math.random().toString(36).substring(7);
 
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `client_id=${encodeURIComponent(clientId)}&` +
-      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-      `response_type=code&` +
-      `scope=${encodeURIComponent(scopes)}&` +
-      `access_type=offline&` +
-      `prompt=select_account&` +
-      `state=${encodeURIComponent(state)}`;
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: "code",
+      scope: scope,
+      access_type: "offline",
+      prompt: "select_account",
+      state: state,
+    });
+
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 
     return NextResponse.redirect(authUrl);
   } catch (error: any) {
