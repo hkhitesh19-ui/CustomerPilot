@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const appUrl = url.origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const redirectUri = `${appUrl}/api/auth/google/callback`;
 
@@ -14,8 +14,7 @@ export async function GET(req: Request) {
     const scopes = [
       "openid",
       "https://www.googleapis.com/auth/userinfo.profile",
-      "https://www.googleapis.com/auth/userinfo.email",
-      "https://www.googleapis.com/auth/business.manage"
+      "https://www.googleapis.com/auth/userinfo.email"
     ].join(" ");
 
     const state = "signup_" + Math.random().toString(36).substring(7);
@@ -26,7 +25,7 @@ export async function GET(req: Request) {
       `response_type=code&` +
       `scope=${encodeURIComponent(scopes)}&` +
       `access_type=offline&` +
-      `prompt=consent&` +
+      `prompt=select_account&` +
       `state=${encodeURIComponent(state)}`;
 
     return NextResponse.redirect(authUrl);

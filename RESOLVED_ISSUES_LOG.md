@@ -863,6 +863,19 @@ ext() function to explicitly POST the merchant's configured reward card details 
   3. **GEO**: Maintained official `/llms.txt` manifest reflecting updated 6M & 1Yr plans, system capabilities, and vertical solution architectures; enabled AI bots (`GPTBot`, `PerplexityBot`, `ClaudeBot`, `Google-Extended`) in `robots.ts`.
 - **Status**: ✅ Resolved and Verified.
 
+---
+
+## [27 Aug 2026] Auth Fix: Google OAuth Account Chooser & Clean Sign-In Scopes
+- **Symptom**: "Sign in with Google" threw `Error 400: redirect_uri_mismatch / invalid_request` and did not show the multi-account chooser dialog when multiple Google accounts were logged in.
+- **Root Cause**:
+  1. `src/app/api/auth/google/route.ts` was requesting restricted scope `business.manage` during standard login, causing Google's consent validation to fail.
+  2. OAuth request had `prompt=consent` instead of `prompt=select_account`, bypassing Google's account picker dialog.
+- **Resolution**:
+  1. Updated `src/app/api/auth/google/route.ts` to request clean standard scopes (`openid`, `profile`, `email`) and dynamic `url.origin` redirect URI.
+  2. Added `prompt=select_account` to both custom OAuth route and NextAuth `GoogleProvider`.
+  3. Re-built and verified production server.
+- **Status**: ✅ Resolved and Verified.
+
 
 
 
