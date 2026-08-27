@@ -853,6 +853,16 @@ ext() function to explicitly POST the merchant's configured reward card details 
   4. Triggered production build.
 - **Status**: ✅ Resolved and Verified.
 
+---
+
+## [27 Aug 2026] Architecture & Discovery: Comprehensive SEO, AEO, and GEO Optimization
+- **Symptom / Requirement**: Ensure CustomerPilot is fully optimized for traditional Search Engines (SEO), Answer Engines (AEO), and Generative AI engines (GEO).
+- **Resolution**:
+  1. **SEO**: Configured dynamic metadata, OpenGraph, JSON-LD schemas (`SoftwareApplication`, `Organization`, `FAQPage`, `BreadcrumbList`), and updated `sitemap.ts` to cover all landing, vertical, and business routes (`/for-business`).
+  2. **AEO**: Implemented direct-answer structured headlines, conversational FAQs, and Google Rich Snippet data schemas.
+  3. **GEO**: Maintained official `/llms.txt` manifest reflecting updated 6M & 1Yr plans, system capabilities, and vertical solution architectures; enabled AI bots (`GPTBot`, `PerplexityBot`, `ClaudeBot`, `Google-Extended`) in `robots.ts`.
+- **Status**: ✅ Resolved and Verified.
+
 
 
 
