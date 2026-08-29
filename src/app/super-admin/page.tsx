@@ -650,6 +650,7 @@ function CMSPanel() {
 function MerchantManagement() {
   const [merchants, setMerchants] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [selectedMerchant, setSelectedMerchant] = useState<any | null>(null)
   const [editForm, setEditForm] = useState<any>({})
   const [saving, setSaving] = useState(false)
@@ -667,14 +668,25 @@ function MerchantManagement() {
   const [resettingMerchantId, setResettingMerchantId] = useState<string | null>(null)
 
   const loadMerchants = () => {
+    setError(null)
     fetch("/api/admin/merchants")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(res.status === 403 ? "Forbidden: Super Admin access required." : "Failed to load merchants.");
+        }
+        return res.json();
+      })
       .then((data) => {
         if (data.success) {
           setMerchants(data.merchants || [])
+        } else {
+          throw new Error(data.error || "Failed to load merchants");
         }
       })
-      .catch((err) => console.error("Error fetching admin merchants:", err))
+      .catch((err) => {
+        console.error("Error fetching admin merchants:", err);
+        setError(err.message || "Failed to load merchants.");
+      })
       .finally(() => setLoading(false))
   }
 
@@ -887,6 +899,20 @@ function MerchantManagement() {
         <CardContent className="p-12 text-center text-slate-400">
           <div className="animate-spin w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full mx-auto mb-2" />
           Loading real merchant database...
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (error) {
+    return (
+      <Card className="bg-slate-900/80 border-red-500/30 text-white">
+        <CardContent className="p-12 text-center text-red-400 flex flex-col items-center justify-center gap-2">
+          <AlertTriangle className="w-8 h-8 text-red-500" />
+          <div className="font-bold text-sm">{error}</div>
+          <p className="text-xs text-slate-500 max-w-sm mt-1">
+            Please log out and log back in using an official Super Admin account (e.g. admin@customerpilot.in).
+          </p>
         </CardContent>
       </Card>
     )

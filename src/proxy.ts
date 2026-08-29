@@ -51,7 +51,10 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
     try {
-      await verifyToken(token);
+      const payload = await verifyToken(token);
+      if (payload.role !== 'super_admin') {
+        return NextResponse.redirect(new URL('/login', request.url));
+      }
       return NextResponse.next();
     } catch {
       return NextResponse.redirect(new URL('/login', request.url));
