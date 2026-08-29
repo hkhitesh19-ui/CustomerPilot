@@ -167,7 +167,6 @@ export default function SettingsPage() {
       </Card>
 
       <WhatsAppVerification merchantId={data?.merchant?.id || ""} />
-      <WhatsAppTemplateManager merchantId={data?.merchant?.id || ""} />
       <GoogleBusinessIntegration merchantId={data?.merchant?.id || ""} />
       <GoogleReviewDelaySettings merchantId={data?.merchant?.id || ""} />
       <AutomationTimerSettings merchantId={data?.merchant?.id || ""} />
@@ -176,6 +175,7 @@ export default function SettingsPage() {
       <RewardSetupCard merchantId={data?.merchant?.id || ""} />
       <QRGenerator merchantId={data?.merchant?.id || ""} />
       <GoLiveValidator merchantId={data?.merchant?.id || ""} />
+      <WhatsAppTemplateManager merchantId={data?.merchant?.id || ""} />
     </div>
   )
 }
