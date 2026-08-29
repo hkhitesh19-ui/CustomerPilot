@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "next build && shx cp -r .next/static .next/standalone/.next/ && shx cp -r public .next/standalone/",
-    "start": "node .next/standalone/server.js",
+    "build": "next build && shx cp -r .next/static .next/standalone/.next/ && shx cp -r public .next/standalone/ && shx cp prisma/dev.db .next/standalone/prisma/dev.db",
+    "start": "shx cp prisma/dev.db .next/standalone/prisma/dev.db && node .next/standalone/server.js",
+    "db:sync": "shx cp prisma/dev.db .next/standalone/prisma/dev.db",
     "lint": "eslint .",
     "db:push": "prisma db push --accept-data-loss",
     "db:generate": "prisma generate",
