@@ -548,12 +548,12 @@ export default function Home() {
               <p className="lead mt-2">
                 CustomerPilot helps local businesses bring customers back with loyalty rewards, AI-powered Google Review assistance, and automated review replies — without requiring customers to download an app.
               </p>
-              <div className="btn-row">
-                <Link href="/signup" className="btn btn-grad py-3.5 sm:py-4 px-6 sm:px-7 text-sm sm:text-base font-bold rounded-xl flex items-center gap-2">
+              <div className="btn-row flex flex-col sm:flex-row gap-3">
+                <Link href="/signup" className="btn btn-grad py-3.5 sm:py-4 px-6 sm:px-7 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 flex-1">
                   Start 7 Days Free Trial Today <span className="arrow">→</span>
                 </Link>
-                <Link href="/pricing" className="btn btn-ghost py-3.5 sm:py-4 px-5 sm:px-6 text-sm sm:text-base font-bold rounded-xl">
-                  View Transparent Pricing
+                <Link href="/signup?module=reviews" className="btn bg-white border-2 border-amber-500 text-amber-600 hover:bg-amber-50 py-3.5 sm:py-4 px-5 sm:px-6 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 flex-1 shadow-sm transition">
+                  <Star className="w-4 h-4 fill-amber-500" /> Start AI Google Reviews
                 </Link>
               </div>
               <div className="trust">
