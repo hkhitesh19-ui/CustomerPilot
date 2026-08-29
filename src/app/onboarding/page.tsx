@@ -1555,20 +1555,23 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
 function OnboardStep4Logo({ data, setData }: any) {
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState("")
+  const [previewUrl, setPreviewUrl] = useState<string>(data.logoDataUrl || "")
 
   const handleLogoUpload = async (e: any) => {
     const file = e.target.files?.[0]
     if (!file) return
     setUploadError("")
 
-    // Show local preview immediately for instant visual feedback
+    // 1. Show local preview immediately for instant visual feedback
     const reader = new FileReader()
     reader.onloadend = () => {
-      setData((prev: any) => ({ ...prev, logoUploaded: true, logoDataUrl: reader.result as string }))
+      const base64 = reader.result as string
+      setPreviewUrl(base64)
+      setData((prev: any) => ({ ...prev, logoUploaded: true, logoDataUrl: base64 }))
     }
     reader.readAsDataURL(file)
 
-    // Upload to server and save to Merchant record
+    // 2. Upload to server and save to Merchant record
     setUploading(true)
     try {
       const formData = new FormData()
@@ -1588,17 +1591,20 @@ function OnboardStep4Logo({ data, setData }: any) {
 
       const json = await res.json()
       if (res.ok && json.data?.url) {
+        // Keep dataUrl synced with server URL while previewUrl maintains instant display
         setData((prev: any) => ({ ...prev, logoUploaded: true, logoDataUrl: json.data.url }))
       } else {
         console.warn("Server upload warning:", json.error)
       }
     } catch (err: any) {
       console.error("Logo upload error:", err)
-      setUploadError("Could not save to cloud, local preview active.")
+      setUploadError("Saved locally. Will sync on next save.")
     } finally {
       setUploading(false)
     }
   }
+
+  const activeLogo = previewUrl || data.logoDataUrl
 
   return (
     <div className="p-6 sm:p-8 text-center space-y-6">
@@ -1606,22 +1612,34 @@ function OnboardStep4Logo({ data, setData }: any) {
         <h2 className="text-xl font-bold text-slate-900">Upload Business Logo</h2>
         <p className="text-xs text-slate-500">Your logo appears on customer digital reward cards and dashboard</p>
         <div className="p-8 border-2 border-dashed rounded-2xl flex flex-col items-center bg-slate-50 relative">
-          {data.logoUploaded && data.logoDataUrl ? (
+          {data.logoUploaded && activeLogo ? (
             <div className="space-y-2 flex flex-col items-center">
-              <img src={data.logoDataUrl} alt="Logo" className="w-24 h-24 object-contain rounded-xl shadow border bg-white p-1" />
-              <Badge className="bg-emerald-600 text-white text-[10px]">Logo Saved ✓</Badge>
+              <img
+                src={activeLogo}
+                alt="Logo Preview"
+                className="w-28 h-28 object-contain rounded-xl shadow-md border-2 border-emerald-200 bg-white p-1"
+                onError={(e: any) => {
+                  // Fallback to placeholder if url fails
+                  e.currentTarget.src = "/cplogo_horizontal.png"
+                }}
+              />
+              <Badge className="bg-emerald-600 text-white text-[10px] shadow-sm">Logo Saved ✓</Badge>
             </div>
           ) : (
-            <Upload className="w-10 h-10 text-slate-400 mb-2" />
+            <div className="flex flex-col items-center text-slate-400">
+              <Upload className="w-10 h-10 mb-2" />
+              <p className="text-xs text-slate-400">PNG, JPG, SVG up to 5MB</p>
+            </div>
           )}
           <label className="mt-4 cursor-pointer">
-            <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs rounded-lg font-bold transition-all">
+            <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs rounded-lg font-bold transition-all shadow">
               {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
               <span>{data.logoUploaded ? "Change Logo" : "Browse File"}</span>
             </span>
             <input type="file" accept="image/*" onChange={handleLogoUpload} disabled={uploading} className="hidden" />
           </label>
         </div>
+        {uploadError && <p className="text-xs text-amber-600 font-medium">{uploadError}</p>}
         <p className="text-xs text-slate-400">(Optional — you can skip this step)</p>
       </div>
     </div>

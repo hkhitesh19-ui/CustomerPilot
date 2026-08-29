@@ -904,6 +904,17 @@ ext() function to explicitly POST the merchant's configured reward card details 
   4. Updated `OnboardStep4Logo` in `src/app/onboarding/page.tsx` with instant local image preview and clear upload state.
 - **Status**: ✅ Resolved and Verified.
 
+---
+
+## [29 Aug 2026] Fix: Standalone Static Uploads Server Route & Bulletproof Local Image Preview
+- **Symptom**: Onboarding Step 4 logo upload showed a broken image icon (`🖼️ Logo`) even when upload succeeded.
+- **Root Cause**: Next.js standalone server does not dynamically serve runtime-created static files from `public/uploads/` without a dedicated route handler, and the UI replaced the working base64 preview with the server URL prematurely.
+- **Resolution**:
+  1. Created `src/app/uploads/[filename]/route.ts` to dynamically serve uploaded images from any candidate directory (`public/uploads`, `.next/standalone/public/uploads`) with correct MIME types and caching headers.
+  2. Updated `src/lib/storage/LocalDevAdapter.ts` to synchronously write uploaded files to both root and standalone `public/uploads` folders.
+  3. Updated `OnboardStep4Logo` in `src/app/onboarding/page.tsx` with dedicated `previewUrl` state, instant FileReader base64 rendering, and `onError` image fallback.
+- **Status**: ✅ Resolved and Verified.
+
 
 
 
