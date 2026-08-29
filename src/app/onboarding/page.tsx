@@ -1554,14 +1554,18 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
 // ─── Step 4: Logo ──────────────────────────────────────────────
 function OnboardStep4Logo({ data, setData }: any) {
   const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState("")
 
   const handleLogoUpload = async (e: any) => {
     const file = e.target.files?.[0]
     if (!file) return
+    setUploadError("")
 
-    // Show local preview immediately
+    // Show local preview immediately for instant visual feedback
     const reader = new FileReader()
-    reader.onloadend = () => setData((prev: any) => ({ ...prev, logoUploaded: true, logoDataUrl: reader.result as string }))
+    reader.onloadend = () => {
+      setData((prev: any) => ({ ...prev, logoUploaded: true, logoDataUrl: reader.result as string }))
+    }
     reader.readAsDataURL(file)
 
     // Upload to server and save to Merchant record
@@ -1571,21 +1575,26 @@ function OnboardStep4Logo({ data, setData }: any) {
       formData.append("file", file)
       formData.append("type", "logo")
 
-      const merchantId = data.merchantId || "cms97ihsr0002w0ykccl3xvqy"
+      const headers: Record<string, string> = {}
+      if (data.merchantId) {
+        headers["x-merchant-id"] = data.merchantId
+      }
+
       const res = await fetch("/api/merchant/upload-brand", {
         method: "POST",
-        headers: { "x-merchant-id": merchantId },
+        headers,
         body: formData,
       })
 
-      if (res.ok) {
-        const json = await res.json()
-        if (json.data?.url) {
-          setData((prev: any) => ({ ...prev, logoUploaded: true, logoDataUrl: json.data.url }))
-        }
+      const json = await res.json()
+      if (res.ok && json.data?.url) {
+        setData((prev: any) => ({ ...prev, logoUploaded: true, logoDataUrl: json.data.url }))
+      } else {
+        console.warn("Server upload warning:", json.error)
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Logo upload error:", err)
+      setUploadError("Could not save to cloud, local preview active.")
     } finally {
       setUploading(false)
     }

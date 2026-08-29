@@ -890,6 +890,20 @@ ext() function to explicitly POST the merchant's configured reward card details 
   4. Triggered Next.js production build and verified server on port 3000.
 - **Status**: ✅ Resolved and Verified.
 
+---
+
+## [28 Aug 2026] Fix: Onboarding Step 4 Logo Upload Authentication & Storage Sync
+- **Symptom**: In Onboarding (`/onboarding?step=1` -> Step 4 Logo), uploading a business logo failed to save or process properly.
+- **Root Cause**:
+  1. `/api/merchant/upload-brand` strictly required a non-empty `x-merchant-id` header matching an existing record, failing for new merchants without an explicit ID set in state.
+  2. Local file uploads were not syncing to the standalone build directory `.next/standalone/public/uploads`.
+- **Resolution**:
+  1. Updated `src/app/api/merchant/upload-brand/route.ts` with `resolveMerchant` helper that resolves merchant from `x-merchant-id` header, JWT session cookie `token`, or active merchant fallback.
+  2. Added file sync to standalone `public/uploads` directory.
+  3. Expanded supported image types (JPEG, PNG, WebP, GIF, SVG) and max file size to 5MB.
+  4. Updated `OnboardStep4Logo` in `src/app/onboarding/page.tsx` with instant local image preview and clear upload state.
+- **Status**: ✅ Resolved and Verified.
+
 
 
 
