@@ -915,6 +915,18 @@ ext() function to explicitly POST the merchant's configured reward card details 
   3. Updated `OnboardStep4Logo` in `src/app/onboarding/page.tsx` with dedicated `previewUrl` state, instant FileReader base64 rendering, and `onError` image fallback.
 - **Status**: ✅ Resolved and Verified.
 
+---
+
+## [29 Aug 2026] Fix: Onboarding Step 8 Live System Test "QR Code Generated" False Failure
+- **Symptom**: In Onboarding (`/onboarding?step=7` -> Step 8 Live System Test), running the system health check showed "QR Code Generated: FAIL X" even though WhatsApp and Merchant account were active.
+- **Root Cause**:
+  1. `OnboardStep8Test` checked a boolean in-memory flag `data.qrGenerated` which resets to `false` on direct URL navigation or browser reload.
+  2. `OnboardStep6QR` was using a stale state closure `setData({ ...data, ... })` rather than functional state setter `setData(prev => ({ ...prev, ... }))`.
+- **Resolution**:
+  1. Updated `OnboardStep8Test` to dynamically verify and generate the QR code data URL on-the-fly if not present in memory.
+  2. Updated `OnboardStep6QR` to use functional state updates.
+- **Status**: ✅ Resolved and Verified.
+
 
 
 

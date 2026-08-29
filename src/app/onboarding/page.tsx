@@ -1721,11 +1721,11 @@ function OnboardStep6QR({ data, setData }: any) {
         const targetUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
         setWaLink(targetUrl)
         const qr = await QRCode.toDataURL(targetUrl, { width: 350, margin: 2 })
-        setData({ ...data, qrGenerated: true, qrDataUrl: qr })
+        setData((prev: any) => ({ ...prev, qrGenerated: true, qrDataUrl: qr }))
       } catch {}
     }
     generate()
-  }, [data.businessName, data.whatsappNumber])
+  }, [data.businessName, data.whatsappNumber, setData])
 
   return (
     <div className="p-6 sm:p-8 text-center space-y-6">
@@ -1968,16 +1968,29 @@ function OnboardStep8Test({ data, setData, error, setError }: any) {
 
       const [waHealth, stateHealth, progressHealth] = checks
 
+      let qrReady = !!data.qrDataUrl || !!data.qrGenerated
+      if (!qrReady && (data.whatsappNumber || data.businessName)) {
+        try {
+          const phone = (data.whatsappNumber || "919033304707").replace(/\D/g, "")
+          const businessName = data.businessName || "our store"
+          const text = `Hi ${businessName}! Checking in for my VIP Club stamps 🎁`
+          const targetUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
+          const qr = await QRCode.toDataURL(targetUrl, { width: 350, margin: 2 })
+          setData((prev: any) => ({ ...prev, qrGenerated: true, qrDataUrl: qr }))
+          qrReady = true
+        } catch {}
+      }
+
       const results = {
         whatsapp: waHealth.status === "fulfilled" && waHealth.value?.ok !== false,
         database: stateHealth.status === "fulfilled" && stateHealth.value?.ok !== false,
         merchant: progressHealth.status === "fulfilled",
-        qrCode: data.qrGenerated,
+        qrCode: qrReady,
         rewards: data.stampsRequired > 0,
       }
 
       setTestResults(results)
-      setData({ ...data, testCustomerScanned: Object.values(results).every(Boolean) })
+      setData((prev: any) => ({ ...prev, testCustomerScanned: Object.values(results).every(Boolean) }))
     } catch (e: any) {
       setError("System test encountered an error: " + e.message)
     } finally {
