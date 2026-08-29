@@ -79,10 +79,15 @@ export async function POST(req: Request) {
       .setExpirationTime('7d')
       .sign(secret);
 
-    // Determine redirect based on user role
-    const redirectTo = user.role === 'super_admin'
-      ? '/super-admin'
-      : (merchant?.onboardingCompleted ? '/dashboard' : `/onboarding?step=${merchant?.currentStep || 1}`);
+    // Determine redirect based on user role and module
+    let redirectTo = '/dashboard';
+    if (user.role === 'super_admin') {
+      redirectTo = '/super-admin';
+    } else if (!merchant?.onboardingCompleted) {
+      redirectTo = `/onboarding?step=${merchant?.currentStep || 1}`;
+    } else if (merchant?.enabledModules === 'REVIEWS' || merchant?.enabledModules === 'AUTOREPLY') {
+      redirectTo = '/dashboard/reviews';
+    }
 
     const response = NextResponse.json({ 
       success: true, 

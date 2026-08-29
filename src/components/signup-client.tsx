@@ -13,6 +13,8 @@ function SignupForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const refCode = searchParams.get("ref") || ""
+  const moduleParam = searchParams.get("module") || "" // "reviews", "loyalty", "autoreply"
+  const isReviewsMode = moduleParam === "reviews"
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -34,8 +36,12 @@ function SignupForm() {
     e.preventDefault()
     setError("")
 
-    if (!form.businessName || !form.ownerName || !form.email || !form.password) {
+    if (!form.businessName || !form.email || !form.password) {
       setError("All required fields must be filled.")
+      return
+    }
+    if (!isReviewsMode && !form.ownerName) {
+      setError("Owner Name is required.")
       return
     }
     if (form.password.length < 6) {
@@ -48,7 +54,7 @@ function SignupForm() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, ...(moduleParam ? { module: moduleParam } : {}) }),
       })
       const data = await res.json()
 
@@ -71,8 +77,8 @@ function SignupForm() {
         }
       }
 
-      // Success: JWT cookie is set, redirect to onboarding wizard
-      router.push("/onboarding")
+      // Success: JWT cookie is set, redirect based on module
+      router.push(data.redirectTo || "/onboarding")
     } catch (e) {
       setError("Network error. Please check your connection.")
     } finally {
@@ -80,12 +86,19 @@ function SignupForm() {
     }
   }
 
-  const benefits = [
-    "WhatsApp-first loyalty system",
-    "Auto Google Review collection",
-    "AI-powered customer retention",
-    "7-Day FREE trial, no credit card",
-  ]
+  const benefits = isReviewsMode
+    ? [
+        "AI-powered Google Review replies",
+        "Auto review collection via WhatsApp",
+        "5-star review boost for your business",
+        "Setup in under 2 minutes, no onboarding",
+      ]
+    : [
+        "WhatsApp-first loyalty system",
+        "Auto Google Review collection",
+        "AI-powered customer retention",
+        "7-Day FREE trial, no credit card",
+      ]
 
   return (
     <div className="min-h-screen bg-white text-stone-900 font-sans relative overflow-hidden flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950">
@@ -122,14 +135,27 @@ function SignupForm() {
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-stone-900 tracking-tight leading-tight">
-              Start Your Free <br />
-              <span className="bg-gradient-to-r from-emerald-600 via-sky-600 to-indigo-600 bg-clip-text text-transparent">
-                Merchant Trial.
-              </span>
+              {isReviewsMode ? (
+                <>
+                  Smart AI <br />
+                  <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 bg-clip-text text-transparent">
+                    Google Reviews.
+                  </span>
+                </>
+              ) : (
+                <>
+                  Start Your Free <br />
+                  <span className="bg-gradient-to-r from-emerald-600 via-sky-600 to-indigo-600 bg-clip-text text-transparent">
+                    Merchant Trial.
+                  </span>
+                </>
+              )}
             </h1>
 
             <p className="text-xs sm:text-sm md:text-base text-stone-600 leading-relaxed">
-              India&apos;s #1 WhatsApp-first AI Customer Retention Platform. Bring your customers back with loyalty rewards, 5-star Google reviews, and automated AI owner replies.
+              {isReviewsMode
+                ? "Get instant AI-powered replies for every Google Review. Boost your 5-star ratings and attract more customers — setup in 2 clicks."
+                : "India\u0027s #1 WhatsApp-first AI Customer Retention Platform. Bring your customers back with loyalty rewards, 5-star Google reviews, and automated AI owner replies."}
             </p>
 
             <div className="space-y-2.5 pt-1">
@@ -161,8 +187,12 @@ function SignupForm() {
               <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-sky-500 to-indigo-600 rounded-t-3xl" />
 
               <div className="mb-6">
-                <h2 className="text-2xl font-black text-stone-900">Create Merchant Account</h2>
-                <p className="text-stone-500 text-xs mt-1">Start 7 Days Free Trial Today in under 2 minutes</p>
+                <h2 className="text-2xl font-black text-stone-900">
+                  {isReviewsMode ? "Start AI Google Reviews" : "Create Merchant Account"}
+                </h2>
+                <p className="text-stone-500 text-xs mt-1">
+                  {isReviewsMode ? "2 clicks to get started — no long onboarding!" : "Start 7 Days Free Trial Today in under 2 minutes"}
+                </p>
               </div>
 
               {error && (
@@ -206,7 +236,7 @@ function SignupForm() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className={`grid grid-cols-1 ${isReviewsMode ? '' : 'md:grid-cols-2'} gap-3`}>
                   <div>
                     <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
                       <Building2 className="w-3.5 h-3.5 text-emerald-600" /> Business Name *
@@ -219,20 +249,23 @@ function SignupForm() {
                       required
                     />
                   </div>
-                  <div>
-                    <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
-                      <User className="w-3.5 h-3.5 text-emerald-600" /> Owner Name *
-                    </Label>
-                    <Input
-                      placeholder="e.g. Hitesh"
-                      value={form.ownerName}
-                      onChange={e => update("ownerName", e.target.value)}
-                      className="mt-1 text-xs bg-stone-50 border-stone-200 focus:bg-white"
-                      required
-                    />
-                  </div>
+                  {!isReviewsMode && (
+                    <div>
+                      <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
+                        <User className="w-3.5 h-3.5 text-emerald-600" /> Owner Name *
+                      </Label>
+                      <Input
+                        placeholder="e.g. Hitesh"
+                        value={form.ownerName}
+                        onChange={e => update("ownerName", e.target.value)}
+                        className="mt-1 text-xs bg-stone-50 border-stone-200 focus:bg-white"
+                        required
+                      />
+                    </div>
+                  )}
                 </div>
 
+                {!isReviewsMode && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
@@ -264,6 +297,7 @@ function SignupForm() {
                     </Select>
                   </div>
                 </div>
+                )}
 
                 <div>
                   <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">

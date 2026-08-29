@@ -16,7 +16,8 @@ export async function POST(req: Request) {
   try {
     const { 
       businessName, ownerName, email, password, 
-      businessType, businessAddress, whatsappPhone 
+      businessType, businessAddress, whatsappPhone,
+      module // optional: "reviews", "loyalty", "autoreply" for fast-track onboarding
     } = await req.json();
 
     // Validation 1: Required fields
@@ -32,6 +33,15 @@ export async function POST(req: Request) {
 
     const cleanEmail = email.trim().toLowerCase();
     const cleanPhone = whatsappPhone ? whatsappPhone.trim() : '';
+
+    // Determine if this is a fast-track module signup
+    const MODULE_MAP: Record<string, string> = {
+      reviews: "REVIEWS",
+      loyalty: "LOYALTY",
+      autoreply: "AUTOREPLY",
+    };
+    const isFastTrack = module && MODULE_MAP[module];
+    const enabledModules = isFastTrack ? MODULE_MAP[module] : "LOYALTY,REVIEWS,AUTOREPLY";
 
     // Validation 2: Check if User already exists with email
     const existingUser = await db.user.findUnique({ where: { email: cleanEmail } });
@@ -77,12 +87,14 @@ export async function POST(req: Request) {
         email: cleanEmail,
         businessType: businessType || 'bakery',
         address: businessAddress || '',
-        whatsappPhone: cleanPhone,
+        whatsappPhone: cleanPhone || undefined,
         plan: 'trial',
         status: 'active',
         trialEndsAt,
-        onboardingCompleted: false,
-        currentStep: 1,
+        enabledModules,
+        // Fast-track: skip onboarding for standalone module signups
+        onboardingCompleted: !!isFastTrack,
+        currentStep: isFastTrack ? 99 : 1,
       },
     });
 
@@ -103,23 +115,25 @@ export async function POST(req: Request) {
         merchantId: merchant.id,
         stepKey: s.stepKey,
         label: s.label,
-        completed: false,
+        completed: !!isFastTrack, // Mark all as completed for fast-track
       })),
     });
 
-    // Create default StampCard for merchant
-    await db.stampCard.create({
-      data: {
-        merchantId: merchant.id,
-        name: `${businessName} VIP Club`,
-        stampsRequired: 10,
-        rewardName: 'FREE Special Treat',
-        stampValue: 500,
-        googleReviewBonus: 1,
-        photoBonus: 2,
-        active: true,
-      },
-    });
+    // Create default StampCard only if LOYALTY module is enabled
+    if (!isFastTrack || module === 'loyalty') {
+      await db.stampCard.create({
+        data: {
+          merchantId: merchant.id,
+          name: `${businessName} VIP Club`,
+          stampsRequired: 10,
+          rewardName: 'FREE Special Treat',
+          stampValue: 500,
+          googleReviewBonus: 1,
+          photoBonus: 2,
+          active: true,
+        },
+      });
+    }
 
     // Sign JWT with userId + merchantId + role
     const secret = new TextEncoder().encode(JWT_SECRET);
@@ -133,10 +147,18 @@ export async function POST(req: Request) {
       .setExpirationTime('7d')
       .sign(secret);
 
+    // Determine redirect based on module fast-track
+    const MODULE_REDIRECTS: Record<string, string> = {
+      reviews: '/dashboard/reviews',
+      autoreply: '/dashboard/reviews',
+      loyalty: '/dashboard',
+    };
+    const redirectTo = isFastTrack ? (MODULE_REDIRECTS[module] || '/dashboard') : '/dashboard';
+
     const response = NextResponse.json({ 
       success: true, 
       merchantId: merchant.id,
-      redirectTo: '/dashboard',
+      redirectTo,
     });
     
     response.cookies.set('token', token, {
