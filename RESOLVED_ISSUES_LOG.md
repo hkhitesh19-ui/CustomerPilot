@@ -2,6 +2,20 @@
 
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
+---
+## [29 Aug 2026] Issue: Standalone Server Using Stale Database (Queue/API 400 Errors)
+- **Symptom**: After `npm run build`, the standalone server (`node .next/standalone/server.js`) returned 400 errors on `/api/queue/join` and similar endpoints. Customers scanning QR codes could not join the merchant queue. Everything appeared to "stop working" after each rebuild.
+- **Root Cause**: `npm run build` copies a snapshot of `prisma/dev.db` into `.next/standalone/prisma/dev.db` at build time. However, the build script was copying the DB **before** recent runtime changes (e.g., new merchant registrations, WhatsApp phone updates, onboarding completions). Each subsequent build used a stale `.next/standalone/prisma/dev.db` (26 Aug 2026 timestamp) while the live, up-to-date DB was at `prisma/dev.db`. The standalone server reads from its local copy and had no visibility into the latest data.
+- **Resolution**:
+  1. Identified the stale DB by running `Get-Item .next/standalone/prisma/dev.db` vs `Get-Item prisma/dev.db` — both showed 26 Aug 2026 timestamp despite new data being written today.
+  2. Manually copied the latest DB: `Copy-Item prisma/dev.db .next/standalone/prisma/dev.db -Force`.
+  3. Permanently fixed `package.json` scripts:
+     - **`build`**: Added `&& shx cp prisma/dev.db .next/standalone/prisma/dev.db` at end of build command.
+     - **`start`**: Added `shx cp prisma/dev.db .next/standalone/prisma/dev.db &&` before `node .next/standalone/server.js` so every server start auto-syncs the latest DB.
+     - **`db:sync`**: Added new convenience script for manual sync.
+  4. Committed as `e9ec881`.
+- **Status**: ✅ Resolved and Verified.
+
 ## [22 Aug 2026] Issue: Updated Homepage Hero Headline & Subheadline
 - **Symptom**: The homepage hero section needed clear, benefit-driven messaging targeting the 3 core pillars (Bring Customers Back, Google Reviews, AutoReply) without requiring customers to download an app.
 - **Root Cause**: Hero copy previously featured a general walk-in headline.
