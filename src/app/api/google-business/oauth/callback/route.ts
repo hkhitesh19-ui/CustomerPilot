@@ -6,10 +6,12 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const code = url.searchParams.get("code");
     const state = url.searchParams.get("state"); // merchantId
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const host = req.headers.get("host") || "localhost:3000";
+    const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https";
+    const appUrl = `${protocol}://${host}`;
 
     if (!code) {
-      return NextResponse.redirect(`${appUrl}/onboarding?step=3&error=no_code`);
+      return NextResponse.redirect(`${appUrl}/dashboard/settings?error=no_code`);
     }
 
     const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -133,18 +135,20 @@ export async function GET(req: Request) {
       }
     });
 
-    // Also ensure merchant table has real address
+    // Also ensure merchant table has real address and review link
     await db.merchant.update({
       where: { id: merchantId },
       data: { 
         address: placeAddress,
+        googleReviewLink: googleReviewUrl,
       }
     }).catch(() => {});
 
-    return NextResponse.redirect(`${appUrl}/onboarding?step=3&google_connected=true`);
+    return NextResponse.redirect(`${appUrl}/dashboard/settings?google_connected=true`);
   } catch (error: any) {
     console.error("[Google OAuth Callback] Global Error:", error);
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    return NextResponse.redirect(`${appUrl}/onboarding?step=3&error=auth_error`);
+    const host = req.headers.get("host") || "localhost:3000";
+    const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https";
+    return NextResponse.redirect(`${protocol}://${host}/dashboard/settings?error=auth_error`);
   }
 }

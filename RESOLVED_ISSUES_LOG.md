@@ -927,6 +927,19 @@ ext() function to explicitly POST the merchant's configured reward card details 
   2. Updated `OnboardStep6QR` to use functional state updates.
 - **Status**: ✅ Resolved and Verified.
 
+---
+
+## [29 Aug 2026] Fix: Google Business Profile (GBP) OAuth 2.0 Dynamic Origin & Account Picker (`prompt=select_account`)
+- **Symptom**: Clicking "Sign In with Google (OAuth 2.0)" under Google Business Profile in Settings produced `Error 400: redirect_uri_mismatch` and bypassed the Google account chooser.
+- **Root Cause**:
+  1. `src/app/api/google-business/oauth/route.ts` used `prompt=consent` instead of `prompt=select_account`.
+  2. The OAuth redirect URI and scopes relied on manual string concatenation instead of RFC-compliant `URLSearchParams`.
+  3. Dynamic host/protocol resolution was missing, leading to mismatched origins.
+- **Resolution**:
+  1. Updated `src/app/api/google-business/oauth/route.ts` with `URLSearchParams`, OIDC scopes (`openid email profile https://www.googleapis.com/auth/business.manage`), dynamic origin resolution, and `prompt: "select_account"`.
+  2. Updated `src/app/api/google-business/oauth/callback/route.ts` with dynamic origin resolution and direct redirect to `/dashboard/settings?google_connected=true`.
+- **Status**: ✅ Resolved and Verified.
+
 
 
 
