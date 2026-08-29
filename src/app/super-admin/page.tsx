@@ -163,7 +163,7 @@ export default function SuperAdminPage() {
         </header>
 
         {/* Content Body */}
-        <div className="p-6 max-w-7xl mx-auto space-y-6">
+        <div className="p-6 max-w-[1600px] mx-auto space-y-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeSection}
@@ -999,7 +999,7 @@ function MerchantManagement() {
                       <td className="p-4 text-right text-slate-400">{m.bills}</td>
                       <td className="p-4 text-right font-extrabold text-emerald-400">₹{m.mrr.toLocaleString("en-IN")}</td>
                       <td className="p-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                        <div className="flex items-center justify-end gap-1.5 flex-nowrap">
                           {/* 1. Edit Rules */}
                           <Button
                             size="sm"
