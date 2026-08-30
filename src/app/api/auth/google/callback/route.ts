@@ -236,7 +236,6 @@ export async function GET(req: Request) {
       .setExpirationTime("7d")
       .sign(secret);
 
-    const isFastTrack = moduleParam === 'reviews' || moduleParam === 'autoreply' || moduleParam === 'loyalty';
     const MODULE_REDIRECTS: Record<string, string> = {
       reviews: '/dashboard/reviews',
       autoreply: '/dashboard/reviews',
