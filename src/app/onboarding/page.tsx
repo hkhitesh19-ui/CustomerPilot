@@ -508,15 +508,6 @@ function OnboardStep1Business({ data, setData }: any) {
           />
         </div>
         <div>
-          <Label className="text-xs font-semibold">Business Timing</Label>
-          <Input
-            value={data.businessAddress}
-            onChange={e => setData({ ...data, businessAddress: e.target.value })}
-            placeholder="e.g., 9AM–9PM, Mon–Sat"
-            className="mt-1 text-sm"
-          />
-        </div>
-        <div>
           <Label className="text-xs font-semibold">Email (from signup)</Label>
           <Input
             value={data.email}
