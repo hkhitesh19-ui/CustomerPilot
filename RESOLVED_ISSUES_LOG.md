@@ -3,6 +3,21 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [30 Aug 2026] Issue: Duplicate Business Timing Value Bug and Missing Unique Merchant ID Numbers
+- **Symptom**: On onboarding step 1 `/onboarding?step=1`, the Business Timing field was erroneously pre-filling with the Business Address value, and there was no way to assign a unique numeric ID code to merchants during signup.
+- **Root Cause**: 
+  1. In `src/app/onboarding/page.tsx`, the Business Timing input field was incorrectly bound to `data.businessAddress` instead of its own property, causing duplicate address text in both inputs.
+  2. The `Merchant` database model lacked a unique human-friendly identifier code, using only internal long CUID strings.
+- **Resolution**:
+  1. Completely removed the redundant "Business Timing" input block from `src/app/onboarding/page.tsx` since merchants do not need to configure timings during the activation phase (it is already configurable on the Settings page).
+  2. Added `merchantIdNumber String? @unique` field to the `Merchant` database model in `prisma/schema.prisma`.
+  3. Pushed the database schema changes and updated Prisma clients cleanly.
+  4. Created a shared helper `src/lib/merchant-id-generator.ts` to generate unique numeric codes in `CP-XXXXXX` format.
+  5. Updated standard signup and custom/NextAuth Google OAuth callback endpoints to generate and save the unique `merchantIdNumber` on registration.
+  6. Verified all changes using an integration test script `scratch/test_reviews_fasttrack_onboarding.js`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [30 Aug 2026] Issue: Missing Sign Out Button on Super-Admin Page Sidebar Footer
 - **Symptom**: There was no "Sign Out" option on the `/super-admin` command center sidebar. Users had to manually delete cookies or navigate back to the merchant dashboard to log out.
 - **Root Cause**: The `/super-admin` page uses a completely custom, custom-styled dark sidebar template that was built from scratch and did not include a logout/sign out action button or imports.
