@@ -73,6 +73,15 @@ export async function GET(req: Request) {
       });
     }
 
+    // Resolve module from OAuth state — applies to both new AND existing merchants
+    const MODULE_MAP: Record<string, string> = {
+      reviews: "REVIEWS",
+      loyalty: "LOYALTY",
+      autoreply: "AUTOREPLY",
+    };
+    const isFastTrack = !!(moduleParam && MODULE_MAP[moduleParam]);
+    const fastTrackModule = isFastTrack ? MODULE_MAP[moduleParam] : "LOYALTY,REVIEWS,AUTOREPLY";
+
     // 4. Find or Create Merchant
     let merchant = await db.merchant.findUnique({ where: { userId: user.id } }).catch(() => null);
     if (!merchant) {
@@ -80,18 +89,11 @@ export async function GET(req: Request) {
     }
 
     if (!merchant) {
+      // ─── New Merchant: Create with fast-track settings ───
       const trialEndsAt = new Date();
       trialEndsAt.setDate(trialEndsAt.getDate() + 7);
 
       const merchantIdNumber = await generateMerchantIdNumber(db);
-
-      const MODULE_MAP: Record<string, string> = {
-        reviews: "REVIEWS",
-        loyalty: "LOYALTY",
-        autoreply: "AUTOREPLY",
-      };
-      const isFastTrack = moduleParam && MODULE_MAP[moduleParam];
-      const enabledModules = isFastTrack ? MODULE_MAP[moduleParam] : "LOYALTY,REVIEWS,AUTOREPLY";
 
       merchant = await db.merchant.create({
         data: {
@@ -104,8 +106,8 @@ export async function GET(req: Request) {
           plan: "trial",
           status: "active",
           trialEndsAt,
-          enabledModules,
-          onboardingCompleted: !!isFastTrack,
+          enabledModules: fastTrackModule,
+          onboardingCompleted: isFastTrack,
           currentStep: isFastTrack ? 99 : 1,
         },
       });
@@ -127,10 +129,28 @@ export async function GET(req: Request) {
           merchantId: merchant!.id,
           stepKey: s.stepKey,
           label: s.label,
-          completed: !!isFastTrack,
+          completed: isFastTrack,
         })),
       }).catch(() => {});
+
+    } else if (isFastTrack && !merchant.onboardingCompleted) {
+      // ─── Existing Merchant stuck in onboarding: Fast-track bypass ───
+      // This handles merchants who registered before the fix or via manual form
+      merchant = await db.merchant.update({
+        where: { id: merchant.id },
+        data: {
+          onboardingCompleted: true,
+          currentStep: 99,
+          enabledModules: fastTrackModule,
+        },
+      });
+      await db.onboardingStep.updateMany({
+        where: { merchantId: merchant.id },
+        data: { completed: true },
+      });
+      console.log(`[Google Auth Callback] Fast-tracked existing merchant ${merchant.id} to module: ${moduleParam}`);
     }
+
 
     // 5. Check and auto-fetch Google Business Profile if available
     try {
