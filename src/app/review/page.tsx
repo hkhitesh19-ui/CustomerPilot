@@ -25,10 +25,10 @@ export default async function ReviewPage({
   const customerId = typeof params.c === 'string' ? params.c : undefined
   const merchantId = typeof params.m === 'string' ? params.m : undefined
 
-  if (!customerId || !merchantId) {
+  if (!merchantId) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 text-center">
-        <div className="text-slate-400">Invalid Review Link.</div>
+        <div className="text-slate-400">Invalid Review Link. Merchant ID is required.</div>
       </div>
     )
   }
@@ -37,36 +37,39 @@ export default async function ReviewPage({
     where: { id: merchantId }
   })
 
-  const googleConnection = await db.merchantGoogleConnection.findUnique({
-    where: { merchantId: merchantId }
-  })
-
-  const customer = await db.customer.findUnique({
-    where: { id: customerId },
-    include: { bills: { orderBy: { createdAt: 'desc' }, take: 5 } }
-  })
-
-  if (!merchant || !customer) {
+  if (!merchant) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 text-center">
-        <div className="text-slate-400">Store or Customer not found.</div>
+        <div className="text-slate-400">Store not found. Please verify the QR code.</div>
       </div>
     )
   }
 
-  // Extract actual purchased product from customer bills
+  const googleConnection = await db.merchantGoogleConnection.findUnique({
+    where: { merchantId: merchantId }
+  })
+
+  const customer = customerId
+    ? await db.customer.findUnique({
+        where: { id: customerId },
+        include: { bills: { orderBy: { createdAt: 'desc' }, take: 5 } }
+      })
+    : null
+
+  // Extract actual purchased product from customer bills if available
   let productName = ""
-  for (const bill of customer.bills || []) {
-    if (bill.notes) {
-      const match = bill.notes.match(/Product:\s*([^|]+)/i)
-      if (match && match[1]?.trim()) {
-        productName = match[1].trim()
-        break
-      } else if (!bill.notes.includes("Visit #") && !bill.notes.includes("Approved by")) {
-        productName = bill.notes.trim()
-        break
+  if (customer) {
+    for (const bill of customer.bills || []) {
+      if (bill.notes) {
+        const match = bill.notes.match(/Product:\s*([^|]+)/i)
+        if (match && match[1]?.trim()) {
+          productName = match[1].trim()
+          break
+        } else if (!bill.notes.includes("Visit #") && !bill.notes.includes("Approved by")) {
+          productName = bill.notes.trim()
+          break
+        }
       }
-    }
   }
 
   const city = merchant.address?.split(',').pop()?.trim() || "Vadodara"
@@ -204,10 +207,12 @@ Output ONLY the review text.`
   }
 
   // Fetch existing review if customer already posted previously
-  const existingReview = await db.review.findFirst({
-    where: { merchantId, customerId },
-    orderBy: { createdAt: "desc" }
-  })
+  const existingReview = customerId
+    ? await db.review.findFirst({
+        where: { merchantId, customerId },
+        orderBy: { createdAt: "desc" }
+      })
+    : null
   const existingReviewText = existingReview?.finalText || existingReview?.aiDraft || null
   
   return (
@@ -223,8 +228,8 @@ Output ONLY the review text.`
         googlePlaceId: googlePlaceId
       }} 
       customer={{
-        id: customer.id,
-        name: customer.name
+        id: customer?.id || "",
+        name: customer?.name || "VIP"
       }} 
     />
     <div className="mt-6 pt-4 border-t border-slate-200/20 text-center space-y-1">

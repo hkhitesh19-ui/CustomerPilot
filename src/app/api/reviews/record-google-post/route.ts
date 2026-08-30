@@ -59,18 +59,35 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { customerId, merchantId, reviewText, rating = 5 } = body;
 
-    if (!customerId || !merchantId) {
-      return NextResponse.json({ error: "customerId and merchantId are required" }, { status: 400 });
+    if (!merchantId) {
+      return NextResponse.json({ error: "merchantId is required" }, { status: 400 });
     }
 
-    const customer = await db.customer.findUnique({ where: { id: customerId } });
     const merchant = await db.merchant.findUnique({ where: { id: merchantId } });
-
-    if (!customer || !merchant) {
-      return NextResponse.json({ error: "Customer or Merchant not found" }, { status: 404 });
+    if (!merchant) {
+      return NextResponse.json({ error: "Merchant not found" }, { status: 404 });
     }
 
-    const finalReviewText = reviewText || "The cake was fresh, beautiful, and absolutely delicious. Highly recommended!";
+    let customer = customerId ? await db.customer.findUnique({ where: { id: customerId } }) : null;
+    if (!customer) {
+      // Find or create guest customer for public QR code reviews
+      const guestPhone = `guest_${merchantId.substring(0, 8)}`;
+      customer = await db.customer.findFirst({
+        where: { merchantId, phone: guestPhone }
+      });
+      if (!customer) {
+        customer = await db.customer.create({
+          data: {
+            merchantId,
+            name: "Counter Customer",
+            phone: guestPhone,
+            visitsCount: 1
+          }
+        });
+      }
+    }
+
+    const finalReviewText = reviewText || "The service and quality were fresh, beautiful, and absolutely delicious. Highly recommended!";
 
     // Fetch Merchant's Active Reward Card Config first
     const template = await db.stampCard.findFirst({ where: { merchantId, active: true } });
