@@ -7,7 +7,7 @@ import {
   Image as ImageIcon, Brain, BarChart3, Heart, Database, Download,
   Settings, Globe, Shield, Code, Zap, Crown, Store, Check, X, Search,
   MessageSquare, RefreshCw, RotateCcw, Activity, Server, Cpu, Sparkles,
-  Layers, ArrowUpRight, Lock, CheckCircle2, ChevronRight, Trash2, AlertTriangle, Eye, UserX
+  Layers, ArrowUpRight, Lock, CheckCircle2, ChevronRight, Trash2, AlertTriangle, Eye, UserX, LogOut
 } from "lucide-react"
 import { WhatsAppTemplateManager } from "@/components/whatsapp-template-manager"
 import { SubscriptionPlansManager } from "@/components/super-admin/subscription-plans-manager"
@@ -128,7 +128,7 @@ export default function SuperAdminPage() {
         </div>
 
         {/* Sidebar Footer Info */}
-        <div className="p-4 border-t border-slate-800/80 bg-slate-950/40">
+        <div className="p-4 border-t border-slate-800/80 bg-slate-950/40 space-y-3">
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800/80">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -136,6 +136,19 @@ export default function SuperAdminPage() {
             </div>
             <span className="text-[10px] font-mono text-slate-500">42ms Latency</span>
           </div>
+
+          <button
+            onClick={async () => {
+              await fetch('/api/auth/logout', { method: 'POST' });
+              const { signOut } = await import("next-auth/react");
+              await signOut({ redirect: false });
+              window.location.href = '/login';
+            }}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-rose-400 hover:bg-rose-950/20 border border-slate-800/60 hover:border-rose-900/30 transition-all duration-200 cursor-pointer"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </aside>
 
