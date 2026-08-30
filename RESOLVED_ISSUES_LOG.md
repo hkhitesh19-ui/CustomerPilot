@@ -3,6 +3,30 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [30 Aug 2026] Issue: Settings Page QR Code Standee Generator Was Combined — Needed Dedicated Standalone Section for SmartAI Google Reviews
+
+- **Symptom**: On `/dashboard/settings`, all QR and loyalty components were rendered in an unsegregated vertical list. Merchants who only purchased the standalone "SmartAI Google Reviews" module did not have a dedicated Google Review QR standee/sticker generator, and saw irrelevant WhatsApp loyalty stamp card QR tools.
+- **Root Cause**:
+  1. The QR Generator component (`qr-generator.tsx`) was strictly wired to WhatsApp loyalty check-ins (`https://wa.me/...`) and did not support generating Google Review collection QR codes.
+  2. `/api/qr/generate/route.ts` required a `whatsappPhone` number to be configured and only generated WhatsApp check-in URLs.
+  3. `src/app/dashboard/settings/page.tsx` rendered all loyalty and review cards together without module filtering (`hasModule`).
+- **Resolution**:
+  1. **Upgraded `/api/qr/generate/route.ts`:** Added support for `mode=reviews` and `mode=loyalty`. When `mode=reviews` is requested, it automatically uses the merchant's connected Google Business Review URL or Smart AI Review Assistant URL (`/review?m=merchantId`) and does not block on missing WhatsApp configuration.
+  2. **Created `src/components/google-review-qr-generator.tsx`:** Built a dedicated SmartAI Google Reviews QR Standee & Posters Generator with:
+     - 5 placement styles: Counter Standee, Table Tent Card, Bill / Box Packaging Sticker, Window Poster, Direct Google 5★ QR.
+     - Live Standee Card preview with 5 golden stars, merchant logo, and "Instant AI Review Assistant" badge.
+     - Download High-Res PNG, Print Ready A4 PDF Standee, and 1-Click Copy Review Link buttons.
+  3. **Updated `src/components/qr-generator.tsx`:** Retitled and styled specifically as **"WhatsApp VIP Loyalty & Stamp Check-in QR Standee"**.
+  4. **Updated `src/app/dashboard/settings/page.tsx`:**
+     - Segregated the page into clear, dedicated visual sections with plan badges:
+       - **Section 1: Business Information** (Core business profile)
+       - **Section 2: ⭐ SmartAI Google Reviews Module** (Google Business Profile connection + Dedicated Google Review QR Standee Generator + Review Delay settings)
+       - **Section 3: 🎁 WhatsApp Loyalty & Stamp Card System** (Shown only if `hasModule(merchant, "LOYALTY")` is true — WhatsApp Verification + VIP Stamp QR Standee + Category & Reward Setup)
+       - **Section 4: 🏢 Branding & Automation Diagnostics**
+  5. Built and restarted production server — verified `http://localhost:3000` is live with 200 OK.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [30 Aug 2026] Issue: Google OAuth 1-Click Signup Loses `module` Parameter — Merchant Sent to Full Onboarding Instead of Fast-Track Dashboard
 
 - **Symptom**: When a merchant clicked **"Start Free Trial - SmartAI Google Reviews"** (landing on `/signup?module=reviews`) and then used the **"Continue with Google Account"** button for 1-Click signup, they were redirected to `/onboarding?step=1` and shown the full 8-step onboarding wizard (WhatsApp QR code, business timing, etc.) instead of being fast-tracked directly to `/dashboard/reviews`.
