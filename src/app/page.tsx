@@ -548,17 +548,27 @@ export default function Home() {
               <p className="lead mt-2">
                 CustomerPilot helps local businesses bring customers back with loyalty rewards, AI-powered Google Review assistance, and automated review replies — without requiring customers to download an app.
               </p>
-              <div className="btn-row flex flex-col sm:flex-row gap-3">
-                <Link href="/signup" className="btn btn-grad py-3.5 sm:py-4 px-6 sm:px-7 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 flex-1">
-                  Start 7 Days Free Trial Today <span className="arrow">→</span>
+              <div className="btn-row flex flex-col gap-3">
+                <Link href="/signup" className="btn btn-grad py-3.5 sm:py-4 px-6 sm:px-7 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/20 transition-all">
+                  <span>Start 7-Day Free Trial (All-in-One Full Suite)</span> <span className="arrow">→</span>
                 </Link>
-                <Link href="/signup?module=reviews" className="btn bg-white border-2 border-amber-500 text-amber-600 hover:bg-amber-50 py-3.5 sm:py-4 px-5 sm:px-6 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 flex-1 shadow-sm transition">
-                  <Star className="w-4 h-4 fill-amber-500" /> Start Free Trial - SmartAI Google Reviews
-                </Link>
+
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                  <span className="text-[11px] text-slate-500 font-medium">Or choose single module:</span>
+                  <Link href="/signup?module=loyalty" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-[11px] font-bold text-amber-800 transition">
+                    🎁 Loyalty Stamps Trial
+                  </Link>
+                  <Link href="/signup?module=reviews" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-[11px] font-bold text-emerald-800 transition">
+                    ⭐ AI Google Reviews Trial
+                  </Link>
+                  <Link href="/signup?module=autoreply" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-[11px] font-bold text-indigo-800 transition">
+                    💬 1-Click AutoReply Trial
+                  </Link>
+                </div>
               </div>
               <div className="trust">
                 <span><span className="ck">✓</span> No credit card required</span>
-                <span><span className="ck">✓</span> Setup in 5 minutes</span>
+                <span><span className="ck">✓</span> Setup in 2 minutes</span>
                 <span><span className="ck">✓</span> 7-Day full access</span>
               </div>
             </div>
@@ -977,6 +987,9 @@ export default function Home() {
               <div className="stamp-row mt-4">
                 <span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span>
               </div>
+              <Link href="/signup?module=loyalty" className="mt-5 w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+                <span>Start Free Trial - WhatsApp Loyalty System</span> <span>→</span>
+              </Link>
             </div>
 
             {/* Engine 2: Magic SEO Optimized Google Reviews */}
@@ -994,6 +1007,10 @@ export default function Home() {
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Organic Rating Booster</li>
               </ul>
               <div className="stars mt-4"><span style={{ color: '#f59e0b' }}>★★★★★</span><small className="bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full text-[10px]">+412 this month</small></div>
+              <Link href="/signup?module=reviews" className="mt-5 w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+                <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+                <span>Start Free Trial - SmartAI Google Reviews</span> <span>→</span>
+              </Link>
             </div>
 
             {/* Engine 3: 1-Click GoogleReview AutoReply */}
@@ -1011,6 +1028,9 @@ export default function Home() {
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Zero Missed Reviews Guarantee</li>
               </ul>
               <div className="reply-prev mt-4 text-xs bg-slate-50 border border-slate-100 p-2.5 rounded-xl"><strong style={{ color: 'var(--slate)' }}>1-Click AutoReply:</strong> &quot;Thank you so much for your kind words! 💜 See you again soon.&quot;</div>
+              <Link href="/signup?module=autoreply" className="mt-5 w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+                <span>Start Free Trial - 1-Click AI AutoReply</span> <span>→</span>
+              </Link>
             </div>
           </div>
         </div>

@@ -35,7 +35,8 @@ export function PricingClient() {
         "14-Day Inactivity Win-Backs",
         "Cashier 1-Tap Counter Queue",
       ],
-      btnText: "Start 7 Days Free Trial Today →",
+      btnText: "Start Free Trial - WhatsApp Loyalty →",
+      module: "loyalty",
       popular: false,
     },
     {
@@ -56,7 +57,8 @@ export function PricingClient() {
         "Review Growth Analytics",
         "Organic Neighborhood SEO Booster",
       ],
-      btnText: "Start 7 Days Free Trial Today →",
+      btnText: "Start Free Trial - SmartAI Reviews →",
+      module: "reviews",
       popular: false,
     },
     {
@@ -77,7 +79,8 @@ export function PricingClient() {
         "Bulk Reply Engine",
         "Smart Sentiment Adaptation",
       ],
-      btnText: "Start 7 Days Free Trial Today →",
+      btnText: "Start Free Trial - AI AutoReply →",
+      module: "autoreply",
       popular: false,
     },
     {
@@ -99,7 +102,8 @@ export function PricingClient() {
         "Free Counter Standee Custom Poster",
         "Priority WhatsApp Founder Support",
       ],
-      btnText: "Start 7 Days Free Trial Today →",
+      btnText: "Start Complete Suite Free Trial →",
+      module: "",
       popular: true,
     },
   ]
@@ -272,7 +276,7 @@ export function PricingClient() {
                     ))}
                   </ul>
 
-                  <Link href="/signup" className="block pt-2">
+                  <Link href={card.module ? `/signup?module=${card.module}` : "/signup"} className="block pt-2">
                     <Button className={`w-full text-xs font-bold rounded-xl py-2.5 ${card.popular ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-md" : "bg-slate-900 hover:bg-slate-800 text-white"}`}>
                       {card.btnText}
                     </Button>

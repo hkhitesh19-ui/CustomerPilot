@@ -20,6 +20,7 @@ model User {
 
 model Merchant {
   id                        String                    @id @default(cuid())
+  merchantIdNumber          String?                   @unique
   userId                    String?                   @unique
   name                      String
   businessType              String?

@@ -15,6 +15,10 @@ function SignupForm() {
   const refCode = searchParams.get("ref") || ""
   const moduleParam = searchParams.get("module") || "" // "reviews", "loyalty", "autoreply"
   const isReviewsMode = moduleParam === "reviews"
+  const isLoyaltyMode = moduleParam === "loyalty"
+  const isAutoReplyMode = moduleParam === "autoreply"
+  const isStandalone = isReviewsMode || isLoyaltyMode || isAutoReplyMode
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -40,7 +44,7 @@ function SignupForm() {
       setError("All required fields must be filled.")
       return
     }
-    if (!isReviewsMode && !form.ownerName) {
+    if (!isReviewsMode && !isAutoReplyMode && !form.ownerName) {
       setError("Owner Name is required.")
       return
     }
@@ -86,19 +90,89 @@ function SignupForm() {
     }
   }
 
-  const benefits = isReviewsMode
-    ? [
-        "AI-powered Google Review replies",
-        "Auto review collection via WhatsApp",
-        "5-star review boost for your business",
-        "Setup in under 2 minutes, no onboarding",
-      ]
-    : [
-        "WhatsApp-first loyalty system",
-        "Auto Google Review collection",
-        "AI-powered customer retention",
-        "7-Day FREE trial, no credit card",
-      ]
+  // Dynamic titles, copy & benefits per selected module
+  let headerBadge = "7-Day FREE Trial • No Credit Card"
+  let mainTitle = (
+    <>
+      Start Your Free <br />
+      <span className="bg-gradient-to-r from-emerald-600 via-sky-600 to-indigo-600 bg-clip-text text-transparent">
+        Merchant Trial.
+      </span>
+    </>
+  )
+  let description = "India's #1 WhatsApp-first AI Customer Retention Platform. Bring your customers back with loyalty rewards, 5-star Google reviews, and automated AI owner replies."
+  let formTitle = "Create Merchant Account"
+  let formSubtitle = "Start 7 Days Free Trial Today in under 2 minutes"
+  let submitBtnText = "Start 7 Days Free Trial Today →"
+
+  let benefits = [
+    "WhatsApp-first loyalty system",
+    "Auto Google Review collection",
+    "AI-powered customer retention",
+    "7-Day FREE trial, no credit card",
+  ]
+
+  if (isReviewsMode) {
+    headerBadge = "7-Day FREE Trial • SmartAI Google Reviews"
+    mainTitle = (
+      <>
+        Smart AI <br />
+        <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 bg-clip-text text-transparent">
+          Google Reviews.
+        </span>
+      </>
+    )
+    description = "Get instant AI-powered replies for every Google Review. Boost your 5-star ratings and attract more customers — setup in 2 clicks."
+    formTitle = "Start Free Trial - SmartAI Google Reviews"
+    formSubtitle = "2 clicks to get started — no long onboarding!"
+    submitBtnText = "Start SmartAI Reviews Free Trial →"
+    benefits = [
+      "AI-powered Google Review replies",
+      "Auto review collection via WhatsApp",
+      "5-star review boost for your business",
+      "Setup in under 2 minutes, no onboarding",
+    ]
+  } else if (isLoyaltyMode) {
+    headerBadge = "7-Day FREE Trial • WhatsApp Loyalty Stamps"
+    mainTitle = (
+      <>
+        WhatsApp <br />
+        <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+          Loyalty Rewards.
+        </span>
+      </>
+    )
+    description = "Convert single-time walk-ins into repeat regulars with WhatsApp digital stamp cards, VIP club, and automated birthday rewards."
+    formTitle = "Start Free Trial - WhatsApp Loyalty System"
+    formSubtitle = "Setup digital stamp cards & VIP rewards in 2 minutes"
+    submitBtnText = "Start WhatsApp Loyalty Free Trial →"
+    benefits = [
+      "Digital WhatsApp Stamp Cards (No app)",
+      "VIP Club Engine & Tier Upgrades",
+      "Automated Inactivity Win-Backs",
+      "Cashier 1-Tap Counter Queue",
+    ]
+  } else if (isAutoReplyMode) {
+    headerBadge = "7-Day FREE Trial • 1-Click AI AutoReply"
+    mainTitle = (
+      <>
+        1-Click AI <br />
+        <span className="bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          Review AutoReply.
+        </span>
+      </>
+    )
+    description = "Never miss a Google review reply again. AI drafts appreciative, SEO-optimized owner responses ready to publish on Google Maps in 1-Click."
+    formTitle = "Start Free Trial - 1-Click AI AutoReply"
+    formSubtitle = "Connect Google Business Profile in 1-Click"
+    submitBtnText = "Start AI AutoReply Free Trial →"
+    benefits = [
+      "AI Context-Aware Drafts in 1 Second",
+      "1-Click Copy & Publish to Google Maps",
+      "Smart Sentiment & Local Keyword Adaptation",
+      "Zero Missed Reviews Guarantee",
+    ]
+  }
 
   return (
     <div className="min-h-screen bg-white text-stone-900 font-sans relative overflow-hidden flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950">
@@ -131,31 +205,15 @@ function SignupForm() {
           <div className="md:col-span-6 lg:col-span-5 space-y-6 text-left pt-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 shadow-sm">
               <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-xs font-bold text-emerald-800">7-Day FREE Trial • No Credit Card</span>
+              <span className="text-xs font-bold text-emerald-800">{headerBadge}</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-stone-900 tracking-tight leading-tight">
-              {isReviewsMode ? (
-                <>
-                  Smart AI <br />
-                  <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 bg-clip-text text-transparent">
-                    Google Reviews.
-                  </span>
-                </>
-              ) : (
-                <>
-                  Start Your Free <br />
-                  <span className="bg-gradient-to-r from-emerald-600 via-sky-600 to-indigo-600 bg-clip-text text-transparent">
-                    Merchant Trial.
-                  </span>
-                </>
-              )}
+              {mainTitle}
             </h1>
 
             <p className="text-xs sm:text-sm md:text-base text-stone-600 leading-relaxed">
-              {isReviewsMode
-                ? "Get instant AI-powered replies for every Google Review. Boost your 5-star ratings and attract more customers — setup in 2 clicks."
-                : "India\u0027s #1 WhatsApp-first AI Customer Retention Platform. Bring your customers back with loyalty rewards, 5-star Google reviews, and automated AI owner replies."}
+              {description}
             </p>
 
             <div className="space-y-2.5 pt-1">
@@ -188,10 +246,10 @@ function SignupForm() {
 
               <div className="mb-6">
                 <h2 className="text-2xl font-black text-stone-900">
-                  {isReviewsMode ? "Start Free Trial - SmartAI Google Reviews" : "Create Merchant Account"}
+                  {formTitle}
                 </h2>
                 <p className="text-stone-500 text-xs mt-1">
-                  {isReviewsMode ? "2 clicks to get started — no long onboarding!" : "Start 7 Days Free Trial Today in under 2 minutes"}
+                  {formSubtitle}
                 </p>
               </div>
 
@@ -265,7 +323,7 @@ function SignupForm() {
                   )}
                 </div>
 
-                {!isReviewsMode && (
+                {!isReviewsMode && !isAutoReplyMode && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
@@ -341,7 +399,7 @@ function SignupForm() {
                   disabled={loading}
                   className="w-full h-11 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow-lg transition-all"
                 >
-                  {loading ? "Setting up merchant account..." : "Start 7 Days Free Trial Today →"}
+                  {loading ? "Setting up merchant account..." : submitBtnText}
                 </Button>
               </form>
             </div>
