@@ -182,12 +182,12 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
   return (
     <Card className="border-border">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <QrCode className="w-5 h-5 text-indigo-500" />
-          Commercial QR Generation
+        <CardTitle className="flex items-center gap-2 text-indigo-300">
+          <QrCode className="w-5 h-5 text-indigo-400" />
+          WhatsApp VIP Loyalty &amp; Stamp Check-in QR Standee
         </CardTitle>
-        <CardDescription>
-          Generate and print your branded Counter Stand QR code for store checkout counters.
+        <CardDescription className="text-slate-400">
+          Generate and print your WhatsApp VIP Club QR code for customer check-ins, collecting stamps, and claiming rewards at checkout.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
