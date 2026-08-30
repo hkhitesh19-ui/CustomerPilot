@@ -12,8 +12,11 @@ export async function GET(req: Request) {
       return NextResponse.redirect(`${appUrl}/signup?error=google_auth_not_configured`);
     }
 
+    const url = new URL(req.url);
+    const moduleParam = url.searchParams.get("module") || "";
+
     const scope = "openid email profile";
-    const state = "signup_" + Math.random().toString(36).substring(7);
+    const state = `signup_${moduleParam}_` + Math.random().toString(36).substring(7);
 
     const params = new URLSearchParams({
       client_id: clientId,

@@ -217,7 +217,7 @@ function SignupForm() {
 
               {/* Google One-Click Signup */}
               <a
-                href="/api/auth/google"
+                href={moduleParam ? `/api/auth/google?module=${moduleParam}` : "/api/auth/google"}
                 className="w-full h-11 bg-stone-50 hover:bg-stone-100 text-stone-900 font-bold text-xs rounded-xl flex items-center justify-center gap-3 transition-all shadow-sm border border-stone-200 mb-5 cursor-pointer"
               >
                 <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
