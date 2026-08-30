@@ -3,6 +3,19 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [30 Aug 2026] Issue: Public Counter Google Review QR Scans Showed "Invalid Review Link"
+
+- **Symptom**: When scanning the physical SmartAI Google Review Counter Standee QR code (`/review?m=merchantId`), the browser displayed `Invalid Review Link.` instead of the AI Review Assistant.
+- **Root Cause**:
+  1. In `src/app/review/page.tsx`, the route enforced `if (!customerId || !merchantId)` and `if (!merchant || !customer)`. Public physical QR code standees placed at store counters or tables do not carry a pre-existing `customerId` query parameter (`c=...`) since walk-in customers are anonymous visitors.
+  2. In `src/app/api/reviews/record-google-post/route.ts`, `customerId` was strictly validated as required, preventing anonymous customer review submissions.
+- **Resolution**:
+  1. **`src/app/review/page.tsx`:** Updated page validation to require only `merchantId`. When `customerId` is absent, the page renders the Smart AI Review Assistant for the customer with fallback review templates, without crashing or blocking.
+  2. **`src/app/api/reviews/record-google-post/route.ts`:** Made `customerId` optional. If an unauthenticated counter customer submits a review, the API creates an anonymous guest customer record linked to the merchant to satisfy foreign key constraints.
+  3. Verified `http://localhost:3000/review?m=cmtffwge20002w05gh23fc6tj` returns HTTP 200 OK with full AI Review Assistant UI.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [30 Aug 2026] Issue: Settings Page QR Code Standee Generator Was Combined — Needed Dedicated Standalone Section for SmartAI Google Reviews
 
 - **Symptom**: On `/dashboard/settings`, all QR and loyalty components were rendered in an unsegregated vertical list. Merchants who only purchased the standalone "SmartAI Google Reviews" module did not have a dedicated Google Review QR standee/sticker generator, and saw irrelevant WhatsApp loyalty stamp card QR tools.
