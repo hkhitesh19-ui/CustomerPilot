@@ -553,7 +553,7 @@ export default function Home() {
                   Start 7 Days Free Trial Today <span className="arrow">→</span>
                 </Link>
                 <Link href="/signup?module=reviews" className="btn bg-white border-2 border-amber-500 text-amber-600 hover:bg-amber-50 py-3.5 sm:py-4 px-5 sm:px-6 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 flex-1 shadow-sm transition">
-                  <Star className="w-4 h-4 fill-amber-500" /> Start AI Google Reviews
+                  <Star className="w-4 h-4 fill-amber-500" /> Start Free Trial - SmartAI Google Reviews
                 </Link>
               </div>
               <div className="trust">

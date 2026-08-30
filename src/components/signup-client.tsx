@@ -188,7 +188,7 @@ function SignupForm() {
 
               <div className="mb-6">
                 <h2 className="text-2xl font-black text-stone-900">
-                  {isReviewsMode ? "Start AI Google Reviews" : "Create Merchant Account"}
+                  {isReviewsMode ? "Start Free Trial - SmartAI Google Reviews" : "Create Merchant Account"}
                 </h2>
                 <p className="text-stone-500 text-xs mt-1">
                   {isReviewsMode ? "2 clicks to get started — no long onboarding!" : "Start 7 Days Free Trial Today in under 2 minutes"}
