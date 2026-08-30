@@ -70,6 +70,7 @@ export default async function ReviewPage({
           break
         }
       }
+    }
   }
 
   const city = merchant.address?.split(',').pop()?.trim() || "Vadodara"
