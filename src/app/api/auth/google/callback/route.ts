@@ -10,6 +10,9 @@ export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const code = url.searchParams.get("code");
+    const state = url.searchParams.get("state") || "";
+    const stateParts = state.split("_");
+    const moduleParam = stateParts[1] || "";
     const host = req.headers.get("host") || "localhost:3000";
     const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https";
     const appUrl = `${protocol}://${host}`;
@@ -82,6 +85,14 @@ export async function GET(req: Request) {
 
       const merchantIdNumber = await generateMerchantIdNumber(db);
 
+      const MODULE_MAP: Record<string, string> = {
+        reviews: "REVIEWS",
+        loyalty: "LOYALTY",
+        autoreply: "AUTOREPLY",
+      };
+      const isFastTrack = moduleParam && MODULE_MAP[moduleParam];
+      const enabledModules = isFastTrack ? MODULE_MAP[moduleParam] : "LOYALTY,REVIEWS,AUTOREPLY";
+
       merchant = await db.merchant.create({
         data: {
           userId: user.id,
@@ -93,8 +104,9 @@ export async function GET(req: Request) {
           plan: "trial",
           status: "active",
           trialEndsAt,
-          onboardingCompleted: false,
-          currentStep: 1,
+          enabledModules,
+          onboardingCompleted: !!isFastTrack,
+          currentStep: isFastTrack ? 99 : 1,
         },
       });
 
@@ -115,7 +127,7 @@ export async function GET(req: Request) {
           merchantId: merchant!.id,
           stepKey: s.stepKey,
           label: s.label,
-          status: "pending",
+          completed: !!isFastTrack,
         })),
       }).catch(() => {});
     }
@@ -204,8 +216,14 @@ export async function GET(req: Request) {
       .setExpirationTime("7d")
       .sign(secret);
 
+    const isFastTrack = moduleParam === 'reviews' || moduleParam === 'autoreply' || moduleParam === 'loyalty';
+    const MODULE_REDIRECTS: Record<string, string> = {
+      reviews: '/dashboard/reviews',
+      autoreply: '/dashboard/reviews',
+      loyalty: '/dashboard',
+    };
     const redirectPath = merchant.onboardingCompleted
-      ? "/dashboard"
+      ? (isFastTrack ? (MODULE_REDIRECTS[moduleParam] || '/dashboard') : '/dashboard')
       : `/onboarding?step=${merchant.currentStep || 1}`;
 
     const res = NextResponse.redirect(`${appUrl}${redirectPath}`);
