@@ -90,7 +90,7 @@ export default function SuperAdminPage() {
           </div>
 
           {/* Navigation Items Grouped */}
-          <div className="p-4 space-y-6 overflow-y-auto max-h-[calc(100vh-160px)] custom-scrollbar">
+          <div className="p-4 space-y-6 overflow-y-auto max-h-[calc(100vh-260px)] custom-scrollbar">
             {navCategories.map((group, gIdx) => (
               <div key={gIdx} className="space-y-1">
                 <div className="px-3 text-[10px] font-extrabold tracking-wider uppercase text-slate-500 mb-2">
@@ -128,13 +128,13 @@ export default function SuperAdminPage() {
         </div>
 
         {/* Sidebar Footer Info */}
-        <div className="p-4 border-t border-slate-800/80 bg-slate-950/40 space-y-3">
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800/80">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[11px] font-semibold text-slate-300">Cluster Node #1</span>
+        <div className="p-3 border-t border-slate-800/80 bg-slate-950/40 space-y-2 flex-shrink-0">
+          <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800/80">
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[10px] font-semibold text-slate-300">Cluster Node #1</span>
             </div>
-            <span className="text-[10px] font-mono text-slate-500">42ms Latency</span>
+            <span className="text-[9px] font-mono text-slate-500">42ms Latency</span>
           </div>
 
           <button
@@ -144,9 +144,9 @@ export default function SuperAdminPage() {
               await signOut({ redirect: false });
               window.location.href = '/login';
             }}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold bg-rose-500/10 text-rose-400 hover:text-white hover:bg-rose-600 border border-rose-500/25 hover:border-rose-500 transition-all duration-200 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 transition-all duration-200 cursor-pointer"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
           </button>
         </div>
