@@ -3,6 +3,17 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [30 Aug 2026] Issue: Missing Sign Out Button on Super-Admin Page Sidebar Footer
+- **Symptom**: There was no "Sign Out" option on the `/super-admin` command center sidebar. Users had to manually delete cookies or navigate back to the merchant dashboard to log out.
+- **Root Cause**: The `/super-admin` page uses a completely custom, custom-styled dark sidebar template that was built from scratch and did not include a logout/sign out action button or imports.
+- **Resolution**:
+  1. Imported `LogOut` icon from `lucide-react` in `src/app/super-admin/page.tsx`.
+  2. Implemented a stylish "Sign Out" button in the sidebar footer directly below the latency monitor card.
+  3. Integrated NextAuth `signOut` and `/api/auth/logout` endpoint execution on button click, redirecting the user back to `/login` upon success.
+  4. Committed as `e41779f`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [29 Aug 2026] Issue: Standalone Server Using Stale Database (Queue/API 400 Errors)
 - **Symptom**: After `npm run build`, the standalone server (`node .next/standalone/server.js`) returned 400 errors on `/api/queue/join` and similar endpoints. Customers scanning QR codes could not join the merchant queue. Everything appeared to "stop working" after each rebuild.
 - **Root Cause**: `npm run build` copies a snapshot of `prisma/dev.db` into `.next/standalone/prisma/dev.db` at build time. However, the build script was copying the DB **before** recent runtime changes (e.g., new merchant registrations, WhatsApp phone updates, onboarding completions). Each subsequent build used a stale `.next/standalone/prisma/dev.db` (26 Aug 2026 timestamp) while the live, up-to-date DB was at `prisma/dev.db`. The standalone server reads from its local copy and had no visibility into the latest data.
