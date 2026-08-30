@@ -1,5 +1,6 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
+import { generateMerchantIdNumber } from "@/lib/merchant-id-generator"
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -41,9 +42,11 @@ export const authOptions: NextAuthOptions = {
         if (!merchant) {
           const trialEndsAt = new Date();
           trialEndsAt.setDate(trialEndsAt.getDate() + 7);
+          const merchantIdNumber = await generateMerchantIdNumber(db);
           merchant = await db.merchant.create({
             data: {
               userId: dbUser.id,
+              merchantIdNumber,
               name: user.name ? `${user.name}'s Business` : "My Business",
               ownerName: user.name || "",
               email: cleanEmail,

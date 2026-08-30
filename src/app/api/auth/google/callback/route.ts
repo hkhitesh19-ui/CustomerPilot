@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { SignJWT } from "jose";
+import { generateMerchantIdNumber } from "@/lib/merchant-id-generator";
 
 if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set');
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -79,9 +80,12 @@ export async function GET(req: Request) {
       const trialEndsAt = new Date();
       trialEndsAt.setDate(trialEndsAt.getDate() + 7);
 
+      const merchantIdNumber = await generateMerchantIdNumber(db);
+
       merchant = await db.merchant.create({
         data: {
           userId: user.id,
+          merchantIdNumber,
           name: name ? `${name}'s Business` : "My Business",
           ownerName: name,
           email,

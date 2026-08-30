@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { SignJWT } from 'jose';
 import bcrypt from 'bcryptjs';
 import { applyAuthRateLimit } from '@/lib/rate-limiter';
+import { generateMerchantIdNumber } from '@/lib/merchant-id-generator';
 
 if (!process.env.JWT_SECRET) {
   throw new Error('FATAL: JWT_SECRET environment variable is not set');
@@ -79,9 +80,12 @@ export async function POST(req: Request) {
     const trialEndsAt = new Date();
     trialEndsAt.setDate(trialEndsAt.getDate() + 7); // 7-day trial
 
+    const merchantIdNumber = await generateMerchantIdNumber(db);
+
     const merchant = await db.merchant.create({
       data: {
         userId: user.id,
+        merchantIdNumber,
         name: businessName,
         ownerName: ownerName || '',
         email: cleanEmail,
