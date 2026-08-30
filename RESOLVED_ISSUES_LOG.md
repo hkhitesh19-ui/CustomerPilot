@@ -3,6 +3,26 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [30 Aug 2026] Issue: Google OAuth 1-Click Signup Loses `module` Parameter — Merchant Sent to Full Onboarding Instead of Fast-Track Dashboard
+
+- **Symptom**: When a merchant clicked **"Start Free Trial - SmartAI Google Reviews"** (landing on `/signup?module=reviews`) and then used the **"Continue with Google Account"** button for 1-Click signup, they were redirected to `/onboarding?step=1` and shown the full 8-step onboarding wizard (WhatsApp QR code, business timing, etc.) instead of being fast-tracked directly to `/dashboard/reviews`.
+- **Root Cause**:
+  1. **Parameter Loss at OAuth Link (`signup-client.tsx`):** The Google signup anchor tag had a hardcoded `href="/api/auth/google"` with no dynamic query forwarding. When clicked from `/signup?module=reviews`, the `module=reviews` parameter was silently dropped.
+  2. **State Not Encoded (`google/route.ts`):** The Google OAuth initiator (`/api/auth/google`) did not read or embed the `module` parameter into the OAuth `state` value before redirecting to Google's auth server.
+  3. **Callback Blind to Module (`google/callback/route.ts`):** The custom Google callback handler never extracted the `state` query parameter returned by Google. It unconditionally created merchants with `onboardingCompleted: false`, `currentStep: 1`, and `enabledModules: "LOYALTY,REVIEWS,AUTOREPLY"`, triggering the full onboarding flow.
+- **Resolution**:
+  1. **`src/components/signup-client.tsx`:** Changed Google OAuth anchor `href` to be dynamic: `href={moduleParam ? \`/api/auth/google?module=${moduleParam}\` : "/api/auth/google"}`. This forwards the module selection into the OAuth initiation request.
+  2. **`src/app/api/auth/google/route.ts`:** Updated the OAuth initiator to read `module` from the incoming query string and embed it in the OAuth `state` parameter as `signup_${moduleParam}_${randomStr}`.
+  3. **`src/app/api/auth/google/callback/route.ts`:**
+     - Extracted `state` from Google's callback query params and split on `_` to recover `moduleParam`.
+     - Added `MODULE_MAP` to map `reviews` → `"REVIEWS"`, `loyalty` → `"LOYALTY"`, `autoreply` → `"AUTOREPLY"`.
+     - Set `enabledModules`, `onboardingCompleted: !!isFastTrack`, and `currentStep: isFastTrack ? 99 : 1` on new merchant creation.
+     - Set `completed: !!isFastTrack` on all created `OnboardingStep` records (replacing incorrect `status: "pending"` field which doesn't exist in schema).
+     - Added `MODULE_REDIRECTS` map so fast-track `reviews`/`autoreply` users land on `/dashboard/reviews` and `loyalty` users on `/dashboard`.
+  4. Rebuilt production bundle (`npm run build`) and restarted server — verified `http://localhost:3000` returns `200 OK`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [30 Aug 2026] Issue: Duplicate Business Timing Value Bug and Missing Unique Merchant ID Numbers
 - **Symptom**: On onboarding step 1 `/onboarding?step=1`, the Business Timing field was erroneously pre-filling with the Business Address value, and there was no way to assign a unique numeric ID code to merchants during signup.
 - **Root Cause**: 
