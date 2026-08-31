@@ -174,11 +174,11 @@ async function seed() {
       active: true
     },
 
-    // ─── Standalone Service 2: AI Draft & WhatsApp Review Flow ───
+    // ─── Standalone Service 2: Ai Drafted SEO Optimized Google Reviews ───
     {
       planKey: "reviews_6mo",
-      name: "AI Draft & WhatsApp Review Flow — 6 Months",
-      description: "Automated WhatsApp review collection with AI-drafted 5-star reviews.",
+      name: "Ai Drafted SEO Optimized Google Reviews — 6 Months",
+      description: "Automated WhatsApp review collection with AI-drafted 5-star reviews — Increase GoogleReviews Very Fast.",
       days: 180,
       price: 649,
       originalPrice: 999,
@@ -197,8 +197,8 @@ async function seed() {
     },
     {
       planKey: "reviews_yearly",
-      name: "AI Draft & WhatsApp Review Flow — 1 Year",
-      description: "Full year of automated review collection (₹3/day Billed yearly).",
+      name: "Ai Drafted SEO Optimized Google Reviews — 1 Year",
+      description: "Full year of automated review collection — Increase GoogleReviews Very Fast (₹3/day Billed yearly).",
       days: 365,
       price: 999,
       originalPrice: 1788,
@@ -215,10 +215,10 @@ async function seed() {
       active: true
     },
 
-    // ─── Standalone Service 3: Smart AI Draft & 1-Click Reply to GoogleReviews ───
+    // ─── Standalone Service 3: Ai Drafted SEO Optimized 1-Click Reply to Google Reviews ───
     {
       planKey: "autoreply_6mo",
-      name: "Smart AI Draft & 1-Click Reply to GoogleReviews — 6 Months",
+      name: "Ai Drafted SEO Optimized 1-Click Reply to Google Reviews — 6 Months",
       description: "AI-powered Google review replies published in 1-Click to Google Maps.",
       days: 180,
       price: 649,
@@ -239,7 +239,7 @@ async function seed() {
     },
     {
       planKey: "autoreply_yearly",
-      name: "Smart AI Draft & 1-Click Reply to GoogleReviews — 1 Year",
+      name: "Ai Drafted SEO Optimized 1-Click Reply to Google Reviews — 1 Year",
       description: "Full year of AI review replies (₹3/day Billed yearly).",
       days: 365,
       price: 999,

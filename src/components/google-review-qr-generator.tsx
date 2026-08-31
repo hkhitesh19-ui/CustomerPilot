@@ -214,10 +214,10 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
               <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
                 <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
               </div>
-              AI Draft &amp; WhatsApp Review Flow QR Standee &amp; Posters
+              Ai Drafted SEO Optimized Google Reviews QR Standee &amp; Posters
             </CardTitle>
             <CardDescription className="text-slate-400 mt-1">
-              Dedicated QR Code for collecting 5-Star Google Reviews with AI Draft assistance &amp; WhatsApp flow.
+              Dedicated QR Code for collecting 5-Star Google Reviews — Increase GoogleReviews Very Fast.
             </CardDescription>
           </div>
           <div className="flex items-center gap-2 flex-wrap">

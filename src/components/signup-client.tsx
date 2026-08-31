@@ -94,38 +94,38 @@ function SignupForm() {
   let headerBadge = "7-Day FREE Trial • CustomerPilot Complete"
   let mainTitle = (
     <>
-      CustomerPilot Complete: <br />
+      CustomerPilot Complete : <br />
       <span className="bg-gradient-to-r from-emerald-600 via-sky-600 to-indigo-600 bg-clip-text text-transparent">
-        Digital Loyalty + AI Reviews + 1-Click AutoReply.
+        Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply.
       </span>
     </>
   )
   let description = "India's #1 WhatsApp-first AI Customer Retention Platform. Bring your customers back with loyalty rewards, 5-star Google reviews, and automated AI owner replies."
-  let formTitle = "Start Free Trial - CustomerPilot Complete"
+  let formTitle = "Start Free Trial - CustomerPilot Complete : Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply"
   let formSubtitle = "Start 7-Day Complete Free Trial in under 2 minutes"
   let submitBtnText = "Start CustomerPilot Complete Free Trial →"
 
   let benefits = [
-    "WhatsApp-first loyalty system & VIP club",
-    "AI draft & WhatsApp review flow",
-    "Smart AI draft & 1-click Google review reply",
+    "Digital Loyalty Stamps & VIP Club",
+    "Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast",
+    "Ai Drafted SEO Optimized 1-Click Reply to Google Reviews",
     "7-Day FREE trial, no credit card required",
   ]
 
   if (isReviewsMode) {
-    headerBadge = "7-Day FREE Trial • AI Draft & WhatsApp Review Flow"
+    headerBadge = "7-Day FREE Trial • Ai Drafted SEO Optimized Google Reviews"
     mainTitle = (
       <>
-        AI Draft &amp; <br />
+        Ai Drafted SEO Optimized <br />
         <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 bg-clip-text text-transparent">
-          WhatsApp Review Flow.
+          Google Reviews - Increase GoogleReviews Very Fast.
         </span>
       </>
     )
     description = "Automatically collect authentic 4 & 5-star Google reviews right after a customer purchase on WhatsApp. AI drafts ready-to-post customer reviews in 1-Click."
-    formTitle = "Start Free Trial - AI Draft & WhatsApp Review Flow"
+    formTitle = "Start Free Trial - Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast"
     formSubtitle = "2 clicks to get started — instant setup!"
-    submitBtnText = "Start AI Reviews Free Trial →"
+    submitBtnText = "Start Free Trial - Ai Drafted SEO Optimized Google Reviews →"
     benefits = [
       "AI-powered Google Review customer drafts",
       "Auto review collection via WhatsApp delay timer",
@@ -145,7 +145,7 @@ function SignupForm() {
     description = "Convert single-time walk-ins into repeat regulars with WhatsApp digital stamp cards, VIP club tier upgrades, and automated birthday rewards."
     formTitle = "Start Free Trial - Digital Loyalty Stamps & VIP Club"
     formSubtitle = "Setup digital stamp cards & VIP rewards in 2 minutes"
-    submitBtnText = "Start Digital Loyalty Free Trial →"
+    submitBtnText = "Start Free Trial - Digital Loyalty Stamps & VIP Club →"
     benefits = [
       "Digital WhatsApp Stamp Cards (No app download)",
       "VIP Club Engine & Tier Upgrades (Silver, Gold, Platinum)",
@@ -153,19 +153,19 @@ function SignupForm() {
       "Cashier 1-Tap Counter Queue Terminal",
     ]
   } else if (isAutoReplyMode) {
-    headerBadge = "7-Day FREE Trial • Smart AI Draft & 1-Click Reply to GoogleReviews"
+    headerBadge = "7-Day FREE Trial • Ai Drafted SEO Optimized 1-Click Reply to Google Reviews"
     mainTitle = (
       <>
-        Smart AI Draft &amp; <br />
+        Ai Drafted SEO Optimized <br />
         <span className="bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
-          1-Click Reply to GoogleReviews.
+          1-Click Reply to Google Reviews.
         </span>
       </>
     )
     description = "Never miss a Google review reply again. AI drafts appreciative, SEO-optimized owner responses ready to publish on Google Maps in 1-Click."
-    formTitle = "Start Free Trial - Smart AI Draft & 1-Click Reply to GoogleReviews"
+    formTitle = "Start Free Trial - Ai Drafted SEO Optimized 1-Click Reply to Google Reviews"
     formSubtitle = "Connect Google Business Profile in 1-Click"
-    submitBtnText = "Start 1-Click AutoReply Free Trial →"
+    submitBtnText = "Start Free Trial - Ai Drafted SEO Optimized 1-Click Reply →"
     benefits = [
       "AI Context-Aware Drafts in 1 Second",
       "1-Click Direct Publish to Google Maps",

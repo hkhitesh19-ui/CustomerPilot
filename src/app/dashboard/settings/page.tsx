@@ -108,11 +108,11 @@ export default function SettingsPage() {
           <h1 className="text-3xl font-bold tracking-tight text-slate-100">Merchant Settings</h1>
           {isReviewsOnly ? (
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1">
-              ⭐ AI Draft &amp; WhatsApp Review Flow
+              ⭐ Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast
             </span>
           ) : (
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-              🚀 CustomerPilot Complete
+              🚀 CustomerPilot Complete : Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply
             </span>
           )}
         </div>
@@ -192,7 +192,7 @@ export default function SettingsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-amber-400">⭐ AI Draft &amp; WhatsApp Review Flow</span>
+            <span className="text-xl font-bold text-amber-400">⭐ Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</span>
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
               Reviews &amp; Standee QR
             </span>

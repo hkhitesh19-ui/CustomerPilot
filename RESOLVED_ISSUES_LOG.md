@@ -3,23 +3,22 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
-## [31 Aug 2026] Issue: Standardize Exact Service Wordings Across All Customer & Merchant Pages
+## [31 Aug 2026] Issue: Standardize Exact Service Wordings Across Navbar, Comparison Tables, Pricing & Signup
 
-- **Symptom**: Different pages and components across the web application were using varied nomenclature for the 3 core services and complete bundle (e.g., "WhatsApp Loyalty Rewards", "Magic SEO Optimized Reviews", "1-Click AutoReply"), causing confusion for merchants evaluating free trial options and comparison tables.
-- **Root Cause**: Product nomenclature had evolved dynamically across landing pages, pricing cards, signup flows, settings headers, and database plan seed records.
+- **Symptom**: Different pages, header Products dropdowns, comparison matrix tables, pricing cards, and signup flows were using varied nomenclature for the 3 core services and complete bundle.
+- **Root Cause**: Products dropdown menu, landing page hero badges, feature cards, and comparison matrix tables needed to be unified with exact standardized titles and descriptions.
 - **Resolution**:
   1. Standardized all 4 service titles across the entire codebase strictly to:
      - **Service 1**: `Digital Loyalty Stamps & VIP Club`
-     - **Service 2**: `AI Draft & WhatsApp Review Flow`
-     - **Service 3**: `Smart AI Draft & 1-Click Reply to GoogleReviews`
-     - **Service 4 (Complete Bundle)**: `CustomerPilot Complete: Digital Loyalty + AI Reviews + 1-Click AutoReply`
+     - **Service 2**: `Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast`
+     - **Service 3**: `Ai Drafted SEO Optimized 1-Click Reply to Google Reviews`
+     - **Service 4 (Complete Bundle)**: `CustomerPilot Complete : Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply`
   2. Updated files:
-     - `src/app/page.tsx`: Hero module tags, 3-engine outcome cards, and full `#comparison` matrix table column headers, section dividers, and CTA buttons.
-     - `src/components/pricing-client.tsx`: Outcome cards titles, subtitles, button texts, and full side-by-side comparison matrix headers/buttons.
-     - `src/components/signup-client.tsx`: Dynamic header badges, main titles, form headers, and submit button texts for all 4 module combinations.
+     - `src/app/page.tsx`: Navbar Products dropdown (Desktop & Mobile), Hero single-module buttons, 3-Engine Feature Cards, and `#comparison` matrix table column headers, section dividers, and CTA buttons.
+     - `src/components/pricing-client.tsx`: Outcome cards titles, subtitles, button texts, and full side-by-side comparison matrix headers, rows, and buttons.
+     - `src/components/signup-client.tsx`: Dynamic header badges, main titles, form headers, and submit button texts for all 4 module variations.
      - `src/app/dashboard/settings/page.tsx`: Plan badges, review module headers, and loyalty section titles.
-     - `src/components/google-review-qr-generator.tsx` & `src/components/whatsapp-stamp-card-client.tsx`: Standee headers and feature hero texts.
-     - `src/components/app-sidebar.tsx`: Dynamic plan display tags for standalone and complete bundle subscriptions.
+     - `src/components/google-review-qr-generator.tsx` & `src/components/google-review-automation-client.tsx`: Standee headers and feature hero texts.
      - `scripts/seedPricingAndTerms.js`: Database seed records for all standalone and bundle plans.
   3. Executed `node scripts/seedPricingAndTerms.js` to update SQLite `Plan` records in database.
   4. Executed `npm run build` — compiled cleanly with exit code 0.
