@@ -99,7 +99,7 @@ export async function GET(req: Request) {
         data: {
           userId: user.id,
           merchantIdNumber,
-          name: name ? `${name}'s Business` : "My Business",
+          name: name || "My Business",
           ownerName: name,
           email,
           businessType: "bakery",

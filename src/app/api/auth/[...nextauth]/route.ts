@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
             data: {
               userId: dbUser.id,
               merchantIdNumber,
-              name: user.name ? `${user.name}'s Business` : "My Business",
+              name: user.name || "My Business",
               ownerName: user.name || "",
               email: cleanEmail,
               businessType: "bakery",

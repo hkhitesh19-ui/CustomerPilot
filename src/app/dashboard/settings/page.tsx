@@ -44,6 +44,8 @@ export default function SettingsPage() {
   const isLoyaltyEnabled = hasModule(merchant, "LOYALTY")
   const isReviewsEnabled = hasModule(merchant, "REVIEWS") || hasModule(merchant, "AUTOREPLY")
   const isReviewsOnly = isReviewsEnabled && !isLoyaltyEnabled
+  const isLoyaltyOnly = isLoyaltyEnabled && !isReviewsEnabled
+  const isCompleteSuite = isLoyaltyEnabled && isReviewsEnabled
 
   useEffect(() => {
     if (data?.merchant) {
@@ -106,7 +108,11 @@ export default function SettingsPage() {
       <div>
         <div className="flex items-center gap-3 flex-wrap">
           <h1 className="text-3xl font-bold tracking-tight text-slate-100">Merchant Settings</h1>
-          {isReviewsOnly ? (
+          {isLoyaltyOnly ? (
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 flex items-center gap-1">
+              🎁 Digital Loyalty Stamps &amp; VIP Club
+            </span>
+          ) : isReviewsOnly ? (
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1">
               ⭐ Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast
             </span>
@@ -189,25 +195,27 @@ export default function SettingsPage() {
       </Card>
 
       {/* ─── SECTION 2: AI DRAFT & WHATSAPP REVIEW FLOW SECTION ─── */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-amber-400">⭐ Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</span>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
-              Reviews &amp; Standee QR
-            </span>
+      {isReviewsEnabled && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-bold text-amber-400">⭐ Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                Reviews &amp; Standee QR
+              </span>
+            </div>
+            <span className="text-xs text-slate-400 hidden sm:inline">Google Business Profile + Standee QR</span>
           </div>
-          <span className="text-xs text-slate-400 hidden sm:inline">Google Business Profile + Standee QR</span>
-        </div>
 
-        <GoogleBusinessIntegration merchantId={merchant?.id || ""} />
-        <GoogleReviewQRGenerator 
-          merchantId={merchant?.id || ""} 
-          googleReviewUrl={merchant?.merchantGoogleConnections?.googleReviewUrl || (merchant as any)?.googleReviewLink} 
-          placeName={merchant?.merchantGoogleConnections?.placeName} 
-        />
-        <GoogleReviewDelaySettings merchantId={merchant?.id || ""} />
-      </div>
+          <GoogleBusinessIntegration merchantId={merchant?.id || ""} />
+          <GoogleReviewQRGenerator 
+            merchantId={merchant?.id || ""} 
+            googleReviewUrl={merchant?.merchantGoogleConnections?.googleReviewUrl || (merchant as any)?.googleReviewLink} 
+            placeName={merchant?.merchantGoogleConnections?.placeName} 
+          />
+          <GoogleReviewDelaySettings merchantId={merchant?.id || ""} />
+        </div>
+      )}
 
       {/* ─── SECTION 3: DIGITAL LOYALTY STAMPS & VIP CLUB SECTION ─── */}
       {isLoyaltyEnabled && (
