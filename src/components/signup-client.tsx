@@ -91,84 +91,84 @@ function SignupForm() {
   }
 
   // Dynamic titles, copy & benefits per selected module
-  let headerBadge = "7-Day FREE Trial • No Credit Card"
+  let headerBadge = "7-Day FREE Trial • CustomerPilot Complete"
   let mainTitle = (
     <>
-      Start Your Free <br />
+      CustomerPilot Complete: <br />
       <span className="bg-gradient-to-r from-emerald-600 via-sky-600 to-indigo-600 bg-clip-text text-transparent">
-        Merchant Trial.
+        Digital Loyalty + AI Reviews + 1-Click AutoReply.
       </span>
     </>
   )
   let description = "India's #1 WhatsApp-first AI Customer Retention Platform. Bring your customers back with loyalty rewards, 5-star Google reviews, and automated AI owner replies."
-  let formTitle = "Create Merchant Account"
-  let formSubtitle = "Start 7 Days Free Trial Today in under 2 minutes"
-  let submitBtnText = "Start 7 Days Free Trial Today →"
+  let formTitle = "Start Free Trial - CustomerPilot Complete"
+  let formSubtitle = "Start 7-Day Complete Free Trial in under 2 minutes"
+  let submitBtnText = "Start CustomerPilot Complete Free Trial →"
 
   let benefits = [
-    "WhatsApp-first loyalty system",
-    "Auto Google Review collection",
-    "AI-powered customer retention",
-    "7-Day FREE trial, no credit card",
+    "WhatsApp-first loyalty system & VIP club",
+    "AI draft & WhatsApp review flow",
+    "Smart AI draft & 1-click Google review reply",
+    "7-Day FREE trial, no credit card required",
   ]
 
   if (isReviewsMode) {
-    headerBadge = "7-Day FREE Trial • SmartAI Google Reviews"
+    headerBadge = "7-Day FREE Trial • AI Draft & WhatsApp Review Flow"
     mainTitle = (
       <>
-        Smart AI <br />
+        AI Draft &amp; <br />
         <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 bg-clip-text text-transparent">
-          Google Reviews.
+          WhatsApp Review Flow.
         </span>
       </>
     )
-    description = "Get instant AI-powered replies for every Google Review. Boost your 5-star ratings and attract more customers — setup in 2 clicks."
-    formTitle = "Start Free Trial - SmartAI Google Reviews"
-    formSubtitle = "2 clicks to get started — no long onboarding!"
-    submitBtnText = "Start SmartAI Reviews Free Trial →"
+    description = "Automatically collect authentic 4 & 5-star Google reviews right after a customer purchase on WhatsApp. AI drafts ready-to-post customer reviews in 1-Click."
+    formTitle = "Start Free Trial - AI Draft & WhatsApp Review Flow"
+    formSubtitle = "2 clicks to get started — instant setup!"
+    submitBtnText = "Start AI Reviews Free Trial →"
     benefits = [
-      "AI-powered Google Review replies",
-      "Auto review collection via WhatsApp",
-      "5-star review boost for your business",
-      "Setup in under 2 minutes, no onboarding",
+      "AI-powered Google Review customer drafts",
+      "Auto review collection via WhatsApp delay timer",
+      "5-star review boost & local neighborhood SEO",
+      "Setup in under 2 minutes, no card required",
     ]
   } else if (isLoyaltyMode) {
-    headerBadge = "7-Day FREE Trial • WhatsApp Loyalty Stamps"
+    headerBadge = "7-Day FREE Trial • Digital Loyalty Stamps & VIP Club"
     mainTitle = (
       <>
-        WhatsApp <br />
+        Digital Loyalty Stamps &amp; <br />
         <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-          Loyalty Rewards.
+          VIP Club.
         </span>
       </>
     )
-    description = "Convert single-time walk-ins into repeat regulars with WhatsApp digital stamp cards, VIP club, and automated birthday rewards."
-    formTitle = "Start Free Trial - WhatsApp Loyalty System"
+    description = "Convert single-time walk-ins into repeat regulars with WhatsApp digital stamp cards, VIP club tier upgrades, and automated birthday rewards."
+    formTitle = "Start Free Trial - Digital Loyalty Stamps & VIP Club"
     formSubtitle = "Setup digital stamp cards & VIP rewards in 2 minutes"
-    submitBtnText = "Start WhatsApp Loyalty Free Trial →"
+    submitBtnText = "Start Digital Loyalty Free Trial →"
     benefits = [
-      "Digital WhatsApp Stamp Cards (No app)",
-      "VIP Club Engine & Tier Upgrades",
-      "Automated Inactivity Win-Backs",
-      "Cashier 1-Tap Counter Queue",
+      "Digital WhatsApp Stamp Cards (No app download)",
+      "VIP Club Engine & Tier Upgrades (Silver, Gold, Platinum)",
+      "Automated Inactivity Win-Backs (14-day & 30-day)",
+      "Cashier 1-Tap Counter Queue Terminal",
     ]
   } else if (isAutoReplyMode) {
-    headerBadge = "7-Day FREE Trial • 1-Click AI AutoReply"
+    headerBadge = "7-Day FREE Trial • Smart AI Draft & 1-Click Reply to GoogleReviews"
     mainTitle = (
       <>
-        1-Click AI <br />
+        Smart AI Draft &amp; <br />
         <span className="bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
-          Review AutoReply.
+          1-Click Reply to GoogleReviews.
         </span>
       </>
     )
     description = "Never miss a Google review reply again. AI drafts appreciative, SEO-optimized owner responses ready to publish on Google Maps in 1-Click."
-    formTitle = "Start Free Trial - 1-Click AI AutoReply"
+    formTitle = "Start Free Trial - Smart AI Draft & 1-Click Reply to GoogleReviews"
     formSubtitle = "Connect Google Business Profile in 1-Click"
-    submitBtnText = "Start AI AutoReply Free Trial →"
+    submitBtnText = "Start 1-Click AutoReply Free Trial →"
     benefits = [
       "AI Context-Aware Drafts in 1 Second",
-      "1-Click Copy & Publish to Google Maps",
+      "1-Click Direct Publish to Google Maps",
       "Smart Sentiment & Local Keyword Adaptation",
       "Zero Missed Reviews Guarantee",
     ]

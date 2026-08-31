@@ -103,9 +103,12 @@ export function AppSidebar() {
     if (isExpired) return { label: "Plan Expired", icon: "⚠️", color: "rose" }
     const plan = merchant?.plan || "trial"
     if (plan === "trial") return { label: "7-Day Free Trial", icon: "🎁", color: "amber" }
-    if (plan === "starter" || plan === "starter_30") return { label: "30 Days Plan", icon: "⚡", color: "indigo" }
-    if (plan === "growth" || plan === "growth_180") return { label: "180 Days Plan", icon: "🚀", color: "purple" }
-    if (plan === "enterprise" || plan === "enterprise_365") return { label: "365 Days Plan", icon: "👑", color: "emerald" }
+    if (plan.startsWith("loyalty_")) return { label: "Digital Loyalty Stamps", icon: "🎁", color: "amber" }
+    if (plan.startsWith("reviews_")) return { label: "AI Reviews Flow", icon: "⭐", color: "emerald" }
+    if (plan.startsWith("autoreply_")) return { label: "1-Click AutoReply", icon: "💬", color: "indigo" }
+    if (plan === "starter" || plan === "starter_30") return { label: "Complete (30 Days)", icon: "⚡", color: "indigo" }
+    if (plan === "growth" || plan === "growth_180") return { label: "Complete (6 Months)", icon: "🚀", color: "purple" }
+    if (plan === "enterprise" || plan === "enterprise_365" || plan === "enterprise_unlimited_365") return { label: "CustomerPilot Complete", icon: "👑", color: "emerald" }
     return { label: "Active Plan", icon: "✨", color: "emerald" }
   }
 

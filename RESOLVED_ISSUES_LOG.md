@@ -3,6 +3,30 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [31 Aug 2026] Issue: Standardize Exact Service Wordings Across All Customer & Merchant Pages
+
+- **Symptom**: Different pages and components across the web application were using varied nomenclature for the 3 core services and complete bundle (e.g., "WhatsApp Loyalty Rewards", "Magic SEO Optimized Reviews", "1-Click AutoReply"), causing confusion for merchants evaluating free trial options and comparison tables.
+- **Root Cause**: Product nomenclature had evolved dynamically across landing pages, pricing cards, signup flows, settings headers, and database plan seed records.
+- **Resolution**:
+  1. Standardized all 4 service titles across the entire codebase strictly to:
+     - **Service 1**: `Digital Loyalty Stamps & VIP Club`
+     - **Service 2**: `AI Draft & WhatsApp Review Flow`
+     - **Service 3**: `Smart AI Draft & 1-Click Reply to GoogleReviews`
+     - **Service 4 (Complete Bundle)**: `CustomerPilot Complete: Digital Loyalty + AI Reviews + 1-Click AutoReply`
+  2. Updated files:
+     - `src/app/page.tsx`: Hero module tags, 3-engine outcome cards, and full `#comparison` matrix table column headers, section dividers, and CTA buttons.
+     - `src/components/pricing-client.tsx`: Outcome cards titles, subtitles, button texts, and full side-by-side comparison matrix headers/buttons.
+     - `src/components/signup-client.tsx`: Dynamic header badges, main titles, form headers, and submit button texts for all 4 module combinations.
+     - `src/app/dashboard/settings/page.tsx`: Plan badges, review module headers, and loyalty section titles.
+     - `src/components/google-review-qr-generator.tsx` & `src/components/whatsapp-stamp-card-client.tsx`: Standee headers and feature hero texts.
+     - `src/components/app-sidebar.tsx`: Dynamic plan display tags for standalone and complete bundle subscriptions.
+     - `scripts/seedPricingAndTerms.js`: Database seed records for all standalone and bundle plans.
+  3. Executed `node scripts/seedPricingAndTerms.js` to update SQLite `Plan` records in database.
+  4. Executed `npm run build` — compiled cleanly with exit code 0.
+  5. Restarted production server, background cron runner, and Prisma Studio. Verified all HTTP 200 responses.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [30 Aug 2026] Issue: Public Counter Google Review QR Scans Showed "Invalid Review Link"
 
 - **Symptom**: When scanning the physical SmartAI Google Review Counter Standee QR code (`/review?m=merchantId`), the browser displayed `Invalid Review Link.` instead of the AI Review Assistant.

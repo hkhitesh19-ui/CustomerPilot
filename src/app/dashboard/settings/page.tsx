@@ -108,15 +108,15 @@ export default function SettingsPage() {
           <h1 className="text-3xl font-bold tracking-tight text-slate-100">Merchant Settings</h1>
           {isReviewsOnly ? (
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1">
-              ⭐ SmartAI Google Reviews Plan
+              ⭐ AI Draft &amp; WhatsApp Review Flow
             </span>
           ) : (
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-              🚀 Full Retain &amp; Growth Suite
+              🚀 CustomerPilot Complete
             </span>
           )}
         </div>
-        <p className="text-slate-400 mt-1">Configure your business profile, Google Review QR Standees, and Loyalty system.</p>
+        <p className="text-slate-400 mt-1">Configure your business profile, Google Review QR Standees, and Digital Loyalty system.</p>
       </div>
 
       {/* ─── SECTION 1: CORE BUSINESS PROFILE ────────────────── */}
@@ -188,13 +188,13 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* ─── SECTION 2: SMART AI GOOGLE REVIEWS & QR CODE SECTION ─── */}
+      {/* ─── SECTION 2: AI DRAFT & WHATSAPP REVIEW FLOW SECTION ─── */}
       <div className="space-y-6">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-amber-400">⭐ SmartAI Google Reviews Module</span>
+            <span className="text-xl font-bold text-amber-400">⭐ AI Draft &amp; WhatsApp Review Flow</span>
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
-              Reviews &amp; Auto-Reply
+              Reviews &amp; Standee QR
             </span>
           </div>
           <span className="text-xs text-slate-400 hidden sm:inline">Google Business Profile + Standee QR</span>
@@ -209,12 +209,12 @@ export default function SettingsPage() {
         <GoogleReviewDelaySettings merchantId={merchant?.id || ""} />
       </div>
 
-      {/* ─── SECTION 3: LOYALTY REWARDS & WHATSAPP STAMP QR SECTION ─── */}
+      {/* ─── SECTION 3: DIGITAL LOYALTY STAMPS & VIP CLUB SECTION ─── */}
       {isLoyaltyEnabled && (
         <div className="space-y-6 pt-4">
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
             <div className="flex items-center gap-2">
-              <span className="text-xl font-bold text-indigo-400">🎁 WhatsApp Loyalty &amp; Stamp Card System</span>
+              <span className="text-xl font-bold text-indigo-400">🎁 Digital Loyalty Stamps &amp; VIP Club</span>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
                 VIP Stamp Cards &amp; QR
               </span>

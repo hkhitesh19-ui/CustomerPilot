@@ -32,10 +32,10 @@ export function GoogleReviewAutomationClient() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 md:py-16 space-y-12 flex-1 w-full">
         <div className="space-y-4 text-center max-w-2xl mx-auto">
           <span className="px-3.5 py-1 bg-amber-50 text-amber-800 rounded-full text-xs font-bold border border-amber-200 shadow-xs inline-flex items-center gap-1.5">
-            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> Magic SEO Optimized Reviews
+            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> AI Draft &amp; WhatsApp Review Flow
           </span>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
-            Magic SEO Optimized Google Reviews - Increase GoogleReviews Very Fast
+            AI Draft &amp; WhatsApp Review Flow
           </h1>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
             After a purchase, your customer gets a gentle WhatsApp reminder to share their experience and earn bonus stamps. Automatically collect authentic 4 and 5-star Google reviews right after a customer purchase on WhatsApp.

@@ -976,7 +976,7 @@ export default function Home() {
             {/* Engine 1: Loyalty Rewards */}
             <div className="fcard">
               <div className="ico amber">🏆</div>
-              <h3 className="text-xl font-bold text-slate-900 mt-4">Loyalty Rewards (Bring Customers Back)</h3>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">Digital Loyalty Stamps &amp; VIP Club</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                 Perfect for bakeries, cafes, and salons wanting to convert single-time walk-ins into 10x repeat regulars.
               </p>
@@ -991,14 +991,14 @@ export default function Home() {
                 <span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span>
               </div>
               <Link href="/signup?module=loyalty" className="mt-5 w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
-                <span>Start Free Trial - WhatsApp Loyalty System</span> <span>→</span>
+                <span>Start Free Trial - Digital Loyalty Stamps &amp; VIP Club</span> <span>→</span>
               </Link>
             </div>
 
-            {/* Engine 2: Magic SEO Optimized Google Reviews */}
+            {/* Engine 2: AI Draft & WhatsApp Review Flow */}
             <div className="fcard">
               <div className="ico em">⭐</div>
-              <h3 className="text-xl font-bold text-slate-900 mt-4">Magic SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</h3>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">AI Draft &amp; WhatsApp Review Flow</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                 After a purchase, your customer gets a gentle WhatsApp reminder to share their experience and earn bonus stamps. Automatically collect authentic 4 and 5-star Google reviews right after a customer purchase on WhatsApp.
               </p>
@@ -1012,14 +1012,14 @@ export default function Home() {
               <div className="stars mt-4"><span style={{ color: '#f59e0b' }}>★★★★★</span><small className="bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full text-[10px]">+412 this month</small></div>
               <Link href="/signup?module=reviews" className="mt-5 w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
                 <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-                <span>Start Free Trial - SmartAI Google Reviews</span> <span>→</span>
+                <span>Start Free Trial - AI Draft &amp; WhatsApp Review Flow</span> <span>→</span>
               </Link>
             </div>
 
-            {/* Engine 3: 1-Click GoogleReview AutoReply */}
+            {/* Engine 3: Smart AI Draft & 1-Click Reply to GoogleReviews */}
             <div className="fcard">
               <div className="ico ind">💬</div>
-              <h3 className="text-xl font-bold text-slate-900 mt-4">1-Click GoogleReview AutoReply</h3>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">Smart AI Draft &amp; 1-Click Reply to GoogleReviews</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                 AI automatically drafts appreciative, context-aware owner responses. Store owners review &amp; publish on Google Maps in 1-Click!
               </p>
@@ -1032,7 +1032,7 @@ export default function Home() {
               </ul>
               <div className="reply-prev mt-4 text-xs bg-slate-50 border border-slate-100 p-2.5 rounded-xl"><strong style={{ color: 'var(--slate)' }}>1-Click AutoReply:</strong> &quot;Thank you so much for your kind words! 💜 See you again soon.&quot;</div>
               <Link href="/signup?module=autoreply" className="mt-5 w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
-                <span>Start Free Trial - 1-Click AI AutoReply</span> <span>→</span>
+                <span>Start Free Trial - Smart AI Draft &amp; 1-Click Reply</span> <span>→</span>
               </Link>
             </div>
           </div>
@@ -1064,26 +1064,26 @@ export default function Home() {
             <table className="w-full text-left border-collapse min-w-[860px]">
               <thead>
                 <tr className="border-b border-slate-800 bg-slate-900/90">
-                  <th className="p-6 text-sm font-extrabold text-slate-200 w-[34%]">
+                  <th className="p-6 text-sm font-extrabold text-slate-200 w-[31%]">
                     Features &amp; Capabilities
                   </th>
-                  <th className="p-5 text-center w-[16%] border-l border-slate-800/80 bg-slate-900/40">
+                  <th className="p-4 text-center w-[17%] border-l border-slate-800/80 bg-slate-900/40">
                     <div className="text-2xl mb-1">🎁</div>
-                    <div className="font-extrabold text-sm text-slate-100">Loyalty Stamps</div>
+                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">Digital Loyalty Stamps &amp; VIP Club</div>
                     <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mt-0.5">Standalone Module</div>
                     <div className="text-sm font-black text-slate-200 mt-1">₹999<span className="text-[10px] text-slate-400 font-normal">/yr</span></div>
                     <div className="text-[10px] text-slate-400">₹2.7/day</div>
                   </th>
-                  <th className="p-5 text-center w-[16%] border-l border-slate-800/80 bg-slate-900/40">
+                  <th className="p-4 text-center w-[17%] border-l border-slate-800/80 bg-slate-900/40">
                     <div className="text-2xl mb-1">⭐</div>
-                    <div className="font-extrabold text-sm text-slate-100">SmartAI Reviews</div>
+                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">AI Draft &amp; WhatsApp Review Flow</div>
                     <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider mt-0.5">Standalone Module</div>
                     <div className="text-sm font-black text-slate-200 mt-1">₹999<span className="text-[10px] text-slate-400 font-normal">/yr</span></div>
                     <div className="text-[10px] text-slate-400">₹2.7/day</div>
                   </th>
-                  <th className="p-5 text-center w-[16%] border-l border-slate-800/80 bg-slate-900/40">
+                  <th className="p-4 text-center w-[17%] border-l border-slate-800/80 bg-slate-900/40">
                     <div className="text-2xl mb-1">💬</div>
-                    <div className="font-extrabold text-sm text-slate-100">1-Click AutoReply</div>
+                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">Smart AI Draft &amp; 1-Click Reply to GoogleReviews</div>
                     <div className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider mt-0.5">Standalone Module</div>
                     <div className="text-sm font-black text-slate-200 mt-1">₹999<span className="text-[10px] text-slate-400 font-normal">/yr</span></div>
                     <div className="text-[10px] text-slate-400">₹2.7/day</div>
@@ -1096,15 +1096,15 @@ export default function Home() {
                     </div>
                     <div className="text-3xl mb-1 mt-1">🚀</div>
                     <div className="font-black text-base text-white flex items-center justify-center gap-1">
-                      <span>Complete Suite</span>
+                      <span>CustomerPilot Complete</span>
                     </div>
-                    <div className="text-[10px] text-emerald-300 font-extrabold uppercase tracking-wider mt-0.5">All 3 Engines Combined</div>
+                    <div className="text-[10px] text-emerald-300 font-extrabold uppercase tracking-wider mt-0.5">Digital Loyalty + AI Reviews + 1-Click AutoReply</div>
                     <div className="mt-1 flex items-baseline justify-center gap-1.5">
                       <span className="text-xs line-through text-slate-500">₹3,999</span>
                       <span className="text-xl font-black text-emerald-400">₹2,899</span>
                       <span className="text-[10px] text-slate-300">/yr</span>
                     </div>
-                    <div className="text-[10px] text-emerald-300 font-semibold mt-0.5">Just ₹7.9/day for everything</div>
+                    <div className="text-[10px] text-emerald-300 font-semibold mt-0.5">Just ₹7.9/day for all 3 combined</div>
                   </th>
                 </tr>
               </thead>
@@ -1112,7 +1112,7 @@ export default function Home() {
                 {/* ---------------- SECTION 1: LOYALTY ---------------- */}
                 <tr className="bg-amber-950/20 font-bold">
                   <td colSpan={5} className="py-3 px-6 text-[11px] uppercase tracking-wider text-amber-300 bg-amber-900/30 font-black flex items-center gap-2">
-                    <span>🎁 1. WhatsApp VIP Loyalty &amp; Digital Stamp Cards</span>
+                    <span>🎁 1. Digital Loyalty Stamps &amp; VIP Club</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
@@ -1164,7 +1164,7 @@ export default function Home() {
                 {/* ---------------- SECTION 2: GOOGLE REVIEWS ---------------- */}
                 <tr className="bg-emerald-950/20 font-bold">
                   <td colSpan={5} className="py-3 px-6 text-[11px] uppercase tracking-wider text-emerald-300 bg-emerald-900/30 font-black flex items-center gap-2">
-                    <span>⭐ 2. SmartAI Google Reviews Engine</span>
+                    <span>⭐ 2. AI Draft &amp; WhatsApp Review Flow</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
@@ -1207,7 +1207,7 @@ export default function Home() {
                 {/* ---------------- SECTION 3: AUTOREPLY ---------------- */}
                 <tr className="bg-indigo-950/20 font-bold">
                   <td colSpan={5} className="py-3 px-6 text-[11px] uppercase tracking-wider text-indigo-300 bg-indigo-900/30 font-black flex items-center gap-2">
-                    <span>💬 3. 1-Click Google Review AutoReply</span>
+                    <span>💬 3. Smart AI Draft &amp; 1-Click Reply to GoogleReviews</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
@@ -1251,7 +1251,7 @@ export default function Home() {
                 <tr className="bg-gradient-to-r from-emerald-900/40 via-teal-900/40 to-slate-900 font-bold">
                   <td colSpan={5} className="py-3.5 px-6 text-[11px] uppercase tracking-wider text-emerald-300 bg-emerald-900/50 font-black flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-emerald-400" />
-                    <span>🚀 4. COMPLETE SUITE EXCLUSIVE CROSS-ENGINE POWER (ONLY IN COMBO)</span>
+                    <span>🚀 4. CustomerPilot Complete: Digital Loyalty + AI Reviews + 1-Click AutoReply</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
@@ -1307,12 +1307,12 @@ export default function Home() {
                   </td>
                   <td className="p-4 text-center border-l border-slate-800">
                     <Link href="/signup?module=loyalty" className="inline-flex w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-bold text-xs items-center justify-center transition">
-                      Trial Loyalty →
+                      Trial Loyalty Stamps →
                     </Link>
                   </td>
                   <td className="p-4 text-center border-l border-slate-800">
                     <Link href="/signup?module=reviews" className="inline-flex w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 font-bold text-xs items-center justify-center transition">
-                      Trial Reviews →
+                      Trial AI Reviews →
                     </Link>
                   </td>
                   <td className="p-4 text-center border-l border-slate-800">
@@ -1325,7 +1325,7 @@ export default function Home() {
                   <td className="p-4 text-center border-l-2 border-emerald-500 bg-gradient-to-b from-emerald-950/80 to-slate-950">
                     <Link href="/signup" className="group w-full py-3.5 px-3 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm flex flex-col items-center justify-center shadow-xl shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-[1.02] transition-all">
                       <span className="flex items-center gap-1.5">
-                        <span>Start Complete Suite Free</span>
+                        <span>Start CustomerPilot Complete Free</span>
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </span>
                       <span className="text-[9px] text-slate-900/80 font-bold uppercase tracking-wider mt-0.5">All 3 Engines Unlocked</span>

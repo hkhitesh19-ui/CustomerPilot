@@ -131,11 +131,11 @@ async function seed() {
       active: true
     },
 
-    // ─── Standalone Service 1: WhatsApp Loyalty Rewards ───
+    // ─── Standalone Service 1: Digital Loyalty Stamps & VIP Club ───
     {
       planKey: "loyalty_6mo",
-      name: "WhatsApp Loyalty Rewards — 6 Months",
-      description: "Digital stamp cards, QR check-in, birthday rewards, and automated win-backs.",
+      name: "Digital Loyalty Stamps & VIP Club — 6 Months",
+      description: "WhatsApp digital loyalty stamp card and VIP rewards automation for 6 months.",
       days: 180,
       price: 649,
       originalPrice: 999,
@@ -155,7 +155,7 @@ async function seed() {
     },
     {
       planKey: "loyalty_yearly",
-      name: "WhatsApp Loyalty Rewards — 1 Year",
+      name: "Digital Loyalty Stamps & VIP Club — 1 Year",
       description: "Full year of loyalty automation (₹3/day Billed yearly).",
       days: 365,
       price: 999,
@@ -174,10 +174,10 @@ async function seed() {
       active: true
     },
 
-    // ─── Standalone Service 2: Magic SEO Optimized Google Reviews ───
+    // ─── Standalone Service 2: AI Draft & WhatsApp Review Flow ───
     {
       planKey: "reviews_6mo",
-      name: "Magic AI Google Reviews — 6 Months",
+      name: "AI Draft & WhatsApp Review Flow — 6 Months",
       description: "Automated WhatsApp review collection with AI-drafted 5-star reviews.",
       days: 180,
       price: 649,
@@ -197,7 +197,7 @@ async function seed() {
     },
     {
       planKey: "reviews_yearly",
-      name: "Magic AI Google Reviews — 1 Year",
+      name: "AI Draft & WhatsApp Review Flow — 1 Year",
       description: "Full year of automated review collection (₹3/day Billed yearly).",
       days: 365,
       price: 999,
@@ -215,10 +215,10 @@ async function seed() {
       active: true
     },
 
-    // ─── Standalone Service 3: 1-Click GoogleReview AutoReply ───
+    // ─── Standalone Service 3: Smart AI Draft & 1-Click Reply to GoogleReviews ───
     {
       planKey: "autoreply_6mo",
-      name: "1-Click AI AutoReply — 6 Months",
+      name: "Smart AI Draft & 1-Click Reply to GoogleReviews — 6 Months",
       description: "AI-powered Google review replies published in 1-Click to Google Maps.",
       days: 180,
       price: 649,
@@ -239,7 +239,7 @@ async function seed() {
     },
     {
       planKey: "autoreply_yearly",
-      name: "1-Click AI AutoReply — 1 Year",
+      name: "Smart AI Draft & 1-Click Reply to GoogleReviews — 1 Year",
       description: "Full year of AI review replies (₹3/day Billed yearly).",
       days: 365,
       price: 999,

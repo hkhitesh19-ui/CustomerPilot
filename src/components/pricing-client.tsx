@@ -18,11 +18,11 @@ export function PricingClient() {
 
   const outcomeCards = [
     {
-      icon: "❤️",
-      title: "WhatsApp Loyalty Rewards",
+      icon: "🎁",
+      title: "Digital Loyalty Stamps & VIP Club",
       subtitle: "Digital Loyalty Stamps & VIP Club",
       badge: "Repeat Visit Engine",
-      description: "Perfect for bakeries, cafes, and salons wanting to convert single-time walk-ins into 10x repeat regulars.",
+      description: "Convert single-time walk-ins into repeat regulars with WhatsApp digital stamp cards, VIP club, and automated birthday rewards.",
       price6Mo: "₹649",
       period6Mo: "for 6 months",
       price1Yr: "₹999",
@@ -35,13 +35,13 @@ export function PricingClient() {
         "14-Day Inactivity Win-Backs",
         "Cashier 1-Tap Counter Queue",
       ],
-      btnText: "Start Free Trial - WhatsApp Loyalty →",
+      btnText: "Start Free Trial - Digital Loyalty Stamps & VIP Club →",
       module: "loyalty",
       popular: false,
     },
     {
       icon: "⭐",
-      title: "Magic AI Google Reviews",
+      title: "AI Draft & WhatsApp Review Flow",
       subtitle: "AI Draft & WhatsApp Review Flow",
       badge: "Local SEO Growth",
       description: "Automatically collect authentic 4 & 5-star Google reviews right after a customer purchase on WhatsApp.",
@@ -57,14 +57,14 @@ export function PricingClient() {
         "Review Growth Analytics",
         "Organic Neighborhood SEO Booster",
       ],
-      btnText: "Start Free Trial - SmartAI Reviews →",
+      btnText: "Start Free Trial - AI Draft & WhatsApp Review Flow →",
       module: "reviews",
       popular: false,
     },
     {
-      icon: "🤖",
-      title: "1-Click AI AutoReply",
-      subtitle: "Smart AI Draft & 1-Click Post",
+      icon: "💬",
+      title: "Smart AI Draft & 1-Click Reply to GoogleReviews",
+      subtitle: "Smart AI Draft & 1-Click Reply to GoogleReviews",
       badge: "Owner Assistant Mode",
       description: "AI automatically drafts appreciative, context-aware owner responses. Store owners review & publish on Google Maps in 1-Click!",
       price6Mo: "₹649",
@@ -79,14 +79,14 @@ export function PricingClient() {
         "Bulk Reply Engine",
         "Smart Sentiment Adaptation",
       ],
-      btnText: "Start Free Trial - AI AutoReply →",
+      btnText: "Start Free Trial - Smart AI Draft & 1-Click Reply →",
       module: "autoreply",
       popular: false,
     },
     {
       icon: "🚀",
       title: "CustomerPilot Complete",
-      subtitle: "Loyalty + AI Reviews + 1-Click AutoReply",
+      subtitle: "Digital Loyalty + AI Reviews + 1-Click AutoReply",
       badge: "⭐ BEST VALUE BUNDLE",
       description: "All 3 outcome engines combined into one single unified AI customer retention & reputation system.",
       price6Mo: "₹1,799",
@@ -102,7 +102,7 @@ export function PricingClient() {
         "Free Counter Standee Custom Poster",
         "Priority WhatsApp Founder Support",
       ],
-      btnText: "Start Complete Suite Free Trial →",
+      btnText: "Start CustomerPilot Complete Free Trial →",
       module: "",
       popular: true,
     },
@@ -349,22 +349,22 @@ export function PricingClient() {
             <table className="w-full text-left border-collapse min-w-[840px]">
               <thead>
                 <tr className="border-b border-slate-800 bg-slate-900/90">
-                  <th className="p-5 text-sm font-extrabold text-slate-200 w-[34%]">Capabilities</th>
-                  <th className="p-4 text-center w-[16%] border-l border-slate-800 bg-slate-900/40">
+                  <th className="p-5 text-sm font-extrabold text-slate-200 w-[31%]">Capabilities</th>
+                  <th className="p-4 text-center w-[17%] border-l border-slate-800 bg-slate-900/40">
                     <div className="text-xl mb-1">🎁</div>
-                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">Loyalty Stamps</div>
+                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">Digital Loyalty Stamps &amp; VIP Club</div>
                     <div className="text-[10px] text-amber-400 font-bold">₹999/yr</div>
                     <div className="text-[9px] text-slate-400">₹2.7/day</div>
                   </th>
-                  <th className="p-4 text-center w-[16%] border-l border-slate-800 bg-slate-900/40">
+                  <th className="p-4 text-center w-[17%] border-l border-slate-800 bg-slate-900/40">
                     <div className="text-xl mb-1">⭐</div>
-                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">SmartAI Reviews</div>
+                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">AI Draft &amp; WhatsApp Review Flow</div>
                     <div className="text-[10px] text-emerald-400 font-bold">₹999/yr</div>
                     <div className="text-[9px] text-slate-400">₹2.7/day</div>
                   </th>
-                  <th className="p-4 text-center w-[16%] border-l border-slate-800 bg-slate-900/40">
+                  <th className="p-4 text-center w-[17%] border-l border-slate-800 bg-slate-900/40">
                     <div className="text-xl mb-1">💬</div>
-                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">1-Click AutoReply</div>
+                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">Smart AI Draft &amp; 1-Click Reply to GoogleReviews</div>
                     <div className="text-[10px] text-indigo-400 font-bold">₹999/yr</div>
                     <div className="text-[9px] text-slate-400">₹2.7/day</div>
                   </th>
@@ -373,20 +373,21 @@ export function PricingClient() {
                       🔥 94% CHOOSE THIS
                     </div>
                     <div className="text-2xl mb-1 mt-1">🚀</div>
-                    <div className="font-black text-sm text-white">Complete Suite</div>
+                    <div className="font-black text-sm text-white">CustomerPilot Complete</div>
+                    <div className="text-[10px] text-emerald-300 font-extrabold uppercase tracking-wider mt-0.5">Digital Loyalty + AI Reviews + 1-Click AutoReply</div>
                     <div className="mt-0.5 flex items-baseline justify-center gap-1">
                       <span className="text-[10px] line-through text-slate-500">₹3,999</span>
                       <span className="text-base font-black text-emerald-400">₹2,899</span>
                       <span className="text-[9px] text-slate-300">/yr</span>
                     </div>
-                    <div className="text-[9px] text-emerald-300 font-semibold">₹7.9/day for all 3</div>
+                    <div className="text-[9px] text-emerald-300 font-semibold">₹7.9/day for all 3 combined</div>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800 text-xs">
                 <tr className="bg-amber-950/20 font-bold">
                   <td colSpan={5} className="py-2.5 px-5 text-[10px] uppercase tracking-wider text-amber-300 bg-amber-900/30 font-black">
-                    🎁 WhatsApp Loyalty Engine
+                    🎁 1. Digital Loyalty Stamps &amp; VIP Club
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/30">
@@ -420,7 +421,7 @@ export function PricingClient() {
 
                 <tr className="bg-emerald-950/20 font-bold">
                   <td colSpan={5} className="py-2.5 px-5 text-[10px] uppercase tracking-wider text-emerald-300 bg-emerald-900/30 font-black">
-                    ⭐ SmartAI Google Reviews Engine
+                    ⭐ 2. AI Draft &amp; WhatsApp Review Flow
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/30">
@@ -447,13 +448,13 @@ export function PricingClient() {
 
                 <tr className="bg-indigo-950/20 font-bold">
                   <td colSpan={5} className="py-2.5 px-5 text-[10px] uppercase tracking-wider text-indigo-300 bg-indigo-900/30 font-black">
-                    💬 1-Click Google Review AutoReply
+                    💬 3. Smart AI Draft &amp; 1-Click Reply to GoogleReviews
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/30">
                   <td className="p-3.5 pl-5 font-semibold text-slate-200">Google Business Profile Connect &amp; Auto-Sync</td>
                   <td className="p-3.5 text-center border-l border-slate-800"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-3.5 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[11px]">✓</span></td>
+                  <td className="p-3.5 text-center border-l border-slate-800"><span className="text-slate-600 font-bold">✕</span></td>
                   <td className="p-3.5 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-[11px]">✓</span></td>
                   <td className="p-3.5 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold text-emerald-400">✓ Unlocked</td>
                 </tr>
@@ -476,7 +477,7 @@ export function PricingClient() {
                 <tr className="bg-gradient-to-r from-emerald-900/40 via-teal-900/40 to-slate-900 font-bold">
                   <td colSpan={5} className="py-2.5 px-5 text-[10px] uppercase tracking-wider text-emerald-300 bg-emerald-900/50 font-black flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>🚀 COMPLETE SUITE EXCLUSIVE SYNERGIES (ONLY IN COMBO)</span>
+                    <span>🚀 4. CustomerPilot Complete: Digital Loyalty + AI Reviews + 1-Click AutoReply</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/30">
@@ -516,22 +517,22 @@ export function PricingClient() {
                   <td className="p-4 font-bold text-slate-200 text-xs">Start 7-Day Free Trial:</td>
                   <td className="p-3 text-center border-l border-slate-800">
                     <Link href="/signup?module=loyalty" className="inline-flex w-full py-2 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-bold text-[11px] items-center justify-center transition">
-                      Trial →
+                      Trial Loyalty Stamps →
                     </Link>
                   </td>
                   <td className="p-3 text-center border-l border-slate-800">
                     <Link href="/signup?module=reviews" className="inline-flex w-full py-2 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 font-bold text-[11px] items-center justify-center transition">
-                      Trial →
+                      Trial AI Reviews →
                     </Link>
                   </td>
                   <td className="p-3 text-center border-l border-slate-800">
                     <Link href="/signup?module=autoreply" className="inline-flex w-full py-2 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 font-bold text-[11px] items-center justify-center transition">
-                      Trial →
+                      Trial AutoReply →
                     </Link>
                   </td>
                   <td className="p-3 text-center border-l-2 border-emerald-500 bg-gradient-to-b from-emerald-950/80 to-slate-950">
                     <Link href="/signup" className="inline-flex w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 font-black text-xs items-center justify-center shadow-lg shadow-emerald-500/20 transition">
-                      Start Complete →
+                      Start CustomerPilot Complete →
                     </Link>
                   </td>
                 </tr>

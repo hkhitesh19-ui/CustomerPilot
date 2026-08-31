@@ -31,14 +31,14 @@ export function WhatsAppStampCardClient() {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 md:py-16 space-y-12 flex-1 w-full">
         <div className="space-y-4 text-center max-w-2xl mx-auto">
-          <span className="px-3.5 py-1 bg-emerald-50 text-emerald-800 rounded-full text-xs font-bold border border-emerald-200 shadow-xs inline-flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> WhatsApp Loyalty Card Engine
+          <span className="px-3.5 py-1 bg-amber-50 text-amber-800 rounded-full text-xs font-bold border border-amber-200 shadow-xs inline-flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Digital Loyalty Stamps &amp; VIP Club
           </span>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
-            Loyalty Rewards (Bring Customers Back)
+            Digital Loyalty Stamps &amp; VIP Club
           </h1>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            Perfect for bakeries, cafes, and salons wanting to convert single-time walk-ins into 10x repeat regulars.
+            Convert single-time walk-ins into repeat regulars with WhatsApp digital stamp cards, VIP club, and automated birthday rewards.
           </p>
         </div>
 
