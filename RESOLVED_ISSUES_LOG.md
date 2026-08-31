@@ -3,6 +3,19 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [31 Aug 2026] Issue: Upgrade Homepage ROI Calculator & 4-Step Revenue Breakdown
+
+- **Symptom**: The old ROI calculator on the homepage was generic and didn't clearly communicate the exact incremental revenue math or the 1-visit break-even advantage for Indian merchants.
+- **Root Cause**: Merchants needed a realistic, mathematically grounded calculator in Indian Professional English showing daily walk-in retention, average bill size, recovered customer counts, and break-even metrics.
+- **Resolution**:
+  1. Updated `src/app/page.tsx` `#roi` section with an interactive 2-column live calculator:
+     - **Sliders**: Daily Store Customers (`10-200/day`), Average Bill Amount (`₹100-₹3,000`), and Lost Customer Recovery Target (`20%-80%`).
+     - **Live Outputs**: Additional Monthly Sales (`+₹90,000/mo`), Annual Revenue Opportunity (`+₹10.80 Lakh/yr`), Repeat Customer Rate surge (`50% ➔ 75%`), and the **1-Visit Break-Even Metric** (`₹8/day cost`).
+  2. Integrated a visual **4-Step Math Infographic Flow** explaining Baseline ➔ Win-Back Engine ➔ Repeat Rate Surge ➔ Financial Impact.
+  3. Verified build and committed locally.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [31 Aug 2026] Issue: Settings Page Failed to Load After Merchant Data Reset
 
 - **Symptom**: After wiping old merchant database records, accessing `/dashboard/settings` displayed a browser error: *"This page couldn't load. Reload to try again, or go back."*
