@@ -38,6 +38,12 @@ export function useDashboardState() {
     queryKey: ["dashboard-state"],
     queryFn: async (): Promise<DashboardState> => {
       const res = await fetch("/api/state")
+      if (res.status === 401 || res.status === 404) {
+        if (typeof window !== "undefined") {
+          window.location.href = "/login"
+        }
+        throw new Error("Session expired. Redirecting to login...")
+      }
       if (!res.ok) {
         throw new Error("Failed to fetch dashboard state")
       }

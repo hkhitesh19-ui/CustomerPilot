@@ -3,6 +3,21 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [31 Aug 2026] Issue: Settings Page Failed to Load After Merchant Data Reset
+
+- **Symptom**: After wiping old merchant database records, accessing `/dashboard/settings` displayed a browser error: *"This page couldn't load. Reload to try again, or go back."*
+- **Root Cause**:
+  1. The browser retained an active JWT cookie referencing a deleted `merchantId`. When `/api/state` responded with 404 (Merchant not found), `useDashboardState` threw an unhandled React Query error instead of redirecting the user to `/login`.
+  2. In `src/app/dashboard/settings/page.tsx`, module check conditions lacked a dedicated `isLoyaltyOnly` check, erroneously showing the Complete Suite badge and Google Reviews configuration sections to Loyalty-only merchants.
+  3. `src/app/api/auth/[...nextauth]/route.ts` and `src/app/api/auth/google/callback/route.ts` were defaulting business names to `${user.name}'s Business` (e.g. `Cake Connection's Business`).
+- **Resolution**:
+  1. Updated `src/hooks/use-dashboard-state.ts` to detect 401/404 responses and automatically redirect expired/deleted sessions cleanly to `/login`.
+  2. Updated `src/app/dashboard/settings/page.tsx` with `if (isLoading || !merchant)` graceful fallback, dedicated `isLoyaltyOnly` badge, and conditional rendering `{isReviewsEnabled && ( ... )}` so loyalty-only merchants do not see Google Review settings.
+  3. Cleaned Google OAuth default business name generation to `user.name || "My Business"`.
+  4. Executed `npm run build` and restarted the standalone server.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [31 Aug 2026] Issue: Standardize Exact Service Wordings Across Navbar, Comparison Tables, Pricing & Signup
 
 - **Symptom**: Different pages, header Products dropdowns, comparison matrix tables, pricing cards, and signup flows were using varied nomenclature for the 3 core services and complete bundle.

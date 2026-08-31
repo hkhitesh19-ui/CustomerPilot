@@ -99,7 +99,7 @@ export default function SettingsPage() {
     }
   }
 
-  if (isLoading) return <div className="p-8 animate-pulse text-muted-foreground">Loading settings...</div>
+  if (isLoading || !merchant) return <div className="p-8 animate-pulse text-muted-foreground">Loading settings...</div>
 
   return (
     <div className="space-y-8 w-full max-w-5xl mx-auto relative pb-12">
