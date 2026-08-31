@@ -181,7 +181,7 @@ export function PricingClient() {
             <Link href="/login" className="text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 px-3 py-1.5 transition">
               Sign In
             </Link>
-            <Link href="/signup">
+            <Link href="/#comparison">
               <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-xs">
                 Start 7 Days Free Trial Today →
               </Button>

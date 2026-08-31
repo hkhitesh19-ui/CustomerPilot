@@ -452,7 +452,7 @@ export default function Home() {
               Sign In
             </Link>
             <Link
-              href="/signup"
+              href="#comparison"
               className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-1"
             >
               <span className="hidden sm:inline">Start 7 Days Free Trial Today</span>
@@ -517,7 +517,7 @@ export default function Home() {
 
             <div className="pt-2">
               <Link
-                href="/signup"
+                href="#comparison"
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full bg-slate-900 text-white font-bold text-xs py-3 rounded-xl text-center block shadow-md"
               >
