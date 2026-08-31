@@ -117,21 +117,45 @@ export default function Home() {
   const [solutionsOpen, setSolutionsOpen] = useState(false)
 
   // ROI Calculator State
-  const [roiCustomers, setRoiCustomers] = useState("250")
-  const [roiAvgBill, setRoiAvgBill] = useState("350")
-  const [roiRepeatRate, setRoiRepeatRate] = useState("30")
+  const [roiDailyCustomers, setRoiDailyCustomers] = useState("40")
+  const [roiAvgBill, setRoiAvgBill] = useState("300")
+  const [roiRecoveryRate, setRoiRecoveryRate] = useState("50")
 
   const calcROI = () => {
-    const c = parseInt(roiCustomers) || 0
-    const b = parseInt(roiAvgBill) || 0
-    const r = parseInt(roiRepeatRate) || 0
-    const monthlyRevenue = Math.round(c * b * (r / 100) * 1.8) // 1.8x repeat frequency boost
-    const planCost = 2499
-    const roi = monthlyRevenue > 0 ? Math.round(((monthlyRevenue - planCost) / planCost) * 100) : 0
-    return { monthlyRevenue, roi }
+    const daily = parseInt(roiDailyCustomers) || 0
+    const avgBill = parseInt(roiAvgBill) || 0
+    const recoveryRate = parseInt(roiRecoveryRate) || 0
+
+    const monthlyCustomers = daily * 30
+    const lostWalkins = Math.round(monthlyCustomers * 0.50) // 50% baseline non-repeat walk-ins
+    const recoveredCustomers = Math.round(lostWalkins * (recoveryRate / 100))
+    const existingRepeat = monthlyCustomers - lostWalkins
+    const newRepeatTotal = existingRepeat + recoveredCustomers
+    const newRepeatPercent = monthlyCustomers > 0 ? Math.round((newRepeatTotal / monthlyCustomers) * 100) : 50
+
+    const additionalMonthlySales = recoveredCustomers * avgBill
+    const additionalAnnualSales = additionalMonthlySales * 12
+    const planCostAnnual = 2899 // CustomerPilot Complete 1-Year
+    const monthlyCost = Math.round(planCostAnnual / 12)
+    const breakEvenVisits = Math.max(1, Math.ceil(monthlyCost / (avgBill || 1)))
+    const multiple = additionalAnnualSales > 0 ? Math.round(additionalAnnualSales / planCostAnnual) : 0
+
+    return {
+      daily,
+      monthlyCustomers,
+      lostWalkins,
+      recoveredCustomers,
+      newRepeatTotal,
+      newRepeatPercent,
+      additionalMonthlySales,
+      additionalAnnualSales,
+      monthlyCost,
+      breakEvenVisits,
+      multiple
+    }
   }
 
-  const { monthlyRevenue, roi } = calcROI()
+  const roiData = calcROI()
 
   // Animated Chat Messages State for Phone Mockup
   const [chatMessages, setChatMessages] = useState<Array<{ d: 'in' | 'out', t: string, time: string }>>([])
@@ -727,41 +751,54 @@ export default function Home() {
       {/* ============ CALCULATE YOUR ROI (Item 10) ============ */}
       <section id="roi" className="py-20 bg-white">
         <div className="wrap">
-          <div className="sec-head">
-            <span className="eyebrow">⚡ Live Profit Estimator</span>
-            <h2 className="sec-h">Calculate Your ROI</h2>
-            <p className="sec-sub">See how much CustomerPilot can add to your monthly revenue.</p>
+          <div className="sec-head max-w-3xl mx-auto text-center">
+            <span className="eyebrow inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-extrabold text-xs shadow-xs">
+              ⚡ Real Business Impact &amp; Revenue Estimator
+            </span>
+            <h2 className="sec-h text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mt-4 leading-tight">
+              Turn One-Time Walk-ins Into Repeat Regulars.
+            </h2>
+            <p className="sec-sub text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
+              See how recovering just 50% of lost customers creates up to ₹10.80 Lakh in incremental annual sales opportunity.
+            </p>
           </div>
 
-          <div className="max-w-4xl mx-auto mt-12 bg-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              {/* Inputs */}
-              <div className="space-y-6">
-                <div>
-                  <div className="flex justify-between text-xs font-semibold text-slate-300 mb-2">
-                    <span>Customers Per Month</span>
-                    <span className="text-emerald-400 font-bold">{roiCustomers} customers</span>
+          <div className="max-w-5xl mx-auto mt-12 bg-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800 space-y-10">
+            {/* 2-Column Calculator Grid */}
+            <div className="grid md:grid-cols-12 gap-8 items-center">
+              {/* Inputs (7 cols) */}
+              <div className="md:col-span-7 space-y-6">
+                <div className="bg-slate-800/60 p-4 sm:p-5 rounded-2xl border border-slate-700/60 space-y-2">
+                  <div className="flex justify-between items-baseline text-xs font-semibold text-slate-300">
+                    <span className="flex items-center gap-1.5">
+                      <span>🚶</span> Daily Store Customers:
+                    </span>
+                    <span className="text-emerald-400 font-bold text-sm">
+                      {roiDailyCustomers} / day <span className="text-slate-400 text-xs font-normal">({roiData.monthlyCustomers.toLocaleString("en-IN")} / mo)</span>
+                    </span>
                   </div>
                   <input
                     type="range"
-                    min="50"
-                    max="2000"
-                    step="25"
-                    value={roiCustomers}
-                    onChange={(e) => setRoiCustomers(e.target.value)}
+                    min="10"
+                    max="200"
+                    step="5"
+                    value={roiDailyCustomers}
+                    onChange={(e) => setRoiDailyCustomers(e.target.value)}
                     className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-500 mt-1">
-                    <span>50</span>
-                    <span>1,000</span>
-                    <span>2,000</span>
+                  <div className="flex justify-between text-[10px] text-slate-400 font-semibold">
+                    <span>10/day (300/mo)</span>
+                    <span>40/day (1,200/mo)</span>
+                    <span>200/day (6,000/mo)</span>
                   </div>
                 </div>
 
-                <div>
-                  <div className="flex justify-between text-xs font-semibold text-slate-300 mb-2">
-                    <span>Average Bill Amount (₹)</span>
-                    <span className="text-emerald-400 font-bold">₹{roiAvgBill}</span>
+                <div className="bg-slate-800/60 p-4 sm:p-5 rounded-2xl border border-slate-700/60 space-y-2">
+                  <div className="flex justify-between items-baseline text-xs font-semibold text-slate-300">
+                    <span className="flex items-center gap-1.5">
+                      <span>💳</span> Average Bill Amount (₹):
+                    </span>
+                    <span className="text-emerald-400 font-bold text-sm">₹{roiAvgBill}</span>
                   </div>
                   <input
                     type="range"
@@ -772,61 +809,144 @@ export default function Home() {
                     onChange={(e) => setRoiAvgBill(e.target.value)}
                     className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+                  <div className="flex justify-between text-[10px] text-slate-400 font-semibold">
                     <span>₹100</span>
-                    <span>₹1,500</span>
-                    <span>₹3,000</span>
+                    <span>₹300 (Cafe / Bakery)</span>
+                    <span>₹3,000 (Salon / Retail)</span>
                   </div>
                 </div>
 
-                <div>
-                  <div className="flex justify-between text-xs font-semibold text-slate-300 mb-2">
-                    <span>Estimated Repeat Rate Boost (%)</span>
-                    <span className="text-emerald-400 font-bold">{roiRepeatRate}%</span>
+                <div className="bg-slate-800/60 p-4 sm:p-5 rounded-2xl border border-slate-700/60 space-y-2">
+                  <div className="flex justify-between items-baseline text-xs font-semibold text-slate-300">
+                    <span className="flex items-center gap-1.5">
+                      <span>🎯</span> Lost Customer Recovery Target:
+                    </span>
+                    <span className="text-emerald-400 font-bold text-sm">
+                      {roiRecoveryRate}% <span className="text-slate-400 text-xs font-normal">(+{roiData.recoveredCustomers} recovered visits)</span>
+                    </span>
                   </div>
                   <input
                     type="range"
-                    min="10"
-                    max="60"
+                    min="20"
+                    max="80"
                     step="5"
-                    value={roiRepeatRate}
-                    onChange={(e) => setRoiRepeatRate(e.target.value)}
+                    value={roiRecoveryRate}
+                    onChange={(e) => setRoiRecoveryRate(e.target.value)}
                     className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-500 mt-1">
-                    <span>10%</span>
-                    <span>35%</span>
-                    <span>60%</span>
+                  <div className="flex justify-between text-[10px] text-slate-400 font-semibold">
+                    <span>20% (Conservative)</span>
+                    <span>50% (Standard)</span>
+                    <span>80% (Aggressive)</span>
                   </div>
+                </div>
+
+                <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-[11px] text-slate-400 flex items-center gap-2">
+                  <span className="text-base">💡</span>
+                  <span>
+                    Baseline: <b className="text-slate-200">{roiData.monthlyCustomers} monthly walk-ins</b> at <b className="text-slate-200">₹{roiAvgBill} avg bill</b> = ₹{(roiData.monthlyCustomers * (parseInt(roiAvgBill) || 0)).toLocaleString("en-IN")}/mo current sales (with ~{roiData.lostWalkins} lost walk-ins).
+                  </span>
                 </div>
               </div>
 
-              {/* Output Result Card */}
-              <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/80 rounded-2xl p-6 sm:p-8 flex flex-col justify-center space-y-4">
-                <div>
-                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Potential Monthly Revenue Increase</div>
-                  <div className="text-3xl sm:text-4xl font-extrabold text-emerald-400 mt-1">
-                    ₹{monthlyRevenue.toLocaleString("en-IN")}
+              {/* Output Result Card (5 cols) */}
+              <div className="md:col-span-5 bg-gradient-to-b from-emerald-950/80 via-slate-800/90 to-slate-900 border-2 border-emerald-500/60 rounded-2xl p-6 sm:p-7 flex flex-col justify-between space-y-5 relative shadow-xl">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-[10px] rounded-full uppercase tracking-wider shadow-sm whitespace-nowrap">
+                  🔥 Incremental Sales Opportunity
+                </div>
+
+                <div className="space-y-4 pt-1">
+                  <div>
+                    <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Additional Monthly Sales</div>
+                    <div className="text-3xl sm:text-4xl font-black text-emerald-400 mt-0.5">
+                      +₹{roiData.additionalMonthlySales.toLocaleString("en-IN")}
+                      <span className="text-xs text-slate-400 font-normal ml-1">/ month</span>
+                    </div>
+                    <div className="text-[10px] text-emerald-300 mt-0.5">
+                      ({roiData.recoveredCustomers} recovered visits × ₹{roiAvgBill} avg bill)
+                    </div>
+                  </div>
+
+                  <div className="border-t border-slate-700/80 pt-3">
+                    <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Annual Revenue Opportunity</div>
+                    <div className="text-2xl sm:text-3xl font-black text-white mt-0.5">
+                      +₹{(roiData.additionalAnnualSales / 100000).toFixed(2)} Lakh
+                      <span className="text-xs text-slate-400 font-normal ml-1">/ year</span>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-slate-700/80 pt-3 flex items-center justify-between">
+                    <div>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Repeat Customer Rate</div>
+                      <div className="text-lg font-black text-white mt-0.5">
+                        50% ➔ <span className="text-emerald-400">{roiData.newRepeatPercent}%</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Repeat Visits Count</div>
+                      <div className="text-sm font-black text-emerald-300 mt-0.5">
+                        {roiData.lostWalkins} ➔ {roiData.newRepeatTotal} / mo
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="border-t border-slate-700/80 pt-4">
-                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Expected ROI on CustomerPilot</div>
-                  <div className="text-2xl sm:text-3xl font-extrabold text-white mt-1">
-                    {roi}% ROI
+                {/* 1-Visit Break-Even Metric Box */}
+                <div className="p-3.5 rounded-xl bg-emerald-950/90 border border-emerald-500/40 text-[11px] text-emerald-200 leading-relaxed">
+                  <div className="font-extrabold text-emerald-300 flex items-center gap-1.5 mb-1">
+                    <span>🎯</span> The 1-Visit Break-Even Metric:
                   </div>
+                  CustomerPilot costs just <b>₹{roiData.monthlyCost}/mo (₹8/day)</b>. Literally just <b>{roiData.breakEvenVisits} extra repeat visit/month</b> pays for your entire subscription! Everything above that is pure upside.
                 </div>
-
-                <p className="text-[11px] text-slate-400 leading-relaxed pt-2">
-                  ⚡ Based on 1.8x repeat frequency increase with CustomerPilot WhatsApp stamp cards.
-                </p>
 
                 <Link
                   href="/signup"
-                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm py-3 rounded-xl text-center shadow-lg transition-all"
+                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm py-3.5 rounded-xl text-center shadow-lg transition-all transform hover:-translate-y-0.5"
                 >
-                  Start 7 Days Free Trial Today →
+                  Start 7-Day Free Trial (All-in-One Full Suite) →
                 </Link>
+              </div>
+            </div>
+
+            {/* Visual 4-Step Infographic Flow */}
+            <div className="border-t border-slate-800 pt-8 space-y-4">
+              <div className="text-center">
+                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">4-Step Math Breakdown</span>
+                <h3 className="text-lg sm:text-xl font-black text-white mt-1">How CustomerPilot Pays For Itself in 30 Days</h3>
+              </div>
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                <div className="bg-slate-800/70 p-4 rounded-2xl border border-slate-700/60 space-y-2 relative">
+                  <div className="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center font-black text-xs text-slate-300">1</div>
+                  <div className="font-bold text-white text-xs sm:text-sm">Current Baseline</div>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    1,200 Monthly Walk-ins (40/day) at ₹300 Avg Bill. 600 repeat (50%) &amp; 600 never return.
+                  </p>
+                </div>
+
+                <div className="bg-slate-800/70 p-4 rounded-2xl border border-indigo-500/40 space-y-2 relative">
+                  <div className="w-6 h-6 rounded-full bg-indigo-500/30 text-indigo-300 border border-indigo-500/50 flex items-center justify-center font-black text-xs">2</div>
+                  <div className="font-bold text-white text-xs sm:text-sm">CustomerPilot Engine</div>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    WhatsApp VIP Stamp Cards &amp; Win-Back automations recover 50% of lost walk-ins (+300 visits).
+                  </p>
+                </div>
+
+                <div className="bg-slate-800/70 p-4 rounded-2xl border border-emerald-500/40 space-y-2 relative">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 flex items-center justify-center font-black text-xs">3</div>
+                  <div className="font-bold text-white text-xs sm:text-sm">Repeat Rate Jumps</div>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    Repeat customer rate surges from <b>50% ➔ 75%</b> (600 ➔ 900 total repeat visits per month).
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-emerald-950/60 to-slate-800/90 p-4 rounded-2xl border border-emerald-500/60 space-y-2 relative">
+                  <div className="w-6 h-6 rounded-full bg-emerald-400 text-slate-950 flex items-center justify-center font-black text-xs">4</div>
+                  <div className="font-bold text-emerald-300 text-xs sm:text-sm">Financial Impact</div>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    <b>+₹90,000/mo (+₹10.80L/yr)</b> incremental sales at just <b>₹8/day cost</b> (360× ROI multiple).
+                  </p>
+                </div>
               </div>
             </div>
           </div>
