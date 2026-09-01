@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [01 Sep 2026] Feature: Added "WhatsApp Journey Templates" Section to Settings Page After "Commercial Go-Live Validator"
+
+- **Symptom**: Merchants needed full visibility and customization control over all automated WhatsApp messages (Welcome, Queue, Stamps, Rewards, Review Prompts, Win-Backs, Expiry Nudges) directly in their Settings dashboard.
+- **Root Cause**: Templates were previously embedded inside the loyalty module sub-cards rather than having a clear, dedicated position after the Commercial Go-Live Validator.
+- **Resolution**:
+  1. Created [`src/components/whatsapp-journey-templates.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/whatsapp-journey-templates.tsx) — complete component displaying all 17 system templates categorized into Transactional, Marketing, Engagement, and System groups with variable pills (`{{customerName}}`, etc.), live text editor, save override, and 1-click reset to default.
+  2. Updated [`src/app/dashboard/settings/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/dashboard/settings/page.tsx) to place `<WhatsAppJourneyTemplates merchantId={merchant?.id || ""} />` directly following `<GoLiveValidator />`.
+  3. Enhanced [`src/app/api/templates/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/templates/route.ts) and [`src/app/api/templates/[key]/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/templates/[key]/route.ts) with `getAuthenticatedMerchant` session-fallback support for seamless authentication.
+  4. Verified production build and live API returning 17 active journey templates.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [01 Sep 2026] Issue: WhatsApp "Couldn't link device, Try Again later" — Recurring Daily on Local Dev
 
 - **Symptom**: Every time the merchant opens Settings and scans the WhatsApp QR code, they get "Couldn't link device, Try Again later" from WhatsApp. The issue was supposedly fixed the previous day but kept recurring.
