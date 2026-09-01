@@ -49,7 +49,17 @@ export function useDashboardState() {
       }
       const data = await res.json().catch(() => null)
       if (!data) throw new Error("Invalid response format from server")
-      return data.data as DashboardState
+      
+      const dashboardData = data.data as DashboardState
+      
+      if (dashboardData.merchant && !dashboardData.merchant.onboardingCompleted) {
+        if (typeof window !== "undefined" && !window.location.pathname.startsWith('/onboarding')) {
+          const step = dashboardData.merchant.currentStep || 1
+          window.location.href = `/onboarding?step=${step}`
+        }
+      }
+      
+      return dashboardData
     },
     refetchInterval: 30000, // Poll every 30s for Live Queue freshness
   })

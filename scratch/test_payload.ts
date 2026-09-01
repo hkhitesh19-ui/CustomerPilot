@@ -37,7 +37,10 @@ async function testPayloads() {
       console.log(`\nTesting ${p.name}...`);
       const res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instance}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': EVOLUTION_API_KEY },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(EVOLUTION_API_KEY ? { 'apikey': EVOLUTION_API_KEY } : {})
+        },
         body: JSON.stringify(p.body)
       });
       const text = await res.text();

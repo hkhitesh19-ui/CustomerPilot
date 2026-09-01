@@ -30,6 +30,8 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
     googleReviewBonus: 1,
     photoBonus: 1,
     vipUpgradeBonusStamps: 1,
+    joiningBonusEnabled: true,
+    joiningBonusStamps: 2,
     color: "#6366f1",
     tierRewardsEnabled: false,
     excludedCategories: "",
@@ -72,6 +74,8 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
             googleReviewBonus: cardData.googleReviewBonus ?? 1,
             photoBonus: cardData.photoBonus ?? 1,
             vipUpgradeBonusStamps: cardData.vipUpgradeBonusStamps ?? 1,
+            joiningBonusEnabled: cardData.joiningBonusEnabled ?? true,
+            joiningBonusStamps: cardData.joiningBonusStamps ?? 2,
             color: cardData.color || "#6366f1",
             tierRewardsEnabled: Boolean(cardData.tierRewardsEnabled),
             excludedCategories: cardData.excludedCategories || "",
@@ -270,6 +274,46 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                 onChange={e => setForm({ ...form, photoBonus: Number(e.target.value) })}
               />
               <p className="text-xs text-muted-foreground">Extra bonus stamps if they attach a photo with their review</p>
+            </div>
+
+            <div className="space-y-2 col-span-1 md:col-span-2 p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                  <Label htmlFor="joining-bonus" className="font-semibold text-slate-200">
+                    Joining Bonus Stamps (First Time Scan)
+                  </Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${form.joiningBonusEnabled ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+                    {form.joiningBonusEnabled ? `ACTIVE (+${form.joiningBonusStamps ?? 2} Stamps on Join)` : "DEACTIVATED"}
+                  </span>
+                  <Switch
+                    checked={form.joiningBonusEnabled}
+                    onCheckedChange={(checked) => setForm({ ...form, joiningBonusEnabled: checked })}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+                <div className="sm:col-span-2">
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Automatically award advance bonus stamps to NEW customers when they scan the QR code and join the loyalty program for the first time.
+                  </p>
+                </div>
+                <div>
+                  <Input
+                    id="joining-bonus-stamps"
+                    type="number"
+                    min="1"
+                    max="10"
+                    disabled={!form.joiningBonusEnabled}
+                    value={form.joiningBonusStamps ?? 2}
+                    onChange={e => setForm({ ...form, joiningBonusStamps: Math.max(1, Number(e.target.value)) })}
+                    className="bg-slate-900 border-slate-700 text-slate-100"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="space-y-2 col-span-1 md:col-span-2 p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-3">

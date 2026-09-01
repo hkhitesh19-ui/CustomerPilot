@@ -197,6 +197,8 @@ model StampCard {
   validityDays       Int?
   googleReviewBonus  Int?
   photoBonus         Int?
+  joiningBonusEnabled Boolean            @default(true)
+  joiningBonusStamps  Int                @default(2)
   tierRewardsEnabled Boolean             @default(false)
   excludedCategories String?
   active             Boolean             @default(true)

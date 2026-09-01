@@ -61,18 +61,31 @@ export async function awardStampsForBill(opts: {
   let card = await db.customerStampCard.findFirst({
     where: { customerId, stampCardId: template.id, completed: false, redeemed: false },
   })
+  
+  let initialStamps = 0;
   if (!card) {
+    const isFirstCard = await db.customerStampCard.count({
+      where: { customerId, stampCardId: template.id }
+    }) === 0;
+
+    if (isFirstCard && template.joiningBonusEnabled) {
+      initialStamps = template.joiningBonusStamps ?? 2;
+    } else if (!isFirstCard && template.vipUpgradeBonusStamps > 0) {
+      initialStamps = template.vipUpgradeBonusStamps;
+    }
+
     card = await db.customerStampCard.create({
       data: {
         customerId,
         stampCardId: template.id,
         merchantId,
-        stampsCollected: 0,
+        stampsCollected: 0, // we will add the initial stamp rows below!
       },
     })
   }
 
-  // Create stamp rows
+  // Create stamp rows (bill stamps + initial bonus stamps if new card)
+  const totalStampsToAward = stamps + initialStamps;
   const stampRows: {
     customerId: string
     stampCardId: string
@@ -81,19 +94,19 @@ export async function awardStampsForBill(opts: {
     merchantId: string
     source: string
   }[] = []
-  for (let i = 0; i < stamps; i++) {
+  for (let i = 0; i < totalStampsToAward; i++) {
     stampRows.push({
       customerId,
       stampCardId: template.id,
       customerStampCardId: card.id,
       billId,
       merchantId,
-      source: "bill",
+      source: i < stamps ? "bill" : "bonus",
     })
   }
   await db.stamp.createMany({ data: stampRows })
 
-  const newCount = card.stampsCollected + stamps
+  const newCount = card.stampsCollected + totalStampsToAward
   const completed = newCount >= template.stampsRequired
 
   card = await db.customerStampCard.update({
@@ -110,14 +123,14 @@ export async function awardStampsForBill(opts: {
   await db.customer.update({
     where: { id: customerId },
     data: {
-      lifetimeStamps: { increment: stamps },
+      lifetimeStamps: { increment: totalStampsToAward },
       lifetimeSpend: { increment: safeSpend },
       lastActiveAt: new Date(),
     },
   })
 
   return {
-    stampsAwarded: stamps,
+    stampsAwarded: totalStampsToAward,
     cardId: card.id,
     cardCompleted: completed,
     rewardReady: completed,

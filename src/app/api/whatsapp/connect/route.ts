@@ -8,8 +8,12 @@ if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment vari
 const JWT_SECRET = process.env.JWT_SECRET;
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
+// Use WHATSAPP_WEBHOOK_URL first (set this to ngrok/production URL).
+// If not set, fall back to NEXT_PUBLIC_APP_URL regardless of localhost —
+// Evolution API is on a remote VPS and needs a reachable URL.
+// On local dev, run ngrok and set WHATSAPP_WEBHOOK_URL in .env.
 const PUBLIC_WEBHOOK_URL = process.env.WHATSAPP_WEBHOOK_URL ||
-  (process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes("localhost")
+  (process.env.NEXT_PUBLIC_APP_URL
     ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/evolution`
     : "")
 
