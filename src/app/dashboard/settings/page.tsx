@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { Store, Clock, MapPin, User, Tag, Globe, CheckCircle2, Sparkles } from "lucide-react"
 import { WhatsAppVerification } from "@/components/whatsapp-verification"
-import { WhatsAppTemplateManager } from "@/components/whatsapp-template-manager"
+import { WhatsAppJourneyTemplates } from "@/components/whatsapp-journey-templates"
 import { GoogleBusinessIntegration } from "@/components/google-business-integration"
 import { GoogleReviewDelaySettings } from "@/components/google-review-delay-settings"
 import { GoogleReviewQRGenerator } from "@/components/google-review-qr-generator"
@@ -234,7 +234,6 @@ export default function SettingsPage() {
           <QRGenerator merchantId={merchant?.id || ""} />
           <LoyaltyCategoryCard merchantId={merchant?.id || ""} initialCategoryJson={(merchant as any)?.loyaltyCategoryNames} />
           <RewardSetupCard merchantId={merchant?.id || ""} />
-          <WhatsAppTemplateManager merchantId={merchant?.id || ""} />
         </div>
       )}
 
@@ -247,6 +246,7 @@ export default function SettingsPage() {
         <BrandingSettings merchantId={merchant?.id || ""} />
         <AutomationTimerSettings merchantId={merchant?.id || ""} />
         <GoLiveValidator merchantId={merchant?.id || ""} />
+        <WhatsAppJourneyTemplates merchantId={merchant?.id || ""} />
       </div>
     </div>
   )

@@ -4,13 +4,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Providers } from "@/components/providers";
 import { SoftwareApplicationJsonLd, OrganizationJsonLd } from "@/components/seo/json-ld";
 
-import { Inter } from "next/font/google";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
+// Inter font is loaded via globals.css @import to ensure offline build resilience
+const inter = {
   variable: "--font-inter",
-});
+  className: "font-sans",
+};
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.ai";
 

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
-import { ok, err } from "@/lib/api"
+import { ok, err, getAuthenticatedMerchant } from "@/lib/api"
 import { validateTemplateVariables, sanitizeTemplate } from "@/lib/variable-engine"
 import { SYSTEM_DEFAULT_TEMPLATES } from "@/lib/default-templates"
 
@@ -9,7 +9,11 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ key: string }> }
 ) {
-  const merchantId = req.headers.get("x-merchant-id")
+  let merchantId = req.headers.get("x-merchant-id")
+  if (!merchantId) {
+    const authM = await getAuthenticatedMerchant()
+    merchantId = authM?.id || null
+  }
   if (!merchantId) return err("Unauthorized", 401)
   const isSystem = merchantId === "system"
   const targetMerchantId = isSystem ? null : merchantId
@@ -44,7 +48,11 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ key: string }> }
 ) {
-  const merchantId = req.headers.get("x-merchant-id")
+  let merchantId = req.headers.get("x-merchant-id")
+  if (!merchantId) {
+    const authM = await getAuthenticatedMerchant()
+    merchantId = authM?.id || null
+  }
   if (!merchantId) return err("Unauthorized", 401)
   const isSystem = merchantId === "system"
   const targetMerchantId = isSystem ? null : merchantId
@@ -144,7 +152,11 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ key: string }> }
 ) {
-  const merchantId = req.headers.get("x-merchant-id")
+  let merchantId = req.headers.get("x-merchant-id")
+  if (!merchantId) {
+    const authM = await getAuthenticatedMerchant()
+    merchantId = authM?.id || null
+  }
   if (!merchantId) return err("Unauthorized", 401)
   const isSystem = merchantId === "system"
   const targetMerchantId = isSystem ? null : merchantId

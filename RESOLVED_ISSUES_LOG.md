@@ -3,6 +3,29 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [01 Sep 2026] Issue: WhatsApp "Couldn't link device, Try Again later" — Recurring Daily on Local Dev
+
+- **Symptom**: Every time the merchant opens Settings and scans the WhatsApp QR code, they get "Couldn't link device, Try Again later" from WhatsApp. The issue was supposedly fixed the previous day but kept recurring.
+- **Root Cause**: A **silent bug in `src/app/api/whatsapp/connect/route.ts`** — the `PUBLIC_WEBHOOK_URL` resolution logic had an incorrect guard condition:
+  ```javascript
+  // OLD (BROKEN): If NEXT_PUBLIC_APP_URL contains "localhost", webhook URL becomes ""
+  const PUBLIC_WEBHOOK_URL = process.env.WHATSAPP_WEBHOOK_URL ||
+    (process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes("localhost")
+      ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/evolution`
+      : "")  // ← ALWAYS EMPTY on localhost dev!
+  ```
+  When `NEXT_PUBLIC_APP_URL="http://localhost:3000"` (which it always is in `.env` on local dev), the webhook URL silently became `""`. Every new Evolution API instance was created with `webhook: { url: "" }`. Evolution API on VPS (at `200.97.170.53:8080`) registered the instance with NO valid callback URL. WhatsApp requires a valid webhook endpoint for Baileys session establishment — without it, the QR scan handshake fails mid-way and WhatsApp shows "Couldn't link device". Additionally, stale "connecting" instances (`CP_M_cmtffwge`, `CP_M_cmti7892`) were accumulating on the Evolution API server from previous database wipes and restarts, which caused further conflicts.
+- **Resolution**:
+  1. **Fixed `src/app/api/whatsapp/connect/route.ts`**: Removed the incorrect `localhost` exclusion guard. The URL now correctly uses `WHATSAPP_WEBHOOK_URL` env var (priority 1) or falls back to `NEXT_PUBLIC_APP_URL` (priority 2) regardless of "localhost" — since the Evolution API VPS always needs a reachable URL (ngrok for dev, real domain for prod).
+  2. **Added `WHATSAPP_WEBHOOK_URL` to `.env`**: Set to active ngrok URL `https://murky-mortally-uphill.ngrok-free.dev/api/webhook/evolution` so Evolution API can reach the local dev server.
+  3. **Cleaned stale Evolution API instances**: Deleted `CP_M_cmtffwge20002w05gh23fc6tj` (Aug 30, from old wiped merchant) and `CP_M_cmti7892w0002w0ioooysmnx5` (Sept 1 broken connecting instance) from Evolution API via DELETE `/instance/delete/`.
+  4. **Restarted Next.js server** to pick up new `.env` values.
+  5. **Committed locally** as `fix: WhatsApp instance webhook URL empty on localhost`.
+- **Note for future**: When ngrok URL changes (new session), update `WHATSAPP_WEBHOOK_URL` in `.env` and restart server. On production (VPS/Vercel), set `NEXT_PUBLIC_APP_URL` to the real domain and `WHATSAPP_WEBHOOK_URL` will auto-resolve correctly.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [31 Aug 2026] Issue: Upgrade Homepage ROI Calculator & 4-Step Revenue Breakdown
 
 - **Symptom**: The old ROI calculator on the homepage was generic and didn't clearly communicate the exact incremental revenue math or the 1-visit break-even advantage for Indian merchants.
