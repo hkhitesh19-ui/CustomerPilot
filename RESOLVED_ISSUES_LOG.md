@@ -3,6 +3,19 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [01 Sep 2026] Feature: Added "Updated 50% Discount Offer Master Pricing Table" & Limited Time Offer Banners Across Website
+
+- **Symptom**: User requested embedding the full "Updated 50% Discount Offer Master Pricing Table" directly onto the website's Pricing pages with prominent "Limited Time 50% Discount Offer" banners.
+- **Root Cause**: The website pricing page previously only rendered interactive card decks without a direct, transparent master summary table comparing all 6-Month and 1-Year plans with their respective strikethrough Main MRPs.
+- **Resolution**:
+  1. Updated [`src/components/pricing-client.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/pricing-client.tsx) with a top "🔥 Limited Time 50% Discount Offer" Hero Alert Banner and a full Master Pricing Table detailing all 9 service plans with Main MRPs (<del>₹1,299</del>, <del>₹1,999</del>, <del>₹3,599</del>, <del>₹5,799</del>, <del>₹9,999</del>), Final Offer Prices (₹649, ₹999, ₹1,799, ₹2,899, ₹4,999), 50% OFF discount badges, and effective daily costs.
+  2. Updated the Side-by-Side Matrix header to reflect the 50% discount prices and strikethrough MRPs.
+  3. Enhanced Homepage ([`src/app/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/page.tsx)) pricing redirect section with the "Limited Time 50% Discount Offer" banner.
+  4. Updated the merchant subscription page ([`src/app/dashboard/subscription/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/dashboard/subscription/page.tsx)) with a 50% OFF locked-in promotion banner.
+  5. Built production bundle and verified live rendering at `http://localhost:3000/pricing`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [01 Sep 2026] Update: Standardized 50% Discount Main MRP Prices Across All Plans
 
 - **Symptom**: User requested that Main MRP price should clearly represent a 50% discount offer relative to the discounted selling price (e.g. 6 Months Standalone MRP ₹1,299 ➔ ₹649; 1 Year Standalone MRP ₹1,999 ➔ ₹999; 1 Year Complete Bundle MRP ₹5,799 ➔ ₹2,899).
