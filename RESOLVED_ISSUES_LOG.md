@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [01 Sep 2026] Update: Standardized 50% Discount Main MRP Prices Across All Plans
+
+- **Symptom**: User requested that Main MRP price should clearly represent a 50% discount offer relative to the discounted selling price (e.g. 6 Months Standalone MRP ₹1,299 ➔ ₹649; 1 Year Standalone MRP ₹1,999 ➔ ₹999; 1 Year Complete Bundle MRP ₹5,799 ➔ ₹2,899).
+- **Root Cause**: Previous MRP values were not uniformly calibrated to exactly double the selling price for a clear 50% discount display.
+- **Resolution**:
+  1. Updated [`scripts/seedPricingAndTerms.js`](file:///f:/CustomerPilot_ByGLM_July2026/scripts/seedPricingAndTerms.js) setting all `originalPrice` to exact 50% markup targets (`loyalty_6mo/reviews_6mo/autoreply_6mo` MRP ₹1,299, `loyalty_yearly/reviews_yearly/autoreply_yearly` MRP ₹1,999, `growth_180` MRP ₹3,599, `enterprise_365` MRP ₹5,799, `enterprise_unlimited_365` MRP ₹9,999) with `discountPercent: 50`.
+  2. Re-seeded the SQLite `Plan` table via `node scripts/seedPricingAndTerms.js`.
+  3. Updated [`src/components/pricing-client.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/pricing-client.tsx) to display exact strikethrough MRP prices and "50% OFF" badges.
+  4. Verified `/api/pricing/plans` returning the updated 50% discount structure.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [01 Sep 2026] Update: Increased Main MRP (Original Price) by 50% Across All Subscription Plans
 
 - **Symptom**: Pricing cards and database records needed an updated, standardized Main MRP (Original strikethrough price) set at +50% above the discounted selling price.
