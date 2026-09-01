@@ -1700,15 +1700,15 @@ export default function Home() {
       <section className="price py-16 bg-white border-t border-slate-200/60" id="pricing">
         <div className="wrap">
           <div className="sec-head">
-            <span className="eyebrow" style={{ background: '#ecfdf5', color: '#059669', border: '1px solid #d1fae5' }}>
-              ⚡ 7-Day Free Trial · No Credit Card Required
+            <span className="eyebrow" style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fee2e2', fontWeight: 800 }}>
+              🔥 Limited Time 50% Discount Offer · Flat 50% OFF All Plans
             </span>
             <h2 className="sec-h">Simple Plans That Scale With You.</h2>
-            <p className="sec-sub">100% of AI Features Included. Deploy standalone modules or the complete retention suite.</p>
+            <p className="sec-sub">100% of AI Features Included. Standalone modules from ₹649 (MRP ₹1,299) and Complete Suite at ₹2,899/yr (MRP ₹5,799).</p>
           </div>
           <div style={{ textAlign: 'center', marginTop: '36px', display: 'flex', justifyContent: 'center' }}>
             <Link href="/pricing" className="btn btn-grad text-sm sm:text-base py-3.5 sm:py-4 px-6 sm:px-8 font-bold rounded-xl" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-              <span>View Full Pricing &amp; Plans ➔</span>
+              <span>View Master 50% Discount Pricing Table ➔</span>
             </Link>
           </div>
         </div>

@@ -23,7 +23,8 @@ import {
   Calendar,
   Clock,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Flame
 } from "lucide-react"
 import { TermsDialog } from "@/components/terms-dialog"
 
@@ -329,6 +330,22 @@ export default function SubscriptionPage() {
         </div>
       ) : (
         <div className="space-y-8">
+          {/* Limited Time 50% Discount Offer Banner */}
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-950/60 via-orange-950/40 to-slate-900 border border-orange-500/40 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg shadow-orange-500/5">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-400/40 flex items-center justify-center flex-shrink-0 text-orange-400">
+                <Flame className="w-5 h-5 animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black text-orange-400 uppercase tracking-wider">🔥 Limited Time 50% Discount Offer</span>
+                  <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-red-500 text-white">50% OFF</span>
+                </div>
+                <p className="text-xs text-slate-300 mt-0.5">All plans are currently locked at 50% OFF the original Main MRP (e.g. 6 Months from ₹649, 1 Year Complete at ₹2,899).</p>
+              </div>
+            </div>
+          </div>
+
           {/* 1. Plans Cards Grid */}
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

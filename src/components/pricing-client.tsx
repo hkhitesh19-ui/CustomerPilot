@@ -203,6 +203,30 @@ export function PricingClient() {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16 space-y-16 flex-1 w-full">
+        {/* Limited Time 50% Discount Offer Alert Banner */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-600 p-1 shadow-2xl shadow-orange-500/20">
+          <div className="rounded-[22px] bg-slate-950 px-6 py-6 sm:py-7 flex flex-col md:flex-row items-center justify-between gap-5 text-white">
+            <div className="space-y-1.5 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-black uppercase tracking-wider">
+                <Flame className="w-4 h-4 text-red-400 animate-pulse" /> Limited Time 50% Discount Offer
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+                Flat 50% OFF on All 6-Month &amp; 1-Year Plans
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
+                Get full automated WhatsApp loyalty, 5★ Google review collection &amp; 1-click replies at half the regular MRP price.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <Link href="/signup">
+                <Button className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs sm:text-sm px-6 py-3.5 rounded-xl shadow-lg shadow-orange-500/30">
+                  Claim 50% Discount Now →
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+
         {/* Hero Section */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-xs">
@@ -220,7 +244,7 @@ export function PricingClient() {
         <div className="space-y-8">
           <div className="text-center space-y-3">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Select by Desired Business Outcome</h2>
-            <p className="text-xs text-slate-500">Deploy only the standalone modules your store requires today, or get the complete bundle.</p>
+            <p className="text-xs text-slate-500">Deploy only the standalone modules your store requires today, or get the complete bundle with our 50% discount offer.</p>
 
             {/* Billing Cycle Switcher */}
             <div className="inline-flex items-center p-1 rounded-2xl bg-slate-100 border border-slate-200 shadow-inner">
@@ -235,7 +259,7 @@ export function PricingClient() {
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${billingCycle === "1year" ? "bg-slate-900 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
               >
                 <span>1 Year (₹999)</span>
-                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">₹3/day</span>
+                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">50% OFF · ₹3/day</span>
               </button>
             </div>
           </div>
@@ -361,6 +385,211 @@ export function PricingClient() {
           </div>
         </div>
 
+        {/* Master 50% Discount Offer Master Pricing Table */}
+        <div className="space-y-6 pt-6">
+          <div className="text-center space-y-2 max-w-3xl mx-auto">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 font-extrabold text-xs">
+              <Flame className="w-3.5 h-3.5 text-red-500" /> Limited Time 50% Discount Offer
+            </span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
+              Updated 50% Discount Offer Master Pricing Table
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600">
+              Transparent, locked-in pricing with flat 50% OFF across all standalone services and all-in-one complete bundles.
+            </p>
+          </div>
+
+          <div className="overflow-x-auto rounded-3xl border border-slate-200 shadow-xl bg-white">
+            <table className="w-full text-left border-collapse min-w-[800px]">
+              <thead>
+                <tr className="border-b border-slate-200 bg-slate-900 text-white">
+                  <th className="p-4 sm:p-5 text-xs sm:text-sm font-extrabold w-[34%]">Service / Plan Name</th>
+                  <th className="p-4 text-center text-xs sm:text-sm font-extrabold w-[14%]">Plan Duration</th>
+                  <th className="p-4 text-center text-xs sm:text-sm font-extrabold w-[13%]">Main MRP</th>
+                  <th className="p-4 text-center text-xs sm:text-sm font-extrabold text-amber-300 w-[14%]">Final Offer Price</th>
+                  <th className="p-4 text-center text-xs sm:text-sm font-extrabold w-[12%]">Discount</th>
+                  <th className="p-4 text-center text-xs sm:text-sm font-extrabold w-[13%]">Daily Cost</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-xs sm:text-sm text-slate-700">
+                <tr className="hover:bg-slate-50 transition">
+                  <td className="p-4 sm:p-5 font-bold text-slate-900 flex items-center gap-2">
+                    <span className="text-lg">🎁</span>
+                    <div>
+                      <div>Digital Loyalty Stamps &amp; VIP Club</div>
+                      <div className="text-[11px] text-slate-500 font-normal">WhatsApp digital loyalty stamp card &amp; VIP rewards</div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-center font-medium">
+                    <span className="bg-slate-100 px-2.5 py-1 rounded-md text-xs font-semibold">6 Months</span>
+                  </td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,299</td>
+                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹649</td>
+                  <td className="p-4 text-center">
+                    <span className="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-600">₹3.6/day</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50 transition bg-emerald-50/30">
+                  <td className="p-4 sm:p-5 font-bold text-slate-900 flex items-center gap-2">
+                    <span className="text-lg">🎁</span>
+                    <div>
+                      <div>Digital Loyalty Stamps &amp; VIP Club</div>
+                      <div className="text-[11px] text-slate-500 font-normal">Full year loyalty automation + VIP CRM export</div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-center font-medium">
+                    <span className="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md text-xs font-bold">1 Year</span>
+                  </td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,999</td>
+                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹999</td>
+                  <td className="p-4 text-center">
+                    <span className="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
+                  </td>
+                  <td className="p-4 text-center font-bold text-emerald-700">₹2.7/day</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50 transition">
+                  <td className="p-4 sm:p-5 font-bold text-slate-900 flex items-center gap-2">
+                    <span className="text-lg">⭐</span>
+                    <div>
+                      <div>Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</div>
+                      <div className="text-[11px] text-slate-500 font-normal">Automated WhatsApp 5★ review collection</div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-center font-medium">
+                    <span className="bg-slate-100 px-2.5 py-1 rounded-md text-xs font-semibold">6 Months</span>
+                  </td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,299</td>
+                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹649</td>
+                  <td className="p-4 text-center">
+                    <span className="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-600">₹3.6/day</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50 transition bg-emerald-50/30">
+                  <td className="p-4 sm:p-5 font-bold text-slate-900 flex items-center gap-2">
+                    <span className="text-lg">⭐</span>
+                    <div>
+                      <div>Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</div>
+                      <div className="text-[11px] text-slate-500 font-normal">365-Day automated review prompts &amp; AI drafts</div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-center font-medium">
+                    <span className="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md text-xs font-bold">1 Year</span>
+                  </td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,999</td>
+                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹999</td>
+                  <td className="p-4 text-center">
+                    <span className="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
+                  </td>
+                  <td className="p-4 text-center font-bold text-emerald-700">₹2.7/day</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50 transition">
+                  <td className="p-4 sm:p-5 font-bold text-slate-900 flex items-center gap-2">
+                    <span className="text-lg">💬</span>
+                    <div>
+                      <div>Ai Drafted SEO Optimized 1-Click Reply to Google Reviews</div>
+                      <div className="text-[11px] text-slate-500 font-normal">Context-aware owner replies &amp; 1-Click GBP post</div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-center font-medium">
+                    <span className="bg-slate-100 px-2.5 py-1 rounded-md text-xs font-semibold">6 Months</span>
+                  </td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,299</td>
+                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹649</td>
+                  <td className="p-4 text-center">
+                    <span className="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
+                  </td>
+                  <td className="p-4 text-center font-medium text-slate-600">₹3.6/day</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50 transition bg-emerald-50/30">
+                  <td className="p-4 sm:p-5 font-bold text-slate-900 flex items-center gap-2">
+                    <span className="text-lg">💬</span>
+                    <div>
+                      <div>Ai Drafted SEO Optimized 1-Click Reply to Google Reviews</div>
+                      <div className="text-[11px] text-slate-500 font-normal">Full year AI reply generator &amp; bulk studio</div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-center font-medium">
+                    <span className="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md text-xs font-bold">1 Year</span>
+                  </td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,999</td>
+                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹999</td>
+                  <td className="p-4 text-center">
+                    <span className="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
+                  </td>
+                  <td className="p-4 text-center font-bold text-emerald-700">₹2.7/day</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50 transition bg-indigo-50/30">
+                  <td className="p-4 sm:p-5 font-black text-slate-900 flex items-center gap-2">
+                    <span className="text-xl">🚀</span>
+                    <div>
+                      <div className="text-indigo-950 font-black">Starter Growth Plan (CustomerPilot Complete)</div>
+                      <div className="text-[11px] text-indigo-700 font-normal">All 3 Engines combined for up to 1,000 VIP customers</div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-center font-medium">
+                    <span className="bg-indigo-100 text-indigo-900 px-2.5 py-1 rounded-md text-xs font-bold">6 Months</span>
+                  </td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹3,599</td>
+                  <td className="p-4 text-center font-black text-indigo-600 text-base">₹1,799</td>
+                  <td className="p-4 text-center">
+                    <span className="inline-block bg-indigo-100 text-indigo-900 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
+                  </td>
+                  <td className="p-4 text-center font-bold text-indigo-700">₹10/day</td>
+                </tr>
+
+                <tr className="hover:bg-amber-50/40 transition bg-gradient-to-r from-amber-50/80 via-orange-50/50 to-amber-50/80 border-2 border-amber-300">
+                  <td className="p-4 sm:p-5 font-black text-slate-900 flex items-center gap-2">
+                    <span className="text-2xl">👑</span>
+                    <div>
+                      <div className="text-slate-950 font-black flex items-center gap-1.5">
+                        <span>Pro Scaling Plan (CustomerPilot Complete)</span>
+                        <span className="text-[10px] uppercase font-black px-2 py-0.2 rounded-full bg-amber-500 text-white">Most Popular</span>
+                      </div>
+                      <div className="text-[11px] text-slate-600 font-normal">Full 3-in-1 Suite for up to 2,500 VIP customers + Priority Support</div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-center font-medium">
+                    <span className="bg-amber-500 text-white px-2.5 py-1 rounded-md text-xs font-black shadow-xs">1 Year</span>
+                  </td>
+                  <td className="p-4 text-center text-slate-400 line-through font-bold text-base">₹5,799</td>
+                  <td className="p-4 text-center font-black text-amber-700 text-lg">₹2,899</td>
+                  <td className="p-4 text-center">
+                    <span className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[11px] font-black px-2.5 py-0.5 rounded-full shadow-xs">50% OFF</span>
+                  </td>
+                  <td className="p-4 text-center font-black text-amber-800">₹8/day</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50 transition">
+                  <td className="p-4 sm:p-5 font-black text-slate-900 flex items-center gap-2">
+                    <span className="text-xl">🏢</span>
+                    <div>
+                      <div className="text-slate-900 font-black">High-Volume / Enterprise Multi-Outlet Chain</div>
+                      <div className="text-[11px] text-slate-500 font-normal">Unlimited VIP members, multi-outlet switcher &amp; dedicated manager</div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-center font-medium">
+                    <span className="bg-slate-900 text-white px-2.5 py-1 rounded-md text-xs font-bold">1 Year</span>
+                  </td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹9,999</td>
+                  <td className="p-4 text-center font-black text-slate-900 text-base">₹4,999</td>
+                  <td className="p-4 text-center">
+                    <span className="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
+                  </td>
+                  <td className="p-4 text-center font-bold text-slate-700">₹14/day</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {/* Full Feature Comparison Matrix */}
         <div className="space-y-6 pt-6">
           <div className="text-center space-y-2 max-w-2xl mx-auto">
@@ -379,20 +608,32 @@ export function PricingClient() {
                   <th className="p-4 text-center w-[17%] border-l border-slate-800 bg-slate-900/40">
                     <div className="text-xl mb-1">🎁</div>
                     <div className="font-extrabold text-xs sm:text-sm text-slate-100">Digital Loyalty Stamps &amp; VIP Club</div>
-                    <div className="text-[10px] text-amber-400 font-bold">₹999/yr</div>
-                    <div className="text-[9px] text-slate-400">₹2.7/day</div>
+                    <div className="mt-0.5 flex items-baseline justify-center gap-1">
+                      <span className="text-[10px] line-through text-slate-500">₹1,999</span>
+                      <span className="text-sm font-black text-amber-400">₹999</span>
+                      <span className="text-[9px] text-slate-300">/yr</span>
+                    </div>
+                    <div className="text-[9px] text-emerald-400 font-bold">50% OFF · ₹2.7/day</div>
                   </th>
                   <th className="p-4 text-center w-[17%] border-l border-slate-800 bg-slate-900/40">
                     <div className="text-xl mb-1">⭐</div>
                     <div className="font-extrabold text-xs sm:text-sm text-slate-100">Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</div>
-                    <div className="text-[10px] text-emerald-400 font-bold">₹999/yr</div>
-                    <div className="text-[9px] text-slate-400">₹2.7/day</div>
+                    <div className="mt-0.5 flex items-baseline justify-center gap-1">
+                      <span className="text-[10px] line-through text-slate-500">₹1,999</span>
+                      <span className="text-sm font-black text-emerald-400">₹999</span>
+                      <span className="text-[9px] text-slate-300">/yr</span>
+                    </div>
+                    <div className="text-[9px] text-emerald-400 font-bold">50% OFF · ₹2.7/day</div>
                   </th>
                   <th className="p-4 text-center w-[17%] border-l border-slate-800 bg-slate-900/40">
                     <div className="text-xl mb-1">💬</div>
                     <div className="font-extrabold text-xs sm:text-sm text-slate-100">Ai Drafted SEO Optimized 1-Click Reply to Google Reviews</div>
-                    <div className="text-[10px] text-indigo-400 font-bold">₹999/yr</div>
-                    <div className="text-[9px] text-slate-400">₹2.7/day</div>
+                    <div className="mt-0.5 flex items-baseline justify-center gap-1">
+                      <span className="text-[10px] line-through text-slate-500">₹1,999</span>
+                      <span className="text-sm font-black text-indigo-400">₹999</span>
+                      <span className="text-[9px] text-slate-300">/yr</span>
+                    </div>
+                    <div className="text-[9px] text-emerald-400 font-bold">50% OFF · ₹2.7/day</div>
                   </th>
                   <th className="p-4 text-center w-[18%] border-l-2 border-emerald-500 bg-gradient-to-b from-emerald-950/90 to-slate-900 relative">
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-[9px] rounded-full uppercase tracking-wider shadow-sm whitespace-nowrap">
@@ -402,11 +643,11 @@ export function PricingClient() {
                     <div className="font-black text-sm text-white">CustomerPilot Complete</div>
                     <div className="text-[10px] text-emerald-300 font-extrabold uppercase tracking-wider mt-0.5">Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply</div>
                     <div className="mt-0.5 flex items-baseline justify-center gap-1">
-                      <span className="text-[10px] line-through text-slate-500">₹3,999</span>
+                      <span className="text-[10px] line-through text-slate-500">₹5,799</span>
                       <span className="text-base font-black text-emerald-400">₹2,899</span>
                       <span className="text-[9px] text-slate-300">/yr</span>
                     </div>
-                    <div className="text-[9px] text-emerald-300 font-semibold">₹7.9/day for all 3 combined</div>
+                    <div className="text-[9px] text-emerald-300 font-bold">50% OFF · ₹7.9/day (₹8/day)</div>
                   </th>
                 </tr>
               </thead>
