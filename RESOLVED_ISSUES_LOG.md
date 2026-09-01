@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [01 Sep 2026] Update: Increased Main MRP (Original Price) by 50% Across All Subscription Plans
+
+- **Symptom**: Pricing cards and database records needed an updated, standardized Main MRP (Original strikethrough price) set at +50% above the discounted selling price.
+- **Root Cause**: Previous MRP values were hardcoded to legacy anchor prices that did not uniformly reflect a consistent +50% base markup.
+- **Resolution**:
+  1. Updated [`scripts/seedPricingAndTerms.js`](file:///f:/CustomerPilot_ByGLM_July2026/scripts/seedPricingAndTerms.js) with new `originalPrice` and `discountPercent` values calculated as +50% above selling price (e.g. ₹999 ➔ ₹1,499 MRP, ₹1,799 ➔ ₹2,699 MRP, ₹2,899 ➔ ₹4,349 MRP, ₹4,999 ➔ ₹7,499 MRP, ₹649 ➔ ₹999 MRP).
+  2. Executed database seed script to update the `Plan` table in SQLite.
+  3. Updated [`src/components/pricing-client.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/pricing-client.tsx) to render strikethrough MRP prices next to current selling prices for all outcome cards and capacity plans.
+  4. Verified `/api/pricing/plans` returning new MRPs and discount percentages.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [01 Sep 2026] Feature: Added "WhatsApp Journey Templates" Section to Settings Page After "Commercial Go-Live Validator"
 
 - **Symptom**: Merchants needed full visibility and customization control over all automated WhatsApp messages (Welcome, Queue, Stamps, Rewards, Review Prompts, Win-Backs, Expiry Nudges) directly in their Settings dashboard.
