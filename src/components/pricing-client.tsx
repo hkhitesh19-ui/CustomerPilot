@@ -24,10 +24,12 @@ export function PricingClient() {
       badge: "Repeat Visit Engine",
       description: "Convert single-time walk-ins into repeat regulars with WhatsApp digital stamp cards, VIP club, and automated birthday rewards.",
       price6Mo: "₹649",
+      mrp6Mo: "₹999",
       period6Mo: "for 6 months",
       price1Yr: "₹999",
+      mrp1Yr: "₹1,499",
       period1Yr: "for 1 year (₹3/day)",
-      savings: "₹3/day (Billed yearly)",
+      savings: "33% OFF (Save ₹500)",
       features: [
         "Digital WhatsApp Stamp Card",
         "VIP Club Engine & Tier Upgrades",
@@ -46,10 +48,12 @@ export function PricingClient() {
       badge: "Local SEO Growth",
       description: "Automatically collect authentic 4 & 5-star Google reviews right after a customer purchase on WhatsApp.",
       price6Mo: "₹649",
+      mrp6Mo: "₹999",
       period6Mo: "for 6 months",
       price1Yr: "₹999",
+      mrp1Yr: "₹1,499",
       period1Yr: "for 1 year (₹3/day)",
-      savings: "₹3/day (Billed yearly)",
+      savings: "33% OFF (Save ₹500)",
       features: [
         "WhatsApp Post-Purchase Prompts",
         "Smart AI 5-Star Review Drafts",
@@ -68,10 +72,12 @@ export function PricingClient() {
       badge: "Owner Assistant Mode",
       description: "AI automatically drafts appreciative, context-aware owner responses. Store owners review & publish on Google Maps in 1-Click!",
       price6Mo: "₹649",
+      mrp6Mo: "₹999",
       period6Mo: "for 6 months",
       price1Yr: "₹999",
+      mrp1Yr: "₹1,499",
       period1Yr: "for 1 year (₹3/day)",
-      savings: "₹3/day (Billed yearly)",
+      savings: "33% OFF (Save ₹500)",
       features: [
         "Google Business Profile Connect",
         "Contextual AI Owner Replies",
@@ -90,10 +96,12 @@ export function PricingClient() {
       badge: "⭐ BEST VALUE BUNDLE",
       description: "All 3 outcome engines combined into one single unified AI customer retention & reputation system.",
       price6Mo: "₹1,799",
+      mrp6Mo: "₹2,699",
       period6Mo: "for 6 months (₹10/day)",
       price1Yr: "₹2,899",
+      mrp1Yr: "₹4,349",
       period1Yr: "for 1 year (₹8/day)",
-      savings: "₹8/day (Save ₹1,500+ Yearly)",
+      savings: "33% OFF (Save ₹1,450)",
       features: [
         "Full WhatsApp Loyalty Stamp Engine",
         "Full AI Draft Google Review Flow",
@@ -114,6 +122,7 @@ export function PricingClient() {
       capacity: "Up to 1,000 VIP Customers",
       duration: "6 Months",
       price: "₹1,799",
+      originalPrice: "₹2,699",
       period: "for 6 months (₹10/day)",
       badge: "Ideal for Growing Shops",
       popular: false,
@@ -132,6 +141,7 @@ export function PricingClient() {
       capacity: "Up to 2,500 VIP Customers",
       duration: "1 Year",
       price: "₹2,899",
+      originalPrice: "₹4,349",
       period: "per year (₹8/day)",
       badge: "⭐ Most Popular",
       popular: true,
@@ -151,6 +161,7 @@ export function PricingClient() {
       capacity: "Unlimited VIP Customers",
       duration: "1 Year",
       price: "₹4,999",
+      originalPrice: "₹7,499",
       period: "per year (₹14/day)",
       badge: "Busy Outlets & Chains",
       popular: false,
@@ -232,6 +243,7 @@ export function PricingClient() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {outcomeCards.map((card, idx) => {
               const currentPrice = billingCycle === "1year" ? card.price1Yr : card.price6Mo
+              const currentMrp = billingCycle === "1year" ? card.mrp1Yr : card.mrp6Mo
               const currentPeriod = billingCycle === "1year" ? card.period1Yr : card.period6Mo
 
               return (
@@ -250,13 +262,20 @@ export function PricingClient() {
 
                     {/* Dynamic Pricing Tag */}
                     <div className="pt-1">
-                      <div className="text-2xl sm:text-3xl font-black text-slate-900">
-                        {currentPrice}
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl sm:text-3xl font-black text-slate-900">
+                          {currentPrice}
+                        </span>
+                        {currentMrp && (
+                          <span className="text-sm font-semibold text-slate-400 line-through">
+                            {currentMrp}
+                          </span>
+                        )}
                       </div>
                       <p className="text-[11px] text-slate-500">
                         {currentPeriod}
                       </p>
-                      {billingCycle === "1year" && card.savings && (
+                      {card.savings && (
                         <span className="inline-block mt-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">
                           {card.savings}
                         </span>
@@ -306,7 +325,14 @@ export function PricingClient() {
                   </div>
 
                   <div className="space-y-1">
-                    <div className="text-3xl sm:text-4xl font-black text-slate-900">{plan.price}</div>
+                    <div className="flex items-baseline gap-2.5">
+                      <span className="text-3xl sm:text-4xl font-black text-slate-900">{plan.price}</span>
+                      {plan.originalPrice && (
+                        <span className="text-base font-semibold text-slate-400 line-through">
+                          {plan.originalPrice}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-slate-500">{plan.period} · {plan.capacity}</p>
                   </div>
 
