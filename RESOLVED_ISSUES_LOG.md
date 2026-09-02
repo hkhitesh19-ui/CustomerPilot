@@ -3,6 +3,16 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Sep 2026] Bug Fix: Fixed CSS Parsing Error in globals.css (@import Order Violation)
+
+- **Symptom**: Turbopack development server crashed with `Parsing CSS source code failed: @import rules must precede all rules aside from @charset and @layer statements` on line 3 of `src/app/globals.css`.
+- **Root Cause**: `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');` was placed after `@import "tailwindcss";`. In Tailwind CSS v4, the tailwind import generates `@property` statements which violate the CSS specification requirement that font `@import url(...)` must precede all other CSS rules.
+- **Resolution**:
+  1. Moved `@import url('https://fonts.googleapis.com/css2?family=Inter...');` to Line 1 in [`src/app/globals.css`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/globals.css) before `@import "tailwindcss";` and `@import "tw-animate-css";`.
+  2. Verified live development server compilation: HTTP 200 returned with `Revenue & Growth Calculator` rendering properly.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Sep 2026] Refactor: Cleaned and Polished Products Section & Navbar Dropdown UI
 
 - **Symptom**: User noted that the Products section and navigation dropdown felt messy, crowded, and wordy with long titles and bloated button text.
