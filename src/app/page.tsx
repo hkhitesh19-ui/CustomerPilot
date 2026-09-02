@@ -413,30 +413,33 @@ export default function Home() {
               {productsOpen && (
                 <div className="absolute top-full left-0 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   <Link href="/features/whatsapp-stamp-card" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
-                    <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                      <Gift className="w-3.5 h-3.5 text-emerald-500" /> Digital Loyalty Stamps &amp; VIP Club
+                    <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5"><Gift className="w-3.5 h-3.5 text-amber-500" /> Digital Loyalty Stamps</span>
+                      <span className="text-[10px] bg-amber-50 text-amber-700 font-bold px-1.5 py-0.5 rounded-md">VIP Club</span>
                     </span>
-                    <span className="text-[11px] text-slate-500 mt-0.5">WhatsApp VIP Loyalty &amp; Digital Stamp Cards</span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">WhatsApp stamp cards &amp; automatic repeat rewards</span>
                   </Link>
                   <Link href="/features/google-review-automation" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
-                    <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                      <Star className="w-3.5 h-3.5 text-amber-500" /> Ai Drafted SEO Optimized Google Reviews
+                    <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5"><Star className="w-3.5 h-3.5 text-emerald-500" /> Smart Google Reviews</span>
+                      <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">AI Drafts</span>
                     </span>
-                    <span className="text-[11px] text-emerald-600 font-bold mt-0.5">Increase GoogleReviews Very Fast</span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Post-purchase WhatsApp 5-star review collector</span>
                   </Link>
                   <Link href="#features" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
-                    <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                      <MessageSquare className="w-3.5 h-3.5 text-indigo-500" /> Ai Drafted SEO Optimized 1-Click Reply to Google Reviews
+                    <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5"><MessageSquare className="w-3.5 h-3.5 text-indigo-500" /> 1-Click AI AutoReply</span>
+                      <span className="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">1-Sec Publish</span>
                     </span>
-                    <span className="text-[11px] text-slate-500 mt-0.5">AI context drafts &amp; 1-click publish</span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Context-aware owner responses on Google Maps</span>
                   </Link>
                   <div className="border-t border-slate-100 my-1 pt-1">
-                    <Link href="#comparison" className="flex flex-col p-2.5 rounded-xl bg-emerald-50/60 hover:bg-emerald-50 transition border border-emerald-100">
-                      <span className="text-xs font-extrabold text-emerald-950 flex items-center gap-1.5">
+                    <Link href="#comparison" className="flex flex-col p-2.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-50 transition border border-emerald-100">
+                      <span className="text-xs font-extrabold text-emerald-950 flex items-center justify-between">
                         <span>🚀 CustomerPilot Complete</span>
-                        <span className="text-[9px] bg-emerald-500 text-slate-950 font-black px-1.5 py-0.5 rounded-full uppercase">All 3 In 1</span>
+                        <span className="text-[9px] bg-emerald-500 text-slate-950 font-black px-1.5 py-0.5 rounded-full uppercase">All-in-One</span>
                       </span>
-                      <span className="text-[10px] text-emerald-800 font-medium mt-0.5">Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply</span>
+                      <span className="text-[10px] text-emerald-800 font-medium mt-0.5">Loyalty Stamps + Smart Reviews + AI AutoReply</span>
                     </Link>
                   </div>
                 </div>
@@ -517,17 +520,21 @@ export default function Home() {
           <div className="md:hidden bg-white border-b border-slate-200 px-6 py-5 space-y-4 shadow-xl animate-in slide-in-from-top duration-200">
             <div className="space-y-1">
               <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2">Products &amp; Services</div>
-              <Link href="/features/whatsapp-stamp-card" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
-                <Gift className="w-4 h-4 text-emerald-500" /> Digital Loyalty Stamps &amp; VIP Club
+              <Link href="/features/whatsapp-stamp-card" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                <span className="flex items-center gap-2"><Gift className="w-4 h-4 text-amber-500" /> Digital Loyalty Stamps</span>
+                <span className="text-[10px] bg-amber-50 text-amber-700 font-bold px-1.5 py-0.5 rounded-md">VIP Club</span>
               </Link>
-              <Link href="/features/google-review-automation" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
-                <Star className="w-4 h-4 text-amber-500" /> Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast
+              <Link href="/features/google-review-automation" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                <span className="flex items-center gap-2"><Star className="w-4 h-4 text-emerald-500" /> Smart Google Reviews</span>
+                <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">AI Drafts</span>
               </Link>
-              <Link href="#features" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
-                <MessageSquare className="w-4 h-4 text-indigo-500" /> Ai Drafted SEO Optimized 1-Click Reply to Google Reviews
+              <Link href="#features" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                <span className="flex items-center gap-2"><MessageSquare className="w-4 h-4 text-indigo-500" /> 1-Click AI AutoReply</span>
+                <span className="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">1-Sec Publish</span>
               </Link>
-              <Link href="#comparison" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-2 py-2 text-sm font-bold text-emerald-900 rounded-lg bg-emerald-50/70 border border-emerald-200">
-                <span>🚀 CustomerPilot Complete : Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply</span>
+              <Link href="#comparison" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-bold text-emerald-900 rounded-lg bg-emerald-50/70 border border-emerald-200">
+                <span>🚀 CustomerPilot Complete</span>
+                <span className="text-[9px] bg-emerald-500 text-slate-950 font-black px-1.5 py-0.5 rounded-full uppercase">All-in-One</span>
               </Link>
             </div>
 
@@ -1107,75 +1114,90 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============ FEATURES (The 3 Engines) ============ */}
+      {/* ============ FEATURES (The 3 Core Products) ============ */}
       <section className="feat bg-slate-50/50" id="features">
         <div className="wrap">
           <div className="sec-head">
-            <span className="eyebrow">One simple software</span>
-            <h2 className="sec-h">Three things your shop needs.<br/><span style={{ color: '#cbd5e1' }}>That&apos;s it.</span></h2>
-            <p className="sec-sub">No complicated setup. No technical work. Just bring customers back, collect reviews, and never miss a reply.</p>
+            <span className="eyebrow">Three Core Engines</span>
+            <h2 className="sec-h">Everything Your Store Needs.<br/><span style={{ color: '#94a3b8' }}>Nothing It Doesn&apos;t.</span></h2>
+            <p className="sec-sub">Bring customers back, collect verified 5-star Google reviews, and auto-reply to every customer — all inside WhatsApp.</p>
           </div>
           <div className="feat-grid">
-            {/* Engine 1: Loyalty Rewards */}
+            {/* Product 1: Digital Loyalty Stamps */}
             <div className="fcard">
-              <div className="ico amber">🏆</div>
-              <h3 className="text-xl font-bold text-slate-900 mt-4">Digital Loyalty Stamps &amp; VIP Club</h3>
+              <div className="flex items-center justify-between">
+                <div className="ico amber">🏆</div>
+                <span className="text-[10px] bg-amber-50 text-amber-800 border border-amber-200 font-bold px-2.5 py-1 rounded-full">
+                  ✨ WhatsApp Native
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">Digital Loyalty &amp; Stamps</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                Perfect for bakeries, cafes, and salons wanting to convert single-time walk-ins into 10x repeat regulars.
+                Turn walk-in buyers into 10x repeat regulars with automatic WhatsApp digital stamp cards and milestone VIP rewards.
               </p>
-              <ul className="space-y-1.5 mt-4 text-xs text-slate-700">
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Digital Loyalty Card</li>
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> VIP Club Engine</li>
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Birthday Rewards Engine</li>
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Repeat Visit Tracking</li>
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Instant QR-based Membership</li>
+              <ul className="space-y-1.5 mt-4 text-xs text-slate-700 flex-1">
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> No-App Digital Stamp Card</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Automated VIP Tier Progression</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Birthday &amp; Anniversary Rewards</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 30-Day Win-Back Re-engagement</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 5-Second QR Counter Setup</li>
               </ul>
               <div className="stamp-row mt-4">
                 <span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span>
               </div>
-              <Link href="/signup?module=loyalty" className="mt-5 w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
-                <span>Start Free Trial - Digital Loyalty Stamps &amp; VIP Club</span> <span>→</span>
+              <Link href="/signup?module=loyalty" className="mt-5 w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+                <span>Start 7-Day Free Trial</span> <span>→</span>
               </Link>
             </div>
 
-            {/* Engine 2: Ai Drafted SEO Optimized Google Reviews */}
+            {/* Product 2: Smart Google Reviews */}
             <div className="fcard">
-              <div className="ico em">⭐</div>
-              <h3 className="text-xl font-bold text-slate-900 mt-4">Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</h3>
+              <div className="flex items-center justify-between">
+                <div className="ico em">⭐</div>
+                <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold px-2.5 py-1 rounded-full">
+                  ⭐ 5-Star Booster
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">Smart Google Reviews</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                After a purchase, your customer gets a gentle WhatsApp reminder to share their experience and earn bonus stamps. Automatically collect authentic 4 and 5-star Google reviews right after a customer purchase on WhatsApp.
+                Automatically invite customers after purchase via WhatsApp. Happy customers post pre-drafted 5-star AI reviews in 1 tap.
               </p>
-              <ul className="space-y-1.5 mt-4 text-xs text-slate-700">
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> AI Review Draft Engine</li>
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> WhatsApp Review Flow</li>
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 1-Click Copy &amp; Post</li>
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Live Review Analytics</li>
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Organic Rating Booster</li>
+              <ul className="space-y-1.5 mt-4 text-xs text-slate-700 flex-1">
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> AI SEO-Optimized Review Drafts</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Post-Purchase WhatsApp Triggers</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Smart Negative Review Shield</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 1-Click Copy &amp; Post to Google Maps</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Live Rating Growth Analytics</li>
               </ul>
               <div className="stars mt-4"><span style={{ color: '#f59e0b' }}>★★★★★</span><small className="bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full text-[10px]">+412 this month</small></div>
-              <Link href="/signup?module=reviews" className="mt-5 w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+              <Link href="/signup?module=reviews" className="mt-5 w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
                 <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-                <span>Start Free Trial - Ai Drafted SEO Optimized Google Reviews</span> <span>→</span>
+                <span>Start 7-Day Free Trial</span> <span>→</span>
               </Link>
             </div>
 
-            {/* Engine 3: Ai Drafted SEO Optimized 1-Click Reply to Google Reviews */}
+            {/* Product 3: 1-Click AI AutoReply */}
             <div className="fcard">
-              <div className="ico ind">💬</div>
-              <h3 className="text-xl font-bold text-slate-900 mt-4">Ai Drafted SEO Optimized 1-Click Reply to Google Reviews</h3>
+              <div className="flex items-center justify-between">
+                <div className="ico ind">💬</div>
+                <span className="text-[10px] bg-indigo-50 text-indigo-800 border border-indigo-200 font-bold px-2.5 py-1 rounded-full">
+                  ⚡ 1-Sec AI Replies
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">1-Click AI AutoReply</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                AI automatically drafts appreciative, context-aware owner responses. Store owners review &amp; publish on Google Maps in 1-Click!
+                Gemini AI drafts appreciative, context-aware owner responses. Review and publish directly to Google Maps in 1 click.
               </p>
-              <ul className="space-y-1.5 mt-4 text-xs text-slate-700">
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> AI Context-Aware Drafts in 1 Second</li>
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 1-Click Copy &amp; Publish to Google Maps</li>
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Smart Sentiment &amp; Keyword Adaptation</li>
-                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Dead-Letter Queue Quota Safety</li>
+              <ul className="space-y-1.5 mt-4 text-xs text-slate-700 flex-1">
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Context-Aware AI Drafts in 1 Sec</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 1-Click Publish to Google Maps</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Sentiment &amp; Keyword Adaptation</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Dead-Letter Queue Safety</li>
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Zero Missed Reviews Guarantee</li>
               </ul>
-              <div className="reply-prev mt-4 text-xs bg-slate-50 border border-slate-100 p-2.5 rounded-xl"><strong style={{ color: 'var(--slate)' }}>1-Click AutoReply:</strong> &quot;Thank you so much for your kind words! 💜 See you again soon.&quot;</div>
-              <Link href="/signup?module=autoreply" className="mt-5 w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
-                <span>Start Free Trial - Ai Drafted SEO Optimized 1-Click Reply</span> <span>→</span>
+              <div className="reply-prev mt-4 text-xs bg-slate-50 border border-slate-100 p-2.5 rounded-xl"><strong style={{ color: 'var(--slate)' }}>AI Reply:</strong> &quot;Thank you so much! 💜 See you again soon.&quot;</div>
+              <Link href="/signup?module=autoreply" className="mt-5 w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+                <span>Start 7-Day Free Trial</span> <span>→</span>
               </Link>
             </div>
           </div>
