@@ -3,6 +3,29 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Sep 2026] Feature: UI/UX Polish — Progressive Scroll Reveal & Interactive Animations (Zero Text Deleted)
+
+- **Symptom**: User noted that the homepage felt heavy with lots of text, and requested making it clean, attractive, and animated with better UI/UX without deleting any text or content.
+- **Root Cause**: All 14 sections were rendered as static blocks on initial load, causing cognitive overload and visual fatigue without scroll cues or progressive disclosure.
+- **Resolution**:
+  1. Created [`src/components/scroll-reveal.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/scroll-reveal.tsx) providing `<ScrollReveal>`, `<StaggerContainer>`, and `<StaggerItem>` leveraging Framer Motion's `useInView` for 60fps viewport-triggered animations.
+  2. Created [`src/components/count-up.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/count-up.tsx) providing `<CountUp>` with ease-out cubic interpolation for animated metrics across Dashboard and Stats sections.
+  3. Applied progressive reveal animations across all sections in [`src/app/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/page.tsx):
+     - Hero: Sequential cascading entrance (Badge → H1 → Subtitle → Lead → CTAs → Trust).
+     - Industries: 8 cards animated in a staggered wave entrance.
+     - Revenue & Growth Calculator: Header fadeUp, container scaleUp.
+     - Business Growth Dashboard: KPI numbers count up dynamically from 0; 3 growth pillars stagger into view.
+     - 3 Core Products: Staggered card entrance with interactive icon micro-rotations.
+     - Feature Comparison Table: Smooth scaleUp entrance.
+     - Why Merchants Choose: Staggered 2x2 pillar grid and comparison strip.
+     - How It Works: 3-step numbered cards with sequential entrance.
+     - Stats: All 4 metrics count up dynamically (`4.8L+`, `1,200+`, `34%`, `98.6%`).
+     - Testimonials & Pricing & CTA: Staggered card reveals and scaleUp CTA container.
+  4. Added `.section-separator` subtle gradient divider lines and `html { scroll-behavior: smooth; }`.
+  5. Verified 100% text content preserved with HTTP 200 response on `http://localhost:3000/`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Sep 2026] Feature: Synced Revenue & Growth Calculator Default Baseline to "The 96 Customers" Story Math
 
 - **Symptom**: User requested syncing the default values and visual 4-step math breakdown of the Revenue & Growth Calculator (`#roi`) to match the exact numbers from the 60-Second "The 96 Customers" story dialogue (Sureshbhai & Kamleshbhai).

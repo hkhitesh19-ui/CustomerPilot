@@ -19,6 +19,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BrandLogo } from "@/components/brand-logo"
 import { FaqSection } from "@/components/faq-section"
 import { AIReplySandbox } from "@/components/ai-reply-sandbox"
+import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/scroll-reveal"
+import { CountUp } from "@/components/count-up"
 
 // ============================================================
 // CustomerPilot V6.4 — Homepage & 9-Step Onboarding Activation
@@ -223,6 +225,7 @@ export default function Home() {
   return (
     <div className="hp-body font-sans text-slate-900 bg-white min-h-screen selection:bg-emerald-500 selection:text-white">
       <style>{`
+        html { scroll-behavior: smooth; }
         :root {
           --em:#10b981;--em-d:#059669;--sky:#0ea5e9;--ind:#6366f1;--ind-d:#4f46e5;
           --slate:#0f172a;--slate6:#475569;--slate5:#64748b;--slate4:#94a3b8;--slate3:#cbd5e1;
@@ -230,6 +233,9 @@ export default function Home() {
         }
         .wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         .grad-txt { background: linear-gradient(90deg, var(--em), var(--sky), var(--ind)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .section-separator { height: 1px; background: linear-gradient(90deg, transparent, #e2e8f0 20%, #cbd5e1 50%, #e2e8f0 80%, transparent); }
+        .fcard:hover .ico { transform: scale(1.1) rotate(-3deg); transition: transform 0.3s cubic-bezier(0.25,0.4,0.25,1); }
+        .fcard .ico { transition: transform 0.3s cubic-bezier(0.25,0.4,0.25,1); }
         .btn-grad { background: linear-gradient(90deg, var(--em), var(--ind)); color: #fff; box-shadow: 0 10px 25px -8px rgba(16,185,129,.5); }
         .btn-grad:hover { filter: brightness(1.08); transform: translateY(-1px); }
         .btn-white { background: #fff; color: var(--slate); box-shadow: 0 10px 25px -8px rgba(0,0,0,.25); }
@@ -592,19 +598,28 @@ export default function Home() {
         <div className="wrap">
           <div className="hero-grid">
             <div>
+              <ScrollReveal variant="fadeDown" delay={0.1} duration={0.7}>
               <span className="badge">
                 <span className="dot-live"><i></i><i></i></span> India&apos;s #1 Customer Retention Platform for Local Businesses
               </span>
+              </ScrollReveal>
+              <ScrollReveal variant="fadeUp" delay={0.25} duration={0.8}>
               <h1 className="hero-h">
                 Turn Every Walk-in<br />
                 <span className="grad-txt">Into a Lifetime Customer.</span>
               </h1>
+              </ScrollReveal>
+              <ScrollReveal variant="fadeUp" delay={0.4} duration={0.6}>
               <p className="mt-4 text-base sm:text-lg font-bold text-slate-800 tracking-tight">
                 Bring Your Customers Back. Get More Google Reviews. Reply Automatically.
               </p>
+              </ScrollReveal>
+              <ScrollReveal variant="fadeUp" delay={0.5} duration={0.6}>
               <p className="lead mt-2">
                 CustomerPilot helps local businesses bring customers back with loyalty rewards, AI-powered Google Review assistance, and automated review replies — without requiring customers to download an app.
               </p>
+              </ScrollReveal>
+              <ScrollReveal variant="fadeUp" delay={0.6} duration={0.6}>
               <div className="btn-row flex flex-col gap-3">
                 <Link href="/signup" className="btn btn-grad py-3.5 sm:py-4 px-6 sm:px-7 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/20 transition-all">
                   <span>Start 7-Day Free Trial (CustomerPilot Complete)</span> <span className="arrow">→</span>
@@ -626,11 +641,14 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
+              </ScrollReveal>
+              <ScrollReveal variant="fadeUp" delay={0.75} duration={0.5}>
               <div className="trust">
                 <span><span className="ck">✓</span> No credit card required</span>
                 <span><span className="ck">✓</span> Setup in 2 minutes</span>
                 <span><span className="ck">✓</span> 7-Day full access</span>
               </div>
+              </ScrollReveal>
             </div>
 
             {/* Phone Mockup with Animated Chat */}
@@ -671,13 +689,16 @@ export default function Home() {
       {/* ============ BUILT FOR EVERY LOCAL BUSINESS (Item 9) ============ */}
       <section id="industries" className="py-20 bg-slate-50/70 border-b border-slate-200/60">
         <div className="wrap">
+          <ScrollReveal variant="fadeUp">
           <div className="sec-head">
             <span className="eyebrow">Industry Solutions</span>
             <h2 className="sec-h">Built for Every Local Business</h2>
             <p className="sec-sub">Works with your existing billing. Cash, UPI, Card, or No Bill.</p>
           </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-12">
+          <StaggerContainer staggerDelay={0.07} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-12">
+            <StaggerItem variant="fadeUp">
             <Link href="/bakery-loyalty" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
               <div className="text-3xl mb-3">🎂</div>
               <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Bakeries & Cakes</h3>
@@ -688,7 +709,9 @@ export default function Home() {
                 Explore Bakery Solution →
               </span>
             </Link>
+            </StaggerItem>
 
+            <StaggerItem variant="fadeUp">
             <Link href="/cafe-loyalty" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
               <div className="text-3xl mb-3">☕</div>
               <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Cafes & Coffee Bars</h3>
@@ -699,7 +722,9 @@ export default function Home() {
                 Explore Cafe Solution →
               </span>
             </Link>
+            </StaggerItem>
 
+            <StaggerItem variant="fadeUp">
             <Link href="/restaurant-loyalty" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
               <div className="text-3xl mb-3">🍽️</div>
               <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Restaurants & Dining</h3>
@@ -710,7 +735,9 @@ export default function Home() {
                 Explore Restaurant Solution →
               </span>
             </Link>
+            </StaggerItem>
 
+            <StaggerItem variant="fadeUp">
             <Link href="/salon-loyalty" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
               <div className="text-3xl mb-3">💇</div>
               <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Salons & Spas</h3>
@@ -721,7 +748,9 @@ export default function Home() {
                 Explore Salon Solution →
               </span>
             </Link>
+            </StaggerItem>
 
+            <StaggerItem variant="fadeUp">
             <Link href="/signup" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
               <div className="text-3xl mb-3">🛍️</div>
               <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Retail & Boutiques</h3>
@@ -732,7 +761,9 @@ export default function Home() {
                 Start Retail Free Trial →
               </span>
             </Link>
+            </StaggerItem>
 
+            <StaggerItem variant="fadeUp">
             <Link href="/bakery-loyalty" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
               <div className="text-3xl mb-3">🍬</div>
               <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Sweet Shops & Mithai</h3>
@@ -743,7 +774,9 @@ export default function Home() {
                 Explore Mithai Solution →
               </span>
             </Link>
+            </StaggerItem>
 
+            <StaggerItem variant="fadeUp">
             <Link href="/signup" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
               <div className="text-3xl mb-3">🏥</div>
               <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Clinics & Dental</h3>
@@ -754,7 +787,9 @@ export default function Home() {
                 Start Clinic Free Trial →
               </span>
             </Link>
+            </StaggerItem>
 
+            <StaggerItem variant="fadeUp">
             <Link href="/signup" className="group p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all">
               <div className="text-3xl mb-3">💪</div>
               <h3 className="font-bold text-slate-900 text-lg group-hover:text-emerald-600 transition">Gyms & Fitness</h3>
@@ -765,13 +800,17 @@ export default function Home() {
                 Start Fitness Free Trial →
               </span>
             </Link>
-          </div>
+            </StaggerItem>
+          </StaggerContainer>
         </div>
       </section>
+
+      <div className="section-separator" />
 
       {/* ============ REVENUE & GROWTH CALCULATOR ============ */}
       <section id="roi" className="py-20 bg-white">
         <div className="wrap">
+          <ScrollReveal variant="fadeUp">
           <div className="sec-head max-w-3xl mx-auto text-center">
             <span className="eyebrow inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-extrabold text-xs shadow-xs">
               📊 Calculate Your Store ROI
@@ -783,8 +822,9 @@ export default function Home() {
               See how much extra monthly revenue CustomerPilot can generate for your shop.
             </p>
           </div>
+          </ScrollReveal>
 
-          <div className="max-w-5xl mx-auto mt-12 bg-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800 space-y-10">
+          <ScrollReveal variant="scaleUp" delay={0.15}>
             {/* 2-Column Calculator Grid */}
             <div className="grid md:grid-cols-12 gap-8 items-center">
               {/* Inputs (7 cols) */}
@@ -973,14 +1013,16 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
-      
+      <div className="section-separator" />
+
       {/* ============ BUSINESS GROWTH DASHBOARD SECTION ============ */}
       <section className="py-20 bg-white border-t border-slate-200/80" id="growth-insights">
         <div className="wrap">
+          <ScrollReveal variant="fadeUp">
           <div className="sec-head max-w-3xl mx-auto text-center">
             <span className="eyebrow inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-extrabold text-xs shadow-xs">
               📊 Business Growth Intelligence
@@ -992,8 +1034,10 @@ export default function Home() {
               CustomerPilot shows you the numbers that actually drive profit: customer growth, repeat visits, loyalty activity, and Google reputation — all in one simple view.
             </p>
           </div>
+          </ScrollReveal>
 
           {/* Clean Dashboard Snapshot Container */}
+          <ScrollReveal variant="scaleUp" delay={0.15}>
           <div className="max-w-5xl mx-auto mt-12 bg-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800 space-y-8">
             {/* Top Bar of the Dashboard Mockup */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
@@ -1014,21 +1058,21 @@ export default function Home() {
               {/* Card 1: Customer Growth */}
               <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700/80 space-y-1 hover:border-slate-600 transition">
                 <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Customer Growth</div>
-                <div className="text-xl sm:text-2xl font-black text-white">1,248</div>
+                <div className="text-xl sm:text-2xl font-black text-white"><CountUp end={1248} duration={2} separator="," /></div>
                 <div className="text-[10px] font-bold text-emerald-400">↑ 18% this month</div>
               </div>
 
               {/* Card 2: Returning Customers */}
               <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700/80 space-y-1 hover:border-slate-600 transition">
                 <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Returning Regulars</div>
-                <div className="text-xl sm:text-2xl font-black text-white">486</div>
+                <div className="text-xl sm:text-2xl font-black text-white"><CountUp end={486} duration={1.8} separator="," /></div>
                 <div className="text-[10px] font-bold text-emerald-400">↑ 12% this month</div>
               </div>
 
               {/* Card 3: Loyalty Members */}
               <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700/80 space-y-1 hover:border-slate-600 transition">
                 <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Loyalty Members</div>
-                <div className="text-xl sm:text-2xl font-black text-white">732</div>
+                <div className="text-xl sm:text-2xl font-black text-white"><CountUp end={732} duration={1.8} separator="," /></div>
                 <div className="text-[10px] font-bold text-slate-400">58% of customers</div>
               </div>
 
@@ -1036,7 +1080,7 @@ export default function Home() {
               <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700/80 space-y-1 hover:border-slate-600 transition">
                 <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Google Reviews</div>
                 <div className="text-xl sm:text-2xl font-black text-amber-400 flex items-center gap-1">
-                  4.8 <span className="text-sm">★</span>
+                  <CountUp end={4.8} decimals={1} duration={1.5} /> <span className="text-sm">★</span>
                 </div>
                 <div className="text-[10px] font-bold text-emerald-400">+64 new reviews</div>
               </div>
@@ -1044,14 +1088,14 @@ export default function Home() {
               {/* Card 5: Repeat Visits */}
               <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700/80 space-y-1 hover:border-slate-600 transition">
                 <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Repeat Visits</div>
-                <div className="text-xl sm:text-2xl font-black text-white">326</div>
+                <div className="text-xl sm:text-2xl font-black text-white"><CountUp end={326} duration={1.8} separator="," /></div>
                 <div className="text-[10px] font-bold text-emerald-400">This Month</div>
               </div>
 
               {/* Card 6: Rewards Redeemed */}
               <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700/80 space-y-1 hover:border-slate-600 transition">
                 <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Rewards Claimed</div>
-                <div className="text-xl sm:text-2xl font-black text-emerald-400">184</div>
+                <div className="text-xl sm:text-2xl font-black text-emerald-400"><CountUp end={184} duration={1.8} separator="," /></div>
                 <div className="text-[10px] font-bold text-slate-300">Customers Returned</div>
               </div>
             </div>
@@ -1081,11 +1125,13 @@ export default function Home() {
               </div>
             </div>
           </div>
+          </ScrollReveal>
 
           {/* 3 Growth Pillars (Actionable Explanations Below the Mockup) */}
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-10">
+          <StaggerContainer staggerDelay={0.12} className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-10">
             {/* Pillar 1: Track Repeat Business & Inactivity */}
-            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 space-y-3 hover:shadow-lg transition">
+            <StaggerItem variant="fadeUp">
+            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 space-y-3 hover:shadow-lg transition h-full">
               <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-xl">
                 🔄
               </div>
@@ -1094,9 +1140,11 @@ export default function Home() {
                 Know which customers are active regulars and which are becoming inactive. Trigger automated 14-day WhatsApp win-backs before you lose them to competitors.
               </p>
             </div>
+            </StaggerItem>
 
             {/* Pillar 2: Measure Loyalty Program ROI */}
-            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 space-y-3 hover:shadow-lg transition">
+            <StaggerItem variant="fadeUp">
+            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 space-y-3 hover:shadow-lg transition h-full">
               <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-xl">
                 🎁
               </div>
@@ -1105,9 +1153,11 @@ export default function Home() {
                 Track exact stamps collected, rewards earned, and free items redeemed. Understand which perks bring back the most customers without eroding your margins.
               </p>
             </div>
+            </StaggerItem>
 
             {/* Pillar 3: Monitor Google Reputation & 1-Click AutoReplies */}
-            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 space-y-3 hover:shadow-lg transition">
+            <StaggerItem variant="fadeUp">
+            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 space-y-3 hover:shadow-lg transition h-full">
               <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-xl">
                 ⭐
               </div>
@@ -1116,21 +1166,28 @@ export default function Home() {
                 Watch your 5-star review count climb every week. Ensure 100% of reviews get an AI-drafted owner response in 1-Click to rank higher on Google Maps.
               </p>
             </div>
-          </div>
+            </StaggerItem>
+          </StaggerContainer>
         </div>
       </section>
+
+      <div className="section-separator" />
 
       {/* ============ FEATURES (The 3 Core Products) ============ */}
       <section className="feat bg-slate-50/50" id="features">
         <div className="wrap">
+          <ScrollReveal variant="fadeUp">
           <div className="sec-head">
             <span className="eyebrow">Three Core Engines</span>
             <h2 className="sec-h">Everything Your Store Needs.<br/><span style={{ color: '#94a3b8' }}>Nothing It Doesn&apos;t.</span></h2>
             <p className="sec-sub">Bring customers back, collect verified 5-star Google reviews, and auto-reply to every customer — all inside WhatsApp.</p>
           </div>
-          <div className="feat-grid">
+          </ScrollReveal>
+
+          <StaggerContainer staggerDelay={0.15} className="feat-grid">
             {/* Product 1: Digital Loyalty Stamps */}
-            <div className="fcard">
+            <StaggerItem variant="fadeUp" className="h-full flex flex-col">
+            <div className="fcard h-full flex flex-col">
               <div className="flex items-center justify-between">
                 <div className="ico amber">🏆</div>
                 <span className="text-[10px] bg-amber-50 text-amber-800 border border-amber-200 font-bold px-2.5 py-1 rounded-full">
@@ -1155,9 +1212,11 @@ export default function Home() {
                 <span>Start 7-Day Free Trial</span> <span>→</span>
               </Link>
             </div>
+            </StaggerItem>
 
             {/* Product 2: Smart Google Reviews */}
-            <div className="fcard">
+            <StaggerItem variant="fadeUp" className="h-full flex flex-col">
+            <div className="fcard h-full flex flex-col">
               <div className="flex items-center justify-between">
                 <div className="ico em">⭐</div>
                 <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold px-2.5 py-1 rounded-full">
@@ -1181,9 +1240,11 @@ export default function Home() {
                 <span>Start 7-Day Free Trial</span> <span>→</span>
               </Link>
             </div>
+            </StaggerItem>
 
             {/* Product 3: 1-Click AI AutoReply */}
-            <div className="fcard">
+            <StaggerItem variant="fadeUp" className="h-full flex flex-col">
+            <div className="fcard h-full flex flex-col">
               <div className="flex items-center justify-between">
                 <div className="ico ind">💬</div>
                 <span className="text-[10px] bg-indigo-50 text-indigo-800 border border-indigo-200 font-bold px-2.5 py-1 rounded-full">
@@ -1206,7 +1267,8 @@ export default function Home() {
                 <span>Start 7-Day Free Trial</span> <span>→</span>
               </Link>
             </div>
-          </div>
+            </StaggerItem>
+          </StaggerContainer>
         </div>
       </section>
 
@@ -1220,6 +1282,7 @@ export default function Home() {
         <div className="absolute bottom-10 right-10 w-[400px] h-[300px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="wrap max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+          <ScrollReveal variant="fadeUp">
           <div className="sec-head max-w-3xl mx-auto text-center space-y-3">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-extrabold text-xs tracking-wide shadow-inner">
               <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
@@ -1232,8 +1295,10 @@ export default function Home() {
               Why buy partial tools? See why <strong className="text-emerald-400">94% of merchants choose the Complete Suite</strong> to connect WhatsApp loyalty, Google 5★ reviews, and automated replies into a single revenue engine.
             </p>
           </div>
+          </ScrollReveal>
 
           {/* Table Container */}
+          <ScrollReveal variant="scaleUp" delay={0.15}>
           <div className="mt-14 overflow-x-auto rounded-3xl border border-slate-700/80 shadow-2xl bg-slate-950/90 backdrop-blur-md">
             <table className="w-full text-left border-collapse min-w-[860px]">
               <thead>
@@ -1509,13 +1574,16 @@ export default function Home() {
               </tfoot>
             </table>
           </div>
+          </ScrollReveal>
         </div>
       </section>
 
-      
+      <div className="section-separator" />
+
       {/* ============ WHY MERCHANTS CHOOSE CUSTOMERPILOT (New High-Impact Section) ============ */}
       <section className="py-20 bg-slate-50 border-y border-slate-200/80" id="why-merchants">
         <div className="wrap">
+          <ScrollReveal variant="fadeUp">
           <div className="sec-head max-w-3xl mx-auto text-center">
             <span className="eyebrow inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-extrabold text-xs shadow-xs">
               ⚡ Store Owner Advantage
@@ -1527,11 +1595,13 @@ export default function Home() {
               Designed to retain your walk-ins, save staff time, and automate 5-star reputation on Google Maps.
             </p>
           </div>
+          </ScrollReveal>
 
           {/* 4 Pillars Grid */}
-          <div className="grid md:grid-cols-2 gap-6 mt-12">
+          <StaggerContainer staggerDelay={0.12} className="grid md:grid-cols-2 gap-6 mt-12">
             {/* Pillar 1: 100% App-Free Customer Retention */}
-            <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all space-y-4">
+            <StaggerItem variant="fadeUp">
+            <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all space-y-4 h-full">
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center text-2xl font-bold">
                   🎁
@@ -1559,9 +1629,11 @@ export default function Home() {
                 </li>
               </ul>
             </div>
+            </StaggerItem>
 
             {/* Pillar 2: 1-Click Google Maps Reputation Engine */}
-            <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all space-y-4">
+            <StaggerItem variant="fadeUp">
+            <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all space-y-4 h-full">
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center text-2xl font-bold">
                   ⭐
@@ -1589,9 +1661,11 @@ export default function Home() {
                 </li>
               </ul>
             </div>
+            </StaggerItem>
 
             {/* Pillar 3: 98% Open-Rate WhatsApp Marketing */}
-            <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all space-y-4">
+            <StaggerItem variant="fadeUp">
+            <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all space-y-4 h-full">
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center text-2xl font-bold">
                   📱
@@ -1619,9 +1693,11 @@ export default function Home() {
                 </li>
               </ul>
             </div>
+            </StaggerItem>
 
             {/* Pillar 4: Zero Staff Friction (5-Second Cashier Tap) */}
-            <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all space-y-4">
+            <StaggerItem variant="fadeUp">
+            <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-xl hover:border-slate-300 transition-all space-y-4 h-full">
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center text-2xl font-bold">
                   ⏱️
@@ -1649,9 +1725,11 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-          </div>
+            </StaggerItem>
+          </StaggerContainer>
 
           {/* Quick Comparison Strip */}
+          <ScrollReveal variant="fadeUp" delay={0.2}>
           <div className="mt-10 p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="space-y-1 text-center md:text-left">
               <h4 className="font-extrabold text-slate-900 text-lg">Traditional Methods vs. CustomerPilot</h4>
@@ -1663,84 +1741,144 @@ export default function Home() {
               </Button>
             </Link>
           </div>
+          </ScrollReveal>
         </div>
       </section>
+
+      <div className="section-separator" />
 
       {/* ============ HOW IT WORKS ============ */}
       <section className="how" id="how">
         <div className="wrap">
+          <ScrollReveal variant="fadeUp">
           <div className="sec-head">
             <span className="eyebrow">3 simple steps</span>
             <h2 className="sec-h text-white">5 Seconds. That&apos;s It.</h2>
           </div>
-          <div className="steps">
+          </ScrollReveal>
+          <StaggerContainer staggerDelay={0.15} className="steps">
+            <StaggerItem variant="fadeUp">
             <div className="step">
               <div className="num" style={{ background: 'linear-gradient(135deg,#34d399,#10b981)' }}>🛒</div>
               <div className="tag">Step 1</div>
               <h3>Customer purchases</h3>
               <p>A customer buys from your shop. You ask them to scan the counter QR standee.</p>
             </div>
+            </StaggerItem>
+
+            <StaggerItem variant="fadeUp">
             <div className="step">
               <div className="num" style={{ background: 'linear-gradient(135deg,#60a5fa,#0ea5e9)' }}>📱</div>
               <div className="tag">Step 2</div>
               <h3>WhatsApp Opens</h3>
               <p>CustomerPilot opens WhatsApp, registers their stamp in 5 seconds, and invites a 5★ review.</p>
             </div>
+            </StaggerItem>
+
+            <StaggerItem variant="fadeUp">
             <div className="step">
               <div className="num" style={{ background: 'linear-gradient(135deg,#818cf8,#6366f1)' }}>🔄</div>
               <div className="tag">Step 3</div>
               <h3>They come back</h3>
               <p>Stamps, reward perks, and automated win-back reminders keep your customers returning.</p>
             </div>
-          </div>
+            </StaggerItem>
+          </StaggerContainer>
         </div>
       </section>
+
+      <div className="section-separator" />
 
       {/* ============ STATS ============ */}
       <section className="stats">
         <div className="wrap">
-          <div className="stats-grid">
-            <div className="stat"><div className="v">4.8L+</div><div className="l">Reviews collected</div></div>
-            <div className="stat"><div className="v">1,200+</div><div className="l">Active merchants</div></div>
-            <div className="stat"><div className="v">34%</div><div className="l">Avg. conversion</div></div>
-            <div className="stat"><div className="v">98.6%</div><div className="l">Delivery rate</div></div>
-          </div>
+          <StaggerContainer staggerDelay={0.1} className="stats-grid">
+            <StaggerItem variant="scaleUp">
+            <div className="stat">
+              <div className="v"><CountUp end={4.8} decimals={1} duration={2} suffix="L+" /></div>
+              <div className="l">Reviews collected</div>
+            </div>
+            </StaggerItem>
+
+            <StaggerItem variant="scaleUp">
+            <div className="stat">
+              <div className="v"><CountUp end={1200} duration={2} separator="," suffix="+" /></div>
+              <div className="l">Active merchants</div>
+            </div>
+            </StaggerItem>
+
+            <StaggerItem variant="scaleUp">
+            <div className="stat">
+              <div className="v"><CountUp end={34} duration={1.8} suffix="%" /></div>
+              <div className="l">Avg. conversion</div>
+            </div>
+            </StaggerItem>
+
+            <StaggerItem variant="scaleUp">
+            <div className="stat">
+              <div className="v"><CountUp end={98.6} decimals={1} duration={1.8} suffix="%" /></div>
+              <div className="l">Delivery rate</div>
+            </div>
+            </StaggerItem>
+          </StaggerContainer>
         </div>
       </section>
+
+      <div className="section-separator" />
 
       {/* ============ TESTIMONIALS ============ */}
       <section className="testi">
         <div className="wrap">
+          <ScrollReveal variant="fadeUp">
           <div className="sec-head">
             <span className="eyebrow">⭐ 4.9 from 1,200+ merchants</span>
             <h2 className="sec-h">Results shops can feel.</h2>
           </div>
-          <div className="tgrid">
-            <div className="tcard">
-              <div className="ttop"><span className="qmark">&quot;</span><span className="metric">+925% reviews</span></div>
-              <div className="tstars">★★★★★</div>
-              <blockquote>40 → 410 Google reviews in 3 months. CustomerPilot keeps customers coming back with stamps &amp; rewards. My clinic is busier than ever.</blockquote>
+          </ScrollReveal>
+
+          <StaggerContainer staggerDelay={0.12} className="tgrid">
+            <StaggerItem variant="fadeUp">
+            <div className="tcard h-full flex flex-col justify-between">
+              <div>
+                <div className="ttop"><span className="qmark">&quot;</span><span className="metric">+925% reviews</span></div>
+                <div className="tstars">★★★★★</div>
+                <blockquote>40 → 410 Google reviews in 3 months. CustomerPilot keeps customers coming back with stamps &amp; rewards. My clinic is busier than ever.</blockquote>
+              </div>
               <div className="tauthor"><div className="a" style={{ background: 'linear-gradient(135deg,#fb7185,#ec4899)' }}>AM</div><div><div className="n">Dr. Anita Mehta</div><div className="r">Owner, Sunrise Dental</div></div></div>
             </div>
-            <div className="tcard">
-              <div className="ttop"><span className="qmark">&quot;</span><span className="metric">Weekly returns</span></div>
-              <div className="tstars">★★★★★</div>
-              <blockquote>Customers love scanning the QR. The loyalty stamps bring them back every week. It feels like one simple tool — not three.</blockquote>
+            </StaggerItem>
+
+            <StaggerItem variant="fadeUp">
+            <div className="tcard h-full flex flex-col justify-between">
+              <div>
+                <div className="ttop"><span className="qmark">&quot;</span><span className="metric">Weekly returns</span></div>
+                <div className="tstars">★★★★★</div>
+                <blockquote>Customers love scanning the QR. The loyalty stamps bring them back every week. It feels like one simple tool — not three.</blockquote>
+              </div>
               <div className="tauthor"><div className="a" style={{ background: 'linear-gradient(135deg,#fbbf24,#f59e0b)' }}>MR</div><div><div className="n">Marco Rossi</div><div className="r">Founder, Urban Brew Café</div></div></div>
             </div>
-            <div className="tcard">
-              <div className="ttop"><span className="qmark">&quot;</span><span className="metric">5-min setup</span></div>
-              <div className="tstars">★★★★★</div>
-              <blockquote>Every Google review gets a reply instantly. My customers feel heard, and I never miss one anymore. Setup took 5 minutes.</blockquote>
+            </StaggerItem>
+
+            <StaggerItem variant="fadeUp">
+            <div className="tcard h-full flex flex-col justify-between">
+              <div>
+                <div className="ttop"><span className="qmark">&quot;</span><span className="metric">5-min setup</span></div>
+                <div className="tstars">★★★★★</div>
+                <blockquote>Every Google review gets a reply instantly. My customers feel heard, and I never miss one anymore. Setup took 5 minutes.</blockquote>
+              </div>
               <div className="tauthor"><div className="a" style={{ background: 'linear-gradient(135deg,#c084fc,#8b5cf6)' }}>SL</div><div><div className="n">Sara Lin</div><div className="r">Manager, Glow Salon</div></div></div>
             </div>
-          </div>
+            </StaggerItem>
+          </StaggerContainer>
         </div>
       </section>
+
+      <div className="section-separator" />
 
       {/* ============ PRICING REDIRECT BANNER ============ */}
       <section className="price py-16 bg-white border-t border-slate-200/60" id="pricing">
         <div className="wrap">
+          <ScrollReveal variant="fadeUp">
           <div className="sec-head">
             <span className="eyebrow" style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fee2e2', fontWeight: 800 }}>
               🔥 Limited Time 50% Discount Offer · Flat 50% OFF All Plans
@@ -1753,12 +1891,16 @@ export default function Home() {
               <span>View Master 50% Discount Pricing Table ➔</span>
             </Link>
           </div>
+          </ScrollReveal>
         </div>
       </section>
+
+      <div className="section-separator" />
 
       {/* ============ CTA ============ */}
       <section className="cta-sec">
         <div className="wrap">
+          <ScrollReveal variant="scaleUp">
           <div className="cta">
             <div className="aurora2"><b></b><b></b></div>
             <div className="ct">
@@ -1771,6 +1913,7 @@ export default function Home() {
               </div>
             </div>
           </div>
+          </ScrollReveal>
         </div>
       </section>
 
