@@ -236,6 +236,10 @@ export default function Home() {
         .section-separator { height: 1px; background: linear-gradient(90deg, transparent, #e2e8f0 20%, #cbd5e1 50%, #e2e8f0 80%, transparent); }
         .fcard:hover .ico { transform: scale(1.1) rotate(-3deg); transition: transform 0.3s cubic-bezier(0.25,0.4,0.25,1); }
         .fcard .ico { transition: transform 0.3s cubic-bezier(0.25,0.4,0.25,1); }
+        .calc-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; background: #1e293b; border-radius: 999px; outline: none; border: 1px solid rgba(255,255,255,0.08); }
+        .calc-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #34d399, #10b981); border: 3px solid #0f172a; cursor: pointer; box-shadow: 0 0 14px rgba(16,185,129,0.7); transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        .calc-slider::-webkit-slider-thumb:hover { transform: scale(1.18); box-shadow: 0 0 20px rgba(16,185,129,0.9); }
+        .calc-slider::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #34d399, #10b981); border: 3px solid #0f172a; cursor: pointer; box-shadow: 0 0 14px rgba(16,185,129,0.7); }
         .btn-grad { background: linear-gradient(90deg, var(--em), var(--ind)); color: #fff; box-shadow: 0 10px 25px -8px rgba(16,185,129,.5); }
         .btn-grad:hover { filter: brightness(1.08); transform: translateY(-1px); }
         .btn-white { background: #fff; color: var(--slate); box-shadow: 0 10px 25px -8px rgba(0,0,0,.25); }
@@ -382,19 +386,6 @@ export default function Home() {
         @media(min-width:640px){ .cta h2 { font-size: 42px; } }
         .cta p { color: #94a3b8; font-size: 16px; margin: 14px auto 0; max-width: 440px; }
         .cta .btn-row { margin-top: 28px; justify-content: center; }
-
-        footer { border-top: 1px solid var(--line); background: #f8fafc; padding: 50px 0 30px; }
-        .fgrid { display: grid; grid-template-columns: 1fr; gap: 32px; }
-        @media(min-width:640px){ .fgrid { grid-template-columns: repeat(2, 1fr); } }
-        @media(min-width:960px){ .fgrid { grid-template-columns: 2fr 1fr 1fr 1fr; } }
-        .fbrand p { color: var(--slate5); font-size: 13px; margin-top: 14px; max-width: 320px; line-height: 1.6; }
-        .frate { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 6px 12px; margin-top: 14px; font-size: 13px; font-weight: 600; color: var(--slate6); }
-        footer h4 { font-size: 13px; font-weight: 800; color: var(--slate); text-transform: uppercase; letter-spacing: .05em; }
-        footer ul { list-style: none; margin-top: 12px; }
-        footer ul li { margin-bottom: 8px; }
-        footer ul a { font-size: 13px; color: var(--slate5); text-decoration: none; transition: color .15s; }
-        footer ul a:hover { color: var(--em-d); }
-        .fbottom { border-top: 1px solid var(--line); margin-top: 40px; padding-top: 24px; text-align: center; color: var(--slate4); font-size: 13px; }
       `}</style>
 
       {/* ============ FIXED STICKY NAVBAR ============ */}
@@ -825,191 +816,207 @@ export default function Home() {
           </ScrollReveal>
 
           <ScrollReveal variant="scaleUp" delay={0.15}>
-            {/* 2-Column Calculator Grid */}
-            <div className="grid md:grid-cols-12 gap-8 items-center">
-              {/* Inputs (7 cols) */}
-              <div className="md:col-span-7 space-y-6">
-                <div className="bg-slate-800/60 p-4 sm:p-5 rounded-2xl border border-slate-700/60 space-y-2">
-                  <div className="flex justify-between items-baseline text-xs font-semibold text-slate-300">
-                    <span className="flex items-center gap-1.5">
-                      <span>🚶</span> Daily Store Customers:
-                    </span>
-                    <span className="text-emerald-400 font-bold text-sm">
-                      {roiDailyCustomers} / day <span className="text-slate-400 text-xs font-normal">({roiData.monthlyCustomers.toLocaleString("en-IN")} / mo)</span>
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="10"
-                    max="200"
-                    step="2"
-                    value={roiDailyCustomers}
-                    onChange={(e) => setRoiDailyCustomers(e.target.value)}
-                    className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-                  />
-                  <div className="flex justify-between text-[10px] text-slate-400 font-semibold">
-                    <span>10/day (300/mo)</span>
-                    <span className="text-emerald-400 font-bold">32/day (960/mo · Sureshbhai)</span>
-                    <span>200/day (6,000/mo)</span>
-                  </div>
-                </div>
+            <div className="max-w-5xl mx-auto mt-12 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800/90 relative overflow-hidden">
+              {/* Subtle background ambient glow */}
+              <div className="absolute -top-32 -right-32 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
-                <div className="bg-slate-800/60 p-4 sm:p-5 rounded-2xl border border-slate-700/60 space-y-2">
-                  <div className="flex justify-between items-baseline text-xs font-semibold text-slate-300">
-                    <span className="flex items-center gap-1.5">
-                      <span>💳</span> Average Bill Amount (₹):
-                    </span>
-                    <span className="text-emerald-400 font-bold text-sm">₹{roiAvgBill}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="100"
-                    max="3000"
-                    step="50"
-                    value={roiAvgBill}
-                    onChange={(e) => setRoiAvgBill(e.target.value)}
-                    className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-                  />
-                  <div className="flex justify-between text-[10px] text-slate-400 font-semibold">
-                    <span>₹100</span>
-                    <span className="text-emerald-400 font-bold">₹200 (Restaurant / Cafe)</span>
-                    <span>₹3,000 (Salon / Retail)</span>
-                  </div>
-                </div>
-
-                <div className="bg-slate-800/60 p-4 sm:p-5 rounded-2xl border border-slate-700/60 space-y-2">
-                  <div className="flex justify-between items-baseline text-xs font-semibold text-slate-300">
-                    <span className="flex items-center gap-1.5">
-                      <span>🎯</span> Lost Customer Recovery Target:
-                    </span>
-                    <span className="text-emerald-400 font-bold text-sm">
-                      {roiRecoveryRate}% <span className="text-slate-400 text-xs font-normal">(+{roiData.recoveredCustomers} recovered customers)</span>
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="10"
-                    max="80"
-                    step="5"
-                    value={roiRecoveryRate}
-                    onChange={(e) => setRoiRecoveryRate(e.target.value)}
-                    className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-                  />
-                  <div className="flex justify-between text-[10px] text-slate-400 font-semibold">
-                    <span className="text-emerald-400 font-bold">20% (The 96 Customers)</span>
-                    <span>50% (Standard)</span>
-                    <span>80% (Aggressive)</span>
-                  </div>
-                </div>
-
-                <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-[11px] text-slate-400 flex items-center gap-2">
-                  <span className="text-base">💡</span>
-                  <span>
-                    Baseline: <b className="text-slate-200">{roiData.monthlyCustomers} monthly walk-ins</b> at <b className="text-slate-200">₹{roiAvgBill} avg bill</b> = ₹{(roiData.monthlyCustomers * (parseInt(roiAvgBill) || 0)).toLocaleString("en-IN")}/mo sales. Recovering just <b className="text-emerald-300">{roiData.recoveredCustomers} customers</b> generates <b className="text-emerald-300">+₹{roiData.additionalMonthlySales.toLocaleString("en-IN")}/mo</b> extra revenue!
-                  </span>
-                </div>
-              </div>
-
-              {/* Output Result Card (5 cols) */}
-              <div className="md:col-span-5 bg-gradient-to-b from-emerald-950/80 via-slate-800/90 to-slate-900 border-2 border-emerald-500/60 rounded-2xl p-6 sm:p-7 flex flex-col justify-between space-y-5 relative shadow-xl">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-[10px] rounded-full uppercase tracking-wider shadow-sm whitespace-nowrap">
-                  🔥 The 96 Customers Impact
-                </div>
-
-                <div className="space-y-4 pt-1">
-                  <div>
-                    <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Additional Monthly Sales</div>
-                    <div className="text-3xl sm:text-4xl font-black text-emerald-400 mt-0.5">
-                      +₹{roiData.additionalMonthlySales.toLocaleString("en-IN")}
-                      <span className="text-xs text-slate-400 font-normal ml-1">/ month</span>
+              {/* 2-Column Calculator Grid */}
+              <div className="grid md:grid-cols-12 gap-8 items-center relative z-10">
+                {/* Inputs (7 cols) */}
+                <div className="md:col-span-7 space-y-5">
+                  {/* Slider 1: Daily Walk-ins */}
+                  <div className="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 hover:border-slate-700 transition shadow-inner space-y-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="flex items-center gap-2 font-bold text-slate-300 uppercase tracking-wider text-[11px]">
+                        <span className="text-base">🚶</span> Daily Store Customers:
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 font-black text-sm">
+                        {roiDailyCustomers} / day <span className="text-slate-400 text-xs font-normal">({roiData.monthlyCustomers.toLocaleString("en-IN")}/mo)</span>
+                      </span>
                     </div>
-                    <div className="text-[10px] text-emerald-300 mt-0.5 font-semibold">
-                      ({roiData.recoveredCustomers} repeat customers × ₹{roiAvgBill} avg bill = +₹{roiData.additionalMonthlySales.toLocaleString("en-IN")}/mo)
+                    <input
+                      type="range"
+                      min="10"
+                      max="200"
+                      step="2"
+                      value={roiDailyCustomers}
+                      onChange={(e) => setRoiDailyCustomers(e.target.value)}
+                      className="calc-slider"
+                    />
+                    <div className="flex justify-between text-[10px] text-slate-400 font-semibold pt-1">
+                      <span>10/day (300/mo)</span>
+                      <span className="text-emerald-400 font-extrabold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">32/day (960/mo · Sureshbhai)</span>
+                      <span>200/day (6,000/mo)</span>
                     </div>
                   </div>
 
-                  <div className="border-t border-slate-700/80 pt-3">
-                    <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Annual Revenue Potential</div>
-                    <div className="text-2xl sm:text-3xl font-black text-white mt-0.5">
-                      +₹{(roiData.additionalAnnualSales / 100000).toFixed(2)} Lakh
-                      <span className="text-xs text-slate-400 font-normal ml-1">/ year (+₹{roiData.additionalAnnualSales.toLocaleString("en-IN")})</span>
+                  {/* Slider 2: Average Bill */}
+                  <div className="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 hover:border-slate-700 transition shadow-inner space-y-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="flex items-center gap-2 font-bold text-slate-300 uppercase tracking-wider text-[11px]">
+                        <span className="text-base">💳</span> Average Bill Amount (₹):
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 font-black text-sm">
+                        ₹{roiAvgBill}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="100"
+                      max="3000"
+                      step="50"
+                      value={roiAvgBill}
+                      onChange={(e) => setRoiAvgBill(e.target.value)}
+                      className="calc-slider"
+                    />
+                    <div className="flex justify-between text-[10px] text-slate-400 font-semibold pt-1">
+                      <span>₹100</span>
+                      <span className="text-emerald-400 font-extrabold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">₹200 (Restaurant / Cafe)</span>
+                      <span>₹3,000 (Salon / Retail)</span>
                     </div>
                   </div>
 
-                  <div className="border-t border-slate-700/80 pt-3 flex items-center justify-between">
+                  {/* Slider 3: Recovery Rate */}
+                  <div className="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 hover:border-slate-700 transition shadow-inner space-y-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="flex items-center gap-2 font-bold text-slate-300 uppercase tracking-wider text-[11px]">
+                        <span className="text-base">🎯</span> Lost Customer Recovery Target:
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 font-black text-sm">
+                        {roiRecoveryRate}% <span className="text-slate-400 text-xs font-normal">(+{roiData.recoveredCustomers} customers)</span>
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="10"
+                      max="80"
+                      step="5"
+                      value={roiRecoveryRate}
+                      onChange={(e) => setRoiRecoveryRate(e.target.value)}
+                      className="calc-slider"
+                    />
+                    <div className="flex justify-between text-[10px] text-slate-400 font-semibold pt-1">
+                      <span className="text-emerald-400 font-extrabold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">20% (The 96 Customers)</span>
+                      <span>50% (Standard)</span>
+                      <span>80% (Aggressive)</span>
+                    </div>
+                  </div>
+
+                  {/* Math Formula Callout */}
+                  <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-800/80 text-[11px] text-slate-400 flex items-center gap-2.5">
+                    <span className="text-lg flex-shrink-0">💡</span>
+                    <span className="leading-relaxed">
+                      Baseline: <b className="text-slate-200">{roiData.monthlyCustomers} monthly walk-ins</b> at <b className="text-slate-200">₹{roiAvgBill} avg bill</b> = ₹{(roiData.monthlyCustomers * (parseInt(roiAvgBill) || 0)).toLocaleString("en-IN")}/mo sales. Recovering just <b className="text-emerald-300">{roiData.recoveredCustomers} customers</b> generates <b className="text-emerald-300">+₹{roiData.additionalMonthlySales.toLocaleString("en-IN")}/mo</b> extra revenue!
+                    </span>
+                  </div>
+                </div>
+
+                {/* Output Result Card (5 cols) */}
+                <div className="md:col-span-5 bg-gradient-to-b from-slate-900 via-slate-900/95 to-slate-950 border-2 border-emerald-500/60 rounded-2xl p-6 sm:p-7 flex flex-col justify-between space-y-5 relative shadow-2xl ring-1 ring-emerald-500/20">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-[10px] rounded-full uppercase tracking-wider shadow-md flex items-center gap-1 whitespace-nowrap">
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping" />
+                    <span>🔥 THE 96 CUSTOMERS IMPACT</span>
+                  </div>
+
+                  <div className="space-y-4 pt-2">
                     <div>
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Repeat Customer Rate</div>
-                      <div className="text-lg font-black text-white mt-0.5">
-                        50% ➔ <span className="text-emerald-400">{roiData.newRepeatPercent}%</span>
+                      <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Additional Monthly Sales</div>
+                      <div className="text-3xl sm:text-4xl lg:text-5xl font-black bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-300 bg-clip-text text-transparent mt-1">
+                        +₹{roiData.additionalMonthlySales.toLocaleString("en-IN")}
+                        <span className="text-xs text-slate-400 font-normal ml-1">/ mo</span>
+                      </div>
+                      <div className="text-[11px] text-emerald-300/90 mt-1 font-medium">
+                        {roiData.recoveredCustomers} repeat customers × ₹{roiAvgBill} avg bill = +₹{roiData.additionalMonthlySales.toLocaleString("en-IN")}/mo
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Monthly Repeat Visits</div>
-                      <div className="text-sm font-black text-emerald-300 mt-0.5">
-                        {roiData.lostWalkins} ➔ {roiData.newRepeatTotal} visits
+
+                    <div className="border-t border-slate-800 pt-3">
+                      <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Annual Revenue Potential</div>
+                      <div className="text-2xl sm:text-3xl font-black text-white mt-0.5">
+                        +₹{(roiData.additionalAnnualSales / 100000).toFixed(2)} Lakh
+                        <span className="text-xs text-slate-400 font-normal ml-1">/ year (+₹{roiData.additionalAnnualSales.toLocaleString("en-IN")})</span>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-slate-800 pt-3 flex items-center justify-between bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+                      <div>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Repeat Rate</div>
+                        <div className="text-base font-black text-white mt-0.5">
+                          50% ➔ <span className="text-emerald-400">{roiData.newRepeatPercent}%</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Repeat Visits</div>
+                        <div className="text-sm font-black text-emerald-300 mt-0.5">
+                          {roiData.lostWalkins} ➔ {roiData.newRepeatTotal} visits
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* 1-Visit Break-Even Metric Box */}
-                <div className="p-3.5 rounded-xl bg-emerald-950/90 border border-emerald-500/40 text-[11px] text-emerald-200 leading-relaxed">
-                  <div className="font-extrabold text-emerald-300 flex items-center gap-1.5 mb-1">
-                    <span>🎯</span> The 1-Visit Break-Even Metric:
+                  {/* 1-Visit Break-Even Metric Box */}
+                  <div className="p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-[11px] text-emerald-200 leading-relaxed shadow-sm">
+                    <div className="font-extrabold text-emerald-300 flex items-center gap-1.5 mb-1">
+                      <span>🎯</span> The 1-Visit Break-Even Metric:
+                    </div>
+                    CustomerPilot costs just <b>₹{roiData.monthlyCost}/mo (~₹6.2/day)</b>. Literally just <b>{roiData.breakEvenVisits} extra repeat visit/month</b> pays for your entire subscription!
                   </div>
-                  CustomerPilot costs just <b>₹{roiData.monthlyCost}/mo (~₹6.2/day)</b>. Literally just <b>{roiData.breakEvenVisits} extra repeat visit/month</b> pays for your entire subscription!
+
+                  <Link
+                    href="/signup"
+                    className="w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm py-3.5 rounded-xl text-center shadow-lg shadow-emerald-500/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-1.5"
+                  >
+                    <span>Start 7-Day Free Trial (All-in-One Full Suite)</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
                 </div>
-
-                <Link
-                  href="/signup"
-                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm py-3.5 rounded-xl text-center shadow-lg transition-all transform hover:-translate-y-0.5"
-                >
-                  Start 7-Day Free Trial (All-in-One Full Suite) →
-                </Link>
-              </div>
-            </div>
-
-            {/* Visual 4-Step Infographic Flow (The 96 Customers Growth Loop) */}
-            <div className="border-t border-slate-800 pt-8 space-y-4">
-              <div className="text-center">
-                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">The &quot;96 Customers&quot; Growth Loop</span>
-                <h3 className="text-lg sm:text-xl font-black text-white mt-1">How CustomerPilot Pays For Itself in 30 Days</h3>
-                <p className="text-xs text-slate-400 mt-1 max-w-xl mx-auto">
-                  Kamleshbhai &amp; Sureshbhai dialogue breakdown: 2 Join stamps + 4 Review stamps ➔ 5 qualified repeat visits.
-                </p>
               </div>
 
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-                <div className="bg-slate-800/70 p-4 rounded-2xl border border-slate-700/60 space-y-2 relative">
-                  <div className="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center font-black text-xs text-slate-300">1</div>
-                  <div className="font-bold text-white text-xs sm:text-sm">The 96 Customers</div>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
-                    960 monthly walk-ins at ₹200 avg bill. Sureshbhai brings back just <b>96 lost customers</b>.
+              {/* Visual 4-Step Infographic Flow (The 96 Customers Growth Loop) */}
+              <div className="border-t border-slate-800/90 pt-8 mt-10 space-y-5 relative z-10">
+                <div className="text-center space-y-1">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-extrabold text-[10px] uppercase tracking-wider">
+                    <span>🔄 THE &quot;96 CUSTOMERS&quot; GROWTH LOOP</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-black text-white tracking-tight">How CustomerPilot Pays For Itself in 30 Days</h3>
+                  <p className="text-xs text-slate-400 max-w-xl mx-auto">
+                    Kamleshbhai &amp; Sureshbhai dialogue breakdown: 2 Join stamps + 4 Review stamps ➔ 5 qualified repeat visits.
                   </p>
                 </div>
 
-                <div className="bg-slate-800/70 p-4 rounded-2xl border border-indigo-500/40 space-y-2 relative">
-                  <div className="w-6 h-6 rounded-full bg-indigo-500/30 text-indigo-300 border border-indigo-500/50 flex items-center justify-center font-black text-xs">2</div>
-                  <div className="font-bold text-white text-xs sm:text-sm">6-Stamp Jumpstart</div>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
-                    Customer scans QR: <b>2 Welcome stamps</b> + <b>4 Google Review AI stamps</b> = 6 stamps on Day 1!
-                  </p>
-                </div>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                  <div className="bg-slate-900/90 p-4 rounded-2xl border border-slate-800 hover:border-slate-700 transition space-y-2 relative shadow-sm">
+                    <div className="w-7 h-7 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center font-black text-xs">1</div>
+                    <div className="font-bold text-white text-xs sm:text-sm">The 96 Customers</div>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      960 monthly walk-ins at ₹200 avg bill. Sureshbhai brings back just <b>96 lost customers</b>.
+                    </p>
+                  </div>
 
-                <div className="bg-slate-800/70 p-4 rounded-2xl border border-emerald-500/40 space-y-2 relative">
-                  <div className="w-6 h-6 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 flex items-center justify-center font-black text-xs">3</div>
-                  <div className="font-bold text-white text-xs sm:text-sm">5 Qualified Visits</div>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
-                    To unlock 11-Stamp Free Meal (₹100), customer visits 5 more times = <b>₹1,000 qualifying sales</b> per customer.
-                  </p>
-                </div>
+                  <div className="bg-slate-900/90 p-4 rounded-2xl border border-indigo-500/40 hover:border-indigo-500/60 transition space-y-2 relative shadow-sm">
+                    <div className="w-7 h-7 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center justify-center font-black text-xs">2</div>
+                    <div className="font-bold text-white text-xs sm:text-sm">6-Stamp Jumpstart</div>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      Customer scans QR: <b>2 Welcome stamps</b> + <b>4 Google Review AI stamps</b> = 6 stamps on Day 1!
+                    </p>
+                  </div>
 
-                <div className="bg-gradient-to-br from-emerald-950/60 to-slate-800/90 p-4 rounded-2xl border border-emerald-500/60 space-y-2 relative">
-                  <div className="w-6 h-6 rounded-full bg-emerald-400 text-slate-950 flex items-center justify-center font-black text-xs">4</div>
-                  <div className="font-bold text-emerald-300 text-xs sm:text-sm">Revenue Impact</div>
-                  <p className="text-[11px] text-slate-300 leading-relaxed">
-                    <b>+₹19,200/mo (+₹2,30,400/yr)</b> extra sales at just <b>₹6.2/day cost</b> (102× ROI multiple).
-                  </p>
+                  <div className="bg-slate-900/90 p-4 rounded-2xl border border-sky-500/40 hover:border-sky-500/60 transition space-y-2 relative shadow-sm">
+                    <div className="w-7 h-7 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/40 flex items-center justify-center font-black text-xs">3</div>
+                    <div className="font-bold text-white text-xs sm:text-sm">5 Qualified Visits</div>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      To unlock 11-Stamp Free Meal (₹100), customer visits 5 more times = <b>₹1,000 qualifying sales</b> per customer.
+                    </p>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-emerald-950/60 via-slate-900/90 to-slate-900 p-4 rounded-2xl border border-emerald-500/60 space-y-2 relative shadow-md">
+                    <div className="w-7 h-7 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-black text-xs">4</div>
+                    <div className="font-bold text-emerald-300 text-xs sm:text-sm">Revenue Impact</div>
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      <b>+₹19,200/mo (+₹2,30,400/yr)</b> extra sales at just <b>₹6.2/day cost</b> (102× ROI multiple).
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1276,7 +1283,7 @@ export default function Home() {
       <AIReplySandbox />
 
       {/* ============ FEATURE COMPARISON MATRIX TABLE (Ultra High-Converting Dominant Complete Suite) ============ */}
-      <section className="py-20 sm:py-28 bg-slate-900 text-white border-y border-slate-800 relative overflow-hidden" id="comparison">
+      <section className="py-20 sm:py-28 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white border-y border-slate-800 relative overflow-hidden" id="comparison">
         {/* Background glow accents */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[900px] h-[400px] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-10 right-10 w-[400px] h-[300px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -1286,7 +1293,7 @@ export default function Home() {
           <div className="sec-head max-w-3xl mx-auto text-center space-y-3">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-extrabold text-xs tracking-wide shadow-inner">
               <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-              <span>👑 STORE OWNER&apos;S #1 CHOICE</span>
+              <span>👑 STORE OWNER&apos;S #1 CHOICE · 94% CHOOSE COMPLETE SUITE</span>
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
               Compare Features Across All 4 Options
@@ -1299,248 +1306,257 @@ export default function Home() {
 
           {/* Table Container */}
           <ScrollReveal variant="scaleUp" delay={0.15}>
-          <div className="mt-14 overflow-x-auto rounded-3xl border border-slate-700/80 shadow-2xl bg-slate-950/90 backdrop-blur-md">
-            <table className="w-full text-left border-collapse min-w-[860px]">
+          <div className="mt-14 overflow-x-auto rounded-3xl border border-slate-700/80 shadow-2xl bg-slate-950/95 backdrop-blur-xl">
+            <table className="w-full text-left border-collapse min-w-[880px]">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-900/90">
-                  <th className="p-6 text-sm font-extrabold text-slate-200 w-[31%]">
-                    Features &amp; Capabilities
+                <tr className="border-b border-slate-800 bg-slate-900/95">
+                  <th className="p-6 text-sm font-extrabold text-slate-200 w-[30%] align-bottom">
+                    <div className="text-xs uppercase tracking-wider text-slate-400 font-bold mb-1">Capabilities Matrix</div>
+                    <div className="text-base font-black text-white">Features &amp; Engines</div>
                   </th>
-                  <th className="p-4 text-center w-[17%] border-l border-slate-800/80 bg-slate-900/40">
-                    <div className="text-2xl mb-1">🎁</div>
-                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">Digital Loyalty Stamps &amp; VIP Club</div>
+                  <th className="p-5 text-center w-[17%] border-l border-slate-800 bg-slate-900/60 align-top">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl mx-auto mb-2">🎁</div>
+                    <div className="font-extrabold text-xs sm:text-sm text-white">Digital Loyalty Stamps</div>
                     <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mt-0.5">Standalone Module</div>
-                    <div className="text-sm font-black text-slate-200 mt-1">₹999<span className="text-[10px] text-slate-400 font-normal">/yr</span></div>
-                    <div className="text-[10px] text-slate-400">₹2.7/day</div>
+                    <div className="text-base font-black text-white mt-2">₹999<span className="text-[10px] text-slate-400 font-normal">/yr</span></div>
+                    <div className="text-[10px] text-slate-400 font-medium">Just ₹2.7/day</div>
                   </th>
-                  <th className="p-4 text-center w-[17%] border-l border-slate-800/80 bg-slate-900/40">
-                    <div className="text-2xl mb-1">⭐</div>
-                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</div>
+                  <th className="p-5 text-center w-[18%] border-l border-slate-800 bg-slate-900/60 align-top">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl mx-auto mb-2">⭐</div>
+                    <div className="font-extrabold text-xs sm:text-sm text-white">Smart Google Reviews</div>
                     <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider mt-0.5">Standalone Module</div>
-                    <div className="text-sm font-black text-slate-200 mt-1">₹999<span className="text-[10px] text-slate-400 font-normal">/yr</span></div>
-                    <div className="text-[10px] text-slate-400">₹2.7/day</div>
+                    <div className="text-base font-black text-white mt-2">₹999<span className="text-[10px] text-slate-400 font-normal">/yr</span></div>
+                    <div className="text-[10px] text-slate-400 font-medium">Just ₹2.7/day</div>
                   </th>
-                  <th className="p-4 text-center w-[17%] border-l border-slate-800/80 bg-slate-900/40">
-                    <div className="text-2xl mb-1">💬</div>
-                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">Ai Drafted SEO Optimized 1-Click Reply to Google Reviews</div>
+                  <th className="p-5 text-center w-[17%] border-l border-slate-800 bg-slate-900/60 align-top">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-xl mx-auto mb-2">💬</div>
+                    <div className="font-extrabold text-xs sm:text-sm text-white">1-Click AI AutoReply</div>
                     <div className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider mt-0.5">Standalone Module</div>
-                    <div className="text-sm font-black text-slate-200 mt-1">₹999<span className="text-[10px] text-slate-400 font-normal">/yr</span></div>
-                    <div className="text-[10px] text-slate-400">₹2.7/day</div>
+                    <div className="text-base font-black text-white mt-2">₹999<span className="text-[10px] text-slate-400 font-normal">/yr</span></div>
+                    <div className="text-[10px] text-slate-400 font-medium">Just ₹2.7/day</div>
                   </th>
                   
                   {/* Dominant Highlighted Complete Suite Header */}
-                  <th className="p-5 text-center w-[18%] border-l-2 border-emerald-500 bg-gradient-to-b from-emerald-950/80 via-slate-900 to-slate-900 relative shadow-2xl">
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-[10px] rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1 whitespace-nowrap">
+                  <th className="p-6 text-center w-[18%] border-l-2 border-r-2 border-emerald-500 bg-gradient-to-b from-emerald-950/90 via-slate-900 to-slate-900 relative shadow-2xl align-top">
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-[10px] rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1 whitespace-nowrap">
                       <span>🔥 94% CHOOSE THIS · SAVE 35%</span>
                     </div>
-                    <div className="text-3xl mb-1 mt-1">🚀</div>
-                    <div className="font-black text-base text-white flex items-center justify-center gap-1">
-                      <span>CustomerPilot Complete</span>
+                    <div className="w-11 h-11 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center text-2xl mx-auto mb-2 shadow-lg shadow-emerald-500/30">🚀</div>
+                    <div className="font-black text-base text-white">
+                      CustomerPilot Complete
                     </div>
-                    <div className="text-[10px] text-emerald-300 font-extrabold uppercase tracking-wider mt-0.5">Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply</div>
-                    <div className="mt-1 flex items-baseline justify-center gap-1.5">
+                    <div className="text-[10px] text-emerald-300 font-extrabold uppercase tracking-wider mt-0.5">All 3 Core Engines Combined</div>
+                    <div className="mt-2 flex items-baseline justify-center gap-1.5">
                       <span className="text-xs line-through text-slate-500">₹3,999</span>
-                      <span className="text-xl font-black text-emerald-400">₹2,899</span>
-                      <span className="text-[10px] text-slate-300">/yr</span>
+                      <span className="text-2xl font-black text-emerald-400">₹2,899</span>
+                      <span className="text-[10px] text-slate-300 font-medium">/yr</span>
                     </div>
-                    <div className="text-[10px] text-emerald-300 font-semibold mt-0.5">Just ₹7.9/day for all 3 combined</div>
+                    <div className="text-[11px] text-emerald-300 font-bold mt-0.5">Just ₹7.9/day for all 3</div>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800 text-xs">
                 {/* ---------------- SECTION 1: LOYALTY ---------------- */}
-                <tr className="bg-amber-950/20 font-bold">
-                  <td colSpan={5} className="py-3 px-6 text-[11px] uppercase tracking-wider text-amber-300 bg-amber-900/30 font-black flex items-center gap-2">
-                    <span>🎁 1. Digital Loyalty Stamps &amp; VIP Club</span>
+                <tr className="bg-amber-950/30">
+                  <td colSpan={5} className="py-3 px-6 bg-gradient-to-r from-amber-950/60 to-slate-900 border-y border-amber-500/20">
+                    <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-300">
+                      <span>🎁 1. Digital Loyalty Stamps &amp; VIP Club</span>
+                    </div>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">Digital Stamp Card on WhatsApp (No App Download for Customer)</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center">✓</span> Unlocked</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Digital Stamp Card on WhatsApp (No App Download for Customer)</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">VIP Club Tier System (Silver, Gold, Platinum Automatic Upgrades)</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center">✓</span> Unlocked</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">VIP Club Tier System (Silver, Gold, Platinum Automatic Upgrades)</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">Automated Birthday Treats &amp; Milestone Bonus Stamps</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center">✓</span> Unlocked</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Automated Birthday Treats &amp; Milestone Bonus Stamps</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">14-Day &amp; 30-Day Inactive Customer Win-Back WhatsApp Alerts</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center">✓</span> Unlocked</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">14-Day &amp; 30-Day Inactive Customer Win-Back WhatsApp Alerts</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">Cashier 1-Tap Counter Queue Terminal &amp; Customer CRM</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center">✓</span> Unlocked</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Cashier 1-Tap Counter Queue Terminal &amp; Customer CRM</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
                   </td>
                 </tr>
 
                 {/* ---------------- SECTION 2: GOOGLE REVIEWS ---------------- */}
-                <tr className="bg-emerald-950/20 font-bold">
-                  <td colSpan={5} className="py-3 px-6 text-[11px] uppercase tracking-wider text-emerald-300 bg-emerald-900/30 font-black flex items-center gap-2">
-                    <span>⭐ 2. Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</span>
+                <tr className="bg-emerald-950/30">
+                  <td colSpan={5} className="py-3 px-6 bg-gradient-to-r from-emerald-950/60 to-slate-900 border-y border-emerald-500/20">
+                    <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-emerald-300">
+                      <span>⭐ 2. Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</span>
+                    </div>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">Instant AI Customer Review Draft Assistant (Gemini AI Engine)</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center">✓</span> Unlocked</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Instant AI Customer Review Draft Assistant (Gemini AI Engine)</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">Post-Purchase WhatsApp 5★ Review Prompts with Delay Timer</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center">✓</span> Unlocked</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Post-Purchase WhatsApp 5★ Review Prompts with Delay Timer</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">1-Click Copy &amp; Post to Google Maps with Organic Keywords</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center">✓</span> Unlocked</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">1-Click Copy &amp; Post to Google Maps with Organic Keywords</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">5-Star Golden Review Standee &amp; Table Tent Posters (Print PDF)</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center">✓</span> Unlocked</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">5-Star Golden Review Standee &amp; Table Tent Posters (Print PDF)</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
                   </td>
                 </tr>
 
                 {/* ---------------- SECTION 3: AUTOREPLY ---------------- */}
-                <tr className="bg-indigo-950/20 font-bold">
-                  <td colSpan={5} className="py-3 px-6 text-[11px] uppercase tracking-wider text-indigo-300 bg-indigo-900/30 font-black flex items-center gap-2">
-                    <span>💬 3. Ai Drafted SEO Optimized 1-Click Reply to Google Reviews</span>
+                <tr className="bg-indigo-950/30">
+                  <td colSpan={5} className="py-3 px-6 bg-gradient-to-r from-indigo-950/60 to-slate-900 border-y border-indigo-500/20">
+                    <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-indigo-300">
+                      <span>💬 3. Ai Drafted SEO Optimized 1-Click Reply to Google Reviews</span>
+                    </div>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">Google Business Profile (GBP) Connect &amp; Review Sync</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center">✓</span> Unlocked</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Google Business Profile (GBP) Connect &amp; Review Sync</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">AI Context-Aware Owner Reply Drafts in 1 Second</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center">✓</span> Unlocked</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">AI Context-Aware Owner Reply Drafts in 1 Second</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">1-Click Direct Publish to Google Maps</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center">✓</span> Unlocked</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">1-Click Direct Publish to Google Maps</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">Bulk Auto-Reply Engine for Past Google Reviews</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/30 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-400 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center">✓</span> Unlocked</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Bulk Auto-Reply Engine for Past Google Reviews</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
                   </td>
                 </tr>
 
                 {/* ---------------- SECTION 4: COMPLETE SUITE EXCLUSIVE SYNERGIES ---------------- */}
-                <tr className="bg-gradient-to-r from-emerald-900/40 via-teal-900/40 to-slate-900 font-bold">
-                  <td colSpan={5} className="py-3.5 px-6 text-[11px] uppercase tracking-wider text-emerald-300 bg-emerald-900/50 font-black flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-emerald-400" />
-                    <span>🚀 4. CustomerPilot Complete : Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply</span>
+                <tr className="bg-gradient-to-r from-emerald-950/60 via-teal-950/60 to-slate-900 font-bold">
+                  <td colSpan={5} className="py-3.5 px-6 bg-gradient-to-r from-emerald-900/60 via-teal-900/40 to-slate-900 border-y border-emerald-500/30">
+                    <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-emerald-300">
+                      <Sparkles className="w-4 h-4 text-emerald-400" />
+                      <span>🚀 4. CustomerPilot Complete : Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply</span>
+                    </div>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-bold text-emerald-300">
+                  <td className="p-4 pl-6 font-bold text-emerald-300 text-sm">
                     <div>AI Review-to-Loyalty Multiplier</div>
-                    <div className="text-[10px] text-slate-400 font-normal mt-0.5">Google Review post karne par customer ko automatic +2 Bonus Stamps WhatsApp pe milte hain</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Google Review post karne par customer ko automatic +2 Bonus Stamps WhatsApp pe milte hain</div>
                   </td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/40 font-bold">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500 text-slate-950 font-black text-[10px] shadow-sm">👑 Exclusive Synergy</span>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/15 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-400 text-slate-950 font-black text-[10px] shadow-sm">👑 Exclusive Synergy</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-bold text-emerald-300">
+                  <td className="p-4 pl-6 font-bold text-emerald-300 text-sm">
                     <div>Unified 360° Customer SuperCRM</div>
-                    <div className="text-[10px] text-slate-400 font-normal mt-0.5">Visits, total spend, loyalty stamp status aur Google Review profile ek single screen pe</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Visits, total spend, loyalty stamp status aur Google Review profile ek single screen pe</div>
                   </td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/40 font-bold">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500 text-slate-950 font-black text-[10px] shadow-sm">👑 Exclusive Unified</span>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/15 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-400 text-slate-950 font-black text-[10px] shadow-sm">👑 Exclusive Unified</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-bold text-emerald-300">
+                  <td className="p-4 pl-6 font-bold text-emerald-300 text-sm">
                     <div>Complete Physical Store Print Kit</div>
-                    <div className="text-[10px] text-slate-400 font-normal mt-0.5">VIP Loyalty Standee + Google 5★ Golden Standee + Table Tents + Sticker Badges (A4 PDF)</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">VIP Loyalty Standee + Google 5★ Golden Standee + Table Tents + Sticker Badges (A4 PDF)</div>
                   </td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-[10px] text-slate-400">1 Standee only</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-[10px] text-slate-400">1 Standee only</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-slate-600 font-bold">✕</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/40 font-bold">
-                    <span className="inline-flex items-center gap-1 text-emerald-300 font-black"><span className="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-black">✓</span> All Standees</span>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-[11px] text-slate-400">1 Standee only</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-[11px] text-slate-400">1 Standee only</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/15 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ All Standees</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-200">Priority WhatsApp VIP Merchant Desk</td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-[10px] text-slate-400">Standard</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-[10px] text-slate-400">Standard</span></td>
-                  <td className="p-4 text-center border-l border-slate-800/80"><span className="text-[10px] text-slate-400">Standard</span></td>
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-emerald-950/40 font-bold">
-                    <span className="inline-flex items-center gap-1 text-amber-300 font-black">⚡ Priority VIP</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Priority WhatsApp VIP Merchant Desk</td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-[11px] text-slate-400">Standard</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-[11px] text-slate-400">Standard</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-[11px] text-slate-400">Standard</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/15 font-bold">
+                    <span className="inline-flex items-center gap-1 text-amber-300 font-black text-xs">⚡ Priority VIP</span>
                   </td>
                 </tr>
               </tbody>
               <tfoot>
-                <tr className="border-t-2 border-slate-700 bg-slate-900/90">
+                <tr className="border-t-2 border-slate-700 bg-slate-900/95">
                   <td className="p-6 font-black text-slate-100 text-sm">
                     Choose Your 7-Day Free Trial:
                   </td>
@@ -1561,13 +1577,13 @@ export default function Home() {
                   </td>
 
                   {/* Dominant Complete Suite Action Button */}
-                  <td className="p-4 text-center border-l-2 border-emerald-500 bg-gradient-to-b from-emerald-950/80 to-slate-950">
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-gradient-to-b from-emerald-950/90 to-slate-950">
                     <Link href="/signup" className="group w-full py-3.5 px-3 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm flex flex-col items-center justify-center shadow-xl shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-[1.02] transition-all">
                       <span className="flex items-center gap-1.5">
-                        <span>Start CustomerPilot Complete Free</span>
+                        <span>Start CustomerPilot Complete</span>
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </span>
-                      <span className="text-[9px] text-slate-900/80 font-bold uppercase tracking-wider mt-0.5">All 3 Engines Unlocked</span>
+                      <span className="text-[9px] text-slate-900/90 font-extrabold uppercase tracking-wider mt-0.5">All 3 Engines Unlocked</span>
                     </Link>
                   </td>
                 </tr>
@@ -1921,66 +1937,101 @@ export default function Home() {
       <FaqSection />
 
       {/* ============ FOOTER ============ */}
-      <footer>
-        <div className="wrap">
-          <div className="fgrid">
-            <div className="fbrand">
-              <Link href="/" className="no-underline block mb-3">
-                <BrandLogo size="md" />
+      <footer className="bg-slate-950 text-slate-400 border-t border-slate-800/80 pt-16 pb-12 relative overflow-hidden">
+        {/* Subtle top border gradient accent */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-10 lg:gap-8">
+            {/* Brand Column (2 cols on large screens) */}
+            <div className="lg:col-span-2 space-y-4">
+              <Link href="/" className="no-underline inline-block bg-white/95 hover:bg-white px-3 py-1.5 rounded-xl shadow-xs transition">
+                <BrandLogo size="sm" />
               </Link>
-              <p>Turn every walk-in into a lifetime customer — with loyalty rewards, Google reviews, and replies on autopilot.</p>
-              <div className="frate"><span style={{ color: '#f59e0b' }}>★</span> 4.9 · 1,200+ merchants</div>
-              <div className="mt-4">
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm">
+                Turn every walk-in into a lifetime customer — with WhatsApp loyalty rewards, Google 5★ reviews, and replies on autopilot.
+              </p>
+
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold text-slate-300">
+                <span className="text-amber-400">★</span> 4.9 Rating · 1,200+ Indian Store Owners
+              </div>
+
+              <div className="pt-2">
                 <a
                   href="https://wa.me/919033304707?text=Hi%20CustomerPilot%20Team%2C%20I%20need%20assistance%20with%20CustomerPilot."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200 transition"
+                  className="inline-flex items-center gap-2 text-xs font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/60 px-4 py-2.5 rounded-xl border border-emerald-500/30 transition shadow-sm"
                 >
-                  <MessageSquare className="w-3.5 h-3.5" /> 24/7 WhatsApp Support: +91 90333 04707
+                  <MessageSquare className="w-4 h-4 text-emerald-400" />
+                  <span>24/7 WhatsApp: +91 90333 04707</span>
                 </a>
               </div>
+
+              <div className="text-[11px] text-slate-500 flex items-center gap-1.5 pt-1">
+                <Shield className="w-3.5 h-3.5 text-emerald-500/70" />
+                <span>100% Encrypted &amp; WhatsApp Business Approved</span>
+              </div>
             </div>
-            <div>
-              <h4>Product</h4>
-              <ul>
-                <li><Link href="/pricing">Pricing &amp; Plans</Link></li>
-                <li><Link href="/case-studies/cake-connection">Case Study: Cake Connection</Link></li>
-                <li><Link href="#ai-demo">AI Review Reply Demo</Link></li>
-                <li><Link href="#faq">Frequently Asked Questions</Link></li>
-                <li><Link href="/features/whatsapp-stamp-card">WhatsApp Stamp Cards</Link></li>
-                <li><Link href="/features/google-review-automation">Google Review AI</Link></li>
+
+            {/* Column 2: Product */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Product</h4>
+              <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
+                <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing &amp; Plans</Link></li>
+                <li><Link href="/case-studies/cake-connection" className="hover:text-emerald-400 transition-colors">Case Study: Cake Connection</Link></li>
+                <li><Link href="#ai-demo" className="hover:text-emerald-400 transition-colors">AI Review Reply Demo</Link></li>
+                <li><Link href="#faq" className="hover:text-emerald-400 transition-colors">Frequently Asked Questions</Link></li>
+                <li><Link href="/features/whatsapp-stamp-card" className="hover:text-emerald-400 transition-colors">WhatsApp Stamp Cards</Link></li>
+                <li><Link href="/features/google-review-automation" className="hover:text-emerald-400 transition-colors">Google Review AI</Link></li>
               </ul>
             </div>
-            <div>
-              <h4>Compare</h4>
-              <ul>
-                <li><Link href="/vs/reelo">vs Reelo</Link></li>
-                <li><Link href="/vs/bingage">vs Bingage</Link></li>
-                <li><Link href="/compare/vs-traditional-pos">vs Traditional POS</Link></li>
+
+            {/* Column 3: Compare */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Compare</h4>
+              <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
+                <li><Link href="/vs/reelo" className="hover:text-emerald-400 transition-colors">vs Reelo</Link></li>
+                <li><Link href="/vs/bingage" className="hover:text-emerald-400 transition-colors">vs Bingage</Link></li>
+                <li><Link href="/compare/vs-traditional-pos" className="hover:text-emerald-400 transition-colors">vs Traditional POS</Link></li>
+                <li><Link href="#comparison" className="hover:text-emerald-400 transition-colors">Compare All 4 Plans</Link></li>
               </ul>
             </div>
-            <div>
-              <h4>Industries</h4>
-              <ul>
-                <li><Link href="/bakery-loyalty">Bakery Loyalty</Link></li>
-                <li><Link href="/cafe-loyalty">Cafe Stamp Cards</Link></li>
-                <li><Link href="/restaurant-loyalty">Restaurant Retention</Link></li>
-                <li><Link href="/salon-loyalty">Salon &amp; Spa VIP</Link></li>
+
+            {/* Column 4: Industries */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Industries</h4>
+              <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
+                <li><Link href="/bakery-loyalty" className="hover:text-emerald-400 transition-colors">Bakery &amp; Cake Shops</Link></li>
+                <li><Link href="/cafe-loyalty" className="hover:text-emerald-400 transition-colors">Cafes &amp; Coffee Bars</Link></li>
+                <li><Link href="/restaurant-loyalty" className="hover:text-emerald-400 transition-colors">Restaurants &amp; Dining</Link></li>
+                <li><Link href="/salon-loyalty" className="hover:text-emerald-400 transition-colors">Salons &amp; Spas</Link></li>
               </ul>
             </div>
-            <div>
-              <h4>Legal &amp; Trust</h4>
-              <ul>
-                <li><Link href="/privacy">Privacy Policy</Link></li>
-                <li><Link href="/terms">Terms of Service</Link></li>
-                <li><Link href="/security">Security &amp; Architecture</Link></li>
-                <li><Link href="/contact">Contact Support</Link></li>
-                <li><Link href="/help">Help &amp; Documentation</Link></li>
+
+            {/* Column 5: Legal & Trust */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Legal &amp; Trust</h4>
+              <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
+                <li><Link href="/privacy" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-emerald-400 transition-colors">Terms of Service</Link></li>
+                <li><Link href="/security" className="hover:text-emerald-400 transition-colors">Security &amp; Architecture</Link></li>
+                <li><Link href="/contact" className="hover:text-emerald-400 transition-colors">Contact Support</Link></li>
+                <li><Link href="/help" className="hover:text-emerald-400 transition-colors">Help &amp; Documentation</Link></li>
               </ul>
             </div>
           </div>
-          <div className="fbottom">© {new Date().getFullYear()} CustomerPilot Inc. · Made with ❤️ in India · support@customerpilot.in</div>
+
+          {/* Footer Bottom Bar */}
+          <div className="border-t border-slate-800/80 pt-8 mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+            <div>
+              © {new Date().getFullYear()} CustomerPilot Inc. · Made with ❤️ in India · support@customerpilot.in
+            </div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-[11px] text-slate-300 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>All Systems Operational</span>
+            </div>
+          </div>
         </div>
       </footer>
 

@@ -448,17 +448,17 @@ export function FaqSection() {
         </div>
 
         {/* ============ STILL HAVE QUESTIONS? CALLOUT CARD ============ */}
-        <div className="mt-14 sm:mt-16 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-950 p-6 sm:p-10 text-white shadow-2xl border border-slate-800 relative overflow-hidden">
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="mt-16 sm:mt-20 rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-7 sm:p-12 text-white shadow-2xl border border-slate-800 relative overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-72 h-72 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8">
-            <div className="space-y-2 text-center lg:text-left max-w-2xl">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold">
-                <Phone className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Need Personalized Help for Your Store?</span>
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div className="space-y-3 text-center lg:text-left max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-extrabold uppercase tracking-wide shadow-inner">
+                <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+                <span>24/7 Founder Direct Desk</span>
               </div>
-              <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight leading-tight">
                 Still have questions? Chat directly with our founders.
               </h3>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
@@ -466,20 +466,20 @@ export function FaqSection() {
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto flex-shrink-0">
+            <div className="flex flex-col sm:flex-row items-center gap-3.5 w-full sm:w-auto flex-shrink-0">
               <a
                 href="https://wa.me/919033304707?text=Hi%20CustomerPilot%20Team%2C%20I%20have%20a%20question%20about%20starting%20CustomerPilot%20for%20my%20business."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-600/30 transition-all hover:scale-[1.02]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-xl shadow-emerald-600/30 transition-all hover:scale-[1.02]"
               >
-                <MessageSquare className="w-4 h-4" />
+                <MessageSquare className="w-4 h-4 text-white" />
                 <span>WhatsApp: +91 90333 04707</span>
               </a>
 
               <Link
                 href="/signup"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-white/10 transition-all hover:scale-[1.02]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-white/10 transition-all hover:scale-[1.02]"
               >
                 <span>Start 7 Days Free Trial Today</span>
                 <ArrowRight className="w-4 h-4" />
