@@ -3,6 +3,28 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Sep 2026] Feature: Synced Revenue & Growth Calculator Default Baseline to "The 96 Customers" Story Math
+
+- **Symptom**: User requested syncing the default values and visual 4-step math breakdown of the Revenue & Growth Calculator (`#roi`) to match the exact numbers from the 60-Second "The 96 Customers" story dialogue (Sureshbhai & Kamleshbhai).
+- **Root Cause**: Calculator previously defaulted to arbitrary values (40 daily walk-ins, ₹300 bill, 50% recovery) instead of the authentic reference case baseline (32 daily walk-ins, ₹200 avg bill, 20% recovery = 96 repeat customers = +₹19,200/mo extra sales, +₹2,30,400/yr).
+- **Resolution**:
+  1. Updated default state values in [`src/app/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/page.tsx):
+     - `roiDailyCustomers` set to `32` (960 walk-ins/month).
+     - `roiAvgBill` set to `₹200` (F&B / Bakery / Cafe standard).
+     - `roiRecoveryRate` set to `20%` (recovering exactly 96 lost walk-ins).
+  2. Result calculation updates:
+     - Additional Monthly Sales: `+₹19,200 / month` (96 × ₹200).
+     - Annual Revenue Potential: `+₹2.30 Lakh / year` (+₹2,30,400/yr).
+     - 1-Visit Break-Even Metric: Just 1 repeat visit/month pays for the ₹2,249/yr (~₹187/mo, ~₹6.2/day) plan.
+  3. Redesigned 4-Step Infographic Flow into **The "96 Customers" Growth Loop**:
+     - Step 1: **The 96 Customers Baseline** (960 monthly walk-ins at ₹200 bill).
+     - Step 2: **6-Stamp Jumpstart** (2 Welcome stamps + 4 Google Review AI stamps = 6 stamps on Day 1).
+     - Step 3: **5 Qualified Visits** (5 more visits to unlock 11-stamp free meal = ₹1,000 qualifying sales per customer).
+     - Step 4: **Revenue Impact** (+₹19,200/mo · +₹2,30,400/yr extra sales at 102× ROI multiple).
+  4. Verified live rendering: `http://localhost:3000/#roi` renders exact calculations with HTTP 200.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Sep 2026] Bug Fix: Fixed CSS Parsing Error in globals.css (@import Order Violation)
 
 - **Symptom**: Turbopack development server crashed with `Parsing CSS source code failed: @import rules must precede all rules aside from @charset and @layer statements` on line 3 of `src/app/globals.css`.
