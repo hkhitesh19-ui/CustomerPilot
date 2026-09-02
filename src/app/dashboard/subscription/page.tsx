@@ -341,7 +341,7 @@ export default function SubscriptionPage() {
                   <span className="text-xs font-black text-orange-400 uppercase tracking-wider">🔥 Limited Time 50% Discount Offer</span>
                   <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-red-500 text-white">50% OFF</span>
                 </div>
-                <p className="text-xs text-slate-300 mt-0.5">All plans are currently locked at 50% OFF the original Main MRP (e.g. 6 Months from ₹649, 1 Year Complete at ₹2,899).</p>
+                <p className="text-xs text-slate-300 mt-0.5">All plans are currently locked at 50% OFF the original Main MRP (e.g. 6 Months from ₹549, 1 Year Complete at ₹2,249).</p>
               </div>
             </div>
           </div>
@@ -398,7 +398,7 @@ export default function SubscriptionPage() {
                     }}
                     className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${billingCycle === "6mo" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-400 hover:text-white"}`}
                   >
-                    6 Months (₹649)
+                    6 Months (₹549)
                   </button>
                   <button
                     type="button"
@@ -409,8 +409,8 @@ export default function SubscriptionPage() {
                     }}
                     className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${billingCycle === "1year" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-400 hover:text-white"}`}
                   >
-                    <span>1 Year (₹999)</span>
-                    <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-500 text-white">₹3/day</span>
+                    <span>1 Year (₹799)</span>
+                    <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-500 text-white">₹2.2/day</span>
                   </button>
                 </div>
               </div>

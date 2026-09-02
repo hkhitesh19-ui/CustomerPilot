@@ -1704,7 +1704,7 @@ export default function Home() {
               🔥 Limited Time 50% Discount Offer · Flat 50% OFF All Plans
             </span>
             <h2 className="sec-h">Simple Plans That Scale With You.</h2>
-            <p className="sec-sub">100% of AI Features Included. Standalone modules from ₹649 (MRP ₹1,299) and Complete Suite at ₹2,899/yr (MRP ₹5,799).</p>
+            <p className="sec-sub">100% of AI Features Included. Standalone modules from ₹549 (MRP ₹1,099) and Complete Suite at ₹2,249/yr (MRP ₹4,499).</p>
           </div>
           <div style={{ textAlign: 'center', marginTop: '36px', display: 'flex', justifyContent: 'center' }}>
             <Link href="/pricing" className="btn btn-grad text-sm sm:text-base py-3.5 sm:py-4 px-6 sm:px-8 font-bold rounded-xl" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>

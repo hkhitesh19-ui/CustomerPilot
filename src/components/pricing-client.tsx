@@ -23,13 +23,13 @@ export function PricingClient() {
       subtitle: "WhatsApp VIP Loyalty & Digital Stamp Cards",
       badge: "Repeat Visit Engine",
       description: "Convert single-time walk-ins into repeat regulars with WhatsApp digital stamp cards, VIP club, and automated birthday rewards.",
-      price6Mo: "₹649",
-      mrp6Mo: "₹1,299",
-      period6Mo: "for 6 months",
-      price1Yr: "₹999",
-      mrp1Yr: "₹1,999",
-      period1Yr: "for 1 year (₹3/day)",
-      savings: "50% OFF Offer",
+      price6Mo: "₹549",
+      mrp6Mo: "₹1,099",
+      period6Mo: "for 6 months (₹3/day)",
+      price1Yr: "₹799",
+      mrp1Yr: "₹1,599",
+      period1Yr: "for 1 year (₹2.2/day)",
+      savings: "50% OFF (Save ₹800)",
       features: [
         "Digital WhatsApp Stamp Card",
         "VIP Club Engine & Tier Upgrades",
@@ -43,17 +43,17 @@ export function PricingClient() {
     },
     {
       icon: "⭐",
-      title: "Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast",
-      subtitle: "Automated WhatsApp 5★ Review Collection",
+      title: "Smart Ai (SEO Optimized) Google Reviews",
+      subtitle: "upto 1000 Reviews (6Mo) / 2500 Reviews (1Yr)",
       badge: "Local SEO Growth",
       description: "Automatically collect authentic 4 & 5-star Google reviews right after a customer purchase on WhatsApp.",
-      price6Mo: "₹649",
-      mrp6Mo: "₹1,299",
-      period6Mo: "for 6 months",
-      price1Yr: "₹999",
-      mrp1Yr: "₹1,999",
-      period1Yr: "for 1 year (₹3/day)",
-      savings: "50% OFF Offer",
+      price6Mo: "₹549",
+      mrp6Mo: "₹1,099",
+      period6Mo: "for 6 months (₹3/day)",
+      price1Yr: "₹799",
+      mrp1Yr: "₹1,599",
+      period1Yr: "for 1 year (₹2.2/day)",
+      savings: "50% OFF (Save ₹800)",
       features: [
         "WhatsApp Post-Purchase Prompts",
         "Smart AI 5-Star Review Drafts",
@@ -61,23 +61,23 @@ export function PricingClient() {
         "Review Growth Analytics",
         "Organic Neighborhood SEO Booster",
       ],
-      btnText: "Start Free Trial - Ai Drafted SEO Optimized Google Reviews →",
+      btnText: "Start Free Trial - Smart Ai Google Reviews →",
       module: "reviews",
       popular: false,
     },
     {
       icon: "💬",
-      title: "Ai Drafted SEO Optimized 1-Click Reply to Google Reviews",
+      title: "Ai Drafted (SEO Optimized) 1-Click AutoReply to GoogleReviews",
       subtitle: "Smart AI Context Drafts & 1-Click Publish",
       badge: "Owner Assistant Mode",
       description: "AI automatically drafts appreciative, context-aware owner responses. Store owners review & publish on Google Maps in 1-Click!",
-      price6Mo: "₹649",
-      mrp6Mo: "₹1,299",
-      period6Mo: "for 6 months",
-      price1Yr: "₹999",
-      mrp1Yr: "₹1,999",
-      period1Yr: "for 1 year (₹3/day)",
-      savings: "50% OFF Offer",
+      price6Mo: "₹549",
+      mrp6Mo: "₹1,099",
+      period6Mo: "for 6 months (₹3/day)",
+      price1Yr: "₹799",
+      mrp1Yr: "₹1,599",
+      period1Yr: "for 1 year (₹2.2/day)",
+      savings: "50% OFF (Save ₹800)",
       features: [
         "Google Business Profile Connect",
         "Contextual AI Owner Replies",
@@ -85,7 +85,7 @@ export function PricingClient() {
         "Bulk Reply Engine",
         "Smart Sentiment Adaptation",
       ],
-      btnText: "Start Free Trial - Ai Drafted SEO Optimized 1-Click Reply →",
+      btnText: "Start Free Trial - 1-Click AutoReply →",
       module: "autoreply",
       popular: false,
     },
@@ -95,13 +95,13 @@ export function PricingClient() {
       subtitle: "Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply",
       badge: "⭐ BEST VALUE BUNDLE",
       description: "All 3 outcome engines combined into one single unified AI customer retention & reputation system.",
-      price6Mo: "₹1,799",
-      mrp6Mo: "₹3,599",
+      price6Mo: "₹1,749",
+      mrp6Mo: "₹3,499",
       period6Mo: "for 6 months (₹10/day)",
-      price1Yr: "₹2,899",
-      mrp1Yr: "₹5,799",
-      period1Yr: "for 1 year (₹8/day)",
-      savings: "50% OFF (Save ₹2,900)",
+      price1Yr: "₹2,249",
+      mrp1Yr: "₹4,499",
+      period1Yr: "for 1 year (₹6.2/day)",
+      savings: "50% OFF (Save ₹2,250)",
       features: [
         "Full WhatsApp Loyalty Stamp Engine",
         "Full AI Draft Google Review Flow",
@@ -118,13 +118,13 @@ export function PricingClient() {
 
   const capacityPlans = [
     {
-      name: "Starter Growth Plan",
+      name: "Starter Growth Plan (CustomerPilot Complete)",
       capacity: "Up to 1,000 VIP Customers",
       duration: "6 Months",
-      price: "₹1,799",
-      originalPrice: "₹3,599",
+      price: "₹1,749",
+      originalPrice: "₹3,499",
       period: "for 6 months (₹10/day)",
-      badge: "Ideal for Growing Shops",
+      badge: "Complete (6 Mo)",
       popular: false,
       features: [
         "Up to 1,000 VIP Customers",
@@ -137,12 +137,12 @@ export function PricingClient() {
       ],
     },
     {
-      name: "Pro Scaling Plan",
+      name: "Pro Scaling Plan (CustomerPilot Complete)",
       capacity: "Up to 2,500 VIP Customers",
       duration: "1 Year",
-      price: "₹2,899",
-      originalPrice: "₹5,799",
-      period: "per year (₹8/day)",
+      price: "₹2,249",
+      originalPrice: "₹4,499",
+      period: "per year (₹6.2/day)",
       badge: "⭐ Most Popular",
       popular: true,
       features: [
@@ -157,17 +157,17 @@ export function PricingClient() {
       ],
     },
     {
-      name: "High-Volume / Enterprise",
-      capacity: "Unlimited VIP Customers",
+      name: "Enterprise / upto 5-Outlets",
+      capacity: "Up to 5 Outlets Supported",
       duration: "1 Year",
       price: "₹4,999",
       originalPrice: "₹9,999",
       period: "per year (₹14/day)",
-      badge: "Busy Outlets & Chains",
+      badge: "upto 5 Outlets",
       popular: false,
       features: [
+        "Up to 5 Retail Outlets Supported",
         "Unlimited VIP Customers",
-        "All 3 Engines Included",
         "Multi-Outlet Store Switcher",
         "Custom Brand Domain & Logo",
         "Dedicated Account Manager",
@@ -252,14 +252,14 @@ export function PricingClient() {
                 onClick={() => setBillingCycle("6mo")}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${billingCycle === "6mo" ? "bg-white text-slate-900 shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
               >
-                6 Months (₹649)
+                6 Months (₹549)
               </button>
               <button
                 onClick={() => setBillingCycle("1year")}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${billingCycle === "1year" ? "bg-slate-900 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
               >
-                <span>1 Year (₹999)</span>
-                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">50% OFF · ₹3/day</span>
+                <span>1 Year (₹799)</span>
+                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-emerald-500 text-white">50% OFF · ₹2.2/day</span>
               </button>
             </div>
           </div>
@@ -423,12 +423,12 @@ export function PricingClient() {
                   <td className="p-4 text-center font-medium">
                     <span className="bg-slate-100 px-2.5 py-1 rounded-md text-xs font-semibold">6 Months</span>
                   </td>
-                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,299</td>
-                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹649</td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,099</td>
+                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹549</td>
                   <td className="p-4 text-center">
                     <span className="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
                   </td>
-                  <td className="p-4 text-center font-medium text-slate-600">₹3.6/day</td>
+                  <td className="p-4 text-center font-medium text-slate-600">₹3/day</td>
                 </tr>
 
                 <tr className="hover:bg-slate-50 transition bg-emerald-50/30">
@@ -442,88 +442,88 @@ export function PricingClient() {
                   <td className="p-4 text-center font-medium">
                     <span className="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md text-xs font-bold">1 Year</span>
                   </td>
-                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,999</td>
-                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹999</td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,599</td>
+                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹799</td>
                   <td className="p-4 text-center">
                     <span className="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
                   </td>
-                  <td className="p-4 text-center font-bold text-emerald-700">₹2.7/day</td>
+                  <td className="p-4 text-center font-bold text-emerald-700">₹2.2/day</td>
                 </tr>
 
                 <tr className="hover:bg-slate-50 transition">
                   <td className="p-4 sm:p-5 font-bold text-slate-900 flex items-center gap-2">
                     <span className="text-lg">⭐</span>
                     <div>
-                      <div>Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</div>
-                      <div className="text-[11px] text-slate-500 font-normal">Automated WhatsApp 5★ review collection</div>
+                      <div>Smart Ai (SEO Optimized) Google Reviews [upto 1000 Reviews]</div>
+                      <div className="text-[11px] text-slate-500 font-normal">Automated WhatsApp 5★ review collection up to 1,000 reviews</div>
                     </div>
                   </td>
                   <td className="p-4 text-center font-medium">
                     <span className="bg-slate-100 px-2.5 py-1 rounded-md text-xs font-semibold">6 Months</span>
                   </td>
-                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,299</td>
-                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹649</td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,099</td>
+                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹549</td>
                   <td className="p-4 text-center">
                     <span className="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
                   </td>
-                  <td className="p-4 text-center font-medium text-slate-600">₹3.6/day</td>
+                  <td className="p-4 text-center font-medium text-slate-600">₹3/day</td>
                 </tr>
 
                 <tr className="hover:bg-slate-50 transition bg-emerald-50/30">
                   <td className="p-4 sm:p-5 font-bold text-slate-900 flex items-center gap-2">
                     <span className="text-lg">⭐</span>
                     <div>
-                      <div>Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</div>
-                      <div className="text-[11px] text-slate-500 font-normal">365-Day automated review prompts &amp; AI drafts</div>
+                      <div>Smart Ai (SEO Optimized) Google Reviews [upto 2500 Reviews]</div>
+                      <div className="text-[11px] text-slate-500 font-normal">365-Day automated review prompts &amp; AI drafts up to 2,500 reviews</div>
                     </div>
                   </td>
                   <td className="p-4 text-center font-medium">
                     <span className="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md text-xs font-bold">1 Year</span>
                   </td>
-                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,999</td>
-                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹999</td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,599</td>
+                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹799</td>
                   <td className="p-4 text-center">
                     <span className="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
                   </td>
-                  <td className="p-4 text-center font-bold text-emerald-700">₹2.7/day</td>
+                  <td className="p-4 text-center font-bold text-emerald-700">₹2.2/day</td>
                 </tr>
 
                 <tr className="hover:bg-slate-50 transition">
                   <td className="p-4 sm:p-5 font-bold text-slate-900 flex items-center gap-2">
                     <span className="text-lg">💬</span>
                     <div>
-                      <div>Ai Drafted SEO Optimized 1-Click Reply to Google Reviews</div>
+                      <div>Ai Drafted (SEO Optimized) 1-Click AutoReply to GoogleReviews</div>
                       <div className="text-[11px] text-slate-500 font-normal">Context-aware owner replies &amp; 1-Click GBP post</div>
                     </div>
                   </td>
                   <td className="p-4 text-center font-medium">
                     <span className="bg-slate-100 px-2.5 py-1 rounded-md text-xs font-semibold">6 Months</span>
                   </td>
-                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,299</td>
-                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹649</td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,099</td>
+                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹549</td>
                   <td className="p-4 text-center">
                     <span className="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
                   </td>
-                  <td className="p-4 text-center font-medium text-slate-600">₹3.6/day</td>
+                  <td className="p-4 text-center font-medium text-slate-600">₹3/day</td>
                 </tr>
 
                 <tr className="hover:bg-slate-50 transition bg-emerald-50/30">
                   <td className="p-4 sm:p-5 font-bold text-slate-900 flex items-center gap-2">
                     <span className="text-lg">💬</span>
                     <div>
-                      <div>Ai Drafted SEO Optimized 1-Click Reply to Google Reviews</div>
+                      <div>Ai Drafted (SEO Optimized) 1-Click AutoReply to GoogleReviews</div>
                       <div className="text-[11px] text-slate-500 font-normal">Full year AI reply generator &amp; bulk studio</div>
                     </div>
                   </td>
                   <td className="p-4 text-center font-medium">
                     <span className="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md text-xs font-bold">1 Year</span>
                   </td>
-                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,999</td>
-                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹999</td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹1,599</td>
+                  <td className="p-4 text-center font-black text-emerald-600 text-base">₹799</td>
                   <td className="p-4 text-center">
                     <span className="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
                   </td>
-                  <td className="p-4 text-center font-bold text-emerald-700">₹2.7/day</td>
+                  <td className="p-4 text-center font-bold text-emerald-700">₹2.2/day</td>
                 </tr>
 
                 <tr className="hover:bg-slate-50 transition bg-indigo-50/30">
@@ -537,8 +537,8 @@ export function PricingClient() {
                   <td className="p-4 text-center font-medium">
                     <span className="bg-indigo-100 text-indigo-900 px-2.5 py-1 rounded-md text-xs font-bold">6 Months</span>
                   </td>
-                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹3,599</td>
-                  <td className="p-4 text-center font-black text-indigo-600 text-base">₹1,799</td>
+                  <td className="p-4 text-center text-slate-400 line-through font-semibold">₹3,499</td>
+                  <td className="p-4 text-center font-black text-indigo-600 text-base">₹1,749</td>
                   <td className="p-4 text-center">
                     <span className="inline-block bg-indigo-100 text-indigo-900 text-[11px] font-black px-2 py-0.5 rounded-full">50% OFF</span>
                   </td>
@@ -559,20 +559,20 @@ export function PricingClient() {
                   <td className="p-4 text-center font-medium">
                     <span className="bg-amber-500 text-white px-2.5 py-1 rounded-md text-xs font-black shadow-xs">1 Year</span>
                   </td>
-                  <td className="p-4 text-center text-slate-400 line-through font-bold text-base">₹5,799</td>
-                  <td className="p-4 text-center font-black text-amber-700 text-lg">₹2,899</td>
+                  <td className="p-4 text-center text-slate-400 line-through font-bold text-base">₹4,499</td>
+                  <td className="p-4 text-center font-black text-amber-700 text-lg">₹2,249</td>
                   <td className="p-4 text-center">
                     <span className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[11px] font-black px-2.5 py-0.5 rounded-full shadow-xs">50% OFF</span>
                   </td>
-                  <td className="p-4 text-center font-black text-amber-800">₹8/day</td>
+                  <td className="p-4 text-center font-black text-amber-800">₹6.2/day</td>
                 </tr>
 
                 <tr className="hover:bg-slate-50 transition">
                   <td className="p-4 sm:p-5 font-black text-slate-900 flex items-center gap-2">
                     <span className="text-xl">🏢</span>
                     <div>
-                      <div className="text-slate-900 font-black">High-Volume / Enterprise Multi-Outlet Chain</div>
-                      <div className="text-[11px] text-slate-500 font-normal">Unlimited VIP members, multi-outlet switcher &amp; dedicated manager</div>
+                      <div className="text-slate-900 font-black">Enterprise / upto 5-Outlets</div>
+                      <div className="text-[11px] text-slate-500 font-normal">Up to 5 outlets supported, multi-outlet switcher &amp; dedicated manager</div>
                     </div>
                   </td>
                   <td className="p-4 text-center font-medium">
@@ -609,31 +609,31 @@ export function PricingClient() {
                     <div className="text-xl mb-1">🎁</div>
                     <div className="font-extrabold text-xs sm:text-sm text-slate-100">Digital Loyalty Stamps &amp; VIP Club</div>
                     <div className="mt-0.5 flex items-baseline justify-center gap-1">
-                      <span className="text-[10px] line-through text-slate-500">₹1,999</span>
-                      <span className="text-sm font-black text-amber-400">₹999</span>
+                      <span className="text-[10px] line-through text-slate-500">₹1,599</span>
+                      <span className="text-sm font-black text-amber-400">₹799</span>
                       <span className="text-[9px] text-slate-300">/yr</span>
                     </div>
-                    <div className="text-[9px] text-emerald-400 font-bold">50% OFF · ₹2.7/day</div>
+                    <div className="text-[9px] text-emerald-400 font-bold">50% OFF · ₹2.2/day</div>
                   </th>
                   <th className="p-4 text-center w-[17%] border-l border-slate-800 bg-slate-900/40">
                     <div className="text-xl mb-1">⭐</div>
-                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</div>
+                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">Smart Ai Google Reviews [upto 2500 Reviews]</div>
                     <div className="mt-0.5 flex items-baseline justify-center gap-1">
-                      <span className="text-[10px] line-through text-slate-500">₹1,999</span>
-                      <span className="text-sm font-black text-emerald-400">₹999</span>
+                      <span className="text-[10px] line-through text-slate-500">₹1,599</span>
+                      <span className="text-sm font-black text-emerald-400">₹799</span>
                       <span className="text-[9px] text-slate-300">/yr</span>
                     </div>
-                    <div className="text-[9px] text-emerald-400 font-bold">50% OFF · ₹2.7/day</div>
+                    <div className="text-[9px] text-emerald-400 font-bold">50% OFF · ₹2.2/day</div>
                   </th>
                   <th className="p-4 text-center w-[17%] border-l border-slate-800 bg-slate-900/40">
                     <div className="text-xl mb-1">💬</div>
-                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">Ai Drafted SEO Optimized 1-Click Reply to Google Reviews</div>
+                    <div className="font-extrabold text-xs sm:text-sm text-slate-100">Ai Drafted 1-Click AutoReply</div>
                     <div className="mt-0.5 flex items-baseline justify-center gap-1">
-                      <span className="text-[10px] line-through text-slate-500">₹1,999</span>
-                      <span className="text-sm font-black text-indigo-400">₹999</span>
+                      <span className="text-[10px] line-through text-slate-500">₹1,599</span>
+                      <span className="text-sm font-black text-indigo-400">₹799</span>
                       <span className="text-[9px] text-slate-300">/yr</span>
                     </div>
-                    <div className="text-[9px] text-emerald-400 font-bold">50% OFF · ₹2.7/day</div>
+                    <div className="text-[9px] text-emerald-400 font-bold">50% OFF · ₹2.2/day</div>
                   </th>
                   <th className="p-4 text-center w-[18%] border-l-2 border-emerald-500 bg-gradient-to-b from-emerald-950/90 to-slate-900 relative">
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-[9px] rounded-full uppercase tracking-wider shadow-sm whitespace-nowrap">
@@ -643,11 +643,11 @@ export function PricingClient() {
                     <div className="font-black text-sm text-white">CustomerPilot Complete</div>
                     <div className="text-[10px] text-emerald-300 font-extrabold uppercase tracking-wider mt-0.5">Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply</div>
                     <div className="mt-0.5 flex items-baseline justify-center gap-1">
-                      <span className="text-[10px] line-through text-slate-500">₹5,799</span>
-                      <span className="text-base font-black text-emerald-400">₹2,899</span>
+                      <span className="text-[10px] line-through text-slate-500">₹4,499</span>
+                      <span className="text-base font-black text-emerald-400">₹2,249</span>
                       <span className="text-[9px] text-slate-300">/yr</span>
                     </div>
-                    <div className="text-[9px] text-emerald-300 font-bold">50% OFF · ₹7.9/day (₹8/day)</div>
+                    <div className="text-[9px] text-emerald-300 font-bold">50% OFF · ₹6.2/day</div>
                   </th>
                 </tr>
               </thead>

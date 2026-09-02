@@ -3,6 +3,26 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Sep 2026] Update: Standardized Updated 50% Discount Offer Pricing & Titles Across All Website Pages and DB
+
+- **Symptom**: User specified updated pricing structure where:
+  1. Standalone 6-Month plans (Loyalty, Reviews [upto 1000 Reviews], AutoReply) have MRP ₹1,099/- and 50% discount offer ₹549/-.
+  2. Standalone 1-Year plans (Loyalty, Reviews [upto 2500 Reviews], AutoReply) have MRP ₹1,599/- and 50% discount offer ₹799/-.
+  3. Starter Growth Plan (CustomerPilot Complete 6 Months) has MRP ₹3,499/- and 50% discount offer ₹1,749/-.
+  4. Pro Scaling Plan (CustomerPilot Complete 1 Year) has MRP ₹4,499/- and 50% discount offer ₹2,249/-.
+  5. Enterprise / upto 5-Outlets (1 Year) has MRP ₹9,999/- and 50% discount offer ₹4,999/-.
+- **Root Cause**: Previous seed data and UI used earlier pricing tiers (₹649/₹1,299, ₹999/₹1,999, etc.) and needed to be synchronized with the latest commercial structure and plan descriptions.
+- **Resolution**:
+  1. Updated [`scripts/seedPricingAndTerms.js`](file:///f:/CustomerPilot_ByGLM_July2026/scripts/seedPricingAndTerms.js) with all exact prices, MRPs, durations, and plan titles.
+  2. Executed database re-seeding via `node scripts/seedPricingAndTerms.js` to persist changes into SQLite `Plan` table.
+  3. Updated [`src/components/pricing-client.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/pricing-client.tsx) with updated outcome cards, capacity plans, billing cycle switcher, Master Pricing Table, and Side-by-Side matrix header.
+  4. Updated [`src/app/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/page.tsx) homepage pricing redirect subtext.
+  5. Updated [`src/app/dashboard/subscription/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/dashboard/subscription/page.tsx) discount notice and sub-filter buttons.
+  6. Rebuilt production application with `npm run build` and started production server.
+  7. Verified live API and HTML rendering via automated check script.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [01 Sep 2026] Feature: Added "Updated 50% Discount Offer Master Pricing Table" & Limited Time Offer Banners Across Website
 
 - **Symptom**: User requested embedding the full "Updated 50% Discount Offer Master Pricing Table" directly onto the website's Pricing pages with prominent "Limited Time 50% Discount Offer" banners.
