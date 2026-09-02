@@ -485,6 +485,9 @@ export default function Home() {
             <Link href="#ai-demo" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
               AI Demo
             </Link>
+            <Link href="#roi" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
+              ROI Calculator
+            </Link>
             <Link href="#faq" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
               FAQ
             </Link>
@@ -766,18 +769,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============ CALCULATE YOUR ROI (Item 10) ============ */}
+      {/* ============ REVENUE & GROWTH CALCULATOR ============ */}
       <section id="roi" className="py-20 bg-white">
         <div className="wrap">
           <div className="sec-head max-w-3xl mx-auto text-center">
             <span className="eyebrow inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-extrabold text-xs shadow-xs">
-              ⚡ Real Business Impact &amp; Revenue Estimator
+              📊 Calculate Your Store ROI
             </span>
             <h2 className="sec-h text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mt-4 leading-tight">
-              Turn One-Time Walk-ins Into Repeat Regulars.
+              Revenue &amp; Growth Calculator
             </h2>
             <p className="sec-sub text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
-              See how recovering just 50% of lost customers creates up to ₹10.80 Lakh in incremental annual sales opportunity.
+              See how much extra monthly revenue CustomerPilot can generate for your shop.
             </p>
           </div>
 
