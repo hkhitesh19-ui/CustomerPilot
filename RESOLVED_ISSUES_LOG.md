@@ -3,6 +3,23 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Sep 2026] Feature: Added Comprehensive "Frequently Asked Questions" Section to Homepage Above Footer
+
+- **Symptom**: User requested a comprehensive "Frequently Asked Questions — Everything you need to know about CustomerPilot" section on the homepage at the bottom, directly above the footer section, referencing industry standards (EasyReviewQR, Druto, Revisit, LoopyLoyalty, Oappso, ReviewPilot).
+- **Root Cause**: The homepage previously lacked a comprehensive objection-handling and FAQ section answering critical merchant questions on no-app customer experience, staff fraud prevention, Google review policy compliance, 1-Click AI AutoReplies, POS compatibility, data privacy, and the 50% discount offer.
+- **Resolution**:
+  1. Built a modern, interactive component [`src/components/faq-section.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/faq-section.tsx) featuring:
+     - 16 in-depth merchant questions across 5 core categories: General & Setup, WhatsApp Loyalty & Stamps, Google Reviews & AutoReply, Pricing & 50% Offer, and Data Ownership & Support.
+     - Real-time question search input with instant match count.
+     - Category pill filters with active highlights.
+     - Interactive accordions with animated chevron transitions and bulleted key takeaways.
+     - High-converting "Still have questions? Chat with our founders" callout card with direct WhatsApp link (+91 90333 04707) and 7-Day Free Trial CTA.
+  2. Placed `<FaqSection />` on the homepage ([`src/app/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/page.tsx)) directly above the `<footer>` section with anchor `#faq`.
+  3. Linked `#faq` in the desktop navbar, mobile navigation drawer, and footer links.
+  4. Tested full production build (`npm run build`, 154/154 pages OK) and verified live rendering at `http://localhost:3000/#faq`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Sep 2026] Update: Standardized Updated 50% Discount Offer Pricing & Titles Across All Website Pages and DB
 
 - **Symptom**: User specified updated pricing structure where:

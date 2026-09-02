@@ -17,6 +17,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BrandLogo } from "@/components/brand-logo"
+import { FaqSection } from "@/components/faq-section"
 
 // ============================================================
 // CustomerPilot V6.4 — Homepage & 9-Step Onboarding Activation
@@ -135,7 +136,7 @@ export default function Home() {
 
     const additionalMonthlySales = recoveredCustomers * avgBill
     const additionalAnnualSales = additionalMonthlySales * 12
-    const planCostAnnual = 2899 // CustomerPilot Complete 1-Year
+    const planCostAnnual = 2249 // Pro Scaling Complete 1-Year (50% OFF)
     const monthlyCost = Math.round(planCostAnnual / 12)
     const breakEvenVisits = Math.max(1, Math.ceil(monthlyCost / (avgBill || 1)))
     const multiple = additionalAnnualSales > 0 ? Math.round(additionalAnnualSales / planCostAnnual) : 0
@@ -477,6 +478,9 @@ export default function Home() {
             <Link href="#roi" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
               Calculate ROI
             </Link>
+            <Link href="#faq" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
+              FAQ
+            </Link>
           </nav>
 
           {/* Right Action Buttons */}
@@ -545,6 +549,9 @@ export default function Home() {
               </Link>
               <Link href="#roi" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-bold text-slate-900">
                 📊 Calculate Your Store ROI
+              </Link>
+              <Link href="#faq" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-bold text-slate-900">
+                ❓ Frequently Asked Questions
               </Link>
               <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-slate-600">
                 📞 Merchant Support &amp; Help
@@ -1732,6 +1739,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ============ FREQUENTLY ASKED QUESTIONS ============ */}
+      <FaqSection />
+
       {/* ============ FOOTER ============ */}
       <footer>
         <div className="wrap">
@@ -1757,6 +1767,7 @@ export default function Home() {
               <h4>Product</h4>
               <ul>
                 <li><Link href="/pricing">Pricing &amp; Plans</Link></li>
+                <li><Link href="#faq">Frequently Asked Questions</Link></li>
                 <li><Link href="/features/whatsapp-stamp-card">WhatsApp Stamp Cards</Link></li>
                 <li><Link href="/features/google-review-automation">Google Review AI</Link></li>
                 <li><Link href="/compare/vs-traditional-pos">vs Traditional POS</Link></li>
