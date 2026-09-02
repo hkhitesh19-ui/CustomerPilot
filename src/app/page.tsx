@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BrandLogo } from "@/components/brand-logo"
 import { FaqSection } from "@/components/faq-section"
+import { AIReplySandbox } from "@/components/ai-reply-sandbox"
 
 // ============================================================
 // CustomerPilot V6.4 — Homepage & 9-Step Onboarding Activation
@@ -475,8 +476,11 @@ export default function Home() {
             <Link href="/pricing" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
               Pricing
             </Link>
-            <Link href="#roi" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
-              Calculate ROI
+            <Link href="/case-studies/cake-connection" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
+              Case Study
+            </Link>
+            <Link href="#ai-demo" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
+              AI Demo
             </Link>
             <Link href="#faq" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
               FAQ
@@ -1178,6 +1182,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ============ AI REPLY SANDBOX (Interactive Demo) ============ */}
+      <AIReplySandbox />
+
       {/* ============ FEATURE COMPARISON MATRIX TABLE (Ultra High-Converting Dominant Complete Suite) ============ */}
       <section className="py-20 sm:py-28 bg-slate-900 text-white border-y border-slate-800 relative overflow-hidden" id="comparison">
         {/* Background glow accents */}
@@ -1767,11 +1774,19 @@ export default function Home() {
               <h4>Product</h4>
               <ul>
                 <li><Link href="/pricing">Pricing &amp; Plans</Link></li>
+                <li><Link href="/case-studies/cake-connection">Case Study: Cake Connection</Link></li>
+                <li><Link href="#ai-demo">AI Review Reply Demo</Link></li>
                 <li><Link href="#faq">Frequently Asked Questions</Link></li>
                 <li><Link href="/features/whatsapp-stamp-card">WhatsApp Stamp Cards</Link></li>
                 <li><Link href="/features/google-review-automation">Google Review AI</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4>Compare</h4>
+              <ul>
+                <li><Link href="/vs/reelo">vs Reelo</Link></li>
+                <li><Link href="/vs/bingage">vs Bingage</Link></li>
                 <li><Link href="/compare/vs-traditional-pos">vs Traditional POS</Link></li>
-                <li><Link href="/marketing">Platform Overview</Link></li>
               </ul>
             </div>
             <div>

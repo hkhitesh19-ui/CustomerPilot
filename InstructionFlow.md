@@ -303,6 +303,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   ├── app/                           # Next.js App Router (Pages, Layouts & API Routes)
 │   │   ├── (auth)/                    # Authentication Route Group (login, register, forgot-password)
 │   │   ├── api/                       # Backend API Endpoint Routes (JSON Services)
+│   │   │   ├── demo/                  # Public Sandboxed Demo APIs (AI Review Reply)
 │   │   │   ├── reviews/               # 1-Click AI Auto-Reply & List APIs
 │   │   │   ├── onboarding/            # 9-Step Onboarding Engine State APIs
 │   │   │   ├── webhook/               # Evolution API & WhatsApp Incoming Webhooks
@@ -312,6 +313,12 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   ├── cafe-loyalty/page.tsx      # Industry Landing Page: Cafe Loyalty
 │   │   ├── salon-loyalty/page.tsx     # Industry Landing Page: Salon Loyalty
 │   │   ├── restaurant-loyalty/page.tsx# Industry Landing Page: Restaurant Loyalty
+│   │   ├── case-studies/              # Hard-Numbered Verified Case Studies
+│   │   │   └── cake-connection/page.tsx # Cake Connection 90-Day Results (+895% reviews)
+│   │   ├── vs/                        # Competitor Attack / Comparison Pages
+│   │   │   ├── reelo/page.tsx         # Reelo vs CustomerPilot
+│   │   │   ├── bingage/page.tsx       # Bingage vs CustomerPilot
+│   │   │   └── birdeye/page.tsx       # Birdeye vs CustomerPilot
 │   │   ├── dashboard/                 # Merchant Command Center Dashboard
 │   │   │   ├── reviews/page.tsx       # 1-Click Google Review AI Studio (NEW)
 │   │   │   ├── customers/page.tsx     # VIP Customers CRM Table
@@ -320,7 +327,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   └── settings/page.tsx      # Merchant Profile, WhatsApp QR & GBP Link
 │   │   ├── join/page.tsx              # Customer QR Scan & Digital Stamp Card Page
 │   │   ├── onboarding/page.tsx        # 9-Step Interactive Onboarding Wizard
-│   │   ├── page.tsx                   # Master Homepage & Product Landing Page
+│   │   ├── page.tsx                   # Master Homepage & Product Landing Page (with AI Sandbox)
 │   │   ├── pricing/page.tsx           # V3.0 Customer Capacity & Founding Merchant Pricing
 │   │   ├── review/page.tsx            # Customer 5-Star WhatsApp Review Collector Page
 │   │   └── super-admin/page.tsx       # Platform SuperAdmin Master Control Panel
@@ -329,7 +336,10 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   ├── splash-screen.tsx          # Full-Screen 1-Second Animated Splash Overlay
 │   │   ├── brand-logo.tsx             # Pure Vector Transparent SVG Logo Component
 │   │   ├── app-sidebar.tsx            # Merchant Navigation Sidebar with Founder Badge
-│   │   └── top-nav.tsx                # Merchant Top Header Navigation
+│   │   ├── top-nav.tsx                # Merchant Top Header Navigation
+│   │   ├── faq-section.tsx            # 16-Question Interactive Searchable FAQ
+│   │   ├── ai-reply-sandbox.tsx       # Gemini AI Review Reply Browser Sandbox
+│   │   └── vs-page.tsx                # Reusable Competitor Comparison Layout
 │   │
 │   ├── communication/                 # Unified Messaging Infrastructure
 │   │   ├── drivers/                   # Evolution API WhatsApp Engine Driver

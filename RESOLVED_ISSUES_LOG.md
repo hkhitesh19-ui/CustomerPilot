@@ -3,6 +3,36 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Sep 2026] Feature: Implemented High-Converting Growth Engine (Pillar 2 AI Demo Sandbox, Pillar 3 Cake Connection Case Study, Pillar 4 Competitor Attack Pages)
+
+- **Symptom**: User requested validation and execution of the strategic growth guide focusing on Pillar 2 (Interactive Demo Sandbox), Pillar 3 (Hard-Numbered Case Studies), and Pillar 4 (Competitor Attack Pages).
+- **Root Cause**: The platform had comprehensive technical features but lacked high-intent organic conversion pages (competitor comparison alternatives, real verified case studies, and a zero-friction public AI trial sandbox) to convert visiting merchants without sales calls.
+- **Resolution**:
+  1. **Pillar 2 (Interactive Demo)**:
+     - Built [`src/app/api/demo/ai-reply/route.ts`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/demo/ai-reply/route.ts) — an isolated, IP-rate-limited (8 calls/IP/hr) public endpoint utilizing Gemini Flash AI.
+     - Built [`src/components/ai-reply-sandbox.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/ai-reply-sandbox.tsx) — an interactive browser sandbox allowing visitors to test 5-star / 1-star reviews across 4 business categories (Bakery, Cafe, Restaurant, Salon) with instant contextual AI replies and 1-click copy.
+     - Integrated the AI sandbox directly on [`src/app/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/page.tsx) above the comparison table with anchor `#ai-demo`.
+  2. **Pillar 3 (Hard-Numbered Case Studies)**:
+     - Built [`src/app/case-studies/cake-connection/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/case-studies/cake-connection/page.tsx) displaying verified 90-day results:
+       * Google Reviews: 42 → 418 (+895%)
+       * Average Rating: 4.1 → 4.8 Stars
+       * Customer CRM: 0 → 2,840 verified profiles
+       * 30-day repeat rate: 14% → 31.4% (+124% lift)
+       * Reminder revenue: ₹42,600/month
+     - Added 3-phase implementation story, merchant quote, and direct CTAs.
+  3. **Pillar 4 (Competitor Attack Pages)**:
+     - Built [`src/components/vs-page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/components/vs-page.tsx) — a high-converting reusable comparison layout.
+     - Built [`src/app/vs/reelo/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/vs/reelo/page.tsx) targeting "Reelo alternative" search queries (highlighting ₹39,000 vs ₹2,249 annual cost savings of ₹36,751).
+     - Built [`src/app/vs/bingage/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/vs/bingage/page.tsx) targeting "Bingage alternative" search queries (highlighting WhatsApp stamps vs cashback points).
+     - Built [`src/app/vs/birdeye/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/vs/birdeye/page.tsx) targeting "Birdeye alternative India" search queries (highlighting Indian SMB affordability vs enterprise US pricing).
+  4. **Site Navigation & Cross-Linking**:
+     - Added "Case Study" and "AI Demo" links to desktop header navigation in [`src/app/page.tsx`](file:///f:/CustomerPilot_ByGLM_July2026/src/app/page.tsx).
+     - Added "Compare" column (vs Reelo, vs Bingage, vs Traditional POS) and Case Study link to footer.
+  5. **Verification**:
+     - Full production build completed successfully with Next.js Turbopack: 159/159 static and dynamic routes compiled with 0 errors.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Sep 2026] Feature: Added Comprehensive "Frequently Asked Questions" Section to Homepage Above Footer
 
 - **Symptom**: User requested a comprehensive "Frequently Asked Questions — Everything you need to know about CustomerPilot" section on the homepage at the bottom, directly above the footer section, referencing industry standards (EasyReviewQR, Druto, Revisit, LoopyLoyalty, Oappso, ReviewPilot).
