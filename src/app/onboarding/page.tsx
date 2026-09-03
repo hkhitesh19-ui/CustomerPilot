@@ -1811,18 +1811,7 @@ function OnboardStep6QR({ data, setData }: any) {
       } catch {}
     }
     generate()
-
-    if (!data.logoDataUrl) {
-      fetch("/api/state")
-        .then((r) => r.json())
-        .then((json) => {
-          if (json?.ok && json?.data?.merchant?.logoUrl) {
-            setData((prev: any) => ({ ...prev, logoDataUrl: json.data.merchant.logoUrl }))
-          }
-        })
-        .catch(() => {})
-    }
-  }, [data.businessName, data.whatsappNumber, data.logoDataUrl, setData])
+  }, [data.businessName, data.whatsappNumber, setData])
 
   return (
     <div className="p-6 sm:p-8 text-center space-y-6">
