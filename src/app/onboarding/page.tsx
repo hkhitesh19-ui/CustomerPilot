@@ -6,7 +6,7 @@
 // Requires JWT cookie (set by /signup or /login)
 // ============================================================
 
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect, useRef, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import QRCode from "qrcode"
@@ -14,7 +14,7 @@ import {
   Store, MessageSquare, Search, Upload, Gift, QrCode as QrIcon, Zap,
   Check, ArrowRight, ArrowLeft, Loader2, UserCheck,
   Printer, AlertCircle, CircleDot, Star, Rocket, X, Shield, Sparkles,
-  CheckCircle2, ExternalLink, MapPin, Copy, Globe, Building2, RefreshCw,
+  CheckCircle2, ExternalLink, MapPin, Copy, Globe, Building2, RefreshCw, Clock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
