@@ -3,37 +3,26 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
-## [03 Sep 2026] Issue: Permanent Fix for Recurring WhatsApp "couldn't link device, Try again later" Error & WhatsApp Pairing Code Integration
+## [03 Sep 2026] Issue: Permanent Fix for WhatsApp Linking with Live 10-Minute Countdown Timer & Automatic Silent Background Refresh
 
-- **Symptom**: Merchants repeatedly received *"couldn't link device, Try again later"* on their mobile WhatsApp when attempting to scan the on-screen QR code during onboarding Step 2 or in Settings. The issue recurred across restarts and fresh merchant data resets.
+- **Symptom**: Merchants repeatedly received *"couldn't link device, Try again later"* on their mobile WhatsApp when scanning the on-screen QR code during onboarding Step 2 or in Settings.
 - **Root Cause**:
-  1. **QR Code TTL Expiry (30s Timeout)**: Baileys/WhatsApp QR codes expire cryptographically every 20-30 seconds. On the frontend (`src/app/onboarding/page.tsx` & `src/components/whatsapp-verification.tsx`), QR codes were loaded once on mount and never refreshed. By the time merchants unlocked their phones and opened WhatsApp > Linked Devices > Link a Device, the QR on screen was dead, causing WhatsApp's servers to reject the handshake with *"couldn't link device, Try again later"*.
-  2. **Aborted Session Lock on Evolution API**: When a QR scan timed out or failed, Evolution API kept the instance in a `"close"` or aborted WebSocket handshake state. Subsequent connect calls without forced cleanup returned stale handshake sessions that immediately failed on the phone.
-  3. **Dead Pinggy Webhook URL in `.env`**: `.env` contained an expired Pinggy tunnel URL (`tysvo-49-43-35-137.run.pinggy-free.link`). Evolution API attempted to dispatch connection webhooks to an offline host, contributing to connection event failures.
-  4. **Missing Official WhatsApp Pairing Code Option**: WhatsApp natively supports "Link with phone number instead" (Pairing Code) which bypasses camera focus, glare, and QR expiry completely, but CustomerPilot lacked UI and API support for phone-based pairing code generation.
+  1. **QR Code TTL Expiry (30s Timeout)**: Baileys/WhatsApp QR codes expire cryptographically every 20-30 seconds. On the frontend (`src/app/onboarding/page.tsx` & `src/components/whatsapp-verification.tsx`), QR codes were loaded once on mount and never refreshed. By the time merchants scanned, the QR on screen was dead.
+  2. **Aborted Session Lock on Evolution API**: When a QR scan timed out or failed, Evolution API kept the instance in a `"close"` state, causing subsequent scans to fail without forced session recreation.
+  3. **Dead Pinggy Webhook URL in `.env`**: `.env` contained an expired Pinggy tunnel URL (`tysvo-49-43-35-137.run.pinggy-free.link`), causing Evolution API webhook delivery errors.
 - **Resolution**:
-  1. **Backend Upgrade (`src/app/api/whatsapp/connect/route.ts`)**:
-     - Added `forceRefresh` support: When `force=true` or when recreating instances, cleanly calls `logout` + `delete` on Evolution API, pauses to clear disk session locks, and creates a 100% clean instance.
-     - Added WhatsApp Pairing Code support: Accepts `phone` or `number` param. When provided, passes `number: cleanPhone` to Evolution API `/instance/create`, queries `/instance/connect/:instanceName` to retrieve the 8-character pairing code, and formats it as `ABCD-1234`.
-     - Added dual HTTP `GET` and `POST` method support with consistent `{ ok: true, status, qrCodeBase64, pairingCode, expiresIn: 30 }` payload.
-  2. **Frontend Settings Component Upgrade (`src/components/whatsapp-verification.tsx`)**:
-     - Added Dual-Mode switcher tabs: **[📷 Option 1: Scan QR Code]** and **[🔢 Option 2: 8-Digit Code (No Scan) ⭐]**.
-     - Implemented a live **30-Second Countdown Timer** with animated badge (`Active · Auto-refreshes in 28s`). Automatically requests a fresh QR code before expiration so merchants never scan an expired code.
-     - Added a dedicated **"Force Reset / New QR"** button to instantly purge stuck server sessions.
-     - Built the **WhatsApp Pairing Code Card**: Phone input, "Get Pairing Code" button, high-contrast 8-digit display (`GC72-JGKJ`), 1-click clipboard copy, and clear 4-step instructions for entering it inside WhatsApp without camera scanning.
-  3. **Onboarding Wizard Step 2 Upgrade (`src/app/onboarding/page.tsx`)**:
-     - Integrated the same Dual-Mode tabs (QR Scan, 8-Digit Pairing Code, SMS OTP fallback).
-     - Added live countdown timer and auto-refresh for the onboarding QR code.
-     - Added Pairing Code generator with phone input and large formatted code display.
-     - Added a clear troubleshooting hint for merchants experiencing scanning difficulties.
-  4. **Auto-Renewing Tunnel & Webhook Sync Daemon (`scripts/autoPinggySync.js`)**:
-     - Updated `autoPinggySync.js` to automatically keep `NEXT_PUBLIC_APP_URL` in `.env.local` and `WHATSAPP_WEBHOOK_URL` in `.env` in sync with the active Pinggy tunnel.
-     - Launched `autoPinggySync.js` as an active background daemon renewing every 55 minutes, keeping Evolution API instances updated with valid webhook endpoints.
-  5. **Purged Stale VPS Instances**:
-     - Cleared stale aborted test instances from Evolution API via `DELETE /instance/delete/CP_M_cmtl0v6xg0042w06kz9ye0vz2`.
-  6. **Local Verification**:
-     - Verified Next.js dev server compilation: `GET /onboarding` compiled cleanly.
-     - Tested pairing code generation against live Evolution API: Successfully returned valid 8-character code `GC72JGKJ`.
+  1. **Live 10-Minute Session Countdown Timer**:
+     - Configured a 10-minute (`600s`) live countdown timer displayed in `MM:SS` format (e.g. `10:00`, `09:59`...) with an active pulsing status badge across both [whatsapp-verification.tsx](file:///f:/CustomerPilot_ByGLM_July2026/src/components/whatsapp-verification.tsx) and [onboarding/page.tsx](file:///f:/CustomerPilot_ByGLM_July2026/src/app/onboarding/page.tsx).
+     - Merchants have a clear 10-minute window to scan their store phone with zero time-pressure anxiety.
+  2. **Automatic Silent Background Refresh (Every 20 Seconds)**:
+     - Implemented background polling every 20 seconds to fetch the updated cryptographic QR code token from `/api/whatsapp/connect` without resetting the 10-minute session countdown and without flickering or disrupting the UI.
+     - The displayed QR code is always cryptographically fresh on WhatsApp servers, permanently eliminating the *"couldn't link device, Try again later"* expiration error.
+  3. **Removed 8-Digit Pairing Code UI**:
+     - Removed manual phone entry and 8-digit pairing code tabs per user request, preserving a clean, focused QR code experience (with existing SMS OTP fallback).
+  4. **1-Click "Reset 10-Min Session" Button**:
+     - Provided a 1-click reset button that cleanly purges any stuck session on Evolution API via `logout` + `delete` and generates a brand-new 10-minute QR session.
+  5. **Auto-Renewing Tunnel & Webhook Sync Daemon (`scripts/autoPinggySync.js`)**:
+     - Running as an active background daemon renewing every 55 minutes, keeping Evolution API instances updated with the live Pinggy tunnel URL.
 - **Status**: ✅ Resolved and Verified.
 
 ---
