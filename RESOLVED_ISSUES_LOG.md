@@ -20,6 +20,9 @@ This document serves as a historical record of all major bugs, configuration iss
      - [api/qr/generate/route.ts](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/qr/generate/route.ts): Powers [qr-generator.tsx](file:///f:/CustomerPilot_ByGLM_July2026/src/components/qr-generator.tsx) (VIP Loyalty Counter Stand, Table Standee, Window Poster, Packaging Sticker, Cake Box Seal) and [google-review-qr-generator.tsx](file:///f:/CustomerPilot_ByGLM_July2026/src/components/google-review-qr-generator.tsx) (Google Reviews Counter Standee, Table Tent, Direct 5-Star Review QR).
      - [onboarding/page.tsx](file:///f:/CustomerPilot_ByGLM_July2026/src/app/onboarding/page.tsx): Updated Step 6 (`OnboardStep6QR`), Step 7 (`OnboardStep7Print`), and Launch Summary.
      - [page.tsx](file:///f:/CustomerPilot_ByGLM_July2026/src/app/page.tsx): Updated interactive Step 6 demo.
+  5. **Merchant Logo Display & Standee UI Cleanup**:
+     - Restored merchant's uploaded logo (`data.logoDataUrl`) above the business name in Step 6 Standee preview. Added automated state fallback fetch to ensure the logo always renders even on direct page reloads.
+     - Removed cluttered test elements (`💬 Opens WhatsApp Directly ★`, deep link URL box, `Open WhatsApp 💬`, `Copy Link 📋`) from the standee preview card so it mirrors a clean, professional counter standee ready for customers.
 - **Status**: ✅ Resolved and Verified.
 
 ---

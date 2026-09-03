@@ -1811,7 +1811,18 @@ function OnboardStep6QR({ data, setData }: any) {
       } catch {}
     }
     generate()
-  }, [data.businessName, data.whatsappNumber, setData])
+
+    if (!data.logoDataUrl) {
+      fetch("/api/state")
+        .then((r) => r.json())
+        .then((json) => {
+          if (json?.ok && json?.data?.merchant?.logoUrl) {
+            setData((prev: any) => ({ ...prev, logoDataUrl: json.data.merchant.logoUrl }))
+          }
+        })
+        .catch(() => {})
+    }
+  }, [data.businessName, data.whatsappNumber, data.logoDataUrl, setData])
 
   return (
     <div className="p-6 sm:p-8 text-center space-y-6">
@@ -1821,21 +1832,18 @@ function OnboardStep6QR({ data, setData }: any) {
       </div>
       {data.qrDataUrl && (
         <div className="inline-block p-6 bg-white border-2 border-slate-900 rounded-3xl shadow-xl space-y-4 max-w-sm w-full">
-          <p className="font-extrabold text-slate-900 text-lg">{data.businessName || "Your Business"}</p>
+          {data.logoDataUrl && (
+            <div className="flex justify-center items-center">
+              <img
+                src={data.logoDataUrl}
+                alt={data.businessName || "Business Logo"}
+                className="max-h-16 max-w-[200px] w-auto h-auto object-contain rounded-xl p-1 bg-white border border-slate-200 shadow-sm"
+              />
+            </div>
+          )}
+          <p className="font-extrabold text-slate-900 text-lg tracking-tight">{data.businessName || "Your Business"}</p>
           <div className="p-3 bg-emerald-50/50 rounded-2xl border border-emerald-200">
             <img src={data.qrDataUrl} alt="WhatsApp QR Code" className="w-52 h-52 mx-auto" />
-          </div>
-          <Badge className="bg-emerald-600 text-white py-1 px-3 text-xs font-bold">💬 Opens WhatsApp Directly ★</Badge>
-          <div className="text-left space-y-2 pt-2">
-            <p className="text-[11px] font-mono text-slate-600 break-all bg-slate-100 p-2 rounded border">{waLink}</p>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="w-full text-xs text-emerald-700 border-emerald-300" onClick={() => window.open(waLink, "_blank")}>
-                Open WhatsApp 💬
-              </Button>
-              <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => navigator.clipboard.writeText(waLink)}>
-                Copy Link 📋
-              </Button>
-            </div>
           </div>
 
           {/* CustomerPilot Branding with Logo */}

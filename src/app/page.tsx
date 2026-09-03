@@ -2842,44 +2842,19 @@ function Step6QRCode({ data, setData }: any) {
 
       {data.qrDataUrl && (
         <div className="inline-block p-6 bg-white border-2 border-slate-900 rounded-3xl shadow-xl space-y-4 max-w-sm w-full">
-          <p className="font-extrabold text-slate-900 text-lg">{data.businessName || "Cake Connection"}</p>
+          {data.logoDataUrl && (
+            <div className="flex justify-center items-center">
+              <img
+                src={data.logoDataUrl}
+                alt={data.businessName || "Cake Connection"}
+                className="max-h-16 max-w-[200px] w-auto h-auto object-contain rounded-xl p-1 bg-white border border-slate-200 shadow-sm"
+              />
+            </div>
+          )}
+          <p className="font-extrabold text-slate-900 text-lg tracking-tight">{data.businessName || "Cake Connection"}</p>
           
           <div className="p-3 bg-emerald-50/50 rounded-2xl border border-emerald-200">
             <img src={data.qrDataUrl} alt="WhatsApp QR Code" className="w-52 h-52 mx-auto" />
-          </div>
-
-          <Badge className="bg-emerald-600 text-white py-1 px-3 text-xs font-bold gap-1">
-            💬 Opens WhatsApp App Directly ★
-          </Badge>
-
-          {/* Direct Link & Test Options */}
-          <div className="pt-2 space-y-2 text-left">
-            <p className="text-[11px] font-semibold text-slate-600">WhatsApp Deep Link (Instant Mobile Scan):</p>
-            <div className="p-2 bg-slate-100 rounded-lg text-[11px] font-mono text-slate-700 break-all border border-slate-200">
-              {waLink}
-            </div>
-            
-            <div className="flex gap-2 pt-1">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full text-xs gap-1.5 bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100 font-semibold"
-                onClick={() => window.open(waLink, "_blank")}
-              >
-                Open WhatsApp 💬
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full text-xs gap-1.5"
-                onClick={() => {
-                  navigator.clipboard.writeText(waLink)
-                  alert("WhatsApp Link copied to clipboard!")
-                }}
-              >
-                Copy Link 📋
-              </Button>
-            </div>
           </div>
 
           {/* CustomerPilot Branding with Logo */}
