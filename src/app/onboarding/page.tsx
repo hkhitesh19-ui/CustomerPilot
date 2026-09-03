@@ -637,7 +637,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
 
     silentRefreshRef.current = setInterval(async () => {
       try {
-        const res = await fetch("/api/whatsapp/connect")
+        const res = await fetch("/api/whatsapp/connect?silent=true")
         if (res.ok) {
           const json = await res.json()
           if (json.status === "open" || json.connected) {

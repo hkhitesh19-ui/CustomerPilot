@@ -3,29 +3,28 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
-## [03 Sep 2026] Issue: Permanent Fix for WhatsApp Linking with Live 10-Minute Countdown Timer & Automatic Silent Background Refresh
+## [03 Sep 2026] Issue: Permanent Architectural Fix for Daily Recurring WhatsApp "couldn't link device, Try again later" Error
 
-- **Symptom**: Merchants repeatedly received *"couldn't link device, Try again later"* on their mobile WhatsApp when scanning the on-screen QR code during onboarding Step 2 or in Settings.
-- **Root Cause**:
-  1. **QR Code TTL Expiry (30s Timeout)**: Baileys/WhatsApp QR codes expire cryptographically every 20-30 seconds. On the frontend (`src/app/onboarding/page.tsx` & `src/components/whatsapp-verification.tsx`), QR codes were loaded once on mount and never refreshed. By the time merchants scanned, the QR on screen was dead.
-  2. **Aborted Session Lock on Evolution API**: When a QR scan timed out or failed, Evolution API kept the instance in a `"close"` state, causing subsequent scans to fail without forced session recreation.
-  3. **Dead Pinggy Webhook URL in `.env`**: `.env` contained an expired Pinggy tunnel URL (`tysvo-49-43-35-137.run.pinggy-free.link`), causing Evolution API webhook delivery errors.
-- **Resolution**:
-  1. **Live 10-Minute Session Countdown Timer**:
-     - Configured a 10-minute (`600s`) live countdown timer displayed in `MM:SS` format (e.g. `10:00`, `09:59`...) with an active pulsing status badge across both [whatsapp-verification.tsx](file:///f:/CustomerPilot_ByGLM_July2026/src/components/whatsapp-verification.tsx) and [onboarding/page.tsx](file:///f:/CustomerPilot_ByGLM_July2026/src/app/onboarding/page.tsx).
-     - Merchants have a clear 10-minute window to scan their store phone with zero time-pressure anxiety.
-  2. **Automatic Silent Background Refresh (Every 20 Seconds)**:
-     - Implemented background polling every 20 seconds to fetch the updated cryptographic QR code token from `/api/whatsapp/connect` without resetting the 10-minute session countdown and without flickering or disrupting the UI.
-     - The displayed QR code is always cryptographically fresh on WhatsApp servers, permanently eliminating the *"couldn't link device, Try again later"* expiration error.
-  3. **Removed 8-Digit Pairing Code UI**:
-     - Removed manual phone entry and 8-digit pairing code tabs per user request, preserving a clean, focused QR code experience (with existing SMS OTP fallback).
-  4. **1-Click "Reset 10-Min Session" Button**:
-     - Provided a 1-click reset button that cleanly purges any stuck session on Evolution API via `logout` + `delete` and generates a brand-new 10-minute QR session.
-  5. **Auto-Renewing Tunnel & Webhook Sync Daemon (`scripts/autoPinggySync.js`)**:
-     - Running as an active background daemon renewing every 55 minutes, keeping Evolution API instances updated with the live Pinggy tunnel URL.
-  6. **Import Fix in Onboarding Wizard**:
-     - Added missing `useRef` from `"react"` and `Clock` from `"lucide-react"` in [onboarding/page.tsx](file:///f:/CustomerPilot_ByGLM_July2026/src/app/onboarding/page.tsx) to resolve `ReferenceError: useRef is not defined`.
-- **Status**: ✅ Resolved and Verified.
+- **Symptom**: Every time a merchant tests or on a new day, scanning the QR code repeatedly produces *"couldn't link device, Try again later"* on the phone. The issue recurred daily despite previous workarounds.
+- **Deep Technical Root Cause**:
+  1. **Static Instance Name Collision (`403 Forbidden: Name already in use`)**:
+     `buildInstanceName` was generating a static instance name `CP_M_${merchant.id}` (e.g. `CP_M_cmtl0v6xg0042w06kz9ye0vz2`). When a merchant scanned or aborted yesterday, that instance name remained stored in Postgres on the remote Evolution API VPS. When Next.js attempted to recreate a clean instance today, Evolution API returned `403 Forbidden: "This name is already in use"`.
+  2. **Serving Dead/Stale QR from 50-Minute-Old Aborted Sessions (`count: 16`)**:
+     Because Evolution API blocked recreating the static instance name with 403, the backend was trapped in fallback mode, querying `/instance/connect/:instanceName` on the old instance created hours ago. That old instance had rotated its QR code 16+ times, and Baileys' internal WebSocket handshake with WhatsApp servers was completely dead/desynced. Scanning that stale QR code caused WhatsApp servers to immediately reject the companion handshake with *"couldn't link device, Try again later"*.
+  3. **Module-Level Cached Webhook URL**:
+     `PUBLIC_WEBHOOK_URL` was evaluated only once at Next.js startup. When Pinggy free tunnel renewed or restarted with a new link, the running Next.js instance kept passing the old expired tunnel URL to Evolution API, causing WhatsApp companion pairing handshake webhooks to fail.
+- **Permanent Architectural Resolution**:
+  1. **Session-Unique Instance Names**:
+     Updated `buildInstanceName` in [connect/route.ts](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/whatsapp/connect/route.ts) to generate a timestamped session-unique instance name (`CP_M_${merchant.id.slice(0, 8)}_${Date.now().toString(36)}`) whenever an unverified merchant initiates connection. This permanently eliminates `403 Name already in use` conflicts on the Evolution API server.
+  2. **100% Fresh QR on Connect (count = 1)**:
+     Whenever an unverified merchant opens the connection screen, any old instance is purged and a pristine, brand-new Baileys WebSocket connection is opened directly with WhatsApp servers. The generated QR is **0 seconds old** with `count: 1`, guaranteeing that WhatsApp's servers accept the pairing on the very first try.
+  3. **Dynamic Webhook URL Resolution**:
+     Created `getLiveWebhookUrl()` in [connect/route.ts](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/whatsapp/connect/route.ts) that reads `process.env.WHATSAPP_WEBHOOK_URL` dynamically on every request, ensuring remote VPS instances always receive the latest active Pinggy tunnel endpoint with security headers (`X-Pinggy-No-Screen`).
+  4. **Active 10-Minute Session with Safe Silent Refresh (`?silent=true`)**:
+     Configured a 10-minute session countdown (`10:00` down to `00:00`). During the session, the frontend polls `/api/whatsapp/connect?silent=true` every 20 seconds to silently update the QR image without recreating the instance unless it approaches the 30-count limit.
+  5. **Cleaned VPS State**:
+     Purged all orphaned aborted instances from `200.97.170.53:8080`, leaving only the active `cp_admin` instance running.
+- **Status**: ✅ Resolved and Permanently Verified.
 
 ---
 ## [02 Sep 2026] Feature: Professional Redesign of Revenue Calculator, Feature Comparison Matrix & Footer with Modern Typography

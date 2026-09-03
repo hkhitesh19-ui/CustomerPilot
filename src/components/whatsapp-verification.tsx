@@ -109,7 +109,7 @@ export function WhatsAppVerification({ merchantId }: { merchantId: string }) {
 
     silentRefreshRef.current = setInterval(async () => {
       try {
-        const res = await fetch("/api/whatsapp/connect", {
+        const res = await fetch("/api/whatsapp/connect?silent=true", {
           headers: { "x-merchant-id": merchantId }
         })
         if (res.ok) {
