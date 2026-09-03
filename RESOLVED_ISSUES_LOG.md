@@ -3,6 +3,32 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Sep 2026] Feature: Industry-Tailored Default Loyalty Rules & Reward Card Setup for New Merchants
+
+- **Symptom**: User requested that whenever a new merchant joins, their default loyalty rules (Card Title, Reward Offer, Minimum Spend for Stamp, Stamp Goal, Validity Days, Google Review Bonus, Photo Review Bonus, Joining Bonus, and Kickstart Bonus) must be automatically configured by default based on their specific **nature of business** (e.g. Bakery, Restaurant, Cafe, Salon, Spa, Gym, Retail, Grocery, Pharmacy, Electronics, etc.).
+- **Root Cause**: Previously, `/api/cards/setup` and registration had generic hardcoded defaults ("FREE 500gm Cake", ₹500 spend, 90 days validity, 1 review bonus) that did not reflect the merchant's actual business nature (e.g. ₹150 min spend for cafes, 60 days validity, 2 review bonus, 2 photo bonus, 2 join bonus, 1 level kickstart).
+- **Resolution**:
+  1. **Comprehensive Industry Rules (`src/lib/industry-campaigns.ts`)**:
+     - Built `getIndustryLoyaltyRule(businessType, businessName)` covering 11 business categories with exact realistic economics:
+       - **Bakery & Cake Shop**: `500 Free Cake`, Min ₹300, 10 stamps, 60 days, 2 review bonus, 2 photo bonus, 2 join bonus, 1 kickstart bonus.
+       - **Restaurant & Dine-in**: `Free Butter Naan / Starter`, Min ₹300, 10 stamps, 60 days.
+       - **Café & Coffee Shop**: `Free Specialty Coffee`, Min ₹150, 10 stamps, 60 days.
+       - **Salon & Beauty**: `Free Haircut / Styling`, Min ₹500, 6 stamps, 90 days.
+       - **Spa & Wellness**: `Free Head Massage / Aromatherapy`, Min ₹800, 5 stamps, 90 days.
+       - **Gym & Fitness**: `Free 1 Month Membership Extension`, Min ₹500, 12 visits, 90 days.
+       - **Retail & Clothing**: `₹200 Shopping Voucher`, Min ₹500, 10 stamps, 60 days.
+       - **Grocery / Kirana**: `₹100 Instant Grocery Discount`, Min ₹200, 15 stamps, 60 days.
+       - **Pharmacy**: `Free Health Checkup / ₹150 Voucher`, Min ₹300, 10 stamps, 90 days.
+       - **Electronics**: `Free Tempered Glass / ₹250 Accessory Voucher`, Min ₹500, 8 stamps, 90 days.
+  2. **Auto-Initialization in Card Setup API (`src/app/api/cards/setup/route.ts`)**:
+     - Updated `GET /api/cards/setup` to inspect the merchant's `businessType` and `name`. When no card exists for a new merchant, it auto-generates and persists the industry-tailored StampCard in the database, populating the Settings UI instantly.
+  3. **Merchant Registration Hook (`src/app/api/auth/register/route.ts`)**:
+     - Seeded initial `StampCard` with `getIndustryLoyaltyRule` upon new account creation.
+  4. **Dynamic Onboarding Flow (`src/app/onboarding/page.tsx`)**:
+     - Pre-fills rewards and title dynamically based on `businessType`. If the merchant changes category in Step 1, all reward parameters automatically update in real-time.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [03 Sep 2026] Issue: Fix useEffect Dependency Size Error in OnboardStep6QR
 
 - **Symptom**: Console error in browser: `The final argument passed to useEffect changed size between renders. The order and size of this array must remain constant.`

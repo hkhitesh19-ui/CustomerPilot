@@ -1,22 +1,7 @@
 import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
 import { ok, err, getAuthenticatedMerchant } from "@/lib/api"
-
-const RECOMMENDED_DEFAULTS = {
-  name: "Loyalty Stamp Card",
-  stampsRequired: 10,
-  rewardName: "FREE 500gm Cake",
-  stampValue: 500, // ₹500 Purchase = 1 Stamp
-  validityDays: 90,
-  googleReviewBonus: 1,
-  photoBonus: 1,
-  joiningBonusEnabled: true,
-  joiningBonusStamps: 2,
-  color: "#6366f1",
-  tierRewardsEnabled: false,
-  excludedCategories: "",
-  rewardImageUrl: ""
-}
+import { getIndustryLoyaltyRule } from "@/lib/industry-campaigns"
 
 export async function GET(req: NextRequest) {
   try {
@@ -40,14 +25,54 @@ export async function GET(req: NextRequest) {
       }),
       db.merchant.findUnique({
         where: { id: merchantId },
-        select: { vipUpgradeBonusStamps: true }
+        select: { name: true, businessType: true, vipUpgradeBonusStamps: true }
       })
     ])
 
-    console.log(`[CardSetup GET] Card found for merchant ${merchantId}:`, card ? `id=${card.id} stamps=${card.stampsRequired} val=${card.stampValue}` : "NULL → will return DEFAULTS")
+    console.log(`[CardSetup GET] Card found for merchant ${merchantId}:`, card ? `id=${card.id} stamps=${card.stampsRequired} val=${card.stampValue}` : "NULL → will return INDUSTRY DEFAULTS")
 
     if (!card) {
-      return ok({ card: { ...RECOMMENDED_DEFAULTS, vipUpgradeBonusStamps: merchant?.vipUpgradeBonusStamps ?? 1 }, isDefault: true }, {
+      const rule = getIndustryLoyaltyRule(merchant?.businessType, merchant?.name)
+      const defaultCardData = {
+        name: rule.getCardTitle(merchant?.name),
+        stampsRequired: rule.stampsRequired,
+        rewardName: rule.rewardName,
+        stampValue: rule.stampValue,
+        validityDays: rule.validityDays,
+        googleReviewBonus: rule.googleReviewBonus,
+        photoBonus: rule.photoBonus,
+        joiningBonusEnabled: rule.joiningBonusEnabled,
+        joiningBonusStamps: rule.joiningBonusStamps,
+        vipUpgradeBonusStamps: merchant?.vipUpgradeBonusStamps ?? rule.vipUpgradeBonusStamps,
+        color: rule.color,
+        tierRewardsEnabled: false,
+        excludedCategories: "",
+        rewardImageUrl: ""
+      }
+
+      // Auto-create initial card in DB so it exists persistently for this merchant
+      const createdCard = await db.stampCard.create({
+        data: {
+          merchantId,
+          name: defaultCardData.name,
+          stampsRequired: defaultCardData.stampsRequired,
+          rewardName: defaultCardData.rewardName,
+          stampValue: defaultCardData.stampValue,
+          validityDays: defaultCardData.validityDays,
+          googleReviewBonus: defaultCardData.googleReviewBonus,
+          photoBonus: defaultCardData.photoBonus,
+          joiningBonusEnabled: defaultCardData.joiningBonusEnabled,
+          joiningBonusStamps: defaultCardData.joiningBonusStamps,
+          color: defaultCardData.color,
+          tierRewardsEnabled: false,
+          active: true,
+        }
+      }).catch(() => null)
+
+      return ok({
+        card: createdCard ? { ...createdCard, vipUpgradeBonusStamps: defaultCardData.vipUpgradeBonusStamps } : defaultCardData,
+        isDefault: true
+      }, {
         headers: { "Cache-Control": "no-store, private" }
       })
     }

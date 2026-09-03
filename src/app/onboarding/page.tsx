@@ -24,7 +24,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { hasModule, type Module } from "@/lib/feature-gate"
-import { getRecommendedCampaign } from "@/lib/industry-campaigns"
+import { getRecommendedCampaign, getIndustryLoyaltyRule } from "@/lib/industry-campaigns"
 
 // ─── Types ────────────────────────────────────────────────────
 interface WizardData {
@@ -179,8 +179,7 @@ function OnboardingPageContent() {
             const gConns = stateJson.data.merchantGoogleConnections || []
             const gConn = gConns[0]
             const isGoogleConnected = gConns.length > 0 || !!m.googleReviewLink
-
-            const recCampaign = getRecommendedCampaign(m.businessType || "bakery")
+            const recRule = getIndustryLoyaltyRule(m.businessType || "bakery", m.name)
 
             setData(prev => ({
               ...prev,
@@ -191,9 +190,10 @@ function OnboardingPageContent() {
               businessType: m.businessType || "bakery",
               businessAddress: m.address || "",
               whatsappNumber: m.whatsappPhone || "",
-              cardName: m.name ? `${m.name} VIP Club` : "VIP Club",
-              stampsRequired: recCampaign.totalStamps || 10,
-              rewardName: recCampaign.rewardName || "FREE Special Treat",
+              cardName: m.name ? `${m.name} VIP Club` : recRule.getCardTitle(m.name),
+              stampsRequired: recRule.stampsRequired || 10,
+              rewardName: recRule.rewardName || "500 Free Cake",
+              stampValue: recRule.stampValue || 300,
               logoUploaded: !!m.logoUrl,
               logoDataUrl: m.logoUrl || prev.logoDataUrl,
               googleConnected: isGoogleConnected,
@@ -272,6 +272,7 @@ function OnboardingPageContent() {
       // If completing Rewards step, save card setup
       if (currentStepKey === "reward_setup") {
         try {
+          const rule = getIndustryLoyaltyRule(data.businessType, data.businessName)
           await fetch("/api/cards/setup", {
             method: "POST",
             headers: { 
@@ -279,11 +280,17 @@ function OnboardingPageContent() {
               "x-merchant-id": data.merchantId 
             },
             body: JSON.stringify({
-              name: data.cardName,
-              stampsRequired: data.stampsRequired,
-              rewardName: data.rewardName,
-              stampValue: 500,
-              validityDays: 90,
+              name: data.cardName || rule.getCardTitle(data.businessName),
+              stampsRequired: Number(data.stampsRequired) || rule.stampsRequired,
+              rewardName: data.rewardName || rule.rewardName,
+              stampValue: data.stampValue ? Number(data.stampValue) : rule.stampValue,
+              validityDays: rule.validityDays,
+              googleReviewBonus: rule.googleReviewBonus,
+              photoBonus: rule.photoBonus,
+              joiningBonusEnabled: rule.joiningBonusEnabled,
+              joiningBonusStamps: rule.joiningBonusStamps,
+              vipUpgradeBonusStamps: rule.vipUpgradeBonusStamps,
+              color: rule.color,
             })
           })
         } catch (e) {
@@ -481,7 +488,20 @@ function OnboardStep1Business({ data, setData }: any) {
         </div>
         <div>
           <Label className="text-xs font-semibold">Business Type</Label>
-          <Select value={data.businessType} onValueChange={v => setData({ ...data, businessType: v })}>
+          <Select 
+            value={data.businessType} 
+            onValueChange={v => {
+              const rule = getIndustryLoyaltyRule(v, data.businessName)
+              setData({ 
+                ...data, 
+                businessType: v,
+                cardName: rule.getCardTitle(data.businessName),
+                stampsRequired: rule.stampsRequired,
+                rewardName: rule.rewardName,
+                stampValue: rule.stampValue,
+              })
+            }}
+          >
             <SelectTrigger className="mt-1 text-sm"><SelectValue /></SelectTrigger>
             <SelectContent>
               {[
@@ -1759,10 +1779,10 @@ function OnboardStep5Rewards({ data, setData }: any) {
           </div>
           <div>
             <Label>Stamps Required for Free Reward</Label>
-            <Select value={String(data.stampsRequired)} onValueChange={v => setData({ ...data, stampsRequired: Number(v) })}>
+            <Select value={String(data.stampsRequired || 10)} onValueChange={v => setData({ ...data, stampsRequired: Number(v) })}>
               <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {[3, 5, 8, 10].map(n => (
+                {[3, 5, 6, 8, 10, 11, 12, 15].map(n => (
                   <SelectItem key={n} value={String(n)}>{n} Stamps</SelectItem>
                 ))}
               </SelectContent>

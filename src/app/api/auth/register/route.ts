@@ -4,6 +4,7 @@ import { SignJWT } from 'jose';
 import bcrypt from 'bcryptjs';
 import { applyAuthRateLimit } from '@/lib/rate-limiter';
 import { generateMerchantIdNumber } from '@/lib/merchant-id-generator';
+import { getIndustryLoyaltyRule } from '@/lib/industry-campaigns';
 
 if (!process.env.JWT_SECRET) {
   throw new Error('FATAL: JWT_SECRET environment variable is not set');
@@ -125,15 +126,21 @@ export async function POST(req: Request) {
 
     // Create default StampCard only if LOYALTY module is enabled
     if (!isFastTrack || module === 'loyalty') {
+      const rule = getIndustryLoyaltyRule(businessType, businessName);
       await db.stampCard.create({
         data: {
           merchantId: merchant.id,
-          name: `${businessName} VIP Club`,
-          stampsRequired: 10,
-          rewardName: 'FREE Special Treat',
-          stampValue: 500,
-          googleReviewBonus: 1,
-          photoBonus: 2,
+          name: rule.getCardTitle(businessName),
+          stampsRequired: rule.stampsRequired,
+          rewardName: rule.rewardName,
+          stampValue: rule.stampValue,
+          validityDays: rule.validityDays,
+          googleReviewBonus: rule.googleReviewBonus,
+          photoBonus: rule.photoBonus,
+          joiningBonusEnabled: rule.joiningBonusEnabled,
+          joiningBonusStamps: rule.joiningBonusStamps,
+          color: rule.color,
+          tierRewardsEnabled: false,
           active: true,
         },
       });
