@@ -14,14 +14,14 @@ This document serves as a historical record of all major bugs, configuration iss
   3. **Module-Level Cached Webhook URL**:
      `PUBLIC_WEBHOOK_URL` was evaluated only once at Next.js startup. When Pinggy free tunnel renewed or restarted with a new link, the running Next.js instance kept passing the old expired tunnel URL to Evolution API, causing WhatsApp companion pairing handshake webhooks to fail.
 - **Permanent Architectural Resolution**:
-  1. **Session-Unique Instance Names**:
-     Updated `buildInstanceName` in [connect/route.ts](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/whatsapp/connect/route.ts) to generate a timestamped session-unique instance name (`CP_M_${merchant.id.slice(0, 8)}_${Date.now().toString(36)}`) whenever an unverified merchant initiates connection. This permanently eliminates `403 Name already in use` conflicts on the Evolution API server.
+  1. **Smart Hybrid Instance Names (`CP_{phone}_{timestamp}`)**:
+     Updated `buildInstanceName` in [connect/route.ts](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/whatsapp/connect/route.ts) to implement **Tarika 1: Smart Hybrid Name**. When a WhatsApp phone number is provided (e.g. `917203824012`), the instance name is generated as `CP_917203824012_${timestamp}` (e.g. `CP_917203824012_mtlb04b7`). If not yet provided, it falls back to `CP_M_${merchant.id.slice(0, 8)}_${timestamp}`. Added a Store WhatsApp Number input field to Step 1 of onboarding so the phone number is captured early.
   2. **100% Fresh QR on Connect (count = 1)**:
      Whenever an unverified merchant opens the connection screen, any old instance is purged and a pristine, brand-new Baileys WebSocket connection is opened directly with WhatsApp servers. The generated QR is **0 seconds old** with `count: 1`, guaranteeing that WhatsApp's servers accept the pairing on the very first try.
   3. **Dynamic Webhook URL Resolution**:
      Created `getLiveWebhookUrl()` in [connect/route.ts](file:///f:/CustomerPilot_ByGLM_July2026/src/app/api/whatsapp/connect/route.ts) that reads `process.env.WHATSAPP_WEBHOOK_URL` dynamically on every request, ensuring remote VPS instances always receive the latest active Pinggy tunnel endpoint with security headers (`X-Pinggy-No-Screen`).
   4. **Active 10-Minute Session with Safe Silent Refresh (`?silent=true`)**:
-     Configured a 10-minute session countdown (`10:00` down to `00:00`). During the session, the frontend polls `/api/whatsapp/connect?silent=true` every 20 seconds to silently update the QR image without recreating the instance unless it approaches the 30-count limit.
+     Configured a 10-minute session countdown (`10:00` down to `00:00`). During the session, the frontend polls `/api/whatsapp/connect?silent=true` every 20 seconds with phone parameters to silently update the QR image without recreating the instance unless it approaches the 30-count limit.
   5. **Cleaned VPS State**:
      Purged all orphaned aborted instances from `200.97.170.53:8080`, leaving only the active `cp_admin` instance running.
 - **Status**: ✅ Resolved and Permanently Verified.

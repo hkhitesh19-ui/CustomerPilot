@@ -109,7 +109,8 @@ export function WhatsAppVerification({ merchantId }: { merchantId: string }) {
 
     silentRefreshRef.current = setInterval(async () => {
       try {
-        const res = await fetch("/api/whatsapp/connect?silent=true", {
+        const phoneParam = phone ? `&phone=${encodeURIComponent(phone)}` : ""
+        const res = await fetch(`/api/whatsapp/connect?silent=true${phoneParam}`, {
           headers: { "x-merchant-id": merchantId }
         })
         if (res.ok) {
@@ -133,7 +134,7 @@ export function WhatsAppVerification({ merchantId }: { merchantId: string }) {
     return () => {
       if (silentRefreshRef.current) clearInterval(silentRefreshRef.current)
     }
-  }, [qrCode, isVerified, sessionCountdown, merchantId, refetch])
+  }, [qrCode, isVerified, sessionCountdown, merchantId, refetch, phone])
 
   // User triggers initial or forced connect
   const handleConnect = async (force: boolean = false) => {
@@ -141,6 +142,7 @@ export function WhatsAppVerification({ merchantId }: { merchantId: string }) {
     try {
       const params = new URLSearchParams()
       if (force) params.append("force", "true")
+      if (phone) params.append("phone", phone)
 
       const res = await fetch(`/api/whatsapp/connect?${params.toString()}`, {
         headers: { "x-merchant-id": merchantId }

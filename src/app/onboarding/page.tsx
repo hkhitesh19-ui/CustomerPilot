@@ -508,6 +508,15 @@ function OnboardStep1Business({ data, setData }: any) {
           />
         </div>
         <div>
+          <Label className="text-xs font-semibold">Store WhatsApp Number (for QR stamps & reviews)</Label>
+          <Input
+            value={data.whatsappNumber}
+            onChange={e => setData({ ...data, whatsappNumber: e.target.value })}
+            placeholder="e.g., 917203824012"
+            className="mt-1 text-sm"
+          />
+        </div>
+        <div>
           <Label className="text-xs font-semibold">Email (from signup)</Label>
           <Input
             value={data.email}
@@ -560,6 +569,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
     try {
       const params = new URLSearchParams()
       if (force) params.append("force", "true")
+      if (data.whatsappNumber) params.append("phone", data.whatsappNumber)
 
       const res = await fetch(`/api/whatsapp/connect?${params.toString()}`)
       const json = await res.json()
@@ -637,7 +647,8 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
 
     silentRefreshRef.current = setInterval(async () => {
       try {
-        const res = await fetch("/api/whatsapp/connect?silent=true")
+        const phoneParam = data.whatsappNumber ? `&phone=${encodeURIComponent(data.whatsappNumber)}` : ""
+        const res = await fetch(`/api/whatsapp/connect?silent=true${phoneParam}`)
         if (res.ok) {
           const json = await res.json()
           if (json.status === "open" || json.connected) {
