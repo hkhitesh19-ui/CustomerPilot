@@ -23,6 +23,8 @@ This document serves as a historical record of all major bugs, configuration iss
      - Provided a 1-click reset button that cleanly purges any stuck session on Evolution API via `logout` + `delete` and generates a brand-new 10-minute QR session.
   5. **Auto-Renewing Tunnel & Webhook Sync Daemon (`scripts/autoPinggySync.js`)**:
      - Running as an active background daemon renewing every 55 minutes, keeping Evolution API instances updated with the live Pinggy tunnel URL.
+  6. **Import Fix in Onboarding Wizard**:
+     - Added missing `useRef` from `"react"` and `Clock` from `"lucide-react"` in [onboarding/page.tsx](file:///f:/CustomerPilot_ByGLM_July2026/src/app/onboarding/page.tsx) to resolve `ReferenceError: useRef is not defined`.
 - **Status**: ✅ Resolved and Verified.
 
 ---
