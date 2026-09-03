@@ -99,24 +99,31 @@ function startPinggy() {
             const extractedUrl = match[0];
             console.log('[PinggySync] Found Pinggy URL:', extractedUrl);
 
-            // ── KEY FIX: Update NEXT_PUBLIC_APP_URL in .env.local ──────────────────
-            // This ensures review links generated during this session use the CURRENT Pinggy URL
+            // ── KEY FIX: Update NEXT_PUBLIC_APP_URL in .env.local & WHATSAPP_WEBHOOK_URL in .env ──
             try {
                 const fs = require('fs');
                 const path = require('path');
                 const envPath = path.join(__dirname, '..', '.env.local');
-                let envContent = fs.readFileSync(envPath, 'utf8');
-                
-                if (envContent.includes('NEXT_PUBLIC_APP_URL=')) {
-                    envContent = envContent.replace(/NEXT_PUBLIC_APP_URL=.*/g, `NEXT_PUBLIC_APP_URL=${extractedUrl}`);
-                } else {
-                    envContent += `\nNEXT_PUBLIC_APP_URL=${extractedUrl}`;
+                if (fs.existsSync(envPath)) {
+                    let envContent = fs.readFileSync(envPath, 'utf8');
+                    if (envContent.includes('NEXT_PUBLIC_APP_URL=')) {
+                        envContent = envContent.replace(/NEXT_PUBLIC_APP_URL=.*/g, `NEXT_PUBLIC_APP_URL=${extractedUrl}`);
+                    } else {
+                        envContent += `\nNEXT_PUBLIC_APP_URL=${extractedUrl}`;
+                    }
+                    fs.writeFileSync(envPath, envContent, 'utf8');
+                    console.log(`[PinggySync] ✅ Updated NEXT_PUBLIC_APP_URL=${extractedUrl} in .env.local`);
                 }
-                
-                fs.writeFileSync(envPath, envContent, 'utf8');
-                console.log(`[PinggySync] ✅ Updated NEXT_PUBLIC_APP_URL=${extractedUrl} in .env.local`);
+
+                const rootEnvPath = path.join(__dirname, '..', '.env');
+                if (fs.existsSync(rootEnvPath)) {
+                    let rootEnv = fs.readFileSync(rootEnvPath, 'utf8');
+                    rootEnv = rootEnv.replace(/WHATSAPP_WEBHOOK_URL=.*/g, `WHATSAPP_WEBHOOK_URL="${extractedUrl}/api/webhook/evolution"`);
+                    fs.writeFileSync(rootEnvPath, rootEnv, 'utf8');
+                    console.log(`[PinggySync] ✅ Updated WHATSAPP_WEBHOOK_URL=${extractedUrl}/api/webhook/evolution in .env`);
+                }
             } catch (e) {
-                console.error('[PinggySync] Failed to update .env.local:', e.message);
+                console.error('[PinggySync] Failed to update env files:', e.message);
             }
 
             fetchAllInstancesAndUpdate(extractedUrl);
