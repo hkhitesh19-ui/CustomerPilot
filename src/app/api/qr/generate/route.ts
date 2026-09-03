@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server"
 import QRCode from "qrcode"
+import { generateBrandedQRDataUrl } from "@/lib/branded-qr"
 import { db } from "@/lib/db"
 import { ok, err } from "@/lib/api"
 
@@ -67,15 +68,11 @@ export async function GET(req: NextRequest) {
       defaultTitle = loyaltyTitleMap[type] || "VIP Loyalty QR Code"
     }
 
-    // Generate QR Code as Data URL
-    const qrDataUrl = await QRCode.toDataURL(targetUrl, {
-      errorCorrectionLevel: "H",
-      margin: 2,
-      width: 400,
-      color: {
-        dark: mode === "reviews" || type.startsWith("review_") ? "#0f172a" : "#1e1b4b",
-        light: "#ffffff"
-      }
+    // Generate QR Code with CustomerPilot Logo & Name in Center (without tagline)
+    const qrDataUrl = await generateBrandedQRDataUrl(targetUrl, {
+      width: 600,
+      darkColor: mode === "reviews" || type.startsWith("review_") ? "#0f172a" : "#1e1b4b",
+      lightColor: "#ffffff"
     })
 
     return ok({

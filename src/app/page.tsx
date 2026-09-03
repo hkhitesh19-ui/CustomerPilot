@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import QRCode from "qrcode"
+import { createBrandedClientQR } from "@/lib/client-branded-qr"
 import Link from "next/link"
 import {
   Store, MessageSquare, Search, Upload, Gift, QrCode as QrIcon, Zap,
@@ -2820,7 +2821,7 @@ function Step6QRCode({ data, setData }: any) {
         const targetUrl = `https://wa.me/${phone}?text=${encodeURIComponent(textMessage)}`
         setWaLink(targetUrl)
 
-        const qr = await QRCode.toDataURL(targetUrl, { width: 350, margin: 2 })
+        const qr = await createBrandedClientQR(targetUrl, { width: 500 })
         setData({
           ...data,
           qrGenerated: true,

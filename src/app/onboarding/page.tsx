@@ -10,6 +10,7 @@ import { useState, useEffect, useRef, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import QRCode from "qrcode"
+import { createBrandedClientQR } from "@/lib/client-branded-qr"
 import {
   Store, MessageSquare, Search, Upload, Gift, QrCode as QrIcon, Zap,
   Check, ArrowRight, ArrowLeft, Loader2, UserCheck,
@@ -1805,7 +1806,7 @@ function OnboardStep6QR({ data, setData }: any) {
         const text = `Hi ${businessName}! Checking in for my VIP Club stamps 🎁`
         const targetUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
         setWaLink(targetUrl)
-        const qr = await QRCode.toDataURL(targetUrl, { width: 350, margin: 2 })
+        const qr = await createBrandedClientQR(targetUrl, { width: 500 })
         setData((prev: any) => ({ ...prev, qrGenerated: true, qrDataUrl: qr }))
       } catch {}
     }
@@ -2060,7 +2061,7 @@ function OnboardStep8Test({ data, setData, error, setError }: any) {
           const businessName = data.businessName || "our store"
           const text = `Hi ${businessName}! Checking in for my VIP Club stamps 🎁`
           const targetUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
-          const qr = await QRCode.toDataURL(targetUrl, { width: 350, margin: 2 })
+          const qr = await createBrandedClientQR(targetUrl, { width: 500 })
           setData((prev: any) => ({ ...prev, qrGenerated: true, qrDataUrl: qr }))
           qrReady = true
         } catch {}
