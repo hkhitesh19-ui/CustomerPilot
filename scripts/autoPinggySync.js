@@ -78,14 +78,27 @@ async function updateAllInstances(instances, url) {
     }
 }
 
+let isRestarting = false;
+
 function startPinggy() {
+    isRestarting = true;
     if (currentPinggyProcess) {
         console.log('[PinggySync] Killing old Pinggy process...');
-        currentPinggyProcess.kill();
+        try { currentPinggyProcess.kill(); } catch (_) {}
     }
 
     console.log('[PinggySync] Starting new Pinggy tunnel...');
-    currentPinggyProcess = spawn('ssh', ['-p', '443', '-R0:localhost:3000', 'a.pinggy.io', '-o', 'StrictHostKeyChecking=no']);
+    currentPinggyProcess = spawn('ssh', [
+        '-p', '443',
+        '-R0:localhost:3000',
+        'a.pinggy.io',
+        '-o', 'StrictHostKeyChecking=no',
+        '-o', 'ServerAliveInterval=15',
+        '-o', 'ServerAliveCountMax=3',
+        '-o', 'ExitOnForwardFailure=yes',
+        '-T'
+    ]);
+    isRestarting = false;
 
     let urlFound = false;
 
@@ -135,6 +148,14 @@ function startPinggy() {
 
     currentPinggyProcess.on('close', (code) => {
         console.log(`[PinggySync] Pinggy process exited with code ${code}`);
+        if (!isRestarting) {
+            console.log('[PinggySync] 🔄 Tunnel disconnected! Reconnecting in 5 seconds...');
+            setTimeout(startPinggy, 5000);
+        }
+    });
+
+    currentPinggyProcess.on('error', (err) => {
+        console.error('[PinggySync] Tunnel error:', err.message);
     });
 }
 
@@ -142,6 +163,9 @@ function startPinggy() {
 startPinggy();
 
 // Renew every 55 minutes
-setInterval(startPinggy, RENEWAL_INTERVAL);
+setInterval(() => {
+    console.log('[PinggySync] ⏰ Scheduled 55-minute renewal triggered...');
+    startPinggy();
+}, RENEWAL_INTERVAL);
 
-console.log('[PinggySync] Daemon started. Will renew Pinggy every 55 minutes.');
+console.log('[PinggySync] Daemon started. Will auto-reconnect on disconnect and renew every 55 minutes.');

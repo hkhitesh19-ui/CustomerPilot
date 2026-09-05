@@ -215,6 +215,62 @@ export async function POST(req: Request) {
 
       const configuredVipBonus = merchant.vipUpgradeBonusStamps || 0;
 
+      // 🌟 JOINING BONUS LOGIC:
+      // Award advance joining bonus stamps on customer's first visit/first card if enabled
+      let joiningBonusStamps = 0;
+      const totalCustomerCards = await tx.customerStampCard.count({
+        where: { merchantId, customerId: waitingCustomer.customerId }
+      });
+      const isFirstVisit = visitNumber === 1 || totalCustomerCards === 0;
+
+      if (isFirstVisit && stampCard.joiningBonusEnabled) {
+        joiningBonusStamps = stampCard.joiningBonusStamps ?? 2;
+        if (joiningBonusStamps > 0) {
+          let initCard = await tx.customerStampCard.findFirst({
+            where: { 
+              merchantId, 
+              customerId: waitingCustomer.customerId,
+              stampCardId: stampCard.id,
+              completed: false 
+            }
+          });
+
+          if (!initCard) {
+            initCard = await tx.customerStampCard.create({
+              data: {
+                merchantId,
+                customerId: waitingCustomer.customerId,
+                stampCardId: stampCard.id,
+                stampsCollected: 0
+              }
+            });
+          }
+
+          for (let j = 0; j < joiningBonusStamps; j++) {
+            await tx.stamp.create({
+              data: {
+                customerId: waitingCustomer.customerId,
+                merchantId,
+                stampCardId: stampCard.id,
+                customerStampCardId: initCard.id,
+                billId: bill.id,
+                source: 'JOINING_BONUS'
+              }
+            });
+          }
+
+          await tx.customerStampCard.update({
+            where: { id: initCard.id },
+            data: { stampsCollected: { increment: joiningBonusStamps } }
+          });
+
+          await tx.customer.update({
+            where: { id: waitingCustomer.customerId },
+            data: { lifetimeStamps: { increment: joiningBonusStamps } }
+          });
+        }
+      }
+
       for (let i = 0; i < stampsToAward; i++) {
         // Find or create active (uncompleted) card for customer
         let activeCard = await tx.customerStampCard.findFirst({
@@ -314,7 +370,8 @@ export async function POST(req: Request) {
       
       return { 
         isUpgraded, 
-        vipBonusStamps: cycleVipBonusAwarded, 
+        vipBonusStamps: cycleVipBonusAwarded,
+        joiningBonusStamps,
         newTier, 
         cycleCompletedInTx,
         completedCardReward: stampCard.rewardName || "FREE Reward",
@@ -325,7 +382,7 @@ export async function POST(req: Request) {
     // 5. Send instant WhatsApp notification to customer (Day 1 / Day 4 Requirements.txt)
     if (waitingCustomer.customer?.phone) {
       const merchantName = merchant?.name || "our store";
-      const { vipBonusStamps, newTier, cycleCompletedInTx, completedCardReward, completedCardStampsRequired } = transactionResult;
+      const { vipBonusStamps, joiningBonusStamps: resJoinBonus, newTier, cycleCompletedInTx, completedCardReward, completedCardStampsRequired } = transactionResult;
       const custName = waitingCustomer.customer.name || "there";
 
       if (cycleCompletedInTx) {
@@ -357,15 +414,19 @@ export async function POST(req: Request) {
           orderBy: { createdAt: 'desc' }
         });
 
-        const totalStamps = customerCard?.stampsCollected || stampsToAward;
+        const totalStamps = customerCard?.stampsCollected || (stampsToAward + resJoinBonus);
         const stampsRequired = stampCard.stampsRequired || 7;
         const remaining = Math.max(0, stampsRequired - totalStamps);
+        const totalAddedThisVisit = stampsToAward + resJoinBonus;
+        const stampCountDisplay = resJoinBonus > 0
+          ? `${totalAddedThisVisit} (${stampsToAward} Purchase + ${resJoinBonus} Welcome Bonus 🎁)`
+          : `${totalAddedThisVisit}`;
 
         const stampMsg = await getCompiledTemplate(merchantId, "STAMP_EARNED", {
           customerName: custName,
           merchantName,
           visitNumber,
-          stampCount: stampsToAward,
+          stampCount: stampCountDisplay,
           totalStamps,
           requiredStamp: stampsRequired,
           rewardName: stampCard.rewardName || "FREE Reward",
@@ -386,7 +447,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ 
       success: true, 
-      stampsAwarded: stampsToAward,
+      stampsAwarded: stampsToAward + transactionResult.joiningBonusStamps,
       visitNumber,
       message: 'Reward processed successfully' 
     });

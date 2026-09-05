@@ -3,6 +3,27 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [05 Sep 2026] Issue: Joining Bonus Stamps Missing on 1st Purchase / Bill Approval
+- **Symptom**: When a customer (e.g. Hitesh) made their 1st purchase at Cake Connection, they only received 1 purchase stamp instead of 3 stamps (1 purchase stamp + 2 joining bonus stamps). The WhatsApp message showed `You earned 1 stamps! Total: 1/10` without the welcome bonus breakdown.
+- **Root Cause**: While `stamp-engine.ts` possessed joining bonus logic, the cashier live queue approval endpoint `src/app/api/rewards/award/route.ts` executed direct Prisma transactions without checking `isFirstVisit` or `stampCard.joiningBonusEnabled`. It only awarded `stampsToAward` (the POS purchase stamp) and omitted joining bonus calculation and WhatsApp template customization.
+- **Resolution**:
+  1. Updated `src/app/api/rewards/award/route.ts` to check if `isFirstVisit` (`visitNumber === 1 || totalCustomerCards === 0`) and `stampCard.joiningBonusEnabled`.
+  2. If active, it creates `source: 'JOINING_BONUS'` stamps, credits `customerStampCard.stampsCollected` and `customer.lifetimeStamps` by `joiningBonusStamps`.
+  3. Formatted the `STAMP_EARNED` WhatsApp template payload to include `${totalAddedThisVisit} (${stampsToAward} Purchase + ${resJoinBonus} Welcome Bonus 🎁)`.
+  4. Backfilled Hitesh's missing 2 joining bonus stamps in the database, bringing wallet balance to 3/10 stamps.
+- **Status**: ✅ Resolved and Verified.
+
+---
+## [05 Sep 2026] Issue: WhatsApp "Yes" Reply to Review Consent Did Not Trigger AI Review Draft
+- **Symptom**: When customer Hitesh replied "Yes" to the WhatsApp AI review consent prompt, the subsequent message with the 1-click Google Maps review draft and link was not delivered. Customer remained stuck in `AWAITING_REVIEW_CONSENT`.
+- **Root Cause**: In `scripts/autoPinggySync.js`, the Pinggy SSH process had exited with code 255 and lacked an auto-reconnection listener. As a result, the public webhook tunnel URL (`cmgqy-49-43-34-14.run.pinggy-free.link`) died. The Evolution API on VPS (`200.97.170.53:8080`) failed to deliver inbound webhook events to localhost, preventing `/api/webhook/evolution` from processing the customer's "Yes" reply.
+- **Resolution**:
+  1. Enhanced `scripts/autoPinggySync.js` with SSH keepalive parameters (`-o ServerAliveInterval=15 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -T`) and added an automated 5-second backoff reconnect listener on process `close` / `error`.
+  2. Restarted the sync daemon, generated a fresh public tunnel URL (`https://vijzb-49-43-34-14.run.pinggy-free.link`), and synced the webhook URL on active Evolution instances (`CP_917203824012_mtldumjv` and `cp_admin`).
+  3. Processed Hitesh's pending reply, transitioning bot state to `IDLE` and delivering Message #8 (`REVIEW_DRAFT`) with the 1-click Google Maps review draft link to his WhatsApp number.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [03 Sep 2026] Feature: Industry-Tailored Default Loyalty Rules & Reward Card Setup for New Merchants
 
 - **Symptom**: User requested that whenever a new merchant joins, their default loyalty rules (Card Title, Reward Offer, Minimum Spend for Stamp, Stamp Goal, Validity Days, Google Review Bonus, Photo Review Bonus, Joining Bonus, and Kickstart Bonus) must be automatically configured by default based on their specific **nature of business** (e.g. Bakery, Restaurant, Cafe, Salon, Spa, Gym, Retail, Grocery, Pharmacy, Electronics, etc.).
