@@ -385,6 +385,9 @@ export async function POST(req: Request) {
       const { vipBonusStamps, joiningBonusStamps: resJoinBonus, newTier, cycleCompletedInTx, completedCardReward, completedCardStampsRequired } = transactionResult;
       const custName = waitingCustomer.customer.name || "there";
 
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+      const walletUrl = `${appUrl}/q/wallet/${waitingCustomer.customerId}`;
+
       if (cycleCompletedInTx) {
         // EVENT 1: CARD COMPLETED -> Send REWARD_UNLOCKED WhatsApp Notification!
         const rewardMsg = await getCompiledTemplate(merchantId, "REWARD_UNLOCKED", {
@@ -393,9 +396,11 @@ export async function POST(req: Request) {
           requiredStamp: completedCardStampsRequired,
           visitNumber,
           rewardName: completedCardReward,
-          couponCode: Math.random().toString(36).substring(2, 8).toUpperCase()
+          couponCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
+          walletUrl
         });
-        sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, rewardMsg, "REWARD_UNLOCKED");
+        const finalRewardMsg = rewardMsg.includes(walletUrl) ? rewardMsg : `${rewardMsg}\n\n📱 *View Your Reward in Digital Wallet:*\n${walletUrl}`;
+        sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, finalRewardMsg, "REWARD_UNLOCKED");
 
         // EVENT 2: NEXT LEVEL UNLOCKED -> If Next Level Kickstart Bonus was awarded, send LEVEL_COMPLETE WhatsApp Notification!
         if (vipBonusStamps > 0) {
@@ -403,9 +408,11 @@ export async function POST(req: Request) {
             customerName: custName,
             merchantName,
             nextLevelName: VIP_TIER_LABELS[newTier.name as any] || newTier.name.toUpperCase(),
-            kickstartStamps: vipBonusStamps.toString()
+            kickstartStamps: vipBonusStamps.toString(),
+            walletUrl
           });
-          sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, levelMsg, "LEVEL_COMPLETE");
+          const finalLevelMsg = levelMsg.includes(walletUrl) ? levelMsg : `${levelMsg}\n\n📱 *Check Your New Card:*\n${walletUrl}`;
+          sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, finalLevelMsg, "LEVEL_COMPLETE");
         }
       } else {
         // STANDARD STAMP AWARDED (Card not completed yet)
@@ -430,10 +437,12 @@ export async function POST(req: Request) {
           totalStamps,
           requiredStamp: stampsRequired,
           rewardName: stampCard.rewardName || "FREE Reward",
-          remainingStamps: remaining
+          remainingStamps: remaining,
+          walletUrl
         });
 
-        sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, stampMsg, "STAMP_AWARDED");
+        const finalStampMsg = stampMsg.includes(walletUrl) ? stampMsg : `${stampMsg}\n\n📱 *View Your Live Digital Stamp Card:*\n${walletUrl}`;
+        sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, finalStampMsg, "STAMP_AWARDED");
       }
 
       // Schedule Google Review request only if merchant has REVIEWS module enabled

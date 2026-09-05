@@ -286,15 +286,52 @@ export async function POST(req: NextRequest) {
                })
                console.log(`[Webhook] ✏️ Name captured for ${customerPhone}: "${nameGuess}"`)
 
-               const nameConfirmMsg = await getCompiledTemplate(merchant.id, "NAME_CONFIRMED", {
-                 customerName: nameGuess,
-                 merchantName: merchant.name || "our store"
-               })
-               const res = await sendEvolutionMessage(customerPhone, nameConfirmMsg, merchantInstance)
-               if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "NAME_CONFIRMED", nameConfirmMsg, res.data?.key?.id)
-               continue
+                const walletUrl = `${publicBaseUrl}/q/wallet/${existingCustomer.id}`
+                const nameConfirmMsg = await getCompiledTemplate(merchant.id, "NAME_CONFIRMED", {
+                  customerName: nameGuess,
+                  merchantName: merchant.name || "our store",
+                  walletUrl
+                })
+                const finalNameConfirmMsg = nameConfirmMsg.includes(walletUrl) 
+                  ? nameConfirmMsg 
+                  : `${nameConfirmMsg}\n\n📱 *Your Digital VIP Card:*\n${walletUrl}`
+
+                const res = await sendEvolutionMessage(customerPhone, finalNameConfirmMsg, merchantInstance)
+                if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "NAME_CONFIRMED", finalNameConfirmMsg, res.data?.key?.id)
+                continue
             }
           }
+        }
+
+        // ── 1.5 SMART INQUIRY: Wallet & Stamp Balance Keywords ────────────
+        const lowerText = text.trim().toLowerCase();
+        const isWalletInquiry = [
+          "wallet", "stamp", "stamps", "balance", "card", "points", "status", 
+          "my stamps", "check stamps", "rewards", "passbook", "score"
+        ].some(kw => lowerText === kw || lowerText.includes(kw));
+
+        if (!isTriggerMsg && existingCustomer && isWalletInquiry) {
+          const activeCard = await db.customerStampCard.findFirst({
+            where: { customerId: existingCustomer.id, completed: false, redeemed: false },
+            include: { stampCard: true },
+            orderBy: { createdAt: "desc" }
+          });
+          const rule = activeCard?.stampCard || await db.stampCard.findFirst({ where: { merchantId: merchant.id, active: true } });
+          const collected = activeCard?.stampsCollected ?? existingCustomer.lifetimeStamps ?? 0;
+          const required = rule?.stampsRequired || 10;
+          const remaining = Math.max(0, required - collected);
+          const walletUrl = `${publicBaseUrl}/q/wallet/${existingCustomer.id}`;
+
+          const walletReply = `⭐ *Hi ${existingCustomer.name || "VIP"}!* ❤️\n\n` +
+            `Here is your live VIP Stamp balance at *${merchant.name}*:\n\n` +
+            `📊 *Wallet:* ${collected} / ${required} Stamps\n` +
+            `🎁 *Goal:* ${rule?.rewardName || "FREE Reward"}${remaining === 0 ? " — 🏆 *REWARD READY!*" : ` (${remaining} more stamp(s) needed)`}\n\n` +
+            `📱 *View Your Real-Time Digital Stamp Card:*\n${walletUrl}`;
+
+          console.log(`[Webhook] 💳 Sent real-time wallet link to ${customerPhone}`);
+          const res = await sendEvolutionMessage(customerPhone, walletReply, merchantInstance);
+          if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "WALLET_INQUIRY", walletReply, res.data?.key?.id);
+          continue;
         }
 
         // If the message is NOT from a QR scan and NOT a reply to a pending bot message, skip queue join!

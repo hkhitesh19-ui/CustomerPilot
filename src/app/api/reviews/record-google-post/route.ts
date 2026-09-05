@@ -80,8 +80,7 @@ export async function POST(req: Request) {
           data: {
             merchantId,
             name: "Counter Customer",
-            phone: guestPhone,
-            visitsCount: 1
+            phone: guestPhone
           }
         });
       }
@@ -91,11 +90,10 @@ export async function POST(req: Request) {
 
     // Fetch Merchant's Active Reward Card Config first
     const template = await db.stampCard.findFirst({ where: { merchantId, active: true } });
-    const configuredBonus = template?.googleReviewBonus ?? 1;
+    const configuredBonus = template?.googleReviewBonus ?? 2;
     const configuredPhotoBonus = template?.photoBonus ?? 2;
 
     const photoAttached = Boolean(body?.photoUrl || body?.hasPhoto || body?.photoAttached);
-    const photoBonusCount = photoAttached ? configuredPhotoBonus : 0;
 
     // Check if customer already submitted a Google Review previously (Upsert support)
     const existingReview = await db.review.findFirst({
@@ -103,12 +101,19 @@ export async function POST(req: Request) {
       orderBy: { createdAt: "desc" }
     });
 
-    const isFirstTimeReview = !existingReview;
-    const reviewBonusCount = isFirstTimeReview ? configuredBonus : 0;
-    const totalBonusCount = reviewBonusCount + photoBonusCount;
-    const bonusCount = totalBonusCount;
+    const alreadyHadReview = Boolean(existingReview);
+    const alreadyHadPhoto = Boolean(existingReview && (existingReview.photoBonusStamps > 0 || existingReview.photoUrl));
+
+    // Calculate bonuses to award in THIS submission
+    const reviewBonusToAward = alreadyHadReview ? 0 : configuredBonus;
+    const photoBonusToAward = (photoAttached && !alreadyHadPhoto) ? configuredPhotoBonus : 0;
+    const totalBonusToAward = reviewBonusToAward + photoBonusToAward;
+    const bonusCount = totalBonusToAward;
 
     let reviewRecord;
+    const cumulativePhotoBonus = (existingReview?.photoBonusStamps || 0) + photoBonusToAward;
+    const cumulativeTotalBonus = (existingReview?.bonusStampsAwarded || 0) + totalBonusToAward;
+
     if (existingReview) {
       reviewRecord = await db.review.update({
         where: { id: existingReview.id },
@@ -116,9 +121,9 @@ export async function POST(req: Request) {
           rating: Number(rating),
           aiDraft: finalReviewText,
           finalText: finalReviewText,
-          photoUrl: body?.photoUrl || null,
-          photoBonusStamps: photoBonusCount,
-          bonusStampsAwarded: totalBonusCount,
+          photoUrl: body?.photoUrl || existingReview.photoUrl || null,
+          photoBonusStamps: cumulativePhotoBonus,
+          bonusStampsAwarded: cumulativeTotalBonus,
           status: "submitted",
           submittedAt: new Date()
         }
@@ -132,8 +137,8 @@ export async function POST(req: Request) {
           aiDraft: finalReviewText,
           finalText: finalReviewText,
           photoUrl: body?.photoUrl || null,
-          photoBonusStamps: photoBonusCount,
-          bonusStampsAwarded: totalBonusCount,
+          photoBonusStamps: photoBonusToAward,
+          bonusStampsAwarded: totalBonusToAward,
           platform: "google",
           status: "submitted",
           submittedAt: new Date()
@@ -206,11 +211,15 @@ export async function POST(req: Request) {
       });
     }
 
-    // Award Bonus Stamps to customer stamp card (Only for first-time reviews if LOYALTY module is enabled)
-    if (hasModule(merchant, "LOYALTY") && isFirstTimeReview && bonusCount > 0) {
+    // Award Bonus Stamps to customer stamp card (If LOYALTY module is enabled and bonus to award > 0)
+    let finalStampsInWallet = 0;
+    let cardCompletedNow = false;
+
+    if (hasModule(merchant, "LOYALTY") && totalBonusToAward > 0) {
       if (template) {
         let card = await db.customerStampCard.findFirst({
-          where: { customerId: customer.id, stampCardId: template.id, completed: false, redeemed: false }
+          where: { customerId: customer.id, stampCardId: template.id, completed: false, redeemed: false },
+          orderBy: { createdAt: "desc" }
         });
         if (!card) {
           card = await db.customerStampCard.create({
@@ -218,7 +227,8 @@ export async function POST(req: Request) {
           });
         }
 
-        for (let i = 0; i < bonusCount; i++) {
+        // Add review bonus stamps
+        for (let i = 0; i < reviewBonusToAward; i++) {
           await db.stamp.create({
             data: {
               customerId: customer.id,
@@ -230,27 +240,101 @@ export async function POST(req: Request) {
           });
         }
 
-        const newCount = Math.min(card.stampsCollected + bonusCount, template.stampsRequired);
-        await db.customerStampCard.update({
-          where: { id: card.id },
-          data: {
-            stampsCollected: newCount,
-            completed: newCount >= template.stampsRequired
+        // Add photo bonus stamps
+        for (let i = 0; i < photoBonusToAward; i++) {
+          await db.stamp.create({
+            data: {
+              customerId: customer.id,
+              stampCardId: template.id,
+              customerStampCardId: card.id,
+              merchantId,
+              source: "photo_bonus"
+            }
+          });
+        }
+
+        const stampsRequired = template.stampsRequired || 10;
+        const totalNewCount = card.stampsCollected + totalBonusToAward;
+
+        if (totalNewCount >= stampsRequired) {
+          cardCompletedNow = true;
+          await db.customerStampCard.update({
+            where: { id: card.id },
+            data: {
+              stampsCollected: stampsRequired,
+              completed: true
+            }
+          });
+          finalStampsInWallet = stampsRequired;
+
+          // If overflow, create next cycle card
+          const overflow = totalNewCount - stampsRequired;
+          if (overflow > 0) {
+            await db.customerStampCard.create({
+              data: {
+                customerId: customer.id,
+                stampCardId: template.id,
+                merchantId,
+                stampsCollected: overflow
+              }
+            });
+            finalStampsInWallet = overflow;
           }
-        });
+        } else {
+          await db.customerStampCard.update({
+            where: { id: card.id },
+            data: {
+              stampsCollected: totalNewCount,
+              completed: false
+            }
+          });
+          finalStampsInWallet = totalNewCount;
+        }
 
         await db.customer.update({
           where: { id: customer.id },
-          data: { lifetimeStamps: { increment: bonusCount } }
+          data: { lifetimeStamps: { increment: totalBonusToAward } }
         });
       }
+    } else if (template) {
+      const currentCard = await db.customerStampCard.findFirst({
+        where: { customerId: customer.id, stampCardId: template.id, completed: false },
+        orderBy: { createdAt: "desc" }
+      });
+      finalStampsInWallet = currentCard?.stampsCollected ?? customer.lifetimeStamps ?? 0;
     }
 
-    // 6. Send WhatsApp confirmation to Customer (Bonus Stamps added)
+    // 6. Send WhatsApp confirmation to Customer (Bonus Stamps added + Real-Time Digital Wallet Link)
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const walletUrl = `${appUrl}/wallet?c=${customer.id}&m=${merchant.id}`;
-    const customerMsg = `🎉 *Congratulations ${customer.name || "VIP"}!* ⭐\n\nThank you for posting your Google Review! We have credited 🎁 *+${bonusCount} Bonus Stamps* to your VIP Card!\n\nCheck your updated VIP Wallet:\n${walletUrl}`;
-    
+    const walletUrl = `${appUrl}/q/wallet/${customer.id}`;
+    const stampsRequired = template?.stampsRequired || 10;
+    const remaining = Math.max(0, stampsRequired - finalStampsInWallet);
+
+    let bonusBreakdown = "";
+    if (reviewBonusToAward > 0 && photoBonusToAward > 0) {
+      bonusBreakdown = `(+${reviewBonusToAward} Review ⭐ + ${photoBonusToAward} Photo Bonus 📸)`;
+    } else if (photoBonusToAward > 0) {
+      bonusBreakdown = `(+${photoBonusToAward} Photo Bonus 📸)`;
+    } else if (reviewBonusToAward > 0) {
+      bonusBreakdown = `(+${reviewBonusToAward} Review Bonus ⭐)`;
+    }
+
+    let customerMsg = "";
+    if (totalBonusToAward > 0) {
+      customerMsg = `🎉 *Congratulations ${customer.name || "VIP"}!* ⭐\n\n` +
+        `Thank you for supporting *${merchant.name}* on Google Maps!\n\n` +
+        `✅ *+${totalBonusToAward} Bonus Stamp(s) Credited!* ${bonusBreakdown}\n` +
+        `📊 *Wallet:* ${finalStampsInWallet} / ${stampsRequired} Stamps\n` +
+        `🎁 *Goal:* ${template?.rewardName || "FREE Reward"}${cardCompletedNow ? " — 🏆 *REWARD UNLOCKED!*" : ` (${remaining} more stamp(s) needed)`}\n\n` +
+        `📱 *View Your Live Digital Stamp Card:*\n${walletUrl}`;
+    } else {
+      customerMsg = `⭐ *Thank you ${customer.name || "VIP"}!* ❤️\n\n` +
+        `Your review for *${merchant.name}* has been updated on Google Maps!\n\n` +
+        `📊 *Wallet:* ${finalStampsInWallet} / ${stampsRequired} Stamps\n` +
+        `🎁 *Next Reward:* ${template?.rewardName || "FREE Reward"} (${remaining} more needed)\n\n` +
+        `📱 *View Your Live Digital Stamp Card:*\n${walletUrl}`;
+    }
+
     await sendCentralWhatsAppMessage({
       merchantId: merchant.id,
       toPhone: customer.phone,

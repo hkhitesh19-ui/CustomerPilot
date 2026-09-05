@@ -3,6 +3,24 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [05 Sep 2026] Feature: Google Review & Photo Bonus Stamps + Real-Time Digital Stamp Wallet
+- **Symptom**: Customer review page lacked photo attachment capability, preventing customers from earning merchant-configured photo bonus stamps (+2). Review post WhatsApp notification sent broken `/wallet` 404 links and lacked stamp breakdowns. Customers had no way to view their live digital stamp wallet, see stamp history, or query wallet balance on WhatsApp.
+- **Root Cause**:
+  1. `ReviewEditor.tsx` had no file upload or photo attachment controls; `record-google-post/route.ts` only awarded review bonus and skipped photo bonus logic if a review record already existed.
+  2. Public wallet was located at `/q/wallet/[customerId]`, but WhatsApp messages used `${appUrl}/wallet?c=...` which 404'd.
+  3. `q/wallet/[customerId]` did not handle completed cards (`0/10` display bug) and lacked real-time client polling and stamp activity breakdown.
+  4. WhatsApp bot had no keyword handler for "wallet" / "stamps" balance inquiries.
+- **Resolution**:
+  1. **Photo Upload API (`/api/reviews/upload-photo`)**: Built lightweight photo upload endpoint saving via `@/lib/storage`.
+  2. **Review Editor UI (`ReviewEditor.tsx`)**: Added stamp bonus banners (`+2 Review, +2 Photo, up to +4 Stamps`), camera upload with instant thumbnail preview, and 1-click "View My Live Digital Wallet" button.
+  3. **Backend Bonus Awarding (`record-google-post/route.ts`)**: Accurately awards `review_bonus` and `photo_bonus` independently with specific DB stamp sources; handles card completion and overflow.
+  4. **Detailed WhatsApp Notifications**: Includes emoji breakdown `(+2 Review ⭐ + 2 Photo Bonus 📸)`, live wallet balance `X / Y Stamps`, and working digital wallet link. Also added wallet link to `STAMP_EARNED` in `award/route.ts`.
+  5. **Real-time Digital Stamp Wallet**: Upgraded `/q/wallet/[customerId]` with interactive animated stamp slots, progress bar, unlocked reward celebration banner, recent stamp activity history (`+1 Purchase`, `+2 Welcome Bonus`, `+2 Google Review`, `+2 Photo Review`), and 12-second silent auto-refresh.
+  6. **Wallet Route Redirects**: Added `/wallet/page.tsx` and `/wallet/[customerId]/page.tsx` redirecting cleanly to `/q/wallet/[customerId]`.
+  7. **Smart WhatsApp Keyword Bot (`evolution/route.ts`)**: Inbound messages with "wallet", "stamps", "balance", "card", or "points" immediately receive the customer's real-time stamp count and live wallet link.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [05 Sep 2026] Issue: Joining Bonus Stamps Missing on 1st Purchase / Bill Approval
 - **Symptom**: When a customer (e.g. Hitesh) made their 1st purchase at Cake Connection, they only received 1 purchase stamp instead of 3 stamps (1 purchase stamp + 2 joining bonus stamps). The WhatsApp message showed `You earned 1 stamps! Total: 1/10` without the welcome bonus breakdown.
 - **Root Cause**: While `stamp-engine.ts` possessed joining bonus logic, the cashier live queue approval endpoint `src/app/api/rewards/award/route.ts` executed direct Prisma transactions without checking `isFirstVisit` or `stampCard.joiningBonusEnabled`. It only awarded `stampsToAward` (the POS purchase stamp) and omitted joining bonus calculation and WhatsApp template customization.

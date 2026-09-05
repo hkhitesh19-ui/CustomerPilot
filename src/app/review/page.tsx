@@ -214,6 +214,12 @@ Output ONLY the review text.`
         orderBy: { createdAt: "desc" }
       })
     : null
+  // Fetch active stamp card configuration to display exact bonus stamps
+  const stampCard = await db.stampCard.findFirst({
+    where: { merchantId, active: true }
+  })
+  const googleReviewBonus = stampCard?.googleReviewBonus ?? 1
+  const photoBonus = stampCard?.photoBonus ?? 2
   const existingReviewText = existingReview?.finalText || existingReview?.aiDraft || null
   
   return (
@@ -232,6 +238,13 @@ Output ONLY the review text.`
         id: customer?.id || "",
         name: customer?.name || "VIP"
       }} 
+      bonusInfo={{
+        googleReviewBonus,
+        photoBonus,
+        hasPreviousPhoto,
+        rewardName: stampCard?.rewardName || "FREE Reward",
+        stampsRequired: stampCard?.stampsRequired || 10
+      }}
     />
     <div className="mt-6 pt-4 border-t border-slate-200/20 text-center space-y-1">
       <p className="text-[10px] text-slate-500">
