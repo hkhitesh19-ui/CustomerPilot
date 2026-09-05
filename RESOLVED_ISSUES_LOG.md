@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [05 Sep 2026] Issue: Customer Google Review Page 500 Error & Pinggy Tunnel Drop
+- **Symptom**: Clicking the review link sent via WhatsApp on mobile or opening it on laptop failed to load (`plvfi-...` connection refused / HTTP 500).
+- **Root Cause**:
+  1. `src/app/review/page.tsx` passed `hasPreviousPhoto` in `bonusInfo` to `<ReviewEditor />` without declaring it, throwing a server-side `ReferenceError: hasPreviousPhoto is not defined` (HTTP 500).
+  2. OpenSSH keepalive flags in `scripts/autoPinggySync.js` had caused Pinggy to drop and rotate the tunnel domain from `plvfi-49-43-34-14` to `mwfca-49-43-34-14`, making older links unreachable.
+- **Resolution**:
+  1. In `src/app/review/page.tsx`, defined `const hasPreviousPhoto = !!(existingReview?.photoUrl)`.
+  2. Verified both locally (`http://localhost:3000/review?...`) and publicly via active Pinggy tunnel (`https://mwfca-49-43-34-14.run.pinggy-free.link/review?...`), confirming HTTP 200 and dynamic AI review draft rendering.
+  3. Stabilized `scripts/autoPinggySync.js` connection parameters with automatic backoff reconnection so the tunnel remains active.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [05 Sep 2026] Feature: Google Review & Photo Bonus Stamps + Real-Time Digital Stamp Wallet
 - **Symptom**: Customer review page lacked photo attachment capability, preventing customers from earning merchant-configured photo bonus stamps (+2). Review post WhatsApp notification sent broken `/wallet` 404 links and lacked stamp breakdowns. Customers had no way to view their live digital stamp wallet, see stamp history, or query wallet balance on WhatsApp.
 - **Root Cause**:

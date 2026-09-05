@@ -92,9 +92,6 @@ function startPinggy() {
         '-R0:localhost:3000',
         'a.pinggy.io',
         '-o', 'StrictHostKeyChecking=no',
-        '-o', 'ServerAliveInterval=15',
-        '-o', 'ServerAliveCountMax=3',
-        '-o', 'ExitOnForwardFailure=yes',
         '-T'
     ]);
     currentPinggyProcess = proc;

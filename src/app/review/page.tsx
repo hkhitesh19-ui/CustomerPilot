@@ -221,6 +221,7 @@ Output ONLY the review text.`
   const googleReviewBonus = stampCard?.googleReviewBonus ?? 1
   const photoBonus = stampCard?.photoBonus ?? 2
   const existingReviewText = existingReview?.finalText || existingReview?.aiDraft || null
+  const hasPreviousPhoto = !!(existingReview?.photoUrl)
   
   return (
     <>
