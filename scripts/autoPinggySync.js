@@ -78,17 +78,16 @@ async function updateAllInstances(instances, url) {
     }
 }
 
-let isRestarting = false;
-
 function startPinggy() {
-    isRestarting = true;
     if (currentPinggyProcess) {
         console.log('[PinggySync] Killing old Pinggy process...');
-        try { currentPinggyProcess.kill(); } catch (_) {}
+        const oldProc = currentPinggyProcess;
+        oldProc.wasKilled = true;
+        try { oldProc.kill(); } catch (_) {}
     }
 
     console.log('[PinggySync] Starting new Pinggy tunnel...');
-    currentPinggyProcess = spawn('ssh', [
+    const proc = spawn('ssh', [
         '-p', '443',
         '-R0:localhost:3000',
         'a.pinggy.io',
@@ -98,7 +97,8 @@ function startPinggy() {
         '-o', 'ExitOnForwardFailure=yes',
         '-T'
     ]);
-    isRestarting = false;
+    currentPinggyProcess = proc;
+    proc.wasKilled = false;
 
     let urlFound = false;
 
@@ -143,18 +143,18 @@ function startPinggy() {
         }
     };
 
-    currentPinggyProcess.stdout.on('data', handleOutput);
-    currentPinggyProcess.stderr.on('data', handleOutput); // ssh often prints to stderr
+    proc.stdout.on('data', handleOutput);
+    proc.stderr.on('data', handleOutput); // ssh often prints to stderr
 
-    currentPinggyProcess.on('close', (code) => {
+    proc.on('close', (code) => {
         console.log(`[PinggySync] Pinggy process exited with code ${code}`);
-        if (!isRestarting) {
-            console.log('[PinggySync] 🔄 Tunnel disconnected! Reconnecting in 5 seconds...');
+        if (!proc.wasKilled) {
+            console.log('[PinggySync] 🔄 Tunnel disconnected unexpectedly! Reconnecting in 5 seconds...');
             setTimeout(startPinggy, 5000);
         }
     });
 
-    currentPinggyProcess.on('error', (err) => {
+    proc.on('error', (err) => {
         console.error('[PinggySync] Tunnel error:', err.message);
     });
 }
