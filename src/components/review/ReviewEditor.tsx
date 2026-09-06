@@ -53,12 +53,35 @@ export function ReviewEditor({
     const localUrl = URL.createObjectURL(file)
     setPhotoPreview(localUrl)
     setHasPhotoAttached(true)
+    setUploadingPhoto(true)
 
-    // Upload to server
+    // Upload to server — compress first using canvas to keep under 1MB
     try {
-      setUploadingPhoto(true)
+      let uploadBlob: Blob = file
+      try {
+        uploadBlob = await new Promise<Blob>((resolve) => {
+          const img = new Image()
+          img.onload = () => {
+            const MAX = 1200
+            let w = img.width, h = img.height
+            if (w > MAX || h > MAX) {
+              const ratio = Math.min(MAX / w, MAX / h)
+              w = Math.round(w * ratio)
+              h = Math.round(h * ratio)
+            }
+            const canvas = document.createElement("canvas")
+            canvas.width = w
+            canvas.height = h
+            const ctx = canvas.getContext("2d")!
+            ctx.drawImage(img, 0, 0, w, h)
+            canvas.toBlob((b) => resolve(b || file), "image/jpeg", 0.82)
+          }
+          img.src = localUrl
+        })
+      } catch { /* canvas failed, use original */ }
+
       const formData = new FormData()
-      formData.append("photo", file)
+      formData.append("photo", uploadBlob, file.name || "review_photo.jpg")
       const res = await fetch("/api/reviews/upload-photo", {
         method: "POST",
         body: formData
@@ -235,7 +258,7 @@ export function ReviewEditor({
           {/* Photo Upload Section */}
           <div className="space-y-2">
             <div className="flex justify-between items-center ml-1">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
+              <label htmlFor="review-photo-input" className="text-xs font-semibold text-slate-400 uppercase tracking-wider block cursor-pointer">
                 Add Purchase Photo (Cake / Item)
               </label>
               <span className="text-[11px] text-teal-400 font-semibold flex items-center gap-1">
@@ -244,16 +267,18 @@ export function ReviewEditor({
             </div>
 
             <input 
+              id="review-photo-input"
               type="file" 
               ref={fileInputRef} 
               accept="image/*" 
+              capture="environment"
               className="hidden" 
               onChange={handlePhotoSelect} 
             />
 
             {!photoPreview ? (
-              <div 
-                onClick={() => fileInputRef.current?.click()}
+              <label 
+                htmlFor="review-photo-input"
                 className="w-full border-2 border-dashed border-slate-700 hover:border-teal-500/70 bg-slate-950/60 rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all group"
               >
                 <div className="w-10 h-10 rounded-full bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 group-hover:scale-110 transition-transform">
@@ -263,30 +288,40 @@ export function ReviewEditor({
                   <p className="text-xs font-semibold text-slate-300">Tap to attach a Photo</p>
                   <p className="text-[10px] text-slate-500">Unlocks +{photoBonus} extra bonus stamps on your card</p>
                 </div>
-              </div>
+              </label>
             ) : (
-              <div className="relative bg-slate-950 border border-teal-500/40 rounded-xl p-3 flex items-center gap-3">
-                <img 
-                  src={photoPreview} 
-                  alt="Review preview" 
-                  className="w-14 h-14 object-cover rounded-lg border border-slate-700" 
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1 text-xs font-bold text-teal-400">
-                    <Check className="w-3.5 h-3.5" />
-                    <span>Photo Ready! (+{photoBonus} Stamps)</span>
+              <div className="bg-slate-950 border border-teal-500/40 rounded-xl p-3 space-y-2">
+                <div className="flex items-center gap-3">
+                  <img 
+                    src={photoPreview} 
+                    alt="Review preview" 
+                    className="w-14 h-14 object-cover rounded-lg border border-slate-700" 
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1 text-xs font-bold text-teal-400">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>{uploadingPhoto ? "Saving Photo... ⏳" : `Photo Saved! +${photoBonus} Stamps ✅`}</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-0.5">
+                      {uploadingPhoto ? "Please wait..." : "Stamps credited after you post to Google"}
+                    </p>
                   </div>
-                  <p className="text-[10px] text-slate-400 truncate">
-                    {uploadingPhoto ? "Uploading..." : "Remember to also attach this photo when Google Maps opens"}
-                  </p>
+                  <button
+                    type="button"
+                    onClick={removePhoto}
+                    className="p-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={removePhoto}
-                  className="p-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                {/* Tip for Google Maps photo */}
+                {!uploadingPhoto && (
+                  <div className="bg-amber-950/30 border border-amber-800/30 rounded-lg px-3 py-2">
+                    <p className="text-[10px] text-amber-300/80 leading-relaxed">
+                      💡 <strong>Tip:</strong> For extra Google Review impact, also attach this photo inside Google Maps when it opens. (Optional — your +{photoBonus} stamps are already saved here!)
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
