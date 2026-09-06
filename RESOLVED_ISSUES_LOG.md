@@ -3,6 +3,20 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [06 Sep 2026] Feature: Fully Automated Google Review & Photo Bonus Stamps Pipeline
+- **Symptom**: System needed a reliable, fully automated mechanism to verify whether a customer genuinely posted a Google Review (+2 Stamps) and attached a product photo on Google Maps (+2 Extra Photo Stamps, Total: 4 Stamps) without human intervention, manual screenshot approvals, or gaming vulnerabilities.
+- **Root Cause**:
+  1. Google Places API (`getPlaceDetails`) is hard-capped to 10 photos with no pagination, which misses newly added customer photos for businesses with >10 photos.
+  2. Google Review API does not link customer photo assets directly into the review object, and Google does not expose customer phone numbers for direct matching.
+  3. Lack of a resilient, persistent job queue for multi-stage delayed photo indexing checks (T+20m, T+24h, T+7d).
+- **Resolution**:
+  1. Implemented `ReviewBonusLog` Prisma model establishing a persistent DB-backed job queue with 90-day audit trail, retry counts, and confidence scores.
+  2. Created `src/lib/review-photo-verifier.ts` featuring Jaro-Winkler fuzzy author name matching, un-capped GBP Customer Media API queries (`accounts.locations.media.customers`), and anti-abuse checks (velocity limiter <5/hr and 24h stamp caps).
+  3. Integrated queue worker into real-time cron engine (`/api/cron/google-reviews`), automatically scanning pending verifications at T+20 minutes with 24h indexing retry and 7-day ambiguous recheck.
+  4. Updated `/api/reviews/record-google-post/route.ts` to award base review stamps (+2) immediately on post, queue photo verification, and dispatch celebratory WhatsApp confirmation when the photo is verified.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [06 Sep 2026] Issue: Mobile Photo Attachment Upload Fix & Clarification on Google Maps Review Workflow
 - **Symptom**: "Tap to attach a Photo" on the review page failed to trigger the camera/gallery picker on mobile devices (iOS Safari / mobile browsers), and photo upload failed or timed out over mobile network. Customer questioned whether attaching a photo on CustomerPilot requires re-uploading on Google Maps, and how Google Maps review/photo detection works.
 - **Root Cause**:

@@ -4,6 +4,7 @@ import { generateAIReviewReply } from '@/lib/ai-review-reply';
 import { postReviewReplyToGBP } from '@/lib/google-reviews-service';
 import { sendCentralWhatsAppMessage } from '@/lib/whatsapp-service';
 import { hasModule } from '@/lib/feature-gate';
+import { verifyCustomerGooglePhoto } from '@/lib/review-photo-verifier';
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
@@ -104,9 +105,36 @@ export async function POST(req: Request) {
     const alreadyHadReview = Boolean(existingReview);
     const alreadyHadPhoto = Boolean(existingReview && (existingReview.photoBonusStamps > 0 || existingReview.photoUrl));
 
-    // Calculate bonuses to award in THIS submission
+    // 1. Base Review Bonus (awarded immediately if first time)
     const reviewBonusToAward = alreadyHadReview ? 0 : configuredBonus;
-    const photoBonusToAward = (photoAttached && !alreadyHadPhoto) ? configuredPhotoBonus : 0;
+
+    // 2. Automated Google Photo Verification Pipeline
+    let photoBonusToAward = 0;
+    let photoVerificationStatus: "VERIFIED" | "PENDING" | "NONE" = "NONE";
+    let verificationStage = "INITIAL_REVIEW";
+    let matchedPhotoUri: string | null = body?.photoUrl || null;
+    let matchConfidence: number | null = null;
+
+    if (!alreadyHadPhoto && configuredPhotoBonus > 0) {
+      // Check if photo can be verified immediately (sandbox session photo or live GBP)
+      const photoCheck = await verifyCustomerGooglePhoto(
+        merchantId,
+        customer.name || "VIP Member",
+        new Date()
+      );
+
+      if (photoCheck.verified) {
+        photoBonusToAward = configuredPhotoBonus;
+        photoVerificationStatus = "VERIFIED";
+        verificationStage = photoCheck.stage;
+        matchedPhotoUri = photoCheck.photoUri || matchedPhotoUri;
+        matchConfidence = photoCheck.confidence ?? null;
+      } else {
+        // Enqueue 20-min verification check in ReviewBonusLog
+        photoVerificationStatus = "PENDING";
+      }
+    }
+
     const totalBonusToAward = reviewBonusToAward + photoBonusToAward;
     const bonusCount = totalBonusToAward;
 
@@ -121,7 +149,7 @@ export async function POST(req: Request) {
           rating: Number(rating),
           aiDraft: finalReviewText,
           finalText: finalReviewText,
-          photoUrl: body?.photoUrl || existingReview.photoUrl || null,
+          photoUrl: matchedPhotoUri || existingReview.photoUrl || null,
           photoBonusStamps: cumulativePhotoBonus,
           bonusStampsAwarded: cumulativeTotalBonus,
           status: "submitted",
@@ -136,7 +164,7 @@ export async function POST(req: Request) {
           rating: Number(rating),
           aiDraft: finalReviewText,
           finalText: finalReviewText,
-          photoUrl: body?.photoUrl || null,
+          photoUrl: matchedPhotoUri || null,
           photoBonusStamps: photoBonusToAward,
           bonusStampsAwarded: totalBonusToAward,
           platform: "google",
@@ -145,6 +173,25 @@ export async function POST(req: Request) {
         }
       });
     }
+
+    // Create entry in ReviewBonusLog queue for auditing and automated rechecking
+    await db.reviewBonusLog.create({
+      data: {
+        merchantId,
+        customerId: customer.id,
+        reviewId: reviewRecord.id,
+        reviewerName: customer.name || "VIP Member",
+        stage: verificationStage,
+        photoUri: matchedPhotoUri,
+        matchConfidence,
+        decision: photoVerificationStatus === "VERIFIED" ? "4_STAMPS" : (photoVerificationStatus === "PENDING" ? "PENDING" : "2_STAMPS"),
+        reason: photoVerificationStatus === "VERIFIED" ? "photo_verified_on_post" : (photoVerificationStatus === "PENDING" ? "awaiting_google_photo_indexing" : "review_only"),
+        recheckScheduled: photoVerificationStatus === "PENDING",
+        recheckAt: photoVerificationStatus === "PENDING" ? new Date(Date.now() + 20 * 60 * 1000) : null,
+        retryCount: 0,
+        finalizedAt: photoVerificationStatus !== "PENDING" ? new Date() : null
+      }
+    }).catch(err => console.error("[ReviewBonusLog] Creation error:", err.message));
 
     let replyText: string | null = null;
 
@@ -310,20 +357,21 @@ export async function POST(req: Request) {
     const stampsRequired = template?.stampsRequired || 10;
     const remaining = Math.max(0, stampsRequired - finalStampsInWallet);
 
-    let bonusBreakdown = "";
-    if (reviewBonusToAward > 0 && photoBonusToAward > 0) {
-      bonusBreakdown = `(+${reviewBonusToAward} Review ⭐ + ${photoBonusToAward} Photo Bonus 📸)`;
-    } else if (photoBonusToAward > 0) {
-      bonusBreakdown = `(+${photoBonusToAward} Photo Bonus 📸)`;
-    } else if (reviewBonusToAward > 0) {
-      bonusBreakdown = `(+${reviewBonusToAward} Review Bonus ⭐)`;
-    }
-
     let customerMsg = "";
-    if (totalBonusToAward > 0) {
+    if (photoVerificationStatus === "VERIFIED" && totalBonusToAward > 0) {
       customerMsg = `🎉 *Congratulations ${customer.name || "VIP"}!* ⭐\n\n` +
         `Thank you for supporting *${merchant.name}* on Google Maps!\n\n` +
-        `✅ *+${totalBonusToAward} Bonus Stamp(s) Credited!* ${bonusBreakdown}\n` +
+        `✅ *+${totalBonusToAward} Bonus Stamps Credited!* (+${reviewBonusToAward} Review ⭐ + ${photoBonusToAward} Photo Bonus 📸)\n` +
+        `📊 *Wallet:* ${finalStampsInWallet} / ${stampsRequired} Stamps\n` +
+        `🎁 *Goal:* ${template?.rewardName || "FREE Reward"}${cardCompletedNow ? " — 🏆 *REWARD UNLOCKED!*" : ` (${remaining} more stamp(s) needed)`}\n\n` +
+        `📱 *View Your Live Digital Stamp Card:*\n${walletUrl}`;
+    } else if (reviewBonusToAward > 0) {
+      customerMsg = `🎉 *Congratulations ${customer.name || "VIP"}!* ⭐\n\n` +
+        `Thank you for supporting *${merchant.name}* on Google Maps!\n\n` +
+        `✅ *+${reviewBonusToAward} Review Bonus Stamps Credited!* ⭐\n` +
+        (configuredPhotoBonus > 0 && !alreadyHadPhoto
+          ? `📸 *Attached a Product Photo on Google Maps?* Our system will verify it automatically within 20 mins and add *+${configuredPhotoBonus} Extra Stamps* (Total 4)! 🎁\n\n`
+          : `\n`) +
         `📊 *Wallet:* ${finalStampsInWallet} / ${stampsRequired} Stamps\n` +
         `🎁 *Goal:* ${template?.rewardName || "FREE Reward"}${cardCompletedNow ? " — 🏆 *REWARD UNLOCKED!*" : ` (${remaining} more stamp(s) needed)`}\n\n` +
         `📱 *View Your Live Digital Stamp Card:*\n${walletUrl}`;

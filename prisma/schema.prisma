@@ -81,6 +81,7 @@ model Merchant {
   redemptions               Redemption[]
   referrals                 Referral[]
   reviews                   Review[]
+  reviewBonusLogs           ReviewBonusLog[]
   rewards                   Reward[]
   rewardWaitlists           RewardWaitlist[]
   staff                     Staff[]
@@ -171,6 +172,7 @@ model Customer {
   referralsReceived   Referral[]          @relation("Friend")
   referrals           Referral[]          @relation("Referrer")
   reviews             Review[]
+  reviewBonusLogs     ReviewBonusLog[]
   stamps              Stamp[]
   waitingCustomers    WaitingCustomer[]
   whatsAppMessages    WhatsAppMessage[]
@@ -825,4 +827,29 @@ model GrowthReport {
 
   @@unique([merchantId, reportMonth])
   @@index([merchantId])
+}
+
+model ReviewBonusLog {
+  id                String    @id @default(cuid())
+  merchantId        String
+  customerId        String
+  reviewId          String?   // Local Review ID or GBP reviewId
+  reviewerName      String
+  stage             String    // "INITIAL_REVIEW" | "GBP_DIRECT" | "GBP_CUSTOMER_MEDIA" | "FAILSAFE" | "RETROACTIVE"
+  photoUri          String?
+  matchConfidence   Float?
+  decision          String    // "2_STAMPS" | "4_STAMPS" | "PENDING"
+  reason            String
+  recheckScheduled  Boolean   @default(false)
+  recheckAt         DateTime?
+  retryCount        Int       @default(0)
+  finalizedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  merchant Merchant @relation(fields: [merchantId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@index([merchantId, customerId, createdAt])
+  @@index([decision, recheckAt])
 }

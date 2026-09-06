@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { fetchGoogleReviews, syncGoogleReviewsToDb, postReviewReplyToGBP } from "@/lib/google-reviews-service"
 import { generateAIReviewReply } from "@/lib/ai-review-reply"
+import { processPendingReviewPhotoVerifications } from "@/lib/review-photo-verifier"
 
 // Vercel cron configuration (runs every 5 minutes in production)
 export const maxDuration = 300 // 5 minutes limit
@@ -85,10 +86,15 @@ export async function GET(req: Request) {
       }
     }
 
+    // 5. Process any pending review photo verifications
+    const verifiedPhotosCount = await processPendingReviewPhotoVerifications()
+    console.log(`[CRON] Processed ${verifiedPhotosCount} pending review photo verifications.`)
+
     return NextResponse.json({
       success: true,
       message: "Real-time Google Reviews Polling completed.",
-      repliesSent: totalRepliesSent
+      repliesSent: totalRepliesSent,
+      verifiedPhotosCount
     })
 
   } catch (error: any) {
