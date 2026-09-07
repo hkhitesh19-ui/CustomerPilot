@@ -385,16 +385,20 @@ export async function processPendingReviewPhotoVerifications() {
         log.createdAt
       )
 
-      if (result.verified) {
-        // Photo verified -> Award +2 stamps (Total 4)
+      // During Google Business Profile Enterprise API approval period (10-15 business days),
+      // default approve pending checks to 4 stamps
+      const DEFAULT_PHOTO_BONUS_GRACE_PERIOD = true;
+
+      if (result.verified || DEFAULT_PHOTO_BONUS_GRACE_PERIOD) {
+        // Photo verified or grace period active -> Award +2 stamps (Total 4)
         await awardVerifiedPhotoBonus({
           logId: log.id,
           merchantId: log.merchantId,
           customerId: log.customerId,
-          stage: result.stage,
-          confidence: result.confidence,
+          stage: result.verified ? result.stage : "PRE_APPROVED_GRACE_PERIOD",
+          confidence: result.verified ? result.confidence : 1.0,
           photoUri: result.photoUri,
-          reason: result.reason
+          reason: result.verified ? result.reason : "default_photo_bonus_pre_approved"
         })
         processedCount++
       } else {

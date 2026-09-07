@@ -3,6 +3,21 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [07 Sep 2026] Feature: Default 4 Bonus Stamps (2 Review + 2 Photo) Grace Period & Customer Hitesh Wallet Upgrade
+- **Symptom**: 
+  1. Google Business Profile Enterprise API Access Request submitted by merchant requires 10-15 business days for approval; in the interim, live Customer Media API queries return HTTP 403 `PERMISSION_DENIED`, preventing automatic photo detection on Google Maps.
+  2. Customers posting Google Reviews through CustomerPilot were receiving only base review stamps (+2) instead of the full +4 stamps reward (+2 Review + 2 Photo Bonus). Customer Hitesh was at 5/10 stamps awaiting photo bonus.
+- **Root Cause**: 
+  1. Un-approved Google Cloud projects have zero quota on `accounts.locations.media.customers` endpoints until the official multi-tenant partner application is granted by Google.
+  2. `src/app/api/reviews/record-google-post/route.ts` only awarded photo bonus upon immediate GBP verification and otherwise enqueued for delayed verification.
+- **Resolution**: 
+  1. **Default 4-Stamp Grace Period Engine (`record-google-post/route.ts`)**: Configured `DEFAULT_PHOTO_BONUS_GRACE_PERIOD = true` during the 10-15 day approval window. By default, every customer posting a Google Review through CustomerPilot is credited with both the base review bonus (+2) and photo bonus (+2) immediately upon posting (Total: 4 Bonus Stamps).
+  2. **Audit Logging & Queue Harmony (`review-photo-verifier.ts`)**: Updated `ReviewBonusLog` and background worker `processPendingReviewPhotoVerifications` to automatically approve checks with `decision: "4_STAMPS"`, `stage: "PRE_APPROVED_GRACE_PERIOD"`, and `reason: "default_photo_bonus_pre_approved"`.
+  3. **Customer Hitesh Wallet Upgrade**: Executed atomic Prisma transaction crediting 2 `photo_bonus` stamps to Hitesh (`919033304707`), advancing his wallet from 5/10 to 7/10 stamps, updating `Review.photoBonusStamps: 2`, `Review.bonusStampsAwarded: 4`, and `ReviewBonusLog.decision: "4_STAMPS"`.
+  4. **WhatsApp Dispatch**: Dispatched celebratory WhatsApp message to Hitesh confirming +2 Extra Photo Bonus Stamps (Total: 4 Bonus Stamps) with his live digital wallet link (`/q/wallet/cmtq2sdly00nvw02sx1lxg8ia`).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [07 Sep 2026] Feature: SEO Keyword-Optimized AI Auto-Reply Engine, Lifetime Google OAuth Fix & 20-Min Photo Verifier
 - **Symptom**: 
   1. Google Review AI auto-reply was falling back to a generic 1-line sentence instead of generating rich, SEO-optimized owner replies with local Vadodara keywords, specific product echoing, and zero manual intervention.

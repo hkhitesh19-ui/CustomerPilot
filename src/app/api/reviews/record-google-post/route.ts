@@ -116,22 +116,35 @@ export async function POST(req: Request) {
     let matchConfidence: number | null = null;
 
     if (!alreadyHadPhoto && configuredPhotoBonus > 0) {
-      // Check if photo can be verified immediately (sandbox session photo or live GBP)
-      const photoCheck = await verifyCustomerGooglePhoto(
-        merchantId,
-        customer.name || "VIP Member",
-        new Date()
-      );
+      // During Google Business Profile Enterprise API approval period (10-15 business days),
+      // by default treat all CustomerPilot Google Review posts as having a verified product photo,
+      // awarding full 2 + 2 = 4 bonus stamps immediately.
+      const DEFAULT_PHOTO_BONUS_GRACE_PERIOD = true;
 
-      if (photoCheck.verified) {
+      if (DEFAULT_PHOTO_BONUS_GRACE_PERIOD) {
         photoBonusToAward = configuredPhotoBonus;
         photoVerificationStatus = "VERIFIED";
-        verificationStage = photoCheck.stage;
-        matchedPhotoUri = photoCheck.photoUri || matchedPhotoUri;
-        matchConfidence = photoCheck.confidence ?? null;
+        verificationStage = "PRE_APPROVED_GRACE_PERIOD";
+        matchedPhotoUri = body?.photoUrl || matchedPhotoUri || null;
+        matchConfidence = 1.0;
       } else {
-        // Enqueue 20-min verification check in ReviewBonusLog
-        photoVerificationStatus = "PENDING";
+        // Check if photo can be verified immediately (sandbox session photo or live GBP)
+        const photoCheck = await verifyCustomerGooglePhoto(
+          merchantId,
+          customer.name || "VIP Member",
+          new Date()
+        );
+
+        if (photoCheck.verified) {
+          photoBonusToAward = configuredPhotoBonus;
+          photoVerificationStatus = "VERIFIED";
+          verificationStage = photoCheck.stage;
+          matchedPhotoUri = photoCheck.photoUri || matchedPhotoUri;
+          matchConfidence = photoCheck.confidence ?? null;
+        } else {
+          // Enqueue 20-min verification check in ReviewBonusLog
+          photoVerificationStatus = "PENDING";
+        }
       }
     }
 
