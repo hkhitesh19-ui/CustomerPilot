@@ -78,12 +78,31 @@ async function updateAllInstances(instances, url) {
     }
 }
 
+function killProcess(proc) {
+    if (!proc) return;
+    proc.wasKilled = true;
+    try {
+        if (process.platform === 'win32' && proc.pid) {
+            const { execSync } = require('child_process');
+            execSync(`taskkill /F /T /PID ${proc.pid}`, { stdio: 'ignore' });
+        } else {
+            proc.kill('SIGKILL');
+        }
+    } catch (_) {}
+}
+
+let watchdogTimer = null;
+
 function startPinggy() {
+    if (watchdogTimer) {
+        clearTimeout(watchdogTimer);
+        watchdogTimer = null;
+    }
+
     if (currentPinggyProcess) {
         console.log('[PinggySync] Killing old Pinggy process...');
-        const oldProc = currentPinggyProcess;
-        oldProc.wasKilled = true;
-        try { oldProc.kill(); } catch (_) {}
+        killProcess(currentPinggyProcess);
+        currentPinggyProcess = null;
     }
 
     console.log('[PinggySync] Starting new Pinggy tunnel...');
@@ -92,12 +111,23 @@ function startPinggy() {
         '-R0:localhost:3000',
         'a.pinggy.io',
         '-o', 'StrictHostKeyChecking=no',
+        '-o', 'ServerAliveInterval=10',
+        '-o', 'ServerAliveCountMax=3',
+        '-o', 'ConnectTimeout=15',
         '-T'
     ]);
     currentPinggyProcess = proc;
     proc.wasKilled = false;
 
     let urlFound = false;
+
+    // Watchdog: If URL not discovered in 25 seconds, force-restart
+    watchdogTimer = setTimeout(() => {
+        if (!urlFound && !proc.wasKilled) {
+            console.log('[PinggySync] ⚠️ No URL received within 25s, restarting tunnel...');
+            startPinggy();
+        }
+    }, 25000);
 
     const handleOutput = (data) => {
         const output = data.toString();
@@ -106,6 +136,10 @@ function startPinggy() {
         
         if (match && match[0] && !urlFound) {
             urlFound = true;
+            if (watchdogTimer) {
+                clearTimeout(watchdogTimer);
+                watchdogTimer = null;
+            }
             const extractedUrl = match[0];
             console.log('[PinggySync] Found Pinggy URL:', extractedUrl);
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Copy, Check, ExternalLink, Star, Camera, Image as ImageIcon, X, Sparkles, Gift } from "lucide-react"
+import { Copy, Check, ExternalLink, Star, Camera, Sparkles, Gift } from "lucide-react"
 import { useSystemContent } from "@/hooks/useSystemContent"
 
 export function ReviewEditor({ 
@@ -34,114 +34,64 @@ export function ReviewEditor({
   const [submitted, setSubmitted] = useState(false)
   const [isEditingExisting, setIsEditingExisting] = useState(!!existingReviewText)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-
-  // Photo state
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
-  const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string | null>(null)
-  const [uploadingPhoto, setUploadingPhoto] = useState(false)
-  const [hasPhotoAttached, setHasPhotoAttached] = useState(false)
 
   const googleLink = merchant.googleReviewLink 
     || (merchant.googlePlaceId ? `https://search.google.com/local/writereview?placeid=${merchant.googlePlaceId}` : "https://maps.google.com")
 
-  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  // Robust multi-layered synchronous + asynchronous clipboard copy
+  const performCopy = (text: string): boolean => {
+    let success = false
 
-    // Show instant local preview
-    const localUrl = URL.createObjectURL(file)
-    setPhotoPreview(localUrl)
-    setHasPhotoAttached(true)
-    setUploadingPhoto(true)
-
-    // Upload to server — compress first using canvas to keep under 1MB
-    try {
-      let uploadBlob: Blob = file
+    // 1. Direct synchronous selection of textarea while tab is active and focused
+    if (textareaRef.current) {
       try {
-        uploadBlob = await new Promise<Blob>((resolve) => {
-          const img = new Image()
-          img.onload = () => {
-            const MAX = 1200
-            let w = img.width, h = img.height
-            if (w > MAX || h > MAX) {
-              const ratio = Math.min(MAX / w, MAX / h)
-              w = Math.round(w * ratio)
-              h = Math.round(h * ratio)
-            }
-            const canvas = document.createElement("canvas")
-            canvas.width = w
-            canvas.height = h
-            const ctx = canvas.getContext("2d")!
-            ctx.drawImage(img, 0, 0, w, h)
-            canvas.toBlob((b) => resolve(b || file), "image/jpeg", 0.82)
-          }
-          img.src = localUrl
-        })
-      } catch { /* canvas failed, use original */ }
-
-      const formData = new FormData()
-      formData.append("photo", uploadBlob, file.name || "review_photo.jpg")
-      const res = await fetch("/api/reviews/upload-photo", {
-        method: "POST",
-        body: formData
-      })
-      const data = await res.json()
-      if (res.ok && data.url) {
-        setUploadedPhotoUrl(data.url)
-      }
-    } catch (err) {
-      console.warn("[ReviewEditor] Photo upload failed, will still award photo bonus flag:", err)
-    } finally {
-      setUploadingPhoto(false)
+        textareaRef.current.focus()
+        textareaRef.current.select()
+        textareaRef.current.setSelectionRange(0, text.length)
+        success = document.execCommand('copy')
+      } catch (_) {}
     }
+
+    // 2. Off-screen temporary textarea fallback
+    if (!success) {
+      try {
+        const temp = document.createElement('textarea')
+        temp.value = text
+        temp.setAttribute('readonly', '')
+        temp.style.position = 'fixed'
+        temp.style.top = '-9999px'
+        temp.style.left = '-9999px'
+        temp.style.opacity = '0'
+        document.body.appendChild(temp)
+        temp.focus()
+        temp.select()
+        temp.setSelectionRange(0, text.length)
+        success = document.execCommand('copy')
+        document.body.removeChild(temp)
+      } catch (_) {}
+    }
+
+    // 3. Modern Navigator Clipboard API
+    if (typeof window !== "undefined" && navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {})
+      success = true
+    }
+
+    setCopied(true)
+    setTimeout(() => setCopied(false), 8000)
+    return success
   }
 
-  const removePhoto = () => {
-    setPhotoPreview(null)
-    setUploadedPhotoUrl(null)
-    setHasPhotoAttached(false)
-    if (fileInputRef.current) fileInputRef.current.value = ""
+  const handleManualCopy = (e: React.MouseEvent) => {
+    e.preventDefault()
+    performCopy(draft)
   }
 
   const handleCopyAndPostClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const ta = textareaRef.current
-    const photoAttached = Boolean(uploadedPhotoUrl || photoPreview || hasPhotoAttached)
+    // 1. MUST copy review text synchronously right now before window navigation starts
+    performCopy(draft)
 
-    // 1. Try modern Clipboard API (works on HTTPS + localhost)
-    if (typeof window !== "undefined" && window.isSecureContext && navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(draft)
-        .then(() => setCopied(true))
-        .catch(() => {})
-      fetch('/api/reviews/record-google-post', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          customerId: customer.id, 
-          merchantId: merchant.id, 
-          reviewText: draft, 
-          rating: 5,
-          photoUrl: uploadedPhotoUrl,
-          photoAttached,
-          hasPhoto: photoAttached
-        })
-      }).catch(() => {})
-      setSubmitted(true)
-      return
-    }
-
-    // 2. HTTP fallback: execCommand on the VISIBLE, FOCUSED textarea ref
-    if (ta) {
-      try {
-        ta.focus()
-        ta.select()
-        ta.setSelectionRange(0, ta.value.length)
-        const ok = document.execCommand('copy')
-        if (ok) setCopied(true)
-      } catch { /* silent */ }
-    }
-
-    // 3. Record review (fire-and-forget)
+    // 2. Fire backend notification (records post + enqueues automated photo verification)
     fetch('/api/reviews/record-google-post', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -149,15 +99,12 @@ export function ReviewEditor({
         customerId: customer.id, 
         merchantId: merchant.id, 
         reviewText: draft, 
-        rating: 5,
-        photoUrl: uploadedPhotoUrl,
-        photoAttached,
-        hasPhoto: photoAttached
+        rating: 5
       })
     }).catch(() => {})
 
     setSubmitted(true)
-    // Natural <a> href navigation fires after this returns
+    // 3. Natural <a> href navigation opens Google Maps in a new tab
   }
 
   const walletUrl = `/q/wallet/${customer?.id || ""}`
@@ -237,10 +184,31 @@ export function ReviewEditor({
               <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
                 {isEditingExisting ? "Your Review (Edit to update)" : "AI DRAFT (FEEL FREE TO EDIT)"}
               </label>
-              <span className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
-                <Star className="w-3 h-3 fill-emerald-400" /> +{reviewBonus} Stamps
-              </span>
+
+              {/* Quick 1-Click Copy Text Button */}
+              <button
+                type="button"
+                onClick={handleManualCopy}
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  copied 
+                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" 
+                    : "bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+                }`}
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Copied! ✅</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Copy Text</span>
+                  </>
+                )}
+              </button>
             </div>
+
             <textarea
               ref={textareaRef}
               id="review-draft-textarea"
@@ -253,77 +221,34 @@ export function ReviewEditor({
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
             />
-          </div>
 
-          {/* Photo Upload Section */}
-          <div className="space-y-2">
-            <div className="flex justify-between items-center ml-1">
-              <label htmlFor="review-photo-input" className="text-xs font-semibold text-slate-400 uppercase tracking-wider block cursor-pointer">
-                Add Purchase Photo (Cake / Item)
-              </label>
-              <span className="text-[11px] text-teal-400 font-semibold flex items-center gap-1">
-                <Camera className="w-3 h-3 text-teal-400" /> +{photoBonus} Extra Stamps
-              </span>
-            </div>
-
-            <input 
-              id="review-photo-input"
-              type="file" 
-              ref={fileInputRef} 
-              accept="image/*" 
-              capture="environment"
-              className="hidden" 
-              onChange={handlePhotoSelect} 
-            />
-
-            {!photoPreview ? (
-              <label 
-                htmlFor="review-photo-input"
-                className="w-full border-2 border-dashed border-slate-700 hover:border-teal-500/70 bg-slate-950/60 rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all group"
-              >
-                <div className="w-10 h-10 rounded-full bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 group-hover:scale-110 transition-transform">
-                  <Camera className="w-5 h-5" />
-                </div>
-                <div className="text-center">
-                  <p className="text-xs font-semibold text-slate-300">Tap to attach a Photo</p>
-                  <p className="text-[10px] text-slate-500">Unlocks +{photoBonus} extra bonus stamps on your card</p>
-                </div>
-              </label>
-            ) : (
-              <div className="bg-slate-950 border border-teal-500/40 rounded-xl p-3 space-y-2">
-                <div className="flex items-center gap-3">
-                  <img 
-                    src={photoPreview} 
-                    alt="Review preview" 
-                    className="w-14 h-14 object-cover rounded-lg border border-slate-700" 
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1 text-xs font-bold text-teal-400">
-                      <Check className="w-3.5 h-3.5" />
-                      <span>{uploadingPhoto ? "Saving Photo... ⏳" : `Photo Saved! +${photoBonus} Stamps ✅`}</span>
-                    </div>
-                    <p className="text-[10px] text-slate-400 mt-0.5">
-                      {uploadingPhoto ? "Please wait..." : "Stamps credited after you post to Google"}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={removePhoto}
-                    className="p-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-                {/* Tip for Google Maps photo */}
-                {!uploadingPhoto && (
-                  <div className="bg-amber-950/30 border border-amber-800/30 rounded-lg px-3 py-2">
-                    <p className="text-[10px] text-amber-300/80 leading-relaxed">
-                      💡 <strong>Tip:</strong> For extra Google Review impact, also attach this photo inside Google Maps when it opens. (Optional — your +{photoBonus} stamps are already saved here!)
-                    </p>
-                  </div>
-                )}
+            {/* Visual Copy Feedback Alert */}
+            {copied && (
+              <div className="p-2.5 bg-emerald-950/60 border border-emerald-500/30 rounded-xl flex items-center gap-2 text-xs text-emerald-300 animate-in fade-in duration-300">
+                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Text copied to clipboard! Just tap <strong>Paste</strong> in Google Maps.</span>
               </div>
             )}
+          </div>
+
+          {/* Google Maps Photo Bonus Guidance (No Upload on CustomerPilot) */}
+          <div className="bg-gradient-to-r from-teal-950/40 via-slate-900 to-slate-950 border border-teal-500/30 rounded-2xl p-4 flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 shrink-0 mt-0.5">
+              <Camera className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-bold text-teal-300">
+                  Want +{photoBonus} Extra Photo Bonus Stamps? 📸
+                </span>
+                <span className="px-1.5 py-0.5 rounded bg-teal-500/20 text-[10px] font-bold text-teal-400">
+                  Total +{maxPossibleBonus}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                When Google Maps opens, simply attach a photo of your purchase directly in your Google Review. Our AI automatically verifies it and adds your extra stamps!
+              </p>
+            </div>
           </div>
 
           {/* 1-Click Copy & Open Google Button */}

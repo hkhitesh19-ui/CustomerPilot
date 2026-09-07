@@ -3,6 +3,20 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [07 Sep 2026] Issue: Review Page Photo Upload Box Removal & Clipboard Copy Failure Fix
+- **Symptom**: 
+  1. Customer review page showed a local photo upload box which confused users; customer shouldn't upload photos to CustomerPilot, but directly on Google Maps to earn +2 extra photo stamps.
+  2. Clicking "Copy & Post to Google" opened the Google Maps review link in a new tab, but the AI draft review text was not copied to the clipboard, preventing the user from pasting on Google Maps.
+- **Root Cause**: 
+  1. Photo upload component on CustomerPilot was redundant since the backend verification engine verifies photo publication directly via GBP Customer Media API on Google Maps.
+  2. `navigator.clipboard.writeText` is asynchronous. When clicking an `<a>` tag with `target="_blank"`, the browser immediately switches focus to the new tab, which causes Chrome to reject `navigator.clipboard.writeText` with `DOMException: Document is not focused`. The rejection was swallowed in `.catch()` and returned early, so the synchronous `document.execCommand('copy')` fallback was never executed.
+- **Resolution**: 
+  1. Removed the CustomerPilot photo upload box from `src/components/review/ReviewEditor.tsx` and replaced it with clear instructional guidance explaining that attaching a purchase photo directly on Google Maps unlocks +2 extra photo bonus stamps (Total: 4 stamps).
+  2. Built synchronous multi-layer clipboard execution in `performCopy`: executes `textareaRef.current.select()` + `document.execCommand('copy')` synchronously in the direct user click stack frame before focus leaves the tab, with off-screen element fallback and `navigator.clipboard`.
+  3. Added a prominent, dedicated 1-click "📋 Copy Text" button right on the draft header with instant "Copied! ✅" visual feedback and guidance banner.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [06 Sep 2026] Feature: Fully Automated Google Review & Photo Bonus Stamps Pipeline
 - **Symptom**: System needed a reliable, fully automated mechanism to verify whether a customer genuinely posted a Google Review (+2 Stamps) and attached a product photo on Google Maps (+2 Extra Photo Stamps, Total: 4 Stamps) without human intervention, manual screenshot approvals, or gaming vulnerabilities.
 - **Root Cause**:
