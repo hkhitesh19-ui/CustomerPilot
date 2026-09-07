@@ -56,13 +56,17 @@ export async function GET(req: Request) {
 
         // 4. Generate & Post Replies
         for (const review of unrepliedReviews) {
-          console.log(`[CRON] Generating reply for review ${review.gbpReviewId}...`)
+          console.log(`[CRON] Generating SEO Auto-Reply for review ${review.gbpReviewId} (${review.rating}⭐)...`)
           
+          const storeLocation = conn.merchant.city || conn.merchant.address || conn.address || "Vadodara"
+          const storeCategory = conn.merchant.businessType || conn.merchant.category || "fresh cakes and bakery products"
+
           const replyText = await generateAIReviewReply({
             merchantName: conn.merchant.name || "Our Store",
-            locationOrArea: conn.address || "Our Area",
-            category: conn.merchant.businessType || "local business",
-            customerReview: review.comment || ""
+            locationOrArea: storeLocation,
+            category: storeCategory,
+            customerReview: review.comment || `${review.rating}-Star Rating and wonderful experience!`,
+            rating: review.rating ?? 5
           })
 
           const success = await postReviewReplyToGBP(conn.merchantId, review.gbpReviewId, replyText)
@@ -78,7 +82,7 @@ export async function GET(req: Request) {
               }
             })
             totalRepliesSent++
-            console.log(`[CRON] Successfully replied to review ${review.gbpReviewId}`)
+            console.log(`[CRON] ✅ Successfully published SEO Auto-Reply for review ${review.gbpReviewId}`)
           }
         }
       } catch (err: any) {

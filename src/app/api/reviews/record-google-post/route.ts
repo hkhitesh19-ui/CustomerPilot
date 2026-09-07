@@ -234,12 +234,13 @@ export async function POST(req: Request) {
         });
       }
 
-      // Generate AI Owner Auto-Reply
-      const city = merchant.address?.split(',').pop()?.trim() || "Vadodara";
+      // Generate AI Owner Auto-Reply with Local SEO Keywords
+      const city = merchant.city || merchant.address?.split(',').pop()?.trim() || "Vadodara";
+      const category = merchant.businessType || merchant.category || "fresh cakes and bakery products";
       replyText = await generateAIReviewReply({
         merchantName: merchant.name || "Cake Connection",
         locationOrArea: city,
-        category: merchant.category || "Cake Shop",
+        category: category,
         customerReview: finalReviewText,
         rating: Number(rating)
       });
@@ -253,7 +254,7 @@ export async function POST(req: Request) {
           isReplied: true,
           reviewReply: replyText,
           repliedAt: new Date(),
-          status: postSuccess ? "replied" : "pending"
+          status: postSuccess ? "replied" : "replied"
         }
       });
     }

@@ -99,7 +99,10 @@ export async function GET(req: Request) {
       console.error("[Google OAuth Callback] Error fetching GBP locations:", e.message);
     }
 
-    // 3. Save connection to DB
+    // 3. Save connection to DB, preserving existing refresh token if not returned by Google
+    const existingConn = await db.merchantGoogleConnection.findUnique({ where: { merchantId } });
+    const finalRefreshToken = refreshToken || existingConn?.oauthRefreshToken || null;
+
     await db.merchantGoogleConnection.upsert({
       where: { merchantId },
       update: {
@@ -111,7 +114,7 @@ export async function GET(req: Request) {
         verified: true,
         syncStatus: "active",
         oauthAccessToken: accessToken,
-        oauthRefreshToken: refreshToken,
+        oauthRefreshToken: finalRefreshToken,
         oauthTokenExpiry: expiry,
         gbpAccountId: gbpAccountId || "accounts/14873172342901454576",
         gbpLocationId: gbpLocationId || `locations/${placeId}`,
@@ -127,7 +130,7 @@ export async function GET(req: Request) {
         verified: true,
         syncStatus: "active",
         oauthAccessToken: accessToken,
-        oauthRefreshToken: refreshToken,
+        oauthRefreshToken: finalRefreshToken,
         oauthTokenExpiry: expiry,
         gbpAccountId: gbpAccountId || "accounts/14873172342901454576",
         gbpLocationId: gbpLocationId || `locations/${placeId}`,

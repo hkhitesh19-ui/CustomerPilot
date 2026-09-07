@@ -397,42 +397,19 @@ export async function processPendingReviewPhotoVerifications() {
           reason: result.reason
         })
         processedCount++
-      } else if (result.isAmbiguous) {
-        // Ambiguous -> Recheck in 7 days
+      } else {
+        // No photo detected at T+20m -> Finalize immediately at 2 stamps (No 24h waiting)
         await db.reviewBonusLog.update({
           where: { id: log.id },
           data: {
-            stage: result.stage,
+            stage: result.stage || "FAILSAFE",
             matchConfidence: result.confidence ?? null,
-            recheckScheduled: true,
-            recheckAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            reason: result.reason
+            decision: "2_STAMPS",
+            reason: result.reason || "no_photo_detected_at_20m",
+            recheckScheduled: false,
+            finalizedAt: new Date()
           }
         })
-      } else {
-        // Not found on this check
-        if (log.retryCount === 0) {
-          // Schedule 24h retry for delayed Google indexing
-          await db.reviewBonusLog.update({
-            where: { id: log.id },
-            data: {
-              retryCount: 1,
-              recheckAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-              reason: "retry_scheduled_24h_for_indexing"
-            }
-          })
-        } else {
-          // 24h elapsed and still no photo -> Finalize at 2 stamps
-          await db.reviewBonusLog.update({
-            where: { id: log.id },
-            data: {
-              decision: "2_STAMPS",
-              reason: "no_photo_detected_after_24h",
-              recheckScheduled: false,
-              finalizedAt: new Date()
-            }
-          })
-        }
       }
     } catch (e: any) {
       console.error(`[ReviewPhotoVerifier] Error processing log ${log.id}:`, e.message)

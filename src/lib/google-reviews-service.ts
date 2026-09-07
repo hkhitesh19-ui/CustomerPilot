@@ -92,6 +92,11 @@ export async function getValidOAuthAccessToken(merchantId: string): Promise<{ co
     }
   }
 
+  if (isExpired && !connection.oauthRefreshToken) {
+    console.warn(`[GBP OAuth] Token for Merchant ${merchantId} is expired and has no refresh token.`);
+    return { connection, token: null };
+  }
+
   return { connection, token: connection.oauthAccessToken }
 }
 

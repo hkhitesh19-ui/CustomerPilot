@@ -3,6 +3,23 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [07 Sep 2026] Feature: SEO Keyword-Optimized AI Auto-Reply Engine, Lifetime Google OAuth Fix & 20-Min Photo Verifier
+- **Symptom**: 
+  1. Google Review AI auto-reply was falling back to a generic 1-line sentence instead of generating rich, SEO-optimized owner replies with local Vadodara keywords, specific product echoing, and zero manual intervention.
+  2. Merchant's Google OAuth token expired after 1 hour with HTTP 401, preventing GBP customer media queries and background review fetching because `oauthRefreshToken` was null.
+  3. Photo verification queue was scheduling an unnecessary 24-hour indexing delay when the merchant desired a fast, direct 20-minute verification cycle.
+- **Root Cause**: 
+  1. In `src/lib/ai-review-reply.ts`, model was set to `gemini-flash-latest` which Google deprecated, returning HTTP 404 (`fetch failed`) and silently triggering the basic fallback template.
+  2. In `src/app/api/google-business/oauth/route.ts`, `prompt: "select_account"` was passed instead of `prompt: "consent select_account"`, causing Google to withhold long-lived `refresh_token` upon re-authorization. Additionally, callback did not preserve existing refresh tokens in DB.
+  3. In `src/lib/review-photo-verifier.ts`, `processPendingReviewPhotoVerifications` scheduled a 24-hour delayed retry (`retryCount: 1`) on initial missing photo instead of finalizing the check cleanly at T+20 minutes.
+- **Resolution**: 
+  1. **SEO-Optimized AI Engine (`ai-review-reply.ts`)**: Upgraded to `gemini-3.6-flash` with cascading fallback to `gemini-2.5-flash` and `gemini-1.5-flash`. Implemented 6-factor Local SEO prompt embedding merchant name, location (`Vadodara`), high-intent search queries (`best bakery in Vadodara`, `fresh cakes in Vadodara`), product mirroring (`soft, fresh Red Velvet cake`, `balanced sweetness`, `packaging`), and next-visit recommendation hooks (`Dutch Chocolate cake`).
+  2. **Permanent Lifetime OAuth Solution (`oauth/route.ts` & `oauth/callback/route.ts`)**: Configured `access_type: "offline"` and `prompt: "consent select_account"` forcing Google to issue a permanent `refresh_token`. Updated callback to preserve existing refresh tokens on re-auth. Backend automatically refreshes access tokens silently in background whenever expired.
+  3. **20-Minute Only Photo Verifier (`review-photo-verifier.ts`)**: Permanently removed 24-hour indexing delay and 7-day ambiguous retry queues; verifier now executes a single, fast check at T+20 minutes, either crediting +2 photo stamps or finalizing at 2 stamps immediately.
+  4. **Database Sync**: Regenerated and backfilled Hitesh's review in `GoogleBusinessReview` (`cmtqrlzjm013ww02sgy5662u9`) with the new SEO-optimized AI reply and finalized the bonus log.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [07 Sep 2026] Issue: Review Page Photo Upload Box Removal & Clipboard Copy Failure Fix
 - **Symptom**: 
   1. Customer review page showed a local photo upload box which confused users; customer shouldn't upload photos to CustomerPilot, but directly on Google Maps to earn +2 extra photo stamps.
