@@ -156,25 +156,38 @@ export function GoogleBusinessIntegration({ merchantId }: { merchantId: string }
                 </div>
               </div>
 
-              <Button 
-                variant="destructive" 
-                size="sm" 
-                onClick={async () => {
-                  try {
-                    await fetch(`/api/google-business/disconnect`, {
-                      method: "POST",
-                      headers: { "x-merchant-id": merchantId }
-                    })
-                    refetch()
-                    toast({ title: "Disconnected", description: "Google Business Profile disconnected." })
-                  } catch (e) {
-                    toast({ title: "Error", description: "Failed to disconnect", variant: "destructive" })
-                  }
-                }}
-                className="shrink-0"
-              >
-                Disconnect
-              </Button>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleOAuth}
+                  className="border-blue-500/40 text-blue-400 hover:bg-blue-950/30 flex items-center gap-1.5 text-xs"
+                  title="Renew permanent lifetime Google authorization"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  Reconnect Google
+                </Button>
+
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  onClick={async () => {
+                    try {
+                      await fetch(`/api/google-business/disconnect`, {
+                        method: "POST",
+                        headers: { "x-merchant-id": merchantId }
+                      })
+                      refetch()
+                      toast({ title: "Disconnected", description: "Google Business Profile disconnected." })
+                    } catch (e) {
+                      toast({ title: "Error", description: "Failed to disconnect", variant: "destructive" })
+                    }
+                  }}
+                  className="shrink-0"
+                >
+                  Disconnect
+                </Button>
+              </div>
             </div>
             
             <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
