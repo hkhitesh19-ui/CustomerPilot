@@ -38,12 +38,22 @@ export function ReviewEditor({
   const googleLink = merchant.googleReviewLink 
     || (merchant.googlePlaceId ? `https://search.google.com/local/writereview?placeid=${merchant.googlePlaceId}` : "https://maps.google.com")
 
-  // Robust multi-layered synchronous + asynchronous clipboard copy
-  const performCopy = (text: string): boolean => {
+  // Robust multi-layered clipboard copy
+  const performCopy = async (text: string): Promise<boolean> => {
     let success = false
 
-    // 1. Direct synchronous selection of textarea while tab is active and focused
-    if (textareaRef.current) {
+    // 1. Try modern async Clipboard API FIRST while document is 100% focused
+    if (typeof window !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(text)
+        success = true
+      } catch (err) {
+        console.warn("[ReviewEditor] navigator.clipboard.writeText failed:", err)
+      }
+    }
+
+    // 2. Direct synchronous selection of textarea fallback
+    if (!success && textareaRef.current) {
       try {
         textareaRef.current.focus()
         textareaRef.current.select()
@@ -52,7 +62,7 @@ export function ReviewEditor({
       } catch (_) {}
     }
 
-    // 2. Off-screen temporary textarea fallback
+    // 3. Off-screen temporary textarea fallback
     if (!success) {
       try {
         const temp = document.createElement('textarea')
@@ -71,40 +81,42 @@ export function ReviewEditor({
       } catch (_) {}
     }
 
-    // 3. Modern Navigator Clipboard API
-    if (typeof window !== "undefined" && navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(text).catch(() => {})
-      success = true
-    }
-
     setCopied(true)
     setTimeout(() => setCopied(false), 8000)
     return success
   }
 
-  const handleManualCopy = (e: React.MouseEvent) => {
+  const handleManualCopy = async (e: React.MouseEvent) => {
     e.preventDefault()
-    performCopy(draft)
+    await performCopy(draft)
   }
 
-  const handleCopyAndPostClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // 1. MUST copy review text synchronously right now before window navigation starts
-    performCopy(draft)
+  const handleCopyAndPostClick = async (e: React.MouseEvent) => {
+    e.preventDefault()
+
+    // 1. MUST COPY FIRST before any navigation occurs
+    await performCopy(draft)
+
+    setSubmitted(true)
 
     // 2. Fire backend notification (records post + enqueues automated photo verification)
     fetch('/api/reviews/record-google-post', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
-        customerId: customer.id, 
+        customerId: customer?.id, 
         merchantId: merchant.id, 
         reviewText: draft, 
         rating: 5
       })
     }).catch(() => {})
 
-    setSubmitted(true)
-    // 3. Natural <a> href navigation opens Google Maps in a new tab
+    // 3. Open Google Maps in a new tab now that text is safely in clipboard
+    try {
+      window.open(googleLink, '_blank', 'noopener,noreferrer')
+    } catch (_) {
+      window.location.href = googleLink
+    }
   }
 
   const walletUrl = `/q/wallet/${customer?.id || ""}`
@@ -213,12 +225,9 @@ export function ReviewEditor({
               ref={textareaRef}
               id="review-draft-textarea"
               className="w-full h-32 bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none transition-all leading-relaxed"
-              style={{ 
-                fontSize: '16px',
-                WebkitUserSelect: 'all',
-                userSelect: 'all'
-              }}
+              style={{ fontSize: '16px' }}
               value={draft}
+              onFocus={(e) => e.target.select()}
               onChange={(e) => setDraft(e.target.value)}
             />
 
@@ -252,13 +261,11 @@ export function ReviewEditor({
           </div>
 
           {/* 1-Click Copy & Open Google Button */}
-          <a 
-            href={googleLink}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button 
+            type="button"
             onClick={handleCopyAndPostClick}
             style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' } as React.CSSProperties}
-            className={`w-full h-14 text-base sm:text-lg font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer no-underline ${
+            className={`w-full h-14 text-base sm:text-lg font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer ${
               copied 
                 ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_0_20px_-3px_rgba(16,185,129,0.7)]" 
                 : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-[0_0_20px_-5px_rgba(16,185,129,0.5)] hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.7)]"
@@ -276,7 +283,7 @@ export function ReviewEditor({
                 <ExternalLink className="w-5 h-5 opacity-75 ml-1" />
               </>
             )}
-          </a>
+          </button>
 
           {/* Post Feedback / Live Wallet Button */}
           {submitted && (
