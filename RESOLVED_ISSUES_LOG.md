@@ -9,11 +9,12 @@ This document serves as a historical record of all major bugs, configuration iss
   2. Clicking "Copy & Post to Google" opened the Google Maps review link in a new tab, but the AI draft review text was not copied to the clipboard, preventing the user from pasting on Google Maps.
 - **Root Cause**: 
   1. Photo upload component on CustomerPilot was redundant since the backend verification engine verifies photo publication directly via GBP Customer Media API on Google Maps.
-  2. `navigator.clipboard.writeText` is asynchronous. When clicking an `<a>` tag with `target="_blank"`, the browser immediately switches focus to the new tab, which causes Chrome to reject `navigator.clipboard.writeText` with `DOMException: Document is not focused`. The rejection was swallowed in `.catch()` and returned early, so the synchronous `document.execCommand('copy')` fallback was never executed.
+  2. The button was an `<a href={googleLink} target="_blank">` anchor. In Chromium browsers, native link clicks with `target="_blank"` immediately transfer browser focus to the new tab, consuming transient user activation. As a result, the background tab's async `navigator.clipboard.writeText` threw `DOMException: Document is not focused`, while `document.execCommand('copy')` was blocked.
 - **Resolution**: 
   1. Removed the CustomerPilot photo upload box from `src/components/review/ReviewEditor.tsx` and replaced it with clear instructional guidance explaining that attaching a purchase photo directly on Google Maps unlocks +2 extra photo bonus stamps (Total: 4 stamps).
-  2. Built synchronous multi-layer clipboard execution in `performCopy`: executes `textareaRef.current.select()` + `document.execCommand('copy')` synchronously in the direct user click stack frame before focus leaves the tab, with off-screen element fallback and `navigator.clipboard`.
-  3. Added a prominent, dedicated 1-click "📋 Copy Text" button right on the draft header with instant "Copied! ✅" visual feedback and guidance banner.
+  2. Converted the button from an anchor (`<a>`) to an explicit `<button>` with async event handling: `performCopy(draft)` executes and awaits clipboard write FIRST while the document is 100% focused, and ONLY THEN calls `window.open(googleLink, '_blank')`.
+  3. Added `onFocus={(e) => e.target.select()}` to the review textarea so clicking inside auto-selects all text for effortless manual copying.
+  4. Added a prominent, dedicated 1-click "📋 Copy Text" button right on the draft header with instant "Copied! ✅" visual feedback and guidance banner.
 - **Status**: ✅ Resolved and Verified.
 
 ---
