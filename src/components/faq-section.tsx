@@ -206,10 +206,10 @@ const FAQ_DATA: FaqItem[] = [
     category: "pricing",
     categoryLabel: "Free Trial",
     icon: "✨",
-    question: "How does the 7-Day Free Trial work? Do I need to enter a credit card?",
-    answer: "Our 7-Day Free Trial gives you 100% unrestricted access to all features—loyalty stamp cards, Google review automation, AI review reply generation, counter QR generator, and analytics. No credit card, debit card, or payment details are required to start. You can test real customer stamp cards and collect Google reviews risk-free.",
+    question: "How does the 3-Day Free Trial work? Do I need to enter a credit card?",
+    answer: "Our 3-Day Free Trial gives you 100% unrestricted access to all features—loyalty stamp cards, Google review automation, AI review reply generation, counter QR generator, and analytics. No credit card, debit card, or payment details are required to start. You can test real customer stamp cards and collect Google reviews risk-free.",
     highlights: [
-      "100% free for 7 days with zero obligation",
+      "100% free for 3 days with zero obligation",
       "No credit card or payment details required",
       "Keep all customer data and Google reviews collected during trial"
     ]
@@ -481,7 +481,7 @@ export function FaqSection() {
                 href="/signup"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-white/10 transition-all hover:scale-[1.02]"
               >
-                <span>Start 7 Days Free Trial Today</span>
+                <span>Start 3 Days Free Trial Today</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

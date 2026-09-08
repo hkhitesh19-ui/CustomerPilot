@@ -251,11 +251,11 @@ export default function CakeConnectionCaseStudy() {
               Ready to Get Results Like Cake Connection?
             </h2>
             <p className="text-slate-400 text-sm sm:text-base mt-4 max-w-xl mx-auto">
-              Start your 7-day free trial — no credit card, no app for customers, no POS dependency. Just one counter QR standee.
+              Start your 3-day free trial — no credit card, no app for customers, no POS dependency. Just one counter QR standee.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link href="/signup" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-black text-sm shadow-lg transition-all hover:scale-[1.02]">
-                Start 7-Day Free Trial Today <ArrowRight className="w-4 h-4" />
+                Start 3-Day Free Trial Today <ArrowRight className="w-4 h-4" />
               </Link>
               <Link href="/pricing" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 transition-all">
                 View 50% Off Pricing Plans <ArrowUpRight className="w-4 h-4" />

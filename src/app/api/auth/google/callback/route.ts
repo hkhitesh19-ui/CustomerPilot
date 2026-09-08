@@ -91,7 +91,7 @@ export async function GET(req: Request) {
     if (!merchant) {
       // ─── New Merchant: Create with fast-track settings ───
       const trialEndsAt = new Date();
-      trialEndsAt.setDate(trialEndsAt.getDate() + 7);
+      trialEndsAt.setDate(trialEndsAt.getDate() + 3); // 3-day trial
 
       const merchantIdNumber = await generateMerchantIdNumber(db);
 

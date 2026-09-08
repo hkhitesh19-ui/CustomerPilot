@@ -500,7 +500,7 @@ export default function Home() {
               href="#comparison"
               className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-1"
             >
-              <span className="hidden sm:inline">Start 7 Days Free Trial Today</span>
+              <span className="hidden sm:inline">Start 3 Days Free Trial Today</span>
               <span className="sm:hidden">Start Free</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
@@ -576,7 +576,7 @@ export default function Home() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full bg-slate-900 text-white font-bold text-xs py-3 rounded-xl text-center block shadow-md"
               >
-                Start 7 Days Free Trial Today →
+                Start 3 Days Free Trial Today →
               </Link>
             </div>
           </div>
@@ -614,7 +614,7 @@ export default function Home() {
               <ScrollReveal variant="fadeUp" delay={0.6} duration={0.6}>
               <div className="btn-row flex flex-col gap-3">
                 <Link href="/signup" className="btn btn-grad py-3.5 sm:py-4 px-6 sm:px-7 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/20 transition-all">
-                  <span>Start 7-Day Free Trial (CustomerPilot Complete)</span> <span className="arrow">→</span>
+                  <span>Start 3-Day Free Trial (CustomerPilot Complete)</span> <span className="arrow">→</span>
                 </Link>
 
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
@@ -638,7 +638,7 @@ export default function Home() {
               <div className="trust">
                 <span><span className="ck">✓</span> No credit card required</span>
                 <span><span className="ck">✓</span> Setup in 2 minutes</span>
-                <span><span className="ck">✓</span> 7-Day full access</span>
+                <span><span className="ck">✓</span> 3-Day full access</span>
               </div>
               </ScrollReveal>
             </div>
@@ -968,7 +968,7 @@ export default function Home() {
                     href="/signup"
                     className="w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm py-3.5 rounded-xl text-center shadow-lg shadow-emerald-500/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-1.5"
                   >
-                    <span>Start 7-Day Free Trial (All-in-One Full Suite)</span>
+                    <span>Start 3-Day Free Trial (All-in-One Full Suite)</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -1217,7 +1217,7 @@ export default function Home() {
                 <span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span>
               </div>
               <Link href="/signup?module=loyalty" className="mt-5 w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
-                <span>Start 7-Day Free Trial</span> <span>→</span>
+                <span>Start 3-Day Free Trial</span> <span>→</span>
               </Link>
             </div>
             </StaggerItem>
@@ -1245,7 +1245,7 @@ export default function Home() {
               <div className="stars mt-4"><span style={{ color: '#f59e0b' }}>★★★★★</span><small className="bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full text-[10px]">+412 this month</small></div>
               <Link href="/signup?module=reviews" className="mt-5 w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
                 <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-                <span>Start 7-Day Free Trial</span> <span>→</span>
+                <span>Start 3-Day Free Trial</span> <span>→</span>
               </Link>
             </div>
             </StaggerItem>
@@ -1272,7 +1272,7 @@ export default function Home() {
               </ul>
               <div className="reply-prev mt-4 text-xs bg-slate-50 border border-slate-100 p-2.5 rounded-xl"><strong style={{ color: 'var(--slate)' }}>AI Reply:</strong> &quot;Thank you so much! 💜 See you again soon.&quot;</div>
               <Link href="/signup?module=autoreply" className="mt-5 w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
-                <span>Start 7-Day Free Trial</span> <span>→</span>
+                <span>Start 3-Day Free Trial</span> <span>→</span>
               </Link>
             </div>
             </StaggerItem>
@@ -1559,7 +1559,7 @@ export default function Home() {
               <tfoot>
                 <tr className="border-t-2 border-slate-700 bg-slate-900/95">
                   <td className="p-6 font-black text-slate-100 text-sm">
-                    Choose Your 7-Day Free Trial:
+                    Choose Your 3-Day Free Trial:
                   </td>
                   <td className="p-4 text-center border-l border-slate-800">
                     <Link href="/signup?module=loyalty" className="inline-flex w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-bold text-xs items-center justify-center transition">
@@ -1754,7 +1754,7 @@ export default function Home() {
             </div>
             <Link href="/signup">
               <Button className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl shadow-md">
-                Start 7 Days Free Trial Today →
+                Start 3 Days Free Trial Today →
               </Button>
             </Link>
           </div>
@@ -1922,10 +1922,10 @@ export default function Home() {
             <div className="aurora2"><b></b><b></b></div>
             <div className="ct">
               <h2>Your next 100 five-star reviews<br/><span className="grad-txt">are one click away.</span></h2>
-              <p>Join 1,200+ merchants automating their reputation. Start 7 Days Free Trial Today.</p>
+              <p>Join 1,200+ merchants automating their reputation. Start 3 Days Free Trial Today.</p>
               <div className="btn-row">
                 <Link href="/signup" className="btn btn-white text-sm sm:text-base py-3.5 sm:py-4 px-6 sm:px-7 font-bold rounded-xl">
-                  Start 7 Days Free Trial Today <span className="arrow">→</span>
+                  Start 3 Days Free Trial Today <span className="arrow">→</span>
                 </Link>
               </div>
             </div>
@@ -2062,7 +2062,7 @@ export default function Home() {
                       <span className="font-bold text-slate-900">CustomerPilot Activation Wizard</span>
                       <Badge variant="secondary" className="text-[10px]">Step {step} of 9</Badge>
                     </div>
-                    <p className="text-xs text-slate-500">7-Day Free Merchant Trial Setup</p>
+                    <p className="text-xs text-slate-500">3-Day Free Merchant Trial Setup</p>
                   </div>
                 </div>
 

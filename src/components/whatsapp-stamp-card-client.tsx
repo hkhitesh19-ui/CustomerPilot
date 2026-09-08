@@ -21,7 +21,7 @@ export function WhatsAppStampCardClient() {
             </Link>
             <Link href="/signup">
               <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl">
-                Start 7 Days Free Trial Today →
+                Start 3 Days Free Trial Today →
               </Button>
             </Link>
           </div>
@@ -94,7 +94,7 @@ export function WhatsAppStampCardClient() {
         <div className="text-center pt-4">
           <Link href="/signup">
             <Button size="lg" className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-8 py-3.5 rounded-xl shadow-md">
-              Start 7 Days Free Trial Today <ArrowRight className="w-4 h-4 ml-2" />
+              Start 3 Days Free Trial Today <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
         </div>

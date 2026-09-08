@@ -41,7 +41,7 @@ export const authOptions: NextAuthOptions = {
         }
         if (!merchant) {
           const trialEndsAt = new Date();
-          trialEndsAt.setDate(trialEndsAt.getDate() + 7);
+          trialEndsAt.setDate(trialEndsAt.getDate() + 3); // 3-day trial
           const merchantIdNumber = await generateMerchantIdNumber(db);
           merchant = await db.merchant.create({
             data: {

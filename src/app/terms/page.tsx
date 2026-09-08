@@ -36,7 +36,7 @@ export default function TermsPage() {
             </Link>
             <Link href="/signup">
               <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl">
-                Start 7 Days Free Trial Today →
+                Start 3 Days Free Trial Today →
               </Button>
             </Link>
           </div>
@@ -65,7 +65,7 @@ export default function TermsPage() {
 
 2. WhatsApp Messaging Compliance: Messages sent through CustomerPilot must adhere strictly to opt-in transactional loyalty cards and review requests. Unsolicited marketing spam is strictly prohibited.
 
-3. Subscription & Billing: All plans come with an initial 7-Day Free Trial. Paid renewals are processed based on your chosen VIP member capacity plan. Cancel anytime from your merchant settings.
+3. Subscription & Billing: All plans come with an initial 3-Day Free Trial. Paid renewals are processed based on your chosen VIP member capacity plan. Cancel anytime from your merchant settings.
 
 4. Intellectual Property: CustomerPilot and all associated logos, software code, and loyalty engine algorithms remain the exclusive property of CustomerPilot Inc.
 

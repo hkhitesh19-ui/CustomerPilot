@@ -287,7 +287,7 @@ export function AIReplySandbox() {
         {/* Bottom Trust Signal */}
         <div className="mt-8 text-center text-xs text-slate-500">
           <span className="font-bold text-slate-700">This exact AI engine</span> runs inside your dashboard for every Google review — automatically. No copy-paste needed.{" "}
-          <Link href="/signup" className="text-indigo-600 font-bold hover:underline">Start your 7-day free trial →</Link>
+          <Link href="/signup" className="text-indigo-600 font-bold hover:underline">Start your 3-day free trial →</Link>
         </div>
       </div>
     </section>

@@ -22,7 +22,7 @@ export function HelpClient() {
             </Link>
             <Link href="/signup">
               <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl">
-                Start 7 Days Free Trial Today →
+                Start 3 Days Free Trial Today →
               </Button>
             </Link>
           </div>

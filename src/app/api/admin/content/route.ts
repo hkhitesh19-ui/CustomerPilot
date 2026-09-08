@@ -54,7 +54,7 @@ const DEFAULT_CONTENT: Record<string, { section: string; category: string; value
   // ─── 3. Public Marketing & Landing Pages ─────────────────────────
   'landing_hero_headline': { section: 'landing_page', category: 'title', value: 'Turn One-Time Buyers Into 10x Repeat Customers', label: 'Landing Page Hero Headline' },
   'landing_hero_subtitle': { section: 'landing_page', category: 'subtitle', value: 'Automated WhatsApp Loyalty, AI Google Review Engine & VIP Pass Cards.', label: 'Landing Page Subtitle' },
-  'landing_cta_primary': { section: 'landing_page', category: 'button', value: 'Start 7-Day FREE Trial', label: 'Primary Hero CTA Button Text' },
+  'landing_cta_primary': { section: 'landing_page', category: 'button', value: 'Start 3-Day FREE Trial', label: 'Primary Hero CTA Button Text' },
   'landing_cta_secondary': { section: 'landing_page', category: 'button', value: 'Book a Demo', label: 'Secondary Hero CTA Button Text' },
 
   // ─── 4. Merchant Dashboard & Settings Sections ────────────────────

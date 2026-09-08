@@ -102,7 +102,7 @@ export function AppSidebar() {
   const getPlanDisplay = () => {
     if (isExpired) return { label: "Plan Expired", icon: "⚠️", color: "rose" }
     const plan = merchant?.plan || "trial"
-    if (plan === "trial") return { label: "7-Day Free Trial", icon: "🎁", color: "amber" }
+    if (plan === "trial") return { label: "3-Day Free Trial", icon: "🎁", color: "amber" }
     if (plan.startsWith("loyalty_")) return { label: "Digital Loyalty Stamps", icon: "🎁", color: "amber" }
     if (plan.startsWith("reviews_")) return { label: "AI Reviews Flow", icon: "⭐", color: "emerald" }
     if (plan.startsWith("autoreply_")) return { label: "1-Click AutoReply", icon: "💬", color: "indigo" }
@@ -181,7 +181,7 @@ export function AppSidebar() {
               ? "bg-gradient-to-br from-indigo-900/90 via-slate-900 to-slate-900 border-indigo-400 ring-2 ring-indigo-500/30 shadow-indigo-500/20"
               : isExpired
               ? "bg-gradient-to-br from-rose-950/70 to-slate-900 border-rose-500/40 hover:border-rose-400"
-              : daysRemaining <= 3
+              : daysRemaining <= 1
               ? "bg-gradient-to-br from-amber-950/70 via-slate-900 to-slate-900 border-amber-500/40 hover:border-amber-400"
               : "bg-gradient-to-br from-indigo-950/70 via-slate-900 to-slate-900 border-indigo-500/40 hover:border-indigo-400"
           }`}
@@ -205,14 +205,14 @@ export function AppSidebar() {
               <span className={`w-2 h-2 rounded-full animate-pulse ${
                 isExpired
                   ? "bg-rose-500"
-                  : daysRemaining <= 3
+                  : daysRemaining <= 1
                   ? "bg-amber-400"
                   : "bg-emerald-400"
               }`} />
               <span className={`text-[11px] font-bold ${
                 isExpired
                   ? "text-rose-400"
-                  : daysRemaining <= 3
+                  : daysRemaining <= 1
                   ? "text-amber-300"
                   : "text-emerald-300"
               }`}>

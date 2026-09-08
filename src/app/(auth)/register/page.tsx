@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Register as Merchant — CustomerPilot',
-    description: 'Set up your store loyalty engine in 2 minutes. Start 7 Days Free Trial Today.',
+    description: 'Set up your store loyalty engine in 2 minutes. Start 3 Days Free Trial Today.',
     url: 'https://customerpilot.ai/register',
   },
 };

@@ -76,7 +76,7 @@ export default async function ReferralLandingPage({ params }: { params: { code: 
           </Link>
           <div className="flex items-center justify-center gap-2 mt-6 text-sm text-slate-400">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>No credit card required. 7-day free trial.</span>
+            <span>No credit card required. 3-day free trial.</span>
           </div>
         </div>
       </div>

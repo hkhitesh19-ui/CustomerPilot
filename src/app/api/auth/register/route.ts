@@ -79,7 +79,7 @@ export async function POST(req: Request) {
 
     // Create Merchant linked to User
     const trialEndsAt = new Date();
-    trialEndsAt.setDate(trialEndsAt.getDate() + 7); // 7-day trial
+    trialEndsAt.setDate(trialEndsAt.getDate() + 3); // 3-day trial
 
     const merchantIdNumber = await generateMerchantIdNumber(db);
 

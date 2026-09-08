@@ -48,6 +48,36 @@ This document serves as a historical record of all major bugs, configuration iss
    - Always test locally (`npm run build` or API curl), commit locally with `git commit`, and NEVER run `git push` without explicit user confirmation.
 
 ---
+## [08 Sep 2026] Feature: Migration of Free Trial from 7 Days to 3 Days (Functional Backend & All UI Touchpoints)
+- **Symptom**: User requested changing the merchant free trial period across the entire platform from 7 days to 3 days ("7 days ka 3 days free trial - all pages and all text, all buttons me change karo and Functionaly bhi change karo").
+- **Root Cause**: Platform was originally built with a 7-day merchant trial default hardcoded across merchant registration APIs (`setDate(getDate() + 7)`), NextAuth callbacks, legal documents, sidebar warning thresholds (`daysRemaining <= 3`), and marketing/landing pages, buttons, badges, comparison tables, and FAQ answers.
+- **Resolution**:
+  1. **Backend Functional Logic**:
+     - `src/app/api/auth/register/route.ts`: Updated `trialEndsAt` calculation to `trialEndsAt.setDate(trialEndsAt.getDate() + 3)`.
+     - `src/app/api/auth/google/callback/route.ts`: Updated `trialEndsAt` calculation to `trialEndsAt.setDate(trialEndsAt.getDate() + 3)`.
+     - `src/app/api/auth/[...nextauth]/route.ts`: Updated `trialEndsAt` calculation to `trialEndsAt.setDate(trialEndsAt.getDate() + 3)`.
+     - `src/app/api/admin/content/route.ts`: Updated `landing_cta_primary` default to `'Start 3-Day FREE Trial'`.
+     - `src/app/api/legal/terms/route.ts`: Updated to `'3-Day complimentary free trial'`.
+     - `src/app/llms.txt/route.ts`: Updated to `'3-Day Full-Featured Free Trial'`.
+  2. **Sidebar & Dashboard Urgency Logic**:
+     - `src/components/app-sidebar.tsx`: Changed trial badge label to `"3-Day Free Trial"`, adjusted urgency threshold from `daysRemaining <= 3` to `daysRemaining <= 1`.
+     - `src/app/dashboard/subscription/page.tsx`: Adjusted urgency threshold to `daysRemaining <= 1`.
+  3. **Onboarding & Auth Pages**:
+     - `src/app/onboarding/page.tsx`: Updated step header (`3-Day Free Trial`), business location selection modal (`3-Day Trial`), and Google Business verification confirmation (`3-Day Trial Active`).
+     - `src/app/signup/page.tsx`: Updated metadata title & description.
+     - `src/components/signup-client.tsx`: Updated badges, subtitles, and feature highlights to 3-Day Free Trial across all modules.
+     - `src/app/(auth)/register/page.tsx`: Updated openGraph description to 3 Days Free Trial.
+  4. **Pricing, Homepage, FAQs, Footers & Industry Landing Pages**:
+     - `src/app/pricing/page.tsx` & `src/components/pricing-client.tsx`: Updated header button, hero badge, card button, comparison table footer, and trust badge to 3-Day Free Trial.
+     - `src/app/page.tsx`: Updated 11 touchpoints including navbar CTA, mobile menu CTA, hero CTA, trust pill, break-even CTA, product cards, comparison strip, bottom CTA, and activation wizard subtext.
+     - `src/components/faq-section.tsx`: Updated Question 14, answer, highlights, and bottom CTA.
+     - `src/components/marketing-client.tsx`: Updated hero and bottom CTA buttons and subtext.
+     - `src/components/help-client.tsx`, `src/app/contact/page.tsx`, `src/app/privacy/page.tsx`, `src/app/security/page.tsx`: Updated header CTA buttons.
+     - `src/components/vs-page.tsx`, `src/app/r/[code]/page.tsx`, `src/app/terms/page.tsx`, `src/app/case-studies/cake-connection/page.tsx`, `src/components/ai-reply-sandbox.tsx`, and industry landing pages (`bakery`, `cafe`, `restaurant`, `salon`, `compare-pos`, `google-review-automation`, `whatsapp-stamp-card`).
+  5. **Preserved Customer Automations**: Explicitly preserved non-merchant 7-day logic: customer birthday advance reminders, stamp card expiry warnings, win-back retention campaigns, and login cookie session `maxAge` (7 days).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [08 Sep 2026] UI/UX: Sidebar Navigation Reordering & Settings Renamed to "Complete Setup"
 - **Symptom**: Settings section was located at the bottom of the sidebar below all other links, labeled as "Settings", making it unintuitive for merchants to discover onboarding setup and configuration steps.
 - **Root Cause**: Sidebar navigation items in `src/components/app-sidebar.tsx` placed Settings in `bottomNav` under Subscription, while merchant onboarding configuration was treated as an afterthought rather than step #1.

@@ -24,7 +24,7 @@ export default function ContactPage() {
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
             </Link>
             <Link href="/signup" className="inline-flex items-center justify-center bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl transition shadow-xs">
-              Start 7 Days Free Trial Today →
+              Start 3 Days Free Trial Today →
             </Link>
           </div>
         </div>

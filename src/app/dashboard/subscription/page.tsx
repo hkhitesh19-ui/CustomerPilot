@@ -307,7 +307,7 @@ export default function SubscriptionPage() {
               <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${
                 isExpired
                   ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
-                  : daysRemaining <= 3
+                  : daysRemaining <= 1
                   ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
                   : "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
               }`}>

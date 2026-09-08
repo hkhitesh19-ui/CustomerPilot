@@ -44,7 +44,7 @@ export function VsPage({ config }: { config: VsPageConfig }) {
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link href="/signup" className="w-full sm:w-auto inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-lg transition-all">
-                Try CustomerPilot Free — 7 Days <ArrowRight className="w-4 h-4" />
+                Try CustomerPilot Free — 3 Days <ArrowRight className="w-4 h-4" />
               </Link>
               <Link href="/pricing" className="w-full sm:w-auto inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm transition-all">
                 View 50% Off Pricing <ArrowUpRight className="w-4 h-4" />
@@ -146,7 +146,7 @@ export function VsPage({ config }: { config: VsPageConfig }) {
         {/* ── CTA ── */}
         <section className="py-16 sm:py-20 bg-slate-900 text-white">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-            <h2 className="text-2xl sm:text-3xl font-black">Switch Today — Risk-Free 7-Day Trial</h2>
+            <h2 className="text-2xl sm:text-3xl font-black">Switch Today — Risk-Free 3-Day Trial</h2>
             <p className="text-slate-400 text-sm mt-3">No credit card. No app for customers. Setup in 3 minutes.</p>
             <Link href="/signup" className="mt-8 inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-black text-sm shadow-lg transition-all hover:scale-[1.02]">
               Start Free Trial Today <ArrowRight className="w-4 h-4" />

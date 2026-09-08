@@ -24,7 +24,7 @@ CustomerPilot provides an AI-powered customer retention, WhatsApp loyalty stamp 
 - Only message customers who have opted-in via your QR code.
 
 ### 3. Subscription & Billing
-- 7-Day complimentary free trial for all new merchants.
+- 3-Day complimentary free trial for all new merchants.
 - Paid plans (30 Days, 180 Days, 365 Days) billed securely via Razorpay.
 - Subscriptions are non-refundable once activated.
 

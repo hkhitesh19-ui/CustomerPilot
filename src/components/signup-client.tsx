@@ -91,7 +91,7 @@ function SignupForm() {
   }
 
   // Dynamic titles, copy & benefits per selected module
-  let headerBadge = "7-Day FREE Trial • CustomerPilot Complete"
+  let headerBadge = "3-Day FREE Trial • CustomerPilot Complete"
   let mainTitle = (
     <>
       CustomerPilot Complete : <br />
@@ -102,18 +102,18 @@ function SignupForm() {
   )
   let description = "India's #1 WhatsApp-first AI Customer Retention Platform. Bring your customers back with loyalty rewards, 5-star Google reviews, and automated AI owner replies."
   let formTitle = "Start Free Trial - CustomerPilot Complete : Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply"
-  let formSubtitle = "Start 7-Day Complete Free Trial in under 2 minutes"
+  let formSubtitle = "Start 3-Day Complete Free Trial in under 2 minutes"
   let submitBtnText = "Start CustomerPilot Complete Free Trial →"
 
   let benefits = [
     "Digital Loyalty Stamps & VIP Club",
     "Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast",
     "Ai Drafted SEO Optimized 1-Click Reply to Google Reviews",
-    "7-Day FREE trial, no credit card required",
+    "3-Day FREE trial, no credit card required",
   ]
 
   if (isReviewsMode) {
-    headerBadge = "7-Day FREE Trial • Ai Drafted SEO Optimized Google Reviews"
+    headerBadge = "3-Day FREE Trial • Ai Drafted SEO Optimized Google Reviews"
     mainTitle = (
       <>
         Ai Drafted SEO Optimized <br />
@@ -133,7 +133,7 @@ function SignupForm() {
       "Setup in under 2 minutes, no card required",
     ]
   } else if (isLoyaltyMode) {
-    headerBadge = "7-Day FREE Trial • Digital Loyalty Stamps & VIP Club"
+    headerBadge = "3-Day FREE Trial • Digital Loyalty Stamps & VIP Club"
     mainTitle = (
       <>
         Digital Loyalty Stamps &amp; <br />
@@ -153,7 +153,7 @@ function SignupForm() {
       "Cashier 1-Tap Counter Queue Terminal",
     ]
   } else if (isAutoReplyMode) {
-    headerBadge = "7-Day FREE Trial • Ai Drafted SEO Optimized 1-Click Reply to Google Reviews"
+    headerBadge = "3-Day FREE Trial • Ai Drafted SEO Optimized 1-Click Reply to Google Reviews"
     mainTitle = (
       <>
         Ai Drafted SEO Optimized <br />

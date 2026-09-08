@@ -334,7 +334,7 @@ function OnboardingPageContent() {
             </div>
             <div>
               <p className="text-white font-bold text-sm leading-none">CustomerPilot Setup</p>
-              <p className="text-slate-400 text-[10px] mt-0.5">Step {step} of 8 • 7-Day Free Trial</p>
+              <p className="text-slate-400 text-[10px] mt-0.5">Step {step} of 8 • 3-Day Free Trial</p>
             </div>
           </div>
 
@@ -1311,19 +1311,19 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
             )}
           </div>
         ) : isPickingLocation && availableLocations.length > 0 ? (
-          /* Multi-Location Selection View (Choose 1 Location for 7-Day Free Trial) */
+          /* Multi-Location Selection View (Choose 1 Location for 3-Day Free Trial) */
           <div className="p-6 sm:p-8 bg-gradient-to-br from-indigo-50/70 via-slate-50 to-blue-50/60 rounded-3xl border-2 border-indigo-200 text-left space-y-6 shadow-xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full text-xs font-bold mb-2">
                   <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Free Trial: 1 Location Included (7 Days Free)</span>
+                  <span>Free Trial: 1 Location Included (3 Days Free)</span>
                 </div>
                 <h3 className="text-xl font-black text-slate-900">
-                  Select Business Location for 7-Day Trial
+                  Select Business Location for 3-Day Trial
                 </h3>
                 <p className="text-xs text-slate-600 mt-1 max-w-xl">
-                  Aapke Google Account me <strong>{availableLocations.length} locations / branches</strong> mili hain. 7-Day Free Trial ke liye wo specific branch select karein jisme aap live reviews aur AI auto-reply start karna chahte hain:
+                  Aapke Google Account me <strong>{availableLocations.length} locations / branches</strong> mili hain. 3-Day Free Trial ke liye wo specific branch select karein jisme aap live reviews aur AI auto-reply start karna chahte hain:
                 </p>
               </div>
             </div>
@@ -1427,7 +1427,7 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
                 <Check className="w-7 h-7 stroke-[3]" />
               </div>
               <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white px-3.5 py-1 text-xs font-bold shadow-sm">
-                Connected & Verified ✓ (7-Day Trial Active)
+                Connected & Verified ✓ (3-Day Trial Active)
               </Badge>
               <h3 className="font-black text-2xl text-slate-900 mt-1 max-w-xl mx-auto leading-tight">
                 {placeName}

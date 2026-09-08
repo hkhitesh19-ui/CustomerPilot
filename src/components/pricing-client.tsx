@@ -194,7 +194,7 @@ export function PricingClient() {
             </Link>
             <Link href="/#comparison">
               <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-xs">
-                Start 7 Days Free Trial Today →
+                Start 3 Days Free Trial Today →
               </Button>
             </Link>
           </div>
@@ -230,7 +230,7 @@ export function PricingClient() {
         {/* Hero Section */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> 7-Day Free Trial · No Credit Card Required
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> 3-Day Free Trial · No Credit Card Required
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
             Transparent, High-ROI Pricing for Growing Merchants
@@ -376,7 +376,7 @@ export function PricingClient() {
                 <div className="pt-6">
                   <Link href="/signup">
                     <Button className={`w-full font-bold text-xs rounded-xl py-3 ${plan.popular ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-md" : "bg-slate-900 hover:bg-slate-800 text-white"}`}>
-                      Start 7 Days Free Trial Today →
+                      Start 3 Days Free Trial Today →
                     </Button>
                   </Link>
                 </div>
@@ -781,7 +781,7 @@ export function PricingClient() {
               </tbody>
               <tfoot>
                 <tr className="border-t-2 border-slate-700 bg-slate-900/90">
-                  <td className="p-4 font-bold text-slate-200 text-xs">Start 7-Day Free Trial:</td>
+                  <td className="p-4 font-bold text-slate-200 text-xs">Start 3-Day Free Trial:</td>
                   <td className="p-3 text-center border-l border-slate-800">
                     <Link href="/signup?module=loyalty" className="inline-flex w-full py-2 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-bold text-[11px] items-center justify-center transition">
                       Trial Loyalty Stamps →
@@ -813,7 +813,7 @@ export function PricingClient() {
           <div className="space-y-1 p-4 rounded-2xl bg-slate-50 border border-slate-100">
             <Lock className="w-5 h-5 text-emerald-600 mx-auto mb-2" />
             <h4 className="text-xs font-bold text-slate-900">No Credit Card Needed</h4>
-            <p className="text-[11px] text-slate-500">7 days full access free</p>
+            <p className="text-[11px] text-slate-500">3 days full access free</p>
           </div>
           <div className="space-y-1 p-4 rounded-2xl bg-slate-50 border border-slate-100">
             <Users className="w-5 h-5 text-purple-600 mx-auto mb-2" />

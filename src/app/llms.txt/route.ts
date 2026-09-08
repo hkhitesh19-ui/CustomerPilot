@@ -26,7 +26,7 @@ export async function GET() {
 - **Retail & Groceries**: Transactional loyalty vouchers and repeat visit booster.
 
 ## Pricing & Plans (6 Months & 1 Year)
-- **Free Trial**: 7-Day Full-Featured Free Trial (No Credit Card Required)
+- **Free Trial**: 3-Day Full-Featured Free Trial (No Credit Card Required)
 - **Starter Growth Plan**: ₹1,799 / 6 Months (Up to 1,000 VIP Customers · ₹10/day)
 - **Pro Scaling Plan**: ₹2,899 / 1 Year (Up to 2,500 VIP Customers · ₹8/day — Most Popular)
 - **High-Volume / Enterprise**: ₹4,999 / 1 Year (Unlimited VIP Customers · Multi-Outlet)
