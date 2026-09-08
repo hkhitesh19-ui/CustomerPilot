@@ -3,6 +3,51 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+# 🏆 MASTER EXECUTIVE SUMMARY & GOLDEN ARCHITECTURAL SOPs (LAST 10 DAYS)
+
+## 1. Top 10 Issues & Deep Resolution Matrix
+
+| # | Issue / Module | Symptom | Deep Root Cause | Final Resolution |
+|---|---|---|---|---|
+| **1** | **WhatsApp Pairing** | Phone showed *"couldn't link device, Try again later"* on scanning QR. | Static instance name collision (`CP_M_id`) on remote VPS returning 403, plus serving 50-minute-old stale QR (`count: 16`) with dead WebSocket, and stale cached webhook URL. | Implemented **Smart Hybrid Instance Engine (`CP_{phone}_{timestamp}`)**, purging old instances, issuing fresh 0-second QR (`count: 1`), dynamic webhook resolution on every request, and 10-minute session countdown. |
+| **2** | **WhatsApp "Yes" Webhook** | Customer replied "Yes" to review prompt but AI review draft was never delivered. | 1. Pinggy SSH tunnel exited (code 255) without auto-reconnect, dropping webhooks.<br>2. `STAMP_AWARDED` had `sentAt: null`; SQLite DESC sort placed NULL at the top, confusing the bot's state machine. | Added SSH keepalive (`ServerAliveInterval=15`) & auto-reconnect in `scripts/autoPinggySync.js`. Made message queries sort by `createdAt DESC` with null-safe handling. |
+| **3** | **Review Page HTTP 500** | Customer review page crashed with HTTP 500 error on mobile/desktop. | `src/app/review/page.tsx` passed `hasPreviousPhoto` in `bonusInfo` prop without declaring the variable (`ReferenceError`). | Declared `const hasPreviousPhoto = !!(existingReview?.photoUrl)` and verified 200 OK across local & tunnel URLs. |
+| **4** | **Clipboard Copy & Camera Picker** | "Copy & Post to Google" didn't copy text, and camera didn't trigger on mobile browsers. | 1. Link click with `target="_blank"` immediately blurred tab, losing focus and blocking `navigator.clipboard.writeText`.<br>2. Synthetic `div.click()` blocked by mobile WebKit sandbox. | Made button an async handler that awaits clipboard write *first* before opening Google Maps, added native `<label htmlFor>` for camera, client-side Canvas compression (<250KB), and a dedicated 1-click "📋 Copy Text" button. |
+| **5** | **Google OAuth Token Expiry** | Google Business Profile API returned HTTP 401 Access Denied after 1 hour. | OAuth consent URL passed `prompt: "select_account"` without `"consent"`, so Google never issued a permanent `refresh_token`. Callback also failed to preserve existing refresh tokens. | Enforced `access_type: "offline"` and `prompt: "consent select_account"`, saved permanent refresh token to DB, and built background auto-refresh utility that silently fetches new access tokens before API calls. |
+| **6** | **AI Review Auto-Reply Fallback** | Gemini AI review reply fell back to generic 1-liner template. | Used deprecated model `gemini-flash-latest` which Google shut down, causing HTTP 404 fetch failure. | Upgraded to `gemini-3.6-flash` with cascading fallback (`gemini-2.5-flash` ➔ `gemini-1.5-flash`) and added 6-factor Local SEO prompt (Vadodara keywords, dish mentions, next-visit hooks). |
+| **7** | **Google Photo API 403 (Approval Window)** | Customer Google Review photo verifier threw 403 Permission Denied. | GBP Enterprise API access form takes 10-15 business days for approval; until approved, quota for media endpoints is 0. | Built **Default 4-Stamp Grace Period Engine** (`DEFAULT_PHOTO_BONUS_GRACE_PERIOD = true`): customers posting a Google Review automatically receive full 4 stamps (+2 review + 2 photo) immediately during the approval window. |
+| **8** | **First Visit Joining Bonus Missing** | Customer on 1st visit only received 1 stamp instead of 3 (1 purchase + 2 welcome bonus). | Cashier queue approval endpoint (`/api/rewards/award`) executed raw transactions without checking `isFirstVisit` or `stampCard.joiningBonusEnabled`. | Updated award route to inspect `visitNumber === 1 || totalCustomerCards === 0`, credit `JOINING_BONUS` stamps atomically, format WhatsApp breakdown, and backfilled missing stamps. |
+| **9** | **Digital Wallet 401 Unauthorized** | Mobile wallet page (`/q/wallet/[customerId]`) background 12s polling failed with 401. | `src/proxy.ts` middleware had strict route whitelist that did not include `'/api/wallet/'`. | Whitelisted `'/api/wallet/'` in `PUBLIC_API_PREFIXES` in `src/proxy.ts`, allowing unauthenticated customer wallet views to poll live balance seamlessly. |
+| **10** | **CSS / Turbopack Build Crash** | Dev server crashed with `@import rules must precede all rules` error. | `@import url('google fonts')` was placed after `@import "tailwindcss"` in `src/app/globals.css` (Tailwind v4 rule violation). | Moved font `@import` to line 1 before any Tailwind imports, ensuring flawless compilation across all routes. |
+
+---
+
+## 2. Golden Architectural SOPs (Rules to Prevent Future Recurrence)
+
+1. **Keep Background Daemons Running in Local Dev**:
+   - Always run `node scripts/autoPinggySync.js` alongside Next.js so Evolution API webhooks reach localhost.
+   - In production (VPS / Vercel), a static domain (`customerpilot.in`) with permanent SSL eliminates tunnel drop issues completely.
+
+2. **Whitelist All Public Customer Endpoints in `src/proxy.ts`**:
+   - Any endpoint called by customers without merchant login (e.g. `/api/wallet/`, `/api/queue/`, `/api/reviews/`, `/api/qr/`) MUST be explicitly present in `PUBLIC_API_PREFIXES` in `src/proxy.ts`.
+
+3. **Defensive Database Queries & Null-Safe Sorting**:
+   - Never sort by single nullable columns (`sentAt`) in SQLite/Postgres. Always sort by `createdAt DESC` with explicit non-null fallbacks (`COALESCE(sentAt, createdAt) DESC`).
+
+4. **Graceful Degradation for Third-Party Enterprise Approvals**:
+   - When integrating external enterprise APIs with 7–15 day approval lags (Google GBP, Meta WhatsApp), always include an automatic Grace Period toggle so user journeys and live testing are never blocked.
+
+5. **Multi-Model Cascading Fallbacks for AI APIs**:
+   - Never rely on a single hardcoded AI model string. Always provide a fallback array (`['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']`) to handle external deprecations seamlessly.
+
+6. **Mobile-First Browser UX & Clipboard Standards**:
+   - Always await clipboard operations while the current window is focused before opening new browser tabs (`window.open`).
+   - Never use synthetic `.click()` on `div` elements for mobile cameras; always use native `<label htmlFor="...">` with client-side HTML5 Canvas compression (<250KB).
+
+7. **Strict Git & Verification Protocol (`AGENTS.md`)**:
+   - Always test locally (`npm run build` or API curl), commit locally with `git commit`, and NEVER run `git push` without explicit user confirmation.
+
+---
 ## [08 Sep 2026] UI/UX: Sidebar Navigation Reordering & Settings Renamed to "Complete Setup"
 - **Symptom**: Settings section was located at the bottom of the sidebar below all other links, labeled as "Settings", making it unintuitive for merchants to discover onboarding setup and configuration steps.
 - **Root Cause**: Sidebar navigation items in `src/components/app-sidebar.tsx` placed Settings in `bottomNav` under Subscription, while merchant onboarding configuration was treated as an afterthought rather than step #1.
