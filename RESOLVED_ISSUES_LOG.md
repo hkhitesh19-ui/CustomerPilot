@@ -3,6 +3,21 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [08 Sep 2026] Feature: Level-Up Kickstart Bonus (+4 Stamps), Silver VIP Card & Wallet Public Proxy Fix
+- **Symptom**: 
+  1. When customer Hitesh completed Loop 1 (10/10 stamps) and achieved Silver VIP status, his new Loop 2 loyalty card was not automatically kickstarted with the 4 Level-Up Bonus stamps configured by the merchant, and no celebratory WhatsApp notification with the VIP tier upgrade was dispatched.
+  2. Public client-side auto-polling on the customer digital wallet page (`/q/wallet/[customerId]`) silently returned HTTP 401 `Unauthorized` when requesting `/api/wallet/[customerId]`.
+- **Root Cause**: 
+  1. Merchant `vipUpgradeBonusStamps` setting had not been pre-configured on Cake Connection (`cmtl0v6xg0042w06kz9ye0vz2`), and the second cycle card required initialization with `source: 'LEVEL_UP_BONUS'` stamps.
+  2. `src/proxy.ts` contained a strict route whitelist (`PUBLIC_API_PREFIXES`) which lacked `'/api/wallet/'`. As a result, direct unauthenticated client-side fetch calls from mobile digital wallet browsers were blocked by middleware.
+- **Resolution**: 
+  1. **Merchant Configuration**: Updated `Merchant.vipUpgradeBonusStamps: 4` for Cake Connection (`cmtl0v6xg0042w06kz9ye0vz2`).
+  2. **Loop 2 Card & Kickstart Bonus Credited**: Created active Card #2 (`cmts6k4qa0001w0fgrlsw9j8r`) for Hitesh with 4 stamps collected, issued 4 atomic stamps with `source: 'LEVEL_UP_BONUS'`, bumped lifetime stamps to 14, and verified `vipTier: 'Silver'`.
+  3. **Celebratory WhatsApp Dispatch**: Dispatched `LEVEL_COMPLETE` WhatsApp template to Hitesh (`919033304707`) via Evolution API, highlighting Silver VIP achievement, +4 Kickstart Advance Bonus Stamps, active 4/10 card status, and unredeemed 250g Free Cake reward.
+  4. **Wallet API Whitelist (`proxy.ts`)**: Added `'/api/wallet/'` to `PUBLIC_API_PREFIXES` in `src/proxy.ts` and updated `/api/wallet/[customerId]` to return `label: 'Level-Up Kickstart Bonus'` and icon `'🥈'`. Verified live response returns HTTP 200 OK.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [07 Sep 2026] Feature: Default 4 Bonus Stamps (2 Review + 2 Photo) Grace Period & Customer Hitesh Wallet Upgrade
 - **Symptom**: 
   1. Google Business Profile Enterprise API Access Request submitted by merchant requires 10-15 business days for approval; in the interim, live Customer Media API queries return HTTP 403 `PERMISSION_DENIED`, preventing automatic photo detection on Google Maps.

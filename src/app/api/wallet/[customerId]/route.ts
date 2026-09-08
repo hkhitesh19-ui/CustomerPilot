@@ -113,9 +113,9 @@ export async function GET(
         } else if (s.source === "photo_bonus") {
           label = "Photo Review Bonus"
           icon = "📸"
-        } else if (s.source?.includes("vip")) {
-          label = "VIP Tier Upgrade Bonus"
-          icon = "👑"
+        } else if (s.source?.includes("vip") || s.source === "LEVEL_UP_BONUS") {
+          label = "Level-Up Kickstart Bonus"
+          icon = "🥈"
         } else if (s.source?.includes("referral")) {
           label = "Friend Referral Bonus"
           icon = "🤝"

@@ -77,6 +77,7 @@ export async function proxy(request: NextRequest) {
     '/api/legal/',
     '/api/coupons/',
     '/api/google-business/oauth',
+    '/api/wallet/',
     // SECURITY FIX: /api/payments/ removed from public — payments require merchant auth
     // Both create-order and verify are called from the authenticated /dashboard context
   ];
