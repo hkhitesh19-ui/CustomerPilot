@@ -9,12 +9,14 @@ export function ReviewEditor({
   customer, 
   initialDraft,
   existingReviewText,
+  draftOptions,
   bonusInfo
 }: { 
   merchant: any, 
   customer: any, 
   initialDraft?: string,
   existingReviewText?: string | null,
+  draftOptions?: { draft1: string; draft2: string } | null,
   bonusInfo?: {
     googleReviewBonus: number,
     photoBonus: number,
@@ -30,6 +32,7 @@ export function ReviewEditor({
 
   const defaultText = existingReviewText || initialDraft || `The products were fresh, beautiful, and absolutely delicious. Highly recommended!`
   const [draft, setDraft] = useState(defaultText)
+  const [selectedOption, setSelectedOption] = useState<"draft1" | "draft2">("draft1")
   const [copied, setCopied] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [isEditingExisting, setIsEditingExisting] = useState(!!existingReviewText)
@@ -189,6 +192,40 @@ export function ReviewEditor({
               <Star key={i} className="w-8 h-8 text-amber-400 fill-amber-400" />
             ))}
           </div>
+
+          {/* Dual AI Draft Options (Anti-Detection Matrix) */}
+          {draftOptions && !isEditingExisting && (
+            <div className="p-1.5 bg-slate-950/80 border border-slate-800/80 rounded-2xl flex gap-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedOption("draft1")
+                  setDraft(draftOptions.draft1)
+                }}
+                className={`flex-1 py-2 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  selectedOption === "draft1"
+                    ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
+                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900"
+                }`}
+              >
+                <span>🍰 Option 1: Product & Taste</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedOption("draft2")
+                  setDraft(draftOptions.draft2)
+                }}
+                className={`flex-1 py-2 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  selectedOption === "draft2"
+                    ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
+                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900"
+                }`}
+              >
+                <span>⚡ Option 2: Service & Pack</span>
+              </button>
+            </div>
+          )}
           
           {/* Review Textarea */}
           <div className="space-y-2">

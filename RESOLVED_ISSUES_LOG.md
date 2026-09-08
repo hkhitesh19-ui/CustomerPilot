@@ -48,6 +48,24 @@ This document serves as a historical record of all major bugs, configuration iss
    - Always test locally (`npm run build` or API curl), commit locally with `git commit`, and NEVER run `git push` without explicit user confirmation.
 
 ---
+## [08 Sep 2026] Feature: Anti-Detection Google Review Prompt & Dual-Option Matrix Upgrade
+- **Symptom**: The customer review draft generator in `src/app/review/page.tsx` contained programmatic footprints that triggered Google's modern NLP spam detectors (forced Business Name + City combo, outdated search-phrase keyword stuffing like "cake shop in ${city}", artificial temporal bans on "today/yesterday", and ambiguous cliché loopholes).
+- **Root Cause**: The prompt was using legacy 2012-era SEO keyword stuffing templates and synthetic static sentences that lacked human burstiness, conversational perplexity, and entity-specific Local Justifications.
+- **Resolution**:
+  1. **Anti-Detection Review Prompt Engine (`src/app/review/page.tsx`)**: Replaced the entire prompt with the advanced Anti-Detection Consumer Review Drafting Engine:
+     - *Natural Entity Anchoring*: Integrates exact purchased products (`${productName}`) for Google "Sold here" / "Mentioned in reviews" search justifications; falls back to category without guessing.
+     - *Eliminated Footprints*: Completely removed forced business name and forced city name combos to prevent algorithmic shadow-bans.
+     - *Humanizer Protocol*: Enforced High Burstiness (pairing 2-4 word fragments with 8-14 word conversational clauses), Perplexity Injection with colloquial connectors ("Honestly", "Taste-wise", "Baki"), casual micro-stylistics (dropped formal subjects, simple punctuation, natural Hinglish), and allowed natural temporal anchors ("today", "yesterday").
+     - *Zero-Hallucination & Blacklist*: Strictly banned marketing clichés ("hidden gem", "exceeded expectations", "top-notch", "must visit", "highly recommend", "best in town", "world class").
+     - *Strict 15-40 Word Limit*: Concise, believable mobile review lengths.
+     - *Multi-Option JSON Matrix*: Prompts AI to return clean JSON `{ "draft_1": "...", "draft_2": "..." }` featuring Draft 1 (Product & Sensory Focus) and Draft 2 (Operational, Speed & Packaging Focus).
+  2. **Multi-Model Cascading Fallbacks**: Upgraded model cascading array to `['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-flash-latest']` to prevent deprecated 404 errors.
+  3. **Smart Fallback Engine**: Updated `getSmartFallbackReview` to return anti-detection dual drafts without forced names or city stuffing.
+  4. **Interactive Dual-Option UI (`src/components/review/ReviewEditor.tsx`)**: Added a 1-tap interactive pill selector allowing customers to switch between `🍰 Option 1: Product & Taste` and `⚡ Option 2: Service & Pack` before 1-click copying and posting to Google Maps.
+  5. **Verification**: Tested live API execution with `gemini-3.6-flash` returning authentic dual JSON drafts, and verified HTTP 200 response on `/review`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [08 Sep 2026] Feature: Capabilities Matrix Refinement & Standalone vs Complete Combo Flywheel Integration
 - **Symptom**: User requested updating the 4-column Capabilities Matrix comparison table in `src/app/page.tsx` with granular working mechanisms and embedding a dedicated visual deep-dive section below the table featuring the 3 Standalone offerings, the 6-Stage Closed-Loop Retention & Ranking Flywheel, and 7 Core Practical Margin Advantages.
 - **Root Cause**: The comparison section was missing granular sub-labels for advanced features (Custom delay timer, SEO keyword injection, photo booster extra stamps, goal-gradient urgency triggers, 30/60d win-back autopilot, COGS margin advantages) and lacked an architectural breakdown comparing individual standalone engines vs the complete unified combo.

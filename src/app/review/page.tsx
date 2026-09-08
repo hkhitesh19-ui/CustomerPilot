@@ -4,16 +4,32 @@ import { ReviewEditor } from "@/components/review/ReviewEditor"
 
 export const dynamic = "force-dynamic"
 
-function getSmartFallbackReview(bizName: string, category: string, city: string, product: string): string {
-  const item = product ? product : (category.toLowerCase().includes('cake') || category.toLowerCase().includes('bakery') ? 'cake' : 'order')
-  const templates = [
-    `Ordered ${product ? product : 'from ' + bizName} in ${city} and really loved the quality! The sponge was very soft, fresh, and perfectly balanced in sweetness. Good service and packaging. Definitely a great bakery in ${city}.`,
-    `Tried ${bizName} in ${city} and had a wonderful experience. The ${item} was super fresh, delicious, and beautifully presented. Staff was polite and the overall service was smooth. Highly recommended cake shop in ${city}!`,
-    `Great experience with ${bizName} in ${city}! The ${item} was very fresh with authentic taste and great texture. If you are looking for a reliable bakery in ${city}, this place is a solid option.`,
-    `Very satisfied with my purchase from ${bizName}, ${city}. The ${item} was fresh, flavorful, and packed neatly. Excellent quality and friendly customer service. One of the best places for cakes in ${city}!`
+function getSmartFallbackReview(category: string, product: string): { draft1: string; draft2: string } {
+  const hasItem = Boolean(product && product.trim())
+  const item = hasItem ? product.trim() : (category.toLowerCase().includes('cake') || category.toLowerCase().includes('bakery') ? 'pastry' : 'order')
+  
+  const draft1Templates = [
+    hasItem
+      ? `Tried the ${item} today. Honestly super fresh, texture was spot on and sweetness was perfectly balanced!`
+      : `Picked up some items earlier today. Super fresh quality, loved the taste. Totally worth it.`,
+    hasItem
+      ? `Got the ${item} yesterday for evening. Really good taste and soft texture, family loved it.`
+      : `Tried their specialty today. Badiya taste tha, really fresh and authentic.`,
   ]
-  const randomIndex = Math.floor(Math.random() * templates.length)
-  return templates[randomIndex]
+
+  const draft2Templates = [
+    hasItem
+      ? `Quick service and very neat packaging for the ${item}. Clean setup and courteous staff!`
+      : `Smooth experience and very neat packaging. Fast counter service, totally hassle-free.`,
+    hasItem
+      ? `Ordered ${item} — packaging was completely intact and service was super quick. Good experience.`
+      : `Prompt service and clean packaging. Baki taste bhi badiya tha, will visit again.`
+  ]
+
+  const d1 = draft1Templates[Math.floor(Math.random() * draft1Templates.length)]
+  const d2 = draft2Templates[Math.floor(Math.random() * draft2Templates.length)]
+
+  return { draft1: d1, draft2: d2 }
 }
 
 export default async function ReviewPage({
@@ -73,130 +89,114 @@ export default async function ReviewPage({
     }
   }
 
-  const city = merchant.address?.split(',').pop()?.trim() || "Vadodara"
-  const businessCategory = merchant.category?.trim() || merchant.businessType || "Cake Shop"
-  const cleanBizName = (merchant.name || "Cake Connection").trim()
+  const businessCategory = merchant.category?.trim() || merchant.businessType || "Retail Store"
 
-  // Generate dynamic AI draft using Gemini with Strict Indian Review Prompt
-  const smartFallback = getSmartFallbackReview(cleanBizName, businessCategory, city, productName)
-  let dynamicDraft = smartFallback
+  // Generate dynamic AI draft using Gemini with Anti-Detection Multi-Option Prompt
+  const smartFallback = getSmartFallbackReview(businessCategory, productName)
+  let dynamicDraft = smartFallback.draft1
+  let draftOptions: { draft1: string; draft2: string } | null = smartFallback
+
   try {
     const apiKey = process.env.GEMINI_API_KEY
     if (apiKey) {
       const genAI = new GoogleGenerativeAI(apiKey)
-      const model = genAI.getGenerativeModel({ 
-        model: "gemini-flash-latest",
-        generationConfig: { temperature: 0.85 }
-      })
       
-      const prompt = `Act as a real Indian customer writing a genuine Google review.
+      const prompt = `[ROLE & OBJECTIVE]
+You are an advanced, anti-detection consumer review drafting engine. Your job is to convert real transaction data provided by a customer into 2 distinctly styled, authentic, and high-converting Google Maps reviews (1 to 3 sentences maximum each). 
 
-Business Details:
-- Business Name: ${cleanBizName}
-- Category: ${businessCategory}
-- City: ${city}
-- Purchased Product/Service: ${productName}
+The generated drafts must completely bypass Google's spam/NLP filters, trigger Google Local Justifications (SEO-rich entity matching), and read 100% like an authentic, spontaneous mobile message typed by an everyday Indian customer.
 
-Write a natural 3-4 lines Google review in simple Indian English.
+[INPUT VARIABLES]
+- Business Category: ${businessCategory}
+- Purchased Item/Service: ${productName}
 
-STRICT RULES
+[SECTION 1: LOCAL SEO & ENTITY OPTIMIZATION (THE RANKING MULTIPLIER)]
+1. NATURAL ENTITY ANCHORING: If ${productName} is provided, seamlessly integrate it into the text. Google's algorithm scans reviews for exact product/service entities to display "Sold here" or "Mentioned in reviews" search justifications.
+2. CATEGORY FALLBACK: If ${productName} is empty, anchor the text around the core experience of ${businessCategory} without guessing specific items.
+3. NO FORCED FOOTPRINTS: 
+   - NEVER force the business name into the review.
+   - NEVER force the city name into the review (e.g., do NOT write "best bakery in Vadodara"). Google Maps already knows the exact location; repeating it creates an artificial footprint that triggers AI review audits.
 
-1. NEVER invent or assume any fact.
-   - Mention the purchased product/service ONLY if [Product/Service Name] is provided.
-   - If it is empty, never guess any product or service. Mention only the business category naturally.
+[SECTION 2: HUMANIZER & ANTI-AI DETECTION PROTOCOL]
+1. HIGH BURSTINESS (Irregular Sentence Cadence): Never write uniform sentences. Pair an ultra-short sentence fragment (2-4 words) with a slightly longer conversational clause (8-14 words).
+   - Unnatural / AI: "The pastry was very fresh. The service was also quite good. I really liked the packaging."
+   - Natural / Human: "Tried the truffle pastry today. Honestly super fresh, and packing bhi ekdum intact thi."
+2. PERPLEXITY INJECTION (Unpredictable Spoken Tokens): Completely avoid sterile, textbook transition words ("Moreover", "Additionally", "Furthermore", "Overall"). Use colloquial, spoken Indian English/Hinglish connectors ("Honestly", "Also", "To be fair", "Baki", "Taste-wise").
+3. CASUAL IMPERFECTIONS (Micro-Stylistics):
+   - Natural Ellipsis: Drop formal grammatical subjects where natural (e.g., write "Loved the texture" instead of "I really loved the texture").
+   - Punctuation: Use conversational punctuation (simple hyphens, a single exclamation mark, or casual commas). Strictly ban semicolons (;) and formal em-dashes (—).
+   - Natural Slang/Hinglish: Blend everyday spoken phrases naturally (e.g., "spot on", "badiya", "super fresh", "clean setup").
+4. TEMPORAL ANCHORS: Freely allow natural time markers ("today", "yesterday", "got this for evening") to mimic authentic mobile behavior.
 
-2. Never mention any incorrect product, flavour, service, staff member, offer, price, event, visit history, or experience.
+[SECTION 3: STRICT NEGATIVE CONSTRAINTS & POLICY GUARDRAILS]
+1. ZERO HALLUCINATION: Never invent staff names, prices, discounts, delivery timelines, or specific store decor not provided in the input.
+2. ABSOLUTE BAN ON MARKETING CLICHÉS: The following phrases immediately trigger spam filters and are strictly forbidden:
+   - "hidden gem"
+   - "exceeded expectations"
+   - "top-notch"
+   - "must visit"
+   - "highly recommend"
+   - "best in town / best in the city"
+   - "world class"
+   - "plethora"
+   - "masterpiece"
+3. STRICT LENGTH LIMIT: Every individual draft must stay strictly between 15 and 40 words. Real customers do not write essays.
 
-3. Never use relative time references such as:
-   - today
-   - yesterday
-   - recently
-   - last week
-   - first visit
-   - second visit
-   - again
-   - this time
-   unless explicitly provided.
+[SECTION 4: DYNAMIC MULTI-OPTION MATRIX]
+Generate exactly 2 diverse drafts catering to different psychological angles:
+- Draft 1 (Product & Sensory Focus): Focuses directly on the item's texture, taste, build, freshness, or direct quality.
+- Draft 2 (Operational & Speed Focus OR Raw Short Remark): Focuses on quick service, neat packaging, or an ultra-short casual remark.
 
-4. Write only from the customer's experience.
+[OUTPUT FORMAT]
+Return ONLY a valid, parseable JSON object with zero additional conversational filler, Markdown headings, or explanations outside the JSON:
+{
+  "draft_1": "String",
+  "draft_2": "String"
+}`
 
-5. Keep the tone completely human, casual and believable.
-   Never sound like an advertisement.
+      let responseText = ""
+      const candidates = ["gemini-3.6-flash", "gemini-2.5-flash", "gemini-1.5-flash", "gemini-flash-latest"]
+      for (const modelName of candidates) {
+        try {
+          const model = genAI.getGenerativeModel({ 
+            model: modelName,
+            generationConfig: { temperature: 0.85 }
+          })
+          const result = await model.generateContent(prompt)
+          const response = await result.response
+          responseText = response.text().trim()
+          if (responseText && responseText.includes("{")) break
+        } catch (_) {
+          continue
+        }
+      }
 
-6. Naturally mention BOTH:
-   - ${cleanBizName}
-   - ${city}
-
-7. Improve local SEO naturally by using ONE OR TWO relevant local search phrases in every review.
-
-Examples (DO NOT always use these):
-- cake shop in ${city}
-- birthday cake in ${city}
-- custom cake in ${city}
-- fresh cakes in ${city}
-- designer cakes in ${city}
-- anniversary cake in ${city}
-- bakery in ${city}
-- dessert shop in ${city}
-- pastry shop in ${city}
-- online cake delivery in ${city}
-- same day cake delivery in ${city}
-- celebration cakes in ${city}
-- delicious cakes in ${city}
-
-8. IMPORTANT:
-Rotate SEO keywords naturally.
-Do NOT repeatedly use the same keyword combination.
-Generate different keyword variations every time depending on the review context.
-
-9. Mention only ONE SEO phrase naturally.
-Occasionally use TWO if it fits naturally.
-Never stuff keywords.
-
-10. Vary every review by changing:
-- sentence structure
-- opening sentence
-- vocabulary
-- review angle
-- writing style
-- ending
-- SEO keyword used
-
-11. Focus naturally on one or more:
-- product quality
-- freshness
-- taste
-- service
-- staff behaviour
-- packaging
-- cleanliness
-- value for money
-- overall experience
-
-12. Avoid AI-style and marketing phrases such as:
-- Best in the city
-- World class
-- Premium experience
-- Outstanding
-- Highly recommended to everyone
-- Number one
-- Perfect in every way
-unless they naturally fit the customer's experience.
-
-13. Every review must look completely human-written and unique.
-Avoid repeated sentence patterns across multiple generations.
-
-Output ONLY the review text.`
-      
-      const result = await model.generateContent(prompt)
-      const response = await result.response
-      const generatedText = response.text().trim().replace(/^["']|["']$/g, '')
-      if (generatedText && generatedText.length > 20) {
-        dynamicDraft = generatedText
+      if (responseText) {
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/)
+        if (jsonMatch) {
+          try {
+            const parsed = JSON.parse(jsonMatch[0])
+            if (parsed.draft_1 && parsed.draft_2) {
+              dynamicDraft = parsed.draft_1.trim()
+              draftOptions = {
+                draft1: parsed.draft_1.trim(),
+                draft2: parsed.draft_2.trim()
+              }
+            } else if (parsed.draft_1) {
+              dynamicDraft = parsed.draft_1.trim()
+              draftOptions = {
+                draft1: parsed.draft_1.trim(),
+                draft2: smartFallback.draft2
+              }
+            }
+          } catch (jsonErr) {
+            console.warn("[ReviewPage] Failed to parse JSON draft from Gemini:", jsonErr)
+          }
+        }
       }
     }
   } catch (error) {
-    console.warn("[ReviewPage] Gemini AI unavailable (rate limit or network), using fallback draft.", error)
+    console.warn("[ReviewPage] Gemini AI unavailable, using smart fallback drafts.", error)
   }
 
   let googlePlaceId: string | null = googleConnection?.placeId || null
@@ -227,6 +227,7 @@ Output ONLY the review text.`
     <>
     <ReviewEditor 
       initialDraft={dynamicDraft}
+      draftOptions={draftOptions}
       existingReviewText={existingReviewText}
       merchant={{
         id: merchant.id,
