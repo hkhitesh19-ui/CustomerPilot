@@ -3,6 +3,15 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [08 Sep 2026] UI/UX: Sidebar Navigation Reordering & Settings Renamed to "Complete Setup"
+- **Symptom**: Settings section was located at the bottom of the sidebar below all other links, labeled as "Settings", making it unintuitive for merchants to discover onboarding setup and configuration steps.
+- **Root Cause**: Sidebar navigation items in `src/components/app-sidebar.tsx` placed Settings in `bottomNav` under Subscription, while merchant onboarding configuration was treated as an afterthought rather than step #1.
+- **Resolution**:
+  1. **Sidebar Navigation (`src/components/app-sidebar.tsx`)**: Reordered navigation so that `{ name: "Complete Setup", href: "/dashboard/settings", icon: Settings }` is placed at the top of `mainNav` above "Home", and removed the redundant bottom "Settings" item.
+  2. **Page Heading (`src/app/dashboard/settings/page.tsx`)**: Renamed main header from "Merchant Settings" to "Complete Setup".
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [08 Sep 2026] Feature: Level-Up Kickstart Bonus (+4 Stamps), Silver VIP Card & Wallet Public Proxy Fix
 - **Symptom**: 
   1. When customer Hitesh completed Loop 1 (10/10 stamps) and achieved Silver VIP status, his new Loop 2 loyalty card was not automatically kickstarted with the 4 Level-Up Bonus stamps configured by the merchant, and no celebratory WhatsApp notification with the VIP tier upgrade was dispatched.

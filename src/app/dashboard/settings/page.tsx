@@ -107,7 +107,7 @@ export default function SettingsPage() {
       
       <div>
         <div className="flex items-center gap-3 flex-wrap">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-100">Merchant Settings</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-100">Complete Setup</h1>
           {isLoyaltyOnly ? (
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 flex items-center gap-1">
               🎁 Digital Loyalty Stamps &amp; VIP Club

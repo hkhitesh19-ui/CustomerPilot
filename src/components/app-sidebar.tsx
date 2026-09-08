@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar"
 
 const mainNav = [
+  { name: "Complete Setup", href: "/dashboard/settings", icon: Settings },
   { name: "Home", href: "/dashboard", icon: LayoutDashboard },
   // HIDING UNTIL GOOGLE API APPROVAL
   // { name: "Google Reviews AI", href: "/dashboard/reviews", icon: Star, module: "AUTOREPLY" as Module },
@@ -44,7 +45,6 @@ const referralNav = [
 
 const bottomNav = [
   { name: "Subscription", href: "/dashboard/subscription", icon: Crown },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
 function NavGroup({ label, items, pathname }: { label: string; items: typeof growthNav; pathname: string }) {
