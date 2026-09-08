@@ -9,7 +9,8 @@ import {
   Store, MessageSquare, Search, Upload, Gift, QrCode as QrIcon, Zap,
   Check, ArrowRight, ArrowLeft, Loader2, UserCheck,
   Printer, AlertCircle, CircleDot, Star, Rocket, X, Shield,
-  Menu, ChevronDown, Calculator, TrendingUp, Sparkles, Phone
+  Menu, ChevronDown, Calculator, TrendingUp, Sparkles, Phone,
+  Clock, Target, Camera, Layers, Flame, Coins, Repeat
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -419,7 +420,7 @@ export default function Home() {
                   </Link>
                   <Link href="/features/google-review-automation" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
                     <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
-                      <span className="flex items-center gap-1.5"><Star className="w-3.5 h-3.5 text-emerald-500" /> Smart Google Reviews</span>
+                      <span className="flex items-center gap-1.5"><Star className="w-3.5 h-3.5 text-emerald-500" /> Smart Ai Google Reviews</span>
                       <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">AI Drafts</span>
                     </span>
                     <span className="text-[11px] text-slate-500 mt-0.5">Post-purchase WhatsApp 5-star review collector</span>
@@ -526,7 +527,7 @@ export default function Home() {
                 <span className="text-[10px] bg-amber-50 text-amber-700 font-bold px-1.5 py-0.5 rounded-md">VIP Club</span>
               </Link>
               <Link href="/features/google-review-automation" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
-                <span className="flex items-center gap-2"><Star className="w-4 h-4 text-emerald-500" /> Smart Google Reviews</span>
+                <span className="flex items-center gap-2"><Star className="w-4 h-4 text-emerald-500" /> Smart Ai Google Reviews</span>
                 <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">AI Drafts</span>
               </Link>
               <Link href="#features" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
@@ -1222,7 +1223,7 @@ export default function Home() {
             </div>
             </StaggerItem>
 
-            {/* Product 2: Smart Google Reviews */}
+            {/* Product 2: Smart Ai Google Reviews */}
             <StaggerItem variant="fadeUp" className="h-full flex flex-col">
             <div className="fcard h-full flex flex-col">
               <div className="flex items-center justify-between">
@@ -1231,7 +1232,7 @@ export default function Home() {
                   ⭐ 5-Star Booster
                 </span>
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mt-4">Smart Google Reviews</h3>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">Smart Ai Google Reviews</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                 Automatically invite customers after purchase via WhatsApp. Happy customers post pre-drafted 5-star AI reviews in 1 tap.
               </p>
@@ -1328,7 +1329,7 @@ export default function Home() {
                   </th>
                   <th className="p-5 text-center w-[18%] border-l border-slate-800 bg-slate-900/60 align-top">
                     <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl mx-auto mb-2">⭐</div>
-                    <div className="font-extrabold text-xs sm:text-sm text-white">Smart Google Reviews</div>
+                    <div className="font-extrabold text-xs sm:text-sm text-white">Smart Ai Google Reviews</div>
                     <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider mt-0.5">Standalone Module</div>
                     <div className="mt-2 flex items-baseline justify-center gap-1.5">
                       <span className="text-xs line-through text-slate-500">₹1,599</span>
@@ -1373,12 +1374,15 @@ export default function Home() {
                 <tr className="bg-amber-950/30">
                   <td colSpan={5} className="py-3 px-6 bg-gradient-to-r from-amber-950/60 to-slate-900 border-y border-amber-500/20">
                     <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-300">
-                      <span>🎁 1. Digital Loyalty Stamps &amp; VIP Club</span>
+                      <span>🎁 1. Smart WhatsApp Loyalty Engine</span>
                     </div>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Digital Stamp Card on WhatsApp (No App Download for Customer)</td>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>Digital Stamp Card on WhatsApp (Zero App Download)</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Counter QR scan se customer ke WhatsApp par live animated stamp card activate hota hai</div>
+                  </td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
@@ -1387,7 +1391,10 @@ export default function Home() {
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">VIP Club Tier System (Silver, Gold, Platinum Automatic Upgrades)</td>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>Welcome Joining Bonus Stamps (Instant Gratification)</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">1st visit par customer ko 2 welcome bonus stamps milte hain (Endowed Progress Effect)</div>
+                  </td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
@@ -1396,7 +1403,10 @@ export default function Home() {
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Automated Birthday Treats &amp; Milestone Bonus Stamps</td>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>VIP Club Tier System (Silver, Gold, Platinum Levels)</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Frequent visits ke hisaab se customer automatic VIP level unlock karta hai</div>
+                  </td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
@@ -1405,7 +1415,10 @@ export default function Home() {
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">14-Day &amp; 30-Day Inactive Customer Win-Back WhatsApp Alerts</td>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>Goal-Gradient Urgency Nudges (WhatsApp 48h Alerts)</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Free reward se 1-2 stamps door hone par urgency notification repeat visit trigger karta hai</div>
+                  </td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
@@ -1414,7 +1427,10 @@ export default function Home() {
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Cashier 1-Tap Counter Queue Terminal &amp; Customer CRM</td>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>Cashier 1-Tap Counter Queue Terminal &amp; Customer CRM</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Counter par bina kisi manual typing ke &lt;3 seconds me stamp credit aur customer database update</div>
+                  </td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
@@ -1427,12 +1443,15 @@ export default function Home() {
                 <tr className="bg-emerald-950/30">
                   <td colSpan={5} className="py-3 px-6 bg-gradient-to-r from-emerald-950/60 to-slate-900 border-y border-emerald-500/20">
                     <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-emerald-300">
-                      <span>⭐ 2. Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast</span>
+                      <span>⭐ 2. Smart AI Google Review &amp; Photo Booster (SEO Keyword Optimized)</span>
                     </div>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Instant AI Customer Review Draft Assistant (AI Engine)</td>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>Custom Delay Timer (5m, 30m, 2h, or Next-Day Delivery)</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Merchant ke business type ke anusar perfect timing par review request dispatch hoti hai</div>
+                  </td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
@@ -1441,7 +1460,10 @@ export default function Home() {
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Post-Purchase WhatsApp 5★ Review Prompts with Delay Timer</td>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>Keyword-Rich AI Draft Injection (Dish Names &amp; Local Area SEO)</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Trending local keywords review draft me inject karta hai taaki Google Maps Rank #1 aaye</div>
+                  </td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
@@ -1450,7 +1472,10 @@ export default function Home() {
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">1-Click Copy &amp; Post to Google Maps with Organic Keywords</td>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>Photo Booster Engine (+4 Total Stamps on Attaching Photo)</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Photo reviews par extra stamps offer karta hai jisse listing par high-converting UGC photos collect hon</div>
+                  </td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
@@ -1459,7 +1484,22 @@ export default function Home() {
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">5-Star Golden Review Standee &amp; Table Tent Posters (Print PDF)</td>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>1-Click Copy &amp; Direct Post to Google Maps</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Pre-copied AI draft direct Google Maps review box me khulta hai in 1 single tap</div>
+                  </td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-slate-800/40 transition-colors">
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>Smart Negative Review Shield (1-3★ Private Owner Channel)</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Unhappy customers ka feedback Google Maps par jane se pehle privately merchant ke WhatsApp par divert hota hai</div>
+                  </td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
@@ -1472,30 +1512,15 @@ export default function Home() {
                 <tr className="bg-indigo-950/30">
                   <td colSpan={5} className="py-3 px-6 bg-gradient-to-r from-indigo-950/60 to-slate-900 border-y border-indigo-500/20">
                     <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-indigo-300">
-                      <span>💬 3. Ai Drafted SEO Optimized 1-Click Reply to Google Reviews</span>
+                      <span>💬 3. 1-Click AI Review Auto-Reply &amp; Win-Back CRM</span>
                     </div>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Google Business Profile (GBP) Connect &amp; Review Sync</td>
-                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
-                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>24/7 Context-Aware AI Review Replies (1-Second Sentiment)</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Naya review aate hi appreciative, SEO-rich reply draft generate karta hai</div>
                   </td>
-                </tr>
-                <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">AI Context-Aware Owner Reply Drafts in 1 Second</td>
-                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
-                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
-                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
-                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
-                  </td>
-                </tr>
-                <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">1-Click Direct Publish to Google Maps</td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
@@ -1504,7 +1529,46 @@ export default function Home() {
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Bulk Auto-Reply Engine for Past Google Reviews</td>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>WhatsApp Reply Preview &amp; 1-Click Direct GBP Publish</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Store owner ko WhatsApp par reply preview aata hai jise 1-click me approve ya direct post kar sakte hain</div>
+                  </td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-slate-800/40 transition-colors">
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>Bulk Auto-Reply Engine for Past Unanswered Google Reviews</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Pichhle sabhi pending reviews ko ek sath contextual AI reply se update karta hai</div>
+                  </td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-slate-800/40 transition-colors">
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>30-Day &amp; 60-Day Dormant Customer Win-Back Autopilot</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Inactive customers ko automated &quot;We Miss You&quot; special offers bhej kar wapas laana</div>
+                  </td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/10 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">✓ Included</span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-slate-800/40 transition-colors">
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>Churn Detection Radar &amp; Customer Retention Analytics</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Lost customers, repeat visit rate aur customer lifetime value ka live analytics radar</div>
+                  </td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs">✓</span></td>
@@ -1518,8 +1582,20 @@ export default function Home() {
                   <td colSpan={5} className="py-3.5 px-6 bg-gradient-to-r from-emerald-900/60 via-teal-900/40 to-slate-900 border-y border-emerald-500/30">
                     <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-emerald-300">
                       <Sparkles className="w-4 h-4 text-emerald-400" />
-                      <span>🚀 4. CustomerPilot Complete : Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply</span>
+                      <span>🚀 4. CustomerPilot Complete Combo : Closed-Loop Autopilot Flywheel</span>
                     </div>
+                  </td>
+                </tr>
+                <tr className="hover:bg-slate-800/40 transition-colors">
+                  <td className="p-4 pl-6 font-bold text-emerald-300 text-sm">
+                    <div>Closed-Loop Flywheel Integration</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Visit 1 ➔ Review Booster ➔ SEO Rank ➔ Animated Progress ➔ Urgency Nudge ➔ Win-Back Retention</div>
+                  </td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
+                  <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/15 font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-400 text-slate-950 font-black text-[10px] shadow-sm">👑 Full Autopilot Flywheel</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
@@ -1531,19 +1607,19 @@ export default function Home() {
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/15 font-bold">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-400 text-slate-950 font-black text-[10px] shadow-sm">👑 Exclusive Synergy</span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-400 text-slate-950 font-black text-[10px] shadow-sm">👑 Cross-Engine Synergy</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
                   <td className="p-4 pl-6 font-bold text-emerald-300 text-sm">
                     <div>Unified 360° Customer SuperCRM</div>
-                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Visits, total spend, loyalty stamp status aur Google Review profile ek single screen pe</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Visits, total spend, loyalty stamp status aur Google Review profile ek single unified screen pe</div>
                   </td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/15 font-bold">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-400 text-slate-950 font-black text-[10px] shadow-sm">👑 Exclusive Unified</span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-400 text-slate-950 font-black text-[10px] shadow-sm">👑 Unified Single App</span>
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
@@ -1559,12 +1635,15 @@ export default function Home() {
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Priority WhatsApp VIP Merchant Desk</td>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">
+                    <div>Priority WhatsApp VIP Merchant Support Desk</div>
+                    <div className="text-[11px] text-slate-400 font-normal mt-0.5">Dedicated onboarding assistant aur instant priority response channel</div>
+                  </td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-[11px] text-slate-400">Standard</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-[11px] text-slate-400">Standard</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-[11px] text-slate-400">Standard</span></td>
                   <td className="p-4 text-center border-l-2 border-r-2 border-emerald-500 bg-emerald-500/15 font-bold">
-                    <span className="inline-flex items-center gap-1 text-amber-300 font-black text-xs">⚡ Priority VIP</span>
+                    <span className="inline-flex items-center gap-1 text-amber-300 font-black text-xs">⚡ Priority VIP Desk</span>
                   </td>
                 </tr>
               </tbody>
@@ -1604,6 +1683,379 @@ export default function Home() {
             </table>
           </div>
           </ScrollReveal>
+
+          {/* ========================================================================= */}
+          {/* NEW SUB-SECTION A: STANDALONE VS COMPLETE COMBO DEEP DIVE CARDS */}
+          {/* ========================================================================= */}
+          <div className="mt-20">
+            <ScrollReveal variant="fadeUp">
+              <div className="text-center max-w-3xl mx-auto mb-12">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 font-bold text-xs">
+                  <Layers className="w-3.5 h-3.5" /> Standalone vs Complete Combo Deep Dive
+                </span>
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mt-4 tracking-tight">
+                  CustomerPilot Service Offerings Breakdown
+                </h3>
+                <p className="text-slate-300 text-xs sm:text-sm mt-3 leading-relaxed">
+                  Pick a standalone engine to solve an isolated bottleneck, or run the Complete Combo to automate the entire customer lifecycle.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* Standalone Card 1: Loyalty */}
+              <ScrollReveal variant="fadeUp" delay={0.05}>
+                <div className="p-6 sm:p-7 rounded-3xl bg-slate-900/80 border border-amber-500/30 hover:border-amber-500/60 transition-all flex flex-col h-full relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-all" />
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center text-2xl font-bold">
+                      🎁
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      Standalone Module
+                    </span>
+                  </div>
+                  <h4 className="text-lg font-bold text-white">1. Smart WhatsApp Loyalty Engine</h4>
+                  <div className="mt-2 text-xs font-semibold text-amber-400 flex items-center gap-1.5">
+                    <Target className="w-3.5 h-3.5" /> Core Focus: Walk-ins ko Repeat Visits me Convert Karna (Zero App Download)
+                  </div>
+                  
+                  <div className="space-y-3 mt-4 text-xs text-slate-300 flex-1">
+                    <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
+                      <div className="font-bold text-white text-[11px] mb-1">⚙️ Working Mechanism:</div>
+                      <p className="text-slate-300 leading-relaxed text-[11px]">
+                        Customer counter par sirf QR scan karta hai aur WhatsApp par digital stamp card activate ho jata hai. Pehli purchase par welcome bonus stamps milte hain aur har valid bill par digital stamp add hota hai.
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
+                      <div className="font-bold text-white text-[11px] mb-1">🎯 Best For / Target:</div>
+                      <p className="text-slate-300 leading-relaxed text-[11px]">
+                        Un merchants ke liye jinki footfall achhi hai lekin customer retention zero hai aur jo paper card ya complex apps ke jhanjhat se bachna chahte hain.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 pt-5 border-t border-slate-800 flex items-center justify-between">
+                    <div>
+                      <div className="text-xs line-through text-slate-500">₹1,599/yr</div>
+                      <div className="text-lg font-black text-amber-400">₹799<span className="text-xs text-slate-400 font-normal">/yr (₹2.2/day)</span></div>
+                    </div>
+                    <Link href="/signup?module=loyalty" className="py-2.5 px-4 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold text-xs transition">
+                      Trial Loyalty →
+                    </Link>
+                  </div>
+                </div>
+              </ScrollReveal>
+
+              {/* Standalone Card 2: Reviews */}
+              <ScrollReveal variant="fadeUp" delay={0.1}>
+                <div className="p-6 sm:p-7 rounded-3xl bg-slate-900/80 border border-emerald-500/30 hover:border-emerald-500/60 transition-all flex flex-col h-full relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all" />
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-2xl font-bold">
+                      ⭐
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      Standalone Module
+                    </span>
+                  </div>
+                  <h4 className="text-lg font-bold text-white">2. Smart AI Google Review &amp; Photo Booster</h4>
+                  <div className="mt-2 text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
+                    <Target className="w-3.5 h-3.5" /> Core Focus: Google Maps par Local Area me Rank #1 &amp; UGC Photos Collection
+                  </div>
+                  
+                  <div className="space-y-3 mt-4 text-xs text-slate-300 flex-1">
+                    <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
+                      <div className="font-bold text-white text-[11px] mb-1">⚙️ Working Mechanism:</div>
+                      <p className="text-slate-300 leading-relaxed text-[11px]">
+                        <strong>Custom Delay Timer:</strong> Bill ke 5m, 30m, 2h ya next day review prompt. <br />
+                        <strong>SEO Keyword Injection:</strong> Trending local dishes &amp; area keywords auto-inserted. <br />
+                        <strong>Photo Booster:</strong> Review ke sath photo attach karne par extra bonus stamps.
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
+                      <div className="font-bold text-white text-[11px] mb-1">🎯 Best For / Target:</div>
+                      <p className="text-slate-300 leading-relaxed text-[11px]">
+                        Un businesses ke liye jo Zomato/Swiggy commissions ya Google Ads par dependency kam karke organic footfall badhana chahte hain.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 pt-5 border-t border-slate-800 flex items-center justify-between">
+                    <div>
+                      <div className="text-xs line-through text-slate-500">₹1,599/yr</div>
+                      <div className="text-lg font-black text-emerald-400">₹799<span className="text-xs text-slate-400 font-normal">/yr (₹2.2/day)</span></div>
+                    </div>
+                    <Link href="/signup?module=reviews" className="py-2.5 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold text-xs transition">
+                      Trial AI Reviews →
+                    </Link>
+                  </div>
+                </div>
+              </ScrollReveal>
+
+              {/* Standalone Card 3: AutoReply */}
+              <ScrollReveal variant="fadeUp" delay={0.15}>
+                <div className="p-6 sm:p-7 rounded-3xl bg-slate-900/80 border border-indigo-500/30 hover:border-indigo-500/60 transition-all flex flex-col h-full relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all" />
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-2xl font-bold">
+                      💬
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                      Standalone Module
+                    </span>
+                  </div>
+                  <h4 className="text-lg font-bold text-white">3. 1-Click AI Review Auto-Reply &amp; Win-Back</h4>
+                  <div className="mt-2 text-xs font-semibold text-indigo-400 flex items-center gap-1.5">
+                    <Target className="w-3.5 h-3.5" /> Core Focus: 24x7 Instant AI Replies &amp; Dormant Customer Recovery
+                  </div>
+                  
+                  <div className="space-y-3 mt-4 text-xs text-slate-300 flex-1">
+                    <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
+                      <div className="font-bold text-white text-[11px] mb-1">⚙️ Working Mechanism:</div>
+                      <p className="text-slate-300 leading-relaxed text-[11px]">
+                        <strong>Contextual Auto-Reply:</strong> New review aate hi 1-second me human-like appreciative response draft karta hai jise WhatsApp se 1-click me publish kar sakte hain. <br />
+                        <strong>Win-Back Engine:</strong> 30 ya 60 din se inactive customers ko automated &quot;We Miss You&quot; offers bhejta hai.
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
+                      <div className="font-bold text-white text-[11px] mb-1">🎯 Best For / Target:</div>
+                      <p className="text-slate-300 leading-relaxed text-[11px]">
+                        Busy store owners jinke paas review reply karne ka samay nahi hai aur jo existing customer database ko monetize nahi kar pa rahe.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 pt-5 border-t border-slate-800 flex items-center justify-between">
+                    <div>
+                      <div className="text-xs line-through text-slate-500">₹1,599/yr</div>
+                      <div className="text-lg font-black text-indigo-400">₹799<span className="text-xs text-slate-400 font-normal">/yr (₹2.2/day)</span></div>
+                    </div>
+                    <Link href="/signup?module=autoreply" className="py-2.5 px-4 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 font-bold text-xs transition">
+                      Trial AutoReply →
+                    </Link>
+                  </div>
+                </div>
+              </ScrollReveal>
+            </div>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* NEW SUB-SECTION B: THE 6-STAGE CLOSED-LOOP BUSINESS FLYWHEEL */}
+          {/* ========================================================================= */}
+          <div className="mt-20">
+            <ScrollReveal variant="fadeUp">
+              <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 border-2 border-emerald-500/40 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+                
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-slate-800">
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-black text-xs uppercase tracking-wider">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> Complete Combo Superpower
+                    </span>
+                    <h3 className="text-2xl sm:text-3xl font-black text-white mt-2">
+                      The 6-Stage Closed-Loop Retention &amp; Ranking Flywheel
+                    </h3>
+                    <p className="text-slate-300 text-xs sm:text-sm mt-1 max-w-2xl">
+                      Jab teeno standalone engines aapas me judte hain, to ek self-fuelling organic growth loop banta hai jo customer acquisition se lifetime retention tak har step automate karta hai.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right hidden sm:block">
+                      <div className="text-xs line-through text-slate-500">₹4,499/yr</div>
+                      <div className="text-xl font-black text-emerald-400">₹2,249<span className="text-xs text-slate-300 font-normal">/yr</span></div>
+                    </div>
+                    <Link href="/signup" className="py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/20 hover:scale-[1.02] transition-all whitespace-nowrap">
+                      Start 3-Day Free Trial →
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="mt-8 overflow-x-auto">
+                  <table className="w-full text-left border-collapse min-w-[700px]">
+                    <thead>
+                      <tr className="border-b border-slate-800 bg-slate-900/60">
+                        <th className="p-4 text-xs font-black uppercase tracking-wider text-emerald-400 w-[18%]">Stage &amp; Step</th>
+                        <th className="p-4 text-xs font-black uppercase tracking-wider text-slate-200 w-[38%]">Customer Journey (What Customer Experiences)</th>
+                        <th className="p-4 text-xs font-black uppercase tracking-wider text-emerald-300 w-[44%]">CustomerPilot Engine (What Runs in Background)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/80 text-xs">
+                      <tr className="hover:bg-slate-800/30 transition-colors">
+                        <td className="p-4 font-extrabold text-amber-300 flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center font-black text-xs">1</span>
+                          <span>Visit 1 (Join)</span>
+                        </td>
+                        <td className="p-4 text-slate-200 font-medium">Counter par standee QR scan karta hai, bina app download kiye WhatsApp par live stamp card open ho jata hai.</td>
+                        <td className="p-4 text-emerald-200 font-semibold bg-emerald-950/20">Instant customer CRM profile generate karta hai aur instant <strong>Welcome Bonus Stamps (+2)</strong> credit karta hai.</td>
+                      </tr>
+                      <tr className="hover:bg-slate-800/30 transition-colors">
+                        <td className="p-4 font-extrabold text-emerald-300 flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-black text-xs">2</span>
+                          <span>Follow-up</span>
+                        </td>
+                        <td className="p-4 text-slate-200 font-medium">Khana khane ya service lene ke baad WhatsApp par personalized review request receive hoti hai.</td>
+                        <td className="p-4 text-emerald-200 font-semibold bg-emerald-950/20"><strong>Smart Delay Timer:</strong> Store ke according 30m ya 2h baad pre-drafted 5★ review link dispatch karta hai.</td>
+                      </tr>
+                      <tr className="hover:bg-slate-800/30 transition-colors">
+                        <td className="p-4 font-extrabold text-emerald-300 flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-black text-xs">3</span>
+                          <span>Ranking</span>
+                        </td>
+                        <td className="p-4 text-slate-200 font-medium">Customer 1-tap me dish &amp; local area keywords ke sath photo Google Maps par post karta hai.</td>
+                        <td className="p-4 text-emerald-200 font-semibold bg-emerald-950/20"><strong>SEO Booster</strong> Maps Rank #1 drive karta hai; <strong>AI Auto-Reply</strong> 1-second me appreciative owner reply post karta hai.</td>
+                      </tr>
+                      <tr className="hover:bg-slate-800/30 transition-colors">
+                        <td className="p-4 font-extrabold text-indigo-300 flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-black text-xs">4</span>
+                          <span>Progress</span>
+                        </td>
+                        <td className="p-4 text-slate-200 font-medium">Customer ke WhatsApp par live animated stamp card update hota hai (+4 total stamps earned).</td>
+                        <td className="p-4 text-emerald-200 font-semibold bg-emerald-950/20"><strong>Endowed Progress Effect:</strong> Customer dekhta hai ki reward ke kareeb pahuch gaya hai (Faster next visit).</td>
+                      </tr>
+                      <tr className="hover:bg-slate-800/30 transition-colors">
+                        <td className="p-4 font-extrabold text-rose-300 flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-rose-500/20 text-rose-300 flex items-center justify-center font-black text-xs">5</span>
+                          <span>Nudge</span>
+                        </td>
+                        <td className="p-4 text-slate-200 font-medium">WhatsApp message aata hai: <em>&quot;Sirf 1 stamp door hai aapka Free Special Reward!&quot;</em></td>
+                        <td className="p-4 text-emerald-200 font-semibold bg-emerald-950/20"><strong>Goal-Gradient Urgency Engine:</strong> Agle 48 hours me repeat purchase generate karne ke liye FOMO nudge trigger karta hai.</td>
+                      </tr>
+                      <tr className="hover:bg-slate-800/30 transition-colors">
+                        <td className="p-4 font-extrabold text-teal-300 flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-300 flex items-center justify-center font-black text-xs">6</span>
+                          <span>Retention</span>
+                        </td>
+                        <td className="p-4 text-slate-200 font-medium">Agar 30 ya 60 din tak customer nahi aata, to WhatsApp par surprise &quot;We Miss You&quot; offer deliver hota hai.</td>
+                        <td className="p-4 text-emerald-200 font-semibold bg-emerald-950/20"><strong>Win-Back Autopilot:</strong> Dormant database ko monetize karta hai aur lost customers ko organically wapas bulata hai.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* NEW SUB-SECTION C: 7 CORE PRACTICAL BUSINESS & MARGIN ADVANTAGES */}
+          {/* ========================================================================= */}
+          <div className="mt-20">
+            <ScrollReveal variant="fadeUp">
+              <div className="text-center max-w-3xl mx-auto mb-12">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 font-bold text-xs">
+                  <Flame className="w-3.5 h-3.5 text-amber-400" /> Unit Economics &amp; Store Profitability
+                </span>
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mt-4 tracking-tight">
+                  7 Practical Business &amp; Margin Advantages
+                </h3>
+                <p className="text-slate-300 text-xs sm:text-sm mt-3 leading-relaxed">
+                  Dekhiye kaise CustomerPilot aapke dhandhe ke margins ko protect karta hai aur cash discount diye bina footfall 3x karta hai.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {/* Adv 1 */}
+              <ScrollReveal variant="fadeUp" delay={0.05}>
+                <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-all h-full space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl">📱</div>
+                    <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">3x Higher Adoption</span>
+                  </div>
+                  <h4 className="text-base font-bold text-white">1. Zero-App WhatsApp Adoption vs App Fatigue</h4>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    85% customers counter par app download karne se mana kar dete hain. CustomerPilot WhatsApp par chalta hai jo 100% smartphones me already hai.
+                  </p>
+                </div>
+              </ScrollReveal>
+
+              {/* Adv 2 */}
+              <ScrollReveal variant="fadeUp" delay={0.1}>
+                <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-all h-full space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl">🧠</div>
+                    <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300">2.8x Visit Velocity</span>
+                  </div>
+                  <h4 className="text-base font-bold text-white">2. Endowed Progress &amp; Goal-Gradient Psychology</h4>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    1st visit par 2 welcome stamps milne se customer psychological headstart feel karta hai. Reward ke kareeb pahuchte hi visit frequency 2.8x fast ho jati hai.
+                  </p>
+                </div>
+              </ScrollReveal>
+
+              {/* Adv 3 */}
+              <ScrollReveal variant="fadeUp" delay={0.15}>
+                <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-all h-full space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 text-blue-400 flex items-center justify-center text-xl">📍</div>
+                    <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300">Save ₹10k–50k/mo</span>
+                  </div>
+                  <h4 className="text-base font-bold text-white">3. Local SEO Dominance via Keyword Injection</h4>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    AI drafts review me automatically trending dishes aur area keywords inject karte hain. Google Maps listing area me Rank #1 par aati hai bina Google Ads ke.
+                  </p>
+                </div>
+              </ScrollReveal>
+
+              {/* Adv 4 */}
+              <ScrollReveal variant="fadeUp" delay={0.2}>
+                <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-all h-full space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center text-xl">📸</div>
+                    <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300">+42% Direction Requests</span>
+                  </div>
+                  <h4 className="text-base font-bold text-white">4. User-Generated Content (UGC) Photo Engine</h4>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Photo reviews par bonus stamps dekar 100+ real customer photos collect karta hai. Google data ke anusar photo listings par 42% zyada direction clicks aate hain.
+                  </p>
+                </div>
+              </ScrollReveal>
+
+              {/* Adv 5 */}
+              <ScrollReveal variant="fadeUp" delay={0.25}>
+                <div className="p-6 rounded-2xl bg-slate-900/90 border border-emerald-500/30 bg-gradient-to-b from-slate-900 to-emerald-950/30 hover:border-emerald-500/60 transition-all h-full space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 flex items-center justify-center text-xl font-bold">💰</div>
+                    <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500 text-slate-950">Huge Margin Savior</span>
+                  </div>
+                  <h4 className="text-base font-bold text-emerald-300">5. COGS Margin Advantage (3.5% Cost vs 10% Cash Discount)</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    10% cash discount dene se seedha profit katta hai. CustomerPilot me ₹150 ki reward item ka actual food cost (COGS) sirf ₹20-₹25 (3.5%) hota hai — customer happy, merchant margin safe!
+                  </p>
+                </div>
+              </ScrollReveal>
+
+              {/* Adv 6 */}
+              <ScrollReveal variant="fadeUp" delay={0.3}>
+                <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-all h-full space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl">⚡</div>
+                    <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300">&lt;3s Counter Speed</span>
+                  </div>
+                  <h4 className="text-base font-bold text-white">6. Zero Staff Drag &amp; 1-Tap Queue Operations</h4>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Cashier ko customer ka lamba number type karne ki zarurat nahi. Customer standee scan karta hai aur cashier 1-tap me approve karta hai. Zero billing delay.
+                  </p>
+                </div>
+              </ScrollReveal>
+
+              {/* Adv 7 */}
+              <ScrollReveal variant="fadeUp" delay={0.35} className="sm:col-span-2 lg:col-span-3">
+                <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 border border-indigo-500/30 hover:border-indigo-500/60 transition-all space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-xl">🛡️</div>
+                      <h4 className="text-base font-bold text-white">7. 100% First-Party Data Ownership (vs Aggregator Lock-in)</h4>
+                    </div>
+                    <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300">100% Store Owned</span>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Zomato aur Swiggy customer ka phone number mask kar dete hain aur 25-30% commission lete hain. CustomerPilot ke sath har walk-in customer ka genuine WhatsApp number aapke database me save hota hai jise aap lifetime monetize kar sakte hain.
+                  </p>
+                </div>
+              </ScrollReveal>
+            </div>
+          </div>
         </div>
       </section>
 

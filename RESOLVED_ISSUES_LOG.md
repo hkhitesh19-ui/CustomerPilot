@@ -48,6 +48,22 @@ This document serves as a historical record of all major bugs, configuration iss
    - Always test locally (`npm run build` or API curl), commit locally with `git commit`, and NEVER run `git push` without explicit user confirmation.
 
 ---
+## [08 Sep 2026] Feature: Capabilities Matrix Refinement & Standalone vs Complete Combo Flywheel Integration
+- **Symptom**: User requested updating the 4-column Capabilities Matrix comparison table in `src/app/page.tsx` with granular working mechanisms and embedding a dedicated visual deep-dive section below the table featuring the 3 Standalone offerings, the 6-Stage Closed-Loop Retention & Ranking Flywheel, and 7 Core Practical Margin Advantages.
+- **Root Cause**: The comparison section was missing granular sub-labels for advanced features (Custom delay timer, SEO keyword injection, photo booster extra stamps, goal-gradient urgency triggers, 30/60d win-back autopilot, COGS margin advantages) and lacked an architectural breakdown comparing individual standalone engines vs the complete unified combo.
+- **Resolution**:
+  1. **Capabilities Matrix Table Rows (`src/app/page.tsx`)**:
+     - Updated Section 1 (Smart WhatsApp Loyalty Engine): Added Zero-App WhatsApp, Welcome Joining Bonus stamps, VIP Club Tier System, Goal-Gradient 48h Urgency Nudges, 1-Tap Cashier Terminal & CRM.
+     - Updated Section 2 (Smart AI Google Review & Photo Booster): Added Custom Delay Timer (5m - next day), SEO Keyword-Rich AI Draft Injection (dishes & area), Photo Booster Engine (+4 Total Stamps), 1-Click Copy & Direct Post to Maps, Smart Negative Review Shield (1-3★ private channel).
+     - Updated Section 3 (1-Click AI Review Auto-Reply & Win-Back CRM): Added 24/7 Context-Aware AI Review Replies (1-second sentiment), WhatsApp Reply Preview & 1-Click GBP Publish, Bulk Auto-Reply Engine, 30-Day & 60-Day Dormant Customer Win-Back Autopilot, Churn Radar & Retention Analytics.
+     - Updated Section 4 (CustomerPilot Complete Combo): Added Closed-Loop Autopilot Flywheel, AI Review-to-Loyalty Cross Multiplier, Unified 360° Customer SuperCRM, Complete Physical Print Kit (All standees + table tents), Priority VIP WhatsApp Desk.
+  2. **Sub-Section A: Standalone Offerings Deep Dive**: Built 3 interactive glassmorphic cards comparing Core Focus, Working Mechanism, and Target Merchant fit for each standalone engine at ₹799/yr (₹2.2/day).
+  3. **Sub-Section B: 6-Stage Closed-Loop Business Flywheel Table**: Built a 6-stage sequential comparison mapping Customer Journey vs CustomerPilot Engine across Visit 1 (Join) ➔ Follow-up ➔ Ranking ➔ Progress ➔ Nudge ➔ Retention.
+  4. **Sub-Section C: 7 Core Practical Business & Margin Advantages**: Built an interactive visual grid highlighting Zero-App WhatsApp Adoption (3x), Endowed Progress Psychology (2.8x Velocity), Local SEO Keyword Dominance, UGC Photo Engine (+42% Directions), COGS Margin Advantage (3.5% Cost vs 10%-20% Cash Discount), Zero Staff Drag (<3s Counter Speed), and 100% First-Party Data Ownership.
+  5. **Verification**: Verified Next.js compilation, zero JSX syntax errors, and live HTTP 200 response on `http://localhost:3000`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [08 Sep 2026] Polish: Remove "Gemini" Branding to "AI", Comparison Matrix Pricing Sync, Footer Nomenclature & Razorpay Gateway Audit
 - **Symptom**: 
   1. "Gemini" word still appeared in AI Reply Sandbox, homepage feature descriptions, and competitor comparison pages (Reelo, Birdeye, Bingage).
