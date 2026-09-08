@@ -120,7 +120,7 @@ export function AIReplySandbox() {
             AI Review Reply Sandbox
           </h2>
           <p className="text-base text-slate-600 leading-relaxed">
-            See exactly what your customers see. Our Gemini AI doesn&apos;t write generic &quot;Thank you for your review&quot; — it reads the customer&apos;s specific words and crafts a contextual, SEO-optimized response in under 1 second.
+            See exactly what your customers see. Our AI doesn&apos;t write generic &quot;Thank you for your review&quot; — it reads the customer&apos;s specific words and crafts a contextual, SEO-optimized response in under 1 second.
           </p>
         </div>
 
@@ -196,7 +196,7 @@ export function AIReplySandbox() {
           <div className="p-6 sm:p-8">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-black">3</div>
-              <span className="text-sm font-bold text-slate-800">Generate with Gemini AI</span>
+              <span className="text-sm font-bold text-slate-800">Generate with AI</span>
             </div>
 
             <button
@@ -213,7 +213,7 @@ export function AIReplySandbox() {
               ) : (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  <span>Generate with Gemini AI</span>
+                  <span>Generate with AI</span>
                 </>
               )}
             </button>
@@ -253,7 +253,7 @@ export function AIReplySandbox() {
                         <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center">
                           <Sparkles className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <span className="text-xs font-black text-indigo-800 uppercase tracking-wide">Gemini AI Generated Reply</span>
+                        <span className="text-xs font-black text-indigo-800 uppercase tracking-wide">AI Generated Reply</span>
                       </div>
                       <button
                         type="button"

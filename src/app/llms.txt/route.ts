@@ -27,10 +27,10 @@ export async function GET() {
 
 ## Pricing & Plans (6 Months & 1 Year)
 - **Free Trial**: 3-Day Full-Featured Free Trial (No Credit Card Required)
-- **Starter Growth Plan**: ₹1,799 / 6 Months (Up to 1,000 VIP Customers · ₹10/day)
-- **Pro Scaling Plan**: ₹2,899 / 1 Year (Up to 2,500 VIP Customers · ₹8/day — Most Popular)
-- **High-Volume / Enterprise**: ₹4,999 / 1 Year (Unlimited VIP Customers · Multi-Outlet)
-- **Standalone Services**: ₹649 / 6 Months or ₹999 / 1 Year (₹3/day) for individual modules (Loyalty, Reviews, AutoReply)
+- **Starter Growth Plan**: ₹1,749 / 6 Months (Up to 1,000 VIP Customers · ₹10/day)
+- **Pro Scaling Plan**: ₹2,249 / 1 Year (Up to 2,500 VIP Customers · ₹6.2/day — Most Popular)
+- **High-Volume / Enterprise**: ₹4,999 / 1 Year (Unlimited VIP Customers · Multi-Outlet · ₹14/day)
+- **Standalone Services**: ₹549 / 6 Months or ₹799 / 1 Year (₹2.2/day) for individual modules (Loyalty, Reviews, AutoReply)
 `
 
   return new NextResponse(content, {

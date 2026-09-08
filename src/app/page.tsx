@@ -1261,7 +1261,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold text-slate-900 mt-4">1-Click AI AutoReply</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                Gemini AI drafts appreciative, context-aware owner responses. Review and publish directly to Google Maps in 1 click.
+                AI drafts appreciative, context-aware owner responses. Review and publish directly to Google Maps in 1 click.
               </p>
               <ul className="space-y-1.5 mt-4 text-xs text-slate-700 flex-1">
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Context-Aware AI Drafts in 1 Sec</li>
@@ -1319,28 +1319,40 @@ export default function Home() {
                     <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl mx-auto mb-2">🎁</div>
                     <div className="font-extrabold text-xs sm:text-sm text-white">Digital Loyalty Stamps</div>
                     <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mt-0.5">Standalone Module</div>
-                    <div className="text-base font-black text-white mt-2">₹999<span className="text-[10px] text-slate-400 font-normal">/yr</span></div>
-                    <div className="text-[10px] text-slate-400 font-medium">Just ₹2.7/day</div>
+                    <div className="mt-2 flex items-baseline justify-center gap-1.5">
+                      <span className="text-xs line-through text-slate-500">₹1,599</span>
+                      <span className="text-base font-black text-white">₹799</span>
+                      <span className="text-[10px] text-slate-400 font-normal">/yr</span>
+                    </div>
+                    <div className="text-[10px] text-amber-400 font-bold mt-0.5">Just ₹2.2/day (50% OFF)</div>
                   </th>
                   <th className="p-5 text-center w-[18%] border-l border-slate-800 bg-slate-900/60 align-top">
                     <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl mx-auto mb-2">⭐</div>
                     <div className="font-extrabold text-xs sm:text-sm text-white">Smart Google Reviews</div>
                     <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider mt-0.5">Standalone Module</div>
-                    <div className="text-base font-black text-white mt-2">₹999<span className="text-[10px] text-slate-400 font-normal">/yr</span></div>
-                    <div className="text-[10px] text-slate-400 font-medium">Just ₹2.7/day</div>
+                    <div className="mt-2 flex items-baseline justify-center gap-1.5">
+                      <span className="text-xs line-through text-slate-500">₹1,599</span>
+                      <span className="text-base font-black text-white">₹799</span>
+                      <span className="text-[10px] text-slate-400 font-normal">/yr</span>
+                    </div>
+                    <div className="text-[10px] text-emerald-400 font-bold mt-0.5">Just ₹2.2/day (50% OFF)</div>
                   </th>
                   <th className="p-5 text-center w-[17%] border-l border-slate-800 bg-slate-900/60 align-top">
                     <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-xl mx-auto mb-2">💬</div>
                     <div className="font-extrabold text-xs sm:text-sm text-white">1-Click AI AutoReply</div>
                     <div className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider mt-0.5">Standalone Module</div>
-                    <div className="text-base font-black text-white mt-2">₹999<span className="text-[10px] text-slate-400 font-normal">/yr</span></div>
-                    <div className="text-[10px] text-slate-400 font-medium">Just ₹2.7/day</div>
+                    <div className="mt-2 flex items-baseline justify-center gap-1.5">
+                      <span className="text-xs line-through text-slate-500">₹1,599</span>
+                      <span className="text-base font-black text-white">₹799</span>
+                      <span className="text-[10px] text-slate-400 font-normal">/yr</span>
+                    </div>
+                    <div className="text-[10px] text-indigo-400 font-bold mt-0.5">Just ₹2.2/day (50% OFF)</div>
                   </th>
                   
                   {/* Dominant Highlighted Complete Suite Header */}
                   <th className="p-6 text-center w-[18%] border-l-2 border-r-2 border-emerald-500 bg-gradient-to-b from-emerald-950/90 via-slate-900 to-slate-900 relative shadow-2xl align-top">
                     <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-[10px] rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1 whitespace-nowrap">
-                      <span>🔥 94% CHOOSE THIS · SAVE 35%</span>
+                      <span>🔥 94% CHOOSE THIS · 50% OFF</span>
                     </div>
                     <div className="w-11 h-11 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center text-2xl mx-auto mb-2 shadow-lg shadow-emerald-500/30">🚀</div>
                     <div className="font-black text-base text-white">
@@ -1348,11 +1360,11 @@ export default function Home() {
                     </div>
                     <div className="text-[10px] text-emerald-300 font-extrabold uppercase tracking-wider mt-0.5">All 3 Core Engines Combined</div>
                     <div className="mt-2 flex items-baseline justify-center gap-1.5">
-                      <span className="text-xs line-through text-slate-500">₹3,999</span>
-                      <span className="text-2xl font-black text-emerald-400">₹2,899</span>
+                      <span className="text-xs line-through text-slate-500">₹4,499</span>
+                      <span className="text-2xl font-black text-emerald-400">₹2,249</span>
                       <span className="text-[10px] text-slate-300 font-medium">/yr</span>
                     </div>
-                    <div className="text-[11px] text-emerald-300 font-bold mt-0.5">Just ₹7.9/day for all 3</div>
+                    <div className="text-[11px] text-emerald-300 font-bold mt-0.5">Just ₹6.2/day for all 3 (50% OFF)</div>
                   </th>
                 </tr>
               </thead>
@@ -1420,7 +1432,7 @@ export default function Home() {
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Instant AI Customer Review Draft Assistant (Gemini AI Engine)</td>
+                  <td className="p-4 pl-6 font-semibold text-slate-100 text-sm">Instant AI Customer Review Draft Assistant (AI Engine)</td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">✓</span></td>
                   <td className="p-4 text-center border-l border-slate-800"><span className="text-slate-600 font-medium text-sm">—</span></td>
@@ -1983,8 +1995,8 @@ export default function Home() {
                 <li><Link href="/case-studies/cake-connection" className="hover:text-emerald-400 transition-colors">Case Study: Cake Connection</Link></li>
                 <li><Link href="#ai-demo" className="hover:text-emerald-400 transition-colors">AI Review Reply Demo</Link></li>
                 <li><Link href="#faq" className="hover:text-emerald-400 transition-colors">Frequently Asked Questions</Link></li>
-                <li><Link href="/features/whatsapp-stamp-card" className="hover:text-emerald-400 transition-colors">WhatsApp Stamp Cards</Link></li>
-                <li><Link href="/features/google-review-automation" className="hover:text-emerald-400 transition-colors">Google Review AI</Link></li>
+                <li><Link href="/features/whatsapp-stamp-card" className="hover:text-emerald-400 transition-colors">Digital Loyalty stamps</Link></li>
+                <li><Link href="/features/google-review-automation" className="hover:text-emerald-400 transition-colors">Smart Ai Google Review</Link></li>
               </ul>
             </div>
 

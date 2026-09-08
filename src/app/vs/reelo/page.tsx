@@ -22,7 +22,7 @@ const config: VsPageConfig = {
   canonicalSlug: "/vs/reelo",
   heroHeadline: "Looking for a Reelo Alternative? Get WhatsApp-Native Loyalty + Autonomous AI Google Reviews at 94% Lower Cost.",
   heroSubtext: "Reelo is a solid platform for large QSR chains. But for local bakeries, cafes, salons, and restaurants with 1–5 outlets, CustomerPilot delivers more — specifically AI Google review automation and WhatsApp-first loyalty — at a fraction of the price.",
-  coreProblem: "Reelo is strong for enterprise retail chains that need a full-stack loyalty platform with POS integrations and large team management. However, for local SME businesses, Reelo's ₹39,000+/year annual commitment is prohibitive, and their Google Review Reply flow runs on basic templates — not autonomous, context-aware AI like CustomerPilot's Gemini-powered engine. CustomerPilot is purpose-built for the 1–5 outlet local business owner who wants maximum customer retention and Google Maps ranking improvement with zero POS dependency.",
+  coreProblem: "Reelo is strong for enterprise retail chains that need a full-stack loyalty platform with POS integrations and large team management. However, for local SME businesses, Reelo's ₹39,000+/year annual commitment is prohibitive, and their Google Review Reply flow runs on basic templates — not autonomous, context-aware AI like CustomerPilot's AI-powered engine. CustomerPilot is purpose-built for the 1–5 outlet local business owner who wants maximum customer retention and Google Maps ranking improvement with zero POS dependency.",
   pricingComparison: {
     competitorLabel: "Reelo (Typical Retail Plan)",
     competitorCost: "₹39,000+",
@@ -35,7 +35,7 @@ const config: VsPageConfig = {
     { feature: "Pricing Model", competitor: "Annual lock-in ₹39,000+/year", cp: "Flexible 6-month or 1-year, from ₹549", winner: "cp" },
     { feature: "WhatsApp Loyalty Mechanism", competitor: "Points / SMS campaigns", cp: "Digital Stamps + VIP Wallet via WhatsApp", winner: "cp" },
     { feature: "Customer App Requirement", competitor: "Web portal (some app flows)", cp: "Zero — 100% inside WhatsApp", winner: "cp" },
-    { feature: "Google Review AutoReply", competitor: "Template-based alerts", cp: "Autonomous Gemini AI (context & tone-aware)", winner: "cp" },
+    { feature: "Google Review AutoReply", competitor: "Template-based alerts", cp: "Autonomous AI (context & tone-aware)", winner: "cp" },
     { feature: "AI Review Draft for Customers", competitor: null, cp: "✅ AI drafts SEO-optimized review for customer", winner: "cp" },
     { feature: "Negative Review Filtering", competitor: "Basic survey form link", cp: "Smart Gate — private escalation before Google", winner: "cp" },
     { feature: "Counter Setup Friction", competitor: "Requires POS tie-up or web console", cp: "5-second standee QR flow — zero POS needed", winner: "cp" },

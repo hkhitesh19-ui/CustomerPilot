@@ -48,6 +48,29 @@ This document serves as a historical record of all major bugs, configuration iss
    - Always test locally (`npm run build` or API curl), commit locally with `git commit`, and NEVER run `git push` without explicit user confirmation.
 
 ---
+## [08 Sep 2026] Polish: Remove "Gemini" Branding to "AI", Comparison Matrix Pricing Sync, Footer Nomenclature & Razorpay Gateway Audit
+- **Symptom**: 
+  1. "Gemini" word still appeared in AI Reply Sandbox, homepage feature descriptions, and competitor comparison pages (Reelo, Birdeye, Bingage).
+  2. "Compare Features Across All 4 Options" matrix table header displayed old prices (₹999/yr standalone, ₹2,899 complete) instead of the active 50% discount launch prices.
+  3. Footer still labeled feature links as "WhatsApp Stamp Cards" and "Google Review AI".
+  4. User requested testing and verification of Razorpay payment gateway order flow.
+- **Root Cause**: 
+  1. Legacy marketing text retained "Gemini AI" branding across 5 UI files.
+  2. The comparison matrix table header in `src/app/page.tsx` was not synced when 50% discount prices were configured in `src/components/pricing-client.tsx`.
+  3. Footer links in `src/app/page.tsx` used legacy service names.
+- **Resolution**:
+  1. **"Gemini" Purge to "AI"**: Replaced all user-facing instances of "Gemini AI" / "Gemini" with "AI" / "Smart AI" across `src/components/ai-reply-sandbox.tsx`, `src/app/page.tsx`, `src/app/vs/reelo/page.tsx`, `src/app/vs/birdeye/page.tsx`, `src/app/vs/bingage/page.tsx`, leaving zero consumer-facing Gemini mentions.
+  2. **Comparison Matrix Price Sync**: Updated `src/app/page.tsx` table headers to display active 50% discount plans:
+     - Standalone Modules: MRP `₹1,599` -> `₹799/yr` (`Just ₹2.2/day (50% OFF)`)
+     - Complete Suite: MRP `₹4,499` -> `₹2,249/yr` (`Just ₹6.2/day for all 3 (50% OFF)`)
+     - Synced `src/app/llms.txt/route.ts` with identical 50% discount plan pricing.
+  3. **Footer Renaming**:
+     - Renamed "WhatsApp Stamp Cards" -> "Digital Loyalty stamps"
+     - Renamed "Google Review AI" -> "Smart Ai Google Review"
+  4. **Razorpay Gateway Verification**: Tested server-side Razorpay order creation (`/api/payments/create-order`) with authenticated merchant session — verified live Razorpay order ID `order_TZaWE4HpPoAAcE` (Amount: 224900 paise / ₹2,249) generated successfully.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [08 Sep 2026] Feature: Migration of Free Trial from 7 Days to 3 Days (Functional Backend & All UI Touchpoints)
 - **Symptom**: User requested changing the merchant free trial period across the entire platform from 7 days to 3 days ("7 days ka 3 days free trial - all pages and all text, all buttons me change karo and Functionaly bhi change karo").
 - **Root Cause**: Platform was originally built with a 7-day merchant trial default hardcoded across merchant registration APIs (`setDate(getDate() + 7)`), NextAuth callbacks, legal documents, sidebar warning thresholds (`daysRemaining <= 3`), and marketing/landing pages, buttons, badges, comparison tables, and FAQ answers.
