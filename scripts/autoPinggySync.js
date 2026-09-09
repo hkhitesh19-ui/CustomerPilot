@@ -143,20 +143,31 @@ function startPinggy() {
             const extractedUrl = match[0];
             console.log('[PinggySync] Found Pinggy URL:', extractedUrl);
 
-            // ── KEY FIX: Update NEXT_PUBLIC_APP_URL in .env.local & WHATSAPP_WEBHOOK_URL in .env ──
+            // ── KEY FIX: Update NEXT_PUBLIC_APP_URL & NEXTAUTH_URL in .env.local & WHATSAPP_WEBHOOK_URL in .env ──
             try {
                 const fs = require('fs');
                 const path = require('path');
                 const envPath = path.join(__dirname, '..', '.env.local');
                 if (fs.existsSync(envPath)) {
                     let envContent = fs.readFileSync(envPath, 'utf8');
+
+                    // Update NEXT_PUBLIC_APP_URL
                     if (envContent.includes('NEXT_PUBLIC_APP_URL=')) {
                         envContent = envContent.replace(/NEXT_PUBLIC_APP_URL=.*/g, `NEXT_PUBLIC_APP_URL=${extractedUrl}`);
                     } else {
                         envContent += `\nNEXT_PUBLIC_APP_URL=${extractedUrl}`;
                     }
+
+                    // ⭐ ALSO update NEXTAUTH_URL so Google OAuth callbacks work from tunnel
+                    if (envContent.includes('NEXTAUTH_URL=')) {
+                        envContent = envContent.replace(/NEXTAUTH_URL=.*/g, `NEXTAUTH_URL=${extractedUrl}`);
+                    } else {
+                        envContent += `\nNEXTAUTH_URL=${extractedUrl}`;
+                    }
+
                     fs.writeFileSync(envPath, envContent, 'utf8');
                     console.log(`[PinggySync] ✅ Updated NEXT_PUBLIC_APP_URL=${extractedUrl} in .env.local`);
+                    console.log(`[PinggySync] ✅ Updated NEXTAUTH_URL=${extractedUrl} in .env.local`);
                 }
 
                 const rootEnvPath = path.join(__dirname, '..', '.env');
