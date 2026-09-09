@@ -330,21 +330,45 @@ export default function SubscriptionPage() {
         </div>
       ) : (
         <div className="space-y-8">
-          {/* Limited Time 50% Discount Offer Banner */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-950/60 via-orange-950/40 to-slate-900 border border-orange-500/40 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg shadow-orange-500/5">
-            <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-400/40 flex items-center justify-center flex-shrink-0 text-orange-400">
-                <Flame className="w-5 h-5 animate-pulse" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-black text-orange-400 uppercase tracking-wider">🔥 Limited Time 50% Discount Offer</span>
-                  <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-red-500 text-white">50% OFF</span>
+          {/* Limited Time 50% Discount Offer Banner - Prominent & Biggest Fonts */}
+          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-red-950/90 via-orange-950/70 to-slate-950 border-2 border-orange-500/50 p-5 sm:p-7 shadow-2xl shadow-orange-500/20">
+            {/* Background glowing flare */}
+            <div className="absolute -right-12 -top-12 w-64 h-64 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -left-12 -bottom-12 w-64 h-64 bg-red-500/15 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+              {/* Left text & details */}
+              <div className="flex items-start sm:items-center gap-4 text-left flex-1">
+                <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500/30 to-red-600/30 border border-orange-400/50 items-center justify-center flex-shrink-0 text-orange-400 shadow-inner">
+                  <Flame className="w-8 h-8 text-orange-400 animate-pulse" />
                 </div>
-                <p className="text-xs text-slate-300 mt-0.5">All plans are currently locked at 50% OFF the original Main MRP (e.g. 6 Months from ₹549, 1 Year Complete at ₹2,249).</p>
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-500/20 border border-orange-400/40 text-orange-300 text-xs font-black uppercase tracking-widest mb-2">
+                    <Flame className="w-3.5 h-3.5 text-orange-400 animate-pulse" /> Limited Time 50% Discount Offer
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-snug">
+                    All Plans Locked at Flat Half Price!
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl leading-relaxed">
+                    Complete WhatsApp Loyalty, Smart AI Google Reviews &amp; 1-Click AutoReply. 
+                    Original MRP ₹4,499 ➔ <span className="text-emerald-400 font-bold">Now ₹2,249/yr</span> (₹6.1/day). Standalone from <span className="text-amber-300 font-bold">₹799/yr</span> (₹2.1/day).
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Biggest Font Highlight */}
+              <div className="w-full md:w-auto flex-shrink-0 flex flex-col items-center justify-center px-8 py-5 rounded-2xl bg-slate-900/90 border-2 border-amber-400/50 shadow-2xl shadow-red-950/80 text-center">
+                <span className="text-xs font-black uppercase tracking-widest text-amber-400">FLAT DISCOUNT</span>
+                <div className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-red-500 drop-shadow-[0_2px_12px_rgba(245,158,11,0.6)]">
+                  50% OFF
+                </div>
+                <div className="mt-1.5 inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-red-500/20 border border-red-500/50 text-red-400 text-[10px] font-extrabold tracking-wide">
+                  ⚡ INSTANT SAVINGS LOCKED
+                </div>
               </div>
             </div>
           </div>
+
 
           {/* 1. Plans Cards Grid */}
           <div className="space-y-6">
