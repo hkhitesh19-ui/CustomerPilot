@@ -324,7 +324,8 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   ├── customers/page.tsx     # VIP Customers CRM Table
 │   │   │   ├── queue/page.tsx         # Live Waitlist & Queue Engine
 │   │   │   ├── rewards/page.tsx       # Loyalty Reward Catalog & Stamp Rules
-│   │   │   └── settings/page.tsx      # Merchant Profile, WhatsApp QR & GBP Link
+│   │   ├── guide/                     # Step-by-Step Interactive Guides & Infographics
+│   │   │   └── 3-day-trial/page.tsx   # 3-Day Free Trial Step-by-Step Infographic Guide
 │   │   ├── join/page.tsx              # Customer QR Scan & Digital Stamp Card Page
 │   │   ├── onboarding/page.tsx        # 9-Step Interactive Onboarding Wizard
 │   │   ├── page.tsx                   # Master Homepage & Product Landing Page (with AI Sandbox)

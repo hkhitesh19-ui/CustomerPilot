@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import Script from "next/script"
 import { useDashboardState } from "@/hooks/use-dashboard-state"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -321,6 +322,27 @@ export default function SubscriptionPage() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Quick Link to 3-Day Trial Infographic Guide */}
+      <div className="bg-gradient-to-r from-indigo-950/60 via-slate-900 to-slate-900 border border-indigo-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg shrink-0">
+            📘
+          </div>
+          <div>
+            <p className="text-sm font-bold text-white">Understand Your 3-Day Free Trial Journey</p>
+            <p className="text-xs text-slate-400 mt-0.5">Step-by-step infographic on how customer stamps, AI reviews, and auto-replies work risk-free.</p>
+          </div>
+        </div>
+        <Link 
+          href="/guide/3-day-trial" 
+          target="_blank" 
+          className="shrink-0 text-xs font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/60 px-4 py-2 rounded-xl border border-emerald-500/30 transition flex items-center gap-1.5 shadow-xs"
+        >
+          <span>View 3-Day Guide</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
       </div>
 
       {/* Main Content */}

@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, ChevronRight, TrendingUp, BarChart3, FileText, Image, Share2, UserPlus, ChevronDown } from "lucide-react"
+import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, ChevronRight, TrendingUp, BarChart3, FileText, Image, Share2, UserPlus, ChevronDown, BookOpen } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { useDashboardState } from "@/hooks/use-dashboard-state"
 import { hasModule, type Module } from "@/lib/feature-gate"
@@ -44,6 +44,7 @@ const referralNav = [
 ]
 
 const bottomNav = [
+  { name: "3-Day Trial Guide", href: "/guide/3-day-trial", icon: BookOpen },
   { name: "Subscription", href: "/dashboard/subscription", icon: Crown },
 ]
 
