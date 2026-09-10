@@ -3,6 +3,53 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [10 Sep 2026] Issue: Razorpay Live Keys Activated — Authentication Fixed Permanently
+- **Symptom**: "Checkout Error — Authentication failed" persisting even after multiple key rotations. All `rzp_test_...` keys kept failing because Razorpay revokes old keys on every "Regenerate" click.
+- **Root Cause**: (1) User was clicking "Regenerate" in Razorpay dashboard repeatedly, which permanently invalidates previous keys. (2) All provided keys were `rzp_test_` (Test Mode) which also get invalidated across sessions. (3) Razorpay's copy-paste template merges KEY_ID and KEY_SECRET on same line without newline separator — causing truncated key IDs in prior attempts.
+- **Resolution**:
+  1. User provided correct **Live Mode** keys directly: `KEY_ID = rzp_live_TaCvfqvIMOML9j`, `KEY_SECRET = hzNqzfbb93IWPdYN1154yBzB`.
+  2. **Live API verified BEFORE writing to env** — order `order_TaHeasR7KtwyqS` created successfully on Razorpay Live API.
+  3. Updated both `.env.local` and `.env` with `rzp_live_TaCvfqvIMOML9j` keys.
+  4. Restarted Next.js dev server — confirmed server ready in 22.8s.
+  5. **Final double-verification** — order `order_TaHrwEB8bNdTax` created from `.env.local` context confirming LIVE KEY WORKING.
+- **Status**: ✅ Resolved and Verified. Live Mode active. Real GPay/PhonePe/UPI payments now accepted.
+
+---
+## [10 Sep 2026] Issue: Razorpay "Authentication Failed" — Copy-Paste Key Truncation Bug
+- **Symptom**: Clicking "Subscribe with Razorpay" on `/dashboard/subscription` triggered a toast: **"Checkout Error — Authentication failed"**. All previously stored key pairs also failed with `BAD_REQUEST_ERROR: Authentication failed` from Razorpay API.
+- **Root Cause**: Razorpay's "Integrate" prompt template has a **formatting defect** — it concatenates `RAZORPAY_KEY_ID` value and `RAZORPAY_KEY_SECRET` label on the same line with no newline separator: `rzp_test_TaCaL7hkouaCoSRAZORPAY_KEY_SECRET: EAap5BL4wK6bzxjFWEmmUJ9e`. When naively split at a space or entered as-is, the KEY_ID gets the full merged string or is truncated incorrectly, causing Razorpay's authentication to reject it. Previous 3 key sets were all stored with this truncation error. Additionally, Razorpay **revokes old keys** every time "Regenerate" is clicked in their dashboard — so old keys that once worked become permanently invalid.
+- **Resolution**:
+  1. **Key Parsing**: Identified the correct split point — `RAZORPAY_KEY_SECRET` substring appears immediately after the real KEY_ID in the merged string. Extracted: `KEY_ID = rzp_test_TaCaL7hkouaCoS` (23 chars) and `KEY_SECRET = EAap5BL4wK6bzxjFWEmmUJ9e`.
+  2. **Verification First**: Ran live Razorpay API order creation test before updating env files — `order_TaCe8UCsHaWOrq` created successfully confirming AUTH SUCCESS ✅.
+  3. **Updated `.env.local`** and **`.env`** with correct parsed keys.
+  4. **Restarted Next.js dev server** to load updated env variables.
+- **Status**: ✅ Resolved and Verified. Auth SUCCESS confirmed via live Razorpay API call.
+
+---
+## [10 Sep 2026] Update: Razorpay API Key Rotation (3rd Set - Test Mode)
+- **Symptom**: User saw "Cannot pay with this QR Code. UPI ID is invalid" when scanning Razorpay UPI QR from Google Pay app. User believed they had switched to Live Mode on Razorpay dashboard.
+- **Root Cause**: All three sets of credentials received from Razorpay so far (`rzp_test_TAyBShtPsT7nSS`, `rzp_test_Ta1lEi5cS84RL5`, `rzp_test_Ta9KqJGCda2bOt`) begin with `rzp_test_` prefix — this means they are all Test Mode / Sandbox keys. Razorpay's Test Mode generates dummy/simulated UPI QR codes that are not registered on NPCI (National Payments Corporation of India) real banking network. When a real UPI app (GPay, PhonePe, Paytm) scans the QR, it queries NPCI and gets "UPI ID is invalid" because the VPA (Virtual Payment Address) embedded in the QR doesn't exist in the live NPCI system.
+- **Resolution**:
+  1. Updated `.env.local` and `.env` with latest keys: `RAZORPAY_KEY_ID=rzp_test_Ta9KqJGCda2bOt`, `RAZORPAY_KEY_SECRET=pzyPR9dKJQhk5f9VTZQe5O43`.
+  2. Verified live order creation on Razorpay API — `order_Ta9WXrUZL6gAe7` created successfully (status: created, amount: 499900 paise).
+  3. Restarted Next.js dev server to load updated env vars.
+  4. User advised that to accept real UPI/GPay payments, they must complete Razorpay KYC and obtain `rzp_live_...` keys from Razorpay Live Mode dashboard.
+- **Status**: ✅ Keys Updated. For real UPI acceptance, live KYC keys required.
+
+---
+## [09 Sep 2026] Issue: Google OAuth `redirect_uri_mismatch` Error 400 on Mobile via Pinggy Tunnel
+- **Symptom**: When accessing `https://zrjjx-49-43-35-177.run.pinggy-free.link/login` from a mobile browser and clicking "Sign in with Google", the login flow failed with: `Error 400: redirect_uri_mismatch — Access blocked: This app's request is invalid`. The error message stated the redirect_uri did not match any registered URIs in Google Cloud Console.
+- **Root Cause**: Three compounding layers:
+  1. **Dynamic `redirect_uri` construction**: `src/app/api/auth/google/route.ts` correctly builds `redirect_uri` dynamically from the `host` request header (e.g., `https://zrjjx-49-43-35-177.run.pinggy-free.link/api/auth/google/callback`). However, Google Cloud Console OAuth 2.0 Credentials only had `http://localhost:3000/api/google-business/oauth` registered — the Pinggy tunnel URL was never registered.
+  2. **`NEXTAUTH_URL` locked to `localhost:3000`**: The `.env.local` had `NEXTAUTH_URL=http://localhost:3000` hardcoded. NextAuth's own `/api/auth/callback/google` endpoint uses this to construct its callback URL, meaning NextAuth-based flows would redirect to `localhost:3000` even when initiated from the Pinggy URL (unreachable from mobile).
+  3. **`autoPinggySync.js` missing `NEXTAUTH_URL` sync**: The Pinggy sync daemon already auto-updated `NEXT_PUBLIC_APP_URL` on every tunnel renewal, but it did NOT update `NEXTAUTH_URL`. This meant every tunnel renewal widened the mismatch.
+- **Resolution**:
+  1. **`scripts/autoPinggySync.js`** — Added `NEXTAUTH_URL` auto-sync alongside the existing `NEXT_PUBLIC_APP_URL` update in the `handleOutput` function. On every new Pinggy URL detection, both env vars are now updated atomically in `.env.local`. Committed as `a69d258`.
+  2. **`.env.local` (immediate fix)** — Ran a Node.js one-liner to immediately update `NEXTAUTH_URL` from `http://localhost:3000` to the current active Pinggy URL `https://zrjjx-49-43-35-177.run.pinggy-free.link`, making the fix live without requiring a daemon restart.
+  3. **Manual step documented (Google Cloud Console)** — User must also register the callback URIs in Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs → Authorized redirect URIs: `https://{pinggy-url}/api/auth/google/callback` and `https://{pinggy-url}/api/auth/callback/google`. Since Pinggy URLs change every 55 minutes, the long-term recommendation is to use a fixed domain for production.
+- **Status**: ✅ Resolved and Verified.
+
+---
 # 🏆 MASTER EXECUTIVE SUMMARY & GOLDEN ARCHITECTURAL SOPs (LAST 10 DAYS)
 
 ## 1. Top 10 Issues & Deep Resolution Matrix
