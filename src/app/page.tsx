@@ -499,13 +499,6 @@ export default function Home() {
             <Link href="/login" className="text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 px-2 sm:px-3 py-1.5 rounded-lg transition">
               Sign In
             </Link>
-            <Link
-              href="#comparison"
-              className="hidden sm:flex bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition-all items-center gap-1"
-            >
-              <span>Start 3 Days Free Trial Today</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
 
             {/* Mobile Hamburger Button */}
             <button
