@@ -3,6 +3,31 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [11 Sep 2026] Issue: UI Refinements, WhatsApp Instance Format, Standee Print Sync & Template Updates
+- **Symptom**: User requested 6 refinements:
+  1. Signup page subtitle to clarify "Login with your Registered Google Business Profile Gmail Id".
+  2. Pricing & Homepage compare table buttons to read "3 Days Free Trial Loyalty Stamps / AI Reviews / AutoReply".
+  3. WhatsApp Instance name format should use `CP_{phone}_{merchantId}_{timestamp}` (e.g., `CP_919033304707_cmtx0049_mtx0gmys`).
+  4. Homepage header mobile view had overflowing button ("Start Free ->") — requested removal of button on mobile view header.
+  5. Onboarding Step 7 Standee print preview did not match the printed PDF (print popup was using plain light style instead of the on-screen dark navy & gold VIP display).
+  6. Settings Reward Card Setup button renamed to "Save Loyalty Reward Rules" with a color transition to emerald on success, and updated `NAME_CONFIRMED` message template to say "after Approval".
+- **Root Cause**:
+  1. Signup form subtitle was generic.
+  2. Compare table button labels were shortened to "Trial ...".
+  3. `buildInstanceName` in `src/app/api/whatsapp/connect/route.ts` omitted phone number when phone was absent on newly registered merchant record.
+  4. Navbar button lacked mobile breakpoint hiding class (`hidden sm:flex`).
+  5. `handlePrintStandeePDF` in `src/app/onboarding/page.tsx` was generating a legacy light-theme HTML document rather than mirroring the dark navy `#0f172a` & gold `#f59e0b` VIP card with `-webkit-print-color-adjust: exact`.
+  6. Settings button had static styling without visual feedback state, and default template text referenced "after billing".
+- **Resolution**:
+  1. Updated `formSubtitle` in `src/components/signup-client.tsx`.
+  2. Updated button text in `src/app/page.tsx` and `src/components/pricing-client.tsx`.
+  3. Updated `buildInstanceName` in `src/app/api/whatsapp/connect/route.ts` with phone fallback `EVOLUTION_ADMIN_NUMBER || "919033304707"`.
+  4. Changed navbar button in `src/app/page.tsx` to `hidden sm:flex`.
+  5. Re-architected `printContent` in `src/app/onboarding/page.tsx` to match the exact on-screen dark VIP card design with print color preservation.
+  6. Added `isSavedSuccess` visual feedback state and renamed button in `src/components/reward-setup-card.tsx`, and updated `NAME_CONFIRMED` message body in `src/lib/default-templates.ts`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [11 Sep 2026] Issue: Google OAuth Callback `?error=oauth_error` on Live Signup (Prisma Schema Sync Fix)
 - **Symptom**: On live production website (`https://customerpilot.in/signup`), when a user/merchant clicked "Sign in with Google", selected their Gmail account, and authorized access, the app redirected back to `https://customerpilot.in/signup?error=oauth_error`.
 - **Root Cause**: 
