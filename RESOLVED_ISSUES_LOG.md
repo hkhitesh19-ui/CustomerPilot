@@ -3,6 +3,21 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [11 Sep 2026] Issue: Hostinger VPS Production Deployment, Sharp Linux Binary & Standalone Build Fix
+- **Symptom**: During live deployment of latest features (`/guide/operations`, `/guide/5-minute-setup-guide`) to Hostinger VPS (`200.97.170.53`), (1) `npm run build` failed with `Error: Could not load the "sharp" module using the linux-x64 runtime` and (2) PM2 `customerpilot-web` crashed repeatedly in restart loop with `Error: Cannot find module '/var/www/CustomerPilot/.next/standalone/server.js'`, resulting in HTTP 502 Bad Gateway from Nginx.
+- **Root Cause**: 
+  1. `next.config.ts` was missing `output: "standalone"`, causing Next.js to not generate `.next/standalone/server.js` which PM2 expects as the entry point.
+  2. The `sharp` image-processing library package was missing the native `linux-x64` prebuilt binary on the Ubuntu VPS.
+  3. Static assets (`.next/static` and `public`) needed to be copied into `.next/standalone/` for complete Next.js standalone execution.
+- **Resolution**:
+  1. Updated `next.config.ts` with `output: "standalone"` and pushed commit `a8ce2db` to GitHub remote.
+  2. Installed native Linux sharp dependency on VPS via `npm install --os=linux --cpu=x64 sharp --save --quiet`.
+  3. Recompiled standalone production bundle on VPS via `npm run build` with all static assets synced into `.next/standalone/`.
+  4. Reset and restarted PM2 process `customerpilot-web` pointing to `.next/standalone/server.js` and restarted `customerpilot-cron`.
+  5. Verified live HTTP response codes: Home (200 OK), `/guide/operations` (200 OK), `/guide/5-minute-setup-guide` (200 OK), and `/guide/3-day-trial` (307 redirect).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [11 Sep 2026] Issue: 1-Click Review Reply Workflow, Win-Back Reminder Copy & Route Rename to /guide/5-minute-setup-guide
 - **Symptom**: (1) Operations manual stated Gemini AI automatically publishes replies to Google Maps without cashier approval; user clarified it should state: CustomerPilot AI writes the appreciative reply automatically, and merchant checks and 1-Click Publishes it. (2) Win-back copy needed to explicitly state "automatic reminder bhi message bhejta hai". (3) User requested changing URL path from `/guide/3-day-trial` to `/guide/5-minute-setup-guide`.
 - **Root Cause**: Earlier text represented autonomous GBP publishing instead of the verified 1-Click AutoReply pre-approval flow, and the route pathname needed to match the new "5-Minute Setup Guide" branding.
