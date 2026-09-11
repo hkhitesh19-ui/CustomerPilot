@@ -1,9 +1,10 @@
 # CustomerPilot - Hostinger KVM1 VPS Deployment Technical Report
 
-**Date:** 14 August 2026  
+**Initial Deployment:** 14 August 2026  
+**Latest Production Deployment:** 11 September 2026  
 **Server IP:** `200.97.170.53`  
 **Operating System:** Ubuntu 24.04.4 LTS (GNU/Linux 6.8.0-134-generic x86_64)  
-**Deployment Status:** ✅ **100% LIVE & FULLY OPERATIONAL (HTTP 200 OK)**
+**Deployment Status:** ✅ **100% LIVE & FULLY OPERATIONAL (HTTP 200 OK across all routes)**
 
 ---
 
@@ -126,18 +127,85 @@ During the live deployment on the VPS, 4 specific issues were encountered and re
 
 ---
 
-## 4. Current Live Verification Scorecard
+### 🔴 Issue 5 [11 Sep 2026]: Git Pull Fast-Forward Blocked by Stale Local Files on VPS
+- **Symptom**: Executing `git pull origin feature/superanalytics-customers-crm-20260810` aborted with:
+  ```text
+  error: Your local changes to the following files would be overwritten by merge:
+      next.config.ts
+      package-lock.json
+  Please commit your changes or stash them before you merge. Aborting.
+  ```
+- **Root Cause**:
+  - The VPS working directory had manual edits or previous temporary patches to `next.config.ts` and `package-lock.json` that were unstaged, preventing Git from applying incoming commits.
+- **Resolution**:
+  - Ran `git stash` before pulling:
+    ```bash
+    cd /var/www/CustomerPilot && git stash
+    git pull origin feature/superanalytics-customers-crm-20260810
+    ```
+  - Git successfully fast-forwarded the branch cleanly to the latest remote commit (`fc87c88..a8ce2db`).
+
+---
+
+### 🔴 Issue 6 [11 Sep 2026]: Production Build Failed on Missing Linux `sharp` Binary
+- **Symptom**: During `npm run build`, Next.js compilation threw a fatal build error:
+  ```text
+  Error: Failed to load external module sharp: Could not load the "sharp" module using the linux-x64 runtime.
+  Error: Failed to collect page data for /api/qr/generate
+  ```
+- **Root Cause**:
+  - The QR code generation route (`/api/qr/generate`) relies on the `sharp` image-processing library.
+  - Because development was conducted on Windows, the repository's `node_modules` lacked the native precompiled Linux x64 binary (`@img/sharp-linux-x64`).
+- **Resolution**:
+  - Ran explicit platform-targeted installation on the VPS:
+    ```bash
+    npm install --os=linux --cpu=x64 sharp --save --quiet
+    ```
+  - Re-ran `npm run build`, which compiled all dynamic and static routes cleanly in 66 seconds.
+
+---
+
+### 🔴 Issue 7 [11 Sep 2026]: Nginx `502 Bad Gateway` — Missing Next.js Standalone Output & Static Asset Sync
+- **Symptom**: Accessing `https://customerpilot.in/` returned `502 Bad Gateway`. PM2 logs showed `customerpilot-web` crash loop (17 restarts) with:
+  ```text
+  Error: Cannot find module '/var/www/CustomerPilot/.next/standalone/server.js'
+  ```
+- **Root Cause**:
+  1. `next.config.ts` was missing the directive `output: "standalone"`. Without it, Next.js does not output `.next/standalone/server.js`.
+  2. In Next.js standalone mode, the standalone directory requires `.next/static` and `public/` directories to be copied into `.next/standalone/` for static assets to serve properly.
+- **Resolution**:
+  1. Updated `next.config.ts` locally with `output: "standalone"` and pushed commit `a8ce2db` to GitHub.
+  2. Pulled the commit on VPS and executed `npm run build`.
+  3. Copied static assets into the standalone bundle:
+     ```bash
+     cp -r /var/www/CustomerPilot/.next/static /var/www/CustomerPilot/.next/standalone/.next/static
+     cp -r /var/www/CustomerPilot/public /var/www/CustomerPilot/.next/standalone/public
+     ```
+  4. Reset and launched PM2 service pointing to the compiled standalone server:
+     ```bash
+     pm2 delete customerpilot-web
+     PORT=3000 HOSTNAME=0.0.0.0 pm2 start .next/standalone/server.js --name "customerpilot-web"
+     pm2 save
+     pm2 restart customerpilot-cron
+     ```
+  5. Verified zero crash restarts and confirmed HTTP 200 OK on Port 3000 and through Nginx.
+
+---
+
+## 4. Current Live Verification Scorecard (Verified 11 Sep 2026)
 
 | Route / Service | Endpoint | HTTP Status | Verification Result |
 | :--- | :--- | :---: | :--- |
-| **Secure HTTPS Live Domain** | `https://customerpilot.in` | `200 OK` | ✅ Verified (SSL Active, Auto-redirect from HTTP) |
+| **Secure HTTPS Live Domain** | `https://customerpilot.in/` | `200 OK` | ✅ Verified (SSL Active, Standalone Next.js 16) |
+| **Live Counter Operations Manual** | `https://customerpilot.in/guide/operations` | `200 OK` | ✅ Verified (Bilingual English/Hinglish Guide) |
+| **5-Minute Complete Setup Guide** | `https://customerpilot.in/guide/5-minute-setup-guide` | `200 OK` | ✅ Verified (Review Time-Delay & Stepper) |
+| **Legacy Trial Redirect** | `https://customerpilot.in/guide/3-day-trial` | `307 Redirect`| ✅ Verified (Auto-redirects to 5-min guide) |
 | **Landing Page (WWW)** | `https://www.customerpilot.in` | `200 OK` | ✅ Verified (SSL Active) |
 | **SuperAdmin Login** | `https://customerpilot.in/login` | `200 OK` | ✅ Verified (Credentials active: `admin@customerpilot.in`) |
-| **SuperAdmin Command Center**| `https://customerpilot.in/super-admin` | `200 OK` | ✅ Verified (Full analytics & merchant controls active) |
 | **Merchant Signup** | `https://customerpilot.in/signup` | `200 OK` | ✅ Verified (Onboarding wizard active) |
 | **Direct VPS IP** | `http://200.97.170.53/` | `200 OK` | ✅ Verified (Nginx reverse proxy active) |
 | **Evolution API** | `http://200.97.170.53:8080/manager/`| `200 OK` | ✅ Verified (WhatsApp QR manager operational) |
-| **Background Cron** | `localCronRunner.js` | `Online` | ✅ Verified (Day 1-90 automations & reviews polling) |
+| **Background Cron** | `customerpilot-cron` | `Online` | ✅ Verified (Day 1-90 automations & reviews polling) |
 
 ---
 
@@ -149,20 +217,48 @@ Whenever new features or bug fixes are developed locally in Antigravity:
 # 1. SSH into the VPS
 ssh root@200.97.170.53
 
-# 2. Go to project directory
+# 2. Go to project directory and pull latest code cleanly
 cd /var/www/CustomerPilot
-
-# 3. Pull latest code
+git stash
 git pull origin feature/superanalytics-customers-crm-20260810
 
-# 4. Rebuild production bundle
+# 3. Ensure native Linux binaries are installed
+npm install --os=linux --cpu=x64 sharp --save --quiet
+
+# 4. Rebuild production bundle (generates .next/standalone)
 npm run build
 
-# 5. Zero-downtime reload
+# 5. Sync static assets to standalone directory
+cp -r .next/static .next/standalone/.next/static
+cp -r public .next/standalone/public
+
+# 6. Zero-downtime reload & restart services
 pm2 reload customerpilot-web
+pm2 restart customerpilot-cron
+pm2 save
+pm2 status
 ```
 
 ---
 
-*Report generated by Antigravity AI Pair Programmer.*  
+## 6. Server & Infrastructure Credentials
+
+> ⚠️ **CONFIDENTIAL**: Strictly for server administration. Stored in local `.env` and `.env.local` (gitignored).
+
+| Parameter | Value / Detail |
+| :--- | :--- |
+| **Hostinger hPanel Account** | `order.cakeconnection@gmail.com` |
+| **Public Server IPv4** | `200.97.170.53` |
+| **SSH Port** | `22` |
+| **SSH User** | `root` |
+| **SSH Password** | `Nilsky@202627` |
+| **Application Directory** | `/var/www/CustomerPilot` |
+| **Database Path** | `/var/www/CustomerPilot/prisma/dev.db` (SQLite + WAL) |
+| **PM2 Processes** | `customerpilot-web` (Port 3000), `customerpilot-cron` |
+| **Reverse Proxy** | Nginx `/etc/nginx/sites-available/default` -> `127.0.0.1:3000` |
+| **Evolution API** | Docker container on `127.0.0.1:8080` (`cp_admin`) |
+
+---
+
+*Report updated and verified on 11 September 2026 by Antigravity AI Pair Programmer.*  
 *Status: Production Verified & Documented.*
