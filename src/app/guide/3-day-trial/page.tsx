@@ -25,7 +25,8 @@ import {
   Flame,
   Globe,
   Receipt,
-  Repeat
+  Repeat,
+  Hourglass
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -43,9 +44,9 @@ const I18N = {
     navChecklist: "Checklist",
     heroBadge: "⚡ 5-MINUTE COMPLETE SETUP BLUEPRINT",
     heroH1Part1: "🛠️ Complete Setup:",
-    heroH1Part2: "5-Minute Merchant Blueprint",
+    heroH1Part2: "5-Minute Restaurant/Shop Setup",
     heroSubtitle:
-      "A step-by-step visual infographic guide to complete your merchant registration, tailor default loyalty rules & rewards to your business, link WhatsApp Web, and go live.",
+      "A step-by-step visual infographic guide to complete your merchant registration, tailor default loyalty rules & rewards to your business, link WhatsApp Web, configure Google Review time-delay, and go live.",
     btnOperationsCardTitle: "Want to see how it works on the counter AFTER setup?",
     btnOperationsCardSub:
       "Explore the Live Counter Operations Manual — step-by-step cashier and customer journeys with real-time counter simulation.",
@@ -60,7 +61,7 @@ const I18N = {
     stat4Label: "Printable Desk QR Included",
     tabAll: "All Setup Steps",
     tabSignup: "Step 1: 1-Min Signup",
-    tabRules: "Step 2: Rules & Rewards",
+    tabRules: "Step 2: Rules, Rewards & Review Delay",
     tabWhatsapp: "Step 3: Connect WhatsApp",
     tabTemplates: "Step 4: WhatsApp Templates",
     tabOther: "Step 5: Pro Marketing Tools",
@@ -69,7 +70,7 @@ const I18N = {
     customRuleTipLabel: "💡 Industry Optimization Tip:",
     step1Title: "Merchant Registration & Store Identity",
     step1Sub: "Step 1 • 60 Seconds",
-    step2Title: "Default vs Custom Loyalty Rules & Rewards",
+    step2Title: "Default vs Custom Loyalty Rules, Rewards & Review Delay",
     step2Sub: "Step 2 • 90 Seconds",
     step3Title: "Connect WhatsApp (Linked Devices QR)",
     step3Sub: "Step 3 • 60 Seconds",
@@ -79,7 +80,7 @@ const I18N = {
     step5Sub: "Step 5 • 30 Seconds",
     checklistTitle: "5-Minute Complete Setup Checklist",
     checklistBadge: "Go-Live Checklist",
-    ctaTitle: "Ready to Configure Your Store Now?",
+    ctaTitle: "Ready to Setup Your Store Now?",
     ctaSub: "Jump straight to your merchant dashboard to set up live rules, rewards, and message templates.",
     ctaBtnSettings: "Open Complete Settings →",
     ctaBtnQueue: "Test Live Queue Desk",
@@ -94,10 +95,10 @@ const I18N = {
     navChecklist: "Checklist",
     heroBadge: "⚡ 5 MINUTE COMPLETE SETUP GUIDE",
     heroH1Part1: "🛠️ Complete Setup:",
-    heroH1Part2: "5 Min Me Dukaandar Ka Setup",
+    heroH1Part2: "5 Min Me Restaurant/Shop Ka Setup",
     heroSubtitle:
-      "Naye Dukaandar ke liye 5 minute me complete signup, business ke hisaab se default rules & rewards modify karna, WhatsApp connect karna aur counter QR lagane ka complete step-by-step guide.",
-    btnOperationsCardTitle: "Setup hone ke baad dukaan par kaise kaam karega?",
+      "Naye Restaurant/Shop ke liye 5 minute me complete signup, business ke hisaab se default rules & rewards modify karna, WhatsApp connect karna, Google Review time delay set karna aur counter QR lagane ka complete step-by-step guide.",
+    btnOperationsCardTitle: "Setup hone ke baad Restaurant/Shop par kaise kaam karega?",
     btnOperationsCardSub:
       "Dekhiye Live Counter Operations Manual — Cashier aur Grahak ka complete step-by-step routine aur interactive simulation.",
     btnOperationsAction: "Operations Manual Kholein →",
@@ -111,7 +112,7 @@ const I18N = {
     stat4Label: "Printable Counter QR PDF",
     tabAll: "Sabhi Steps",
     tabSignup: "Step 1: 1-Min Signup",
-    tabRules: "Step 2: Rules & Rewards",
+    tabRules: "Step 2: Rules, Rewards & Review Delay",
     tabWhatsapp: "Step 3: WhatsApp Connect",
     tabTemplates: "Step 4: WhatsApp Templates",
     tabOther: "Step 5: Pro Features",
@@ -120,7 +121,7 @@ const I18N = {
     customRuleTipLabel: "💡 Industry Profit Tip:",
     step1Title: "Merchant Registration & Store Profile",
     step1Sub: "Step 1 • 60 Seconds",
-    step2Title: "Rules, Rewards & Points Customization",
+    step2Title: "Rules, Rewards & Google Review Delay Setup",
     step2Sub: "Step 2 • 90 Seconds",
     step3Title: "WhatsApp Web Connect Karna (QR Scan)",
     step3Sub: "Step 3 • 60 Seconds",
@@ -130,8 +131,8 @@ const I18N = {
     step5Sub: "Step 5 • 30 Seconds",
     checklistTitle: "5-Minute Complete Setup Checklist",
     checklistBadge: "Go-Live Checklist",
-    ctaTitle: "Abhi Apne Store Ka Setup Karne Ke Liye Ready Hain?",
-    ctaSub: "Seedha merchant dashboard me jaakar rules, rewards aur WhatsApp templates ko live modify karein.",
+    ctaTitle: "Ready to Setup Your Store Now?",
+    ctaSub: "Seedha merchant dashboard me jaakar rules, rewards, Google review delay aur WhatsApp templates ko live modify karein.",
     ctaBtnSettings: "Settings Dashboard Kholein →",
     ctaBtnQueue: "Live Queue Desk Test Karein",
     ctaBtnCatalog: "Reward Catalog",
@@ -148,6 +149,7 @@ export default function FiveMinuteCompleteSetupGuidePage() {
   const [checklist, setChecklist] = useState<Record<string, boolean>>({
     profile: true,
     rules: false,
+    reviewDelay: false,
     whatsapp: false,
     templates: false,
     standee: false,
@@ -169,6 +171,8 @@ export default function FiveMinuteCompleteSetupGuidePage() {
       defaultStamps: 10,
       minPurchase: "₹200",
       defaultReward: "Free Belgian Chocolate Pastry (Value: ₹150)",
+      recommendedReviewDelay: "20 Minutes",
+      reviewDelayReason: "Customer cake ya pastry ghar le jakar ya counter par khakar turant enjoy karta hai, isliye 20-30 minute ka delay sabse best rehta hai.",
       customTip:
         "Bake shops ke liye 8-10 stamps ideal hain. High-margin items jaise pastry ya brownie ko reward rakhein taaki aapka real food cost sirf ₹30-40 ho lekin customer ko ₹150 ka value dikhe!",
       bonusStamp: "1 Bonus Stamp on 1st Scan",
@@ -179,6 +183,8 @@ export default function FiveMinuteCompleteSetupGuidePage() {
       defaultStamps: 8,
       minPurchase: "₹150",
       defaultReward: "Free Signature Cappuccino / Cold Coffee",
+      recommendedReviewDelay: "30 Minutes",
+      reviewDelayReason: "Customer coffee drink finish karne ke dauran relaxed mood me hota hai, 30 minute baad WhatsApp prompt maximum 5★ conversion deta hai.",
       customTip:
         "Coffee drinks me margin 75%+ hota hai. 8 stamps ka target rakhein jisse customer hafte me 2-3 baar aaye aur jaldi reward unlock ho sake.",
       bonusStamp: "1 Instant Welcome Stamp",
@@ -189,6 +195,8 @@ export default function FiveMinuteCompleteSetupGuidePage() {
       defaultStamps: 6,
       minPurchase: "₹500",
       defaultReward: "Free Hair Spa Treatment / Beard Styling",
+      recommendedReviewDelay: "2 Hours",
+      reviewDelayReason: "Grooming session ke 2 ghante baad jab customer look settle ho jata hai aur log compliment dete hain, tab review mangne par sabse positive 5★ feedback milta hai.",
       customTip:
         "Salons me visit frequency mahine me 1-2 baar hoti hai, isliye yahan 6 stamps ka target rakhein (zyada stamps rakhenge toh customer demotivate ho sakta hai).",
       bonusStamp: "1 Welcome Stamp on Grooming",
@@ -199,6 +207,8 @@ export default function FiveMinuteCompleteSetupGuidePage() {
       defaultStamps: 10,
       minPurchase: "₹350",
       defaultReward: "Free Starter / Sizzling Brownie with Ice Cream",
+      recommendedReviewDelay: "1 Hour",
+      reviewDelayReason: "Customer meal complete karke ghar ya office pahunchta hai, 1-2 ghante baad fresh meal memory ke sath AI review link tap karna sabse convenient lagta hai.",
       customTip:
         "Table dining ke liye ₹350 ya ₹500 ka minimum bill threshold zaroor set karein. Isse average order value (AOV) naturally 20-30% badhti hai!",
       bonusStamp: "1 Family Visit Stamp",
@@ -209,6 +219,8 @@ export default function FiveMinuteCompleteSetupGuidePage() {
       defaultStamps: 10,
       minPurchase: "₹500",
       defaultReward: "₹250 Flat Store Shopping Voucher",
+      recommendedReviewDelay: "3 Hours",
+      reviewDelayReason: "Shopping ke baad ghar pahunchkar clothes/items unbox karne ke baad customer relaxed hota hai.",
       customTip:
         "Retail me flat rupee voucher (e.g. ₹250 off on next purchase) sabse zyada convert hota hai kyunki customer dubara aakar shopping karta hai.",
       bonusStamp: "1 Shopping Bonus Stamp",
@@ -300,7 +312,7 @@ export default function FiveMinuteCompleteSetupGuidePage() {
             {t.heroSubtitle}
           </p>
 
-          {/* User Requested: PROMINENT LINK CARD TO NEW OPERATIONS MANUAL PAGE */}
+          {/* Prominent Callout Link Card to Operations Manual */}
           <div className="mt-8 max-w-2xl mx-auto bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-indigo-500/10 border-2 border-emerald-300 rounded-3xl p-5 sm:p-6 text-left shadow-sm hover:shadow-md transition-all">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="space-y-1">
@@ -401,9 +413,9 @@ export default function FiveMinuteCompleteSetupGuidePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div className="bg-slate-50/70 border border-slate-200/60 rounded-2xl p-4 space-y-2">
                 <div className="text-xs font-black text-emerald-700">A. Basic Registration</div>
-                <h4 className="font-bold text-slate-900 text-sm">Store Name &amp; Owner Phone</h4>
+                <h4 className="font-bold text-slate-900 text-sm">Restaurant/Shop Name &amp; Owner Phone</h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Apna store name (e.g. <em>Cake Connection</em>), mobile number aur password daal kar 30 second me account activate karein.
+                  Apna Restaurant/Shop name (e.g. <em>Cake Connection</em>), mobile number aur password daal kar 30 second me account activate karein.
                 </p>
               </div>
 
@@ -415,11 +427,15 @@ export default function FiveMinuteCompleteSetupGuidePage() {
                 </p>
               </div>
 
-              <div className="bg-slate-50/70 border border-slate-200/60 rounded-2xl p-4 space-y-2">
-                <div className="text-xs font-black text-emerald-700">C. Google Maps URL</div>
-                <h4 className="font-bold text-slate-900 text-sm">Instant Review Link Auto-Fetch</h4>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Apne Google Maps page ka name ya link enter karein. CustomerPilot aapke Google review shortlink ko automatically integrate kar lega.
+              {/* USER REQUESTED CHANGE FOR GOOGLE BUSINESS PROFILE EMAIL LOGIN */}
+              <div className="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-4 space-y-2">
+                <div className="text-xs font-black text-emerald-800 flex items-center gap-1.5">
+                  <span>C. Google Business Profile Login</span>
+                  <span className="bg-emerald-200/80 text-emerald-900 text-[10px] px-1.5 py-0.2 rounded font-bold">Recommended</span>
+                </div>
+                <h4 className="font-bold text-slate-900 text-sm">Same Gmail Se 1-Click Connect</h4>
+                <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                  Aapne Google Business Profile jis Email Se banaya he us same Email se login karna he, CustomerPilot aapke Google review shortlink ko automatically integrate kar lega.
                 </p>
               </div>
             </div>
@@ -435,7 +451,7 @@ export default function FiveMinuteCompleteSetupGuidePage() {
           </div>
         )}
 
-        {/* ===================== STEP 2: RULES & REWARDS (CUSTOMIZATION) ===================== */}
+        {/* ===================== STEP 2: RULES, REWARDS & GOOGLE REVIEW DELAY ===================== */}
         {(activeSetupTab === "all" || activeSetupTab === "rules") && (
           <div className="relative bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xs hover:shadow-md transition-all space-y-6">
             <div className="flex items-center justify-between flex-wrap gap-4 border-b border-slate-100 pb-5">
@@ -511,6 +527,44 @@ export default function FiveMinuteCompleteSetupGuidePage() {
                 </div>
               </div>
 
+              {/* USER REQUESTED ADDITION: GOOGLE REVIEW LINK TIME-DELAY CUSTOMIZATION */}
+              <div className="bg-white rounded-2xl border-2 border-indigo-200 p-4 space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <Hourglass className="w-4 h-4 text-indigo-600 animate-pulse" />
+                    <span className="font-bold text-slate-900 text-xs sm:text-sm">
+                      Google Review WhatsApp Link Time-Delay Setting (Very Important) ⏱️
+                    </span>
+                  </div>
+                  <Badge className="bg-indigo-100 text-indigo-800 text-[11px] font-mono font-bold">
+                    Recommended Delay: {currentInd.recommendedReviewDelay}
+                  </Badge>
+                </div>
+
+                <p className="text-xs text-slate-700 leading-relaxed">
+                  Jab customer counter par bill pay karke Restaurant/Shop se jaye, tab us customer ke WhatsApp par <strong>kitne time delay ke baad</strong> Google Review ki link jaye — ye Merchant apne business ke nature ke hisaab se <strong>Dashboard ➔ Settings ➔ Rules &amp; Automation</strong> me freely customize kar sakta hai!
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] pt-1">
+                  <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                    <strong className="text-slate-900 block mb-0.5">🥐 Bakery / Cafe / QSR:</strong>
+                    <span className="text-slate-600 font-medium">15 - 30 Minutes delay</span> (customer pastry/beverage enjoy karte hi 5★ review deta hai).
+                  </div>
+                  <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                    <strong className="text-slate-900 block mb-0.5">🍽️ Dine-in Restaurant:</strong>
+                    <span className="text-slate-600 font-medium">1 - 2 Hours delay</span> (jab dining complete ho chuki ho aur customer ghar/office pahunch chuka ho).
+                  </div>
+                  <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                    <strong className="text-slate-900 block mb-0.5">💇 Salon / Spa / Retail:</strong>
+                    <span className="text-slate-600 font-medium">2 - 4 Hours delay</span> (jab customer service ke results aur compliments notice karta hai).
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-indigo-700 italic">
+                  💡 <strong>Kyu zaroori hai:</strong> Turant counter par review mangne se customer irritate ho sakta hai, lekin 20-60 min delay ke baad WhatsApp prompt aane par genuine 5★ reviews ka conversion 4X badh jata hai!
+                </p>
+              </div>
+
               {/* Expert Optimization Tip */}
               <div className="p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-xl flex items-start gap-2.5 text-xs text-amber-900 leading-relaxed">
                 <Flame className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
@@ -521,10 +575,10 @@ export default function FiveMinuteCompleteSetupGuidePage() {
             </div>
 
             <div className="pt-2 flex items-center justify-between flex-wrap gap-3">
-              <span className="text-xs text-slate-500 font-medium">📍 Live in Dashboard: Settings ➔ Rules &amp; Rewards</span>
+              <span className="text-xs text-slate-500 font-medium">📍 Live in Dashboard: Settings ➔ Rules &amp; Automation</span>
               <Link href="/dashboard/settings">
                 <Button variant="outline" size="sm" className="text-xs font-bold border-slate-300 hover:bg-slate-50">
-                  Modify Rules in Settings <Sliders className="w-3 h-3 ml-1" />
+                  Modify Rules &amp; Review Delay in Settings <Sliders className="w-3 h-3 ml-1" />
                 </Button>
               </Link>
             </div>
@@ -564,9 +618,9 @@ export default function FiveMinuteCompleteSetupGuidePage() {
                 <span className="text-xs font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
                   3.2 Scan Linked Devices
                 </span>
-                <h4 className="font-bold text-slate-900 text-sm">Store Phone Se QR Scan Karein</h4>
+                <h4 className="font-bold text-slate-900 text-sm">Restaurant/Shop Phone Se QR Scan Karein</h4>
                 <p className="text-slate-600 leading-relaxed">
-                  Apne dukaan ke phone me WhatsApp kholiye ➔ 3 dots ➔ <strong>Linked Devices</strong> ➔ <strong>Link a Device</strong> par tap karke screen ka QR scan karein.
+                  Apne Restaurant/Shop ke phone me WhatsApp kholiye ➔ 3 dots ➔ <strong>Linked Devices</strong> ➔ <strong>Link a Device</strong> par tap karke screen ka QR scan karein.
                 </p>
               </div>
 
@@ -776,12 +830,13 @@ Agli visit par payein: Free Extra Treat with Your Bill!
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             {[
-              { id: "profile", title: "1. Store Name & Category Profile", time: "1 Min", desc: "Select bakery, cafe, salon, restaurant or retail" },
+              { id: "profile", title: "1. Restaurant/Shop Profile & Google Business Connect", time: "1 Min", desc: "Select category & login with same Google Business Profile email" },
               { id: "rules", title: "2. Rules & Rewards Tailored", time: "1 Min", desc: "Stamps target, min bill & high-margin free item" },
-              { id: "whatsapp", title: "3. WhatsApp Web Connected", time: "1 Min", desc: "Scan QR code via Linked Devices in store phone" },
-              { id: "templates", title: "4. Message Templates Reviewed", time: "1 Min", desc: "Customize text, language and emojis in settings" },
-              { id: "standee", title: "5. Counter Standee QR Printed", time: "1 Min", desc: "Download PDF and place on acrylic stand at counter" },
-              { id: "testScan", title: "6. Self Test Scan Completed", time: "1 Min", desc: "Scan counter QR with your phone and approve in /queue" },
+              { id: "reviewDelay", title: "3. Google Review Link Time-Delay Set", time: "30 Sec", desc: "Configure delay (e.g. 15-30 min for cafe/bakery, 1-2h for dining)" },
+              { id: "whatsapp", title: "4. WhatsApp Web Connected", time: "1 Min", desc: "Scan QR code via Linked Devices in store phone" },
+              { id: "templates", title: "5. Message Templates Reviewed", time: "1 Min", desc: "Customize text, language and emojis in settings" },
+              { id: "standee", title: "6. Counter Standee QR Printed", time: "1 Min", desc: "Download PDF and place on acrylic stand at counter" },
+              { id: "testScan", title: "7. Self Test Scan Completed", time: "1 Min", desc: "Scan counter QR with your phone and approve in /queue" },
             ].map((task) => {
               const isChecked = checklist[task.id]
               return (
@@ -846,6 +901,7 @@ Agli visit par payein: Free Extra Treat with Your Bill!
               Quick Navigation
             </Badge>
 
+            {/* USER REQUESTED: Ready to Setup Your Store Now? */}
             <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
               {t.ctaTitle}
             </h2>

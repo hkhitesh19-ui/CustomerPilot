@@ -3,6 +3,19 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [11 Sep 2026] Issue: Guide Terminology Standardization & Review Time-Delay Customization
+- **Symptom**: User requested several content refinements across the guide system: (1) Rename CTA to "Ready to Setup Your Store Now?" on `/guide/3-day-trial`. (2) Add `/guide/operations` links to main homepage navigation and footer. (3) Replace all "Dukaan" terminology with "Restaurant/Shop". (4) In operations manual, update title to "Merchant Ki Journey: Restaurant/Shop ke Owner/Manager/Cashier Ko Kya-Kya Karna Hoga?" and add counter verbal pitch script and optional product name note. (5) In setup guide, clarify Google Business Profile email login and add a dedicated step for setting the Google Review WhatsApp link time-delay tailored per business type.
+- **Root Cause**: Setup guide was missing the vital post-bill time-delay configuration explanation (crucial for review conversion), and terminology was using "Dukaan" instead of standard modern "Restaurant/Shop" nomenclature.
+- **Resolution**:
+  1. Renamed CTA section title to "Ready to Setup Your Store Now?" in `src/app/guide/3-day-trial/page.tsx`.
+  2. Integrated `/guide/operations` link into the main desktop navbar, mobile navigation drawer, and footer Product section in `src/app/page.tsx`.
+  3. Replaced "Dukaan" with "Restaurant/Shop" throughout both `src/app/guide/3-day-trial/page.tsx` and `src/app/guide/operations/page.tsx`.
+  4. In `src/app/guide/operations/page.tsx`, updated the Merchant Journey section title to include Owner/Manager/Cashier, added the counter pitch dialogue ("Sir/Mam aap ab hamare Restaurant/Shop ke VIP Club me Member ban sakte ho..."), and added the optional product name entry note in Step M3.
+  5. In `src/app/guide/3-day-trial/page.tsx`, updated Step 1 to clarify logging in with the same email used for Google Business Profile, and added Step 2.D for Google Review Time-Delay setting with industry-specific recommendations (Bakery/Cafe: 15-30m, Restaurant: 1-2h, Salon/Retail: 2-4h).
+  6. Verified both guide endpoints compile and respond with HTTP 200 OK.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [11 Sep 2026] Issue: React 19 Script Tag Warning & Guide Page Architecture Refactor
 - **Symptom**: (1) Console Error in browser: "Encountered a script tag while rendering React component... at Providers (src/components/providers.tsx:12:7)". (2) Stale module error for `ai-reply-sandbox.tsx` in browser cache. (3) Guide page `/guide/3-day-trial` needed to be renamed to "5 Minute Complete Setup Guide" with bigger font for "🛠️ Complete Setup". (4) Counter Operations Manual needed to be separated onto a dedicated new page (`/guide/operations`) with bilingual English / Hinglish toggle on both pages.
 - **Root Cause**: (1) `next-themes` ThemeProvider without `forcedTheme` injects an inline script on client render which triggers a strict warning in React 19 / Next.js 16. (2) Turbopack client HMR had cached the prior import from `page.tsx` before it was removed. (3) Setup guide was combining both onboarding and counter operations into a single long page instead of separate modular guides.

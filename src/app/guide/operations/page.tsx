@@ -23,7 +23,8 @@ import {
   Receipt,
   MessageSquare,
   Flame,
-  Award
+  Award,
+  Volume2
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -37,7 +38,7 @@ const I18N = {
   en: {
     langBtn: "हिंग्लिश (Hinglish)",
     langLabel: "Language",
-    topBanner: "Live Counter Operations Manual • Real-Time Daily Flow for Merchants & Customers",
+    topBanner: "Live Counter Operations Manual • Daily Flow for Restaurant/Shop Owners, Managers & Customers",
     topLink: "5-Min Setup Blueprint →",
     navHome: "Home",
     navSetup: "5-Minute Setup Guide",
@@ -48,9 +49,9 @@ const I18N = {
     heroH1Part1: "After Complete Setup:",
     heroH1Part2: "How Does It Actually Work?",
     heroSubtitle:
-      "A complete infographic guide explaining exactly what the Merchant (Cashier) does at the billing counter (just 3 seconds!) and what the Customer experiences on WhatsApp in real time.",
+      "A complete infographic guide explaining exactly what the Restaurant/Shop Owner, Manager, or Cashier does at the billing counter (just 3 seconds!) and what the Customer experiences on WhatsApp in real time.",
     switcherAll: "Full Journey (All)",
-    switcherMerchant: "👨‍💼 Merchant's Journey (Store)",
+    switcherMerchant: "👨‍💼 Merchant's Journey (Restaurant/Shop)",
     switcherCustomer: "📱 Customer's Journey (Visitor)",
     switcherSimulation: "⚡ Interactive Simulation",
     switcherMatrix: "📊 Responsibility Matrix",
@@ -71,8 +72,8 @@ const I18N = {
     simMerchantTitle: "👨‍💼 Cashier / Merchant Screen (/dashboard/queue)",
     simSystemAutomation: "System Automation:",
     simNextStage: "Next Stage",
-    merchantSectionBadge: "Store Daily Routine",
-    merchantSectionTitle: "Merchant Journey: What Does the Store Owner / Cashier Do?",
+    merchantSectionBadge: "Restaurant/Shop Daily Routine",
+    merchantSectionTitle: "Merchant Journey: What Does the Restaurant/Shop Owner / Manager / Cashier Do?",
     merchantPosBadge: "Zero POS Integration Risk 🛡️",
     customerSectionBadge: "Visitor Experience",
     customerSectionTitle: "Customer Journey: What Does the Customer Experience?",
@@ -80,8 +81,8 @@ const I18N = {
     matrixBadge: "Responsibility Matrix",
     matrixTitle: "Summary Matrix: Who Does What?",
     colStep: "Step / Activity",
-    colMerchant: "👨‍💼 What Does the Merchant Do?",
-    colCustomer: "📱 What Does the Customer Do?",
+    colMerchant: "👨‍💼 What Does Merchant / Cashier Do?",
+    colCustomer: "📱 What Does Customer Do?",
     colAI: "🤖 What Does CustomerPilot AI Automate?",
     ctaBadge: "Need to Configure First?",
     ctaTitle: "Want to Learn the 5-Minute Setup First?",
@@ -96,9 +97,11 @@ const I18N = {
         time: "0 Min Daily",
         title: "Place QR Standee on the Billing Counter",
         desc: "Download the printable QR Standee PDF from your dashboard and place it in an acrylic stand on your billing desk (right next to your UPI payment scanner). No wires, POS cables, or electricity needed.",
+        pitchTitle: "🗣️ How to invite customers at the counter (Verbal Pitch):",
+        pitch: "You can say: 'Sir/Madam, you can now become a VIP Club Member of our Restaurant/Shop. Just scan this QR code on your phone — it is 100% free with no charges and you will earn rewards on every visit!'",
       },
       {
-        tag: "Step M2 • Store Opening",
+        tag: "Step M2 • When Restaurant/Shop Opens",
         time: "10 Seconds",
         title: "Open Live Queue on the Counter Phone or Tablet",
         desc: "Cashier keeps customerpilot.in/dashboard/queue open on any phone, tablet, or billing PC. You can add it to your home screen like an app icon for 1-tap launch.",
@@ -107,8 +110,8 @@ const I18N = {
         tag: "Step M3 • Core Daily Duty (Per Customer)",
         time: "⏱️ Only 3 Seconds!",
         title: "Type Bill Amount & Tap 'Approve Stamp (✓)'",
-        desc: "When a customer scans the counter QR, their name and mobile number instantly appear on the cashier's Live Queue. The cashier just types the bill amount (e.g. ₹280) and taps the green 'Approve Stamp' button.",
-        highlight: "Rahul Sharma (+91 98765...) ➔ Bill: ₹280 [✓ Approve Stamp]",
+        desc: "When a customer scans the counter QR, their name and mobile number instantly appear on the cashier's Live Queue. The cashier just types the bill amount (e.g. ₹280) and taps the green 'Approve Stamp (✓)' button. (Here, you can also enter a short name for the product purchased by the customer — this is purely optional, not compulsory).",
+        highlight: "Rahul Sharma (+91 98765...) ➔ Bill: ₹280 | Item: Belgian Chocolate Pastry (Optional) [✓ Approve Stamp]",
         note: "💡 That's all the cashier does! Adding stamps, sending WhatsApp receipt, and updating the customer's wallet are 100% handled by CustomerPilot autonomously.",
       },
       {
@@ -124,7 +127,7 @@ const I18N = {
         items: [
           {
             title: "⭐ Google 5★ Review Requests",
-            desc: "Customers automatically receive AI review prompts on WhatsApp after visiting. Merchant never needs to beg.",
+            desc: "Customers automatically receive AI review prompts on WhatsApp after the customizable time delay. Merchant never needs to beg.",
           },
           {
             title: "🤖 Gemini AI Auto-Replies",
@@ -160,7 +163,7 @@ const I18N = {
         tag: "Step C4 • 1-Click AI Review",
         time: "Effort: 5 Seconds",
         title: "Publish AI-Drafted 5-Star Review to Google Maps",
-        desc: "After the visit, customer receives a WhatsApp message: 'Loved your visit? AI has drafted a 5★ review for you!'. With 1 tap, the customer opens Google Maps with the genuine review already drafted, and clicks Post.",
+        desc: "After the visit (after the set time-delay), customer receives a WhatsApp message: 'Loved your visit? AI has drafted a 5★ review for you!'. With 1 tap, the customer opens Google Maps with the genuine review already drafted, and clicks Post.",
       },
       {
         tag: "Step C5 • Reward Milestone",
@@ -178,21 +181,21 @@ const I18N = {
     matrixRows: [
       {
         step: "1. Joining the Loyalty Program",
-        merchant: "Keep QR standee on the billing counter",
+        merchant: "Keep QR standee on the counter & invite customer to scan",
         customer: "Point phone camera to scan & tap Send",
         ai: "Instant WhatsApp welcome message & live digital wallet creation",
       },
       {
         step: "2. Earning Stamps",
-        merchant: "Type bill amount & tap 'Approve' (3 seconds)",
+        merchant: "Type bill amount & tap 'Approve' (optional product name) (3s)",
         customer: "Pay bill normally (UPI/Cash/Card)",
         ai: "Instant WhatsApp receipt delivery & animated stamp card balance update",
       },
       {
         step: "3. 5-Star Google Reviews",
-        merchant: "Zero effort (never need to ask customers)",
+        merchant: "Zero effort (automated after custom time-delay)",
         customer: "Tap WhatsApp link to post AI-drafted 5★ review (1 click)",
-        ai: "Gemini AI crafts personalized review drafts & delivers via WhatsApp",
+        ai: "Gemini AI crafts personalized review drafts & delivers via WhatsApp after set delay",
       },
       {
         step: "4. Google Review Auto-Replies",
@@ -208,7 +211,7 @@ const I18N = {
       },
       {
         step: "6. Customer Retention & Repeat Visits",
-        merchant: "Focus on serving great products and food",
+        merchant: "Focus on running Restaurant/Shop and serving great products",
         customer: "Receives birthday treats & win-back perks",
         ai: "30-day win-back campaigns, birthday automation & referral rewards",
       },
@@ -217,7 +220,7 @@ const I18N = {
   hi: {
     langBtn: "English",
     langLabel: "भाषा",
-    topBanner: "Live Counter Operations Manual • Dukaandar aur Grahak Ka Rozana Flow",
+    topBanner: "Live Counter Operations Manual • Restaurant/Shop ke Owner/Manager/Cashier aur Grahak Ka Rozana Flow",
     topLink: "5-Min Setup Blueprint →",
     navHome: "Home",
     navSetup: "5-Minute Setup Guide",
@@ -228,9 +231,9 @@ const I18N = {
     heroH1Part1: "Complete Setup Ke Baad:",
     heroH1Part2: "Kaise Kaam Karega?",
     heroSubtitle:
-      "Dukaan par complete setup ke baad Cashier ko kya karna hoga (sirf 3 second!) aur Customer ko apne WhatsApp par kya dikhega — step-by-step infographical guide aur live simulation dekhiye.",
+      "Restaurant/Shop par complete setup ke baad Cashier ko kya karna hoga (sirf 3 second!) aur Customer ko apne WhatsApp par kya dikhega — step-by-step infographical guide aur live simulation dekhiye.",
     switcherAll: "Full Journey (Dono)",
-    switcherMerchant: "👨‍💼 Merchant Ki Journey (Dukaandar)",
+    switcherMerchant: "👨‍💼 Merchant Ki Journey (Restaurant/Shop)",
     switcherCustomer: "📱 Customer Ki Journey (Grahak)",
     switcherSimulation: "⚡ Interactive Simulation",
     switcherMatrix: "📊 Responsibility Matrix",
@@ -251,8 +254,8 @@ const I18N = {
     simMerchantTitle: "👨‍💼 Cashier / Merchant Screen (/dashboard/queue)",
     simSystemAutomation: "System Automation:",
     simNextStage: "Agla Stage",
-    merchantSectionBadge: "Dukaan Par Daily Routine",
-    merchantSectionTitle: "Merchant Ki Journey: Dukaandar Ko Kya-Kya Karna Hoga?",
+    merchantSectionBadge: "Restaurant/Shop Par Daily Routine",
+    merchantSectionTitle: "Merchant Ki Journey: Restaurant/Shop ke Owner/Manager/Cashier Ko Kya-Kya Karna Hoga?",
     merchantPosBadge: "Zero POS Integration Risk 🛡️",
     customerSectionBadge: "Grahak Ka Experience",
     customerSectionTitle: "Customer Ki Journey: Grahak Ko Kya-Kya Karna Hoga?",
@@ -260,7 +263,7 @@ const I18N = {
     matrixBadge: "Kaam Ka Batwara",
     matrixTitle: "Summary Matrix: Kaun Kya Karega?",
     colStep: "Activity / Step",
-    colMerchant: "👨‍💼 Merchant Ko Kya Karna Hai?",
+    colMerchant: "👨‍💼 Restaurant/Shop Cashier Ko Kya Karna Hai?",
     colCustomer: "📱 Customer Ko Kya Karna Hai?",
     colAI: "🤖 CustomerPilot AI Engine Kya Automate Karta Hai?",
     ctaBadge: "Pehle Setup Karna Hai?",
@@ -274,11 +277,13 @@ const I18N = {
       {
         tag: "Step M1 • Subah (Ek Baar Setup)",
         time: "Daily: 0 Minutes",
-        title: "Counter Par Standee QR Rakhna",
+        title: "Counter Par Standee QR Rakhna & Customer Ko Invite Karna",
         desc: "Dashboard se downloaded printable PDF QR Standee ko cash counter / billing desk par acrylic stand me rakh dein (UPI scanner ke bagal me). Isme koi wire ya electricity ki zaroorat nahi hoti.",
+        pitchTitle: "🗣️ Customer ko cashier kya bol sakta hai (Verbal Pitch):",
+        pitch: "Customer ko aisa bata sakte ho ki : 'Sir/Mam aap ab hamare Restaurant/Shop ke VIP Club me Member ban sakte ho, uske liye just ye QR code Scan kijiye, uska koi charges nahi he, bilkul Free he.'",
       },
       {
-        tag: "Step M2 • Store Open Hote Hi",
+        tag: "Step M2 • Restaurant/Shop Open Hote Hi",
         time: "10 Seconds",
         title: "Counter Phone Ya Tablet Me Live Queue Kholna",
         desc: "Cashier apne phone, billing tablet ya computer browser me customerpilot.in/dashboard/queue open rakhta hai (ya phone screen par bookmark/Add to Home Screen kar leta hai).",
@@ -287,8 +292,8 @@ const I18N = {
         tag: "Step M3 • Core Daily Duty (Per Customer)",
         time: "⏱️ Sirf 3 Seconds!",
         title: "Customer Bill Amount Daal Kar 'Approve' Click Karna",
-        desc: "Customer ne counter QR scan kiya hai, toh cashier ke queue screen par customer ka naam aur phone number dikhta hai. Cashier bas bill amount type karta hai (e.g. ₹280) aur green 'Approve Stamp (✓)' button press kar deta hai.",
-        highlight: "Rahul Sharma (+91 98765...) ➔ Amount: ₹280 [✓ Approve Stamp]",
+        desc: "Customer ne counter QR scan kiya hai, toh cashier ke queue screen par customer ka naam aur phone number dikhta hai. Cashier bas bill amount type karta hai (e.g. ₹280) aur green 'Approve Stamp (✓)' button press kar deta hai. (Yahan Customer ne jo Product Purchase kiya uska short name bhi aap enter kar sakte ho - ye Compulsory nahi he).",
+        highlight: "Rahul Sharma (+91 98765...) ➔ Bill Amount: ₹280 | Product: Belgian Chocolate Pastry (Optional) [✓ Approve Stamp]",
         note: "💡 Cashier ko bas itna hi karna hai! Stamp add karna, WhatsApp receipt bhejna, aur wallet update karna CustomerPilot khud karta hai.",
       },
       {
@@ -303,8 +308,8 @@ const I18N = {
         title: "Google Reviews, Auto-Replies & Win-backs Khud Chalte Hain",
         items: [
           {
-            title: "⭐ Google 5★ Review:",
-            desc: "Customer ko AI review link khud send hota hai. Merchant ko mangne ki zarurat nahi.",
+            title: "⭐ Google 5★ Review (Custom Time-Delay):",
+            desc: "Customer ke jaane ke baad aapke set kiye gaye time delay (e.g. 20 min ya 1 ghanta) ke baad AI review link khud send hota hai. Merchant ko mangne ki zarurat nahi.",
           },
           {
             title: "🤖 AI Auto-Reply:",
@@ -328,7 +333,7 @@ const I18N = {
         tag: "Step C2 • 1-Tap Join",
         time: "Action: 1 Tap 'Send'",
         title: "WhatsApp Par Pre-Typed Message Send Karna",
-        desc: "Scan karte hi customer ka WhatsApp khulta hai jisme pehle se likha hota hai: 'Hi! Adding my visit at Cake Connection...'. Customer bas 'Send' dabata hai aur turant store ka personalized welcome card receive ho jata hai.",
+        desc: "Scan karte hi customer ka WhatsApp khulta hai jisme pehle se likha hota hai: 'Hi! Adding my visit at Cake Connection...'. Customer bas 'Send' dabata hai aur turant Restaurant/Shop ka personalized welcome card receive ho jata hai.",
       },
       {
         tag: "Step C3 • Bill Payment Ke Baad",
@@ -337,10 +342,10 @@ const I18N = {
         desc: "Cashier ke approve karte hi customer ke phone par notification aati hai: '🎉 ₹320 Bill Confirmed! 1 Stamp Added. Total: 1/10 Stamps.'. Saath me live digital wallet link hota hai jisme animated stamp card dikhta hai.",
       },
       {
-        tag: "Step C4 • 1-Click AI Review",
+        tag: "Step C4 • 1-Click AI Review (After Time-Delay)",
         time: "Effort: 5 Seconds",
         title: "AI-Drafted 5-Star Review Google Maps Par Post Karna",
-        desc: "Visit ke baad customer ko WhatsApp message aata hai: 'Aapka experience kaisa raha? AI ne aapke liye ek shandar review draft kiya hai!'. Customer link kholta hai, Gemini AI genuine 5★ review pre-fill kar deta hai, aur customer 1-tap me Google Maps par post kar deta hai.",
+        desc: "Visit ke baad (aapke set kiye gaye delay ke baad) customer ko WhatsApp message aata hai: 'Aapka experience kaisa raha? AI ne aapke liye ek shandar review draft kiya hai!'. Customer link kholta hai, Gemini AI genuine 5★ review pre-fill kar deta hai, aur customer 1-tap me Google Maps par post kar deta hai.",
       },
       {
         tag: "Step C5 • Reward Unlock",
@@ -358,21 +363,21 @@ const I18N = {
     matrixRows: [
       {
         step: "1. Joining Loyalty",
-        merchant: "Counter par standee QR rakhna",
+        merchant: "Counter par standee QR rakhna & customer ko scan karne bolna",
         customer: "Phone camera se scan & send",
         ai: "Instant WhatsApp welcome & digital wallet creation",
       },
       {
         step: "2. Stamp Crediting",
-        merchant: "Bill amount enter karke 'Approve' click (3s)",
+        merchant: "Bill amount enter karke 'Approve' click (optional product name) (3s)",
         customer: "Sirf normal bill pay karna",
         ai: "WhatsApp bill receipt + animated stamp card update",
       },
       {
         step: "3. Google 5★ Review",
-        merchant: "Zero work (kabhi mangna nahi padta)",
+        merchant: "Zero work (time-delay ke baad khud WhatsApp jata hai)",
         customer: "1-tap me AI review Google Maps pe post",
-        ai: "Gemini AI contextual review draft + delayed dispatch",
+        ai: "Gemini AI contextual review draft + delayed dispatch according to setting",
       },
       {
         step: "4. Review Response",
@@ -388,7 +393,7 @@ const I18N = {
       },
       {
         step: "6. Customer Retention",
-        merchant: "Dukaan chalana aur acche items bechna",
+        merchant: "Restaurant/Shop chalana aur acche items bechna",
         customer: "Personalized offers receive karna",
         ai: "30-day win-back offers, birthday treats & referrals",
       },
@@ -407,7 +412,7 @@ const SIMULATION_STAGES = [
       message: "Hi! Adding my visit at Cake Connection... 🥐",
       reply: "Welcome to Cake Connection VIP Club! 🎉 You have been added to the counter queue. As soon as cashier confirms your bill, your digital stamp will be added.",
     },
-    merchantAction: "Cashier simply welcomes the customer with a smile. No registration form, OTP, or mobile app installation required.",
+    merchantAction: "Cashier customer ko smile ke sath invite karta hai: 'Sir/Mam aap ab hamare Restaurant/Shop ke VIP Club me Member ban sakte ho, uske liye just ye QR code Scan kijiye, bilkul Free he.'",
     merchantScreen: {
       title: "Live Queue Screen (/dashboard/queue)",
       badge: "1 Customer Waiting",
@@ -425,11 +430,11 @@ const SIMULATION_STAGES = [
       message: "Bill paid: ₹320. Waiting for receipt ping on WhatsApp...",
       reply: "",
     },
-    merchantAction: "Cashier sees Rahul Sharma on their Live Queue desk, types '320' in the amount box, and taps the green 'Approve Stamp (✓)' button.",
+    merchantAction: "Cashier sees Rahul Sharma on Live Queue, types '320' (aur optional product name), and taps green 'Approve Stamp (✓)' button.",
     merchantScreen: {
       title: "Cashier Actions (Live Queue)",
       badge: "Action Required (Takes 3s)",
-      content: "Amount: [ ₹320 ]  ➔  [ ✓ Approve Stamp (1 Stamp Awarded) ]",
+      content: "Amount: [ ₹320 ]  | Item: [ Pastry (Opt) ] ➔  [ ✓ Approve Stamp (1 Stamp Awarded) ]",
     },
     timeNeeded: "3 Seconds",
     automation: "Instant stamp calculation & digital wallet balance update",
@@ -454,14 +459,14 @@ const SIMULATION_STAGES = [
   },
   {
     stage: 4,
-    title: "Stage 4: AI-Crafted 5-Star Google Review",
+    title: "Stage 4: AI-Crafted 5-Star Google Review (After Set Delay)",
     short: "4. Google Review",
-    customerAction: "After visiting, the customer receives an automated WhatsApp prompt with an AI-crafted genuine 5-star review. With 1 tap, they publish it to Google Maps.",
+    customerAction: "After visiting (after merchant's configured time-delay), customer receives WhatsApp prompt with AI-crafted 5★ review and posts with 1-click.",
     customerScreen: {
       message: "How was your experience at Cake Connection? 🌟\n\nAI drafted a review for you:\n\"Loved the fresh pastries at Cake Connection! Great ambiance and polite staff in Vadodara.\"\n\n👉 [ Post to Google Maps (1 Tap) ]",
       reply: "",
     },
-    merchantAction: "Zero effort! The store owner never has to beg for reviews. When the 5★ review goes live on Google Maps, Gemini AI publishes an appreciative owner reply automatically.",
+    merchantAction: "Zero effort! When 5★ review goes live on Google Maps, Gemini AI publishes an appreciative owner reply automatically.",
     merchantScreen: {
       title: "Google Review Dashboard",
       badge: "5★ New Review on Google Maps",
@@ -829,6 +834,19 @@ export default function LiveCounterOperationsManualPage() {
                   <h4 className="text-base font-bold text-slate-900">{step.title}</h4>
                   {"desc" in step && step.desc && (
                     <p className="text-xs text-slate-700 leading-relaxed">{step.desc}</p>
+                  )}
+
+                  {/* USER REQUESTED VERBAL PITCH IN STEP M1 */}
+                  {"pitch" in step && step.pitch && (
+                    <div className="p-4 bg-amber-50 border-2 border-amber-200/80 rounded-2xl text-xs space-y-1.5">
+                      <div className="font-bold text-amber-900 flex items-center gap-1.5">
+                        <Volume2 className="w-4 h-4 text-amber-700" />
+                        <span>{step.pitchTitle}</span>
+                      </div>
+                      <p className="text-amber-950 font-medium leading-relaxed italic">
+                        &quot;{step.pitch}&quot;
+                      </p>
+                    </div>
                   )}
 
                   {"highlight" in step && step.highlight && (

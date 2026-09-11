@@ -477,8 +477,11 @@ export default function Home() {
             <Link href="/pricing" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
               Pricing
             </Link>
-            <Link href="/guide/3-day-trial" className="px-3 py-2 rounded-lg text-sm font-bold text-emerald-700 hover:text-emerald-900 hover:bg-emerald-50 transition flex items-center gap-1">
-              <span>📘 3-Day Guide</span>
+            <Link href="/guide/3-day-trial" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
+              5-Min Setup
+            </Link>
+            <Link href="/guide/operations" className="px-3 py-2 rounded-lg text-sm font-bold text-emerald-700 hover:text-emerald-900 hover:bg-emerald-50 transition flex items-center gap-1">
+              <span>🔄 Operations Manual</span>
             </Link>
             <Link href="/case-studies/cake-connection" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
               Case Study
@@ -556,8 +559,11 @@ export default function Home() {
             </div>
 
             <div className="space-y-1 border-t border-slate-100 pt-3">
-              <Link href="/guide/3-day-trial" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-bold text-emerald-700 bg-emerald-50/80 rounded-lg">
-                📘 3-Day Free Trial Guide &amp; Infographic
+              <Link href="/guide/3-day-trial" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-semibold text-slate-800 rounded-lg hover:bg-slate-50">
+                🛠️ 5-Minute Setup Guide
+              </Link>
+              <Link href="/guide/operations" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-bold text-emerald-700 bg-emerald-50/80 rounded-lg">
+                🔄 Live Operations Manual (Counter Flow)
               </Link>
               <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-bold text-slate-900">
                 ⚡ View Transparent Pricing
@@ -2442,7 +2448,8 @@ export default function Home() {
             <div className="space-y-3">
               <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Product</h4>
               <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
-                <li><Link href="/guide/3-day-trial" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">📘 3-Day Trial Guide</Link></li>
+                <li><Link href="/guide/3-day-trial" className="hover:text-emerald-400 transition-colors">🛠️ 5-Min Setup Guide</Link></li>
+                <li><Link href="/guide/operations" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">🔄 Live Operations Manual</Link></li>
                 <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing &amp; Plans</Link></li>
                 <li><Link href="/case-studies/cake-connection" className="hover:text-emerald-400 transition-colors">Case Study: Cake Connection</Link></li>
                 <li><Link href="#faq" className="hover:text-emerald-400 transition-colors">Frequently Asked Questions</Link></li>
