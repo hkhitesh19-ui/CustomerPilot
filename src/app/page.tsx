@@ -20,7 +20,6 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BrandLogo } from "@/components/brand-logo"
 import { FaqSection } from "@/components/faq-section"
-import { AIReplySandbox } from "@/components/ai-reply-sandbox"
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/scroll-reveal"
 import { CountUp } from "@/components/count-up"
 
@@ -483,9 +482,6 @@ export default function Home() {
             </Link>
             <Link href="/case-studies/cake-connection" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
               Case Study
-            </Link>
-            <Link href="#ai-demo" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
-              AI Demo
             </Link>
             <Link href="#roi" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
               ROI Calculator
@@ -1286,9 +1282,6 @@ export default function Home() {
           </StaggerContainer>
         </div>
       </section>
-
-      {/* ============ AI REPLY SANDBOX (Interactive Demo) ============ */}
-      <AIReplySandbox />
 
       {/* ============ FEATURE COMPARISON MATRIX TABLE (Ultra High-Converting Dominant Complete Suite) ============ */}
       <section className="py-20 sm:py-28 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white border-y border-slate-800 relative overflow-hidden" id="comparison">
@@ -2452,7 +2445,6 @@ export default function Home() {
                 <li><Link href="/guide/3-day-trial" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">📘 3-Day Trial Guide</Link></li>
                 <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing &amp; Plans</Link></li>
                 <li><Link href="/case-studies/cake-connection" className="hover:text-emerald-400 transition-colors">Case Study: Cake Connection</Link></li>
-                <li><Link href="#ai-demo" className="hover:text-emerald-400 transition-colors">AI Review Reply Demo</Link></li>
                 <li><Link href="#faq" className="hover:text-emerald-400 transition-colors">Frequently Asked Questions</Link></li>
                 <li><Link href="/features/whatsapp-stamp-card" className="hover:text-emerald-400 transition-colors">Digital Loyalty stamps</Link></li>
                 <li><Link href="/features/google-review-automation" className="hover:text-emerald-400 transition-colors">Smart Ai Google Review</Link></li>
