@@ -72,6 +72,7 @@ async function handleConnect(req: Request) {
     const isSilent = url.searchParams.get("silent") === "true"
     let forceRefresh = url.searchParams.get("force") === "true" || url.searchParams.get("refresh") === "true"
     let inputPhone = url.searchParams.get("phone") || url.searchParams.get("number")
+    let connectMode = url.searchParams.get("mode") || "qr"
 
     if (req.method === "POST") {
       try {
@@ -79,8 +80,11 @@ async function handleConnect(req: Request) {
         if (body.forceRefresh !== undefined) forceRefresh = !!body.forceRefresh
         if (body.phone) inputPhone = body.phone
         if (body.number) inputPhone = body.number
+        if (body.mode) connectMode = body.mode
       } catch {}
     }
+
+    const isPairing = connectMode === "pairing"
 
     let cleanPhone: string | null = null
     const candidatePhone = inputPhone || merchant.whatsappPhone
@@ -140,15 +144,19 @@ async function handleConnect(req: Request) {
       await fetch(`${EVOLUTION_API_URL}/instance/delete/${currentInstanceName}`, { method: "DELETE", headers }).catch(() => null)
     }
 
+    if (isPairing && !cleanPhone) {
+      return NextResponse.json({ ok: false, error: "Please enter a valid 10-digit WhatsApp phone number to generate a pairing code." }, { status: 400 })
+    }
+
     // ── Step 3: Create a 100% FRESH, session-unique instance ──────────────────
     const freshInstanceName = buildInstanceName(cleanPhone, merchant.id, true)
-    console.log(`[WhatsApp Connect] Creating fresh session-unique instance: ${freshInstanceName}`)
+    console.log(`[WhatsApp Connect] Creating fresh session-unique instance: ${freshInstanceName} (Mode: ${isPairing ? "Pairing Code" : "QR Scan"})`)
 
     const liveWebhook = getLiveWebhookUrl()
     const createPayload: Record<string, any> = {
       instanceName: freshInstanceName,
       token: `cpilot_${merchant.id.slice(0, 8)}`,
-      qrcode: true,
+      qrcode: !isPairing,
       integration: "WHATSAPP-BAILEYS",
       reject_call: false,
     }
@@ -184,23 +192,35 @@ async function handleConnect(req: Request) {
     const createData = await createRes.json().catch(() => null)
     let rawCode: string | null = createData?.qrcode?.code || null
     let qrBase64: string | null = createData?.qrcode?.base64 || null
+    let pairingCode: string | null = createData?.pairingCode || null
 
-    // If QR code is not immediately ready in create response, poll connect once
-    if (!qrBase64 && !rawCode) {
-      await new Promise((r) => setTimeout(r, 1200))
-      const pollConnect = await fetch(`${EVOLUTION_API_URL}/instance/connect/${freshInstanceName}`, { headers }).catch(() => null)
-      if (pollConnect && pollConnect.ok) {
-        const pData = await pollConnect.json().catch(() => null)
-        qrBase64 = pData?.qrcode?.base64 || pData?.base64 || null
-        rawCode = pData?.qrcode?.code || pData?.code || null
+    if (isPairing) {
+      if (!pairingCode) {
+        await new Promise((r) => setTimeout(r, 1500))
+        const pollConnect = await fetch(`${EVOLUTION_API_URL}/instance/connect/${freshInstanceName}?number=${cleanPhone}`, { headers }).catch(() => null)
+        if (pollConnect && pollConnect.ok) {
+          const pData = await pollConnect.json().catch(() => null)
+          pairingCode = pData?.pairingCode || null
+        }
       }
-    }
+    } else {
+      // If QR code is not immediately ready in create response, poll connect once
+      if (!qrBase64 && !rawCode) {
+        await new Promise((r) => setTimeout(r, 1200))
+        const pollConnect = await fetch(`${EVOLUTION_API_URL}/instance/connect/${freshInstanceName}`, { headers }).catch(() => null)
+        if (pollConnect && pollConnect.ok) {
+          const pData = await pollConnect.json().catch(() => null)
+          qrBase64 = pData?.qrcode?.base64 || pData?.base64 || null
+          rawCode = pData?.qrcode?.code || pData?.code || null
+        }
+      }
 
-    if (rawCode) {
-      try {
-        qrBase64 = await QRCode.toDataURL(rawCode, { width: 800, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
-      } catch (err) {
-        console.warn(`[WhatsApp Connect] Failed to generate high-res QR, falling back to base64`, err)
+      if (rawCode) {
+        try {
+          qrBase64 = await QRCode.toDataURL(rawCode, { width: 800, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
+        } catch (err) {
+          console.warn(`[WhatsApp Connect] Failed to generate high-res QR, falling back to base64`, err)
+        }
       }
     }
 
@@ -213,13 +233,14 @@ async function handleConnect(req: Request) {
       }
     })
 
-    console.log(`[WhatsApp Connect] Fresh instance created successfully: ${freshInstanceName} | QR Ready: ${!!qrBase64}`)
+    console.log(`[WhatsApp Connect] Fresh instance created successfully: ${freshInstanceName} | Mode: ${isPairing ? "Pairing Code" : "QR"} | Ready: ${isPairing ? !!pairingCode : !!qrBase64}`)
 
     return NextResponse.json({
       ok: true, status: "connecting", connected: false, instanceName: freshInstanceName,
       whatsappPhone: cleanPhone || merchant.whatsappPhone,
       qrCodeBase64: qrBase64,
-      expiresIn: 30,
+      pairingCode: pairingCode,
+      expiresIn: isPairing ? 120 : 30,
     })
 
   } catch (error: any) {

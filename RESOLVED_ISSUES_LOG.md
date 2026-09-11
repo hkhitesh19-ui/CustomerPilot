@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [11 Sep 2026] Issue: Onboarding Step 2 WhatsApp Linking - Replaced Broken System OTP with Native Baileys Pairing Code
+- **Symptom**: On Onboarding Step 2 (`/onboarding?step=2`), attempting to connect store WhatsApp via the "SMS / OTP Code" tab produced the error: `"Failed to send via Evolution API: WhatsApp API Error: The 'CustomerPilot_Main' instance does not exist"`.
+- **Root Cause**: The OTP mode attempted to send an outbound verification WhatsApp message from a central administrative instance (`CustomerPilot_Main`) which was not provisioned or connected on the Evolution API container. Sending an OTP is also fundamentally fragile because it creates a circular dependency on a central admin WhatsApp account/SMS gateway for new merchants to onboard.
+- **Resolution**:
+  1. Kept the existing Instant QR Code Scan (Option A1) 100% untouched as the primary, seamless method.
+  2. Upgraded the secondary mode from broken "SMS / OTP" to Evolution API's native Baileys **WhatsApp Web Pairing Code** (Option A2):
+     - Updated `/api/whatsapp/connect` to support `mode=pairing`: creates a fresh instance with `qrcode: false`, sets the merchant's store phone number, and retrieves the 8-character pairing code directly from Evolution API (`/instance/connect/{instanceName}?number={phone}`).
+     - Updated `OnboardStep2WhatsApp` in `src/app/onboarding/page.tsx`: added a "🔢 Link via Phone (Pairing Code)" tab featuring a 4-step guide, large monospace code display (`ABCD - EFGH`), one-click "Copy Code" button, and auto-countdown.
+     - Status polling (`/api/whatsapp/status`) automatically detects when the merchant inputs the 8-digit code into WhatsApp's "Link with phone number instead", instantly transitioning to the green celebration state.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [11 Sep 2026] Issue: UI Refinements, WhatsApp Instance Format, Standee Print Sync & Template Updates
 - **Symptom**: User requested 6 refinements:
   1. Signup page subtitle to clarify "Login with your Registered Google Business Profile Gmail Id".

@@ -565,17 +565,18 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
   const [qrCodeBase64, setQrCodeBase64] = useState<string | null>(null)
   const [connectionStatus, setConnectionStatus] = useState<"connecting" | "open" | "disconnected">("connecting")
   const [instanceName, setInstanceName] = useState<string>("")
-  const [connectMode, setConnectMode] = useState<"qr" | "otp">("qr")
+  const [connectMode, setConnectMode] = useState<"qr" | "pairing">("qr")
   const [sessionCountdown, setSessionCountdown] = useState(TOTAL_SESSION_SECONDS)
   const sessionTimerRef = useRef<NodeJS.Timeout | null>(null)
   const silentRefreshRef = useRef<NodeJS.Timeout | null>(null)
 
-  // OTP Fallback state
-  const [otp, setOtp] = useState("")
-  const [sendingOtp, setSendingOtp] = useState(false)
-  const [verifying, setVerifying] = useState(false)
-  const [resendTimer, setResendTimer] = useState(0)
-  const [apiResponse, setApiResponse] = useState<any>(null)
+  // Pairing Code state (Native Baileys / WhatsApp Web 8-digit linking)
+  const [pairingPhone, setPairingPhone] = useState(data.whatsappNumber || "")
+  const [pairingCode, setPairingCode] = useState<string | null>(null)
+  const [loadingPairing, setLoadingPairing] = useState(false)
+  const [pairingCopied, setPairingCopied] = useState(false)
+  const [pairingError, setPairingError] = useState("")
+  const [pairingCountdown, setPairingCountdown] = useState(120) // 2 minutes
 
   // Format seconds into MM:SS format (e.g. 09:45)
   const formatTime = (totalSeconds: number) => {
@@ -688,49 +689,61 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
     }
   }, [connectMode, connectionStatus, qrCodeBase64, sessionCountdown, setData])
 
-  // OTP handlers for fallback
-  const sendOtp = async () => {
-    if (!data.whatsappNumber || data.whatsappNumber.length < 10) {
-      setError("Please enter a valid phone number with country code")
+  // Native WhatsApp 8-digit Pairing Code handlers (Baileys)
+  const handleGeneratePairingCode = async () => {
+    const rawDigits = (pairingPhone || data.whatsappNumber || "").replace(/\D/g, "")
+    if (rawDigits.length < 10) {
+      setPairingError("Please enter a valid 10-digit WhatsApp phone number")
       return
     }
-    setSendingOtp(true); setError("")
+    const cleanNumber = rawDigits.length === 10 ? `91${rawDigits}` : rawDigits
+    setLoadingPairing(true)
+    setPairingError("")
     try {
-      const res = await fetch("/api/whatsapp/send-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: data.whatsappNumber }),
-      })
+      const res = await fetch(`/api/whatsapp/connect?mode=pairing&force=true&phone=${encodeURIComponent(cleanNumber)}`)
       const json = await res.json()
       if (res.ok && json.ok) {
-        setData({ ...data, otpSent: true, otpSessionId: json.data.sessionId, deliveryStatus: json.data.deliveryResult?.status })
-        setApiResponse(json.data)
-        setResendTimer(json.data.resendCooldownSeconds || 10)
+        setInstanceName(json.instanceName || "")
+        if (json.pairingCode) {
+          setPairingCode(json.pairingCode)
+          setPairingCountdown(120)
+          setData((prev: any) => ({ ...prev, whatsappNumber: cleanNumber }))
+        } else if (json.status === "open" || json.connected) {
+          setConnectionStatus("open")
+          setData((prev: any) => ({ ...prev, otpVerified: true, whatsappNumber: json.whatsappPhone || cleanNumber }))
+        } else {
+          setPairingError("Could not generate pairing code. Please try again.")
+        }
       } else {
-        setError(json.error || "Failed to send OTP")
+        setPairingError(json.error || "Failed to generate pairing code")
       }
-    } catch { setError("Network error.") }
-    finally { setSendingOtp(false) }
+    } catch {
+      setPairingError("Network error. Please try again.")
+    } finally {
+      setLoadingPairing(false)
+    }
   }
 
-  const verifyOtp = async () => {
-    if (otp.length !== 4) { setError("Please enter the 4-digit OTP"); return }
-    setVerifying(true); setError("")
-    try {
-      const res = await fetch("/api/whatsapp/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: data.otpSessionId, otp }),
+  // Pairing code 2-minute countdown timer
+  useEffect(() => {
+    if (connectMode !== "pairing" || !pairingCode || connectionStatus === "open") return
+    const timer = setInterval(() => {
+      setPairingCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          return 0
+        }
+        return prev - 1
       })
-      const json = await res.json()
-      if (res.ok && json.ok && json.data.verified) {
-        setData({ ...data, otpVerified: true })
-        setConnectionStatus("open")
-      } else {
-        setError(json.error || json.data?.message || "Invalid OTP")
-      }
-    } catch { setError("Verification failed.") }
-    finally { setVerifying(false) }
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [connectMode, pairingCode, connectionStatus])
+
+  const handleCopyPairingCode = () => {
+    if (!pairingCode) return
+    navigator.clipboard.writeText(pairingCode)
+    setPairingCopied(true)
+    setTimeout(() => setPairingCopied(false), 2500)
   }
 
   return (
@@ -756,10 +769,10 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
             📷 Instant QR Scan
           </button>
           <button
-            onClick={() => setConnectMode("otp")}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${connectMode === "otp" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"}`}
+            onClick={() => setConnectMode("pairing")}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${connectMode === "pairing" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"}`}
           >
-            💬 SMS / OTP Code
+            🔢 Link via Phone (Pairing Code)
           </button>
         </div>
       </div>
@@ -876,65 +889,150 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
           </div>
         </div>
       ) : (
-        /* OTP Connect Mode (Fallback) */
-        <div className="space-y-6 max-w-lg mx-auto">
-          {!data.otpVerified ? (
-            <>
-              <div>
-                <Label>WhatsApp Business Number *</Label>
-                <div className="flex gap-2 mt-1">
+        /* Pairing Code Mode (Option A2 - For mobile users on the same phone) */
+        <div className="max-w-xl mx-auto space-y-5">
+          {!pairingCode ? (
+            /* Input View to generate pairing code */
+            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4">
+              <div className="space-y-1">
+                <h4 className="font-bold text-slate-900 text-base">Link with WhatsApp 8-Digit Pairing Code</h4>
+                <p className="text-xs text-slate-500">
+                  Ideal if you are on mobile or cannot scan a QR code. Enter your WhatsApp number to get an 8-character pairing code.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-700">Store WhatsApp Number *</Label>
+                <div className="flex gap-2">
                   <Input
-                    value={data.whatsappNumber}
-                    onChange={e => setData({ ...data, whatsappNumber: e.target.value })}
-                    placeholder="e.g., 919033304707"
-                    disabled={data.otpSent}
+                    value={pairingPhone}
+                    onChange={(e) => {
+                      setPairingPhone(e.target.value)
+                      setPairingError("")
+                    }}
+                    placeholder="e.g. 919033304707 or 9033304707"
+                    disabled={loadingPairing}
+                    className="bg-white font-mono"
                   />
                   <Button
-                    onClick={sendOtp}
-                    disabled={data.otpSent || data.whatsappNumber.length < 10 || resendTimer > 0}
-                    className="bg-slate-900 text-white"
+                    onClick={handleGeneratePairingCode}
+                    disabled={loadingPairing || pairingPhone.replace(/\D/g, "").length < 10}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shrink-0"
                   >
-                    {sendingOtp ? <Loader2 className="w-4 h-4 animate-spin" /> : data.otpSent ? "Sent ✓" : "Send OTP"}
+                    {loadingPairing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      "Get Pairing Code"
+                    )}
                   </Button>
+                </div>
+                {pairingError && (
+                  <p className="text-xs text-rose-600 font-medium">{pairingError}</p>
+                )}
+              </div>
+
+              <div className="p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl space-y-1.5 text-xs text-blue-900">
+                <p className="font-bold flex items-center gap-1.5">
+                  <span>ℹ️</span> How it works:
+                </p>
+                <p className="text-[11px] text-blue-800 leading-relaxed">
+                  WhatsApp allows linking devices directly through an 8-character code. You enter this code inside your WhatsApp app under <strong>Settings ➔ Linked Devices ➔ Link with phone number instead</strong>.
+                </p>
+              </div>
+            </div>
+          ) : (
+            /* Active Pairing Code View */
+            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-5 shadow-sm">
+              <div className="text-center space-y-1">
+                <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[11px] px-3 py-0.5">
+                  Pairing Code Generated
+                </Badge>
+                <h4 className="font-extrabold text-slate-900 text-lg">Enter this code in WhatsApp</h4>
+                <p className="text-xs text-slate-500">Open WhatsApp on your phone and link with this 8-character code</p>
+              </div>
+
+              {/* Big Monospace Code Display */}
+              <div className="bg-white p-5 rounded-2xl border-2 border-emerald-400 text-center space-y-3 shadow-md max-w-sm mx-auto">
+                <div className="flex items-center justify-center">
+                  <span className="font-mono text-3xl sm:text-4xl font-black tracking-wider text-slate-900 select-all">
+                    {pairingCode.length === 8 ? `${pairingCode.slice(0, 4)} - ${pairingCode.slice(4)}` : pairingCode}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-center gap-2 pt-1">
+                  <Button
+                    size="sm"
+                    onClick={handleCopyPairingCode}
+                    className={`text-xs font-bold transition-all ${
+                      pairingCopied
+                        ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                        : "bg-slate-900 text-white hover:bg-slate-800"
+                    }`}
+                  >
+                    {pairingCopied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 mr-1" />
+                        Copied! ✓
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 mr-1" />
+                        Copy Code
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleGeneratePairingCode}
+                    disabled={loadingPairing}
+                    className="text-xs text-slate-600"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 mr-1 ${loadingPairing ? "animate-spin" : ""}`} />
+                    New Code
+                  </Button>
+                </div>
+
+                <div className="text-[11px] text-slate-500 font-mono">
+                  {pairingCountdown > 0 ? (
+                    <span>Expires in: <strong className="text-emerald-700">{formatTime(pairingCountdown)}</strong></span>
+                  ) : (
+                    <span className="text-amber-600 font-bold">Code expired. Click "New Code" above.</span>
+                  )}
                 </div>
               </div>
 
-              {data.otpSent && (
-                <div className="space-y-3">
-                  {apiResponse?.isSameNumber && (
-                    <div className="p-4 bg-amber-50 border border-amber-300 rounded-xl">
-                      <p className="text-sm font-bold text-amber-800 mb-2">⚠️ OTP Code:</p>
-                      <div className="bg-white border-2 border-amber-400 rounded-lg p-3 text-center">
-                        <p className="text-4xl font-mono font-black tracking-[0.5em] text-slate-900">{apiResponse.otp}</p>
-                      </div>
-                    </div>
-                  )}
-                  <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200 space-y-3">
-                    <Label className="text-xs">Enter 4-digit OTP</Label>
-                    <div className="flex gap-2 mt-1">
-                      <Input
-                        value={otp}
-                        onChange={e => setOtp(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                        placeholder="1234"
-                        maxLength={4}
-                        className="font-mono text-center tracking-widest text-lg font-bold"
-                      />
-                      <Button
-                        onClick={verifyOtp}
-                        disabled={verifying || otp.length !== 4}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                      >
-                        {verifying ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify"}
-                      </Button>
-                    </div>
+              {/* 4 Simple Steps to enter code on phone */}
+              <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2.5">
+                <h5 className="font-bold text-xs text-slate-800 uppercase tracking-wider">How to link on your phone:</h5>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2.5 text-xs text-slate-700">
+                    <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
+                    <span>Open <strong>WhatsApp</strong> on your store phone.</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-xs text-slate-700">
+                    <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
+                    <span>Tap <strong>Settings / 3 Dots (⋮)</strong> ➔ select <strong>Linked Devices</strong>.</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-xs text-slate-700">
+                    <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
+                    <span>Tap <strong>Link a Device</strong>, then at the bottom tap <strong>"Link with phone number instead"</strong>.</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-xs text-slate-700">
+                    <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">4</span>
+                    <span>Enter the 8-character code: <strong className="font-mono bg-emerald-50 text-emerald-800 px-1 py-0.5 rounded">{pairingCode}</strong></span>
                   </div>
                 </div>
-              )}
-            </>
-          ) : (
-            <div className="p-6 bg-emerald-50 rounded-xl border border-emerald-200 text-center space-y-2">
-              <Check className="w-6 h-6 text-emerald-600 mx-auto" />
-              <h3 className="font-bold text-slate-900">WhatsApp Verified!</h3>
+              </div>
+
+              {/* Waiting status pill */}
+              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center justify-center gap-2 text-center">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span>Waiting for connection... This page will update automatically once you enter the code on your phone.</span>
+              </div>
             </div>
           )}
         </div>
