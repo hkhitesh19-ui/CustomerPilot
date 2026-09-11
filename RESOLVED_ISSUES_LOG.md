@@ -3,6 +3,19 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [11 Sep 2026] Issue: WhatsApp Connect & Pairing Code 401 Unauthorized on Onboarding Step 2
+- **Symptom**: On live production `/onboarding?step=2`, QR code generation showed "Initializing QR Code..." indefinitely, and clicking "Get Pairing Code" showed a red error message: `"Unauthorized"`.
+- **Root Cause**: 
+  1. In `src/proxy.ts`, `/api/whatsapp/` was not included in `PUBLIC_API_PREFIXES`. As a result, the Next.js edge proxy middleware intercepted all incoming `/api/whatsapp/*` calls and returned `401 Unauthorized` before reaching the API route if the custom `token` cookie was missing or if authenticated via Google OAuth / NextAuth.
+  2. In `getAuthMerchant`, session resolution was only checking `x-merchant-id` and `token` cookie, missing the `merchant_id` cookie and `merchantId` query parameter.
+  3. In `OnboardStep2WhatsApp`, fetch calls did not explicitly pass the `x-merchant-id` header or `merchantId` query parameter.
+- **Resolution**:
+  1. Added `/api/whatsapp/` to `PUBLIC_API_PREFIXES` in `src/proxy.ts` so proxy middleware allows WhatsApp connection endpoints to process their own auth.
+  2. Enhanced `getAuthMerchant` in `src/app/api/whatsapp/connect/route.ts` and `src/app/api/whatsapp/status/route.ts` with 5-tier fallback: `x-merchant-id` header, `merchantId` query param, `merchant_id` cookie, JWT `token` cookie, and DB fallback.
+  3. Updated all fetch calls in `OnboardStep2WhatsApp` in `src/app/onboarding/page.tsx` (`fetchInstanceStatus`, `handleGeneratePairingCode`, `silentRefreshRef`, and polling) to pass `x-merchant-id` header and `merchantId` query parameter.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [11 Sep 2026] Issue: Onboarding Step 2 WhatsApp Linking - Replaced Broken System OTP with Native Baileys Pairing Code
 - **Symptom**: On Onboarding Step 2 (`/onboarding?step=2`), attempting to connect store WhatsApp via the "SMS / OTP Code" tab produced the error: `"Failed to send via Evolution API: WhatsApp API Error: The 'CustomerPilot_Main' instance does not exist"`.
 - **Root Cause**: The OTP mode attempted to send an outbound verification WhatsApp message from a central administrative instance (`CustomerPilot_Main`) which was not provisioned or connected on the Evolution API container. Sending an OTP is also fundamentally fragile because it creates a circular dependency on a central admin WhatsApp account/SMS gateway for new merchants to onboard.

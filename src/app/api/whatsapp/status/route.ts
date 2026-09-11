@@ -15,8 +15,21 @@ async function getAuthMerchant(req: Request) {
     if (m) return m
   }
 
+  const url = new URL(req.url)
+  const queryMerchantId = url.searchParams.get("merchantId")
+  if (queryMerchantId) {
+    const m = await db.merchant.findUnique({ where: { id: queryMerchantId } })
+    if (m) return m
+  }
+
   try {
     const cookieStore = await cookies()
+    const merchantCookie = cookieStore.get("merchant_id")?.value
+    if (merchantCookie) {
+      const m = await db.merchant.findUnique({ where: { id: merchantCookie } })
+      if (m) return m
+    }
+
     const token = cookieStore.get("token")?.value
     if (token) {
       const secret = new TextEncoder().encode(JWT_SECRET)

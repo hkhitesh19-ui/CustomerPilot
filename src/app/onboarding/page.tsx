@@ -592,8 +592,11 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
       const params = new URLSearchParams()
       if (force) params.append("force", "true")
       if (data.whatsappNumber) params.append("phone", data.whatsappNumber)
+      if (data.merchantId) params.append("merchantId", data.merchantId)
 
-      const res = await fetch(`/api/whatsapp/connect?${params.toString()}`)
+      const res = await fetch(`/api/whatsapp/connect?${params.toString()}`, {
+        headers: data.merchantId ? { "x-merchant-id": data.merchantId } : {},
+      })
       const json = await res.json()
       if (res.ok && json.ok) {
         setInstanceName(json.instanceName || "")
@@ -620,7 +623,10 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
     const interval = setInterval(() => {
       if (connectionStatus !== "open") {
         // Simple polling for state if not yet connected
-        fetch("/api/whatsapp/status")
+        const mParam = data.merchantId ? `?merchantId=${encodeURIComponent(data.merchantId)}` : ""
+        fetch(`/api/whatsapp/status${mParam}`, {
+          headers: data.merchantId ? { "x-merchant-id": data.merchantId } : {},
+        })
           .then(r => r.json())
           .then(json => {
              if (json.ok && (json.status === "open" || json.connected)) {
@@ -634,7 +640,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
 
     return () => clearInterval(interval)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [data.merchantId])
 
   // 10-Minute Live Session Countdown Timer
   useEffect(() => {
@@ -670,7 +676,10 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
     silentRefreshRef.current = setInterval(async () => {
       try {
         const phoneParam = data.whatsappNumber ? `&phone=${encodeURIComponent(data.whatsappNumber)}` : ""
-        const res = await fetch(`/api/whatsapp/connect?silent=true${phoneParam}`)
+        const mParam = data.merchantId ? `&merchantId=${encodeURIComponent(data.merchantId)}` : ""
+        const res = await fetch(`/api/whatsapp/connect?silent=true${phoneParam}${mParam}`, {
+          headers: data.merchantId ? { "x-merchant-id": data.merchantId } : {},
+        })
         if (res.ok) {
           const json = await res.json()
           if (json.status === "open" || json.connected) {
@@ -687,7 +696,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
     return () => {
       if (silentRefreshRef.current) clearInterval(silentRefreshRef.current)
     }
-  }, [connectMode, connectionStatus, qrCodeBase64, sessionCountdown, setData])
+  }, [connectMode, connectionStatus, qrCodeBase64, sessionCountdown, setData, data.merchantId])
 
   // Native WhatsApp 8-digit Pairing Code handlers (Baileys)
   const handleGeneratePairingCode = async () => {
@@ -700,7 +709,10 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
     setLoadingPairing(true)
     setPairingError("")
     try {
-      const res = await fetch(`/api/whatsapp/connect?mode=pairing&force=true&phone=${encodeURIComponent(cleanNumber)}`)
+      const mParam = data.merchantId ? `&merchantId=${encodeURIComponent(data.merchantId)}` : ""
+      const res = await fetch(`/api/whatsapp/connect?mode=pairing&force=true&phone=${encodeURIComponent(cleanNumber)}${mParam}`, {
+        headers: data.merchantId ? { "x-merchant-id": data.merchantId } : {},
+      })
       const json = await res.json()
       if (res.ok && json.ok) {
         setInstanceName(json.instanceName || "")
