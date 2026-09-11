@@ -3,6 +3,22 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [11 Sep 2026] Issue: Google OAuth Callback `?error=oauth_error` on Live Signup (Prisma Schema Sync Fix)
+- **Symptom**: On live production website (`https://customerpilot.in/signup`), when a user/merchant clicked "Sign in with Google", selected their Gmail account, and authorized access, the app redirected back to `https://customerpilot.in/signup?error=oauth_error`.
+- **Root Cause**: 
+  - Token exchange with Google and user profile fetching succeeded completely (`access_token` and Google email were received).
+  - During merchant provisioning in `src/app/api/auth/google/callback/route.ts`, the code called `generateMerchantIdNumber(db)` to assign a human-readable ID (`CP-XXXXXX`).
+  - That function executed `prisma.merchant.findUnique({ where: { merchantIdNumber } })`.
+  - On the Hostinger VPS server, the Prisma Client had not been regenerated with the newly added `merchantIdNumber` field, causing `PrismaClientValidationError: Invalid prisma.merchant.findUnique() invocation: where: { merchantIdNumber: "CP-XXXXXX" }`. This caught into the global handler and redirected to `?error=oauth_error`.
+- **Resolution**:
+  1. Connected to VPS and executed `npx prisma db push --accept-data-loss` to sync database columns.
+  2. Executed `npx prisma generate` to recompile the Prisma Client on the server.
+  3. Recompiled Next.js production standalone build (`npm run build`) and synced static assets into `.next/standalone/`.
+  4. Reloaded PM2 service `customerpilot-web`.
+  5. Verified zero Prisma validation exceptions in PM2 logs.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [11 Sep 2026] Issue: Hostinger VPS Production Deployment, Sharp Linux Binary & Standalone Build Fix
 - **Symptom**: During live deployment of latest features (`/guide/operations`, `/guide/5-minute-setup-guide`) to Hostinger VPS (`200.97.170.53`), (1) `npm run build` failed with `Error: Could not load the "sharp" module using the linux-x64 runtime` and (2) PM2 `customerpilot-web` crashed repeatedly in restart loop with `Error: Cannot find module '/var/www/CustomerPilot/.next/standalone/server.js'`, resulting in HTTP 502 Bad Gateway from Nginx.
 - **Root Cause**: 
