@@ -44,7 +44,8 @@ const referralNav = [
 ]
 
 const bottomNav = [
-  { name: "3-Day Trial Guide", href: "/guide/3-day-trial", icon: BookOpen },
+  { name: "5-Min Setup Guide", href: "/guide/5-minute-setup-guide", icon: BookOpen },
+  { name: "Operations Manual", href: "/guide/operations", icon: BookOpen },
   { name: "Subscription", href: "/dashboard/subscription", icon: Crown },
 ]
 

@@ -130,12 +130,12 @@ const I18N = {
             desc: "Customers automatically receive AI review prompts on WhatsApp after the customizable time delay. Merchant never needs to beg.",
           },
           {
-            title: "🤖 Gemini AI Auto-Replies",
-            desc: "When a 5-star review appears on Google Maps, Gemini AI instantly publishes a polite, personalized owner reply.",
+            title: "🤖 1-Click AI Review Reply Studio",
+            desc: "For any Google review, CustomerPilot AI automatically writes an appreciative owner reply for you; you simply check it and 1-Click Publish to Google Maps.",
           },
           {
             title: "💌 30-Day Win-Backs",
-            desc: "Customers who haven't returned for 30 days receive automated friendly WhatsApp reminders with tailored treats.",
+            desc: "Customers who haven't returned for 30 days automatically receive friendly reminder messages with personalized treats.",
           },
         ],
       },
@@ -199,9 +199,9 @@ const I18N = {
       },
       {
         step: "4. Google Review Auto-Replies",
-        merchant: "Zero effort (no manual typing)",
+        merchant: "Review AI draft and 1-Click Publish (1 second)",
         customer: "N/A",
-        ai: "Gemini AI generates and posts polite owner replies directly onto Google Maps",
+        ai: "CustomerPilot AI pre-drafts appreciative owner replies for every review",
       },
       {
         step: "5. Claiming Free Rewards",
@@ -313,11 +313,11 @@ const I18N = {
           },
           {
             title: "🤖 AI Auto-Reply:",
-            desc: "Google Maps par aane wale 5★ review ka appreciative reply Gemini AI khud publish karta hai.",
+            desc: "Google Maps par aane wale koi bhi GoogleReview ka appreciative reply CustomerPilot ka AI khud se likh ke aapko de dega , aapko check karke 1 click Publish karna hai.",
           },
           {
             title: "💌 30-Day Win-Backs:",
-            desc: "Jo customer 30 din se nahi aaya, system use automatic re-engagement offer bhejta hai.",
+            desc: "Jo customer 30 din se nahi aaya, system use automatic reminder bhi message bhejta hai.",
           },
         ],
       },
@@ -381,9 +381,9 @@ const I18N = {
       },
       {
         step: "4. Review Response",
-        merchant: "Zero work (manual typing nahi)",
+        merchant: "AI draft check karke 1-Click Publish karna (1 second)",
         customer: "N/A",
-        ai: "Google Maps par AI owner reply autonomously published",
+        ai: "CustomerPilot AI khud se appreciative reply likh kar ready karta hai",
       },
       {
         step: "5. Reward Claim",
@@ -466,14 +466,14 @@ const SIMULATION_STAGES = [
       message: "How was your experience at Cake Connection? 🌟\n\nAI drafted a review for you:\n\"Loved the fresh pastries at Cake Connection! Great ambiance and polite staff in Vadodara.\"\n\n👉 [ Post to Google Maps (1 Tap) ]",
       reply: "",
     },
-    merchantAction: "Zero effort! When 5★ review goes live on Google Maps, Gemini AI publishes an appreciative owner reply automatically.",
+    merchantAction: "CustomerPilot AI Google Maps review ke liye appreciative reply khud se likh kar ready kar deta hai, aap check karke 1-Click Publish kar dete hain.",
     merchantScreen: {
-      title: "Google Review Dashboard",
-      badge: "5★ New Review on Google Maps",
-      content: "Rahul Sharma: 5 Stars ⭐⭐⭐⭐⭐\nAI Owner Reply Published: \"Thank you Rahul! So glad you loved our pastries. See you again soon! 💜\"",
+      title: "1-Click AI Review Reply Studio",
+      badge: "AI Reply Ready for Review",
+      content: "Rahul Sharma: 5 Stars ⭐⭐⭐⭐⭐\nCustomerPilot AI Draft: \"Thank you Rahul! So glad you loved our pastries. See you again soon! 💜\"\n[ 1-Click Publish to Google Maps ✓ ]",
     },
-    timeNeeded: "100% Automated",
-    automation: "Gemini AI review draft + Google Business Profile auto-fetch + AI owner reply publish",
+    timeNeeded: "1 Click (1 Second)",
+    automation: "Gemini AI reply drafting + Google Business Profile auto-fetch + 1-click publish",
   },
   {
     stage: 5,
@@ -509,7 +509,7 @@ export default function LiveCounterOperationsManualPage() {
       <div className="bg-gradient-to-r from-emerald-600 via-indigo-600 to-purple-600 text-white text-xs py-2.5 px-4 text-center font-bold tracking-wide flex items-center justify-center gap-2 shadow-xs">
         <Sparkles className="w-4 h-4 animate-spin" />
         <span>{t.topBanner}</span>
-        <Link href="/guide/3-day-trial" className="underline hover:text-emerald-200 ml-2 font-black">
+        <Link href="/guide/5-minute-setup-guide" className="underline hover:text-emerald-200 ml-2 font-black">
           {t.topLink}
         </Link>
       </div>
@@ -525,7 +525,7 @@ export default function LiveCounterOperationsManualPage() {
             <Link href="/" className="hover:text-slate-900 transition-colors">
               {t.navHome}
             </Link>
-            <Link href="/guide/3-day-trial" className="text-indigo-600 hover:text-indigo-700 font-bold flex items-center gap-1.5">
+            <Link href="/guide/5-minute-setup-guide" className="text-indigo-600 hover:text-indigo-700 font-bold flex items-center gap-1.5">
               <ArrowLeft className="w-4 h-4" />
               <span>{t.navSetup}</span>
             </Link>
@@ -983,7 +983,7 @@ export default function LiveCounterOperationsManualPage() {
               {t.ctaSubtitle}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3">
-              <Link href="/guide/3-day-trial">
+              <Link href="/guide/5-minute-setup-guide">
                 <Button className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-bold text-sm px-7 py-5 rounded-xl shadow-lg shadow-indigo-500/20">
                   {t.ctaBtnSetup}
                 </Button>
@@ -1011,7 +1011,7 @@ export default function LiveCounterOperationsManualPage() {
           <div className="flex items-center gap-6">
             <Link href="/pricing" className="hover:text-slate-900">Pricing</Link>
             <Link href="/terms" className="hover:text-slate-900">Terms &amp; Privacy</Link>
-            <Link href="/guide/3-day-trial" className="text-indigo-600 font-bold hover:underline">5-Minute Setup Guide</Link>
+            <Link href="/guide/5-minute-setup-guide" className="text-indigo-600 font-bold hover:underline">5-Minute Setup Guide</Link>
             <Link href="/guide/operations" className="text-emerald-700 font-bold hover:underline">Operations Manual</Link>
           </div>
         </div>

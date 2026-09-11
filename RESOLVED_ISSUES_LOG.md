@@ -3,6 +3,19 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [11 Sep 2026] Issue: 1-Click Review Reply Workflow, Win-Back Reminder Copy & Route Rename to /guide/5-minute-setup-guide
+- **Symptom**: (1) Operations manual stated Gemini AI automatically publishes replies to Google Maps without cashier approval; user clarified it should state: CustomerPilot AI writes the appreciative reply automatically, and merchant checks and 1-Click Publishes it. (2) Win-back copy needed to explicitly state "automatic reminder bhi message bhejta hai". (3) User requested changing URL path from `/guide/3-day-trial` to `/guide/5-minute-setup-guide`.
+- **Root Cause**: Earlier text represented autonomous GBP publishing instead of the verified 1-Click AutoReply pre-approval flow, and the route pathname needed to match the new "5-Minute Setup Guide" branding.
+- **Resolution**:
+  1. Updated Step M5, Simulation Stage 4, and Responsibility Matrix in `src/app/guide/operations/page.tsx` with user's exact wording: "Google Maps par aane wale koi bhi GoogleReview ka appreciative reply CustomerPilot ka AI khud se likh ke aapko de dega , aapko check karke 1 click Publish karna hai."
+  2. Updated 30-day win-backs text to: "Jo customer 30 din se nahi aaya, system use automatic reminder bhi message bhejta hai."
+  3. Created new route `src/app/guide/5-minute-setup-guide/page.tsx` containing the full 5-minute setup guide.
+  4. Configured `src/app/guide/3-day-trial/page.tsx` as a permanent Next.js redirect to `/guide/5-minute-setup-guide`.
+  5. Updated all internal links across `src/app/page.tsx`, `src/app/guide/operations/page.tsx`, `src/components/app-sidebar.tsx`, `src/app/dashboard/subscription/page.tsx`, and `InstructionFlow.md` Section 10.
+  6. Verified `/guide/5-minute-setup-guide` returns HTTP 200 OK and `/guide/3-day-trial` returns HTTP 307 redirect.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [11 Sep 2026] Issue: Guide Terminology Standardization & Review Time-Delay Customization
 - **Symptom**: User requested several content refinements across the guide system: (1) Rename CTA to "Ready to Setup Your Store Now?" on `/guide/3-day-trial`. (2) Add `/guide/operations` links to main homepage navigation and footer. (3) Replace all "Dukaan" terminology with "Restaurant/Shop". (4) In operations manual, update title to "Merchant Ki Journey: Restaurant/Shop ke Owner/Manager/Cashier Ko Kya-Kya Karna Hoga?" and add counter verbal pitch script and optional product name note. (5) In setup guide, clarify Google Business Profile email login and add a dedicated step for setting the Google Review WhatsApp link time-delay tailored per business type.
 - **Root Cause**: Setup guide was missing the vital post-bill time-delay configuration explanation (crucial for review conversion), and terminology was using "Dukaan" instead of standard modern "Restaurant/Shop" nomenclature.

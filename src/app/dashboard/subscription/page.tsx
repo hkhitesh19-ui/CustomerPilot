@@ -336,11 +336,11 @@ export default function SubscriptionPage() {
           </div>
         </div>
         <Link 
-          href="/guide/3-day-trial" 
+          href="/guide/5-minute-setup-guide" 
           target="_blank" 
           className="shrink-0 text-xs font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/60 px-4 py-2 rounded-xl border border-emerald-500/30 transition flex items-center gap-1.5 shadow-xs"
         >
-          <span>View 3-Day Guide</span>
+          <span>View Setup Guide</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
