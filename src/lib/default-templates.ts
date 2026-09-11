@@ -59,7 +59,7 @@ export const SYSTEM_DEFAULT_TEMPLATES: SystemTemplateDefinition[] = [
     language: "en",
     variables: ["customerName", "merchantName"],
     messageBody:
-      "✅ *Got it! Welcome, {{customerName}}!* 🎉\n\nYour FREE VIP Membership is now active at *{{merchantName}}*.\n\nYou're in the queue. Our team will add your first stamp after billing. 🌟",
+      "✅ *Got it! Welcome, {{customerName}}!* 🎉\n\nYour FREE VIP Membership is now active at *{{merchantName}}*.\n\nYou're in the queue. Our team will add your first stamp after Approval. 🌟",
   },
   {
     templateKey: "STAMP_EARNED",

@@ -501,10 +501,9 @@ export default function Home() {
             </Link>
             <Link
               href="#comparison"
-              className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-1"
+              className="hidden sm:flex bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition-all items-center gap-1"
             >
-              <span className="hidden sm:inline">Start 3 Days Free Trial Today</span>
-              <span className="sm:hidden">Start Free</span>
+              <span>Start 3 Days Free Trial Today</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
 
@@ -1659,17 +1658,17 @@ export default function Home() {
                   </td>
                   <td className="p-4 text-center border-l border-slate-800">
                     <Link href="/signup?module=loyalty" className="inline-flex w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-bold text-xs items-center justify-center transition">
-                      Trial Loyalty Stamps →
+                      3 Days Free Trial Loyalty Stamps →
                     </Link>
                   </td>
                   <td className="p-4 text-center border-l border-slate-800">
                     <Link href="/signup?module=reviews" className="inline-flex w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 font-bold text-xs items-center justify-center transition">
-                      Trial AI Reviews →
+                      3 Days Free Trial AI Reviews →
                     </Link>
                   </td>
                   <td className="p-4 text-center border-l border-slate-800">
                     <Link href="/signup?module=autoreply" className="inline-flex w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 font-bold text-xs items-center justify-center transition">
-                      Trial AutoReply →
+                      3 Days Free Trial AutoReply →
                     </Link>
                   </td>
 

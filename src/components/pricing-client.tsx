@@ -784,17 +784,17 @@ export function PricingClient() {
                   <td className="p-4 font-bold text-slate-200 text-xs">Start 3-Day Free Trial:</td>
                   <td className="p-3 text-center border-l border-slate-800">
                     <Link href="/signup?module=loyalty" className="inline-flex w-full py-2 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-bold text-[11px] items-center justify-center transition">
-                      Trial Loyalty Stamps →
+                      3 Days Free Trial Loyalty Stamps →
                     </Link>
                   </td>
                   <td className="p-3 text-center border-l border-slate-800">
                     <Link href="/signup?module=reviews" className="inline-flex w-full py-2 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 font-bold text-[11px] items-center justify-center transition">
-                      Trial AI Reviews →
+                      3 Days Free Trial AI Reviews →
                     </Link>
                   </td>
                   <td className="p-3 text-center border-l border-slate-800">
                     <Link href="/signup?module=autoreply" className="inline-flex w-full py-2 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 font-bold text-[11px] items-center justify-center transition">
-                      Trial AutoReply →
+                      3 Days Free Trial AutoReply →
                     </Link>
                   </td>
                   <td className="p-3 text-center border-l-2 border-emerald-500 bg-gradient-to-b from-emerald-950/80 to-slate-950">

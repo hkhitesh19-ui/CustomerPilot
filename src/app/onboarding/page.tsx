@@ -1892,95 +1892,136 @@ function OnboardStep7Print({ data, setData }: any) {
           <title>Print Counter Standee - ${businessName}</title>
           <style>
             @page { size: A4 portrait; margin: 0; }
+            * {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              box-sizing: border-box;
+            }
             body {
               font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-              background: #f8fafc;
+              background: #0f172a;
               margin: 0;
               padding: 40px 20px;
               display: flex;
               justify-content: center;
               align-items: center;
               min-height: 100vh;
-              box-sizing: border-box;
             }
             .standee-card {
               width: 380px;
-              background: white;
-              border-radius: 24px;
-              border: 4px solid #6366f1;
-              padding: 36px 28px;
+              background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%) !important;
+              color: #ffffff !important;
+              border-radius: 28px;
+              border: 4px solid #f59e0b !important;
+              padding: 30px 24px;
               text-align: center;
-              box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+              box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             }
             .badge {
-              background: #6366f1;
-              color: white;
+              display: inline-block;
+              padding: 5px 16px;
+              background: #f59e0b !important;
+              color: #020617 !important;
+              font-weight: 800;
+              font-size: 12px;
+              border-radius: 999px;
+              margin-bottom: 14px;
+              letter-spacing: 0.5px;
+            }
+            .store-name {
+              font-size: 22px;
+              font-weight: 900;
+              color: #ffffff !important;
+              margin: 2px 0 6px 0;
+              letter-spacing: -0.5px;
+            }
+            .qr-box {
+              background: #ffffff !important;
+              padding: 14px;
+              border-radius: 20px;
+              border: 3px solid #fcd34d !important;
+              display: inline-block;
+              margin: 8px auto;
+              box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            }
+            .qr-img {
+              width: 205px;
+              height: 205px;
+              display: block;
+              margin: 0 auto;
+            }
+            .qr-sub {
               font-size: 11px;
+              font-weight: 800;
+              color: #0f172a !important;
+              margin: 8px 0 0 0;
+              text-transform: uppercase;
+              letter-spacing: 0.8px;
+            }
+            .offer-box {
+              margin-top: 14px;
+              padding: 12px 14px;
+              background: rgba(255,255,255,0.1) !important;
+              border-radius: 16px;
+              border: 1px solid rgba(255,255,255,0.2) !important;
+            }
+            .offer-tag {
+              font-size: 11px;
+              color: #fde68a !important;
+              font-weight: 800;
+              text-transform: uppercase;
+              letter-spacing: 0.8px;
+              margin: 0 0 3px 0;
+            }
+            .offer-main {
+              font-size: 14px;
+              font-weight: 900;
+              color: #ffffff !important;
+              margin: 0 0 3px 0;
+            }
+            .offer-sub {
+              font-size: 10px;
+              color: #cbd5e1 !important;
+              margin: 0;
+            }
+            .footer-brand {
+              margin-top: 14px;
+              padding-top: 10px;
+              border-top: 1px solid rgba(255,255,255,0.2);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 8px;
+            }
+            .powered-txt {
+              font-size: 10px;
+              color: #94a3b8 !important;
               font-weight: 700;
               text-transform: uppercase;
               letter-spacing: 1.2px;
-              padding: 6px 16px;
-              border-radius: 20px;
-              display: inline-block;
-              margin-bottom: 18px;
-            }
-            .store-name {
-              font-size: 24px;
-              font-weight: 800;
-              color: #0f172a;
-              margin: 4px 0 4px 0;
-              letter-spacing: -0.5px;
-            }
-            .tagline {
-              font-size: 13px;
-              color: #64748b;
-              margin-bottom: 22px;
-              font-weight: 600;
-            }
-            .qr-box {
-              background: white;
-              padding: 16px;
-              border-radius: 20px;
-              border: 2px solid #e2e8f0;
-              display: inline-block;
-              box-shadow: 0 6px 16px rgba(0,0,0,0.06);
-            }
-            .qr-img {
-              width: 230px;
-              height: 230px;
-              display: block;
-            }
-            .footer-text {
-              margin-top: 22px;
-              font-size: 13px;
-              color: #334155;
-              font-weight: 700;
-            }
-            .powered-by {
-              margin-top: 12px;
-              font-size: 10px;
-              color: #94a3b8;
-              text-transform: uppercase;
-              letter-spacing: 1.5px;
-              font-weight: 600;
             }
           </style>
         </head>
         <body>
           <div class="standee-card">
-            <div class="badge">VIP Loyalty Club</div>
-            ${logoHtml}
+            ${logoUrl ? `<img src="${logoUrl}" style="max-height:50px; max-width:180px; object-fit:contain; background:rgba(255,255,255,0.12); border-radius:12px; padding:5px; margin:0 auto 8px auto; display:block;" />` : ''}
             <div class="store-name">${businessName}</div>
-            <div class="tagline">Scan QR Code to Earn Stamps & Get ${rewardOffer}!</div>
+            <div class="badge">VIP Loyalty Club 👑</div>
             
             <div class="qr-box">
               <img src="${qrUrl}" class="qr-img" />
+              <p class="qr-sub">Scan with WhatsApp Camera</p>
             </div>
 
-            <div class="footer-text">📲 Point your camera to check-in on WhatsApp</div>
-            <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid #e2e8f0;">
-              <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:1.2px;">Powered by</span>
-              <img src="/cplogo_horizontal.png" style="height:22px; width:auto; object-fit:contain;" alt="CustomerPilot" />
+            <div class="offer-box">
+              <p class="offer-tag">★ Exclusive Member Offer ★</p>
+              <p class="offer-main">Earn Stamps & Get ${rewardOffer}!</p>
+              <p class="offer-sub">No App Required • 5 Seconds on WhatsApp</p>
+            </div>
+
+            <div class="footer-brand">
+              <span class="powered-txt">Powered by</span>
+              <img src="/cplogo_horizontal.png" style="height:20px; width:auto; object-fit:contain; background:rgba(255,255,255,0.15); border-radius:4px; padding:2px 6px;" alt="CustomerPilot" />
             </div>
           </div>
           <script>

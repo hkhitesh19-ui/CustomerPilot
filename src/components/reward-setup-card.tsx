@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/hooks/use-toast"
-import { Gift, Sparkles, RefreshCw, Award, Image as ImageIcon } from "lucide-react"
+import { Gift, Sparkles, RefreshCw, Award, Image as ImageIcon, Check } from "lucide-react"
 
 import { useDashboardState } from "@/hooks/use-dashboard-state"
 
@@ -17,6 +17,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [isSavedSuccess, setIsSavedSuccess] = useState(false)
   const [isDefault, setIsDefault] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
 
@@ -118,10 +119,13 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
 
       toast({ title: "Saved Successfully", description: "Reward Card rules updated." })
       setIsDefault(false)
+      setIsSavedSuccess(true)
+      setTimeout(() => setIsSavedSuccess(false), 3500)
       if (json.data?.card?.id) setForm(prev => ({ ...prev, id: json.data.card.id }))
       if (refetch) refetch()
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" })
+      setIsSavedSuccess(false)
     } finally {
       setSaving(false)
     }
@@ -370,9 +374,31 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
 
 
           <div className="flex justify-end pt-2">
-            <Button type="submit" disabled={saving}>
-              {saving ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Award className="w-4 h-4 mr-2" />}
-              Save Reward Config
+            <Button
+              type="submit"
+              disabled={saving}
+              className={`transition-all duration-300 font-bold px-6 py-2.5 ${
+                isSavedSuccess
+                  ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/30"
+                  : ""
+              }`}
+            >
+              {saving ? (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  Saving Rules...
+                </>
+              ) : isSavedSuccess ? (
+                <>
+                  <Check className="w-4 h-4 mr-2 text-white" />
+                  Saved Successfully! ✓
+                </>
+              ) : (
+                <>
+                  <Award className="w-4 h-4 mr-2" />
+                  Save Loyalty Reward Rules
+                </>
+              )}
             </Button>
           </div>
         </form>

@@ -22,15 +22,9 @@ function getLiveWebhookUrl(): string {
 
 function buildInstanceName(whatsappPhone?: string | null, merchantId?: string, isNewSession: boolean = false): string {
   const timestamp = Date.now().toString(36)
-  if (whatsappPhone) {
-    const cleanPhone = whatsappPhone.replace(/\D/g, "")
-    if (cleanPhone.length >= 10) {
-      // Tarika 1: Smart Hybrid Name (e.g. CP_917203824012_mtlad58c)
-      return isNewSession ? `CP_${cleanPhone}_${timestamp}` : `CP_${cleanPhone}`
-    }
-  }
-  const base = `CP_M_${(merchantId || 'anon').slice(0, 8)}`
-  return isNewSession ? `${base}_${timestamp}` : base
+  const phone = (whatsappPhone || process.env.EVOLUTION_ADMIN_NUMBER || "919033304707").replace(/\D/g, "")
+  const mId = (merchantId || 'anon').slice(0, 8)
+  return isNewSession ? `CP_${phone}_${mId}_${timestamp}` : `CP_${phone}_${mId}`
 }
 
 async function getAuthMerchant(req: Request) {
