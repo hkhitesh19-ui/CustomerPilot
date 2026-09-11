@@ -325,7 +325,8 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   ├── queue/page.tsx         # Live Waitlist & Queue Engine
 │   │   │   ├── rewards/page.tsx       # Loyalty Reward Catalog & Stamp Rules
 │   │   ├── guide/                     # Step-by-Step Interactive Guides & Infographics
-│   │   │   └── 3-day-trial/page.tsx   # 5-Min Setup & Live Counter Operations Journey Guide (Merchant & Customer)
+│   │   │   ├── 3-day-trial/page.tsx   # 5-Minute Complete Setup Guide (Fast-Track Onboarding Blueprint)
+│   │   │   └── operations/page.tsx    # Live Counter Operations Manual (Merchant & Customer Daily Journeys, Stepper & Matrix)
 │   │   ├── join/page.tsx              # Customer QR Scan & Digital Stamp Card Page
 │   │   ├── onboarding/page.tsx        # 9-Step Interactive Onboarding Wizard
 │   │   ├── page.tsx                   # Master Homepage & Product Landing Page

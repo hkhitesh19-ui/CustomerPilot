@@ -3,6 +3,19 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [11 Sep 2026] Issue: React 19 Script Tag Warning & Guide Page Architecture Refactor
+- **Symptom**: (1) Console Error in browser: "Encountered a script tag while rendering React component... at Providers (src/components/providers.tsx:12:7)". (2) Stale module error for `ai-reply-sandbox.tsx` in browser cache. (3) Guide page `/guide/3-day-trial` needed to be renamed to "5 Minute Complete Setup Guide" with bigger font for "🛠️ Complete Setup". (4) Counter Operations Manual needed to be separated onto a dedicated new page (`/guide/operations`) with bilingual English / Hinglish toggle on both pages.
+- **Root Cause**: (1) `next-themes` ThemeProvider without `forcedTheme` injects an inline script on client render which triggers a strict warning in React 19 / Next.js 16. (2) Turbopack client HMR had cached the prior import from `page.tsx` before it was removed. (3) Setup guide was combining both onboarding and counter operations into a single long page instead of separate modular guides.
+- **Resolution**:
+  1. Added `forcedTheme="light"` to `<NextThemesProvider>` in `src/components/providers.tsx`, preventing inline script tag emission during client component tree rendering.
+  2. Verified `ai-reply-sandbox` is completely unreferenced in `src/app/page.tsx`.
+  3. Created dedicated new page `src/app/guide/operations/page.tsx` for the "Live Counter Operations Manual", featuring Merchant Journey (M1-M5), Customer Journey (C1-C6), Interactive 5-Stage Simulation Stepper, and Responsibility Matrix with full English / Hinglish language toggle.
+  4. Redesigned `src/app/guide/3-day-trial/page.tsx` as the dedicated "5 Minute Complete Setup Guide" with larger hero typography, English / Hinglish language switcher, 5 setup steps (Signup, Rules & Rewards, WhatsApp, Templates, Pro Marketing), interactive checklist, and prominent link card to the Operations Manual.
+  5. Updated Section 10 of `InstructionFlow.md` to index `src/app/guide/operations/page.tsx`.
+  6. Verified both `/guide/3-day-trial` and `/guide/operations` return HTTP 200 OK.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [10 Sep 2026] Issue: Razorpay Live Keys Activated — Authentication Fixed Permanently
 - **Symptom**: "Checkout Error — Authentication failed" persisting even after multiple key rotations. All `rzp_test_...` keys kept failing because Razorpay revokes old keys on every "Regenerate" click.
 - **Root Cause**: (1) User was clicking "Regenerate" in Razorpay dashboard repeatedly, which permanently invalidates previous keys. (2) All provided keys were `rzp_test_` (Test Mode) which also get invalidated across sessions. (3) Razorpay's copy-paste template merges KEY_ID and KEY_SECRET on same line without newline separator — causing truncated key IDs in prior attempts.
