@@ -102,7 +102,7 @@ function SignupForm() {
   )
   let description = "India's #1 WhatsApp-first AI Customer Retention Platform. Bring your customers back with loyalty rewards, 5-star Google reviews, and automated AI owner replies."
   let formTitle = "Start Free Trial - CustomerPilot Complete : Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply"
-  let formSubtitle = "Start 3-Day Complete Free Trial in under 2 minutes - Login with your Registered Google Business Profile  Gmail Id"
+  let formSubtitle = "Start 3-Day Complete Free Trial in under 2 minutes — no credit card required"
   let submitBtnText = "Start CustomerPilot Complete Free Trial →"
 
   let benefits = [

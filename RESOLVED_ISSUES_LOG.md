@@ -3,6 +3,15 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [12 Sep 2026] Issue: ReferenceError connectMode Crash on Onboarding Step 2 ("This page couldn't load")
+- **Symptom**: On `https://customerpilot.in/onboarding?step=2`, the page immediately crashed with the Next.js error boundary screen: `"This page couldn't load. Reload to try again, or go back."` after user signed up or navigated to Step 2.
+- **Root Cause**: During the earlier streamlining of Step 2 (where phone pairing code mode was removed in favor of sole QR Code Scan), an undeclared reference to `connectMode !== "qr"` remained inside the 10-minute session countdown timer's `useEffect` hook in `OnboardStep2WhatsApp` in `src/app/onboarding/page.tsx`. When Step 2 mounted, JavaScript threw an uncaught `ReferenceError: connectMode is not defined`, triggering Next.js's top-level error boundary.
+- **Resolution**:
+  1. In `src/app/onboarding/page.tsx`, removed `connectMode !== "qr"` from the `useEffect` guard, updating it cleanly to `if (connectionStatus === "open" || !qrCodeBase64)`.
+  2. In `src/components/signup-client.tsx`, restored standard subtitle `"Start 3-Day Complete Free Trial in under 2 minutes — no credit card required"` to prevent merchant confusion regarding where Google Business Profile authentication takes place (which is specifically handled in Step 3).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [12 Sep 2026] Issue: Onboarding Step 1 & Step 5 Form Fields Washed Out / Low Contrast
 - **Symptom**: On `https://customerpilot.in/onboarding?step=1` and Step 5, form input labels ("Business Name *", "Owner Name *", "Business Type", "Business Address", "Store WhatsApp Number", "Email") and inputs were washed out and hard to read (white text on white card).
 - **Root Cause**: The outer onboarding layout had `min-h-screen bg-slate-950 text-white` and `<html>` was in dark mode. The step content wrapper `<div className="bg-white rounded-2xl shadow-2xl overflow-hidden">` lacked explicit `text-slate-900`, causing Radix `<Label>` elements (defaulting to `text-foreground` / white in dark mode) and `<Input>` fields to inherit white text and transparent backgrounds on a white card.

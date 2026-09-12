@@ -635,7 +635,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
 
   // 10-Minute Live Session Countdown Timer
   useEffect(() => {
-    if (connectMode !== "qr" || connectionStatus === "open" || !qrCodeBase64) {
+    if (connectionStatus === "open" || !qrCodeBase64) {
       if (sessionTimerRef.current) clearInterval(sessionTimerRef.current)
       return
     }
