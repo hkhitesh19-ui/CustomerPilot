@@ -391,7 +391,7 @@ function OnboardingPageContent() {
 
       {/* Step Content */}
       <div className="max-w-4xl mx-auto px-4 pb-24">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-white text-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
@@ -467,27 +467,27 @@ function OnboardStep1Business({ data, setData }: any) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl">
         <div>
-          <Label className="text-xs font-semibold">Business Name *</Label>
+          <Label className="text-xs font-bold text-slate-800">Business Name *</Label>
           <Input
             value={data.businessName}
             onChange={e => setData({ ...data, businessName: e.target.value })}
             placeholder="e.g., Cake Connection"
-            className="mt-1 text-sm"
+            className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 font-medium shadow-xs"
           />
         </div>
         <div>
-          <Label className="text-xs font-semibold">Owner Name *</Label>
+          <Label className="text-xs font-bold text-slate-800">Owner Name *</Label>
           <Input
             value={data.ownerName}
             onChange={e => setData({ ...data, ownerName: e.target.value })}
             placeholder="e.g., Hitesh"
-            className="mt-1 text-sm"
+            className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 font-medium shadow-xs"
           />
         </div>
         <div>
-          <Label className="text-xs font-semibold">Business Type</Label>
+          <Label className="text-xs font-bold text-slate-800">Business Type</Label>
           <Select 
             value={data.businessType} 
             onValueChange={v => {
@@ -502,8 +502,8 @@ function OnboardStep1Business({ data, setData }: any) {
               })
             }}
           >
-            <SelectTrigger className="mt-1 text-sm"><SelectValue /></SelectTrigger>
-            <SelectContent>
+            <SelectTrigger className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 font-medium focus:ring-emerald-500 shadow-xs"><SelectValue /></SelectTrigger>
+            <SelectContent className="bg-white text-slate-900 border-slate-200 shadow-xl">
               {[
                 { value: "bakery", label: "Bakery 🥐" },
                 { value: "cafe", label: "Cafe ☕" },
@@ -514,35 +514,35 @@ function OnboardStep1Business({ data, setData }: any) {
                 { value: "clinic", label: "Clinic 🏥" },
                 { value: "other", label: "Other 📦" },
               ].map(t => (
-                <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                <SelectItem key={t.value} value={t.value} className="text-slate-900 hover:bg-slate-100 font-medium">{t.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
         <div>
-          <Label className="text-xs font-semibold">Business Address / City</Label>
+          <Label className="text-xs font-bold text-slate-800">Business Address / City</Label>
           <Input
             value={data.businessAddress}
             onChange={e => setData({ ...data, businessAddress: e.target.value })}
             placeholder="e.g., Vadodara, Gujarat"
-            className="mt-1 text-sm"
+            className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 font-medium shadow-xs"
           />
         </div>
         <div>
-          <Label className="text-xs font-semibold">Store WhatsApp Number (for QR stamps & reviews)</Label>
+          <Label className="text-xs font-bold text-slate-800">Store WhatsApp Number (for QR stamps & reviews)</Label>
           <Input
             value={data.whatsappNumber}
             onChange={e => setData({ ...data, whatsappNumber: e.target.value })}
             placeholder="e.g., 917203824012"
-            className="mt-1 text-sm"
+            className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 font-medium shadow-xs"
           />
         </div>
         <div>
-          <Label className="text-xs font-semibold">Email (from signup)</Label>
+          <Label className="text-xs font-bold text-slate-800">Email (from signup)</Label>
           <Input
             value={data.email}
             readOnly
-            className="mt-1 text-sm bg-slate-50 text-slate-500"
+            className="mt-1.5 text-sm bg-slate-100 text-slate-700 border-slate-300 font-mono font-medium"
           />
         </div>
       </div>
@@ -1493,32 +1493,32 @@ function OnboardStep5Rewards({ data, setData }: any) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div>
-            <Label>Reward Card Title</Label>
+            <Label className="text-xs font-bold text-slate-800">Reward Card Title</Label>
             <Input
               value={data.cardName}
               onChange={e => setData({ ...data, cardName: e.target.value })}
               placeholder="e.g., VIP Cake Loyalty Pass"
-              className="mt-1"
+              className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 font-medium shadow-xs"
             />
           </div>
           <div>
-            <Label>Stamps Required for Free Reward</Label>
+            <Label className="text-xs font-bold text-slate-800">Stamps Required for Free Reward</Label>
             <Select value={String(data.stampsRequired || 10)} onValueChange={v => setData({ ...data, stampsRequired: Number(v) })}>
-              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-              <SelectContent>
+              <SelectTrigger className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 font-medium focus:ring-emerald-500 shadow-xs"><SelectValue /></SelectTrigger>
+              <SelectContent className="bg-white text-slate-900 border-slate-200 shadow-xl">
                 {[3, 5, 6, 8, 10, 11, 12, 15].map(n => (
-                  <SelectItem key={n} value={String(n)}>{n} Stamps</SelectItem>
+                  <SelectItem key={n} value={String(n)} className="text-slate-900 hover:bg-slate-100 font-medium">{n} Stamps</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label>Free Reward Description</Label>
+            <Label className="text-xs font-bold text-slate-800">Free Reward Description</Label>
             <Input
               value={data.rewardName}
               onChange={e => setData({ ...data, rewardName: e.target.value })}
               placeholder="e.g., 1 Free Pastry + Coffee"
-              className="mt-1"
+              className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 font-medium shadow-xs"
             />
           </div>
         </div>

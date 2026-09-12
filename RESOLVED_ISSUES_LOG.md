@@ -3,6 +3,16 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [12 Sep 2026] Issue: Onboarding Step 1 & Step 5 Form Fields Washed Out / Low Contrast
+- **Symptom**: On `https://customerpilot.in/onboarding?step=1` and Step 5, form input labels ("Business Name *", "Owner Name *", "Business Type", "Business Address", "Store WhatsApp Number", "Email") and inputs were washed out and hard to read (white text on white card).
+- **Root Cause**: The outer onboarding layout had `min-h-screen bg-slate-950 text-white` and `<html>` was in dark mode. The step content wrapper `<div className="bg-white rounded-2xl shadow-2xl overflow-hidden">` lacked explicit `text-slate-900`, causing Radix `<Label>` elements (defaulting to `text-foreground` / white in dark mode) and `<Input>` fields to inherit white text and transparent backgrounds on a white card.
+- **Resolution**: 
+  1. Updated the step container in `src/app/onboarding/page.tsx` to `bg-white text-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-200`.
+  2. Enhanced all labels and inputs across Step 1 and Step 5 with explicit high-contrast classes: `text-xs font-bold text-slate-800` for labels, `bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 font-medium shadow-xs` for inputs, and explicit dropdown styling for `SelectTrigger` and `SelectContent`.
+  3. Verified build passes cleanly (`npm run build` compiled 164 routes with 0 errors).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [12 Sep 2026] Issue: Onboarding Streamlining (QR-Only WhatsApp & Direct Google OAuth) and Super Admin Credentials Provisioning
 - **Symptom**:
   1. Onboarding Step 2 had an alternative "Link via Phone (Pairing Code)" button and UI that was confusing to merchants and cluttered the simple Instant QR scan journey.
