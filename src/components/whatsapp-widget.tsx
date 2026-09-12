@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import { usePathname } from "next/navigation"
 import { MessageCircle, X } from "lucide-react"
 
 interface WhatsAppWidgetProps {
@@ -12,7 +13,13 @@ export function WhatsAppFloatingWidget({
   phoneNumber = "919033304707",
   message = "Hi CustomerPilot Team, I want to know more about CustomerPilot for my business.",
 }: WhatsAppWidgetProps) {
+  const pathname = usePathname()
   const [showTooltip, setShowTooltip] = useState(true)
+
+  // Do not render floating public inquiry widget on authenticated dashboard screens
+  if (pathname?.startsWith("/dashboard")) {
+    return null
+  }
 
   const encodedMessage = encodeURIComponent(message)
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`

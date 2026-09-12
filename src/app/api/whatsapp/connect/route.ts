@@ -10,14 +10,15 @@ const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 
 function getLiveWebhookUrl(): string {
+  const secret = process.env.EVOLUTION_WEBHOOK_SECRET || "webhook_secret_customerpilot_v22"
   const base = process.env.WHATSAPP_WEBHOOK_URL ||
     (process.env.NEXT_PUBLIC_APP_URL
       ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/evolution`
-      : "")
+      : "https://customerpilot.in/api/webhook/evolution")
   if (!base) return ""
   if (base.includes("secret=")) return base
   const separator = base.includes("?") ? "&" : "?"
-  return `${base}${separator}secret=cpilot_webhook_secret_change_in_prod_2026`
+  return `${base}${separator}secret=${secret}`
 }
 
 function buildInstanceName(whatsappPhone?: string | null, merchantId?: string, isNewSession: boolean = false): string {

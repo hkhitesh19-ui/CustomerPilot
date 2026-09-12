@@ -160,11 +160,18 @@ export async function POST(req: NextRequest) {
 
         console.log(`[Webhook] 📥 Incoming from: +${customerPhone} (${pushName}) | Text: ${text.substring(0, 80)}`)
 
-        // ── Find merchant by instance name ──────────────────────────────
+        // ── Find merchant by instance name or phone ─────────────────────
+        const phoneMatch = webhookInstance.match(/CP_(\d+)/)
+        const instancePhone = phoneMatch ? phoneMatch[1] : ""
+        const mIdMatch = webhookInstance.match(/CP_\d+_([a-z0-9]+)/)
+        const instanceMerchantPrefix = mIdMatch ? mIdMatch[1] : ""
+
         let merchant = await db.merchant.findFirst({
           where: {
             OR: [
               { whatsappInstanceName: webhookInstance },
+              ...(instancePhone ? [{ whatsappPhone: instancePhone }] : []),
+              ...(instanceMerchantPrefix ? [{ id: { startsWith: instanceMerchantPrefix } }] : []),
               { whatsappPhone: webhookInstance.replace("CP_M", "") }
             ]
           }
@@ -177,14 +184,22 @@ export async function POST(req: NextRequest) {
           continue
         }
 
+        // Auto-sync instance name in merchant DB if different
+        if (webhookInstance && merchant.whatsappInstanceName !== webhookInstance) {
+          db.merchant.update({
+            where: { id: merchant.id },
+            data: { whatsappInstanceName: webhookInstance }
+          }).catch(() => {})
+        }
+
         // ── Subscription Gatekeeper ───────────────────────────────────────
         if (merchant.trialEndsAt && new Date(merchant.trialEndsAt) < new Date()) {
           console.warn(`[Webhook] 🚫 Merchant ${merchant.id} subscription expired. Dropping message.`);
           continue;
         }
 
-        // Use merchant's dedicated Evolution instance
-        const merchantInstance = merchant.whatsappInstanceName || webhookInstance
+        // Use incoming instance directly to ensure reply is dispatched from the exact connected socket
+        const merchantInstance = webhookInstance || merchant.whatsappInstanceName
 
         // ── Idempotency check ───────────────────────────────────────────
         const existing = await db.whatsAppMessage.findFirst({

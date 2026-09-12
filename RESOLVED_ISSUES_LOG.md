@@ -3,6 +3,32 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [12 Sep 2026] Issue: Mobile Sticky Nav, Drawer Auto-Close, Light/Dark Toggle, Settings Layout Revamp & WhatsApp Bot Webhook Fix
+- **Symptom**:
+  1. In the mobile bottom sticky navigation, "Home" and "Customers" were clickable, but "Rewards" and "Queue" did not respond to touches/clicks.
+  2. Clicking any navigation menu item in the mobile left drawer (Complete Setup, Home, Live Queue, Rewards, Customers CRM) navigated to the page, but the drawer panel stayed open over the screen instead of automatically hiding.
+  3. The Dark/Light mode toggle button in TopNav was functionally unresponsive.
+  4. On the Settings page (`/dashboard/settings`), sections on mobile view lacked clear visual structure, creating confusion.
+  5. The `"Branding & Automation Diagnostics"` section was requested to be removed.
+  6. The section `"Ai Drafted SEO Optimized Google Reviews QR Standee & Posters"` needed to be renamed to `"Smart Ai Google Reviews"`.
+  7. When a customer scanned the VIP Loyalty QR code and sent the preset WhatsApp check-in message ("Hi Cake Connection! checking in for my VIP club stamps"), the automated bot reply was not sent.
+- **Root Cause**:
+  1. `WhatsAppFloatingWidget` in `src/components/whatsapp-widget.tsx` was fixed at `bottom-5 right-5 z-50` with an animated tooltip bubble. On mobile screens, this floating button sat directly on top of the "Rewards" and "Queue" buttons of `MobileBottomNav` (`z-40`), intercepting and swallowing touch/click events.
+  2. `AppSidebar` in `src/components/app-sidebar.tsx` did not listen to mobile navigation events or call `setOpenMobile(false)` on click.
+  3. In `src/components/providers.tsx`, `NextThemesProvider` had hardcoded `forcedTheme="light"`, which explicitly locked theme state to light mode and disabled toggling. Furthermore, `DashboardLayout` container in `src/app/dashboard/layout.tsx` had a hardcoded `className="dark"` attribute.
+  4. Settings page components were rendered in an undifferentiated single vertical stack on mobile with subtle borders.
+  5. `getLiveWebhookUrl()` in `src/app/api/whatsapp/connect/route.ts` hardcoded `secret=cpilot_webhook_secret_change_in_prod_2026` instead of matching `EVOLUTION_WEBHOOK_SECRET` (`webhook_secret_customerpilot_v22`). On the VPS, the active Evolution API instance webhook was pointing to a dead Pinggy tunnel, and the merchant's `trialEndsAt` in the production database had expired on Sep 10, 2026, causing the webhook subscription gatekeeper to drop inbound messages.
+- **Resolution**:
+  1. Updated `src/components/whatsapp-widget.tsx` to return `null` when `pathname?.startsWith("/dashboard")`, preventing any overlay over authenticated dashboard touch targets. Elevated `MobileBottomNav` z-index to `z-50`.
+  2. Integrated `useSidebar` hook into `src/components/app-sidebar.tsx`, adding `useEffect([pathname])` and `handleNavClick` (`setOpenMobile(false)`) across all drawer navigation items, groups, and the sign-out button.
+  3. Removed `forcedTheme="light"` from `Providers` in `src/components/providers.tsx`, set `defaultTheme="dark"` with `enableSystem`. Removed hardcoded `dark` class from `DashboardLayout`. Upgraded `ModeToggle` in `src/components/mode-toggle.tsx` to a direct 1-click animated Sun/Moon toggle.
+  4. Revamped `src/app/dashboard/settings/page.tsx` with mobile quick-jump navigation pills (`01 Store Info`, `02 Google Reviews`, `03 Loyalty Stamps`, `04 Timers & Templates`, `05 Manuals & Admin`), clear numbered section badges (`01`, `02`, `03`...), distinct icon accents, bordered cards, and friendly subtitles.
+  5. Removed `"Branding & Automation Diagnostics"` (`<BrandingSettings />` and `<GoLiveValidator />`) from `src/app/dashboard/settings/page.tsx`.
+  6. Renamed section to `"Smart Ai Google Reviews"` in `src/app/dashboard/settings/page.tsx`.
+  7. Updated `getLiveWebhookUrl()` in `src/app/api/whatsapp/connect/route.ts` to dynamically use `process.env.EVOLUTION_WEBHOOK_SECRET` and production URL. Updated Evolution API active instance webhook on VPS to `https://customerpilot.in/api/webhook/evolution?secret=webhook_secret_customerpilot_v22`. Updated Cake Connection's `trialEndsAt` to active future timestamp on VPS SQLite database. Verified end-to-end webhook execution with HTTP 201 response and immediate bot reply dispatch.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [11 Sep 2026] Issue: WhatsApp Connect & Pairing Code 401 Unauthorized on Onboarding Step 2
 - **Symptom**: On live production `/onboarding?step=2`, QR code generation showed "Initializing QR Code..." indefinitely, and clicking "Get Pairing Code" showed a red error message: `"Unauthorized"`.
 - **Root Cause**: 

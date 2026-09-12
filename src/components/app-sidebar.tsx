@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, ChevronRight, TrendingUp, BarChart3, FileText, Image, Share2, UserPlus, ChevronDown, BookOpen } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { useDashboardState } from "@/hooks/use-dashboard-state"
@@ -15,6 +15,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 const mainNav = [
@@ -49,7 +50,7 @@ const bottomNav = [
   { name: "Subscription", href: "/dashboard/subscription", icon: Crown },
 ]
 
-function NavGroup({ label, items, pathname }: { label: string; items: typeof growthNav; pathname: string }) {
+function NavGroup({ label, items, pathname, onItemClick }: { label: string; items: typeof growthNav; pathname: string; onItemClick?: () => void }) {
   const isAnyActive = items.some(item => pathname.startsWith(item.href))
   const [open, setOpen] = useState(isAnyActive)
 
@@ -69,7 +70,7 @@ function NavGroup({ label, items, pathname }: { label: string; items: typeof gro
           {items.map((item) => (
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton asChild isActive={pathname === item.href}>
-                <Link href={item.href}>
+                <Link href={item.href} onClick={onItemClick}>
                   <item.icon className="h-4 w-4" />
                   <span className="text-[13px]">{item.name}</span>
                 </Link>
@@ -84,7 +85,21 @@ function NavGroup({ label, items, pathname }: { label: string; items: typeof gro
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const { isMobile, setOpenMobile } = useSidebar()
   const { data } = useDashboardState()
+
+  // Auto-close mobile drawer when navigating to a new route
+  useEffect(() => {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }, [pathname, isMobile, setOpenMobile])
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }
 
   const merchant = data?.merchant
   const trialEndsAt = merchant?.trialEndsAt ? new Date(merchant.trialEndsAt) : null
@@ -121,7 +136,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader className="h-20 flex flex-col justify-center px-4 border-b">
         <div className="flex items-center justify-between w-full">
-          <Link href="/dashboard" className="no-underline">
+          <Link href="/dashboard" onClick={handleNavClick} className="no-underline">
             <BrandLogo variant="dark" size="sm" />
           </Link>
           <div className="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
@@ -139,7 +154,7 @@ export function AppSidebar() {
             .map((item) => (
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton asChild isActive={pathname === item.href}>
-                  <Link href={item.href}>
+                  <Link href={item.href} onClick={handleNavClick}>
                     <item.icon className="h-5 w-5" />
                     <span>{item.name}</span>
                   </Link>
@@ -149,13 +164,13 @@ export function AppSidebar() {
         </SidebarMenu>
 
         {/* Growth Section */}
-        <NavGroup label="Growth" items={growthNav} pathname={pathname} />
+        <NavGroup label="Growth" items={growthNav} pathname={pathname} onItemClick={handleNavClick} />
 
         {/* Marketing Section */}
-        <NavGroup label="Marketing" items={marketingNav} pathname={pathname} />
+        <NavGroup label="Marketing" items={marketingNav} pathname={pathname} onItemClick={handleNavClick} />
 
         {/* Referrals Section */}
-        <NavGroup label="Referrals" items={referralNav} pathname={pathname} />
+        <NavGroup label="Referrals" items={referralNav} pathname={pathname} onItemClick={handleNavClick} />
 
         {/* Bottom items */}
         <div className="mt-2 pt-2 border-t border-slate-800/50">
@@ -163,7 +178,7 @@ export function AppSidebar() {
             {bottomNav.map((item) => (
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton asChild isActive={pathname === item.href}>
-                  <Link href={item.href}>
+                  <Link href={item.href} onClick={handleNavClick}>
                     <item.icon className="h-5 w-5" />
                     <span>{item.name}</span>
                   </Link>
@@ -178,6 +193,7 @@ export function AppSidebar() {
         {/* Prominent Colored Subscription Widget navigating to /dashboard/subscription */}
         <Link
           href="/dashboard/subscription"
+          onClick={handleNavClick}
           className={`group relative block overflow-hidden rounded-xl p-3 no-underline border transition-all duration-200 shadow-md ${
             isSubPage
               ? "bg-gradient-to-br from-indigo-900/90 via-slate-900 to-slate-900 border-indigo-400 ring-2 ring-indigo-500/30 shadow-indigo-500/20"
@@ -238,6 +254,7 @@ export function AppSidebar() {
             <SidebarMenuButton 
               variant="outline" 
               onClick={async () => {
+                handleNavClick();
                 await fetch('/api/auth/logout', { method: 'POST' });
                 const { signOut } = await import("next-auth/react");
                 await signOut({ redirect: false });

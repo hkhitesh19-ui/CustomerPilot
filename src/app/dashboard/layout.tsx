@@ -12,7 +12,7 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="dark flex min-h-screen w-full bg-slate-950 text-slate-50 selection:bg-emerald-500/30">
+      <div className="flex min-h-screen w-full bg-background text-foreground selection:bg-emerald-500/30">
         <AppSidebar />
         <div className="flex w-full flex-col relative">
           {/* Subtle glowing orb in background */}
