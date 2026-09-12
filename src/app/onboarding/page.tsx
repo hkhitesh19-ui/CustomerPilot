@@ -565,18 +565,9 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
   const [qrCodeBase64, setQrCodeBase64] = useState<string | null>(null)
   const [connectionStatus, setConnectionStatus] = useState<"connecting" | "open" | "disconnected">("connecting")
   const [instanceName, setInstanceName] = useState<string>("")
-  const [connectMode, setConnectMode] = useState<"qr" | "pairing">("qr")
   const [sessionCountdown, setSessionCountdown] = useState(TOTAL_SESSION_SECONDS)
   const sessionTimerRef = useRef<NodeJS.Timeout | null>(null)
   const silentRefreshRef = useRef<NodeJS.Timeout | null>(null)
-
-  // Pairing Code state (Native Baileys / WhatsApp Web 8-digit linking)
-  const [pairingPhone, setPairingPhone] = useState(data.whatsappNumber || "")
-  const [pairingCode, setPairingCode] = useState<string | null>(null)
-  const [loadingPairing, setLoadingPairing] = useState(false)
-  const [pairingCopied, setPairingCopied] = useState(false)
-  const [pairingError, setPairingError] = useState("")
-  const [pairingCountdown, setPairingCountdown] = useState(120) // 2 minutes
 
   // Format seconds into MM:SS format (e.g. 09:45)
   const formatTime = (totalSeconds: number) => {
@@ -663,12 +654,12 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
     return () => {
       if (sessionTimerRef.current) clearInterval(sessionTimerRef.current)
     }
-  }, [connectMode, connectionStatus, qrCodeBase64])
+  }, [connectionStatus, qrCodeBase64])
 
   // Automatic Silent Background Refresh every 20 seconds
   // Keeps Baileys QR code fresh on WhatsApp servers without disturbing the 10-minute timer
   useEffect(() => {
-    if (connectMode !== "qr" || connectionStatus === "open" || !qrCodeBase64 || sessionCountdown <= 0) {
+    if (connectionStatus === "open" || !qrCodeBase64 || sessionCountdown <= 0) {
       if (silentRefreshRef.current) clearInterval(silentRefreshRef.current)
       return
     }
@@ -696,67 +687,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
     return () => {
       if (silentRefreshRef.current) clearInterval(silentRefreshRef.current)
     }
-  }, [connectMode, connectionStatus, qrCodeBase64, sessionCountdown, setData, data.merchantId])
-
-  // Native WhatsApp 8-digit Pairing Code handlers (Baileys)
-  const handleGeneratePairingCode = async () => {
-    const rawDigits = (pairingPhone || data.whatsappNumber || "").replace(/\D/g, "")
-    if (rawDigits.length < 10) {
-      setPairingError("Please enter a valid 10-digit WhatsApp phone number")
-      return
-    }
-    const cleanNumber = rawDigits.length === 10 ? `91${rawDigits}` : rawDigits
-    setLoadingPairing(true)
-    setPairingError("")
-    try {
-      const mParam = data.merchantId ? `&merchantId=${encodeURIComponent(data.merchantId)}` : ""
-      const res = await fetch(`/api/whatsapp/connect?mode=pairing&force=true&phone=${encodeURIComponent(cleanNumber)}${mParam}`, {
-        headers: data.merchantId ? { "x-merchant-id": data.merchantId } : {},
-      })
-      const json = await res.json()
-      if (res.ok && json.ok) {
-        setInstanceName(json.instanceName || "")
-        if (json.pairingCode) {
-          setPairingCode(json.pairingCode)
-          setPairingCountdown(120)
-          setData((prev: any) => ({ ...prev, whatsappNumber: cleanNumber }))
-        } else if (json.status === "open" || json.connected) {
-          setConnectionStatus("open")
-          setData((prev: any) => ({ ...prev, otpVerified: true, whatsappNumber: json.whatsappPhone || cleanNumber }))
-        } else {
-          setPairingError("Could not generate pairing code. Please try again.")
-        }
-      } else {
-        setPairingError(json.error || "Failed to generate pairing code")
-      }
-    } catch {
-      setPairingError("Network error. Please try again.")
-    } finally {
-      setLoadingPairing(false)
-    }
-  }
-
-  // Pairing code 2-minute countdown timer
-  useEffect(() => {
-    if (connectMode !== "pairing" || !pairingCode || connectionStatus === "open") return
-    const timer = setInterval(() => {
-      setPairingCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-    return () => clearInterval(timer)
-  }, [connectMode, pairingCode, connectionStatus])
-
-  const handleCopyPairingCode = () => {
-    if (!pairingCode) return
-    navigator.clipboard.writeText(pairingCode)
-    setPairingCopied(true)
-    setTimeout(() => setPairingCopied(false), 2500)
-  }
+  }, [connectionStatus, qrCodeBase64, sessionCountdown, setData, data.merchantId, data.whatsappNumber])
 
   return (
     <div className="p-6 sm:p-8">
@@ -772,21 +703,6 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
           </div>
         </div>
 
-        {/* Mode Switcher */}
-        <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
-          <button
-            onClick={() => setConnectMode("qr")}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${connectMode === "qr" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"}`}
-          >
-            📷 Instant QR Scan
-          </button>
-          <button
-            onClick={() => setConnectMode("pairing")}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${connectMode === "pairing" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"}`}
-          >
-            🔢 Link via Phone (Pairing Code)
-          </button>
-        </div>
       </div>
 
       {connectionStatus === "open" || data.otpVerified ? (
@@ -808,7 +724,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
             </p>
           )}
         </div>
-      ) : connectMode === "qr" ? (
+      ) : (
         /* QR Code Scan Pairing Interface */
         <div className="max-w-xl mx-auto space-y-4">
           {sessionCountdown <= 0 ? (
@@ -900,154 +816,6 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
             <span>Automatic silent refresh keeps the QR code fresh in the background, giving you 10 full minutes without timeout errors.</span>
           </div>
         </div>
-      ) : (
-        /* Pairing Code Mode (Option A2 - For mobile users on the same phone) */
-        <div className="max-w-xl mx-auto space-y-5">
-          {!pairingCode ? (
-            /* Input View to generate pairing code */
-            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4">
-              <div className="space-y-1">
-                <h4 className="font-bold text-slate-900 text-base">Link with WhatsApp 8-Digit Pairing Code</h4>
-                <p className="text-xs text-slate-500">
-                  Ideal if you are on mobile or cannot scan a QR code. Enter your WhatsApp number to get an 8-character pairing code.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold text-slate-700">Store WhatsApp Number *</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={pairingPhone}
-                    onChange={(e) => {
-                      setPairingPhone(e.target.value)
-                      setPairingError("")
-                    }}
-                    placeholder="e.g. 919033304707 or 9033304707"
-                    disabled={loadingPairing}
-                    className="bg-white font-mono"
-                  />
-                  <Button
-                    onClick={handleGeneratePairingCode}
-                    disabled={loadingPairing || pairingPhone.replace(/\D/g, "").length < 10}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shrink-0"
-                  >
-                    {loadingPairing ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      "Get Pairing Code"
-                    )}
-                  </Button>
-                </div>
-                {pairingError && (
-                  <p className="text-xs text-rose-600 font-medium">{pairingError}</p>
-                )}
-              </div>
-
-              <div className="p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl space-y-1.5 text-xs text-blue-900">
-                <p className="font-bold flex items-center gap-1.5">
-                  <span>ℹ️</span> How it works:
-                </p>
-                <p className="text-[11px] text-blue-800 leading-relaxed">
-                  WhatsApp allows linking devices directly through an 8-character code. You enter this code inside your WhatsApp app under <strong>Settings ➔ Linked Devices ➔ Link with phone number instead</strong>.
-                </p>
-              </div>
-            </div>
-          ) : (
-            /* Active Pairing Code View */
-            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-5 shadow-sm">
-              <div className="text-center space-y-1">
-                <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[11px] px-3 py-0.5">
-                  Pairing Code Generated
-                </Badge>
-                <h4 className="font-extrabold text-slate-900 text-lg">Enter this code in WhatsApp</h4>
-                <p className="text-xs text-slate-500">Open WhatsApp on your phone and link with this 8-character code</p>
-              </div>
-
-              {/* Big Monospace Code Display */}
-              <div className="bg-white p-5 rounded-2xl border-2 border-emerald-400 text-center space-y-3 shadow-md max-w-sm mx-auto">
-                <div className="flex items-center justify-center">
-                  <span className="font-mono text-3xl sm:text-4xl font-black tracking-wider text-slate-900 select-all">
-                    {pairingCode.length === 8 ? `${pairingCode.slice(0, 4)} - ${pairingCode.slice(4)}` : pairingCode}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-center gap-2 pt-1">
-                  <Button
-                    size="sm"
-                    onClick={handleCopyPairingCode}
-                    className={`text-xs font-bold transition-all ${
-                      pairingCopied
-                        ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                        : "bg-slate-900 text-white hover:bg-slate-800"
-                    }`}
-                  >
-                    {pairingCopied ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 mr-1" />
-                        Copied! ✓
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5 mr-1" />
-                        Copy Code
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleGeneratePairingCode}
-                    disabled={loadingPairing}
-                    className="text-xs text-slate-600"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 mr-1 ${loadingPairing ? "animate-spin" : ""}`} />
-                    New Code
-                  </Button>
-                </div>
-
-                <div className="text-[11px] text-slate-500 font-mono">
-                  {pairingCountdown > 0 ? (
-                    <span>Expires in: <strong className="text-emerald-700">{formatTime(pairingCountdown)}</strong></span>
-                  ) : (
-                    <span className="text-amber-600 font-bold">Code expired. Click "New Code" above.</span>
-                  )}
-                </div>
-              </div>
-
-              {/* 4 Simple Steps to enter code on phone */}
-              <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2.5">
-                <h5 className="font-bold text-xs text-slate-800 uppercase tracking-wider">How to link on your phone:</h5>
-                <div className="space-y-2">
-                  <div className="flex items-start gap-2.5 text-xs text-slate-700">
-                    <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
-                    <span>Open <strong>WhatsApp</strong> on your store phone.</span>
-                  </div>
-                  <div className="flex items-start gap-2.5 text-xs text-slate-700">
-                    <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
-                    <span>Tap <strong>Settings / 3 Dots (⋮)</strong> ➔ select <strong>Linked Devices</strong>.</span>
-                  </div>
-                  <div className="flex items-start gap-2.5 text-xs text-slate-700">
-                    <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
-                    <span>Tap <strong>Link a Device</strong>, then at the bottom tap <strong>"Link with phone number instead"</strong>.</span>
-                  </div>
-                  <div className="flex items-start gap-2.5 text-xs text-slate-700">
-                    <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">4</span>
-                    <span>Enter the 8-character code: <strong className="font-mono bg-emerald-50 text-emerald-800 px-1 py-0.5 rounded">{pairingCode}</strong></span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Waiting status pill */}
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center justify-center gap-2 text-center">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                <span>Waiting for connection... This page will update automatically once you enter the code on your phone.</span>
-              </div>
-            </div>
-          )}
-        </div>
       )}
     </div>
   )
@@ -1055,12 +823,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
 
 // ─── Step 3: Google Business ─────────────────────────────────
 function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
-  const [activeTab, setActiveTab] = useState<"oauth" | "manual">("oauth")
   const [connectingOauth, setConnectingOauth] = useState(false)
-  const [searching, setSearching] = useState(false)
-  const [query, setQuery] = useState(data.businessName || "")
-  const [directUrl, setDirectUrl] = useState(data.googleReviewUrl || "")
-  const [connectingLink, setConnectingLink] = useState(false)
   const [disconnecting, setDisconnecting] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
   
@@ -1167,76 +930,6 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
     }
   }
 
-  const handleDirectLink = async () => {
-    if (!directUrl.trim()) { setError("Please enter your Google Review or Google Maps link"); return }
-    let name = data.businessName || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"
-    let placeId = "ChIJc7ija2zFXzkR8DbOxXEfaM4"
-    if (directUrl.includes("ChIJ")) {
-      const match = directUrl.match(/ChIJ[A-Za-z0-9_-]{23}/)
-      if (match) placeId = match[0]
-    }
-    await selectPlace({ 
-      name, 
-      placeId, 
-      address: "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011", 
-      reviewUrl: directUrl.trim(),
-      cid: "14873172342901454576",
-      mapsUri: "https://maps.google.com/?cid=14873172342901454576"
-    })
-  }
-
-  const searchGooglePlaces = async () => {
-    if (!query) return
-    setSearching(true); setError("")
-    try {
-      const res = await fetch(`/api/google/places-search?q=${encodeURIComponent(query)}`)
-      const json = await res.json()
-      if (res.ok && json.ok) {
-        setData((prev: any) => ({ ...prev, googleSearchResults: json.data.results || [] }))
-      } else {
-        setError(json.error || "Search failed")
-      }
-    } catch { setError("Failed to search Google Places") }
-    finally { setSearching(false) }
-  }
-
-  const selectPlace = async (place: any) => {
-    setConnectingLink(true)
-    const reviewUrl = place.reviewUrl || (place.placeId?.startsWith('http') ? place.placeId : `https://search.google.com/local/writereview?placeid=${place.placeId}`)
-    
-    setData((prev: any) => ({
-      ...prev,
-      googleBusiness: place.name || prev.businessName || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara",
-      googlePlaceId: place.placeId || "ChIJc7ija2zFXzkR8DbOxXEfaM4",
-      googleCid: place.cid || "14873172342901454576",
-      googleMapsUri: place.mapsUri || `https://maps.google.com/?cid=14873172342901454576`,
-      googleReviewUrl: reviewUrl || "https://g.page/r/CfA2zsVxH2jOEBM/review",
-      googleAddress: place.address || place.formattedAddress || prev.address || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011",
-      googleConnected: true
-    }))
-
-    try {
-      const merchantId = data.merchantId || "cms97ihsr0002w0ykccl3xvqy"
-      await fetch("/api/google-business/connect", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-merchant-id": merchantId
-        },
-        body: JSON.stringify({
-          placeId: place.placeId || "ChIJc7ija2zFXzkR8DbOxXEfaM4",
-          placeName: place.name || data.businessName || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara",
-          address: place.address || place.formattedAddress || data.address || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011",
-          reviewUrl: reviewUrl
-        })
-      })
-    } catch (err) {
-      console.error("Failed to save Google Connection to DB:", err)
-    } finally {
-      setConnectingLink(false)
-    }
-  }
-
   const disconnectPlace = async () => {
     setDisconnecting(true)
     setError("")
@@ -1258,9 +951,7 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
       googleAddress: "",
       googleCid: "",
       googleMapsUri: "",
-      googleSearchResults: []
     }))
-    setActiveTab("oauth")
     setIsPickingLocation(false)
 
     // 3. Delete from backend database
@@ -1309,116 +1000,39 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
 
       <div className="space-y-6">
         {!data.googleConnected ? (
-          /* Selection Mode */
-          <div className="space-y-4">
-            <div className="flex gap-2 p-1 bg-slate-100 rounded-xl">
-              <Button
-                variant={activeTab === "oauth" ? "default" : "ghost"}
-                className={`flex-1 text-xs font-semibold py-2 rounded-lg ${activeTab === "oauth" ? "bg-white text-slate-800 shadow" : "text-slate-600"}`}
-                onClick={() => setActiveTab("oauth")}
-              >
-                🔐 Google OAuth 2.0 (Official)
-              </Button>
-              <Button
-                variant={activeTab === "manual" ? "default" : "ghost"}
-                className={`flex-1 text-xs font-semibold py-2 rounded-lg ${activeTab === "manual" ? "bg-white text-slate-800 shadow" : "text-slate-600"}`}
-                onClick={() => setActiveTab("manual")}
-              >
-                🔗 Direct Review Link / Maps Search
-              </Button>
+          /* Official Google OAuth 2.0 Connect View */
+          <div className="p-8 border-2 border-dashed border-blue-200 bg-blue-50/30 rounded-2xl text-center space-y-5">
+            <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center mx-auto shadow-md shadow-blue-100">
+              <Star className="w-7 h-7 fill-blue-600" />
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="font-extrabold text-lg text-slate-900">Official Google Business Profile (OAuth)</h3>
+              <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
+                Connect your verified Google Business Profile to auto-sync 5★ reviews, track customer ratings, and trigger instant WhatsApp stamps.
+              </p>
             </div>
 
-            {activeTab === "oauth" ? (
-              <div className="p-6 border-2 border-dashed border-blue-200 bg-blue-50/30 rounded-2xl text-center space-y-4">
-                <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mx-auto">
-                  <Star className="w-6 h-6 fill-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-base text-slate-800">Official Google Business Profile API</h3>
-                  <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
-                    Connect your verified Google Business Profile to auto-sync 5★ reviews, track customer ratings, and trigger instant WhatsApp stamps.
-                  </p>
-                </div>
-                <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                  <Button
-                    onClick={handleOAuthConnect}
-                    disabled={connectingOauth}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg shadow-blue-200 flex items-center gap-2"
-                  >
-                    {connectingOauth ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                    Sign In with Google (OAuth)
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      const merchantId = data.merchantId || "cms97ihsr0002w0ykccl3xvqy"
-                      window.location.href = `/api/google-business/oauth?merchantId=${merchantId}&mode=instant`
-                    }}
-                    className="border-emerald-500 text-emerald-700 hover:bg-emerald-50 text-xs font-semibold"
-                  >
-                    ⚡ Instant 1-Click Sandbox Connect
-                  </Button>
-                </div>
+            {/* Prominent Helper Description Notice */}
+            <div className="p-4 bg-amber-50 border border-amber-200/80 rounded-xl text-xs text-amber-900 flex items-start gap-3 max-w-lg mx-auto text-left shadow-xs">
+              <span className="text-base shrink-0 mt-0.5">⚠️</span>
+              <div>
+                <p className="font-bold text-amber-950">Important Login Requirement:</p>
+                <p className="text-[11px] text-amber-900 mt-0.5 leading-relaxed">
+                  Please click below and <strong>sign in with the exact Google / Gmail ID</strong> that is registered as Owner or Manager of your <strong>Google Business Profile</strong> on Google Maps.
+                </p>
               </div>
-            ) : (
-              <div className="p-6 border border-slate-200 bg-slate-50 rounded-2xl space-y-4">
-                <div>
-                  <Label className="text-xs font-bold text-slate-700">Paste your Google Maps / Review Link:</Label>
-                  <p className="text-[11px] text-slate-500 mb-2">e.g., https://g.page/r/CfA2zsVxH2jOEBM/review or Google Maps URL</p>
-                  <div className="flex gap-2">
-                    <Input
-                      value={directUrl}
-                      onChange={e => setDirectUrl(e.target.value)}
-                      placeholder="https://g.page/r/.../review"
-                      className="text-xs font-mono"
-                    />
-                    <Button onClick={handleDirectLink} disabled={connectingLink} className="bg-blue-600 hover:bg-blue-700 text-white font-bold min-w-[100px]">
-                      {connectingLink ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Link →"}
-                    </Button>
-                  </div>
-                </div>
+            </div>
 
-                <div className="relative flex items-center py-1">
-                  <div className="flex-grow border-t border-slate-200" />
-                  <span className="mx-3 text-xs text-slate-400 font-semibold uppercase">OR SEARCH ON MAPS</span>
-                  <div className="flex-grow border-t border-slate-200" />
-                </div>
-
-                <div>
-                  <Label className="text-xs text-slate-600">Search your business name on Google Maps:</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Input
-                      value={query}
-                      onChange={e => setQuery(e.target.value)}
-                      placeholder="e.g., Cake Connection Vadodara"
-                      onKeyDown={e => e.key === "Enter" && searchGooglePlaces()}
-                    />
-                    <Button onClick={searchGooglePlaces} disabled={searching} variant="outline" className="min-w-[90px]">
-                      {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : "Search"}
-                    </Button>
-                  </div>
-                </div>
-
-                {data.googleSearchResults && data.googleSearchResults.length > 0 && (
-                  <div className="space-y-3">
-                    <Label className="text-xs font-semibold">Select your profile from search results:</Label>
-                    {data.googleSearchResults.map((place: any) => (
-                      <div
-                        key={place.placeId}
-                        onClick={() => selectPlace(place)}
-                        className="p-4 border bg-white rounded-2xl hover:border-blue-500 hover:shadow-md cursor-pointer flex items-center justify-between"
-                      >
-                        <div>
-                          <p className="font-bold text-sm">{place.name}</p>
-                          <p className="text-xs text-slate-500">{place.address}</p>
-                        </div>
-                        <Button size="sm" className="bg-blue-600 text-white text-xs">Connect →</Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+            <div className="pt-2 flex justify-center">
+              <Button
+                onClick={handleOAuthConnect}
+                disabled={connectingOauth}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-blue-200 flex items-center gap-2 text-sm"
+              >
+                {connectingOauth ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                Sign In with Google (OAuth)
+              </Button>
+            </div>
           </div>
         ) : isPickingLocation && availableLocations.length > 0 ? (
           /* Multi-Location Selection View (Choose 1 Location for 3-Day Free Trial) */

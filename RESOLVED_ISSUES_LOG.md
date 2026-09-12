@@ -3,6 +3,23 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [12 Sep 2026] Issue: Onboarding Streamlining (QR-Only WhatsApp & Direct Google OAuth) and Super Admin Credentials Provisioning
+- **Symptom**:
+  1. Onboarding Step 2 had an alternative "Link via Phone (Pairing Code)" button and UI that was confusing to merchants and cluttered the simple Instant QR scan journey.
+  2. Onboarding Step 3 had multiple tabs ("Google OAuth 2.0" vs "Direct Review Link / Maps Search") and an "Instant 1-Click Sandbox Connect" button that distracted merchants from officially authenticating with their Google Business Profile.
+  3. Merchants needed prominent instructions to log in with the exact Google/Gmail ID registered with their Google Business Profile.
+  4. Super Admin credentials (`admin@customerpilot.in` / `Admin@CustomerPilot2026!`) were missing or not syncing on the live VPS database, preventing login to `/super-admin` for resetting test customer data or managing merchants.
+- **Root Cause**:
+  1. Step 2 in `src/app/onboarding/page.tsx` maintained legacy and secondary phone pairing states and countdown timers alongside the primary QR code scanner.
+  2. Step 3 contained fallback search and sandbox bypass buttons intended for development/staging environments rather than official production Google OAuth.
+  3. The live VPS SQLite databases (`/var/www/CustomerPilot/prisma/prisma/dev.db` and standalone replicas) did not have a verified `super_admin` record with the matching bcrypt hash for `Admin@CustomerPilot2026!`.
+- **Resolution**:
+  1. Streamlined Step 2 in `src/app/onboarding/page.tsx`: removed pairing code buttons, states, timers, and input forms. Configured Instant QR Scan as the sole, 10-minute auto-refreshing connection method.
+  2. Streamlined Step 3 in `src/app/onboarding/page.tsx`: removed tab switcher, manual Maps search, direct link input, and sandbox bypass button. Added a prominent, styled helper alert notifying merchants to sign in with their registered Google Business Profile Gmail ID.
+  3. Provisioned and verified `admin@customerpilot.in` on the production VPS database with role `super_admin` and bcrypt hash for `Admin@CustomerPilot2026!`. Verified HTTP 200 authentication and redirection to `/super-admin`. Documented the 1-click "🧹 Reset" and "🗑️ Delete" capabilities in `/super-admin` for fresh testing.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [12 Sep 2026] Issue: Mobile Sticky Nav, Drawer Auto-Close, Light/Dark Toggle, Settings Layout Revamp & WhatsApp Bot Webhook Fix
 - **Symptom**:
   1. In the mobile bottom sticky navigation, "Home" and "Customers" were clickable, but "Rewards" and "Queue" did not respond to touches/clicks.
