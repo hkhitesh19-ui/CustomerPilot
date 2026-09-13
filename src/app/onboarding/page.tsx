@@ -1776,30 +1776,30 @@ function OnboardStep7Print({ data, setData }: any) {
       </div>
 
       <div className="flex justify-center">
-        <div id="printable-standee" className="w-full max-w-sm bg-gradient-to-b from-slate-900 to-indigo-950 text-white p-6 rounded-3xl shadow-2xl border-4 border-amber-400 space-y-4 text-center">
+        <div id="printable-standee" className="w-full max-w-sm bg-white text-slate-900 p-6 rounded-3xl shadow-2xl border-4 border-indigo-500 space-y-4 text-center">
           <div className="flex flex-col items-center gap-2">
-            {logoUrl && <img src={logoUrl} alt={businessName} className="h-12 object-contain bg-white/10 rounded-xl p-1.5" />}
-            <h3 className="text-xl font-black">{businessName}</h3>
-            <div className="px-3 py-1 bg-amber-400 text-slate-950 font-bold text-xs rounded-full">VIP Loyalty Club 👑</div>
+            <div className="px-3 py-1 bg-indigo-600 text-white font-extrabold text-xs rounded-full uppercase tracking-wider shadow-xs">👑 VIP Loyalty Club</div>
+            {logoUrl && <img src={logoUrl} alt={businessName} className="h-14 max-w-[200px] object-contain p-1" />}
+            <h3 className="text-xl font-black text-slate-900 tracking-tight">{businessName}</h3>
           </div>
-          <div className="p-4 bg-white rounded-2xl inline-block mx-auto border-2 border-amber-300">
+          <div className="p-3 bg-slate-50 rounded-2xl inline-block mx-auto border-2 border-indigo-100 shadow-inner">
             {qrUrl ? (
-              <img src={qrUrl} alt="QR" className="w-48 h-48 mx-auto" />
+              <img src={qrUrl} alt="QR" className="w-48 h-48 mx-auto rounded-lg" />
             ) : (
               <div className="w-48 h-48 bg-slate-100 rounded-xl flex items-center justify-center text-xs text-slate-400">QR Loading...</div>
             )}
-            <p className="text-[11px] font-bold text-slate-900 mt-2 uppercase tracking-wide">Scan with WhatsApp Camera</p>
+            <p className="text-[11px] font-bold text-indigo-700 mt-2 uppercase tracking-wide">📲 Scan with WhatsApp Camera</p>
           </div>
-          <div className="p-3 bg-white/10 rounded-xl border border-white/20">
-            <p className="text-xs text-amber-300 font-bold uppercase">★ Exclusive Member Offer ★</p>
-            <p className="text-sm font-extrabold">Earn Stamps & Get {rewardOffer}!</p>
-            <p className="text-[10px] text-slate-300">No App Required • 5 Seconds on WhatsApp</p>
+          <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-100">
+            <p className="text-xs text-indigo-700 font-bold uppercase">★ Exclusive Member Offer ★</p>
+            <p className="text-sm font-extrabold text-indigo-950">Earn Stamps &amp; Get {rewardOffer}!</p>
+            <p className="text-[10px] text-slate-500 font-medium">No App Required • 5 Seconds on WhatsApp</p>
           </div>
 
-          {/* CustomerPilot Branding with Logo */}
-          <div className="pt-3 border-t border-white/20 flex items-center justify-center gap-2">
-            <span className="text-[10px] text-slate-300 font-semibold uppercase tracking-wider">Powered by</span>
-            <img src="/cplogo_horizontal.png" alt="CustomerPilot" className="h-5 w-auto object-contain bg-white/15 rounded px-1.5 py-0.5" />
+          {/* CustomerPilot Branding with Logo on Clean White Background */}
+          <div className="pt-3 border-t border-slate-200 flex items-center justify-center gap-2">
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Powered by</span>
+            <img src="/cplogo_horizontal.png" alt="CustomerPilot" className="h-5 w-auto object-contain" />
           </div>
         </div>
       </div>

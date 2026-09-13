@@ -192,19 +192,24 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid md:grid-cols-2 gap-6 items-center">
-          {/* Printable Preview Card */}
-          <div className="flex flex-col items-center justify-center p-6 border-2 border-indigo-500/30 rounded-2xl bg-gradient-to-b from-indigo-50/50 to-background dark:from-indigo-950/20 text-center shadow-lg relative overflow-hidden">
-            <div className="absolute top-3 right-3 flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-indigo-500 text-white rounded-full">
+          {/* Printable Preview Card (Pure White Acrylic Standee Design) */}
+          <div className="w-full max-w-sm mx-auto bg-white text-slate-900 rounded-3xl p-6 shadow-2xl border-4 border-indigo-500 text-center relative overflow-hidden">
+            <div className="absolute top-3 right-3 flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 bg-emerald-500 text-white rounded-full shadow-xs">
               <Sparkles className="w-3 h-3" /> Ready to Print
             </div>
 
+            {/* VIP Loyalty Badge */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-600 text-white text-[11px] font-extrabold uppercase tracking-wider rounded-full mb-3 shadow-xs">
+              👑 VIP Loyalty Club
+            </div>
+
             {/* Prominent Un-cropped Merchant Logo */}
-            <div className="flex flex-col items-center justify-center mb-3 mt-2 min-h-[70px]">
+            <div className="flex flex-col items-center justify-center mb-2 min-h-[75px]">
               {qrData?.merchant?.logoUrl ? (
                 <img
                   src={qrData.merchant.logoUrl}
                   alt="Store Logo"
-                  className="max-h-20 max-w-[220px] w-auto h-auto object-contain rounded-xl shadow-md border border-slate-200/80 p-1.5 bg-white"
+                  className="max-h-20 max-w-[220px] w-auto h-auto object-contain p-1"
                   onError={(e) => {
                     const target = e.currentTarget
                     target.style.display = 'none'
@@ -221,26 +226,38 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
               </div>
             </div>
 
-            <span className="font-bold text-lg text-slate-900 dark:text-slate-100 mb-1">
+            <span className="font-black text-xl text-slate-900 mb-0.5 block tracking-tight">
               {qrData?.merchant?.name || "Merchant Store"}
             </span>
 
-            <p className="text-xs text-muted-foreground mb-4 font-medium">Scan to Collect Stamps & Claim Rewards!</p>
+            <p className="text-xs text-slate-600 mb-3.5 font-semibold">
+              Scan to Collect Stamps &amp; Claim Rewards!
+            </p>
 
             {/* QR Image Container */}
-            <div className="relative p-3 bg-white rounded-xl shadow-inner border border-gray-200">
+            <div className="relative p-3 bg-slate-50 rounded-2xl shadow-inner border-2 border-indigo-100 inline-block">
               {loading ? (
                 <div className="w-48 h-48 flex items-center justify-center">
                   <RefreshCw className="w-8 h-8 animate-spin text-indigo-600" />
                 </div>
               ) : qrData?.qrDataUrl ? (
-                <img src={qrData.qrDataUrl} alt="Store QR Code" className="w-48 h-48 rounded-lg" />
+                <img src={qrData.qrDataUrl} alt="Store QR Code" className="w-48 h-48 rounded-lg mx-auto" />
               ) : null}
+              <p className="text-[11px] font-bold text-indigo-700 mt-2 tracking-wide uppercase">
+                📲 Scan with WhatsApp Camera
+              </p>
             </div>
 
-            {/* CustomerPilot Branding with Logo */}
-            <div className="pt-3 mt-2 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-center gap-2">
-              <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Powered by</span>
+            {/* Loyalty Benefit Pill */}
+            <div className="mt-3 p-2.5 bg-indigo-50 rounded-xl border border-indigo-100 text-center">
+              <span className="text-[11px] font-extrabold text-indigo-950">
+                Earn Stamps • Unlock Free Rewards • No App Needed
+              </span>
+            </div>
+
+            {/* CustomerPilot Branding with Logo on Clean White Background */}
+            <div className="pt-3 mt-3 border-t border-slate-200 flex items-center justify-center gap-2">
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Powered by</span>
               <img src="/cplogo_horizontal.png" alt="CustomerPilot" className="h-5 w-auto object-contain" />
             </div>
           </div>

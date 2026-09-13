@@ -3,6 +3,17 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [13 Sep 2026] Issue: WhatsApp Loyalty QR Standee Pure White Acrylic Redesign
+- **Symptom**: In `/dashboard/settings` and Onboarding Step 7, the WhatsApp VIP Loyalty QR standee preview had a dark gradient / black background. On this black background, the "CustomerPilot" logo text was dark and hard to read, the merchant logo sat inside a jarring white box, and the card did not look like a professional white acrylic counter standee.
+- **Root Cause**: The standee card container in `src/components/qr-generator.tsx` used `bg-gradient-to-b from-indigo-50/50 to-background dark:from-indigo-950/20`, causing it to inherit the dark mode page background (`slate-950`). Because `/cplogo_horizontal.png` features dark typography, placing it directly over a dark background compromised readability and contrast.
+- **Resolution**:
+  1. Redesigned the VIP Loyalty standee card across `src/components/qr-generator.tsx`, `src/app/onboarding/page.tsx`, and `src/app/page.tsx` to a pure white acrylic style (`bg-white text-slate-900 rounded-3xl p-6 shadow-2xl border-4 border-indigo-500`).
+  2. Added high-contrast royal indigo VIP badge (`👑 VIP Loyalty Club`), soft rounded QR frame with subtle border (`bg-slate-50 border-2 border-indigo-100`), and bold uppercase WhatsApp camera scanning prompt (`text-indigo-700 font-bold`).
+  3. Placed `/cplogo_horizontal.png` on the pure white footer container, providing 100% sharp contrast, vibrant cyan branding, and clean typography matching real-world acrylic counter displays.
+  4. Tested and verified full production build (`npm run build`) with 0 errors across 164 routes.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [13 Sep 2026] Issue: Merchant Review Alert Disablement, Natural Review Phrasing, Desktop Widget Alignment, and Standee Logo Persistence
 - **Symptom**:
   1. Whenever a customer posted a Google review, CustomerPilot sent a "⭐ New 5-Star Google Review Received!" alert to the merchant's WhatsApp. The merchant requested this notification to be completely disabled.
