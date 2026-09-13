@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [13 Sep 2026] Issue: Desktop WhatsApp Widget Alignment & VPS Git Deployment Fast-Forward
+- **Symptom**: On desktop view (`https://customerpilot.in/dashboard/settings`), the floating WhatsApp widget ("Need Help? Chat on WhatsApp") remained fixed to the bottom-left corner of the viewport, overlapping the sidebar subscription card and signout button.
+- **Root Cause**: 
+  1. On the Hostinger production VPS, an untracked image file (`public/uploads/1789267721286-IMG_20220502_WA0034.jpg`) collided with the same tracked image added in commit `3b366b3`. As a result, `git pull` aborted and the VPS repository remained at commit `28655ec` (which had `sm:left-6` hardcoded).
+  2. In `src/components/whatsapp-widget.tsx`, relying on `sm:left-auto sm:right-6` risked CSS cascade conflicts with base `left-4`.
+- **Resolution**:
+  1. Updated `src/components/whatsapp-widget.tsx` to use mutually exclusive responsive breakpoints: `max-sm:bottom-20 max-sm:left-4 max-sm:items-start` for mobile and `sm:bottom-6 sm:right-6 sm:items-end` for desktop. Updated the tooltip caret to `max-sm:left-6 sm:right-6`. This completely eliminates any CSS property inheritance conflict between mobile and desktop.
+  2. Fixed the deployment conflict strategy on VPS: preserved persistent uploads in `/var/www/uploads/`, cleaned untracked file collisions, and fast-forwarded the git repository.
+  3. Verified production build passed locally with 0 errors across 164 routes.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [13 Sep 2026] Issue: WhatsApp Loyalty QR Standee Pure White Acrylic Redesign
 - **Symptom**: In `/dashboard/settings` and Onboarding Step 7, the WhatsApp VIP Loyalty QR standee preview had a dark gradient / black background. On this black background, the "CustomerPilot" logo text was dark and hard to read, the merchant logo sat inside a jarring white box, and the card did not look like a professional white acrylic counter standee.
 - **Root Cause**: The standee card container in `src/components/qr-generator.tsx` used `bg-gradient-to-b from-indigo-50/50 to-background dark:from-indigo-950/20`, causing it to inherit the dark mode page background (`slate-950`). Because `/cplogo_horizontal.png` features dark typography, placing it directly over a dark background compromised readability and contrast.
