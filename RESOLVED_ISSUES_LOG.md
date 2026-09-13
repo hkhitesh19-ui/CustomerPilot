@@ -3,6 +3,40 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [13 Sep 2026] Issue: Merchant Review Alert Disablement, Natural Review Phrasing, Desktop Widget Alignment, and Standee Logo Persistence
+- **Symptom**:
+  1. Whenever a customer posted a Google review, CustomerPilot sent a "⭐ New 5-Star Google Review Received!" alert to the merchant's WhatsApp. The merchant requested this notification to be completely disabled.
+  2. The AI review generator drafted reviews using unnatural/cliché words like `"spot on"` instead of natural everyday Indian English, and the AI owner auto-reply was outputting `"Dhanyawad"` instead of `"Thank you"`.
+  3. The floating WhatsApp widget was placed on the left on all screen sizes, causing it to overlap desktop sidebar elements; the merchant requested it to be placed on the right on desktop, while staying above bottom navigation on mobile.
+  4. In `/dashboard/settings`, the WhatsApp Loyalty QR Standee displayed a broken image icon with alt text `Store Logo`.
+- **Root Cause**:
+  1. In `src/app/api/reviews/record-google-post/route.ts`, step 7 sent a `merchant_review_alert` WhatsApp message to `merchant.whatsappPhone`.
+  2. In `src/app/review/page.tsx`, `"spot on"` was literally hardcoded in fallback draft template line 13 and suggested as an example in prompt line 128. In `src/lib/ai-review-reply.ts`, `"Dhanyawad"` was hardcoded in fallback reply line 50 and suggested in line 106.
+  3. In `src/components/whatsapp-widget.tsx`, the widget had `left-4 sm:left-6` hardcoded without responsive right-alignment on `sm:` breakpoints.
+  4. The merchant uploaded their logo (`1789267721286-IMG_20220502_WA0034.jpg`) through the web UI which wrote to `.next/standalone/public/uploads`. During subsequent VPS deployments (`npm run build`), Next.js wiped the volatile `.next` directory. Because persistent storage outside the transient Next.js build tree (`/var/www/uploads`) was not in place, the uploaded image file was lost, returning 404 while the database retained the file path.
+- **Resolution**:
+  1. In `src/app/api/reviews/record-google-post/route.ts`, removed the merchant alert block so no WhatsApp alert is sent to the merchant upon customer review submission.
+  2. In `src/app/review/page.tsx`:
+     - Replaced `"spot on"` with `"super fresh, really good texture"` in fallback templates.
+     - Removed `"spot on"` from prompt examples and added it to the strict banned marketing clichés list.
+     - Added regex sanitization `.replace(/\bspot[- ]?on\b/gi, "really good")` on parsed AI drafts.
+  3. In `src/lib/ai-review-reply.ts`:
+     - Replaced `"Dhanyawad"` with `"Thank you so much"` in fallback template.
+     - Replaced `"Dhanyawad / Thank you ❤️"` with `"Thank you ❤️ / Thank you so much"` in prompt guidance.
+     - Added strict constraint banning `"Dhanyawad"` and added post-processing `.replace(/\bDhanyawad\b/gi, "Thank you")`.
+  4. In `src/components/whatsapp-widget.tsx`:
+     - Configured responsive positioning: `bottom-20 left-4 sm:bottom-6 sm:left-auto sm:right-6 sm:items-end` with matching tooltip caret `left-6 sm:left-auto sm:right-6`.
+  5. In `src/lib/storage/LocalDevAdapter.ts` & `src/app/uploads/[filename]/route.ts`:
+     - Added dedicated persistent directory `/var/www/uploads` to target directories and candidate lookup paths on production Linux VPS.
+  6. In `src/components/qr-generator.tsx`:
+     - Added defensive `onError` fallback handling so if a logo image ever fails to load, it cleanly toggles to the store's default icon instead of showing a broken browser image.
+  7. On the VPS:
+     - Established `/var/www/uploads/` directory, restored Cake Connection's high-res logo to `1789267721286-IMG_20220502_WA0034.jpg`, and verified HTTP 200 image delivery.
+     - Updated `deployVPS.py` deployment script to backup `/public/uploads` into `/var/www/uploads` before builds and restore into `.next/standalone/public/uploads` post-build.
+  8. Verified local production build (`npm run build`) passed with 0 errors across all 164 routes.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [13 Sep 2026] Issue: Comprehensive UI Refinements, Queue Mobile Inputs, Light/Dark Contrast, and Reviews Sidebar Activation
 - **Symptom**:
   1. `/signup` page had an unwanted hero marketing column with text, feature lists, and Cake Connection quotes that distracted users from the signup form.

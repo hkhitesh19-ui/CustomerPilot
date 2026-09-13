@@ -405,16 +405,8 @@ export async function POST(req: Request) {
       customerId: customer.id
     });
 
-    // 7. Send WhatsApp notification to Merchant
-    if (merchant.whatsappPhone) {
-      const merchantMsg = `⭐ *New 5-Star Google Review Received!* ⭐\n\n👤 *Customer:* ${customer.name}\n💬 *Review:* "${finalReviewText}"\n\n🤖 *AI Auto-Reply Sent:* "${replyText}"`;
-      await sendCentralWhatsAppMessage({
-        merchantId: merchant.id,
-        toPhone: merchant.whatsappPhone,
-        text: merchantMsg,
-        template: 'merchant_review_alert'
-      });
-    }
+    // 7. Merchant WhatsApp alert disabled per merchant preference
+    // (Google Review Received & AI Auto-Reply notification is not sent to merchant)
 
     return NextResponse.json({
       success: true,

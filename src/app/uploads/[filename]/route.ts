@@ -11,6 +11,7 @@ export async function GET(
     const safeName = path.basename(filename);
 
     const candidateDirs = [
+      "/var/www/uploads",
       path.join(process.cwd(), "public", "uploads"),
       path.join(process.cwd(), ".next", "standalone", "public", "uploads"),
       path.join(process.cwd(), "public"),

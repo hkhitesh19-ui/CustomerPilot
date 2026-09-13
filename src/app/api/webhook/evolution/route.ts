@@ -381,9 +381,13 @@ export async function POST(req: NextRequest) {
 
         // ── JOIN: Add customer to Live Queue (Only for QR Code Scans) ────
         try {
+          // GAP 5 FIX: Smart name detection from pushName
+          const detectedName = extractPersonName(pushName)
+
           const result = await joinQueue({
             merchantId: merchant.id,
             phone: customerPhone,
+            name: detectedName || undefined,
             scanSource: scanType
           })
 
@@ -396,9 +400,6 @@ export async function POST(req: NextRequest) {
           const rewardName = stampCard?.rewardName || "FREE special treat"
           const stampsRequired = stampCard?.stampsRequired || 10
           const stampValue = stampCard?.stampValue || 500
-
-          // GAP 5 FIX: Smart name detection from pushName
-          const detectedName = extractPersonName(pushName)
 
           let welcomeMsg: string
 

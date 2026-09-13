@@ -5,10 +5,19 @@ import { CloudStorageProvider } from "./StorageProvider"
 export class LocalDevAdapter implements CloudStorageProvider {
   private getTargetDirs(): string[] {
     const cwd = process.cwd()
-    return [
-      path.join(cwd, "public", "uploads"),
-      path.join(cwd, ".next", "standalone", "public", "uploads"),
-    ]
+    const dirs = new Set<string>()
+
+    dirs.add(path.join(cwd, "public", "uploads"))
+    dirs.add(path.join(cwd, ".next", "standalone", "public", "uploads"))
+
+    // Dedicated persistent storage outside volatile build directory on production Linux VPS
+    if (fs.existsSync("/var/www")) {
+      dirs.add("/var/www/uploads")
+      dirs.add("/var/www/CustomerPilot/public/uploads")
+      dirs.add("/var/www/CustomerPilot/.next/standalone/public/uploads")
+    }
+
+    return Array.from(dirs)
   }
 
   constructor() {

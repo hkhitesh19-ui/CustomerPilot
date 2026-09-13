@@ -205,12 +205,20 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
                   src={qrData.merchant.logoUrl}
                   alt="Store Logo"
                   className="max-h-20 max-w-[220px] w-auto h-auto object-contain rounded-xl shadow-md border border-slate-200/80 p-1.5 bg-white"
+                  onError={(e) => {
+                    const target = e.currentTarget
+                    target.style.display = 'none'
+                    const fallback = target.parentElement?.querySelector('.cp-fallback-logo') as HTMLElement
+                    if (fallback) fallback.style.display = 'flex'
+                  }}
                 />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-md">
-                  CP
-                </div>
-              )}
+              ) : null}
+              <div
+                className="cp-fallback-logo w-12 h-12 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-md"
+                style={{ display: qrData?.merchant?.logoUrl ? 'none' : 'flex' }}
+              >
+                CP
+              </div>
             </div>
 
             <span className="font-bold text-lg text-slate-900 dark:text-slate-100 mb-1">

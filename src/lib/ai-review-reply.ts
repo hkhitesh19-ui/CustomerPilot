@@ -47,7 +47,7 @@ function buildSeoFallbackReply(params: {
   } else if (rating === 4) {
     return `Thank you so much for your wonderful review! ❤️ We are so glad you enjoyed our ${productEcho || categoryStr} at ${storeName}, ${location}. We're committed to being the best ${categoryStr} in ${location} and would love to know how we can earn that 5th star on your next visit!`
   } else {
-    return `Dhanyawad for such a lovely 5-star review! ❤️ We are thrilled that you loved our ${productEcho || categoryStr} and service. At ${storeName}, delivering the freshest, highest quality ${categoryStr} in ${location} is our greatest passion. We warmly look forward to welcoming you back soon!`
+    return `Thank you so much for such a lovely 5-star review! ❤️ We are thrilled that you loved our ${productEcho || categoryStr} and service. At ${storeName}, delivering the freshest, highest quality ${categoryStr} in ${location} is our greatest passion. We warmly look forward to welcoming you back soon!`
   }
 }
 
@@ -103,7 +103,7 @@ RULES:
   } else {
     sentimentGuidance = `
 RATING: 5/5 Stars (DELIGHTED CUSTOMER / MAXIMUM SEO OPPORTUNITY)
-TONE: Celebratory, genuinely hospitable ("Dhanyawad / Thank you ❤️"), and proud.
+TONE: Celebratory, genuinely hospitable ("Thank you so much ❤️"), and proud.
 RULES:
 1. Express genuine delight for their compliments, echoing the exact items or qualities praised (e.g. freshness, softness, packaging, specific flavors).
 2. LOCAL SEO OPTIMIZATION: Naturally weave in:
@@ -125,6 +125,7 @@ ${sentimentGuidance}
 
 STRICT CONSTRAINTS:
 - Length: 2 to 4 sentences (45-75 words). Concise, human, conversational.
+- Always use "Thank you" or "Thank you so much" to express gratitude. Strictly never use "Dhanyawad".
 - Incorporate Local SEO keywords naturally without keyword stuffing or robotic language.
 - Echo specific products/flavors mentioned by the customer.
 - Output ONLY the final reply text. Do NOT include markdown quotes, introductory labels like "Response:", or quotation marks.`
@@ -141,6 +142,7 @@ STRICT CONSTRAINTS:
         .replace(/^(Here is a draft|Sure|Here's a response|Owner response):/i, "")
         .replace(/^"/, "")
         .replace(/"$/, "")
+        .replace(/\bDhanyawad\b/gi, "Thank you")
         .trim()
 
       if (cleanText) {

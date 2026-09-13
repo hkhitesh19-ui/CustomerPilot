@@ -10,7 +10,7 @@ function getSmartFallbackReview(category: string, product: string): { draft1: st
   
   const draft1Templates = [
     hasItem
-      ? `Tried the ${item} today. Honestly super fresh, texture was spot on and sweetness was perfectly balanced!`
+      ? `Tried the ${item} today. Honestly super fresh, really good texture and sweetness was perfectly balanced!`
       : `Picked up some items earlier today. Super fresh quality, loved the taste. Totally worth it.`,
     hasItem
       ? `Got the ${item} yesterday for evening. Really good taste and soft texture, family loved it.`
@@ -125,12 +125,13 @@ The generated drafts must completely bypass Google's spam/NLP filters, trigger G
 3. CASUAL IMPERFECTIONS (Micro-Stylistics):
    - Natural Ellipsis: Drop formal grammatical subjects where natural (e.g., write "Loved the texture" instead of "I really loved the texture").
    - Punctuation: Use conversational punctuation (simple hyphens, a single exclamation mark, or casual commas). Strictly ban semicolons (;) and formal em-dashes (—).
-   - Natural Slang/Hinglish: Blend everyday spoken phrases naturally (e.g., "spot on", "badiya", "super fresh", "clean setup").
+   - Natural Slang/Hinglish: Blend everyday spoken phrases naturally (e.g., "badiya", "super fresh", "clean setup", "taste acha tha").
 4. TEMPORAL ANCHORS: Freely allow natural time markers ("today", "yesterday", "got this for evening") to mimic authentic mobile behavior.
 
 [SECTION 3: STRICT NEGATIVE CONSTRAINTS & POLICY GUARDRAILS]
 1. ZERO HALLUCINATION: Never invent staff names, prices, discounts, delivery timelines, or specific store decor not provided in the input.
 2. ABSOLUTE BAN ON MARKETING CLICHÉS: The following phrases immediately trigger spam filters and are strictly forbidden:
+   - "spot on"
    - "hidden gem"
    - "exceeded expectations"
    - "top-notch"
@@ -176,18 +177,16 @@ Return ONLY a valid, parseable JSON object with zero additional conversational f
         if (jsonMatch) {
           try {
             const parsed = JSON.parse(jsonMatch[0])
+            const clean = (s: string) => s.replace(/\bspot[- ]?on\b/gi, "really good").trim()
             if (parsed.draft_1 && parsed.draft_2) {
-              dynamicDraft = parsed.draft_1.trim()
-              draftOptions = {
-                draft1: parsed.draft_1.trim(),
-                draft2: parsed.draft_2.trim()
-              }
+              const d1 = clean(parsed.draft_1)
+              const d2 = clean(parsed.draft_2)
+              dynamicDraft = d1
+              draftOptions = { draft1: d1, draft2: d2 }
             } else if (parsed.draft_1) {
-              dynamicDraft = parsed.draft_1.trim()
-              draftOptions = {
-                draft1: parsed.draft_1.trim(),
-                draft2: smartFallback.draft2
-              }
+              const d1 = clean(parsed.draft_1)
+              dynamicDraft = d1
+              draftOptions = { draft1: d1, draft2: smartFallback.draft2 }
             }
           } catch (jsonErr) {
             console.warn("[ReviewPage] Failed to parse JSON draft from Gemini:", jsonErr)
