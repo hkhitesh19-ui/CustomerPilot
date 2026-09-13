@@ -139,7 +139,7 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="sm:max-w-md bg-slate-950 border-slate-800 text-slate-100">
+      <DialogContent className="sm:max-w-md max-h-[92vh] overflow-y-auto bg-slate-950 border-slate-800 text-slate-100">
         {result ? (
           /* ── Success State ── */
           <div className="flex flex-col items-center py-6 gap-4 text-center">
@@ -223,20 +223,20 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Product Name (Optional per Requirements.txt Rules) */}
               <div className="space-y-1.5">
-                <Label htmlFor="productName" className="text-slate-300 text-sm">Product Name <span className="text-xs text-slate-500">(Optional)</span></Label>
+                <Label htmlFor="productName" className="text-slate-300 text-sm font-medium">Product Name <span className="text-xs text-slate-500">(Optional)</span></Label>
                 <Input
                   id="productName"
                   type="text"
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
                   placeholder="e.g. Black Forest Cake"
-                  className="bg-slate-900 border-slate-800 text-slate-100 placeholder:text-slate-600 text-sm"
+                  className="h-11 bg-slate-900 border border-slate-700 text-slate-100 placeholder:text-slate-500 rounded-xl px-3 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
 
               {/* Bill Amount (Mandatory per Requirements.txt Rules) */}
               <div className="space-y-1.5">
-                <Label htmlFor="amount" className="text-slate-300 text-sm">Purchase Amount (₹) <span className="text-emerald-400">*</span></Label>
+                <Label htmlFor="amount" className="text-slate-300 text-sm font-medium">Purchase Amount (₹) <span className="text-emerald-400">*</span></Label>
                 <Input
                   id="amount"
                   type="number"
@@ -250,7 +250,7 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
                   placeholder="e.g. 550"
                   required
                   autoFocus
-                  className="bg-slate-900 border-slate-800 text-slate-100 text-lg font-semibold placeholder:text-slate-600"
+                  className="h-12 bg-slate-900 border border-slate-700 text-slate-100 text-lg font-semibold placeholder:text-slate-500 rounded-xl px-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
 
@@ -279,14 +279,14 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
 
               {error && <p className="text-sm text-red-400 bg-red-950/50 p-2.5 rounded border border-red-900">{error}</p>}
 
-              <DialogFooter className="fixed bottom-0 left-0 w-full p-4 bg-slate-950 border-t border-slate-800 md:relative md:border-none md:p-0 md:bg-transparent md:flex md:justify-end gap-2 z-50">
-                <Button type="button" variant="ghost" onClick={handleRemove} disabled={loading} className="text-red-400 hover:text-red-300 hover:bg-red-950/30 w-full md:w-auto md:mr-auto">
+              <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4 border-t border-slate-800">
+                <Button type="button" variant="ghost" onClick={handleRemove} disabled={loading} className="text-red-400 hover:text-red-300 hover:bg-red-950/30 w-full sm:w-auto sm:mr-auto">
                   {isRemoving ? 'Removing...' : 'Dismiss'}
                 </Button>
-                <Button type="button" variant="outline" onClick={handleClose} disabled={loading} className="border-slate-800 text-slate-400 w-full md:w-auto">
+                <Button type="button" variant="outline" onClick={handleClose} disabled={loading} className="border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-900 w-full sm:w-auto">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={loading || !amount} className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold w-full md:w-auto">
+                <Button type="submit" disabled={loading || !amount} className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold w-full sm:w-auto">
                   {loading && !isRemoving ? 'Processing...' : 'Give Reward'}
                 </Button>
               </DialogFooter>

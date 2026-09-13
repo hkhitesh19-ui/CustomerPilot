@@ -30,15 +30,15 @@ export default function QueuePage() {
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-100">Live Queue (Manual Approval)</h1>
-        <p className="text-slate-400 mt-2">Customers below have scanned the QR. Tap a customer to verify their purchase amount and manually award stamps.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Live Queue (Manual Approval)</h1>
+        <p className="text-slate-600 dark:text-slate-400 mt-2">Customers below have scanned the QR. Tap a customer to verify their purchase amount and manually award stamps.</p>
       </div>
 
-      <Card className="bg-slate-900/60 border-emerald-500/30 backdrop-blur-xl shadow-[0_0_40px_-15px_rgba(16,185,129,0.3)] overflow-hidden relative min-h-[60vh]">
+      <Card className="bg-white dark:bg-slate-900/60 border-slate-200 dark:border-emerald-500/30 backdrop-blur-xl shadow-md dark:shadow-[0_0_40px_-15px_rgba(16,185,129,0.3)] overflow-hidden relative min-h-[60vh]">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 animate-gradient-x" />
         
-        <CardHeader className="bg-slate-900/40 pb-4 border-b border-slate-800">
-          <CardTitle className="flex items-center gap-2 text-emerald-400">
+        <CardHeader className="bg-slate-50/70 dark:bg-slate-900/40 pb-4 border-b border-slate-200 dark:border-slate-800">
+          <CardTitle className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
             <Clock className="h-5 w-5 animate-pulse" /> 
             {waitingCustomers.length} Customers Waiting
           </CardTitle>
@@ -63,34 +63,34 @@ export default function QueuePage() {
                     setSelectedWaitingCustomer(wc);
                     setIsRewardModalOpen(true);
                   }}
-                  className="flex flex-col p-5 rounded-xl border border-slate-700 bg-slate-800/50 shadow-inner hover:border-emerald-400 hover:shadow-[0_0_15px_-3px_rgba(52,211,153,0.4)] cursor-pointer transition-all duration-300 active:scale-95 group relative overflow-hidden"
+                  className="flex flex-col p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 shadow-sm dark:shadow-inner hover:border-emerald-500 hover:shadow-[0_0_15px_-3px_rgba(52,211,153,0.4)] cursor-pointer transition-all duration-300 active:scale-95 group relative overflow-hidden"
                 >
                   {/* Subtle background glow on hover */}
                   <div className="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/5 transition-colors pointer-events-none" />
 
                   <div className="flex justify-between items-start mb-2 relative z-10">
                     <div className="flex flex-col">
-                      <span className="font-bold text-xl text-slate-100 group-hover:text-emerald-300 transition-colors">
+                      <span className="font-bold text-xl text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">
                         {wc.customer?.name || "Guest"}
                       </span>
-                      <span className="text-xs text-slate-400 font-mono mt-0.5">{phoneStr}</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{phoneStr}</span>
                     </div>
-                    <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full animate-pulse border border-emerald-500/30 shadow-[0_0_10px_0_rgba(16,185,129,0.2)] mt-1">
+                    <span className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full animate-pulse border border-emerald-500/30 shadow-[0_0_10px_0_rgba(16,185,129,0.2)] mt-1">
                       WAITING
                     </span>
                   </div>
                   
-                  <div className="mt-2 flex items-center justify-between text-xs text-slate-400 relative z-10 bg-slate-900/50 rounded-lg p-2.5 border border-slate-700/50">
+                  <div className="mt-2 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 relative z-10 bg-slate-100/80 dark:bg-slate-900/50 rounded-lg p-2.5 border border-slate-200 dark:border-slate-700/50">
                     <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-emerald-500/70" />
+                      <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-500/70" />
                       <span>{timeStr} IST</span>
                     </div>
-                    <div className="font-medium text-amber-500/90 bg-amber-500/10 px-2 py-0.5 rounded">
+                    <div className="font-medium text-amber-600 dark:text-amber-500/90 bg-amber-500/10 px-2 py-0.5 rounded">
                       {durationStr}
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-slate-700/50 text-sm font-semibold text-emerald-500 flex items-center justify-between opacity-80 group-hover:opacity-100 transition-opacity relative z-10">
+                  <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700/50 text-sm font-semibold text-emerald-600 dark:text-emerald-500 flex items-center justify-between opacity-80 group-hover:opacity-100 transition-opacity relative z-10">
                     Tap to Bill & Reward <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
                   </div>
                 </div>
@@ -100,11 +100,11 @@ export default function QueuePage() {
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center relative h-full">
               <div className="absolute inset-0 bg-emerald-500/5 blur-[120px] rounded-full max-w-lg mx-auto" />
-              <div className="w-20 h-20 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center mb-6 relative shadow-[0_0_30px_-5px_rgba(255,255,255,0.1)]">
-                <Users className="w-10 h-10 text-slate-500" />
+              <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 flex items-center justify-center mb-6 relative shadow-[0_0_30px_-5px_rgba(0,0,0,0.1)]">
+                <Users className="w-10 h-10 text-slate-400 dark:text-slate-500" />
                 <div className="absolute inset-0 border-2 border-emerald-500/20 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
               </div>
-              <p className="text-slate-300 font-medium text-xl">Queue is completely empty</p>
+              <p className="text-slate-800 dark:text-slate-300 font-medium text-xl">Queue is completely empty</p>
               <p className="text-sm text-slate-500 mt-3 max-w-sm">When a customer scans your VIP QR code at the counter, they will instantly drop into this grid.</p>
             </div>
           )}

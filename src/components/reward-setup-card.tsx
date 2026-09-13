@@ -230,7 +230,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="validity">Maximum Time Duration to earn Loyalty Reward</Label>
+              <Label htmlFor="validity">Validity( in Days) [ Maximum Time Duration to Earn Reward]</Label>
               <Input
                 id="validity"
                 type="number"

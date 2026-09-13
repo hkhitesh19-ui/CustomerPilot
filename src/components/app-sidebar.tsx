@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
-import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, ChevronRight, TrendingUp, BarChart3, FileText, Image, Share2, UserPlus, ChevronDown, BookOpen } from "lucide-react"
+import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, ChevronRight, TrendingUp, BarChart3, FileText, Image, Share2, UserPlus, ChevronDown, BookOpen, Star } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { useDashboardState } from "@/hooks/use-dashboard-state"
 import { hasModule, type Module } from "@/lib/feature-gate"
@@ -18,11 +18,18 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-const mainNav = [
+interface MainNavItem {
+  name: string
+  href: string
+  icon: any
+  module?: Module
+  modules?: Module[]
+}
+
+const mainNav: MainNavItem[] = [
   { name: "Complete Setup", href: "/dashboard/settings", icon: Settings },
   { name: "Home", href: "/dashboard", icon: LayoutDashboard },
-  // HIDING UNTIL GOOGLE API APPROVAL
-  // { name: "Google Reviews AI", href: "/dashboard/reviews", icon: Star, module: "AUTOREPLY" as Module },
+  { name: "Smart AI Google Reviews", href: "/dashboard/reviews", icon: Star, modules: ["REVIEWS", "AUTOREPLY"] },
   { name: "Live Queue", href: "/dashboard/queue", icon: Clock, module: "LOYALTY" as Module },
   { name: "Rewards", href: "/dashboard/rewards", icon: Gift, module: "LOYALTY" as Module },
   { name: "Customers CRM", href: "/dashboard/customers", icon: Users },
@@ -150,7 +157,12 @@ export function AppSidebar() {
         {/* Main Navigation */}
         <SidebarMenu>
           {mainNav
-            .filter((item) => !item.module || hasModule(merchant, item.module))
+            .filter((item) => {
+              if (item.modules) {
+                return item.modules.some((m) => hasModule(merchant, m))
+              }
+              return !item.module || hasModule(merchant, item.module)
+            })
             .map((item) => (
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton asChild isActive={pathname === item.href}>

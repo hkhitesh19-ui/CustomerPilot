@@ -16,16 +16,11 @@ export function WhatsAppFloatingWidget({
   const pathname = usePathname()
   const [showTooltip, setShowTooltip] = useState(true)
 
-  // Do not render floating public inquiry widget on authenticated dashboard screens
-  if (pathname?.startsWith("/dashboard")) {
-    return null
-  }
-
   const encodedMessage = encodeURIComponent(message)
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2 group select-none">
+    <div className="fixed bottom-20 left-4 sm:bottom-6 sm:left-6 z-50 flex flex-col items-start gap-2 group select-none">
       {/* Floating Tooltip / Chat Callout */}
       {showTooltip && (
         <div className="relative bg-white text-slate-800 text-xs font-semibold py-2 px-3.5 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-2 animate-bounce transition-all duration-300">
@@ -41,7 +36,7 @@ export function WhatsAppFloatingWidget({
             <X className="w-3 h-3" />
           </button>
           {/* Tooltip caret */}
-          <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-white border-r border-b border-slate-100 transform rotate-45" />
+          <div className="absolute -bottom-1.5 left-6 w-3 h-3 bg-white border-l border-b border-slate-100 transform rotate-45" />
         </div>
       )}
 

@@ -198,51 +198,10 @@ function SignupForm() {
         </div>
       </header>
 
-      {/* Main Content Split Layout */}
-      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-10 flex-1 flex items-start justify-center w-full">
-        <div className="grid md:grid-cols-12 gap-8 lg:gap-12 items-start w-full">
-          {/* Left Hero Column */}
-          <div className="md:col-span-6 lg:col-span-5 space-y-6 text-left pt-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-xs font-bold text-emerald-800">{headerBadge}</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-stone-900 tracking-tight leading-tight">
-              {mainTitle}
-            </h1>
-
-            <p className="text-xs sm:text-sm md:text-base text-stone-600 leading-relaxed">
-              {description}
-            </p>
-
-            <div className="space-y-2.5 pt-1">
-              {benefits.map((b, i) => (
-                <div key={i} className="flex items-center gap-2.5">
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600" />
-                  </div>
-                  <span className="text-stone-700 text-xs sm:text-sm font-semibold">{b}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Social Proof Card */}
-            <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-lg space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-extrabold text-stone-900">🍰 Cake Connection, Vadodara</span>
-                <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full text-[10px]">Verified Merchant</span>
-              </div>
-              <p className="text-xs text-stone-500 pt-1">
-                &quot;Added ₹38,400 repeat revenue &amp; 19 Google 5-star reviews in just 7 days of onboarding.&quot;
-              </p>
-            </div>
-          </div>
-
-          {/* Right Form Column */}
-          <div className="md:col-span-6 lg:col-span-7 flex justify-center w-full">
-            <div className="w-full max-w-lg bg-white/90 border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-sky-500 to-indigo-600 rounded-t-3xl" />
+      {/* Main Content Form Card */}
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12 flex-1 flex items-center justify-center w-full">
+        <div className="w-full max-w-lg bg-white/95 border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-sky-500 to-indigo-600 rounded-t-3xl" />
 
               <div className="mb-6">
                 <h2 className="text-2xl font-black text-stone-900">
@@ -403,8 +362,6 @@ function SignupForm() {
                 </Button>
               </form>
             </div>
-          </div>
-        </div>
       </main>
 
       {/* Footer */}

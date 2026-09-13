@@ -1339,7 +1339,7 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
                 onClick={nextStep}
                 className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white font-bold py-6 text-sm sm:text-base rounded-2xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
               >
-                <span>Confirm & Continue to Next Step (Logo Setup)</span>
+                <span>Confirm & Continue</span>
                 <ArrowRight className="w-5 h-5 stroke-[2.5]" />
               </Button>
 

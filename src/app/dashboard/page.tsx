@@ -83,7 +83,7 @@ export default function DashboardHome() {
       )}
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Dashboard Overview</h1>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span className="flex items-center gap-1"><Crown className="h-4 w-4 text-amber-500" /> Plan: {activeSubscription.planId}</span>
           <span className="px-2">|</span>
@@ -95,66 +95,66 @@ export default function DashboardHome() {
 
       {/* Top Metrics Row */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-slate-900/60 border-slate-800/60 backdrop-blur-xl shadow-2xl relative overflow-hidden group hover:border-emerald-500/50 transition-colors duration-500">
+        <Card className="bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800/60 backdrop-blur-xl shadow-md dark:shadow-2xl relative overflow-hidden group hover:border-emerald-500/50 transition-colors duration-500">
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium text-slate-300">Customers Brought Back</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300">Customers Brought Back</CardTitle>
             <div className="bg-emerald-500/20 p-2 rounded-lg">
-              <Users className="h-4 w-4 text-emerald-400" />
+              <Users className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-bold text-white">{customersBroughtBack}</div>
-            <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1">
+            <div className="text-3xl font-bold text-slate-900 dark:text-white">{customersBroughtBack}</div>
+            <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               Repeat visitors
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/60 border-slate-800/60 backdrop-blur-xl shadow-2xl relative overflow-hidden group hover:border-indigo-500/50 transition-colors duration-500">
+        <Card className="bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800/60 backdrop-blur-xl shadow-md dark:shadow-2xl relative overflow-hidden group hover:border-indigo-500/50 transition-colors duration-500">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium text-slate-300">Repeat Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300">Repeat Revenue</CardTitle>
             <div className="bg-indigo-500/20 p-2 rounded-lg">
-              <CreditCard className="h-4 w-4 text-indigo-400" />
+              <CreditCard className="h-4 w-4 text-indigo-500 dark:text-indigo-400" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-bold text-white">₹{repeatRevenue.toLocaleString()}</div>
-            <p className="text-xs text-indigo-400 mt-1 flex items-center gap-1">
+            <div className="text-3xl font-bold text-slate-900 dark:text-white">₹{repeatRevenue.toLocaleString()}</div>
+            <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-1 flex items-center gap-1">
               From returning customers
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/60 border-slate-800/60 backdrop-blur-xl shadow-2xl relative overflow-hidden group hover:border-amber-500/50 transition-colors duration-500">
+        <Card className="bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800/60 backdrop-blur-xl shadow-md dark:shadow-2xl relative overflow-hidden group hover:border-amber-500/50 transition-colors duration-500">
           <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium text-slate-300">Average Google Rating</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300">Average Google Rating</CardTitle>
             <div className="bg-amber-500/20 p-2 rounded-lg">
-              <Star className="h-4 w-4 text-amber-400" />
+              <Star className="h-4 w-4 text-amber-500 dark:text-amber-400" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-bold text-white">{avgGoogleRating}</div>
-            <p className="text-xs text-amber-400 mt-1 flex items-center gap-1">
+            <div className="text-3xl font-bold text-slate-900 dark:text-white">{avgGoogleRating}</div>
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
               {totalReviews} total reviews
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/60 border-slate-800/60 backdrop-blur-xl shadow-2xl relative overflow-hidden group hover:border-pink-500/50 transition-colors duration-500">
+        <Card className="bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800/60 backdrop-blur-xl shadow-md dark:shadow-2xl relative overflow-hidden group hover:border-pink-500/50 transition-colors duration-500">
           <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium text-slate-300">Live Queue Summary</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-300">Live Queue Summary</CardTitle>
             <div className="bg-pink-500/20 p-2 rounded-lg">
-              <Clock className="h-4 w-4 text-pink-400" />
+              <Clock className="h-4 w-4 text-pink-500 dark:text-pink-400" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-bold text-white">{liveQueueCount}</div>
-            <p className="text-xs text-pink-400 mt-1 flex items-center gap-1">
+            <div className="text-3xl font-bold text-slate-900 dark:text-white">{liveQueueCount}</div>
+            <p className="text-xs text-pink-600 dark:text-pink-400 mt-1 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse"></span>
               Currently waiting
             </p>
@@ -163,11 +163,11 @@ export default function DashboardHome() {
       </div>
 
       {/* Live Queue Section */}
-      <Card className="bg-slate-900/60 border-emerald-500/30 backdrop-blur-xl shadow-[0_0_40px_-15px_rgba(16,185,129,0.3)] overflow-hidden relative">
+      <Card className="bg-white dark:bg-slate-900/60 border-slate-200 dark:border-emerald-500/30 backdrop-blur-xl shadow-md dark:shadow-[0_0_40px_-15px_rgba(16,185,129,0.3)] overflow-hidden relative">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 animate-gradient-x" />
         
-        <CardHeader className="bg-slate-900/40 pb-4 border-b border-slate-800">
-          <CardTitle className="flex items-center gap-2 text-emerald-400">
+        <CardHeader className="bg-slate-50/70 dark:bg-slate-900/40 pb-4 border-b border-slate-200 dark:border-slate-800">
+          <CardTitle className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
             <Clock className="h-5 w-5 animate-pulse" /> 
             Live Queue — Waiting Customers
           </CardTitle>
@@ -182,19 +182,19 @@ export default function DashboardHome() {
                     setSelectedWaitingCustomer(wc);
                     setIsRewardModalOpen(true);
                   }}
-                  className="flex flex-col p-4 rounded-xl border border-slate-700 bg-slate-800/50 shadow-inner hover:border-emerald-400 hover:shadow-[0_0_15px_-3px_rgba(52,211,153,0.4)] cursor-pointer transition-all duration-300 active:scale-95 group"
+                  className="flex flex-col p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 shadow-sm dark:shadow-inner hover:border-emerald-500 hover:shadow-[0_0_15px_-3px_rgba(52,211,153,0.4)] cursor-pointer transition-all duration-300 active:scale-95 group"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-lg text-slate-100 group-hover:text-emerald-300 transition-colors">{wc.customer?.name || "Guest"}</span>
-                    <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse border border-emerald-500/30">
+                    <span className="font-bold text-lg text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">{wc.customer?.name || "Guest"}</span>
+                    <span className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse border border-emerald-500/30">
                       WAITING
                     </span>
                   </div>
-                  <span className="text-xs text-slate-400 flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-slate-500" />
+                  <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                     Joined {Math.floor((Date.now() - new Date(wc.scannedAt).getTime()) / 1000)} seconds ago
                   </span>
-                  <div className="mt-4 pt-3 border-t border-slate-700/50 text-xs font-semibold text-emerald-500 flex items-center justify-between opacity-80 group-hover:opacity-100 transition-opacity">
+                  <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700/50 text-xs font-semibold text-emerald-600 dark:text-emerald-500 flex items-center justify-between opacity-80 group-hover:opacity-100 transition-opacity">
                     Tap to Reward <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
@@ -203,11 +203,11 @@ export default function DashboardHome() {
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center relative">
               <div className="absolute inset-0 bg-emerald-500/5 blur-[100px] rounded-full" />
-              <div className="w-16 h-16 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center mb-4 relative shadow-[0_0_20px_-5px_rgba(255,255,255,0.1)]">
-                <Users className="w-8 h-8 text-slate-500" />
+              <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 flex items-center justify-center mb-4 relative shadow-[0_0_20px_-5px_rgba(0,0,0,0.1)]">
+                <Users className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                 <div className="absolute inset-0 border-2 border-emerald-500/20 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
               </div>
-              <p className="text-slate-300 font-medium">Queue is empty</p>
+              <p className="text-slate-800 dark:text-slate-300 font-medium">Queue is empty</p>
               <p className="text-xs text-slate-500 mt-2 max-w-[250px]">When a customer scans your VIP QR code, they will magically appear here.</p>
             </div>
           )}

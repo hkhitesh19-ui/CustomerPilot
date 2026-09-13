@@ -3,6 +3,38 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [13 Sep 2026] Issue: Comprehensive UI Refinements, Queue Mobile Inputs, Light/Dark Contrast, and Reviews Sidebar Activation
+- **Symptom**:
+  1. `/signup` page had an unwanted hero marketing column with text, feature lists, and Cake Connection quotes that distracted users from the signup form.
+  2. The floating WhatsApp widget was positioned on the right and overlapped bottom navigation on mobile; it needed to be shifted to the left and placed above the sticky mobile nav bar.
+  3. Onboarding Step 3 button read `"Confirm & continue to Next Step (Logo Setup)"` instead of `"Confirm & Continue"`.
+  4. In Settings under Reward Card Setup, the label `"Maximum Time Duration to Earn Reward"` needed to be updated to `"Validity( in Days) [ Maximum Time Duration to Earn Reward]"`.
+  5. In Settings Section 5, the SuperAdmin Control Panel card needed to be removed from merchant view.
+  6. On mobile view in `/dashboard/queue`, clicking a waiting customer opened a reward modal where Product Name and Purchase Amount input fields were invisible / obscured.
+  7. When switching from Dark mode to Light mode via TopNav, headings and text on Dashboard, Live Queue, and Settings pages were rendering white on white background.
+  8. Cake Connection had all 3 modules enabled (`LOYALTY,REVIEWS,AUTOREPLY`), but the "Smart AI Google Reviews & 1-Click AutoReply" navigation item was missing from the sidebar.
+- **Root Cause**:
+  1. `src/components/signup-client.tsx` contained a 2-column layout with static marketing hero copy.
+  2. `src/components/whatsapp-widget.tsx` was fixed at `bottom-5 right-5` on all screen sizes and suppressed on dashboard routes.
+  3. `src/app/onboarding/page.tsx` had the verbose button text hardcoded.
+  4. `src/components/reward-setup-card.tsx` used the old label string.
+  5. `src/app/dashboard/settings/page.tsx` included a direct link card to `/super-admin`.
+  6. In `src/components/dashboard/RewardModal.tsx`, `DialogFooter` used `fixed bottom-0 left-0 w-full p-4 bg-slate-950`. Because Radix `DialogContent` utilizes CSS `transform`, it acted as the containing block for fixed children, causing the opaque footer to render directly over the input fields on mobile viewports.
+  7. Headings and cards across `queue/page.tsx`, `dashboard/page.tsx`, and `settings/page.tsx` had hardcoded `text-white`, `text-slate-100`, and `bg-slate-900/60` classes without light mode variants.
+  8. In `src/components/app-sidebar.tsx`, the reviews navigation item was commented out.
+- **Resolution**:
+  1. Cleaned up `src/components/signup-client.tsx` to render a single, cleanly centered signup form card.
+  2. Repositioned WhatsApp floating widget in `src/components/whatsapp-widget.tsx` to `left-4 sm:left-6` and `bottom-20 sm:bottom-6` with bottom-left tooltip caret.
+  3. Renamed button in `src/app/onboarding/page.tsx` Step 3 to `"Confirm & Continue"`.
+  4. Updated label in `src/components/reward-setup-card.tsx` to `"Validity( in Days) [ Maximum Time Duration to Earn Reward]"`.
+  5. Removed SuperAdmin card from `src/app/dashboard/settings/page.tsx` Section 5 and retitled section to "Staff & Operations Manual".
+  6. Fixed `src/components/dashboard/RewardModal.tsx` by replacing `fixed` with standard flex layout `flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4 border-t border-slate-800`, adding `max-h-[92vh] overflow-y-auto` to `DialogContent`, and styling inputs with explicit height and high contrast borders.
+  7. Applied theme-adaptive classes (`text-slate-900 dark:text-white`, `text-slate-900 dark:text-slate-100`, `text-slate-600 dark:text-slate-400`, `bg-white dark:bg-slate-900/60`, `border-slate-200 dark:border-slate-800`) across `queue/page.tsx`, `dashboard/page.tsx`, and `settings/page.tsx`.
+  8. Uncommented and activated `"Smart AI Google Reviews"` in `src/components/app-sidebar.tsx` with Star icon and module filtering supporting both `REVIEWS` and `AUTOREPLY`.
+  9. Executed full Next.js production build (`npm run build`) and verified 164 routes compiled cleanly with 0 errors.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [12 Sep 2026] Issue: ReferenceError connectMode Crash on Onboarding Step 2 ("This page couldn't load")
 - **Symptom**: On `https://customerpilot.in/onboarding?step=2`, the page immediately crashed with the Next.js error boundary screen: `"This page couldn't load. Reload to try again, or go back."` after user signed up or navigated to Step 2.
 - **Root Cause**: During the earlier streamlining of Step 2 (where phone pairing code mode was removed in favor of sole QR Code Scan), an undeclared reference to `connectMode !== "qr"` remained inside the 10-minute session countdown timer's `useEffect` hook in `OnboardStep2WhatsApp` in `src/app/onboarding/page.tsx`. When Step 2 mounted, JavaScript threw an uncaught `ReferenceError: connectMode is not defined`, triggering Next.js's top-level error boundary.
