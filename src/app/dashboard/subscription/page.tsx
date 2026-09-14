@@ -577,46 +577,21 @@ export default function SubscriptionPage() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col sm:flex-row items-center gap-4">
-                <div className="flex flex-col gap-2.5 w-full sm:w-auto flex-1 max-w-lg">
-                  <div className="flex items-center gap-3">
-                    <Input
-                      placeholder="ENTER COUPON CODE (E.G. CP99)"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                      className="bg-slate-950 border-slate-700 text-xs font-mono uppercase tracking-wider h-10"
-                    />
-                    <Button
-                      variant="secondary"
-                      onClick={() => handleApplyCoupon(couponCode)}
-                      disabled={validatingCoupon || !couponCode.trim()}
-                      className="h-10 px-5 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white"
-                    >
-                      {validatingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply Code"}
-                    </Button>
-                  </div>
-
-                  {/* Available promo quick chips */}
-                  <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                    <span className="text-[11px] text-slate-400 font-semibold">Available Offers:</span>
-                    {[
-                      { code: "CP99", label: "🏷️ CP99 (₹99 Test Pass)" },
-                      { code: "LAUNCH50", label: "⚡ LAUNCH50 (50% OFF)" },
-                      { code: "WELCOME20", label: "🎉 WELCOME20 (20% OFF)" },
-                      { code: "FLAT500", label: "💰 FLAT500 (₹500 OFF)" }
-                    ].map((promo) => (
-                      <button
-                        key={promo.code}
-                        type="button"
-                        onClick={() => {
-                          setCouponCode(promo.code)
-                          handleApplyCoupon(promo.code)
-                        }}
-                        className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 hover:text-white border border-indigo-500/30 transition-all cursor-pointer active:scale-95"
-                      >
-                        {promo.label}
-                      </button>
-                    ))}
-                  </div>
+                <div className="flex items-center gap-3 w-full sm:w-auto flex-1 max-w-md">
+                  <Input
+                    placeholder="ENTER PROMO CODE"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    className="bg-slate-950 border-slate-700 text-xs font-mono uppercase tracking-wider h-10"
+                  />
+                  <Button
+                    variant="secondary"
+                    onClick={() => handleApplyCoupon(couponCode)}
+                    disabled={validatingCoupon || !couponCode.trim()}
+                    className="h-10 px-5 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white"
+                  >
+                    {validatingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply Code"}
+                  </Button>
                 </div>
 
                 {appliedCoupon && (
