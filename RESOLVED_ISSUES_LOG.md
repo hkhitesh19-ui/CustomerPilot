@@ -3,6 +3,17 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [14 Sep 2026] Issue: Missing Pricing Plans on /dashboard/subscription
+- **Symptom**: On `https://customerpilot.in/dashboard/subscription`, the "Step 1: Select Your Plan" section appeared blank with no plan cards rendered, resulting in "Selected Plan: None Selected" and disabling the Razorpay checkout button.
+- **Root Cause**: Next.js standalone runtime operates from `.next/standalone` which maintains its own SQLite database replica (`.next/standalone/prisma/prisma/dev.db`). During the recent fresh testing database resets, new merchant records were created in this replica, but `scripts/seedPricingAndTerms.js` had only executed in the root repository tree. As a result, the `Plan` table in the active standalone database was completely empty (`count = 0`), causing `/api/pricing/plans` to return `{"ok": true, "data": {"plans": []}}`.
+- **Resolution**:
+  1. Executed `scripts/seedPricingAndTerms.js` explicitly targeting the active standalone database (`DATABASE_URL="file:/var/www/CustomerPilot/.next/standalone/prisma/prisma/dev.db"`).
+  2. Synced all 9 subscription plans (Starter Growth 6-mo, Pro Scaling 1-yr, Enterprise 1-yr, Standalone Loyalty 6-mo & 1-yr, Standalone Reviews 6-mo & 1-yr, Standalone AutoReply 6-mo & 1-yr), coupons (WELCOME20, LAUNCH50, FLAT500), and Merchant Terms & Conditions across all database replica locations.
+  3. Updated `scratch/deployVPS.py` to automatically execute `seedPricingAndTerms.js` targeting the standalone DB on every future build so plans can never be lost or omitted during deployments.
+  4. Verified live endpoint `https://customerpilot.in/api/pricing/plans` returns HTTP 200 with all 9 active pricing plans.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [13 Sep 2026] Issue: Desktop WhatsApp Widget Alignment & VPS Git Deployment Fast-Forward
 - **Symptom**: On desktop view (`https://customerpilot.in/dashboard/settings`), the floating WhatsApp widget ("Need Help? Chat on WhatsApp") remained fixed to the bottom-left corner of the viewport, overlapping the sidebar subscription card and signout button.
 - **Root Cause**: 
