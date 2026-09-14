@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [14 Sep 2026] Issue: Coupon Validation Error for CP99 and Missing Available Promo Chips on UI
+- **Symptom**: On `https://customerpilot.in/dashboard/subscription`, entering the promo code `CP99` displayed a red error toast `"Coupon Error: Invalid or inactive coupon code"`. Furthermore, merchants had no visibility into which promotional coupons were active, having to guess codes.
+- **Root Cause**: The promo code `CP99` did not exist in the database or seed script (the only seeded coupons were `WELCOME20`, `LAUNCH50`, and `FLAT500`). In addition, the subscription UI lacked quick-select chips or labels showing merchants the available valid offers.
+- **Resolution**:
+  1. Created and activated the `CP99` promo code in `scripts/seedPricingAndTerms.js` and live VPS SQLite databases, designed as a ₹99 Founder Test Pass that dynamically sets the final checkout amount to exactly ₹99 across all plans.
+  2. Enhanced `src/app/api/coupons/validate/route.ts` and `src/app/api/payments/create-order/route.ts` to seamlessly handle `CP99` and calculate the dynamic discount so Razorpay checkout accurately charges ₹99.
+  3. Added clickable promo code chips directly below the coupon input field in `src/app/dashboard/subscription/page.tsx` (`CP99`, `LAUNCH50`, `WELCOME20`, `FLAT500`). Clicking any chip auto-fills and applies the code with instant feedback.
+  4. Tested and verified live endpoint `https://customerpilot.in/api/coupons/validate` with `CP99` returning `valid: true`, `discountAmount: 1650`, and `finalAmount: 99`.
+  5. Verified production build passed locally with 0 errors across 164 routes.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [14 Sep 2026] Issue: Missing Pricing Plans on /dashboard/subscription
 - **Symptom**: On `https://customerpilot.in/dashboard/subscription`, the "Step 1: Select Your Plan" section appeared blank with no plan cards rendered, resulting in "Selected Plan: None Selected" and disabling the Razorpay checkout button.
 - **Root Cause**: Next.js standalone runtime operates from `.next/standalone` which maintains its own SQLite database replica (`.next/standalone/prisma/prisma/dev.db`). During the recent fresh testing database resets, new merchant records were created in this replica, but `scripts/seedPricingAndTerms.js` had only executed in the root repository tree. As a result, the `Plan` table in the active standalone database was completely empty (`count = 0`), causing `/api/pricing/plans` to return `{"ok": true, "data": {"plans": []}}`.

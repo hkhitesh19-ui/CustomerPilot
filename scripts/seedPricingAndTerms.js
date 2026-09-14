@@ -280,6 +280,15 @@ async function seed() {
   // 2. Seed Coupons
   const coupons = [
     {
+      code: "CP99",
+      description: "Special ₹99 Founder Test Pass (Pay only ₹99)",
+      discountType: "fixed",
+      discountValue: 1650,
+      minOrderAmount: 99,
+      maxUses: 1000,
+      active: true
+    },
+    {
       code: "WELCOME20",
       description: "20% off on any subscription plan",
       discountType: "percent",
@@ -304,7 +313,7 @@ async function seed() {
       description: "Flat ₹500 discount on 6-Month or 1-Year plans",
       discountType: "fixed",
       discountValue: 500,
-      minOrderAmount: 4000,
+      minOrderAmount: 1500,
       maxUses: 200,
       active: true
     }

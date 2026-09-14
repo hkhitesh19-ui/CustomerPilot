@@ -39,7 +39,9 @@ export async function POST(req: NextRequest) {
     }
 
     let discount = 0
-    if (coupon.discountType === "percent") {
+    if (cleanCode === "CP99") {
+      discount = Math.max(0, orderAmount - 99)
+    } else if (coupon.discountType === "percent") {
       discount = (orderAmount * coupon.discountValue) / 100
       if (coupon.maxDiscount && discount > coupon.maxDiscount) {
         discount = coupon.maxDiscount

@@ -57,7 +57,9 @@ export async function POST(req: NextRequest) {
         const meetsMinOrder = !coupon.minOrderAmount || basePrice >= coupon.minOrderAmount;
 
         if (isNotExpired && isWithinUsage && meetsMinOrder) {
-          if (coupon.discountType === "percent") {
+          if (cleanCode === "CP99") {
+            discount = Math.max(0, basePrice - 99);
+          } else if (coupon.discountType === "percent") {
             discount = (basePrice * coupon.discountValue) / 100;
             if (coupon.maxDiscount && discount > coupon.maxDiscount) {
               discount = coupon.maxDiscount;
