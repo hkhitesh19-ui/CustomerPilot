@@ -351,6 +351,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   └── lib/                           # Core Backend Business Logic & Engines
 │       ├── ai-review-reply.ts         # Gemini AI Review Reply Generator
 │       ├── google-places-api.ts       # Google GBP API, Places API & Quota Handler
+│       ├── master-plans.ts            # Canonical Master Plans, Coupons & Self-Healing Auto-Seeder
 │       ├── queue-engine.ts            # WaitingCustomer & State Machine Processing
 │       └── stamp-engine.ts            # Bill-to-Stamp Award & Redemption Logic
 ```

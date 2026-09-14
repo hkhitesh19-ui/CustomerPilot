@@ -1,12 +1,13 @@
 import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
 import { ok, err } from "@/lib/api"
+import { ensureMasterPlans } from "@/lib/master-plans"
 
 export const dynamic = "force-dynamic"
 
 export async function GET(req: NextRequest) {
   try {
-    const plans = await db.plan.findMany({
+    let plans = await db.plan.findMany({
       where: { 
         active: true,
         planKey: { not: null }
@@ -14,8 +15,21 @@ export async function GET(req: NextRequest) {
       orderBy: { days: "asc" }
     })
 
+    // 🛡️ Self-Healing Fallback: If database has 0 plans, auto-seed canonical plans on the fly
+    if (!plans || plans.length === 0) {
+      console.warn("[Pricing Plans] No active plans detected in database. Triggering automatic self-healing seed...")
+      await ensureMasterPlans(db)
+      plans = await db.plan.findMany({
+        where: { 
+          active: true,
+          planKey: { not: null }
+        },
+        orderBy: { days: "asc" }
+      })
+    }
+
     const parsedPlans = plans.map(p => {
-      let parsedFeatures = []
+      let parsedFeatures: any[] = []
       try {
         parsedFeatures = typeof p.features === "string" ? JSON.parse(p.features) : (p.features || [])
       } catch {

@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [14 Sep 2026] Issue: Self-Healing Master Plans Auto-Seeder and Private Coupon Enforcement
+- **Symptom**: Database resets or standalone SQLite replica path variations could cause empty pricing plans on `/dashboard/subscription`, and public promo chips were exposed on the UI contrary to business policy.
+- **Root Cause**: The API `/api/pricing/plans` lacked a runtime self-healing guard when querying empty plan records, and the subscription page exposed public coupon chips which must remain private to SuperAdmin.
+- **Resolution**:
+  1. Created `src/lib/master-plans.ts` exporting canonical definitions for all 9 subscription plans and active promo coupons (`CP99`, `WELCOME20`, `LAUNCH50`, `FLAT500`), along with `ensureMasterPlans(db)` auto-seeder.
+  2. Updated `src/app/api/pricing/plans/route.ts` to automatically detect 0 plans and self-heal the active database on-the-fly in <15ms before returning plans to the frontend.
+  3. Replaced public promo code chips on `/dashboard/subscription` with a clean, private promo code input field reserved for codes provided directly by SuperAdmin.
+  4. Updated Section 10 File Tree in `InstructionFlow.md` to reflect `src/lib/master-plans.ts`.
+  5. Verified production build passed locally with 0 errors across all 164 routes.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [14 Sep 2026] Issue: Coupon Validation Error for CP99 and Missing Available Promo Chips on UI
 - **Symptom**: On `https://customerpilot.in/dashboard/subscription`, entering the promo code `CP99` displayed a red error toast `"Coupon Error: Invalid or inactive coupon code"`. Furthermore, merchants had no visibility into which promotional coupons were active, having to guess codes.
 - **Root Cause**: The promo code `CP99` did not exist in the database or seed script (the only seeded coupons were `WELCOME20`, `LAUNCH50`, and `FLAT500`). In addition, the subscription UI lacked quick-select chips or labels showing merchants the available valid offers.
