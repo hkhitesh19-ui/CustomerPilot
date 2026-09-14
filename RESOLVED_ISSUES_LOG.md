@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [14 Sep 2026] Issue: Razorpay Checkout Error "Authentication failed" on /dashboard/subscription
+- **Symptom**: On `https://customerpilot.in/dashboard/subscription`, selecting a plan, applying promo code `CP99` (total payable ₹99), agreeing to Terms, and clicking "Subscribe with Razorpay" failed with a red toast error: `"Checkout Error: Authentication failed"`. The Razorpay payment popup did not appear.
+- **Root Cause**: The production VPS `.env` file contained an expired/inactive test Razorpay key pair (`RAZORPAY_KEY_ID="rzp_test_TAyBShtPsT7nSS"`). When the backend invoked `razorpay.orders.create(...)`, Razorpay's API rejected the API credentials with HTTP 401 Unauthorized `{"error":{"code":"BAD_REQUEST_ERROR","description":"Authentication failed"}}`.
+- **Resolution**:
+  1. Tested both VPS credentials and local production credentials against the live Razorpay Orders API (`https://api.razorpay.com/v1/orders`). Verified that the local live key pair (`rzp_live_TaCvfqvIMOML9j`) is 100% active and returning HTTP 200 OK.
+  2. Updated `/var/www/CustomerPilot/.env` and `.next/standalone/.env` on the Hostinger VPS with the verified live keys (`RAZORPAY_KEY_ID="rzp_live_TaCvfqvIMOML9j"`, `RAZORPAY_KEY_SECRET="hzNqzfbb93IWPdYN1154yBzB"`, and `NEXT_PUBLIC_RAZORPAY_KEY_ID="rzp_live_TaCvfqvIMOML9j"`).
+  3. Reloaded PM2 processes on VPS with `--update-env` flag to ensure runtime environment variables were reloaded into the Node process.
+  4. Executed live test script on VPS verifying order creation: Successfully generated test order with ID and amount ₹9900 (paise).
+  5. Updated `deployVPS.py` to always pass `--update-env` during PM2 reloads on VPS.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [14 Sep 2026] Issue: Self-Healing Master Plans Auto-Seeder and Private Coupon Enforcement
 - **Symptom**: Database resets or standalone SQLite replica path variations could cause empty pricing plans on `/dashboard/subscription`, and public promo chips were exposed on the UI contrary to business policy.
 - **Root Cause**: The API `/api/pricing/plans` lacked a runtime self-healing guard when querying empty plan records, and the subscription page exposed public coupon chips which must remain private to SuperAdmin.
