@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'CustomerPilot Merchant Login',
     description: 'Access your retail loyalty terminal, customer queue, and automated review management.',
-    url: 'https://customerpilot.ai/login',
+    url: 'https://customerpilot.in/login',
   },
 };
 

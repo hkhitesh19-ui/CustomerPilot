@@ -2,22 +2,23 @@ import type { Metadata } from "next"
 import { CafeLoyaltyClient } from "@/components/cafe-loyalty-client"
 
 export const metadata: Metadata = {
-  title: "Cafe Loyalty & WhatsApp Coffee Punch Card System — CustomerPilot",
-  description: "Replace paper coffee punch cards with instant WhatsApp digital stamps. Automate win-back campaigns and boost cafe repeat visits with zero app downloads.",
+  title: "WhatsApp Loyalty Card for Cafe in India & Digital Stamp Cards — CustomerPilot",
+  description: "Drive 2X weekly cafe check-ins using automated WhatsApp reward triggers. Replace lost paper punch cards with digital stamps and boost repeat coffee visits.",
   keywords: [
-    "Cafe Loyalty System",
-    "Coffee Shop Punch Card",
-    "WhatsApp Stamp Card Cafe",
-    "Cafe Customer Retention",
-    "Digital Coffee Loyalty India",
+    "whatsapp loyalty card for cafe in india",
+    "cafe loyalty system india",
+    "coffee shop punch card whatsapp",
+    "digital stamp card software for cafes",
+    "how to increase repeat customers in cafe",
+    "cafe customer retention software",
   ],
   alternates: {
     canonical: "/cafe-loyalty",
   },
   openGraph: {
-    title: "CustomerPilot for Cafes — Digital WhatsApp Coffee Punch Cards",
-    description: "Replace paper punch cards with automated WhatsApp digital stamps. Win back dormant coffee lovers on autopilot.",
-    url: "https://customerpilot.ai/cafe-loyalty",
+    title: "WhatsApp Loyalty Card for Cafe in India — CustomerPilot",
+    description: "Drive 2X weekly cafe check-ins using automated WhatsApp reward triggers. Zero app downloads, instant counter check-in.",
+    url: "https://customerpilot.in/cafe-loyalty",
   },
 }
 

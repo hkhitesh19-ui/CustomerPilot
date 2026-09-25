@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Birdeye Alternative India — CustomerPilot: AI Google Reviews + WhatsApp Loyalty at ₹2,249/yr",
     description: "Side-by-side comparison of Birdeye vs CustomerPilot for Indian local F&B and retail businesses who want AI-powered Google review management without enterprise pricing.",
-    url: "https://customerpilot.ai/vs/birdeye"
+    url: "https://customerpilot.in/vs/birdeye"
   }
 }
 

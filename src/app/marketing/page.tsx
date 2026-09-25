@@ -38,14 +38,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CustomerPilot — Autonomous Customer Retention SaaS",
     description: "Customer scans QR. Cashier taps. Reward delivered in 5 seconds on WhatsApp. No POS replacement needed.",
-    url: "https://customerpilot.ai/marketing",
+    url: "https://customerpilot.in/marketing",
   },
 }
 
 export default function MarketingPage() {
   return (
     <>
-      <BreadcrumbJsonLd items={[{ name: "Home", url: "https://customerpilot.ai" }, { name: "Platform", url: "https://customerpilot.ai/marketing" }]} />
+      <BreadcrumbJsonLd items={[{ name: "Home", url: "https://customerpilot.in" }, { name: "Platform", url: "https://customerpilot.in/marketing" }]} />
       <FAQPageJsonLd faqs={MARKETING_FAQS} />
       <MarketingClient />
     </>

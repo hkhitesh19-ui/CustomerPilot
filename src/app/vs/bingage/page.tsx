@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Bingage Alternative — CustomerPilot: WhatsApp Loyalty + AI Google Reviews at ₹2,249/yr",
     description: "Side-by-side comparison of Bingage vs CustomerPilot for local bakeries, cafes, and retail stores in India.",
-    url: "https://customerpilot.ai/vs/bingage"
+    url: "https://customerpilot.in/vs/bingage"
   }
 }
 

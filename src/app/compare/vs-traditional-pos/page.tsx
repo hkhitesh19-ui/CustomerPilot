@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CustomerPilot vs Traditional POS Loyalty Systems",
     description: "Discover why merchants prefer CustomerPilot's app-free WhatsApp loyalty over clunky POS software add-ons.",
-    url: "https://customerpilot.ai/compare/vs-traditional-pos",
+    url: "https://customerpilot.in/compare/vs-traditional-pos",
   },
 }
 

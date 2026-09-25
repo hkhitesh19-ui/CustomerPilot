@@ -10,7 +10,7 @@ const inter = {
   className: "font-sans",
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.ai";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.in";
 
 export const viewport = {
   themeColor: "#020617",

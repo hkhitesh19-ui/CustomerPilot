@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CustomerPilot Pricing — Unlimited WhatsApp Loyalty & Google Reviews",
     description: "Start with a 3-Day Free Trial Today. Scale customer retention and 5-star Google reviews with high-ROI WhatsApp stamp cards.",
-    url: "https://customerpilot.ai/pricing",
+    url: "https://customerpilot.in/pricing",
   },
 }
 

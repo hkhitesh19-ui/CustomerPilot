@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Google Review Automation & AI Replies — CustomerPilot",
     description: "Turn positive walk-in experiences into verified 5-star Google reviews with automated AI response drafts.",
-    url: "https://customerpilot.ai/features/google-review-automation",
+    url: "https://customerpilot.in/features/google-review-automation",
   },
 }
 

@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next"
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.ai"
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.in"
 
   const routes = [
     "",
@@ -11,9 +11,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/restaurant-loyalty",
     "/cafe-loyalty",
     "/salon-loyalty",
+    "/fastfood-loyalty",
+    "/car-wash-loyalty",
     "/features/whatsapp-stamp-card",
     "/features/google-review-automation",
+    "/case-studies/cake-connection",
     "/compare/vs-traditional-pos",
+    "/vs/reelo",
+    "/vs/birdeye",
+    "/vs/bingage",
     "/for-business",
     "/help",
     "/signup",

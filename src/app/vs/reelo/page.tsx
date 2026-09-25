@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Reelo Alternative — CustomerPilot: Smarter WhatsApp Loyalty + AI Reviews at 94% Lower Cost",
     description: "Compare Reelo vs CustomerPilot on pricing, WhatsApp loyalty, Google review AI, and POS friction. Honest comparison for local F&B and retail businesses.",
-    url: "https://customerpilot.ai/vs/reelo"
+    url: "https://customerpilot.in/vs/reelo"
   }
 }
 

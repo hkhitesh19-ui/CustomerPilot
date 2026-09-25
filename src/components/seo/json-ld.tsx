@@ -30,15 +30,15 @@ export function OrganizationJsonLd() {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "CustomerPilot Inc.",
-    "url": "https://customerpilot.ai",
-    "logo": "https://customerpilot.ai/cplogo_horizontal.png",
+    "url": "https://customerpilot.in",
+    "logo": "https://customerpilot.in/cplogo_horizontal.png",
     "sameAs": [
       "https://twitter.com/customerpilot",
       "https://linkedin.com/company/customerpilot"
     ],
     "contactPoint": {
       "@type": "ContactPoint",
-      "email": "support@customerpilot.ai",
+      "email": "support@customerpilot.in",
       "contactType": "customer service"
     }
   }

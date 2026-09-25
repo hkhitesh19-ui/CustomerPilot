@@ -314,6 +314,8 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   ├── cafe-loyalty/page.tsx      # Industry Landing Page: Cafe Loyalty
 │   │   ├── salon-loyalty/page.tsx     # Industry Landing Page: Salon Loyalty
 │   │   ├── restaurant-loyalty/page.tsx# Industry Landing Page: Restaurant Loyalty
+│   │   ├── fastfood-loyalty/page.tsx  # Industry Landing Page: Fast Food & QSR Loyalty
+│   │   ├── car-wash-loyalty/page.tsx  # Industry Landing Page: Car Wash & Auto Detailing Loyalty
 │   │   ├── case-studies/              # Hard-Numbered Verified Case Studies
 │   │   │   └── cake-connection/page.tsx # Cake Connection 90-Day Results (+895% reviews)
 │   │   ├── vs/                        # Competitor Attack / Comparison Pages
@@ -343,7 +345,9 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   ├── top-nav.tsx                # Merchant Top Header Navigation
 │   │   ├── faq-section.tsx            # 16-Question Interactive Searchable FAQ
 │   │   ├── ai-reply-sandbox.tsx       # Gemini AI Review Reply Browser Sandbox
-│   │   └── vs-page.tsx                # Reusable Competitor Comparison Layout
+│   │   ├── vs-page.tsx                # Reusable Competitor Comparison Layout
+│   │   ├── fastfood-loyalty-client.tsx# Fast Food & QSR Loyalty Client Component
+│   │   └── car-wash-loyalty-client.tsx# Car Wash & Detailing Loyalty Client Component
 │   │
 │   ├── communication/                 # Unified Messaging Infrastructure
 │   │   ├── drivers/                   # Evolution API WhatsApp Engine Driver

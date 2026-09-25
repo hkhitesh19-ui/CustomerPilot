@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Cake Connection: 895% More Google Reviews in 90 Days — CustomerPilot Case Study",
     description: "Real numbers from a real bakery. See how CustomerPilot turned 42 Google reviews into 418 and doubled repeat customers.",
-    url: "https://customerpilot.ai/case-studies/cake-connection",
+    url: "https://customerpilot.in/case-studies/cake-connection",
     type: "article"
   }
 }
