@@ -1,0 +1,26 @@
+# ==========================================================
+# CUSTOMERPILOT - VPS LIVE DEPLOYMENT TRACKER
+# ==========================================================
+# This file records the active Git commit currently running
+# live on the Hostinger Production VPS (200.97.170.53).
+# Rule: Update this file every time a VPS deployment is executed!
+# ==========================================================
+
+Current Live Commit Details:
+----------------------------------------------------------
+Active Git Commit : 9edcceb
+Full Commit Hash  : 9edccebfd0b60cdf4fc79f3d8c1b4a4029237daf
+Branch Name       : feature/superanalytics-customers-crm-20260810
+Deployment Date   : 14 Sep 2026, 02:06 PM IST
+Commit Title      : feat: add self-healing master plans and coupons auto-seeder
+Status            : Active & Running Live on VPS
+PM2 Services      : customerpilot-web (Online), customerpilot-cron (Online)
+----------------------------------------------------------
+
+Deployment History Log:
+----------------------------------------------------------
+• [14 Sep 2026, 02:06 PM IST] Commit 9edcceb - feat: add self-healing master plans and coupons auto-seeder
+• [13 Sep 2026, 05:15 PM IST] Commit 4ea9f12 - fix: desktop whatsapp widget alignment and uploads persistence
+• [13 Sep 2026, 01:55 PM IST] Commit 182e7ea - feat: pure white acrylic style VIP loyalty standee
+• [12 Sep 2026, 10:15 PM IST] Commit 3b366b3 - fix: cake connection logo and trial setup
+----------------------------------------------------------

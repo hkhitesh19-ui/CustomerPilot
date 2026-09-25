@@ -34,3 +34,7 @@ The correct workflow is:
 6. ONLY AFTER user confirmation: run `git push`.
 
 Violation of this rule (pushing before user confirmation) is a breach of the project workflow.
+
+## VPS Live Deployment Tracking (MANDATORY)
+Whenever you deploy code to the live Hostinger VPS server (200.97.170.53), you MUST immediately update `Git Commit on VPS Live.txt` in the project root with the active Git commit hash, branch, timestamp, and commit message. 
+Never complete a deployment without keeping `Git Commit on VPS Live.txt` 100% synchronized with the live server.

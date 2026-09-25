@@ -287,6 +287,7 @@ This section provides the complete, authoritative map of all directories, files,
 ### **10.1 Directory Tree Structure**
 ```
 F:\CustomerPilot_ByGLM_July2026
+├── Git Commit on VPS Live.txt         # Active Live Git Commit & Deployment History Tracker on Hostinger VPS
 ├── prisma/
 │   └── schema.prisma                  # Master Database Schema (Prisma ORM: Customer, Merchant, AuditLog, DeadLetterQueue, etc.)
 │
