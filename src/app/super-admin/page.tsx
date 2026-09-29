@@ -7,7 +7,8 @@ import {
   Image as ImageIcon, Brain, BarChart3, Heart, Database, Download,
   Settings, Globe, Shield, Code, Zap, Crown, Store, Check, X, Search,
   MessageSquare, RefreshCw, RotateCcw, Activity, Server, Cpu, Sparkles,
-  Layers, ArrowUpRight, Lock, CheckCircle2, ChevronRight, Trash2, AlertTriangle, Eye, UserX, LogOut
+  Layers, ArrowUpRight, Lock, CheckCircle2, ChevronRight, Trash2, AlertTriangle, Eye, UserX, LogOut,
+  MapPin, ExternalLink, Clock, Rocket, Loader2, Edit3
 } from "lucide-react"
 import { WhatsAppTemplateManager } from "@/components/whatsapp-template-manager"
 import { SubscriptionPlansManager } from "@/components/super-admin/subscription-plans-manager"
@@ -680,6 +681,93 @@ function MerchantManagement() {
   const [deletingMerchantId, setDeletingMerchantId] = useState<string | null>(null)
   const [resettingMerchantId, setResettingMerchantId] = useState<string | null>(null)
 
+  // Impersonation state
+  const [impersonatingId, setImpersonatingId] = useState<string | null>(null)
+
+  // Profile Edit Modal State
+  const [profileModalMerchant, setProfileModalMerchant] = useState<any | null>(null)
+  const [profileEditForm, setProfileEditForm] = useState<any>({})
+  const [savingProfile, setSavingProfile] = useState(false)
+  const [profileSaveSuccess, setProfileSaveSuccess] = useState(false)
+
+  // Screenshot Proof Modal State
+  const [screenshotModalMerchant, setScreenshotModalMerchant] = useState<any | null>(null)
+
+  const handleImpersonate = async (m: any) => {
+    try {
+      setImpersonatingId(m.id)
+      const res = await fetch("/api/admin/impersonate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ merchantId: m.id })
+      })
+      const data = await res.json()
+      if (data.success && data.redirectTo) {
+        window.open(data.redirectTo, "_blank")
+      } else {
+        alert("Failed to access dashboard: " + (data.error || "Unknown error"))
+      }
+    } catch (e: any) {
+      alert("Error logging in as merchant: " + e.message)
+    } finally {
+      setImpersonatingId(null)
+    }
+  }
+
+  const handleOpenProfileEdit = (m: any) => {
+    setProfileModalMerchant(m)
+    setProfileEditForm({
+      name: m.name || "",
+      ownerName: m.ownerName === "N/A" ? "" : (m.ownerName || ""),
+      whatsappPhone: m.whatsappPhone === "N/A" ? "" : (m.whatsappPhone || ""),
+      email: m.email === "N/A" ? "" : (m.email || ""),
+      city: m.city === "N/A" ? "" : (m.city || ""),
+      address: m.address === "N/A" ? "" : (m.address || ""),
+      category: m.category || "Retail",
+      plan: m.plan || "TRIAL",
+      status: m.status || "Active",
+      googleReviewLink: m.googleReviewLink || "",
+      baselineReviewCount: m.baselineReviewCount ?? 0,
+      baselineRating: m.baselineRating ?? 0.0,
+      baselineScreenshotUrl: m.baselineScreenshotUrl || "",
+      onboardingCompleted: m.onboardingCompleted ?? false,
+      currentStep: m.currentStep ?? 1
+    })
+    setProfileSaveSuccess(false)
+  }
+
+  const handleSaveProfile = async () => {
+    if (!profileModalMerchant) return
+    setSavingProfile(true)
+    setProfileSaveSuccess(false)
+    try {
+      const res = await fetch("/api/admin/merchants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_profile",
+          merchantId: profileModalMerchant.id,
+          ...profileEditForm
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setProfileSaveSuccess(true)
+        loadMerchants()
+        setTimeout(() => {
+          setProfileModalMerchant(null)
+          setProfileSaveSuccess(false)
+        }, 1200)
+      } else {
+        alert("Failed to update profile: " + (data.error || "Unknown error"))
+      }
+    } catch (e: any) {
+      alert("Error updating profile: " + e.message)
+    } finally {
+      setSavingProfile(false)
+    }
+  }
+
   const loadMerchants = () => {
     setError(null)
     fetch("/api/admin/merchants")
@@ -962,10 +1050,11 @@ function MerchantManagement() {
             <table className="w-full">
               <thead className="bg-slate-950 border-b border-slate-800/80">
                 <tr>
-                  <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Merchant</th>
-                  <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Owner & WhatsApp</th>
+                  <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Merchant & Dashboard</th>
+                  <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">City & GBP Page</th>
+                  <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Owner & Contact</th>
+                  <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Registration & Baseline</th>
                   <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Plan</th>
-                  <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Review Delay</th>
                   <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Status</th>
                   <th className="text-center p-4 text-xs font-bold text-slate-400 uppercase">Customers</th>
                   <th className="text-right p-4 text-xs font-bold text-slate-400 uppercase">Bills</th>
@@ -977,19 +1066,116 @@ function MerchantManagement() {
                 {merchants.map((m: any, i: number) => {
                   const isDeleting = deletingMerchantId === m.id
                   const isResetting = resettingMerchantId === m.id
+                  const isImpersonating = impersonatingId === m.id
 
                   return (
                     <tr key={m.id || i} className="hover:bg-slate-800/40 transition-colors">
-                      <td className="p-4 font-bold text-white">
-                        {m.name}
-                        <div className="text-[11px] text-slate-500 font-mono">ID: {m.id}</div>
+                      {/* 1. Merchant Name & Impersonate Link */}
+                      <td className="p-4">
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() => handleImpersonate(m)}
+                            disabled={isImpersonating}
+                            className="text-left font-black text-white hover:text-indigo-400 transition-colors flex items-center gap-1.5 group cursor-pointer"
+                            title="Click to Open Live Dashboard or Complete Onboarding"
+                          >
+                            <span className="group-hover:underline text-sm">{m.name}</span>
+                            {isImpersonating ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-400" />
+                            ) : (
+                              <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 text-indigo-400" />
+                            )}
+                          </button>
+                          <div className="text-[10px] text-slate-500 font-mono flex items-center gap-2">
+                            <span>ID: {m.id}</span>
+                            {m.onboardingCompleted ? (
+                              <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">
+                                ✓ Live
+                              </span>
+                            ) : (
+                              <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold">
+                                Step {m.currentStep || 1} Pending
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </td>
+
+                      {/* 2. City & Google Business Profile Link */}
+                      <td className="p-4">
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-1 text-xs font-semibold text-slate-200">
+                            <MapPin className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+                            <span>{m.city && m.city !== "N/A" ? m.city : (m.address && m.address !== "N/A" ? m.address.split(',').pop()?.trim() : "Vadodara")}</span>
+                          </div>
+                          {m.googleReviewLink ? (
+                            <a
+                              href={m.googleReviewLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-400 hover:text-blue-300 hover:underline"
+                              title="Open live Google Maps / Review page"
+                            >
+                              <Globe className="w-3 h-3 text-blue-400" />
+                              <span>View GBP</span>
+                              <ExternalLink className="w-2.5 h-2.5" />
+                            </a>
+                          ) : (
+                            <span className="text-[10px] text-slate-500 italic">No GBP linked</span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* 3. Owner & Contact */}
                       <td className="p-4 text-slate-300">
-                        <div>{m.ownerName}</div>
+                        <div className="font-semibold text-xs text-slate-200">{m.ownerName}</div>
                         <div className="text-xs text-slate-400 font-mono">{m.whatsappPhone}</div>
+                        {m.email && m.email !== "N/A" && (
+                          <div className="text-[10px] text-slate-500 truncate max-w-[130px]">{m.email}</div>
+                        )}
                       </td>
-                      <td className="p-4 font-extrabold text-indigo-400">{m.plan}</td>
-                      <td className="p-4 text-slate-300 font-mono text-xs">{m.googleReviewDelayMinutes ?? 30} mins</td>
+
+                      {/* 4. Registration Date & Baseline Google Reviews */}
+                      <td className="p-4">
+                        <div className="flex flex-col gap-1.5">
+                          <div className="text-xs text-slate-300 font-medium flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-slate-400" />
+                            <span>
+                              {m.createdAt ? new Date(m.createdAt).toLocaleDateString("en-IN", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric"
+                              }) : "N/A"}
+                            </span>
+                            <span className="text-[10px] text-slate-500">
+                              {m.createdAt ? new Date(m.createdAt).toLocaleTimeString("en-IN", {
+                                hour: "2-digit",
+                                minute: "2-digit"
+                              }) : ""}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-[10px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded flex items-center gap-1">
+                              <span>⭐ {m.baselineRating || "0.0"}</span>
+                              <span className="text-slate-400">({m.baselineReviewCount || 0} reviews)</span>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setScreenshotModalMerchant(m)}
+                              className="h-5 px-1.5 text-[9px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold flex items-center gap-0.5"
+                              title="View Registration Proof Screenshot"
+                            >
+                              <Eye className="w-2.5 h-2.5" /> Proof
+                            </Button>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* 5. Plan */}
+                      <td className="p-4 font-extrabold text-indigo-400 text-xs">{m.plan}</td>
+
+                      {/* 6. Status */}
                       <td className="p-4">
                         <Badge variant="outline" className={
                           m.status === "Active" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" :
@@ -997,6 +1183,8 @@ function MerchantManagement() {
                           "bg-rose-500/10 text-rose-400 border-rose-500/30"
                         }>{m.status}</Badge>
                       </td>
+
+                      {/* 7. Customers */}
                       <td className="p-4 text-center">
                         <Button
                           size="sm"
@@ -1009,11 +1197,43 @@ function MerchantManagement() {
                           <span>{m.customers}</span>
                         </Button>
                       </td>
+
+                      {/* 8. Bills */}
                       <td className="p-4 text-right text-slate-400">{m.bills}</td>
+
+                      {/* 9. MRR */}
                       <td className="p-4 text-right font-extrabold text-emerald-400">₹{m.mrr.toLocaleString("en-IN")}</td>
+
+                      {/* 10. Actions */}
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-1.5 flex-nowrap">
-                          {/* 1. Edit Rules */}
+                          {/* 0. Impersonate / Complete Onboarding */}
+                          <Button
+                            size="sm"
+                            onClick={() => handleImpersonate(m)}
+                            disabled={isImpersonating}
+                            className="h-8 px-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs gap-1"
+                            title="Open live dashboard or complete registration on behalf of merchant"
+                          >
+                            {isImpersonating ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Rocket className="w-3.5 h-3.5" />
+                            )}
+                            <span>{m.onboardingCompleted ? "Dashboard" : "Onboard"}</span>
+                          </Button>
+
+                          {/* 1. Edit Profile Details */}
+                          <Button
+                            size="sm"
+                            onClick={() => handleOpenProfileEdit(m)}
+                            className="h-8 px-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-xs"
+                            title="Edit merchant details (City, Address, GBP link, etc.)"
+                          >
+                            ✏️ Edit
+                          </Button>
+
+                          {/* 2. Edit Rules */}
                           <Button
                             size="sm"
                             onClick={() => handleOpenEdit(m)}
@@ -1023,7 +1243,7 @@ function MerchantManagement() {
                             ⚙️ Rules
                           </Button>
 
-                          {/* 2. Reset Customers / Wipe Data */}
+                          {/* 3. Reset Customers / Wipe Data */}
                           <Button
                             size="sm"
                             variant="outline"
@@ -1039,7 +1259,7 @@ function MerchantManagement() {
                             )}
                           </Button>
 
-                          {/* 3. Delete Merchant */}
+                          {/* 4. Delete Merchant */}
                           <Button
                             size="sm"
                             variant="outline"
@@ -1305,6 +1525,373 @@ function MerchantManagement() {
               <Button
                 variant="outline"
                 onClick={() => setCustomerModalMerchant(null)}
+                className="border-slate-700 text-slate-300 text-xs"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SuperAdmin Edit Merchant Profile Details Modal */}
+      {profileModalMerchant && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                  ✏️ Edit Merchant Details — {profileModalMerchant.name}
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Modify business profile, city, Google Maps links, baseline reviews, and plan configuration.
+                </p>
+              </div>
+              <Button size="sm" variant="ghost" onClick={() => setProfileModalMerchant(null)} className="text-slate-400 hover:text-white">✕</Button>
+            </div>
+
+            {profileSaveSuccess && (
+              <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 p-3.5 rounded-xl text-xs font-bold flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-400" /> Merchant details successfully saved to Database!
+              </div>
+            )}
+
+            <div className="space-y-5">
+              {/* Section 1: Business Profile & Contact */}
+              <div className="space-y-3">
+                <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider text-indigo-400 border-b border-slate-800 pb-1 flex items-center gap-1.5">
+                  <Store className="w-3.5 h-3.5" /> Business Profile & Contact
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-xs text-slate-400">Business Name</Label>
+                    <Input
+                      value={profileEditForm.name}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, name: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Owner Name</Label>
+                    <Input
+                      value={profileEditForm.ownerName}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, ownerName: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">WhatsApp Phone (with Country Code)</Label>
+                    <Input
+                      value={profileEditForm.whatsappPhone}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, whatsappPhone: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Email Address</Label>
+                    <Input
+                      value={profileEditForm.email}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, email: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400 flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-rose-400" /> City / Location
+                    </Label>
+                    <Input
+                      placeholder="e.g. Vadodara, Surat, Ahmedabad"
+                      value={profileEditForm.city}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, city: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Category / Industry</Label>
+                    <Input
+                      placeholder="Bakery, Cafe, Salon, Restaurant, QSR"
+                      value={profileEditForm.category}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, category: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs text-slate-400">Full Business Address</Label>
+                  <Input
+                    placeholder="Shop No, Complex, Street, Area..."
+                    value={profileEditForm.address}
+                    onChange={(e) => setProfileEditForm({ ...profileEditForm, address: e.target.value })}
+                    className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                  />
+                </div>
+              </div>
+
+              {/* Section 2: Google Business Profile & Day-0 Baseline Reviews */}
+              <div className="space-y-3 pt-2">
+                <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider text-amber-400 border-b border-slate-800 pb-1 flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5" /> Google Business Profile & Day-0 Baseline
+                </h4>
+                <div>
+                  <Label className="text-xs text-slate-400 flex items-center gap-1">
+                    <Globe className="w-3 h-3 text-blue-400" /> Google Maps / Review Link (GBP URL)
+                  </Label>
+                  <Input
+                    placeholder="https://maps.google.com/?cid=... or https://g.page/r/..."
+                    value={profileEditForm.googleReviewLink}
+                    onChange={(e) => setProfileEditForm({ ...profileEditForm, googleReviewLink: e.target.value })}
+                    className="bg-slate-950 border-slate-800 text-white text-xs mt-1 font-mono"
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-xs text-slate-400">Day-0 Baseline Reviews</Label>
+                    <Input
+                      type="number"
+                      placeholder="e.g. 42"
+                      value={profileEditForm.baselineReviewCount}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, baselineReviewCount: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Day-0 Baseline Rating (Stars)</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      placeholder="e.g. 4.2"
+                      value={profileEditForm.baselineRating}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, baselineRating: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Proof Screenshot URL / Path</Label>
+                    <Input
+                      placeholder="/uploads/proof.png or https://..."
+                      value={profileEditForm.baselineScreenshotUrl}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, baselineScreenshotUrl: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Subscription Plan & Onboarding State */}
+              <div className="space-y-3 pt-2">
+                <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider text-emerald-400 border-b border-slate-800 pb-1 flex items-center gap-1.5">
+                  <CreditCard className="w-3.5 h-3.5" /> Plan & Onboarding Controls
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-xs text-slate-400">Subscription Plan</Label>
+                    <select
+                      value={profileEditForm.plan}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, plan: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-md px-3 py-2 text-white text-xs mt-1 focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
+                    >
+                      <option value="TRIAL">TRIAL (7 Days)</option>
+                      <option value="STARTER">STARTER</option>
+                      <option value="GROWTH">GROWTH</option>
+                      <option value="PRO">PRO (₹2,499/mo)</option>
+                      <option value="ENTERPRISE">ENTERPRISE (₹9,999/mo)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Account Status</Label>
+                    <select
+                      value={profileEditForm.status}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, status: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-md px-3 py-2 text-white text-xs mt-1 focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Trial">Trial</option>
+                      <option value="Inactive">Inactive</option>
+                      <option value="Suspended">Suspended</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Onboarding Step (1-8)</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={8}
+                      value={profileEditForm.currentStep}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, currentStep: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 pt-2">
+                  <Switch
+                    checked={profileEditForm.onboardingCompleted}
+                    onCheckedChange={(checked) => setProfileEditForm({ ...profileEditForm, onboardingCompleted: checked })}
+                    id="onboarding-toggle"
+                  />
+                  <Label htmlFor="onboarding-toggle" className="text-xs font-semibold text-slate-300 cursor-pointer">
+                    Mark Onboarding as Completed (Bypass 8-Step Wizard directly to Dashboard)
+                  </Label>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-800">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleImpersonate(profileModalMerchant)}
+                className="border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 text-xs font-bold gap-1"
+              >
+                <Rocket className="w-3.5 h-3.5" />
+                Launch Dashboard on Behalf
+              </Button>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" onClick={() => setProfileModalMerchant(null)} className="border-slate-700 text-slate-300 text-xs">
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveProfile} disabled={savingProfile} className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg">
+                  {savingProfile ? "Saving to DB..." : "💾 Save Changes (SuperAdmin)"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SuperAdmin Google Maps Day-0 Proof & Screenshot Modal */}
+      {screenshotModalMerchant && (
+        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                  <Globe className="w-5 h-5 text-blue-400" />
+                  Google Business Day-0 Registration Proof
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Baseline review count, star rating, and visual snapshot for {screenshotModalMerchant.name}.
+                </p>
+              </div>
+              <Button size="sm" variant="ghost" onClick={() => setScreenshotModalMerchant(null)} className="text-slate-400 hover:text-white">✕</Button>
+            </div>
+
+            {/* Proof Details Card */}
+            <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/60 pb-4">
+                <div>
+                  <div className="text-lg font-black text-white">{screenshotModalMerchant.name}</div>
+                  <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
+                    <MapPin className="w-3.5 h-3.5 text-rose-400" />
+                    <span>{screenshotModalMerchant.city && screenshotModalMerchant.city !== "N/A" ? screenshotModalMerchant.city : "Vadodara"}</span>
+                    <span>•</span>
+                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Registered: {new Date(screenshotModalMerchant.createdAt).toLocaleString("en-IN")}</span>
+                  </div>
+                </div>
+                {screenshotModalMerchant.googleReviewLink && (
+                  <a
+                    href={screenshotModalMerchant.googleReviewLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 border border-blue-500/30 text-xs font-bold"
+                  >
+                    <Globe className="w-3.5 h-3.5" />
+                    <span>Live Google Maps</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+              </div>
+
+              {/* Baseline Metrics Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="bg-slate-900 border border-slate-800 p-3.5 rounded-xl">
+                  <div className="text-[10px] uppercase font-bold text-slate-400">Day-0 Baseline Rating</div>
+                  <div className="text-2xl font-black text-amber-400 mt-1 flex items-center gap-1">
+                    <span>⭐ {screenshotModalMerchant.baselineRating || "0.0"}</span>
+                  </div>
+                </div>
+                <div className="bg-slate-900 border border-slate-800 p-3.5 rounded-xl">
+                  <div className="text-[10px] uppercase font-bold text-slate-400">Day-0 Baseline Reviews</div>
+                  <div className="text-2xl font-black text-white mt-1">
+                    {screenshotModalMerchant.baselineReviewCount || 0}
+                  </div>
+                </div>
+                <div className="bg-slate-900 border border-slate-800 p-3.5 rounded-xl col-span-2 sm:col-span-1">
+                  <div className="text-[10px] uppercase font-bold text-slate-400">Total Tracked In CP</div>
+                  <div className="text-2xl font-black text-emerald-400 mt-1">
+                    {screenshotModalMerchant.reviews || 0} reviews
+                  </div>
+                </div>
+              </div>
+
+              {/* Visual Screenshot or Certificate */}
+              <div className="space-y-2 pt-2">
+                <Label className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                  Visual Registration Screenshot Proof:
+                </Label>
+                {screenshotModalMerchant.baselineScreenshotUrl ? (
+                  <div className="rounded-xl overflow-hidden border border-slate-700 bg-slate-900">
+                    <img
+                      src={screenshotModalMerchant.baselineScreenshotUrl}
+                      alt="Google Maps Baseline Proof"
+                      className="w-full max-h-80 object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="p-8 border-2 border-dashed border-slate-800 rounded-2xl bg-slate-900/50 flex flex-col items-center justify-center text-center space-y-3">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                      <Sparkles className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-slate-200">Verified Day-0 Registration Snapshot Certificate</div>
+                      <p className="text-xs text-slate-400 max-w-sm mt-1">
+                        Captured at registration: {new Date(screenshotModalMerchant.createdAt).toLocaleString("en-IN")}. Baseline Reviews: {screenshotModalMerchant.baselineReviewCount || 0}, Rating: ⭐ {screenshotModalMerchant.baselineRating || '0.0'}.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 pt-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          const url = prompt("Enter Screenshot Image URL for this merchant:", screenshotModalMerchant.baselineScreenshotUrl || "");
+                          if (url !== null) {
+                            fetch("/api/admin/merchants", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                action: "update_profile",
+                                merchantId: screenshotModalMerchant.id,
+                                baselineScreenshotUrl: url
+                              })
+                            }).then(() => {
+                              alert("Screenshot URL updated successfully!");
+                              loadMerchants();
+                              setScreenshotModalMerchant({ ...screenshotModalMerchant, baselineScreenshotUrl: url });
+                            });
+                          }
+                        }}
+                        className="text-xs border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/10 font-bold"
+                      >
+                        📷 Attach Screenshot URL
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 pt-2 border-t border-slate-800">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleImpersonate(screenshotModalMerchant)}
+                className="border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 text-xs font-bold gap-1"
+              >
+                <Rocket className="w-3.5 h-3.5" /> Open Dashboard
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setScreenshotModalMerchant(null)}
                 className="border-slate-700 text-slate-300 text-xs"
               >
                 Close

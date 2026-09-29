@@ -28,6 +28,12 @@ model Merchant {
   address                   String?
   businessTiming            String?
   category                  String?
+  city                      String?
+  googleReviewLink          String?
+  baselineReviewCount       Int?                      @default(0)
+  baselineRating            Float?                    @default(0.0)
+  baselineScreenshotUrl     String?
+  baselineCapturedAt        DateTime?
   timezone                  String?
   whatsappPhone             String?                   @unique
   whatsappInstanceName      String?

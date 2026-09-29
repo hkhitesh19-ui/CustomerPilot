@@ -2073,3 +2073,13 @@ ext() function to explicitly POST the merchant's configured reward card details 
 
 
 
+
+---
+## [29 Sep 2026] Issue: Corrupted node_modules and Missing Native Bindings
+- **Symptom**: npm install was failing with timeouts, Next.js build failed with 
+ext-swc.win32-x64-msvc.node is not a valid Win32 application, and Tailwind failed with Cannot find module '../lightningcss.win32-x64-msvc.node'.
+- **Root Cause**: Frequent server restarts interrupted 
+pm install, leaving null bytes in binaries and corrupting the npm cache. Network timeouts to registry.npmjs.org prevented clean downloads.
+- **Resolution**: Completely wiped 
+ode_modules and .next cache. Switched npm registry to mirror to bypass timeouts. Reinstalled dependencies cleanly. Manually reinstalled and mapped the missing lightningcss-win32-x64-msvc binary to the correct expected path.
+- **Status**: ? Resolved and Verified.

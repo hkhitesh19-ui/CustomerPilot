@@ -25,6 +25,7 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { hasModule, type Module } from "@/lib/feature-gate"
 import { getRecommendedCampaign, getIndustryLoyaltyRule } from "@/lib/industry-campaigns"
+import { ImpersonationBanner } from "@/components/impersonation-banner"
 
 // ─── Types ────────────────────────────────────────────────────
 interface WizardData {
@@ -48,6 +49,7 @@ interface WizardData {
   cardName: string
   stampsRequired: number
   rewardName: string
+  stampValue?: number
   cardColor: string
   qrGenerated: boolean
   qrDataUrl: string
@@ -325,6 +327,7 @@ function OnboardingPageContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950">
+      <ImpersonationBanner />
       {/* Top Bar */}
       <div className="sticky top-0 z-30 bg-slate-900/90 border-b border-white/10 backdrop-blur-xl px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">

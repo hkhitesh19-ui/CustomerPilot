@@ -304,6 +304,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   ├── app/                           # Next.js App Router (Pages, Layouts & API Routes)
 │   │   ├── (auth)/                    # Authentication Route Group (login, register, forgot-password)
 │   │   ├── api/                       # Backend API Endpoint Routes (JSON Services)
+│   │   │   ├── admin/                     # SuperAdmin Management & Impersonate APIs
 │   │   │   ├── demo/                  # Public Sandboxed Demo APIs (AI Review Reply)
 │   │   │   ├── reviews/               # 1-Click AI Auto-Reply & List APIs
 │   │   │   ├── onboarding/            # 9-Step Onboarding Engine State APIs
@@ -339,6 +340,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   └── super-admin/page.tsx       # Platform SuperAdmin Master Control Panel
 │   │
 │   ├── components/                    # Reusable React UI Components
+│   │   ├── impersonation-banner.tsx   # SuperAdmin Impersonation Sticky Banner & Return Action
 │   │   ├── splash-screen.tsx          # Full-Screen 1-Second Animated Splash Overlay
 │   │   ├── brand-logo.tsx             # Pure Vector Transparent SVG Logo Component
 │   │   ├── app-sidebar.tsx            # Merchant Navigation Sidebar with Founder Badge

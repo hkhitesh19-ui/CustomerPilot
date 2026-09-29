@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { TopNav } from "@/components/top-nav"
 import { SubscriptionGuard } from "@/components/subscription-guard"
 import { MobileBottomNav } from "@/components/mobile-bottom-nav"
+import { ImpersonationBanner } from "@/components/impersonation-banner"
 
 export default function DashboardLayout({
   children,
@@ -15,6 +16,7 @@ export default function DashboardLayout({
       <div className="flex min-h-screen w-full bg-background text-foreground selection:bg-emerald-500/30">
         <AppSidebar />
         <div className="flex w-full flex-col relative">
+          <ImpersonationBanner />
           {/* Subtle glowing orb in background */}
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none" />
           

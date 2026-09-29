@@ -68,6 +68,7 @@ export async function GET(req: Request) {
       db.merchant.findMany({
         include: {
           stampCards: { where: { active: true }, orderBy: { updatedAt: 'desc' }, take: 1 },
+          merchantGoogleConnections: true,
           _count: {
             select: {
               customers: { where: { deletedAt: null } },
@@ -87,6 +88,17 @@ export async function GET(req: Request) {
       name: m.name || 'Unnamed Business',
       ownerName: m.ownerName || 'N/A',
       whatsappPhone: m.whatsappPhone || 'N/A',
+      email: m.email || 'N/A',
+      category: m.category || 'Retail',
+      city: m.city || 'N/A',
+      address: m.address || 'N/A',
+      googleReviewLink: m.googleReviewLink || m.merchantGoogleConnections?.googleReviewUrl || null,
+      baselineReviewCount: m.baselineReviewCount ?? 0,
+      baselineRating: m.baselineRating ?? 0.0,
+      baselineScreenshotUrl: m.baselineScreenshotUrl || null,
+      baselineCapturedAt: m.baselineCapturedAt || null,
+      onboardingCompleted: m.onboardingCompleted ?? false,
+      currentStep: m.currentStep ?? 1,
       plan: (m.plan || 'trial').toUpperCase(),
       status: (m.status || 'active').charAt(0).toUpperCase() + (m.status || 'active').slice(1),
       googleReviewDelayMinutes: m.googleReviewDelayMinutes ?? 30,
@@ -123,6 +135,58 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { action, merchantId, customerId } = body;
+
+    if (action === 'update_profile' && merchantId) {
+      const merchant = await db.merchant.findUnique({ where: { id: merchantId } });
+      if (!merchant) {
+        return NextResponse.json({ error: 'Merchant not found' }, { status: 404 });
+      }
+
+      const {
+        name,
+        ownerName,
+        whatsappPhone,
+        email,
+        city,
+        address,
+        category,
+        plan,
+        status,
+        googleReviewLink,
+        baselineReviewCount,
+        baselineRating,
+        baselineScreenshotUrl,
+        onboardingCompleted,
+        currentStep
+      } = body;
+
+      const updated = await db.merchant.update({
+        where: { id: merchantId },
+        data: {
+          ...(name !== undefined && { name }),
+          ...(ownerName !== undefined && { ownerName }),
+          ...(whatsappPhone !== undefined && { whatsappPhone }),
+          ...(email !== undefined && { email }),
+          ...(city !== undefined && { city }),
+          ...(address !== undefined && { address }),
+          ...(category !== undefined && { category }),
+          ...(plan !== undefined && { plan: String(plan).toLowerCase() }),
+          ...(status !== undefined && { status: String(status).toLowerCase() }),
+          ...(googleReviewLink !== undefined && { googleReviewLink }),
+          ...(baselineReviewCount !== undefined && { baselineReviewCount: Number(baselineReviewCount) }),
+          ...(baselineRating !== undefined && { baselineRating: Number(baselineRating) }),
+          ...(baselineScreenshotUrl !== undefined && { baselineScreenshotUrl }),
+          ...(onboardingCompleted !== undefined && { onboardingCompleted: Boolean(onboardingCompleted) }),
+          ...(currentStep !== undefined && { currentStep: Number(currentStep) }),
+        }
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: `Successfully updated profile for ${updated.name}`,
+        merchant: updated
+      });
+    }
 
     if (action === 'reset_customers' && merchantId) {
       const merchant = await db.merchant.findUnique({ where: { id: merchantId } });
