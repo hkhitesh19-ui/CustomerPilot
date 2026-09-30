@@ -101,6 +101,7 @@ export async function GET(req: Request) {
       currentStep: m.currentStep ?? 1,
       plan: (m.plan || 'trial').toUpperCase(),
       status: (m.status || 'active').charAt(0).toUpperCase() + (m.status || 'active').slice(1),
+      trialEndsAt: m.trialEndsAt || null,
       googleReviewDelayMinutes: m.googleReviewDelayMinutes ?? 30,
       vipUpgradeBonusStamps: m.vipUpgradeBonusStamps ?? 1,
       loyaltyCategoryNames: m.loyaltyCategoryNames || null,
@@ -157,7 +158,8 @@ export async function POST(req: Request) {
         baselineRating,
         baselineScreenshotUrl,
         onboardingCompleted,
-        currentStep
+        currentStep,
+        trialEndsAt
       } = body;
 
       const updated = await db.merchant.update({
@@ -178,6 +180,7 @@ export async function POST(req: Request) {
           ...(baselineScreenshotUrl !== undefined && { baselineScreenshotUrl }),
           ...(onboardingCompleted !== undefined && { onboardingCompleted: Boolean(onboardingCompleted) }),
           ...(currentStep !== undefined && { currentStep: Number(currentStep) }),
+          ...(trialEndsAt !== undefined && { trialEndsAt: trialEndsAt ? new Date(trialEndsAt) : null }),
         }
       });
 

@@ -764,7 +764,8 @@ function MerchantManagement() {
       baselineRating: m.baselineRating ?? 0.0,
       baselineScreenshotUrl: m.baselineScreenshotUrl || "",
       onboardingCompleted: m.onboardingCompleted ?? false,
-      currentStep: m.currentStep ?? 1
+      currentStep: m.currentStep ?? 1,
+      trialEndsAt: m.trialEndsAt ? new Date(m.trialEndsAt).toISOString().split('T')[0] : ""
     })
     setProfileSaveSuccess(false)
   }
@@ -1741,7 +1742,7 @@ function MerchantManagement() {
                 <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider text-emerald-400 border-b border-slate-800 pb-1 flex items-center gap-1.5">
                   <CreditCard className="w-3.5 h-3.5" /> Plan & Onboarding Controls
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div>
                     <Label className="text-xs text-slate-400">Subscription Plan</Label>
                     <select
@@ -1768,6 +1769,15 @@ function MerchantManagement() {
                       <option value="Inactive">Inactive</option>
                       <option value="Suspended">Suspended</option>
                     </select>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Trial Ends At</Label>
+                    <Input
+                      type="date"
+                      value={profileEditForm.trialEndsAt || ""}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, trialEndsAt: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
                   </div>
                   <div>
                     <Label className="text-xs text-slate-400">Onboarding Step (1-8)</Label>
