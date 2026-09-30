@@ -40,14 +40,14 @@
     <rect width="656" height="96" rx="14" fill="#020617" fill-opacity="0.6" stroke="#1e293b" stroke-width="1"/>
     
     <!-- Big Rating Number -->
-    <text x="24" y="62" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="900">4.5</text>
+    <text x="24" y="62" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="900">4.8</text>
     
     <!-- Stars -->
     <g transform="translate(112, 32)">
       <path fill="#FBBC04" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" transform="translate(0, 0)"/><path fill="#FBBC04" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" transform="translate(26, 0)"/><path fill="#FBBC04" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" transform="translate(52, 0)"/><path fill="#FBBC04" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" transform="translate(78, 0)"/><path fill="#FBBC04" d="M12 15.4V6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24z" transform="translate(104, 0)"/>
     </g>
 
-    <text x="114" y="68" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700">31 Google Reviews</text>
+    <text x="114" y="68" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700">26 Google Reviews</text>
     
     <!-- Growth Metric Pill -->
     <rect x="460" y="26" width="176" height="44" rx="10" fill="#6366f1" fill-opacity="0.15" stroke="#6366f1" stroke-width="1"/>
