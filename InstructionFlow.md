@@ -304,7 +304,10 @@ F:\CustomerPilot_ByGLM_July2026
 │   ├── app/                           # Next.js App Router (Pages, Layouts & API Routes)
 │   │   ├── (auth)/                    # Authentication Route Group (login, register, forgot-password)
 │   │   ├── api/                       # Backend API Endpoint Routes (JSON Services)
-│   │   │   ├── admin/                     # SuperAdmin Management & Impersonate APIs
+│   │   │   ├── admin/                     # SuperAdmin Management, Impersonate & Sync-VPS APIs
+│   │   │   │   ├── impersonate/route.ts   # Impersonation Token & Session Issuer
+│   │   │   │   ├── merchants/route.ts     # Merchant Fleet List & Profile Editor
+│   │   │   │   └── sync-vps/route.ts      # 1-Click Production Database Sync from Hostinger VPS
 │   │   │   ├── demo/                  # Public Sandboxed Demo APIs (AI Review Reply)
 │   │   │   ├── reviews/               # 1-Click AI Auto-Reply & List APIs
 │   │   │   ├── onboarding/            # 9-Step Onboarding Engine State APIs

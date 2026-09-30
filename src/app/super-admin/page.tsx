@@ -693,7 +693,34 @@ function MerchantManagement() {
   // Screenshot Proof Modal State
   const [screenshotModalMerchant, setScreenshotModalMerchant] = useState<any | null>(null)
 
+  // Live VPS DB Sync State
+  const [isSyncingVps, setIsSyncingVps] = useState(false)
+  const [syncVpsMessage, setSyncVpsMessage] = useState<string | null>(null)
+
+  const handleSyncVpsDb = async () => {
+    if (!confirm("Are you sure you want to sync the latest production database from Hostinger VPS (200.97.170.53)?")) return
+    setIsSyncingVps(true)
+    setSyncVpsMessage(null)
+    try {
+      const res = await fetch("/api/admin/sync-vps", { method: "POST" })
+      const data = await res.json()
+      if (data.success) {
+        setSyncVpsMessage("✅ Live VPS DB synced successfully!")
+        loadMerchants()
+        setTimeout(() => setSyncVpsMessage(null), 6000)
+      } else {
+        alert("Sync failed: " + (data.error || "Unknown error"))
+      }
+    } catch (e: any) {
+      alert("Sync error: " + e.message)
+    } finally {
+      setIsSyncingVps(false)
+    }
+  }
+
   const handleImpersonate = async (m: any) => {
+    // Open new tab synchronously right here so Chrome/Edge popup blocker NEVER blocks it!
+    const newTab = typeof window !== "undefined" ? window.open("about:blank", "_blank") : null
     try {
       setImpersonatingId(m.id)
       const res = await fetch("/api/admin/impersonate", {
@@ -703,11 +730,17 @@ function MerchantManagement() {
       })
       const data = await res.json()
       if (data.success && data.redirectTo) {
-        window.open(data.redirectTo, "_blank")
+        if (newTab) {
+          newTab.location.href = data.redirectTo
+        } else {
+          window.open(data.redirectTo, "_blank")
+        }
       } else {
+        if (newTab) newTab.close()
         alert("Failed to access dashboard: " + (data.error || "Unknown error"))
       }
     } catch (e: any) {
+      if (newTab) newTab.close()
       alert("Error logging in as merchant: " + e.message)
     } finally {
       setImpersonatingId(null)
@@ -1041,6 +1074,32 @@ function MerchantManagement() {
           <p className="text-xs text-slate-400 mt-0.5">
             Manage live merchants, edit loyalty rules, reset test customer data, or permanently delete merchant accounts.
           </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {syncVpsMessage && (
+            <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-xl">
+              {syncVpsMessage}
+            </span>
+          )}
+          <Button
+            size="sm"
+            onClick={handleSyncVpsDb}
+            disabled={isSyncingVps}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg gap-2 px-3.5 h-9 rounded-xl border border-indigo-400/30"
+            title="Download and sync the latest production database from Hostinger VPS (200.97.170.53)"
+          >
+            {isSyncingVps ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <span>Syncing Live VPS...</span>
+              </>
+            ) : (
+              <>
+                <RefreshCw className="w-3.5 h-3.5 text-indigo-200" />
+                <span>⚡ Sync Live VPS DB</span>
+              </>
+            )}
+          </Button>
         </div>
       </div>
 

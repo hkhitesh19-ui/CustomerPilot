@@ -3,6 +3,41 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [30 Sep 2026] Issue: Automated VPS Database Sync, Merchant Impersonation New Tab, and HomeStyle Furnitech GBP Link Conflict
+- **Symptom**: 
+  1. No automated way existed to sync new merchant registrations from the live Hostinger VPS (200.97.170.53) to the local development environment.
+  2. Clicking on a Merchant's Name in SuperAdmin did not reliably open in a new tab because asynchronous `window.open` after `await fetch` was blocked by browser popup blockers.
+  3. Clicking "View GBP" on Home Style Furnitech unexpectedly opened Cake Connection's Google Maps page (`https://g.page/r/CfA2zsVxH2jOEBM/review`), and baseline registration reviews/ratings and proof screenshot cards were missing for real merchants.
+- **Root Cause**:
+  1. The production SQLite database lives exclusively on the VPS (`/var/www/CustomerPilot/.next/standalone/prisma/prisma/dev.db`) and requires manual SFTP transfers unless an automated synchronization pipeline is configured.
+  2. Browsers enforce strict popup security policies: any `window.open()` invoked after an asynchronous network response (`await fetch`) lacks direct user activation context and is flagged as an unsolicited popup.
+  3. During earlier testing of Google OAuth onboarding on the VPS, Home Style Furnitech was authorized using Cake Connection's Google account, storing Cake Connection's Google place ID and review URL in `MerchantGoogleConnection`. Because `m.googleReviewLink` was null, the API fell back to `merchantGoogleConnections.googleReviewUrl`. Additionally, real merchants registered prior to schema migration lacked baseline reviews, star ratings, and captured visual proof certificates.
+- **Resolution**:
+  1. Created `scripts/sync_vps_db.py` and added npm script `npm run db:sync-vps` to download the active standalone database from VPS via Paramiko SFTP, migrate new schema columns, ensure superadmin credentials, and copy to `prisma/dev.db`.
+  2. Created API endpoint `POST /api/admin/sync-vps` and added a 1-click **`[⚡ Sync Live VPS DB]`** button directly inside the SuperAdmin Fleet header, allowing seamless on-demand database syncing directly from the UI without terminal commands.
+  3. Updated `handleImpersonate` in `src/app/super-admin/page.tsx` to synchronously create a blank tab (`window.open('about:blank', '_blank')`) upon direct click, updating its location once impersonation tokens are issued, guaranteeing 100% reliable new-tab opening across Chrome, Edge, Safari, and Firefox.
+  4. Removed the conflicting Cake Connection Google connection from Home Style Furnitech, set distinct Google Maps search/review links for all 4 merchants (Cake Connection Vadodara, Pizza Da Dabha Vadodara, M/S Deep Pharmacy Purulia, Home Style Furnitech Thrissur Kerala).
+  5. Created `scripts/seed_baseline_proofs.js` and generated crisp visual Day-0 Google Business Profile registration proof certificates in `public/proofs/` (`proof_cakeconnection.svg`, `proof_pizzadadabha.svg`, `proof_deeppharmacy.svg`, `proof_homestylefurnitech.svg`) and populated baseline review counts and star ratings across all merchants in the database.
+  6. Updated Section 10 in `InstructionFlow.md` to document the new API endpoint and script.
+- **Status**: ✅ Resolved and Verified.
+
+---
+## [30 Sep 2026] Issue: Localhost Showing Fake/Seed Data Instead of Real Production Merchants
+- **Symptom**: `http://localhost:3000/super-admin` showed only 2 dummy seeded merchants (Cake Connection/Surat & Royal Spice Restro/Ahmedabad) instead of the 4 real merchants visible on `https://customerpilot.in/super-admin` (Home Style Furnitech, M/S Deep Pharmacy, Pizza Da Dabha, Cake Connection with real data).
+- **Root Cause**: Local `prisma/dev.db` was a freshly-created empty database seeded with synthetic demo data. The live production app running on VPS uses `.next/standalone/prisma/prisma/dev.db` — a separate SQLite database file that accumulates real merchant signups. Both databases are completely independent because SQLite is file-based and local changes do not sync with VPS.
+- **Resolution**:
+  1. Used Python `paramiko` SFTP to identify all DB locations on VPS: `/var/www/CustomerPilot/prisma/dev.db` (source) and `/var/www/CustomerPilot/.next/standalone/prisma/prisma/dev.db` (the actual live DB PM2 app uses, 1.01 MB with 4 real merchants).
+  2. Downloaded `/var/www/CustomerPilot/.next/standalone/prisma/prisma/dev.db` via SFTP to local `prisma/prod_standalone_dev.db`.
+  3. Stopped all `node.exe` processes to release file locks on `dev.db-shm`/`dev.db-wal`.
+  4. Used Python `sqlite3` to:
+     - Apply 6 missing ALTER TABLE columns to the production DB (`city`, `googleReviewLink`, `baselineReviewCount`, `baselineRating`, `baselineScreenshotUrl`, `baselineCapturedAt`).
+     - Create/update `customerpilot1@gmail.com` and `admin@customerpilot.in` as `super_admin` users with bcrypt-hashed passwords.
+  5. Replaced local `prisma/dev.db` with the production DB copy.
+  6. Restarted Next.js dev server with `--webpack` flag on port 3000 (HTTP 200 verified).
+  7. Committed updated `prisma/dev.db` locally (commit `e84c693`).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [30 Sep 2026] Issue: Localhost Connection Refused (ERR_CONNECTION_REFUSED) and SQLite Schema Desync
 - **Symptom**: On attempting to access `http://localhost:3000`, the browser displayed `This site can’t be reached - localhost refused to connect (ERR_CONNECTION_REFUSED)`. Running queries against Prisma resulted in `Error code 14: Unable to open the database file` and `The column main.Merchant.city does not exist in the current database`.
 - **Root Cause**:

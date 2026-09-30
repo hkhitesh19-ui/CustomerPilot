@@ -38,3 +38,4 @@ cloudflared.exe
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+prisma/prod_*.db*
