@@ -130,18 +130,6 @@ async function main() {
       fileKey: "pizzadadabha"
     },
     {
-      id: "cmuc7phd20jqpkx2jijhkw2ut",
-      name: "M/S DEEP PHARMACY",
-      city: "Purulia",
-      address: "Upen Babu Street, Purulia, West Bengal",
-      category: "Pharmacy & Retail Chemist",
-      rating: 3.6,
-      reviews: 12,
-      googleReviewLink: "https://www.google.com/maps/search/?api=1&query=Deep+Pharmacy+Purulia",
-      registeredAt: "22 Sept 2026, 10:37 AM",
-      fileKey: "deeppharmacy"
-    },
-    {
       id: "cmulf87er1qxqkx2jxzxtyzv3",
       name: "Home Style Furnitech",
       city: "Thrissur",

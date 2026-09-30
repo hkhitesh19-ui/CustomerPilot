@@ -97,13 +97,6 @@ try:
             "reviews": 3042,
             "proof": "/proofs/proof_pizzadadabha.svg"
         },
-        "M/S DEEP PHARMACY ": {
-            "city": "Purulia",
-            "googleReviewLink": "https://www.google.com/maps/search/?api=1&query=Deep+Pharmacy+Purulia",
-            "rating": 3.6,
-            "reviews": 12,
-            "proof": "/proofs/proof_deeppharmacy.svg"
-        },
         "Home Style Furnitech": {
             "city": "Thrissur",
             "googleReviewLink": "https://www.google.com/maps/search/?api=1&query=Home+Style+Furniture+Chevoor+Thrissur+Kerala",
