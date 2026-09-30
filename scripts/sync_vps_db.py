@@ -86,29 +86,29 @@ try:
         "Cake Connection": {
             "city": "Vadodara",
             "googleReviewLink": "https://g.page/r/CfA2zsVxH2jOEBM/review",
-            "rating": 4.8,
-            "reviews": 142,
+            "rating": 4.6,
+            "reviews": 689,
             "proof": "/proofs/proof_cakeconnection.svg"
         },
         "Pizza Da Dabha ": {
             "city": "Vadodara",
             "googleReviewLink": "https://www.google.com/maps/search/?api=1&query=Pizza+Da+Dhaba+Waghodia+Road+Vadodara",
-            "rating": 4.3,
-            "reviews": 68,
+            "rating": 4.1,
+            "reviews": 3042,
             "proof": "/proofs/proof_pizzadadabha.svg"
         },
         "M/S DEEP PHARMACY ": {
             "city": "Purulia",
             "googleReviewLink": "https://www.google.com/maps/search/?api=1&query=Deep+Pharmacy+Purulia",
-            "rating": 4.6,
-            "reviews": 24,
+            "rating": 3.6,
+            "reviews": 12,
             "proof": "/proofs/proof_deeppharmacy.svg"
         },
         "Home Style Furnitech": {
             "city": "Thrissur",
             "googleReviewLink": "https://www.google.com/maps/search/?api=1&query=Home+Style+Furniture+Chevoor+Thrissur+Kerala",
-            "rating": 4.5,
-            "reviews": 31,
+            "rating": 4.8,
+            "reviews": 26,
             "proof": "/proofs/proof_homestylefurnitech.svg"
         }
     }
@@ -139,6 +139,16 @@ try:
     conn.close()
 
     # Step 3: Atomic copy to dev.db
+    # VERY IMPORTANT: Delete existing WAL and SHM files to prevent "database disk image is malformed"
+    wal_path = LOCAL_DB_PATH + "-wal"
+    shm_path = LOCAL_DB_PATH + "-shm"
+    if os.path.exists(wal_path):
+        try: os.remove(wal_path)
+        except: pass
+    if os.path.exists(shm_path):
+        try: os.remove(shm_path)
+        except: pass
+
     shutil.copy2(LOCAL_BACKUP_PATH, LOCAL_DB_PATH)
     print(f"\n✅ SUCCESS! Synced {merchant_count} merchants from Live VPS to local dev.db.")
     sys.exit(0)

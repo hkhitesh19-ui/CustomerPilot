@@ -111,8 +111,8 @@ async function main() {
       city: "Vadodara",
       address: "Rutu Platina, Manjalpur, Vadodara, Gujarat",
       category: "Bakery & Cafe",
-      rating: 4.8,
-      reviews: 142,
+      rating: 4.6,
+      reviews: 689,
       googleReviewLink: "https://g.page/r/CfA2zsVxH2jOEBM/review",
       registeredAt: "12 Sept 2026, 10:16 PM",
       fileKey: "cakeconnection"
@@ -123,8 +123,8 @@ async function main() {
       city: "Vadodara",
       address: "Kamal Plaza, Waghodia Road, Vadodara, Gujarat",
       category: "Casual Dining & Pizzeria",
-      rating: 4.3,
-      reviews: 68,
+      rating: 4.1,
+      reviews: 3042,
       googleReviewLink: "https://www.google.com/maps/search/?api=1&query=Pizza+Da+Dhaba+Waghodia+Road+Vadodara",
       registeredAt: "21 Sept 2026, 06:06 PM",
       fileKey: "pizzadadabha"
@@ -135,8 +135,8 @@ async function main() {
       city: "Purulia",
       address: "Upen Babu Street, Purulia, West Bengal",
       category: "Pharmacy & Retail Chemist",
-      rating: 4.6,
-      reviews: 24,
+      rating: 3.6,
+      reviews: 12,
       googleReviewLink: "https://www.google.com/maps/search/?api=1&query=Deep+Pharmacy+Purulia",
       registeredAt: "22 Sept 2026, 10:37 AM",
       fileKey: "deeppharmacy"
@@ -147,8 +147,8 @@ async function main() {
       city: "Thrissur",
       address: "Naikanal, Mannath Lane, Chevoor, Thrissur, Kerala",
       category: "Furniture & Interior Showroom",
-      rating: 4.5,
-      reviews: 31,
+      rating: 4.8,
+      reviews: 26,
       googleReviewLink: "https://www.google.com/maps/search/?api=1&query=Home+Style+Furniture+Chevoor+Thrissur+Kerala",
       registeredAt: "28 Sept 2026, 04:17 PM",
       fileKey: "homestylefurnitech"
