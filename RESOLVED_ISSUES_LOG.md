@@ -3,6 +3,21 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [30 Sep 2026] Issue: Localhost Connection Refused (ERR_CONNECTION_REFUSED) and SQLite Schema Desync
+- **Symptom**: On attempting to access `http://localhost:3000`, the browser displayed `This site can’t be reached - localhost refused to connect (ERR_CONNECTION_REFUSED)`. Running queries against Prisma resulted in `Error code 14: Unable to open the database file` and `The column main.Merchant.city does not exist in the current database`.
+- **Root Cause**:
+  1. The local development web server was stopped during system restart, leaving port 3000 unserviced.
+  2. In `.env`, `DATABASE_URL="file:./prisma/dev.db"` caused Prisma CLI to resolve relative paths to `prisma/prisma/dev.db`, while Prisma client resolved relative to runtime cwd differently. In addition, PRAGMA queries in `src/lib/db.ts` used `$executeRawUnsafe` instead of `$queryRawUnsafe`, throwing SQLite result set errors.
+  3. The SQLite database `dev.db` had not been synced with the latest schema fields (`city`, `googleReviewLink`, `baselineRating`, `baselineReviewCount`, `baselineScreenshotUrl`, `baselineCapturedAt`).
+- **Resolution**:
+  1. Updated `src/lib/db.ts` to compute the canonical absolute database path via `path.resolve(process.cwd(), 'prisma', 'dev.db')` and converted PRAGMA calls (`journal_mode`, `busy_timeout`, `synchronous`) to `$queryRawUnsafe` for clean execution.
+  2. Updated `.env` with `DATABASE_URL="file:./dev.db"` ensuring Prisma CLI and runtime resolve strictly to `prisma/dev.db`.
+  3. Ran `npx prisma db push` and `npx prisma generate` to apply all latest schema columns to `prisma/dev.db`.
+  4. Seeded realistic demo merchants (Cake Connection in Surat and Royal Spice Restro in Ahmedabad), master plans, coupons, terms, and configured the SuperAdmin account (`admin@customerpilot.in`).
+  5. Started Next.js server with `--webpack` on port 3000 as a daemon process and verified HTTP 200 response on `http://localhost:3000/login`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [14 Sep 2026] Issue: Razorpay Checkout Error "Authentication failed" on /dashboard/subscription
 - **Symptom**: On `https://customerpilot.in/dashboard/subscription`, selecting a plan, applying promo code `CP99` (total payable ₹99), agreeing to Terms, and clicking "Subscribe with Razorpay" failed with a red toast error: `"Checkout Error: Authentication failed"`. The Razorpay payment popup did not appear.
 - **Root Cause**: The production VPS `.env` file contained an expired/inactive test Razorpay key pair (`RAZORPAY_KEY_ID="rzp_test_TAyBShtPsT7nSS"`). When the backend invoked `razorpay.orders.create(...)`, Razorpay's API rejected the API credentials with HTTP 401 Unauthorized `{"error":{"code":"BAD_REQUEST_ERROR","description":"Authentication failed"}}`.
