@@ -87,7 +87,9 @@ export async function GET(req: NextRequest) {
       merchant: {
         name: merchant.name,
         logoUrl: merchant.logoUrl,
+        businessType: merchant.businessType,
         category: merchant.category,
+        city: (merchant as any).city || null,
         googleReviewUrl: merchant.merchantGoogleConnections?.googleReviewUrl || (merchant as any).googleReviewLink || null,
         googlePlaceName: merchant.merchantGoogleConnections?.placeName || null,
       }
