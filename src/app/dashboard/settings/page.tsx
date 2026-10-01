@@ -156,7 +156,7 @@ export default function SettingsPage() {
           className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/40 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
         >
           <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-1.5 py-0.2 rounded">01</span>
-          <span>VIP QR Standee</span>
+          <span>Loyalty Stamp QR</span>
         </a>
 
         {isReviewsEnabled && (
@@ -226,7 +226,7 @@ export default function SettingsPage() {
               </span>
               <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <QrCode className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                WhatsApp VIP Loyalty &amp; Stamp Check-in QR Standee
+                Digital Loyalty Stamp QR
               </h2>
             </div>
             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
