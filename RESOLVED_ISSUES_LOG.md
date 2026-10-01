@@ -3,6 +3,21 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [01 Oct 2026] Issue: Digital Loyalty Stamp QR Standee 3 Shortlisted Designs Side-by-Side Presentation
+- **Symptom**: In the Merchant Settings Dashboard under "Digital Loyalty Stamp QR" (`#sec-vip-qr`), only one standee design was displayed at a time behind a toggle button, and the designs did not showcase the merchant's 3 shortlisted creative themes (Artisanal Bakery & Cafe, Royal Retail & Lifestyle, Fast-Food & Pizzeria) simultaneously for visual comparison.
+- **Root Cause**: The component was architected with a binary toggle state (`selectedDesign: "theme" | "classic"`) rendering a single standee mockup in a 6-column grid, preventing merchants from viewing and comparing multiple aesthetic options at the same time.
+- **Resolution**:
+  1. Updated `src/components/qr-generator.tsx` to render a 3-column responsive layout (`grid grid-cols-1 lg:grid-cols-3 gap-6`) presenting all 3 shortlisted standee designs simultaneously ("ek sath"):
+     - **Option 1 (Artisanal Bakery & Cake Studio)**: Ruby crimson & gold theme, chocolate drip cake with cherries vector graphic, "SCAN TO EARN REWARDS" brush badge, and bakery perk circles.
+     - **Option 2 (Royal Retail & Lifestyle)**: Royal sapphire blue & gold theme, 3D shopping bag and coral gift box vector graphic, "INSTANT ₹100 ON FIRST SCAN!" sunburst badge, and retail perk circles.
+     - **Option 3 (High-Energy Fast-Food & Pizzeria)**: Italian crimson & mozzarella gold theme, sizzling wood-fired pizza slice with melted cheese pull, "1 STAMP ON EVERY VISIT!" badge, and foodie perk circles.
+  2. Integrated dynamic merchant branding into all 3 standees: Store Name, Branch/City, dynamic Merchant Business Logo (header and embedded in the QR center badge), and crisp high-contrast QR codes.
+  3. Added interactive "3D Studio Photo" / "Live Standee" toggle to each card, allowing merchants to switch between live data previews and photorealistic tabletop studio mockups (`public/standees/`).
+  4. Added individual 1-click **"Print A4 Standee"** and **"Download QR"** actions directly on each of the 3 cards, with high-resolution A4 print templates tailored to each specific aesthetic.
+  5. Updated Section 10 in `InstructionFlow.md` to document the new `public/standees/` asset directory.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [01 Oct 2026] Issue: Google OAuth Local Token Exchange & Settings Dashboard Light Mode Visual Overhaul
 - **Symptom**:
   1. Google OAuth signup failed on localhost with `http://localhost:3000/signup?error=oauth_error` and subsequently with `error=token_exchange_failed`.

@@ -298,7 +298,9 @@ F:\CustomerPilot_ByGLM_July2026
 ├── public/
 │   ├── cplogo.png                     # Master Light-Mode Horizontal Brand Logo (Navbar & Header)
 │   ├── cplogo_dark_backup.png          # Backup of Original Dark-Mode Logo
-│   └── logo_variations/               # 5 Generated High-Res Brand Logo Variations (.jpg)
+│   ├── logo_variations/               # 5 Generated High-Res Brand Logo Variations (.jpg)
+│   ├── proofs/                        # Day-0 Google Business Profile Registration Proof Certificates (.svg)
+│   └── standees/                      # 3 Shortlisted Tabletop Standee Mockup Images (Bakery, Retail, Pizzeria) (.jpg)
 │
 ├── src/
 │   ├── app/                           # Next.js App Router (Pages, Layouts & API Routes)
