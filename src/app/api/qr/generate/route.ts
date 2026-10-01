@@ -70,11 +70,12 @@ export async function GET(req: NextRequest) {
       defaultTitle = loyaltyTitleMap[type] || "VIP Loyalty QR Code"
     }
 
-    // Generate QR Code with CustomerPilot Logo & Name in Center (without tagline)
+    // Generate QR Code with Merchant Business Logo in Center (or CustomerPilot fallback)
     const qrDataUrl = await generateBrandedQRDataUrl(targetUrl, {
       width: 600,
       darkColor: mode === "reviews" || type.startsWith("review_") ? "#0f172a" : "#1e1b4b",
-      lightColor: "#ffffff"
+      lightColor: "#ffffff",
+      merchantLogoUrl: merchant.logoUrl || null
     })
 
     return ok({

@@ -264,6 +264,12 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
               </div>
               <div class="smart-badge">Smart Ai GoogleReview QR</div>
               
+              ${qrData?.merchant?.logoUrl ? `
+                <div style="display:flex; justify-content:center; align-items:center; min-height:50px; margin: 4px auto 8px auto;">
+                  <img src="${qrData.merchant.logoUrl}" style="max-height:55px; max-width:180px; width:auto; height:auto; object-fit:contain; border-radius:10px; background:#ffffff; padding:4px; border:1px solid #cbd5e1;" />
+                </div>
+              ` : ''}
+
               ${storeName ? `<div class="store-pill">${storeName}</div>` : ''}
 
               <div class="leave-us">LEAVE US A</div>
@@ -286,7 +292,10 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
 
             <div class="bottom-banner">
               <div class="powered-line">---- Powered By ----</div>
-              <div class="brand-line">CustomerPilot • AI Review Assistant</div>
+              <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:3px;">
+                <img src="/cplogo_icon.png" style="width:18px; height:18px; border-radius:4px; object-fit:contain;" />
+                <span class="brand-line">CustomerPilot - YourReview Partner</span>
+              </div>
             </div>
           </div>
           <script>
@@ -446,9 +455,21 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
                   </div>
 
                   {/* Smart Ai GoogleReview QR pill */}
-                  <div className="inline-block bg-black text-white text-[10px] font-black tracking-wider uppercase px-4 py-1.5 rounded-full mb-2.5 shadow-xs">
+                  <div className="inline-block bg-black text-white text-[10px] font-black tracking-wider uppercase px-4 py-1.5 rounded-full mb-2 shadow-xs">
                     Smart Ai GoogleReview QR
                   </div>
+
+                  {/* Merchant Business Logo */}
+                  {qrData?.merchant?.logoUrl && (
+                    <div className="flex flex-col items-center justify-center my-1 min-h-[46px]">
+                      <img
+                        src={qrData.merchant.logoUrl}
+                        alt={storeName}
+                        className="max-h-12 max-w-[180px] w-auto h-auto object-contain p-1 rounded-xl bg-white/95 border border-slate-200/90 shadow-xs"
+                        onError={(e) => { e.currentTarget.style.display = 'none' }}
+                      />
+                    </div>
+                  )}
 
                   {/* Store Name Badge */}
                   {storeName && (
@@ -512,12 +533,19 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
                   </div>
 
                   {/* Bottom Dark Banner */}
-                  <div className="bg-[#0B132B] text-white py-3 px-3 mt-4 border-t border-slate-800">
-                    <div className="text-[8px] font-bold text-sky-400 tracking-wider">
+                  <div className="bg-[#0B132B] text-white py-2.5 px-3 mt-4 border-t border-slate-800">
+                    <div className="text-[8px] font-bold text-sky-400 tracking-wider uppercase">
                       •••• Powered By ••••
                     </div>
-                    <div className="text-[10px] font-black tracking-tight text-white mt-0.5 truncate">
-                      CustomerPilot - Your Branding Partner
+                    <div className="flex items-center justify-center gap-1.5 mt-0.5">
+                      <img 
+                        src="/cplogo_icon.png" 
+                        alt="CustomerPilot" 
+                        className="w-4 h-4 rounded object-contain" 
+                      />
+                      <span className="text-[10px] font-black tracking-tight text-white truncate">
+                        CustomerPilot - YourReview Partner
+                      </span>
                     </div>
                   </div>
                 </div>
