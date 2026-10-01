@@ -24,11 +24,11 @@ interface Template {
 }
 
 const CATEGORY_CONFIG: Record<string, { label: string; color: string; emoji: string }> = {
-  MARKETING:      { label: "Marketing",     color: "bg-purple-500/10 text-purple-400 border-purple-500/20", emoji: "📣" },
-  TRANSACTIONAL:  { label: "Transactional", color: "bg-blue-500/10 text-blue-400 border-blue-500/20",   emoji: "✅" },
-  ENGAGEMENT:     { label: "Engagement",    color: "bg-amber-500/10 text-amber-400 border-amber-500/20", emoji: "💬" },
-  SYSTEM:         { label: "System",        color: "bg-slate-500/10 text-slate-400 border-slate-500/20", emoji: "⚙️" },
-  AUTHENTICATION: { label: "Auth",          color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20", emoji: "🔐" },
+  MARKETING:      { label: "Marketing",     color: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20", emoji: "📣" },
+  TRANSACTIONAL:  { label: "Transactional", color: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",   emoji: "✅" },
+  ENGAGEMENT:     { label: "Engagement",    color: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20", emoji: "💬" },
+  SYSTEM:         { label: "System",        color: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20", emoji: "⚙️" },
+  AUTHENTICATION: { label: "Auth",          color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20", emoji: "🔐" },
 }
 
 const GROUP_ORDER = ["TRANSACTIONAL", "MARKETING", "ENGAGEMENT", "SYSTEM", "AUTHENTICATION"]
@@ -45,7 +45,7 @@ function highlightVariables(text: string) {
   const parts = text.split(/({{[^}]+}})/g)
   return parts.map((part, i) =>
     /^{{.+}}$/.test(part)
-      ? <span key={i} className="bg-emerald-500/20 text-emerald-300 rounded px-1 font-mono text-xs">{part}</span>
+      ? <span key={i} className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-transparent rounded px-1 font-mono text-xs">{part}</span>
       : <span key={i}>{part}</span>
   )
 }
@@ -160,18 +160,18 @@ function TemplateCard({ template, merchantId }: { template: Template; merchantId
 
           <div className="flex items-center gap-2 flex-wrap">
             {!editing ? (
-              <Button size="sm" variant="outline" className="h-7 text-xs border-slate-700 text-slate-300 hover:border-indigo-500/60 hover:text-indigo-300"
+              <Button size="sm" variant="outline" className="h-7 text-xs border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-500/60 hover:text-indigo-600 dark:hover:text-indigo-300"
                 onClick={() => { setEditing(true); setDraft(currentBody) }}>
                 <Pencil className="w-3 h-3 mr-1" /> Edit Message
               </Button>
             ) : (
               <>
                 <Button size="sm" disabled={saving} onClick={handleSave}
-                  className="h-7 text-xs bg-indigo-600 hover:bg-indigo-500 text-white">
+                  className="h-7 text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-medium">
                   {saving ? <RefreshCw className="w-3 h-3 mr-1 animate-spin" /> : <Save className="w-3 h-3 mr-1" />}
                   Save
                 </Button>
-                <Button size="sm" variant="outline" className="h-7 text-xs border-slate-700 text-slate-400"
+                <Button size="sm" variant="outline" className="h-7 text-xs border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400"
                   onClick={() => { setEditing(false); setDraft(currentBody) }}>
                   <X className="w-3 h-3 mr-1" /> Cancel
                 </Button>
@@ -179,7 +179,7 @@ function TemplateCard({ template, merchantId }: { template: Template; merchantId
             )}
             {isCustomized && !editing && (
               <Button size="sm" variant="outline" disabled={resetting}
-                className="h-7 text-xs border-slate-700 text-amber-400 hover:border-amber-500/50"
+                className="h-7 text-xs border-amber-300 dark:border-slate-700 text-amber-700 dark:text-amber-400 hover:border-amber-500/50"
                 onClick={handleReset}>
                 {resetting ? <RefreshCw className="w-3 h-3 mr-1 animate-spin" /> : <RotateCcw className="w-3 h-3 mr-1" />}
                 Reset to Default
@@ -281,11 +281,11 @@ export function WhatsAppJourneyTemplates({ merchantId }: { merchantId: string })
           </div>
         ))}
 
-        <div className="mt-4 p-3 bg-slate-950/40 rounded-lg border border-slate-800 flex items-start gap-2">
-          <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-          <p className="text-[11px] text-slate-500 leading-relaxed">
-            <span className="font-semibold text-slate-400">Tip:</span> Use{" "}
-            <code className="bg-emerald-500/10 text-emerald-400 px-1 rounded text-[10px]">{"{{variable}}"}</code>{" "}
+        <div className="mt-4 p-3 bg-amber-50/70 dark:bg-slate-950/40 rounded-lg border border-amber-200/60 dark:border-slate-800 flex items-start gap-2">
+          <Sparkles className="w-4 h-4 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+            <span className="font-semibold text-slate-800 dark:text-slate-300">Tip:</span> Use{" "}
+            <code className="bg-emerald-100 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-transparent px-1 rounded text-[10px]">{"{{variable}}"}</code>{" "}
             placeholders exactly as shown. They are auto-filled by the system when messages are sent. Editing a template creates a version history so you can always reset to the original.
           </p>
         </div>

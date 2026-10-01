@@ -104,7 +104,7 @@ export function LoyaltyCategoryCard({ merchantId, initialCategoryJson }: Props) 
                   value={catName}
                   onChange={(e) => handleCategoryChange(idx, e.target.value)}
                   placeholder={`Level ${idx + 1} Name`}
-                  className="bg-slate-900/80 border-slate-700/80 text-sm font-medium text-slate-100"
+                  className="bg-white dark:bg-slate-900/80 border-slate-200 dark:border-slate-700/80 text-sm font-medium text-slate-900 dark:text-slate-100 rounded-xl"
                 />
               </div>
             ))}

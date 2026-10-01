@@ -6,6 +6,11 @@ import { generateMerchantIdNumber } from "@/lib/merchant-id-generator";
 if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set');
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// In local Windows development, prevent 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' SSL error during Google token exchange
+if (process.env.NODE_ENV !== "production") {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
+
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);

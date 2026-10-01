@@ -3,6 +3,28 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [01 Oct 2026] Issue: Google OAuth Local Token Exchange & Settings Dashboard Light Mode Visual Overhaul
+- **Symptom**:
+  1. Google OAuth signup failed on localhost with `http://localhost:3000/signup?error=oauth_error` and subsequently with `error=token_exchange_failed`.
+  2. In Merchant Dashboard (`/dashboard/settings`), several components (page background, Google Business Integration, Google Reviews QR Standee, Loyalty Category Level inputs, WhatsApp Journey Templates tip box) appeared dark/blackish with illegible text when viewed in Light Mode.
+  3. Settings sections were not aligned in the merchant's operational priority hierarchy.
+- **Root Cause**:
+  1. `error=oauth_error` was caused by Node.js failing TLS verification (`UNABLE_TO_VERIFY_LEAF_SIGNATURE`) on Windows when calling `https://oauth2.googleapis.com/token`. `error=token_exchange_failed` was caused by a desynchronized `GOOGLE_CLIENT_SECRET` in the local `.env` compared to the active credentials registered in Google Cloud Console.
+  2. Hardcoded Tailwind classes (`bg-slate-900`, `via-slate-950 to-slate-950`, `bg-slate-950/40`, `text-slate-300`) were applied unconditionally without `dark:` prefix variants, causing high-contrast dark blocks on white backgrounds.
+- **Resolution**:
+  1. Added development-only TLS tolerance (`NODE_TLS_REJECT_UNAUTHORIZED = "0"`) inside `src/app/api/auth/google/callback/route.ts` and `src/app/api/google-business/oauth/callback/route.ts` and synced the active Google Client Secret into local `.env`.
+  2. Reorganized the top 5 sections in `/dashboard/settings` to exact order:
+     - 01: `WhatsApp VIP Loyalty & Stamp Check-in QR Standee`
+     - 02: `Smart Ai Google Reviews`
+     - 03: `Business Information`
+     - 04: `Reward Card Setup`
+     - 05: `Your Business WhatsApp Connection`
+     - 06: `Custom Automation Timers & Message Templates`
+     - 07: `Staff & Operations Manual`
+  3. Replaced all unconditional dark backgrounds in `settings/page.tsx`, `google-business-integration.tsx`, `google-review-qr-generator.tsx`, `loyalty-category-card.tsx`, and `whatsapp-journey-templates.tsx` with light-mode first styling (`bg-white`, `bg-slate-50`, `text-slate-900`, `border-slate-200`) and preserved `dark:` variants.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [30 Sep 2026] Issue: Automated VPS Database Sync, Merchant Impersonation New Tab, and HomeStyle Furnitech GBP Link Conflict
 - **Symptom**: 
   1. No automated way existed to sync new merchant registrations from the live Hostinger VPS (200.97.170.53) to the local development environment.
