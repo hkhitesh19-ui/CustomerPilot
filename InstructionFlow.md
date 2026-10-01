@@ -312,6 +312,9 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   │   └── sync-vps/route.ts      # 1-Click Production Database Sync from Hostinger VPS
 │   │   │   ├── demo/                  # Public Sandboxed Demo APIs (AI Review Reply)
 │   │   │   ├── reviews/               # 1-Click AI Auto-Reply & List APIs
+│   │   │   ├── qr/                    # Dynamic Standee & QR Generation APIs
+│   │   │   │   ├── generate/route.ts  # Branded QR Code Generator API
+│   │   │   │   └── standee/route.ts   # Dynamic High-Res Acrylic Standee Composite API (Sharp)
 │   │   │   ├── onboarding/            # 9-Step Onboarding Engine State APIs
 │   │   │   ├── webhook/               # Evolution API & WhatsApp Incoming Webhooks
 │   │   │   ├── queue/                 # Live Waitlist & Queue Management APIs

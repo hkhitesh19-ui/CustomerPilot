@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [01 Oct 2026] Issue: Photorealistic Designer Acrylic Tabletop Standee Live QR Compositing
+- **Symptom**: The user observed that while AI studio mockups shown in chat were 10/10 ultra-luxury photorealistic acrylic standees, the merchant dashboard (`/dashboard/settings#sec-vip-qr`) showed crude, flat CSS boxes with amateur clip-art drawings ("tumne dikhaya acche options , and jab Merchant online Website me Designer standy ekdam cheap level ki design he - solution do").
+- **Root Cause**: The web application was attempting to simulate standee designs entirely via primitive HTML/CSS elements (Tailwind gradient rectangles, clip-path CSS drips, and emojis) instead of rendering high-resolution photorealistic acrylic studio artwork.
+- **Resolution**:
+  1. Built a high-performance dynamic image compositing API route `GET /api/qr/standee` using `sharp`. It takes `design` (`bakery` | `retail` | `pizzeria`) and `m` (merchantId).
+  2. The endpoint dynamically generates the merchant's live WhatsApp VIP Club check-in QR code (with center merchant logo badge) and overlays it with calibrated pixel-perfect coordinates directly onto the high-resolution (848x1264) photorealistic tabletop acrylic standee artwork in ~140ms.
+  3. Ensured the endpoint is whitelisted under `/api/qr/` in `src/proxy.ts` so browser `<img>` tags load the live standees without 401 token errors.
+  4. Updated `src/components/qr-generator.tsx` to display all 3 photorealistic standees side-by-side with full-screen HD zoom modal, 1-click A4 print engine (`window.print()` with full-bleed high-res artwork), and direct HD JPEG downloads.
+  5. Tested and verified HTTP 200 `image/jpeg` responses for all 3 designs (`bakery`, `retail`, `pizzeria`) on localhost:3000.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [01 Oct 2026] Issue: Digital Loyalty Stamp QR Standee 3 Shortlisted Designs Side-by-Side Presentation
 - **Symptom**: In the Merchant Settings Dashboard under "Digital Loyalty Stamp QR" (`#sec-vip-qr`), only one standee design was displayed at a time behind a toggle button, and the designs did not showcase the merchant's 3 shortlisted creative themes (Artisanal Bakery & Cafe, Royal Retail & Lifestyle, Fast-Food & Pizzeria) simultaneously for visual comparison.
 - **Root Cause**: The component was architected with a binary toggle state (`selectedDesign: "theme" | "classic"`) rendering a single standee mockup in a 6-column grid, preventing merchants from viewing and comparing multiple aesthetic options at the same time.
