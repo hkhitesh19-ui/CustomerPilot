@@ -300,7 +300,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   ├── cplogo_dark_backup.png          # Backup of Original Dark-Mode Logo
 │   ├── logo_variations/               # 5 Generated High-Res Brand Logo Variations (.jpg)
 │   ├── proofs/                        # Day-0 Google Business Profile Registration Proof Certificates (.svg)
-│   └── standees/                      # 3 Shortlisted Tabletop Standee Mockup Images (Bakery, Retail, Pizzeria) (.jpg)
+│   └── standees/                      # 3 Shortlisted Tabletop Standee Mockup Images (Bakery, Royal VIP, Sweet Celebration) (.jpg)
 │
 ├── src/
 │   ├── app/                           # Next.js App Router (Pages, Layouts & API Routes)

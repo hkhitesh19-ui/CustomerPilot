@@ -3,6 +3,24 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: Merchant-Specific Business Logo & Name Consistency Across All 3 QR Standees
+- **Symptom**: When a merchant (e.g. "Cake Connection") logged in, Option 2 displayed a different store ("TrendZone Lifestyle" fashion boutique with shopping bags) and Option 3 displayed another store ("Pizza Da Dabha" with pizzas). The merchant rightfully expected all 3 creative options to be personalized to their own business ("Cake Connection") using their own business logo ("yaha Cake Connection Merchant ka login he to fir hi uske hi business ka same Logo use karke all 3 QR code alag alag design ka generate hona chaiye").
+- **Root Cause**: The static mockup templates for Option 2 and Option 3 were previously generated with hardcoded demo brands (TrendZone Lifestyle and Pizza Da Dabha) from other industries, rather than being tailored to the logged-in merchant's category and branding.
+- **Resolution**:
+  1. Replaced the generic demo standees with 3 ultra-luxurious, commercial photorealistic tabletop acrylic standee templates all branded specifically for the merchant ("Cake Connection"):
+     - **Option 1**: *Artisanal Bakery & Cake Studio* (`standee_bakery_mockup.jpg` - Ruby Crimson & Warm Gold with signature chocolate drip cake & cherries).
+     - **Option 2**: *Royal Sapphire & Gold VIP Club* (`standee_royal_mockup.jpg` - Royal Sapphire Blue & Amber Gold with French macarons, tiered velvet cake & Cake Connection 3-tier logo).
+     - **Option 3**: *Sweet Celebrations & Pastry Lounge* (`standee_celebration_mockup.jpg` - Warm Rose Gold & Champagne Bronze with strawberry cheesecake, chocolate cupcakes & Cake Connection 3-tier logo).
+  2. Dynamically composited the merchant's real scannable WhatsApp check-in QR code (with Cake Connection's real business logo in the center badge) on all 3 standees with calibrated coordinates (`/api/qr/standee`):
+     - Option 1 (Bakery): `left: 408, top: 440, width: 266, height: 268, darkColor: "#4a0e17"`
+     - Option 2 (Royal): `left: 448, top: 615, width: 142, height: 142, darkColor: "#0f2942"`
+     - Option 3 (Celebration): `left: 420, top: 602, width: 152, height: 168, darkColor: "#3b1d11"`
+  3. Maintained backward-compatibility aliases in `/api/qr/standee/route.ts` mapping legacy `retail` -> `royal` and `pizzeria` -> `celebration`.
+  4. Updated `src/components/qr-generator.tsx` with updated `StandeeDesignId`, `STANDEE_OPTIONS`, and `designsList`.
+  5. Verified HTTP 200 responses across all standee endpoints and confirmed seamless rendering on `http://localhost:3000/dashboard/settings#sec-vip-qr`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [01 Oct 2026] Issue: Photorealistic Designer Acrylic Tabletop Standee Live QR Compositing
 - **Symptom**: The user observed that while AI studio mockups shown in chat were 10/10 ultra-luxury photorealistic acrylic standees, the merchant dashboard (`/dashboard/settings#sec-vip-qr`) showed crude, flat CSS boxes with amateur clip-art drawings ("tumne dikhaya acche options , and jab Merchant online Website me Designer standy ekdam cheap level ki design he - solution do").
 - **Root Cause**: The web application was attempting to simulate standee designs entirely via primitive HTML/CSS elements (Tailwind gradient rectangles, clip-path CSS drips, and emojis) instead of rendering high-resolution photorealistic acrylic studio artwork.

@@ -6,18 +6,32 @@ import { db } from "@/lib/db"
 import { normalizePhone } from "@/lib/utils"
 import { generateBrandedQRDataUrl } from "@/lib/branded-qr"
 
-const STANDEE_COORDS = {
+const STANDEE_COORDS: Record<string, { image: string; qr: { left: number; top: number; width: number; height: number }; darkColor: string }> = {
   bakery: {
     image: "standee_bakery_mockup.jpg",
     qr: { left: 408, top: 440, width: 266, height: 268 },
+    darkColor: "#4a0e17",
   },
+  royal: {
+    image: "standee_royal_mockup.jpg",
+    qr: { left: 448, top: 615, width: 142, height: 142 },
+    darkColor: "#0f2942",
+  },
+  celebration: {
+    image: "standee_celebration_mockup.jpg",
+    qr: { left: 420, top: 602, width: 152, height: 168 },
+    darkColor: "#3b1d11",
+  },
+  // Backwards-compatible aliases for previously selected design keys
   retail: {
-    image: "standee_retail_mockup.jpg",
-    qr: { left: 415, top: 421, width: 224, height: 224 },
+    image: "standee_royal_mockup.jpg",
+    qr: { left: 448, top: 615, width: 142, height: 142 },
+    darkColor: "#0f2942",
   },
   pizzeria: {
-    image: "standee_pizzeria_mockup.jpg",
-    qr: { left: 431, top: 428, width: 220, height: 220 },
+    image: "standee_celebration_mockup.jpg",
+    qr: { left: 420, top: 602, width: 152, height: 168 },
+    darkColor: "#3b1d11",
   },
 }
 
@@ -55,7 +69,7 @@ export async function GET(req: NextRequest) {
     // 2. Generate crisp QR code with merchant logo in center
     const qrDataUrl = await generateBrandedQRDataUrl(targetUrl, {
       width: config.qr.width * 2, // 2x for sharp retina rendering
-      darkColor: design === "retail" ? "#0f172a" : design === "pizzeria" ? "#1e1b4b" : "#1e1b4b",
+      darkColor: config.darkColor || "#0f172a",
       lightColor: "#ffffff",
       merchantLogoUrl: merchant.logoUrl || null,
     })

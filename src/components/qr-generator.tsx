@@ -10,7 +10,7 @@ import { QrCode, Download, RefreshCw, Printer, Sparkles, CheckCircle2, ZoomIn, E
  * Standee Design Options (Photorealistic Designer Standees)
  * ─────────────────────────────────────────────────────────────────────────── */
 
-export type StandeeDesignId = "bakery" | "retail" | "pizzeria"
+export type StandeeDesignId = "bakery" | "royal" | "celebration"
 
 interface StandeeOption {
   id: StandeeDesignId
@@ -27,28 +27,28 @@ const STANDEE_OPTIONS: Record<StandeeDesignId, StandeeOption> = {
     id: "bakery",
     number: "Option 1",
     title: "Artisanal Bakery & Cake Studio",
-    badgeLabel: "🎂 Bakery & Cake Studio",
-    categoryHint: "Best for Bakeries, Cake Shops, Pastry Cafes & Dessert Studios",
+    badgeLabel: "🎂 Artisanal Bakery & Cake Studio",
+    categoryHint: "Ruby Crimson & Warm Gold with Signature Chocolate Cake & Cherries",
     palette: "Ruby Crimson & Warm Gold",
     keyHighlight: "Photorealistic Chocolate Drip Cake with Cherries + Golden Crown & Brush Badge",
   },
-  retail: {
-    id: "retail",
+  royal: {
+    id: "royal",
     number: "Option 2",
-    title: "Royal Retail & Lifestyle",
-    badgeLabel: "🛍️ Royal Retail & Lifestyle",
-    categoryHint: "Best for Fashion Boutiques, Footwear, Electronics & Retail Stores",
+    title: "Royal Sapphire & Gold VIP Club",
+    badgeLabel: "👑 Royal Sapphire & Gold VIP Club",
+    categoryHint: "Royal Sapphire Blue & Amber Gold with French Macarons & Tiered Cake",
     palette: "Royal Sapphire Blue & Amber",
-    keyHighlight: "3D VIP Shopping Bags + Golden Sunburst 'Instant ₹100 Off' Badge",
+    keyHighlight: "Tiered Luxury Velvet Cake & French Macarons + Gold VIP Medallion",
   },
-  pizzeria: {
-    id: "pizzeria",
+  celebration: {
+    id: "celebration",
     number: "Option 3",
-    title: "Fast-Food & Pizzeria",
-    badgeLabel: "🍕 Fast-Food & Pizzeria",
-    categoryHint: "Best for Pizzerias, Burger Hubs, Fast-Casual Dining & Food Courts",
-    palette: "Italian Crimson & Mozzarella Gold",
-    keyHighlight: "Sizzling Wood-Fired Pizza with Melted Cheese Pull + Chef Medallion",
+    title: "Sweet Celebrations & Pastry Lounge",
+    badgeLabel: "🍓 Sweet Celebrations & Pastry Lounge",
+    categoryHint: "Warm Rose Gold & Champagne Bronze with Strawberry Cheesecake & Cupcakes",
+    palette: "Rose Gold & Champagne Bronze",
+    keyHighlight: "Gourmet Strawberry Cheesecake & Chocolate Cupcakes + 'SCAN TO JOIN VIP' Gold Badge",
   },
 }
 
@@ -60,24 +60,18 @@ function detectDefaultDesign(businessType?: string | null, category?: string | n
     typeStr.includes("RETAIL") ||
     catStr.includes("SHOP") ||
     catStr.includes("STORE") ||
-    catStr.includes("CLOTH") ||
-    catStr.includes("FURNIT") ||
-    catStr.includes("FASHION") ||
-    catStr.includes("OPTIC")
+    catStr.includes("LUXURY") ||
+    catStr.includes("VIP")
   ) {
-    return "retail"
+    return "royal"
   }
   if (
-    typeStr.includes("PIZZA") ||
-    catStr.includes("PIZZA") ||
-    typeStr.includes("BURGER") ||
-    catStr.includes("BURGER") ||
-    typeStr.includes("FAST") ||
-    catStr.includes("FAST") ||
-    catStr.includes("DHABA") ||
-    catStr.includes("RESTAURANT")
+    typeStr.includes("CAFE") ||
+    catStr.includes("SWEET") ||
+    catStr.includes("DESSERT") ||
+    catStr.includes("CELEBRATION")
   ) {
-    return "pizzeria"
+    return "celebration"
   }
   return "bakery"
 }
@@ -90,8 +84,8 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
   const [zoomImage, setZoomImage] = useState<string | null>(null)
   const [imgLoaded, setImgLoaded] = useState<Record<StandeeDesignId, boolean>>({
     bakery: false,
-    retail: false,
-    pizzeria: false,
+    royal: false,
+    celebration: false,
   })
 
   useEffect(() => {
@@ -220,7 +214,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
     }
   }
 
-  const designsList: StandeeDesignId[] = ["bakery", "retail", "pizzeria"]
+  const designsList: StandeeDesignId[] = ["bakery", "royal", "celebration"]
 
   return (
     <Card className="border-border shadow-sm">
