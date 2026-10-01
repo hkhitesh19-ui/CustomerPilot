@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import { applyAuthRateLimit } from '@/lib/rate-limiter';
 import { generateMerchantIdNumber } from '@/lib/merchant-id-generator';
 import { getIndustryLoyaltyRule } from '@/lib/industry-campaigns';
+import { normalizePhone } from '@/lib/utils';
 
 if (!process.env.JWT_SECRET) {
   throw new Error('FATAL: JWT_SECRET environment variable is not set');
@@ -34,7 +35,8 @@ export async function POST(req: Request) {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const cleanPhone = whatsappPhone ? whatsappPhone.trim() : '';
+    // Normalize phone at entry point — ensures 91XXXXXXXXXX format in DB from day 1
+    const cleanPhone = normalizePhone(whatsappPhone) || '';
 
     // Determine if this is a fast-track module signup
     const MODULE_MAP: Record<string, string> = {

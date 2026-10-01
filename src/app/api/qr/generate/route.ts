@@ -3,6 +3,7 @@ import QRCode from "qrcode"
 import { generateBrandedQRDataUrl } from "@/lib/branded-qr"
 import { db } from "@/lib/db"
 import { ok, err } from "@/lib/api"
+import { normalizePhone } from "@/lib/utils"
 
 export async function GET(req: NextRequest) {
   try {
@@ -51,7 +52,8 @@ export async function GET(req: NextRequest) {
       defaultTitle = reviewTitleMap[type] || "Google Reviews QR Standee"
     } else {
       // ─── Loyalty VIP WhatsApp Check-in QR ───────────────────
-      const merchantPhone = (merchant.whatsappPhone || "").replace(/[^0-9]/g, "")
+      // normalizePhone: last-line-of-defense — always ensures 91XXXXXXXXXX format
+      const merchantPhone = normalizePhone(merchant.whatsappPhone)
       if (!merchantPhone) return err("Merchant WhatsApp number not configured. Please configure WhatsApp number first.", 400)
 
       const bizName = merchant.name || "our store"

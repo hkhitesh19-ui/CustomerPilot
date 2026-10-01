@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { normalizePhone } from "@/lib/utils"
 import { cookies } from "next/headers"
 import { jwtVerify } from "jose"
 
@@ -84,14 +85,17 @@ export async function GET(req: Request) {
     const isConnected = state === "open"
     const ownerJid: string | null = instanceData?.ownerJid || null
 
-    // If now connected, save ownerJid phone to merchant DB
-    if (isConnected && ownerJid && !merchant.whatsappPhone) {
-      const phone = ownerJid.replace("@s.whatsapp.net", "").replace(/\D/g, "")
-      if (phone.length >= 10) {
+    // Always sync & normalise phone from ownerJid when connected.
+    // This corrects any stale/wrongly-formatted number (e.g. 10-digit without country code)
+    // that was saved at registration time — regardless of whether DB already has a value.
+    if (isConnected && ownerJid) {
+      const normalised = normalizePhone(ownerJid)
+      if (normalised && normalised !== merchant.whatsappPhone) {
         await db.merchant.update({
           where: { id: merchant.id },
-          data: { whatsappPhone: phone }
-        })
+          data: { whatsappPhone: normalised }
+        }).catch(e => console.error("[WhatsApp Status] Failed to sync phone:", e))
+        console.log(`[WhatsApp Status] ✅ Phone auto-corrected: ${merchant.whatsappPhone} → ${normalised}`)
       }
     }
 
