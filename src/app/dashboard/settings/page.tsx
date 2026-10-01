@@ -79,6 +79,31 @@ export default function SettingsPage() {
   }
 
   const handleSave = async () => {
+    if (!formData.name?.trim()) {
+      toast({
+        title: "Mandatory Field Missing",
+        description: "Please enter your Business Name.",
+        variant: "destructive",
+      })
+      return
+    }
+    if (!formData.businessType?.trim()) {
+      toast({
+        title: "Mandatory Field Missing",
+        description: "Please select your Business Type.",
+        variant: "destructive",
+      })
+      return
+    }
+    if (!formData.category?.trim()) {
+      toast({
+        title: "Mandatory Field Missing",
+        description: "Please enter your Category / Cuisine.",
+        variant: "destructive",
+      })
+      return
+    }
+
     setIsSaving(true)
     setSaveStatus("saving")
     try {
@@ -116,27 +141,11 @@ export default function SettingsPage() {
     <div className="space-y-8 w-full max-w-5xl mx-auto relative pb-16">
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950 -z-10 pointer-events-none" />
       
-      {/* ─── Header & Plan Pill ────────────────────────────────────────── */}
-      <div>
-        <div className="flex items-center gap-3 flex-wrap">
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">Settings &amp; Configuration</h1>
-          {isLoyaltyOnly ? (
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border border-indigo-500/30 flex items-center gap-1">
-              🎁 Digital Loyalty Stamps &amp; VIP Club
-            </span>
-          ) : isReviewsOnly ? (
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1">
-              ⭐ Smart Ai Google Reviews
-            </span>
-          ) : (
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-              🚀 CustomerPilot Complete : Loyalty + Reviews + AutoReply
-            </span>
-          )}
-        </div>
-        <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm mt-1.5 leading-relaxed">
-          Configure your business profile, Google Review QR Standees, and Digital Loyalty system.
-        </p>
+      {/* ─── Header ───────────────────────────────────────────────────── */}
+      <div className="pb-1">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+          Settings &amp; Configuration
+        </h1>
       </div>
 
       {/* ─── Mobile Quick-Jump Anchor Bar ───────────────────────────────── */}
@@ -165,7 +174,7 @@ export default function SettingsPage() {
             className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/40 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
           >
             <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-1.5 py-0.2 rounded">03</span>
-            <span>Loyalty Stamps</span>
+            <span>WhatsApp Connection</span>
           </a>
         )}
 
@@ -229,12 +238,13 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  <Store className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400"/> Business Name
+                  <Store className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400"/> Business Name <span className="text-rose-500 font-bold">*</span>
                 </Label>
                 <Input 
                   value={formData.name} 
                   onChange={(e) => handleChange("name", e.target.value)}
                   placeholder="E.g., Cake Connection"
+                  required
                   className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
                 />
               </div>
@@ -253,7 +263,7 @@ export default function SettingsPage() {
 
               <div className="space-y-1.5">
                 <Label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  <Tag className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400"/> Business Type
+                  <Tag className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400"/> Business Type <span className="text-rose-500 font-bold">*</span>
                 </Label>
                 <Select value={formData.businessType?.toUpperCase() || ""} onValueChange={(v) => handleChange("businessType", v)}>
                   <SelectTrigger className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm">
@@ -273,12 +283,13 @@ export default function SettingsPage() {
 
               <div className="space-y-1.5">
                 <Label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  <Globe className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400"/> Category / Cuisine
+                  <Globe className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400"/> Category / Cuisine <span className="text-rose-500 font-bold">*</span>
                 </Label>
                 <Input 
                   value={formData.category} 
                   onChange={(e) => handleChange("category", e.target.value)}
                   placeholder="E.g., Fresh Cakes, Italian Cuisine, Barber Shop"
+                  required
                   className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
                 />
               </div>
@@ -349,7 +360,7 @@ export default function SettingsPage() {
       )}
 
       {/* ══════════════════════════════════════════════════════════════════ */}
-      {/* SECTION 3: DIGITAL LOYALTY STAMPS & VIP CLUB                      */}
+      {/* SECTION 3: YOUR BUSINESS WHATSAPP CONNECTION                       */}
       {/* ══════════════════════════════════════════════════════════════════ */}
       {isLoyaltyEnabled && (
         <section id="sec-loyalty-club" className="space-y-4 pt-4">
@@ -360,11 +371,11 @@ export default function SettingsPage() {
               </span>
               <h2 className="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
                 <Gift className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
-                Digital Loyalty Stamps &amp; VIP Club
+                Your Business WhatsApp Connection
               </h2>
             </div>
             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
-              WhatsApp VIP Standees &amp; Stamp Rewards
+              WhatsApp Verification, QR Standees &amp; Stamp Rewards
             </span>
           </div>
 
@@ -436,11 +447,25 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-4">
+          {/* 4A: Win-Back & Retention Timers */}
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-md dark:shadow-lg space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-violet-600 dark:text-violet-300 bg-violet-500/10 px-2 py-0.5 rounded">STEP A</span>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-200">Customer Retention &amp; Win-Back Timers</h3>
+              </div>
+            </div>
             <AutomationTimerSettings merchantId={merchant?.id || ""} />
           </div>
 
+          {/* 4B: Message Templates */}
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-md dark:shadow-lg space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-violet-600 dark:text-violet-300 bg-violet-500/10 px-2 py-0.5 rounded">STEP B</span>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-200">Automated WhatsApp Journey Templates</h3>
+              </div>
+            </div>
             <WhatsAppJourneyTemplates merchantId={merchant?.id || ""} />
           </div>
         </div>

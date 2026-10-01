@@ -213,9 +213,6 @@ export function WhatsAppVerification({ merchantId }: { merchantId: string }) {
               </svg>
               WhatsApp Business Connection
             </CardTitle>
-            <CardDescription>
-              Connect your official store WhatsApp number to send automated digital stamp cards, AI review requests, and reward notifications.
-            </CardDescription>
           </div>
           <div>
             {isVerified ? (

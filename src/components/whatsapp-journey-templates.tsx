@@ -108,24 +108,24 @@ function TemplateCard({ template, merchantId }: { template: Template; merchantId
   }
 
   return (
-    <div className={`border rounded-xl transition-all duration-200 ${expanded ? "border-slate-600 bg-slate-900/80" : "border-slate-800 bg-slate-900/40 hover:border-slate-700"}`}>
+    <div className={`border rounded-xl transition-all duration-200 ${expanded ? "border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/80 shadow-sm" : "border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-white dark:hover:bg-slate-800/40"}`}>
       <button
         onClick={() => { setExpanded(e => !e); setEditing(false); setDraft(currentBody) }}
         className="w-full text-left p-4 flex items-start gap-3"
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
-            <span className="font-semibold text-slate-200 text-sm">{template.templateName}</span>
+            <span className="font-semibold text-slate-900 dark:text-slate-200 text-sm">{template.templateName}</span>
             <Badge variant="outline" className={`text-[10px] px-2 py-0 border ${cat.color}`}>
               {cat.emoji} {cat.label}
             </Badge>
             {isCustomized && (
-              <Badge variant="outline" className="text-[10px] px-2 py-0 border bg-indigo-500/10 text-indigo-400 border-indigo-500/20">
+              <Badge variant="outline" className="text-[10px] px-2 py-0 border bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/20">
                 ✏️ Customized
               </Badge>
             )}
           </div>
-          <p className="text-[11px] text-slate-500 leading-relaxed">{template.triggerEvent}</p>
+          <p className="text-[11px] text-slate-600 dark:text-slate-500 leading-relaxed">{template.triggerEvent}</p>
         </div>
         <div className="flex-shrink-0 mt-0.5 text-slate-500">
           {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -133,12 +133,12 @@ function TemplateCard({ template, merchantId }: { template: Template; merchantId
       </button>
 
       {expanded && (
-        <div className="px-4 pb-4 space-y-3 border-t border-slate-800 pt-3">
+        <div className="px-4 pb-4 space-y-3 border-t border-slate-200 dark:border-slate-800 pt-3">
           {vars.length > 0 && (
             <div className="flex flex-wrap gap-1.5 items-center">
-              <span className="text-[10px] text-slate-500 font-medium">Variables:</span>
+              <span className="text-[10px] text-slate-600 dark:text-slate-500 font-medium">Variables:</span>
               {vars.map((v: string) => (
-                <span key={v} className="bg-emerald-500/10 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-mono border border-emerald-500/20">
+                <span key={v} className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-mono border border-emerald-200 dark:border-emerald-500/20">
                   {`{{${v}}}`}
                 </span>
               ))}
@@ -146,12 +146,12 @@ function TemplateCard({ template, merchantId }: { template: Template; merchantId
           )}
 
           {!editing ? (
-            <div className="bg-slate-950/60 rounded-lg p-3 border border-slate-800 text-xs text-slate-300 leading-relaxed whitespace-pre-wrap font-mono">
+            <div className="bg-white dark:bg-slate-950/60 rounded-lg p-3 border border-slate-200 dark:border-slate-800 text-xs text-slate-800 dark:text-slate-300 leading-relaxed whitespace-pre-wrap font-mono shadow-inner">
               {highlightVariables(currentBody)}
             </div>
           ) : (
             <textarea
-              className="w-full bg-slate-950/80 border border-indigo-500/40 rounded-lg p-3 text-xs text-slate-200 font-mono leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500/60"
+              className="w-full bg-white dark:bg-slate-950/80 border border-indigo-300 dark:border-indigo-500/40 rounded-lg p-3 text-xs text-slate-900 dark:text-slate-200 font-mono leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500/60 shadow-inner"
               rows={10}
               value={draft}
               onChange={e => setDraft(e.target.value)}
@@ -239,24 +239,24 @@ export function WhatsAppJourneyTemplates({ merchantId }: { merchantId: string })
   const customizedCount = templates.filter(t => t.isCustomized).length
 
   return (
-    <Card className="border-slate-800 bg-slate-900/30">
+    <Card className="border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/30">
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <CardTitle className="flex items-center gap-2 text-slate-200">
-              <div className="w-8 h-8 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-center justify-center">
-                <MessageSquare className="w-4 h-4 text-emerald-400" />
+            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-slate-200">
+              <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-lg flex items-center justify-center">
+                <MessageSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               </div>
               WhatsApp Journey Templates
             </CardTitle>
-            <p className="text-xs text-slate-500 mt-1.5 leading-relaxed max-w-xl">
+            <p className="text-xs text-slate-600 dark:text-slate-500 mt-1.5 leading-relaxed max-w-xl">
               These are the WhatsApp messages automatically sent to customers at each stage of their loyalty journey. Customize them to match your brand voice.
             </p>
           </div>
           <div className="flex-shrink-0 flex flex-col items-end gap-1">
             <span className="text-xs text-slate-500">{templates.length} Templates</span>
             {customizedCount > 0 && (
-              <span className="text-xs bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full px-2 py-0.5">
+              <span className="text-xs bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 rounded-full px-2 py-0.5">
                 ✏️ {customizedCount} Customized
               </span>
             )}
@@ -267,9 +267,9 @@ export function WhatsAppJourneyTemplates({ merchantId }: { merchantId: string })
       <CardContent className="space-y-6">
         {GROUP_ORDER.filter(g => grouped[g]?.length).map(groupKey => (
           <div key={groupKey} className="space-y-2">
-            <div className="flex items-center gap-2 pb-1 border-b border-slate-800/60">
-              <span className="text-xs font-semibold text-slate-400">{GROUP_LABELS[groupKey]}</span>
-              <span className="text-[10px] bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded-full ml-auto">
+            <div className="flex items-center gap-2 pb-1 border-b border-slate-200 dark:border-slate-800/60">
+              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{GROUP_LABELS[groupKey]}</span>
+              <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded-full ml-auto">
                 {grouped[groupKey].length}
               </span>
             </div>

@@ -179,117 +179,17 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
       <CardContent>
         <form onSubmit={handleSave} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="card-name">Card Title</Label>
-              <Input
-                id="card-name"
-                value={form.name ?? ""}
-                onChange={e => setForm({ ...form, name: e.target.value })}
-                placeholder="e.g. VIP Club Card"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="reward-name">Reward Description</Label>
-              <Input
-                id="reward-name"
-                value={form.rewardName ?? ""}
-                onChange={e => setForm({ ...form, rewardName: e.target.value })}
-                placeholder="e.g. FREE 500gm Cake"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="stamp-val">Eligible Minimum Purchase Amount for Loyalty stamp</Label>
-              <div className="relative">
-                <span className="absolute left-3 top-2.5 text-muted-foreground text-sm">₹</span>
-                <Input
-                  id="stamp-val"
-                  type="number"
-                  className="pl-7"
-                  value={form.stampValue ?? 500}
-                  onChange={e => setForm({ ...form, stampValue: Number(e.target.value) })}
-                  required
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">Every ₹{form.stampValue || 500} spent = 1 Stamp</p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="stamps-req">Stamp Goal (Stamps for Reward)</Label>
-              <Input
-                id="stamps-req"
-                type="number"
-                value={form.stampsRequired ?? 10}
-                onChange={e => setForm({ ...form, stampsRequired: Number(e.target.value) })}
-                required
-              />
-              <p className="text-xs text-muted-foreground">{form.stampsRequired || 10} Stamps needed for 1 {form.rewardName || 'Reward'}</p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="validity">Validity( in Days) [ Maximum Time Duration to Earn Reward]</Label>
-              <Input
-                id="validity"
-                type="number"
-                value={form.validityDays ?? 90}
-                onChange={e => setForm({ ...form, validityDays: Number(e.target.value) })}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="theme-color">Card Theme Color</Label>
-              <div className="flex gap-2 items-center">
-                <input
-                  type="color"
-                  id="theme-color"
-                  value={form.color ?? "#6366f1"}
-                  onChange={e => setForm({ ...form, color: e.target.value })}
-                  className="w-10 h-10 rounded cursor-pointer border"
-                />
-                <Input
-                  value={form.color ?? "#6366f1"}
-                  onChange={e => setForm({ ...form, color: e.target.value })}
-                  className="font-mono"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="google-bonus">Google Review Bonus Stamps</Label>
-              <Input
-                id="google-bonus"
-                type="number"
-                value={form.googleReviewBonus ?? 0}
-                onChange={e => setForm({ ...form, googleReviewBonus: Number(e.target.value) })}
-              />
-              <p className="text-xs text-muted-foreground">Bonus stamps awarded when a customer posts a 5-star Google review</p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="photo-bonus">Photo Review Bonus Stamps</Label>
-              <Input
-                id="photo-bonus"
-                type="number"
-                value={form.photoBonus ?? 0}
-                onChange={e => setForm({ ...form, photoBonus: Number(e.target.value) })}
-              />
-              <p className="text-xs text-muted-foreground">Extra bonus stamps if they attach a photo with their review</p>
-            </div>
-
-            <div className="space-y-2 col-span-1 md:col-span-2 p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-3">
+            {/* ── Joining Bonus Stamps moved to TOP ── */}
+            <div className="col-span-1 md:col-span-2 p-4 sm:p-5 bg-emerald-50/50 dark:bg-slate-950/60 border border-emerald-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-emerald-400" />
-                  <Label htmlFor="joining-bonus" className="font-semibold text-slate-200">
+                  <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <Label htmlFor="joining-bonus" className="font-bold text-sm text-slate-900 dark:text-slate-100">
                     Joining Bonus Stamps (First Time Scan)
                   </Label>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${form.joiningBonusEnabled ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${form.joiningBonusEnabled ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/20' : 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-500/20'}`}>
                     {form.joiningBonusEnabled ? `ACTIVE (+${form.joiningBonusStamps ?? 2} Stamps on Join)` : "DEACTIVATED"}
                   </span>
                   <Switch
@@ -301,7 +201,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
                 <div className="sm:col-span-2">
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                     Automatically award advance bonus stamps to NEW customers when they scan the QR code and join the loyalty program for the first time.
                   </p>
                 </div>
@@ -314,22 +214,129 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                     disabled={!form.joiningBonusEnabled}
                     value={form.joiningBonusStamps ?? 2}
                     onChange={e => setForm({ ...form, joiningBonusStamps: Math.max(1, Number(e.target.value)) })}
-                    className="bg-slate-900 border-slate-700 text-slate-100"
+                    className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="space-y-2 col-span-1 md:col-span-2 p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor="card-name" className="text-xs font-semibold text-slate-700 dark:text-slate-300">Card Title</Label>
+              <Input
+                id="card-name"
+                value={form.name ?? ""}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                placeholder="e.g. VIP Club Card"
+                className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="reward-name" className="text-xs font-semibold text-slate-700 dark:text-slate-300">Reward Description</Label>
+              <Input
+                id="reward-name"
+                value={form.rewardName ?? ""}
+                onChange={e => setForm({ ...form, rewardName: e.target.value })}
+                placeholder="e.g. FREE 500gm Cake"
+                className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="stamp-val" className="text-xs font-semibold text-slate-700 dark:text-slate-300">Eligible Minimum Purchase Amount for Loyalty stamp</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-2.5 text-muted-foreground text-sm">₹</span>
+                <Input
+                  id="stamp-val"
+                  type="number"
+                  className="pl-7 bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+                  value={form.stampValue ?? 500}
+                  onChange={e => setForm({ ...form, stampValue: Number(e.target.value) })}
+                  required
+                />
+              </div>
+              <p className="text-[11px] text-muted-foreground">Every ₹{form.stampValue || 500} spent = 1 Stamp</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="stamps-req" className="text-xs font-semibold text-slate-700 dark:text-slate-300">Stamp Goal (Stamps for Reward)</Label>
+              <Input
+                id="stamps-req"
+                type="number"
+                value={form.stampsRequired ?? 10}
+                onChange={e => setForm({ ...form, stampsRequired: Number(e.target.value) })}
+                className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+                required
+              />
+              <p className="text-[11px] text-muted-foreground">{form.stampsRequired || 10} Stamps needed for 1 {form.rewardName || 'Reward'}</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="validity" className="text-xs font-semibold text-slate-700 dark:text-slate-300">Validity (in Days) [Maximum Time Duration to Earn Reward]</Label>
+              <Input
+                id="validity"
+                type="number"
+                value={form.validityDays ?? 90}
+                onChange={e => setForm({ ...form, validityDays: Number(e.target.value) })}
+                className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="theme-color" className="text-xs font-semibold text-slate-700 dark:text-slate-300">Card Theme Color</Label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="color"
+                  id="theme-color"
+                  value={form.color ?? "#6366f1"}
+                  onChange={e => setForm({ ...form, color: e.target.value })}
+                  className="w-10 h-10 rounded-xl cursor-pointer border border-slate-200 dark:border-slate-700"
+                />
+                <Input
+                  value={form.color ?? "#6366f1"}
+                  onChange={e => setForm({ ...form, color: e.target.value })}
+                  className="font-mono bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="google-bonus" className="text-xs font-semibold text-slate-700 dark:text-slate-300">Google Review Bonus Stamps</Label>
+              <Input
+                id="google-bonus"
+                type="number"
+                value={form.googleReviewBonus ?? 0}
+                onChange={e => setForm({ ...form, googleReviewBonus: Number(e.target.value) })}
+                className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+              />
+              <p className="text-[11px] text-muted-foreground">Bonus stamps awarded when a customer posts a 5-star Google review</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="photo-bonus" className="text-xs font-semibold text-slate-700 dark:text-slate-300">Photo Review Bonus Stamps</Label>
+              <Input
+                id="photo-bonus"
+                type="number"
+                value={form.photoBonus ?? 0}
+                onChange={e => setForm({ ...form, photoBonus: Number(e.target.value) })}
+                className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+              />
+              <p className="text-[11px] text-muted-foreground">Extra bonus stamps if they attach a photo with their review</p>
+            </div>
+
+            <div className="col-span-1 md:col-span-2 p-4 sm:p-5 bg-amber-50/50 dark:bg-slate-950/60 border border-amber-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  <Label htmlFor="vip-upgrade-bonus" className="font-semibold text-slate-200">
+                  <Sparkles className="w-4 h-4 text-amber-500" />
+                  <Label htmlFor="vip-upgrade-bonus" className="font-bold text-sm text-slate-900 dark:text-slate-100">
                     Next Level Kickstart Bonus Stamps (Level Completion Bonus)
                   </Label>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${(form.vipUpgradeBonusStamps ?? 0) > 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${(form.vipUpgradeBonusStamps ?? 0) > 0 ? 'bg-amber-100 dark:bg-emerald-500/10 text-amber-800 dark:text-emerald-400 border-amber-300 dark:border-emerald-500/20' : 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-500/20'}`}>
                     {(form.vipUpgradeBonusStamps ?? 0) > 0 ? `ACTIVE (+${form.vipUpgradeBonusStamps ?? 0} Stamp on Next Level)` : "DEACTIVATED (0 Stamps)"}
                   </span>
                   <Switch
@@ -341,9 +348,8 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
                 <div className="sm:col-span-2">
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                     Advance bonus stamps pre-credited when a customer completes their previous level/card and unlocks the next loyalty level (e.g. Level 1 complete → Level 2 starts with pre-added bonus stamps).
-                    Toggle OFF or set to <strong>0</strong> to start new levels at 0 stamps.
                   </p>
                 </div>
                 <div>
@@ -354,21 +360,11 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                     max="10"
                     value={form.vipUpgradeBonusStamps ?? 0}
                     onChange={e => setForm({ ...form, vipUpgradeBonusStamps: Math.max(0, Number(e.target.value)) })}
-                    className="bg-slate-900 border-slate-700 text-slate-100"
+                    className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl"
                   />
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="excluded-cat">Excluded Categories (Comma Separated)</Label>
-            <Input
-              id="excluded-cat"
-              value={form.excludedCategories ?? ""}
-              onChange={e => setForm({ ...form, excludedCategories: e.target.value })}
-              placeholder="e.g. Cigarettes, Alcohol, Discounted Items"
-            />
           </div>
 
 

@@ -37,6 +37,20 @@ try:
 
     print(f"Downloading {REMOTE_DB_PATH} -> {LOCAL_BACKUP_PATH} ...")
     sftp.get(REMOTE_DB_PATH, LOCAL_BACKUP_PATH)
+    
+    # Also fetch WAL and SHM files if they exist to get latest live data
+    try:
+        sftp.get(REMOTE_DB_PATH + "-wal", LOCAL_BACKUP_PATH + "-wal")
+        print("Downloaded -wal file successfully.")
+    except Exception as e:
+        print("No -wal file found or couldn't download.")
+        
+    try:
+        sftp.get(REMOTE_DB_PATH + "-shm", LOCAL_BACKUP_PATH + "-shm")
+        print("Downloaded -shm file successfully.")
+    except Exception as e:
+        print("No -shm file found or couldn't download.")
+
     print("Download complete!")
 
     sftp.close()
@@ -132,7 +146,7 @@ try:
     conn.close()
 
     # Step 3: Atomic copy to dev.db
-    # VERY IMPORTANT: Delete existing WAL and SHM files to prevent "database disk image is malformed"
+    # Delete existing WAL and SHM files to prevent "database disk image is malformed"
     wal_path = LOCAL_DB_PATH + "-wal"
     shm_path = LOCAL_DB_PATH + "-shm"
     if os.path.exists(wal_path):
@@ -143,6 +157,11 @@ try:
         except: pass
 
     shutil.copy2(LOCAL_BACKUP_PATH, LOCAL_DB_PATH)
+    if os.path.exists(LOCAL_BACKUP_PATH + "-wal"):
+        shutil.copy2(LOCAL_BACKUP_PATH + "-wal", wal_path)
+    if os.path.exists(LOCAL_BACKUP_PATH + "-shm"):
+        shutil.copy2(LOCAL_BACKUP_PATH + "-shm", shm_path)
+        
     print(f"\n✅ SUCCESS! Synced {merchant_count} merchants from Live VPS to local dev.db.")
     sys.exit(0)
 

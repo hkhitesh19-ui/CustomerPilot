@@ -205,18 +205,18 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
   }
 
   return (
-    <Card className="bg-slate-900/60 border-amber-500/30 backdrop-blur-xl shadow-2xl relative overflow-hidden">
+    <Card className="bg-white/80 dark:bg-slate-900/60 border-amber-500/30 backdrop-blur-xl shadow-2xl relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500" />
-      <CardHeader className="bg-slate-900/40 border-b border-slate-800/60">
+      <CardHeader className="bg-amber-50/50 dark:bg-slate-900/40 border-b border-amber-100 dark:border-slate-800/60">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <CardTitle className="text-slate-200 flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <CardTitle className="text-slate-900 dark:text-slate-200 flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                 <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
               </div>
               Ai Drafted SEO Optimized Google Reviews QR Standee &amp; Posters
             </CardTitle>
-            <CardDescription className="text-slate-400 mt-1">
+            <CardDescription className="text-slate-600 dark:text-slate-400 mt-1">
               Dedicated QR Code for collecting 5-Star Google Reviews — Increase GoogleReviews Very Fast.
             </CardDescription>
           </div>
@@ -226,7 +226,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
               size="sm"
               onClick={handleCopyLink}
               disabled={loading || !qrData?.targetUrl}
-              className="border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs"
+              className="border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs"
             >
               {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
               {copied ? "Copied Link" : "Copy Review Link"}
@@ -313,32 +313,22 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
           {/* Live Preview Standee Card */}
           <div className="lg:col-span-5 flex flex-col items-center justify-center">
             <div className="w-full max-w-[280px] bg-white text-slate-900 rounded-3xl p-5 shadow-2xl border-4 border-amber-400 text-center relative">
-              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider mb-2">
-                ★★★★★ Google Reviews
-              </div>
-              <h4 className="font-extrabold text-sm text-slate-900 truncate">
+              <h4 className="font-extrabold text-base text-slate-900 truncate mb-3">
                 {qrData?.merchant?.name || placeName || "Your Business"}
               </h4>
-              <p className="text-[11px] text-slate-500 font-medium mb-3">
-                Scan to leave a 5-star review in 10s
-              </p>
 
               <div className="p-3 bg-slate-50 rounded-2xl border-2 border-slate-200 inline-block shadow-inner">
                 {loading ? (
-                  <div className="w-40 h-40 flex items-center justify-center">
+                  <div className="w-44 h-44 flex items-center justify-center">
                     <RefreshCw className="w-6 h-6 animate-spin text-amber-500" />
                   </div>
                 ) : qrData?.qrDataUrl ? (
-                  <img src={qrData.qrDataUrl} alt="Google Review QR" className="w-40 h-40 object-contain mx-auto" />
+                  <img src={qrData.qrDataUrl} alt="Google Review QR" className="w-44 h-44 object-contain mx-auto" />
                 ) : (
-                  <div className="w-40 h-40 flex items-center justify-center text-xs text-slate-400">
+                  <div className="w-44 h-44 flex items-center justify-center text-xs text-slate-400">
                     QR Unavailable
                   </div>
                 )}
-              </div>
-
-              <div className="mt-3 p-2 bg-amber-50 rounded-xl border border-amber-200 text-[10px] font-bold text-amber-900">
-                ✨ Instant AI Review Assistant
               </div>
             </div>
           </div>

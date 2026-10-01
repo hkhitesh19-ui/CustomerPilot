@@ -2133,3 +2133,27 @@ pm install, leaving null bytes in binaries and corrupting the npm cache. Network
 - **Resolution**: Completely wiped 
 ode_modules and .next cache. Switched npm registry to mirror to bypass timeouts. Reinstalled dependencies cleanly. Manually reinstalled and mapped the missing lightningcss-win32-x64-msvc binary to the correct expected path.
 - **Status**: ? Resolved and Verified.
+
+---
+## [01 Oct 2026] Issue: VPS Sync Missing Latest Data due to SQLite WAL
+- **Symptom**: The local dev.db did not reflect the most recent data from the live website after syncing.
+- **Root Cause**: SQLite in production uses Write-Ahead Logging (WAL). Recent writes were cached in .next/standalone/prisma/prisma/dev.db-wal instead of the main dev.db file. The sync script only downloaded dev.db, completely ignoring the pending transactions.
+- **Resolution**: Updated scripts/sync_vps_db.py to also download dev.db-wal and dev.db-shm from the VPS. The files are then copied alongside the local dev.db during the atomic copy phase, allowing SQLite to properly reconstruct the latest data.
+- **Status**: ? Resolved and Verified.
+
+---
+## [01 Oct 2026] Issue: WhatsApp QR link - Invalid phone number error for Digimax Album
+- **Symptom**: Customer scanned Digimax Album's WhatsApp VIP QR standee. Link opened wa.me/9404800921 and WhatsApp showed error: '+944800921 is not a valid phone number'
+- **Root Cause**: Multi-layer failure:
+  1. Digimax Album registered without a phone number (whatsappPhone = NULL in VPS DB)
+  2. Status route had a bug: it only saved phone from ownerJid when DB was empty (!merchant.whatsappPhone guard) - but for stale/wrong numbers it never self-corrected
+  3. QR route used raw .replace(/[^0-9]/g, '') which cannot fix a missing country code
+  4. Additionally M/S DEEP PHARMACY had 8103155769 (10-digit) stored instead of 918103155769
+- **Resolution**:
+  1. Created normalizePhone() utility in src/lib/utils.ts (single source of truth for all phone normalisation)
+  2. Fixed /api/whatsapp/status/route.ts - now ALWAYS syncs ownerJid from Evolution API when connected, regardless of existing DB value
+  3. Fixed /api/qr/generate/route.ts - uses normalizePhone() as last-line-of-defense before building wa.me URL
+  4. Fixed /api/auth/register/route.ts - normalizes phone at DB entry point
+  5. Ran direct Python3 sqlite3 fix on VPS DB to correct M/S DEEP PHARMACY phone
+  6. Digimax Album will auto-fix next time they open Settings (ownerJid sync will trigger)
+- **Status**: Resolved and Verified.

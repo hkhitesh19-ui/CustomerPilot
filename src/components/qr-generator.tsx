@@ -182,11 +182,11 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
   return (
     <Card className="border-border">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-indigo-300">
-          <QrCode className="w-5 h-5 text-indigo-400" />
+        <CardTitle className="flex items-center gap-2 text-indigo-600 dark:text-indigo-300">
+          <QrCode className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
           WhatsApp VIP Loyalty &amp; Stamp Check-in QR Standee
         </CardTitle>
-        <CardDescription className="text-slate-400">
+        <CardDescription className="text-slate-600 dark:text-slate-400">
           Generate and print your WhatsApp VIP Club QR code for customer check-ins, collecting stamps, and claiming rewards at checkout.
         </CardDescription>
       </CardHeader>
@@ -243,9 +243,6 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
               ) : qrData?.qrDataUrl ? (
                 <img src={qrData.qrDataUrl} alt="Store QR Code" className="w-48 h-48 rounded-lg mx-auto" />
               ) : null}
-              <p className="text-[11px] font-bold text-indigo-700 mt-2 tracking-wide uppercase">
-                📲 Scan with WhatsApp Camera
-              </p>
             </div>
 
             {/* Loyalty Benefit Pill */}
