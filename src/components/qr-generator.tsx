@@ -4,83 +4,816 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { QrCode, Download, RefreshCw, Printer, Sparkles, CheckCircle2, ZoomIn, ExternalLink } from "lucide-react"
+import { QrCode, Download, RefreshCw, Printer, Sparkles, CheckCircle2, ZoomIn, Layers } from "lucide-react"
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Industry Categories & Adaptation Themes
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+export type IndustryCategoryId = "bakery" | "dining" | "retail" | "salon" | "pharmacy" | "auto" | "general"
+export type StandeeDesignId = "bakery" | "royal" | "celebration"
+
+export interface PerkItem {
+  icon: string
+  title: string
+  desc: string
+}
+
+export interface IndustryConfig {
+  id: IndustryCategoryId
+  label: string
+  icon: string
+  subtitle: string
+  tagline: string
+  badgeText: string
+  primary: string
+  secondary: string
+  accent: string
+  cardBg: string
+  perks: [PerkItem, PerkItem, PerkItem, PerkItem]
+  option1Title: string
+  option1Badge: string
+  option1Highlight: string
+}
+
+export const INDUSTRY_CONFIGS: Record<IndustryCategoryId, IndustryConfig> = {
+  bakery: {
+    id: "bakery",
+    label: "Bakery & Desserts",
+    icon: "🎂",
+    subtitle: "Artisanal Cakes, Fresh Bakes & Confectionery",
+    tagline: "FRESH BAKES, PASTRIES & SWEET CELEBRATIONS",
+    badgeText: "🎂 VIP CAKE LOVERS CLUB",
+    primary: "#7f1d1d", // ruby crimson
+    secondary: "#991b1b",
+    accent: "#b45309", // warm gold
+    cardBg: "#fffbeb",
+    perks: [
+      { icon: "🪙", title: "1 Stamp Every ₹300+", desc: "Collect stamps to unlock free bakery delights" },
+      { icon: "🎁", title: "Instant Welcome Treat", desc: "Special sweet discount coupon on your first visit" },
+      { icon: "🎂", title: "Free Birthday Cake", desc: "Complimentary handcrafted cake on your birthday" },
+      { icon: "⭐", title: "5% VIP Store Credit", desc: "Automatic loyalty balance credited on every order" },
+    ],
+    option1Title: "Artisanal Bakery & Cake Studio",
+    option1Badge: "🎂 Artisanal Bakery & Cake Studio",
+    option1Highlight: "Photorealistic Chocolate Drip Cake with Cherries + Golden Crown & Brush Badge",
+  },
+  dining: {
+    id: "dining",
+    label: "Cafe & Dining",
+    icon: "☕",
+    subtitle: "Gourmet Coffee, Bistro & Artisanal Dining",
+    tagline: "GOURMET COFFEE, BISTRO & ARTISANAL DINING",
+    badgeText: "☕ ARTISANAL CAFE & DINING CLUB",
+    primary: "#451a03", // rich espresso
+    secondary: "#78350f",
+    accent: "#d97706", // warm amber
+    cardBg: "#fffbeb",
+    perks: [
+      { icon: "🪙", title: "1 Stamp on Every Visit", desc: "Earn loyalty stamps with every beverage & meal" },
+      { icon: "☕", title: "Free Beverage on 5th Visit", desc: "Complimentary handcrafted coffee or mocktail" },
+      { icon: "🍕", title: "Birthday Dining Treat", desc: "Celebrate with special chef dessert on your birthday" },
+      { icon: "⚡", title: "Priority Table & 10% Off", desc: "Skip the queue with instant VIP counter privileges" },
+    ],
+    option1Title: "Artisanal Cafe & Bistro Lounge",
+    option1Badge: "☕ Artisanal Cafe & Bistro Lounge",
+    option1Highlight: "Warm Roasted Espresso & Rich Timber Aesthetics with Counter Presentation",
+  },
+  retail: {
+    id: "retail",
+    label: "Retail & Fashion",
+    icon: "🛍️",
+    subtitle: "Apparel, Boutiques, Supermarkets & Jewelry",
+    tagline: "EXCLUSIVE PRIVILEGE MEMBERSHIP & REWARDS",
+    badgeText: "🛍️ VIP SHOPPERS CLUB",
+    primary: "#0f2942", // sapphire navy
+    secondary: "#1e3a8a",
+    accent: "#d97706", // gold amber
+    cardBg: "#f8fafc",
+    perks: [
+      { icon: "🪙", title: "1 Stamp Every ₹1000", desc: "Accumulate stamps towards massive bill discounts" },
+      { icon: "🏷️", title: "Instant ₹100 Off Today", desc: "Applied directly to your billing counter invoice" },
+      { icon: "🎉", title: "Birthday VIP Hamper", desc: "Exclusive luxury gift box on your special month" },
+      { icon: "💎", title: "Early Sale Previews", desc: "Shop seasonal collections 48 hours before the public" },
+    ],
+    option1Title: "Luxury Retail & Fashion Boutique",
+    option1Badge: "🛍️ Luxury Retail & Fashion Boutique",
+    option1Highlight: "High-Fashion Editorial Style with Metallic Accents & Premium Pedestal",
+  },
+  salon: {
+    id: "salon",
+    label: "Salon & Wellness",
+    icon: "💇",
+    subtitle: "Hair Studios, Beauty Parlours, Spas & Grooming",
+    tagline: "LUXURY BEAUTY, GROOMING & SPA PRIVILEGES",
+    badgeText: "✨ VIP BEAUTY & SPA CLUB",
+    primary: "#4a044e", // deep velvet plum
+    secondary: "#701a75",
+    accent: "#e11d48", // rose gold
+    cardBg: "#fff1f2",
+    perks: [
+      { icon: "🪙", title: "1 Stamp Every Visit", desc: "Redeem for premium hair & skin therapy sessions" },
+      { icon: "💆", title: "Free Head Massage", desc: "Complimentary relaxing treatment on your 4th service" },
+      { icon: "🎂", title: "Birthday Glow Voucher", desc: "Free salon upgrade during your birthday week" },
+      { icon: "✨", title: "Priority VIP Booking", desc: "Direct WhatsApp concierge for instant appointments" },
+    ],
+    option1Title: "Luxury Salon & Aesthetics Studio",
+    option1Badge: "💇 Luxury Salon & Aesthetics Studio",
+    option1Highlight: "Blossom Rose Gold & Velvet Plum with High-Gloss Acrylic Finish",
+  },
+  pharmacy: {
+    id: "pharmacy",
+    label: "Pharmacy & Health",
+    icon: "💊",
+    subtitle: "Chemists, Clinics, Diagnostics & Healthcare",
+    tagline: "TRUSTED HEALTHCARE & WELLNESS ADVANTAGE",
+    badgeText: "🌿 WELLNESS CARE PRIVILEGE",
+    primary: "#064e3b", // emerald
+    secondary: "#047857",
+    accent: "#0d9488", // teal
+    cardBg: "#f0fdf4",
+    perks: [
+      { icon: "🪙", title: "1 Point per ₹100", desc: "Redeem against prescription & OTC healthcare products" },
+      { icon: "📦", title: "Free Home Delivery", desc: "Zero delivery fees on all regular monthly orders" },
+      { icon: "🩺", title: "Quarterly Health Screen", desc: "Complimentary blood pressure, sugar & BMI checks" },
+      { icon: "⚡", title: "10% Off Wellness Brands", desc: "Exclusive savings on vitamins & nutritional supplements" },
+    ],
+    option1Title: "Trusted Pharmacy & Wellness Care",
+    option1Badge: "💊 Trusted Pharmacy & Wellness Care",
+    option1Highlight: "Clean Emerald Forest & Medical Cross Branding with Pristine Counter Clarity",
+  },
+  auto: {
+    id: "auto",
+    label: "Auto & Services",
+    icon: "🚗",
+    subtitle: "Car Detailing, Garages, Repair & Hardware",
+    tagline: "PREMIUM VEHICLE CARE & SERVICE REWARDS",
+    badgeText: "🛠️ ELITE DRIVERS PRIVILEGE",
+    primary: "#0f172a", // carbon slate
+    secondary: "#1e293b",
+    accent: "#2563eb", // cobalt blue
+    cardBg: "#f1f5f9",
+    perks: [
+      { icon: "🪙", title: "1 Stamp per Service Visit", desc: "Unlock free premium foam wash & tyre rotation" },
+      { icon: "🚗", title: "Free 15-Point Inspection", desc: "Complete safety diagnostic before long highway road trips" },
+      { icon: "🛠️", title: "Flat ₹500 Off Next Service", desc: "Applied instantly at billing counter on routine service" },
+      { icon: "⚡", title: "24/7 Breakdown Help", desc: "Priority emergency WhatsApp roadside support assistance" },
+    ],
+    option1Title: "Elite Auto Care & Service Garage",
+    option1Badge: "🚗 Elite Auto Care & Service Garage",
+    option1Highlight: "Titanium Slate & Electric Cobalt with Heavy-Duty Clear Acrylic Base",
+  },
+  general: {
+    id: "general",
+    label: "Universal VIP Club",
+    icon: "⭐",
+    subtitle: "Corporate, Commercial & Universal Businesses",
+    tagline: "EXCLUSIVE PRIVILEGE MEMBERSHIP & REWARDS",
+    badgeText: "⭐ VIP MEMBER CLUB",
+    primary: "#09090b", // onyx black
+    secondary: "#18181b",
+    accent: "#f59e0b", // amber gold
+    cardBg: "#fafafa",
+    perks: [
+      { icon: "🪙", title: "1 Stamp on Every Visit", desc: "Zero minimum spend to collect stamps on every billing" },
+      { icon: "🎁", title: "Instant Welcome Reward", desc: "Special member voucher on your very first scan" },
+      { icon: "🎉", title: "Birthday Member Surprise", desc: "Celebrate your special day with exclusive gift treats" },
+      { icon: "💎", title: "VIP Customer Concierge", desc: "Dedicated priority support and instant rewards tracking" },
+    ],
+    option1Title: "Modern Onyx & Gold VIP Standee",
+    option1Badge: "⭐ Modern Onyx & Gold VIP Standee",
+    option1Highlight: "Polished Minimalist Onyx & Brushed Brass with Scannable High-Contrast QR",
+  },
+}
 
 /* ─────────────────────────────────────────────────────────────────────────────
  * Standee Design Options (Photorealistic Designer Standees)
  * ─────────────────────────────────────────────────────────────────────────── */
-
-export type StandeeDesignId = "bakery" | "royal" | "celebration"
 
 interface StandeeOption {
   id: StandeeDesignId
   number: string
   title: string
   badgeLabel: string
-  categoryHint: string
   palette: string
   keyHighlight: string
+  primaryColor: string
+  secondaryColor: string
+  accentColor: string
+  cardBg: string
 }
 
-const STANDEE_OPTIONS: Record<StandeeDesignId, StandeeOption> = {
+export const STANDEE_BASE_OPTIONS: Record<StandeeDesignId, StandeeOption> = {
   bakery: {
     id: "bakery",
     number: "Option 1",
-    title: "Artisanal Bakery & Cake Studio",
-    badgeLabel: "🎂 Artisanal Bakery & Cake Studio",
-    categoryHint: "Ruby Crimson & Warm Gold with Signature Chocolate Cake & Cherries",
-    palette: "Ruby Crimson & Warm Gold",
-    keyHighlight: "Photorealistic Chocolate Drip Cake with Cherries + Golden Crown & Brush Badge",
+    title: "Industry Signature Standee",
+    badgeLabel: "🎨 Industry Signature Design",
+    palette: "Industry Tailored Colors",
+    keyHighlight: "Curated specifically to your store's business category & aesthetic",
+    primaryColor: "#7f1d1d",
+    secondaryColor: "#991b1b",
+    accentColor: "#b45309",
+    cardBg: "#fffbeb",
   },
   royal: {
     id: "royal",
     number: "Option 2",
     title: "Royal Sapphire & Gold VIP Club",
     badgeLabel: "👑 Royal Sapphire & Gold VIP Club",
-    categoryHint: "Royal Sapphire Blue & Amber Gold with French Macarons & Tiered Cake",
     palette: "Royal Sapphire Blue & Amber",
-    keyHighlight: "Tiered Luxury Velvet Cake & French Macarons + Gold VIP Medallion",
+    keyHighlight: "Tiered Luxury Velvet Theme & Royal Gold Medallion with VIP Status",
+    primaryColor: "#0f2942",
+    secondaryColor: "#1e3a8a",
+    accentColor: "#d97706",
+    cardBg: "#f8fafc",
   },
   celebration: {
     id: "celebration",
     number: "Option 3",
-    title: "Sweet Celebrations & Pastry Lounge",
-    badgeLabel: "🍓 Sweet Celebrations & Pastry Lounge",
-    categoryHint: "Warm Rose Gold & Champagne Bronze with Strawberry Cheesecake & Cupcakes",
-    palette: "Rose Gold & Champagne Bronze",
-    keyHighlight: "Gourmet Strawberry Cheesecake & Chocolate Cupcakes + 'SCAN TO JOIN VIP' Gold Badge",
+    title: "Sweet Celebrations & Rewards Lounge",
+    badgeLabel: "🍓 Sweet Celebrations & Rewards Lounge",
+    palette: "Rose Bronze & Warm Copper",
+    keyHighlight: "Festive Gourmet Dessert Aesthetics + 'SCAN TO JOIN VIP' Gold Badge",
+    primaryColor: "#581c87",
+    secondaryColor: "#701a75",
+    accentColor: "#ea580c",
+    cardBg: "#fff7ed",
   },
 }
 
-function detectDefaultDesign(businessType?: string | null, category?: string | null): StandeeDesignId {
-  const typeStr = (businessType || "").toUpperCase()
-  const catStr = (category || "").toUpperCase()
+/**
+ * Auto-detects the industry category from merchant business type, category, or store name
+ */
+export function detectIndustryCategory(businessType?: string | null, category?: string | null, name?: string | null): IndustryCategoryId {
+  const combined = `${businessType || ""} ${category || ""} ${name || ""}`.toLowerCase()
 
-  if (
-    typeStr.includes("RETAIL") ||
-    catStr.includes("SHOP") ||
-    catStr.includes("STORE") ||
-    catStr.includes("LUXURY") ||
-    catStr.includes("VIP")
-  ) {
-    return "royal"
+  if (combined.match(/cake|bake|bakery|pastry|patisserie|sweet|dessert|mithai|cookie|bread|waffle|chocolat/i)) {
+    return "bakery"
   }
-  if (
-    typeStr.includes("CAFE") ||
-    catStr.includes("SWEET") ||
-    catStr.includes("DESSERT") ||
-    catStr.includes("CELEBRATION")
-  ) {
-    return "celebration"
+  if (combined.match(/cafe|coffee|restaurant|bistro|pizza|pizzeria|burger|food|dining|bar|kitchen|diner|eatery/i)) {
+    return "dining"
   }
-  return "bakery"
+  if (combined.match(/salon|spa|beauty|hair|grooming|parlour|parlor|skin|nail|barber|makeup|wellness/i)) {
+    return "salon"
+  }
+  if (combined.match(/pharma|pharmacy|chemist|medical|health|care|clinic|optics|dental|hospital|drug/i)) {
+    return "pharmacy"
+  }
+  if (combined.match(/auto|car|wash|garage|bike|motors|tyre|tire|repair|hardware|service|detailing/i)) {
+    return "auto"
+  }
+  if (combined.match(/retail|fashion|boutique|cloth|garment|wear|jewel|jewellery|store|mart|shop|supermarket|apparel/i)) {
+    return "retail"
+  }
+  return "general"
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * High-Resolution Printable Standee Generator (Full A4 Insert with Trim Guides)
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+function generatePrintableStandeeHtml(
+  designId: StandeeDesignId,
+  industryId: IndustryCategoryId,
+  storeName: string,
+  logoUrl: string | null,
+  qrDataUrl: string,
+  branchCity?: string | null
+): string {
+  const ind = INDUSTRY_CONFIGS[industryId] || INDUSTRY_CONFIGS.bakery
+
+  let primary = ind.primary
+  let secondary = ind.secondary
+  let accent = ind.accent
+  let cardBg = ind.cardBg
+  let badgeText = ind.badgeText
+  let title = ind.option1Title
+
+  if (designId === "royal") {
+    primary = "#0f2942"
+    secondary = "#1e3a8a"
+    accent = "#d97706"
+    cardBg = "#f8fafc"
+    badgeText = "👑 ROYAL PRIVILEGE VIP MEMBER"
+    title = "Royal Sapphire VIP Club"
+  } else if (designId === "celebration") {
+    primary = "#581c87"
+    secondary = "#701a75"
+    accent = "#ea580c"
+    cardBg = "#fff7ed"
+    badgeText = "🎉 SWEET CELEBRATIONS & REWARDS"
+    title = "Sweet Celebrations Lounge"
+  }
+
+  const perks = ind.perks
+  const storeLogoHtml = logoUrl
+    ? `<img src="${logoUrl}" alt="${storeName}" class="store-logo" />`
+    : `<div class="store-logo-placeholder"><span>${storeName.slice(0, 2).toUpperCase()}</span></div>`
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>A4 Standee Printable - ${storeName} (${title})</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color: #0f172a;
+    }
+    .print-sheet {
+      width: 210mm;
+      height: 297mm;
+      background: #ffffff;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12mm 14mm 10mm 14mm;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+    }
+    @media print {
+      body {
+        background: #ffffff;
+      }
+      .print-sheet {
+        box-shadow: none;
+        width: 100vw;
+        height: 100vh;
+        max-width: 210mm;
+        max-height: 297mm;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+
+    /* Outer Trim / Crop Guidelines for Standard 6x8" / A5 Acrylic Stands */
+    .trim-guide {
+      position: absolute;
+      top: 6mm;
+      left: 6mm;
+      right: 6mm;
+      bottom: 6mm;
+      border: 1.5px dashed rgba(148, 163, 184, 0.5);
+      border-radius: 12px;
+      pointer-events: none;
+    }
+    .trim-label {
+      position: absolute;
+      bottom: 2mm;
+      right: 8mm;
+      font-size: 8.5px;
+      color: #94a3b8;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    /* Brand Header */
+    .brand-header {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      padding-bottom: 2mm;
+    }
+    .theme-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: ${primary};
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 18px;
+      border-radius: 30px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      margin-bottom: 6px;
+    }
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 3px 0 6px 0;
+      height: 52px;
+    }
+    .store-logo {
+      max-height: 50px;
+      max-width: 200px;
+      object-fit: contain;
+    }
+    .store-logo-placeholder {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: ${primary};
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+    .store-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: ${primary};
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      font-family: "Georgia", "Times New Roman", serif;
+    }
+    .store-subtitle {
+      font-size: 11px;
+      font-weight: 800;
+      color: ${accent};
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+    .branch-badge {
+      display: inline-block;
+      font-size: 10px;
+      color: #64748b;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* Hero Call to Action Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, ${primary} 0%, ${secondary} 100%);
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 10px 16px;
+      text-align: center;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      margin: 3mm 0 4mm 0;
+      position: relative;
+    }
+    .hero-title {
+      font-size: 17.5px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .hero-subtitle {
+      font-size: 11px;
+      font-weight: 600;
+      opacity: 0.92;
+      margin-top: 2px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Centerpiece Massive QR Code Card */
+    .qr-card-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 2mm 0 4mm 0;
+    }
+    .qr-card {
+      background: #ffffff;
+      border: 3.5px solid ${accent};
+      border-radius: 24px;
+      padding: 14px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+      position: relative;
+      text-align: center;
+      width: 82mm;
+      max-width: 320px;
+    }
+    .qr-bracket-tl, .qr-bracket-tr, .qr-bracket-bl, .qr-bracket-br {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-color: ${primary};
+      border-style: solid;
+    }
+    .qr-bracket-tl { top: 6px; left: 6px; border-width: 3.5px 0 0 3.5px; border-top-left-radius: 8px; }
+    .qr-bracket-tr { top: 6px; right: 6px; border-width: 3.5px 3.5px 0 0; border-top-right-radius: 8px; }
+    .qr-bracket-bl { bottom: 6px; left: 6px; border-width: 0 0 3.5px 3.5px; border-bottom-left-radius: 8px; }
+    .qr-bracket-br { bottom: 6px; right: 6px; border-width: 0 3.5px 3.5px 0; border-bottom-right-radius: 8px; }
+
+    .qr-image {
+      width: 68mm;
+      height: 68mm;
+      max-width: 270px;
+      max-height: 270px;
+      display: block;
+      margin: 0 auto;
+      border-radius: 12px;
+    }
+    .qr-scan-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f1f5f9;
+      color: #0f172a;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-top: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .wa-icon {
+      color: #16a34a;
+      font-size: 14px;
+    }
+
+    /* 4 Perks Grid */
+    .perks-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px 12px;
+      margin: 2mm 0 3mm 0;
+    }
+    .perk-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: ${cardBg};
+      border: 1px solid rgba(0,0,0,0.06);
+      border-left: 4.5px solid ${primary};
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+    .perk-icon-wrap {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .perk-text h4 {
+      font-size: 11px;
+      font-weight: 800;
+      color: ${primary};
+      line-height: 1.2;
+    }
+    .perk-text p {
+      font-size: 9.5px;
+      color: #475569;
+      margin-top: 1px;
+      line-height: 1.25;
+    }
+
+    /* 3 Simple Steps */
+    .steps-bar {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 6px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9.5px;
+      color: #475569;
+      font-weight: 700;
+      margin-top: 2mm;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .step-num {
+      background: ${primary};
+      color: #ffffff;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 900;
+    }
+    .step-arrow {
+      color: #94a3b8;
+      font-size: 10px;
+    }
+
+    /* Sheet Footer with Official CustomerPilot Logo */
+    .sheet-footer {
+      border-top: 1.5px solid #e2e8f0;
+      padding-top: 7px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2mm;
+    }
+    .footer-left {
+      font-size: 9.5px;
+      color: #64748b;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cp-logo-img {
+      height: 24px;
+      width: auto;
+      object-fit: contain;
+    }
+    .powered-by-text {
+      font-size: 9px;
+      color: #94a3b8;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Top Floating Print Bar (Hidden on print) */
+    .print-bar {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 100;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn-print {
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-print:hover {
+      background: #1d4ed8;
+    }
+    .paper-hint {
+      background: rgba(15, 23, 42, 0.85);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 8px;
+      backdrop-blur: 4px;
+    }
+    .btn-close {
+      background: #475569;
+      color: #ffffff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="print-bar no-print">
+    <span class="paper-hint">📐 Paper: A4 Portrait (250+ GSM recommended)</span>
+    <button class="btn-print" onclick="window.print()">🖨️ Print Standee Sheet</button>
+    <button class="btn-close" onclick="window.close()">✕ Close</button>
+  </div>
+
+  <div class="print-sheet">
+    <div class="trim-guide"></div>
+    <span class="trim-label">✂️ Trim guide for standard 6×8" / A5 acrylic counter stand</span>
+
+    <!-- Top Brand Header -->
+    <div class="brand-header">
+      <div class="theme-badge">${badgeText}</div>
+      <div class="logo-container">
+        ${storeLogoHtml}
+      </div>
+      <h1 class="store-title">${storeName}</h1>
+      <div class="store-subtitle">${ind.tagline}</div>
+      <div class="branch-badge">📍 ${branchCity || "Billing Counter Standee"} • Official VIP Member Club</div>
+    </div>
+
+    <!-- Hero Call to Action -->
+    <div class="hero-banner">
+      <div class="hero-title">SCAN WITH WHATSAPP TO EARN STAMPS</div>
+      <div class="hero-subtitle">Collect stamps on every visit &amp; unlock exclusive handcrafted member rewards!</div>
+    </div>
+
+    <!-- Massive QR Code Card -->
+    <div class="qr-card-container">
+      <div class="qr-card">
+        <div class="qr-bracket-tl"></div>
+        <div class="qr-bracket-tr"></div>
+        <div class="qr-bracket-bl"></div>
+        <div class="qr-bracket-br"></div>
+        <img src="${qrDataUrl}" alt="VIP Check-in QR" class="qr-image" />
+        <div class="qr-scan-pill">
+          <span class="wa-icon">💬</span>
+          <span>Open WhatsApp Camera &amp; Scan • Instant 5-Sec Check-in</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 Perks Grid -->
+    <div class="perks-grid">
+      <div class="perk-box">
+        <span class="perk-icon-wrap">${perks[0].icon}</span>
+        <div class="perk-text">
+          <h4>${perks[0].title}</h4>
+          <p>${perks[0].desc}</p>
+        </div>
+      </div>
+      <div class="perk-box">
+        <span class="perk-icon-wrap">${perks[1].icon}</span>
+        <div class="perk-text">
+          <h4>${perks[1].title}</h4>
+          <p>${perks[1].desc}</p>
+        </div>
+      </div>
+      <div class="perk-box">
+        <span class="perk-icon-wrap">${perks[2].icon}</span>
+        <div class="perk-text">
+          <h4>${perks[2].title}</h4>
+          <p>${perks[2].desc}</p>
+        </div>
+      </div>
+      <div class="perk-box">
+        <span class="perk-icon-wrap">${perks[3].icon}</span>
+        <div class="perk-text">
+          <h4>${perks[3].title}</h4>
+          <p>${perks[3].desc}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 Simple Steps -->
+    <div class="steps-bar">
+      <div class="step-item">
+        <span class="step-num">1</span>
+        <span>Open WhatsApp Camera</span>
+      </div>
+      <span class="step-arrow">➔</span>
+      <div class="step-item">
+        <span class="step-num">2</span>
+        <span>Scan &amp; Send &lsquo;Hi&rsquo;</span>
+      </div>
+      <span class="step-arrow">➔</span>
+      <div class="step-item">
+        <span class="step-num">3</span>
+        <span>Collect Stamp &amp; Enjoy Treats!</span>
+      </div>
+    </div>
+
+    <!-- Sheet Footer with CustomerPilot Logo -->
+    <div class="sheet-footer">
+      <div class="footer-left">
+        <div><strong>No mobile app download needed.</strong> 100% WhatsApp integrated.</div>
+        <div>Ask counter staff for assistance with loyalty stamp collection.</div>
+      </div>
+      <div class="footer-right">
+        <span class="powered-by-text">Powered by</span>
+        <img src="/cplogo.png" alt="CustomerPilot" class="cp-logo-img" />
+      </div>
+    </div>
+  </div>
+</body>
+</html>`
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Main Component
+ * ─────────────────────────────────────────────────────────────────────────── */
 
 export function QRGenerator({ merchantId }: { merchantId: string }) {
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
   const [qrData, setQrData] = useState<any>(null)
+  const [selectedIndustry, setSelectedIndustry] = useState<IndustryCategoryId>("bakery")
   const [selectedDesign, setSelectedDesign] = useState<StandeeDesignId>("bakery")
+  const [autoIndustry, setAutoIndustry] = useState<IndustryCategoryId>("bakery")
+  const [isManualCategory, setIsManualCategory] = useState(false)
   const [zoomImage, setZoomImage] = useState<string | null>(null)
   const [imgLoaded, setImgLoaded] = useState<Record<StandeeDesignId, boolean>>({
     bakery: false,
@@ -101,8 +834,13 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
         if (res.ok && json && isMounted) {
           const data = json.data || json
           setQrData(data)
-          const defaultDesign = detectDefaultDesign(data?.merchant?.businessType, data?.merchant?.category)
-          setSelectedDesign(defaultDesign)
+
+          // Auto-detect industry theme based on merchant's registered business category and name
+          const detected = detectIndustryCategory(data?.merchant?.businessType, data?.merchant?.category, data?.merchant?.name)
+          setAutoIndustry(detected)
+          if (!isManualCategory) {
+            setSelectedIndustry(detected)
+          }
         } else if (!res.ok && isMounted) {
           toast({ title: "Error", description: json?.error || "Failed to load standee data", variant: "destructive" })
         }
@@ -116,12 +854,14 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
     return () => {
       isMounted = false
     }
-  }, [toast, merchantId])
+  }, [toast, merchantId, isManualCategory])
 
   const storeName = qrData?.merchant?.name || "Merchant Store"
-  const recommendedDesign = detectDefaultDesign(qrData?.merchant?.businessType, qrData?.merchant?.category)
+  const storeLogo = qrData?.merchant?.logoUrl || null
+  const branchCity = qrData?.merchant?.city || null
+  const activeIndustryConfig = INDUSTRY_CONFIGS[selectedIndustry] || INDUSTRY_CONFIGS.bakery
 
-  // Download stand-alone QR code PNG
+  // Standalone QR code download
   const handleDownloadQROnly = () => {
     if (!qrData?.qrDataUrl) return
     const link = document.createElement("a")
@@ -133,7 +873,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
     toast({ title: "Downloaded QR", description: "Standalone VIP Loyalty QR Code downloaded successfully." })
   }
 
-  // Download high-resolution Standee graphic image
+  // 3D Tabletop Mockup Download
   const handleDownloadStandeeHD = (designId: StandeeDesignId) => {
     const standeeUrl = `/api/qr/standee?design=${designId}&m=${merchantId}`
     const link = document.createElement("a")
@@ -142,69 +882,24 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-    toast({ title: "Downloaded Standee HD", description: `Full resolution ${STANDEE_OPTIONS[designId].title} downloaded.` })
+    toast({ title: "Downloaded Standee HD", description: `Full resolution standee mockup downloaded.` })
   }
 
-  // Print A4 Tabletop Standee (opens printable window with full-bleed high-res artwork)
+  // True High-Resolution Printable A4 Sheet Generator
   const handlePrintStandee = (designId: StandeeDesignId) => {
-    const standeeUrl = `/api/qr/standee?design=${designId}&m=${merchantId}&v=${Date.now()}`
-    const cfg = STANDEE_OPTIONS[designId]
+    if (!qrData?.qrDataUrl) {
+      toast({ title: "Please wait", description: "QR code data is still loading.", variant: "destructive" })
+      return
+    }
 
-    const printHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Print Standee - ${cfg.title} - ${storeName}</title>
-          <meta charset="utf-8">
-          <style>
-            @page {
-              size: A4 portrait;
-              margin: 0;
-            }
-            * { box-sizing: border-box; }
-            body {
-              margin: 0;
-              padding: 0;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              min-height: 100vh;
-              background: #f8fafc;
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            }
-            .standee-print-card {
-              max-width: 190mm;
-              max-height: 277mm;
-              width: 100%;
-              height: auto;
-              display: block;
-              margin: auto;
-              box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-              border-radius: 8px;
-            }
-            @media print {
-              body {
-                background: #ffffff;
-                min-height: auto;
-              }
-              .standee-print-card {
-                max-width: 200mm;
-                max-height: 287mm;
-                width: 100%;
-                box-shadow: none;
-                border-radius: 0;
-                page-break-inside: avoid;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <img src="${standeeUrl}" class="standee-print-card" alt="Standee A4" onload="setTimeout(function(){ window.print(); }, 400);" />
-        </body>
-      </html>
-    `
+    const printHtml = generatePrintableStandeeHtml(
+      designId,
+      selectedIndustry,
+      storeName,
+      storeLogo,
+      qrData.qrDataUrl,
+      branchCity
+    )
 
     const printWindow = window.open("", "_blank")
     if (printWindow) {
@@ -215,6 +910,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
   }
 
   const designsList: StandeeDesignId[] = ["bakery", "royal", "celebration"]
+  const industryList: IndustryCategoryId[] = ["bakery", "dining", "retail", "salon", "pharmacy", "auto", "general"]
 
   return (
     <Card className="border-border shadow-sm">
@@ -226,7 +922,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
               Digital Loyalty Stamp QR Standees
             </CardTitle>
             <CardDescription className="text-slate-600 dark:text-slate-400">
-              3 world-class designer acrylic standees displayed side-by-side with your real store branding, live WhatsApp QR &amp; 1-click A4 printing.
+              3 world-class designer acrylic standees displayed side-by-side with your real store branding, live WhatsApp QR &amp; 1-click A4 printable format.
             </CardDescription>
           </div>
 
@@ -242,11 +938,11 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
             </Button>
             <Button
               onClick={() => handlePrintStandee(selectedDesign)}
-              disabled={loading || !merchantId}
+              disabled={loading || !merchantId || !qrData}
               size="sm"
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md"
             >
-              <Printer className="w-4 h-4 mr-1.5" /> Print Standee ({STANDEE_OPTIONS[selectedDesign].title})
+              <Printer className="w-4 h-4 mr-1.5" /> Print A4 Standee Sheet
             </Button>
           </div>
         </div>
@@ -256,12 +952,61 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-amber-500 flex-shrink-0" />
             <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-              These are <strong>100% photorealistic studio standees</strong> with your <strong>real scannable WhatsApp QR code</strong> embedded directly. Test scanning with your phone!
+              Themes adapt dynamically to your business category! Click <strong>&quot;Print A4 Standee&quot;</strong> to get a pure printable insert with crop/trim lines ready for acrylic stands.
             </span>
           </div>
-          <span className="text-[11px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full whitespace-nowrap">
-            Auto-Recommended: {STANDEE_OPTIONS[recommendedDesign].title}
+          <span className="text-[11px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full whitespace-nowrap flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            Auto-Detected: {INDUSTRY_CONFIGS[autoIndustry].label}
           </span>
+        </div>
+
+        {/* ─── Interactive Industry Theme Adaptor (Requirement 1) ────────────── */}
+        <div className="mt-4 pt-4 border-t border-slate-200/80 dark:border-slate-800">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              Adapt Theme for Your Business Category:
+            </span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">
+              Active: <strong>{activeIndustryConfig.icon} {activeIndustryConfig.label}</strong>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+            {industryList.map((indId) => {
+              const cfg = INDUSTRY_CONFIGS[indId]
+              const isSelected = selectedIndustry === indId
+              const isDetected = autoIndustry === indId
+
+              return (
+                <button
+                  key={indId}
+                  onClick={() => {
+                    setSelectedIndustry(indId)
+                    setIsManualCategory(true)
+                    toast({
+                      title: `Theme adapted to ${cfg.label}`,
+                      description: `Standee designs and printables updated with ${cfg.label} perks & styling.`,
+                    })
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                    isSelected
+                      ? "bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20"
+                      : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300"
+                  }`}
+                >
+                  <span>{cfg.icon}</span>
+                  <span>{cfg.label}</span>
+                  {isDetected && (
+                    <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.2 bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 rounded font-black ml-0.5">
+                      Auto
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
         </div>
       </CardHeader>
 
@@ -271,10 +1016,22 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
         {/* ══════════════════════════════════════════════════════════════════ */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           {designsList.map((designId) => {
-            const cfg = STANDEE_OPTIONS[designId]
+            const baseCfg = STANDEE_BASE_OPTIONS[designId]
             const isSelected = selectedDesign === designId
-            const isRecommended = recommendedDesign === designId
             const standeeImgUrl = merchantId ? `/api/qr/standee?design=${designId}&m=${merchantId}` : ""
+
+            // Dynamic titles and badges adapted per industry
+            let displayTitle = baseCfg.title
+            let displayBadge = baseCfg.badgeLabel
+            let displayHighlight = baseCfg.keyHighlight
+            let displayPalette = baseCfg.palette
+
+            if (designId === "bakery") {
+              displayTitle = activeIndustryConfig.option1Title
+              displayBadge = activeIndustryConfig.option1Badge
+              displayHighlight = activeIndustryConfig.option1Highlight
+              displayPalette = activeIndustryConfig.label
+            }
 
             return (
               <div
@@ -289,14 +1046,14 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
                 <div className="flex items-center justify-between mb-3 gap-2">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-2xs">
-                      {cfg.number}
+                      {baseCfg.number}
                     </span>
-                    {isRecommended && (
+                    {designId === "bakery" && (
                       <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-                        Recommended
+                        {activeIndustryConfig.icon} Adapted Theme
                       </span>
                     )}
-                    {isSelected && !isRecommended && (
+                    {isSelected && (
                       <span className="text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">
                         Active
                       </span>
@@ -304,17 +1061,17 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
                   </div>
 
                   <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                    {cfg.palette}
+                    {displayPalette}
                   </span>
                 </div>
 
                 {/* ── Title & Category Subtitle ── */}
                 <div className="mb-3 text-left">
                   <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                    {cfg.badgeLabel}
+                    {displayBadge}
                   </h4>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
-                    {cfg.categoryHint}
+                    {displayTitle}
                   </p>
                 </div>
 
@@ -332,7 +1089,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
                   {standeeImgUrl && (
                     <img
                       src={standeeImgUrl}
-                      alt={cfg.title}
+                      alt={displayTitle}
                       onLoad={() => setImgLoaded((prev) => ({ ...prev, [designId]: true }))}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                     />
@@ -355,7 +1112,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
 
                 {/* ── Key Highlight ── */}
                 <div className="mt-2.5 text-[11px] text-slate-600 dark:text-slate-400 text-left line-clamp-1">
-                  ⭐ {cfg.keyHighlight}
+                  ⭐ {displayHighlight}
                 </div>
 
                 {/* ── Card Bottom Actions (1-Click Print, Download & Select) ── */}
@@ -363,7 +1120,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
                   <div className="flex items-center gap-2">
                     <Button
                       onClick={() => handlePrintStandee(designId)}
-                      disabled={loading || !merchantId}
+                      disabled={loading || !merchantId || !qrData}
                       size="sm"
                       className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-white font-bold rounded-xl shadow-xs text-xs"
                     >
@@ -376,7 +1133,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
                       disabled={loading || !merchantId}
                       size="sm"
                       className="rounded-xl px-2.5 border-slate-300 dark:border-slate-700"
-                      title="Download Full HD Standee Image (JPEG)"
+                      title="Download Full HD Standee 3D Mockup (JPEG)"
                     >
                       <Download className="w-3.5 h-3.5" />
                     </Button>
@@ -386,7 +1143,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
                     onClick={() => {
                       setSelectedDesign(designId)
                       toast({
-                        title: `${cfg.title} Selected`,
+                        title: `${displayTitle} Selected`,
                         description: "Set as your active standee template for top print action.",
                       })
                     }}
@@ -419,7 +1176,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
               Counter Setup &amp; Material Guidelines:
             </span>
             <p>
-              Click <strong>&quot;Print A4 Standee&quot;</strong> on any design to print directly on 250+ GSM glossy photo paper or coated card. Insert it into a standard clear acrylic L-stand on your billing counter for instant customer scan conversion.
+              Clicking <strong>&quot;Print A4 Standee&quot;</strong> generates a dedicated <strong>2D A4 printable insert sheet</strong> with scissor trim guides for standard 6×8&quot; or A5 acrylic L-stands. Print on 250+ GSM coated card for best counter clarity.
             </p>
           </div>
 

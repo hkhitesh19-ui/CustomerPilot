@@ -6,39 +6,51 @@ import { db } from "@/lib/db"
 import { normalizePhone } from "@/lib/utils"
 import { generateBrandedQRDataUrl } from "@/lib/branded-qr"
 
-const STANDEE_COORDS: Record<string, { image: string; qr: { left: number; top: number; width: number; height: number }; darkColor: string }> = {
+interface StandeeConfig {
+  image: string
+  qr: { left: number; top: number; width: number; height: number }
+  darkColor: string
+  cpBadge?: { left: number; top: number; width: number; height: number }
+}
+
+const STANDEE_COORDS: Record<string, StandeeConfig> = {
   bakery: {
     image: "standee_bakery_mockup.jpg",
     qr: { left: 408, top: 440, width: 266, height: 268 },
     darkColor: "#4a0e17",
+    cpBadge: { left: 428, top: 922, width: 225, height: 40 },
   },
   royal: {
     image: "standee_royal_mockup.jpg",
-    qr: { left: 448, top: 615, width: 142, height: 142 },
+    qr: { left: 432, top: 598, width: 172, height: 172 },
     darkColor: "#0f2942",
+    cpBadge: { left: 375, top: 996, width: 215, height: 38 },
   },
   celebration: {
     image: "standee_celebration_mockup.jpg",
-    qr: { left: 420, top: 602, width: 152, height: 168 },
+    qr: { left: 412, top: 590, width: 168, height: 178 },
     darkColor: "#3b1d11",
+    cpBadge: { left: 350, top: 935, width: 205, height: 36 },
   },
   // Backwards-compatible aliases for previously selected design keys
   retail: {
     image: "standee_royal_mockup.jpg",
-    qr: { left: 448, top: 615, width: 142, height: 142 },
+    qr: { left: 432, top: 598, width: 172, height: 172 },
     darkColor: "#0f2942",
+    cpBadge: { left: 375, top: 996, width: 215, height: 38 },
   },
   pizzeria: {
     image: "standee_celebration_mockup.jpg",
-    qr: { left: 420, top: 602, width: 152, height: 168 },
+    qr: { left: 412, top: 590, width: 168, height: 178 },
     darkColor: "#3b1d11",
+    cpBadge: { left: 350, top: 935, width: 205, height: 36 },
   },
 }
 
 export async function GET(req: NextRequest) {
   try {
     const url = req.nextUrl
-    const design = (url.searchParams.get("design") || "bakery") as "bakery" | "retail" | "pizzeria"
+    const design = (url.searchParams.get("design") || "bakery") as string
     const merchantId = url.searchParams.get("m") || req.headers.get("x-merchant-id")
 
     if (!merchantId) {
@@ -84,15 +96,44 @@ export async function GET(req: NextRequest) {
       .png()
       .toBuffer()
 
-    // 3. Composite live QR onto photorealistic tabletop standee
+    const composites: sharp.OverlayOptions[] = [
+      {
+        input: qrBuffer,
+        left: config.qr.left,
+        top: config.qr.top,
+      },
+    ]
+
+    // 3. Composite CustomerPilot Logo Badge if configured
+    if (config.cpBadge) {
+      const cpLogoPath = path.join(process.cwd(), "public", "cplogo.png")
+      if (fs.existsSync(cpLogoPath)) {
+        const badgeSvg = Buffer.from(`
+          <svg width="${config.cpBadge.width}" height="${config.cpBadge.height}">
+            <rect x="0" y="0" width="${config.cpBadge.width}" height="${config.cpBadge.height}" rx="${Math.round(config.cpBadge.height / 2)}" ry="${Math.round(config.cpBadge.height / 2)}" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+          </svg>
+        `)
+        const cpLogoResized = await sharp(cpLogoPath)
+          .resize({ width: Math.round(config.cpBadge.width * 0.88), fit: "inside" })
+          .png()
+          .toBuffer()
+
+        const cpBadgeBuffer = await sharp(badgeSvg)
+          .composite([{ input: cpLogoResized, gravity: "center" }])
+          .png()
+          .toBuffer()
+
+        composites.push({
+          input: cpBadgeBuffer,
+          left: config.cpBadge.left,
+          top: config.cpBadge.top,
+        })
+      }
+    }
+
+    // 4. Composite live elements onto photorealistic tabletop standee
     const finalImageBuffer = await sharp(baseImagePath)
-      .composite([
-        {
-          input: qrBuffer,
-          left: config.qr.left,
-          top: config.qr.top,
-        },
-      ])
+      .composite(composites)
       .jpeg({ quality: 92, mozjpeg: true })
       .toBuffer()
 

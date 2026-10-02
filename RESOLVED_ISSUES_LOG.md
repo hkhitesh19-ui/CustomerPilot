@@ -3,6 +3,48 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: Dynamic Business Theme Adaptation, True Printable A4 Standee Engine & Prominent Branding
+- **Symptom**:
+  1. The user questioned whether the standee designs adapt dynamically to different business categories or if they were only rigid static cake designs (`[1] 3 design to aagayi, but kya ye har business ke hisab se theme set karega ?`).
+  2. Clicking "Print A4 Standee" printed the 3D tabletop mockup photo (acrylic stand sitting on wooden cafe counter with background blur) rather than a clean, flat 2D printable insert poster (`[2] jab QR code print pe click kare to PRINTABLE Format me print hona chahiye , not same to same image`).
+  3. QR codes in the standee designs were smaller than optimal for fast camera recognition, and CustomerPilot branding was not consistently prominent across all 3 options (`[3] all 3 design option me QR code ko thoda sa bigger banana so aur jyada clear dikhe and sare design option me niche CustomerPilot ka name and Logo bhi clearly visible ho eisa karo`).
+- **Root Cause**:
+  1. Previous standee options were hardcoded with bakery-oriented text and palettes without category awareness or an interactive switcher for other merchant industries (Cafes, Retail, Salons, Pharmacies, Garages, etc.).
+  2. `handlePrintStandee` in `src/components/qr-generator.tsx` previously opened a print window with `<img src="${standeeUrl}">` where `standeeUrl` was the 3D photorealistic tabletop JPEG mockup, resulting in an absurd "photo of a standee on a table" on physical printouts.
+  3. QR code bounding box coordinates in `src/app/api/qr/standee/route.ts` were smaller (Option 2: 142x142, Option 3: 152x168), and the official white CustomerPilot logo pill badge was only partially applied.
+- **Resolution**:
+  1. **Dynamic Business Theme Engine & Auto-Detection**:
+     - Created an `INDUSTRY_CONFIGS` registry in `src/components/qr-generator.tsx` spanning 7 core merchant industries:
+       - 🎂 *Bakery & Desserts*: Ruby crimson & warm gold, cake badges, birthday cake perks.
+       - ☕ *Cafe & Dining*: Roasted espresso & amber gold, coffee badges, free beverage on 5th visit.
+       - 🛍️ *Retail & Fashion*: Sapphire navy & amber gold, luxury shopping badges, ₹100 off billing invoice.
+       - 💇 *Salon & Wellness*: Deep velvet plum & rose gold, beauty badges, free relaxing head massage.
+       - 💊 *Pharmacy & Health*: Emerald forest & teal, health badges, free home delivery & quarterly health screens.
+       - 🚗 *Auto & Services*: Titanium carbon & cobalt blue, driver badges, free 15-point inspection & service discounts.
+       - ⭐ *Universal VIP*: Modern onyx & gold, universal membership badges, welcome perks.
+     - Implemented `detectIndustryCategory()` to automatically analyze `merchant.businessType`, `merchant.category`, and `merchant.name` (e.g. automatically detecting `bakery` for "Cake Connection").
+     - Added an interactive horizontal Industry Theme Pill Switcher above the 3 designs allowing merchants to explore and switch between all 7 industry aesthetics on demand.
+  2. **Dedicated 2D Printable A4 Standee Sheet Generator**:
+     - Completely replaced the 3D table image print popup with a full-bleed A4 printable layout engine (`@page { size: A4 portrait; margin: 0; }`).
+     - Added outer dashed trim/crop guidelines with scissors icon and label: `✂️ Trim Guide: Cut along dashed line to fit standard 6×8" / A5 acrylic counter stand`.
+     - Integrated real merchant logo (crisp centered emblem container), store name, industry subtitle, branch city, and high-impact hero banner.
+     - Centered a massive 68mm x 68mm high-contrast QR code with 4-corner luxury designer brackets and merchant logo center badge.
+     - Included 4 industry-tailored perk boxes and 3-step WhatsApp check-in instructions.
+     - Integrated the official CustomerPilot logo (`/cplogo.png`) and "Powered by CustomerPilot • Smart Retention Partner" footer.
+     - Added floating top print bar with "🖨️ Print Standee Sheet", "📐 Paper: A4 Portrait (250+ GSM recommended)", and auto-triggering `window.print()`.
+  3. **Enlarged QR Codes & Prominent CustomerPilot Branding Across All 3 Options**:
+     - Enlarged live QR dimensions in `src/app/api/qr/standee/route.ts`:
+       - Bakery: `width: 266, height: 268`
+       - Royal: `width: 172, height: 172` (was 142x142)
+       - Celebration: `width: 168, height: 178` (was 152x168)
+     - Added dynamic compositing of the official white CustomerPilot pill badge (`public/cplogo.png`) across all 3 options:
+       - Bakery: `left: 428, top: 922, width: 225, height: 40`
+       - Royal: `left: 375, top: 996, width: 215, height: 38`
+       - Celebration: `left: 350, top: 935, width: 205, height: 36`
+  4. Tested and verified HTTP 200 responses on all standee endpoints and verified that `http://localhost:3000/dashboard/settings` compiles and renders cleanly.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: Merchant-Specific Business Logo & Name Consistency Across All 3 QR Standees
 - **Symptom**: When a merchant (e.g. "Cake Connection") logged in, Option 2 displayed a different store ("TrendZone Lifestyle" fashion boutique with shopping bags) and Option 3 displayed another store ("Pizza Da Dabha" with pizzas). The merchant rightfully expected all 3 creative options to be personalized to their own business ("Cake Connection") using their own business logo ("yaha Cake Connection Merchant ka login he to fir hi uske hi business ka same Logo use karke all 3 QR code alag alag design ka generate hona chaiye").
 - **Root Cause**: The static mockup templates for Option 2 and Option 3 were previously generated with hardcoded demo brands (TrendZone Lifestyle and Pizza Da Dabha) from other industries, rather than being tailored to the logged-in merchant's category and branding.
