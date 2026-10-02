@@ -282,7 +282,7 @@ END:VCARD`
               </div>
               <span className="text-[11px] text-slate-600 truncate max-w-full">
                 {card.deliveryInfo
-                  ? card.deliveryInfo.replace("Delivery Available • ", "").replace("Delivery Available: ", "")
+                  ? card.deliveryInfo.replace(/^Delivery\s*(Available)?\s*[•:]\s*/i, "")
                   : (card.locationState?.toLowerCase().includes("ahmedabad") ? "Gujarat & Pan-India" : "Available")}
               </span>
             </div>

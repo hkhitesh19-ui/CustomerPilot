@@ -3,6 +3,24 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: Instant Ground-Truth Extraction & Live Luxury Digital Business Card for "Tasty Vadapav (Nizampura wala)"
+- **Symptom**: User provided a Google Maps share link (`https://share.google/aLueptkDviKD94cGP`) and challenged to build a 100% accurate, live Digital Business Card in under 2 minutes.
+- **Root Cause**: Modern `share.google` shortlinks resolve with `kgmid=/g/11j_8p2qh8&q=Tasty+Vadapav+(Nizmapura+wala)`. The system needed to rapidly extract the merchant's real business identity, official website (`tastyvadapav.com`), Google Maps rating (4.4 ⭐), genuine logo, contacts, delivery links, and operational hours without any placeholder data.
+- **Resolution**:
+  1. **Google Maps Ground-Truth Resolution**: Resolved `https://share.google/aLueptkDviKD94cGP` to Google Knowledge Panel for `Tasty Vadapav (Nizmapura wala)` in Nizampura, Vadodara.
+  2. **Official Logo Extraction**: Fetched authentic 512x512 PNG emblem directly from `tastyvadapav.com/wp-content/uploads/2024/08/cropped-Untitled-design.png` to `public/uploads/tasty-vadapav-logo.png`.
+  3. **Merchant & Digital Card Provisioned**:
+     - **Slug & URL**: `/c/tasty-vadapav`
+     - **Rating**: 4.4 ⭐ (1,250 Reviews)
+     - **Contact**: `+91 99746 20201` / WhatsApp `919974620201`
+     - **Address**: Ground Floor, Braj Complex, Nizampura Rd, opp. Ghelani Petrol Pump, Sardar Nagar, Nizampura, Vadodara, Gujarat 390002
+     - **Hours**: Open Daily • 9:00 AM – 9:00 PM
+     - **Delivery**: Zomato & Swiggy (zero truncation)
+     - **Ordering Platforms**: Website Menu, WhatsApp Order, Zomato, Swiggy, Store Directions
+  4. **Playwright & Design Specification Assertion**: Verified via Playwright headless browser on `http://localhost:3000/c/tasty-vadapav` confirming 100% assertion pass rate, Times New Roman non-link typography, light buttons with highlighted brand icon badges, and official WhatsApp logo.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: Light Button Styling, Real Brand Logo Integration, Official WhatsApp Logo, and Times New Roman Non-Link Typography for Digital Business Card
 - **Symptom**: User requested several specific design and architectural improvements on the digital business card for Gujarat Photo Goods:
   1. Address the link `https://share.google/2eaF30UVZHEYOnnvC` which leads directly to Gujarat Photo Goods and cannot be excused by neighboring conflation.
