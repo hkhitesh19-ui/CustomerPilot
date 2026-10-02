@@ -286,28 +286,26 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       position: relative;
     }
 
-    /* 3. VIP Reward CLUB */
-    .vip-club-badge {
+    /* 3. VIP Reward CLUB - Golden & Bigger Font (No Black Belt) */
+    .vip-club-title {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      background: #0f172a;
-      color: #fbbf24;
-      padding: 5px 22px;
-      border-radius: 9999px;
-      border: 1px solid #d97706;
-      margin-bottom: 0;
-      position: relative;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    .vip-club-text {
-      font-family: 'Cinzel', serif;
-      font-size: 13px;
+      gap: 8px;
+      color: #b45309;
+      font-family: 'Cinzel', serif, Georgia, sans-serif;
+      font-size: 19px;
       font-weight: 900;
       letter-spacing: 3.5px;
       text-transform: uppercase;
-      color: #fbbf24;
+      margin-top: 1mm;
+      margin-bottom: 2mm;
+      position: relative;
+      z-index: 1;
+    }
+    .vip-star {
+      font-size: 15px;
+      color: #d97706;
     }
 
     /* 4. Vector QR Box with 4-Corner Target Brackets */
@@ -463,8 +461,10 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
             ${logoHtml}
           </div>
           <h1 class="brand-name">${storeName}</h1>
-          <div class="vip-club-badge">
-            <span class="vip-club-text">★ VIP REWARD CLUB ★</span>
+          <div class="vip-club-title">
+            <span class="vip-star">★</span>
+            <span>VIP REWARD CLUB</span>
+            <span class="vip-star">★</span>
           </div>
         </div>
 
@@ -597,11 +597,14 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
                 {storeName}
               </h3>
 
-              {/* 3. VIP Reward CLUB */}
-              <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-slate-950 text-amber-400 dark:bg-amber-400/10 dark:text-amber-300 font-black text-xs tracking-[0.25em] uppercase shadow-md border border-amber-500/40 mb-5 relative z-10">
-                <span>★</span>
+              {/* 3. VIP Reward CLUB - Golden & Bigger Font (No Black Belt) */}
+              <div 
+                className="inline-flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400 font-black text-base sm:text-lg tracking-[0.22em] uppercase mb-4 relative z-10"
+                style={{ fontFamily: 'Cinzel, Georgia, serif' }}
+              >
+                <span className="text-amber-500 text-sm sm:text-base">★</span>
                 <span>VIP REWARD CLUB</span>
-                <span>★</span>
+                <span className="text-amber-500 text-sm sm:text-base">★</span>
               </div>
 
               {/* 4. Vector QR Code Box with 4 Precision Corner Target Brackets */}

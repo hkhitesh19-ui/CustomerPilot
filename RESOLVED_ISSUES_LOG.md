@@ -3,6 +3,19 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: Golden & Bigger "★ VIP REWARD CLUB ★" Typography without Black Belt
+- **Symptom**: The user requested removing the black pill / belt background from "★ VIP REWARD CLUB ★" and styling the text as golden with a bigger font on both the on-screen standee card and the printable A4 insert ("★ VIP REWARD CLUB ★ - isko Golden and Bigger font karo, uska black belt remove karo").
+- **Root Cause**: The VIP club title previously had a dark onyx pill container (`bg-slate-950` / `background: #0f172a; border-radius: 9999px;`) with small text (`text-xs` / `13px`), creating a dark belt appearance rather than an open, regal typography headline.
+- **Resolution**:
+  1. **Removed Black Belt**: Stripped out the dark onyx container, pill border, and background styling from both the on-screen card and the printable template in `src/components/qr-generator.tsx`.
+  2. **Golden & Enlarged Typography**:
+     - Upgraded font to bold uppercase `Cinzel` serif with wide letter spacing.
+     - Enlarged font size to `text-base sm:text-lg` (16–18px) on screen and `19px` in the printable template.
+     - Applied deep luxury gold (`text-amber-600 dark:text-amber-400` / `#b45309` and `#d97706`) to the text and flanking stars (`★`).
+  3. **Maintained Cohesive Layout**: Maintained clean, tight vertical grouping under the store name and above the large QR code.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: 2D Vector Standee Design & Perks Clutter Removal
 - **Symptom**: In the Digital Loyalty Stamp QR section, the standee displayed cluttered promotional lines ("Scan with WhatsApp to Collect Stamps", "🪙 1 Stamp / Visit", "🎁 Welcome Treat", "🎂 Birthday Freebie") which cluttered the presentation. The user requested: `[1]` remove all these lines ("ye sab line remove karo") and `[2]` build a clean, high-end 2D vector graphic design ready for physical acrylic stand printing ("vector wala badhiya design banao 2D print ke hisab se").
 - **Root Cause**: The standee card and print template were rendering promotional perk tags and instructional pills, occupying vertical space and diluting the clean, luxury 2D acrylic standee look.
