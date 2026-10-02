@@ -3,6 +3,32 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: Light Button Styling, Real Brand Logo Integration, Official WhatsApp Logo, and Times New Roman Non-Link Typography for Digital Business Card
+- **Symptom**: User requested several specific design and architectural improvements on the digital business card for Gujarat Photo Goods:
+  1. Address the link `https://share.google/2eaF30UVZHEYOnnvC` which leads directly to Gujarat Photo Goods and cannot be excused by neighboring conflation.
+  2. All buttons must be light colored with only social media icons highlighted inside their brand circles, using the authentic most-used official WhatsApp logo.
+  3. Remove any floating WhatsApp icon appearing above "Save contact".
+  4. Clarify whether "Save contact" saves full contact data directly into the user's mobile phone contact list.
+  5. All non-link text must be styled with "Times New Roman" font while links remain in clean UI sans typography.
+  6. Download and display the authentic merchant logo from their official website if found, otherwise do not use a fabricated logo.
+- **Root Cause**:
+  1. Initial data extraction had made an unverified assumption regarding Places conflation when the direct link clearly pointed to Gujarat Photo Goods' Knowledge Panel.
+  2. Buttons previously used dark gradient fills (`bg-gradient-to-r from-[#25D366] to-[#128C7E]`, etc.) which colored the whole button instead of maintaining a light card aesthetic with highlighted circular icon badges.
+  3. The global `WhatsAppFloatingWidget` hovered over the bottom viewport area near the sticky "Save contact" action button.
+  4. The logo container used a fixed 1:1 circle (`w-28 h-28 rounded-full`), distorting horizontal merchant logos (like Gujarat Photo Goods' 800x317 banner logo).
+  5. Fonts uniformly defaulted to system sans-serif without serif editorial hierarchy for business name, categories, status badges, and headings.
+- **Resolution**:
+  1. **Direct Accountability & Link Clarity**: Acknowledged that `https://share.google/2eaF30UVZHEYOnnvC` directly resolves to Gujarat Photo Goods' Knowledge Panel (4.5 rating, 406 reviews).
+  2. **Real Official Logo Integrated**: Downloaded authentic merchant logo from `https://gujaratphotogoods.in/wp-content/uploads/2026/09/logo.png` (800x317) to `public/uploads/gujarat-photo-goods-real-logo.png` and embedded into `public/uploads/gujarat-photo-goods-logo.svg`. Updated the logo container in `src/components/digital-card-view.tsx` to a rounded-2xl showcase (`w-48 h-24`) that preserves the horizontal logo's native aspect ratio and sharp resolution.
+  3. **Light Button Aesthetic & Highlighted Icon Badges**: Converted all action buttons (WhatsApp, Call Now, Instagram, Facebook, YouTube, Location) to light cards (`bg-white/95 text-slate-900 border border-slate-200/90 shadow-xs`) with only the icons highlighted in dedicated circular badges (`#25D366` green, `blue-600`, Instagram gradient, `#1877F2` blue, `rose-500`).
+  4. **Official WhatsApp SVG Logo**: Integrated the authentic worldwide WhatsApp speech bubble with phone handset vector in both the action button and catalog grid.
+  5. **Removed WhatsApp Icon Above "Save Contact"**: Pathname gating in `src/components/whatsapp-widget.tsx` hides the platform support bubble on `/c/*`, leaving "Save Contact" completely unobstructed.
+  6. **Times New Roman Non-Link Typography**: Applied `style={{ fontFamily: '"Times New Roman", Times, "Liberation Serif", serif' }}` across all non-link text: Business Name (`h1`), Tagline/Categories (`p`), 3-pill status bar, Section Headers, and Bottom Utility cards.
+  7. **Save Contact vCard Confirmation**: Confirmed that `handleSaveContact()` generates a standard vCard (.vcf 3.0) file containing `FN`, `ORG`, `TITLE`, `TEL;TYPE=CELL`, `TEL;TYPE=WORK`, `ADR`, `URL`, and `NOTE`, enabling instant 1-tap addition to Google Contacts (Android) and Apple Contacts (iOS).
+  8. **Verified via Playwright**: Verified with Playwright headless browser testing on `http://localhost:3000/c/gujarat-photo-goods` confirming 100% assertions passed and visual snapshot captured.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: Exact Google Business Profile Ground-Truth Alignment & Micro-UI Truncation Fixes for Gujarat Photo Goods
 
 - **Symptom**: User pointed out an inaccuracy in rating metrics: "Real Rating: 4.9 ⭐ (1,280+ Google Reviews)" was displayed/recorded instead of exact Google Places ground-truth. The actual Google Knowledge Panel for Gujarat Photo Goods shows 4.5 ⭐ (406 reviews), Closes 7:30 pm. In addition, the location pill had pincode truncation (`Ahmedabad, Gujarat 3...`), catalog labels had ellipsis (`Online S...`), and an intrusive floating platform support bubble covered the Google Reviews card.

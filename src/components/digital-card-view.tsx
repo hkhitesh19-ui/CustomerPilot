@@ -6,6 +6,12 @@ function sanitizeUrl(url?: string | null): string {
   if (!url) return "#"
   const trimmed = url.trim()
   const lowerTrimmed = trimmed.toLowerCase()
+  if (lowerTrimmed.startsWith("javascript:") || lowerTrimmed.startsWith("data:")) {
+    return "#"
+  }
+  if (trimmed.startsWith("//")) {
+    return `https:${trimmed}`
+  }
   if (
     lowerTrimmed.startsWith("http://") || 
     lowerTrimmed.startsWith("https://") || 
@@ -14,10 +20,20 @@ function sanitizeUrl(url?: string | null): string {
   ) {
     return trimmed
   }
-  if (trimmed.startsWith("/")) {
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) {
     return trimmed
   }
   return `https://${trimmed}`
+}
+
+const timesFont: React.CSSProperties = { fontFamily: '"Times New Roman", Times, "Liberation Serif", serif' }
+
+function OfficialWhatsAppIcon({ className = "w-5 h-5 fill-current" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  )
 }
 import { 
   BadgeCheck, 
@@ -75,7 +91,8 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
     let list: Array<{ platform: string; label: string; sublabel?: string; url: string; color?: string }> = []
     try {
       if (card.orderingLinks) {
-        list = JSON.parse(card.orderingLinks)
+        const parsed = JSON.parse(card.orderingLinks)
+        if (Array.isArray(parsed)) list = parsed
       }
     } catch {
       list = []
@@ -138,9 +155,10 @@ END:VCARD`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-
-    setTimeout(() => setSavingContact(false), 1200)
+    setTimeout(() => {
+      URL.revokeObjectURL(url)
+      setSavingContact(false)
+    }, 1200)
   }
 
   // 🔗 Share Card
@@ -179,55 +197,64 @@ END:VCARD`
         <div className="relative z-10 space-y-4 sm:space-y-5">
           
           {/* ═══════════════════════════════════════════════════════════════ */}
-          {/* 1. TOP BRANDING: LOGO MEDALLION + NAME + CATEGORIES             */}
+          {/* 1. TOP BRANDING: REAL LOGO + NAME + CATEGORIES                  */}
           {/* ═══════════════════════════════════════════════════════════════ */}
           <div className="flex flex-col items-center text-center pt-2">
             
-            {/* Circular Logo Medallion with Gold Ring */}
+            {/* Real Logo Card Container */}
             <div className="relative mb-3">
-              <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-white p-1.5 shadow-xl border-2 border-amber-400/80 flex items-center justify-center relative z-10 overflow-hidden">
+              <div className="w-48 h-24 sm:w-52 sm:h-26 rounded-2xl bg-white p-2.5 shadow-md border-2 border-amber-300/80 flex items-center justify-center relative z-10 overflow-hidden">
                 {card.logoUrl ? (
                   <img
                     src={card.logoUrl}
                     alt={card.displayName}
-                    className="w-full h-full object-contain rounded-full"
+                    className="w-full h-full object-contain"
                   />
                 ) : (
-                  <div className="w-full h-full rounded-full bg-slate-900 text-amber-400 font-black text-3xl flex items-center justify-center">
+                  <div className="w-full h-full rounded-xl bg-slate-900 text-amber-400 font-black text-3xl flex items-center justify-center">
                     {card.displayName.slice(0, 2).toUpperCase()}
                   </div>
                 )}
               </div>
-              {/* Outer soft golden ring */}
-              <div className="absolute -inset-1.5 rounded-full border border-amber-500/30 pointer-events-none" />
+              {/* Outer subtle glow ring */}
+              <div className="absolute -inset-1 rounded-2xl border border-amber-500/20 pointer-events-none" />
             </div>
 
-            {/* Business Display Name with Blue Verified Badge */}
-            <h1 className="text-2xl sm:text-[26px] font-black text-slate-900 tracking-tight flex items-center justify-center gap-1.5 leading-tight">
+            {/* Business Display Name with Blue Verified Badge (Times New Roman) */}
+            <h1 
+              style={timesFont}
+              className="text-2xl sm:text-[27px] font-bold text-slate-900 tracking-normal flex items-center justify-center gap-1.5 leading-tight"
+            >
               <span>{card.displayName}</span>
               <BadgeCheck className="w-6 h-6 text-sky-500 fill-sky-500 text-white flex-shrink-0" />
             </h1>
 
-            {/* Sub-categories / Tagline */}
-            <p className="text-xs sm:text-[13px] font-semibold text-slate-600 tracking-wide mt-1">
+            {/* Sub-categories / Tagline (Times New Roman) */}
+            <p 
+              style={timesFont}
+              className="text-sm sm:text-[15px] italic text-slate-700 tracking-normal mt-1"
+            >
               {card.subCategories || "Artisanal Bakery • Cakes • Desserts"}
             </p>
           </div>
 
           {/* ═══════════════════════════════════════════════════════════════ */}
-          {/* 2. 3-PILL QUICK STATUS BAR                                      */}
+          {/* 2. 3-PILL QUICK STATUS BAR (Times New Roman Text)               */}
           {/* ═══════════════════════════════════════════════════════════════ */}
-          <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-amber-200/80 shadow-sm p-3 grid grid-cols-3 divide-x divide-slate-100 text-center">
+          <div 
+            style={timesFont}
+            className="bg-white/95 backdrop-blur-md rounded-2xl border border-amber-200/80 shadow-xs p-3 grid grid-cols-3 divide-x divide-slate-100 text-center"
+          >
             
-            {/* Pill 1: Location (Split on comma to avoid ugly truncation) */}
+            {/* Pill 1: Location */}
             <div className="flex flex-col items-center px-1">
               <div className="flex items-center gap-1 text-red-600 mb-0.5">
                 <MapPin className="w-3.5 h-3.5 fill-red-600 text-white flex-shrink-0" />
-                <span className="font-extrabold text-[11px] text-slate-900 truncate max-w-full">
+                <span className="font-bold text-[12px] text-slate-900 truncate max-w-full">
                   {card.locationShort ? card.locationShort.split(",")[0].trim() : "Manjalpur"}
                 </span>
               </div>
-              <span className="text-[10px] text-slate-500 font-medium truncate max-w-full">
+              <span className="text-[11px] text-slate-600 truncate max-w-full">
                 {card.locationState || (card.locationShort?.includes(",") ? card.locationShort.split(",").slice(1).join(",").trim() : "Vadodara, Gujarat")}
               </span>
             </div>
@@ -236,11 +263,11 @@ END:VCARD`
             <div className="flex flex-col items-center px-1">
               <div className="flex items-center gap-1 text-red-600 mb-0.5">
                 <Clock className="w-3.5 h-3.5 text-red-600 stroke-[2.5] flex-shrink-0" />
-                <span className="font-extrabold text-[11px] text-slate-900 truncate max-w-full">
+                <span className="font-bold text-[12px] text-slate-900 truncate max-w-full">
                   Open Daily
                 </span>
               </div>
-              <span className="text-[10px] text-slate-500 font-medium truncate max-w-full">
+              <span className="text-[11px] text-slate-600 truncate max-w-full">
                 {card.businessHours ? card.businessHours.replace("Open Daily • ", "").replace("Open Daily: ", "") : "9:00 AM – 12:00 AM"}
               </span>
             </div>
@@ -249,11 +276,11 @@ END:VCARD`
             <div className="flex flex-col items-center px-1">
               <div className="flex items-center gap-1 text-red-600 mb-0.5">
                 <Bike className="w-3.5 h-3.5 text-red-600 stroke-[2.5] flex-shrink-0" />
-                <span className="font-extrabold text-[11px] text-slate-900 truncate max-w-full">
-                  Delivery Available
+                <span className="font-bold text-[12px] text-slate-900 truncate max-w-full">
+                  Delivery
                 </span>
               </div>
-              <span className="text-[10px] text-slate-500 font-medium truncate max-w-full">
+              <span className="text-[11px] text-slate-600 truncate max-w-full">
                 {card.deliveryInfo
                   ? card.deliveryInfo.replace("Delivery Available • ", "").replace("Delivery Available: ", "")
                   : (card.locationState?.toLowerCase().includes("ahmedabad") ? "Gujarat & Pan-India" : "Available")}
@@ -263,9 +290,9 @@ END:VCARD`
           </div>
 
           {/* ═══════════════════════════════════════════════════════════════ */}
-          {/* 3. PRIMARY ACTION BUTTONS (VERIFIED LINKS & CONTACTS)           */}
+          {/* 3. PRIMARY ACTION BUTTONS (LIGHT CARDS + HIGHLIGHTED ICONS)     */}
           {/* ═══════════════════════════════════════════════════════════════ */}
-          <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 font-sans">
             
             {/* 1. WhatsApp Button */}
             {Boolean(card.whatsappNumber) && (
@@ -273,39 +300,39 @@ END:VCARD`
                 href={`https://wa.me/${card.whatsappNumber!.replace(/[^0-9]/g, "")}?text=Hello%20${encodeURIComponent(card.displayName)}%2C%20I%20found%20your%20Digital%20Card`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
+                className="p-3 sm:p-3.5 rounded-2xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98]"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
-                    <MessageCircle className="w-5 h-5 text-white fill-white" />
+                  <div className="w-9 h-9 rounded-full bg-[#25D366] flex items-center justify-center flex-shrink-0 shadow-xs">
+                    <OfficialWhatsAppIcon className="w-5 h-5 fill-white" />
                   </div>
                   <div className="text-left min-w-0">
-                    <div className="font-black text-xs sm:text-[13px] leading-tight text-white">WhatsApp</div>
-                    <div className="text-[10px] text-white/90 truncate">Chat with Us</div>
+                    <div className="font-bold text-xs sm:text-[13px] leading-tight text-slate-900">WhatsApp</div>
+                    <div className="text-[10px] text-slate-500 truncate">Chat with Us</div>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
               </a>
             )}
 
             {/* 2. Call Now Button */}
             {Boolean(card.phoneNumber || card.whatsappNumber) && (
               <a
-                href={`tel:${card.phoneNumber || (card.whatsappNumber ? `+${card.whatsappNumber.replace(/[^0-9]/g, "")}` : "")}`}
-                className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
+                href={`tel:${(card.phoneNumber || (card.whatsappNumber ? `+${card.whatsappNumber}` : "")).replace(/[^0-9+]/g, "")}`}
+                className="p-3 sm:p-3.5 rounded-2xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98]"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 shadow-xs">
                     <Phone className="w-4 h-4 text-white fill-white" />
                   </div>
                   <div className="text-left min-w-0">
-                    <div className="font-black text-xs sm:text-[13px] leading-tight text-white">Call Now</div>
-                    <div className="text-[10px] text-white/90 truncate font-mono">
+                    <div className="font-bold text-xs sm:text-[13px] leading-tight text-slate-900">Call Now</div>
+                    <div className="text-[10px] text-slate-500 truncate font-mono">
                       {card.phoneNumber || (card.whatsappNumber ? `+${card.whatsappNumber}` : "")}
                     </div>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
               </a>
             )}
 
@@ -315,18 +342,18 @@ END:VCARD`
                 href={sanitizeUrl(card.instagramUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
+                className="p-3 sm:p-3.5 rounded-2xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98]"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center flex-shrink-0 shadow-xs">
                     <Instagram className="w-4 h-4 text-white" />
                   </div>
                   <div className="text-left min-w-0">
-                    <div className="font-black text-xs sm:text-[13px] leading-tight text-white">Instagram</div>
-                    <div className="text-[10px] text-white/90 truncate">Follow for Updates</div>
+                    <div className="font-bold text-xs sm:text-[13px] leading-tight text-slate-900">Instagram</div>
+                    <div className="text-[10px] text-slate-500 truncate">Follow for Updates</div>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
               </a>
             )}
 
@@ -336,39 +363,39 @@ END:VCARD`
                 href={sanitizeUrl(card.facebookUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#1877F2] to-[#0a58ca] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
+                className="p-3 sm:p-3.5 rounded-2xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98]"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-[#1877F2] flex items-center justify-center flex-shrink-0 shadow-xs">
                     <Facebook className="w-4 h-4 text-white fill-white" />
                   </div>
                   <div className="text-left min-w-0">
-                    <div className="font-black text-xs sm:text-[13px] leading-tight text-white">Facebook</div>
-                    <div className="text-[10px] text-white/90 truncate">Like Our Page</div>
+                    <div className="font-bold text-xs sm:text-[13px] leading-tight text-slate-900">Facebook</div>
+                    <div className="text-[10px] text-slate-500 truncate">Like Our Page</div>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
               </a>
             )}
 
-            {/* 5. YouTube Button (only rendered if a real custom YouTube channel URL is set) */}
+            {/* 5. YouTube Button */}
             {Boolean(card.youtubeUrl && card.youtubeUrl.trim() !== "" && card.youtubeUrl !== "https://youtube.com" && card.youtubeUrl !== "https://www.youtube.com") && (
               <a
                 href={sanitizeUrl(card.youtubeUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#FF0000] to-[#b30000] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
+                className="p-3 sm:p-3.5 rounded-2xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98]"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-[#FF0000] flex items-center justify-center flex-shrink-0 shadow-xs">
                     <Youtube className="w-4 h-4 text-white fill-white" />
                   </div>
                   <div className="text-left min-w-0">
-                    <div className="font-black text-xs sm:text-[13px] leading-tight text-white">YouTube</div>
-                    <div className="text-[10px] text-white/90 truncate">Watch Our Videos</div>
+                    <div className="font-bold text-xs sm:text-[13px] leading-tight text-slate-900">YouTube</div>
+                    <div className="text-[10px] text-slate-500 truncate">Watch Our Videos</div>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
               </a>
             )}
 
@@ -377,35 +404,35 @@ END:VCARD`
               href={sanitizeUrl(card.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(card.displayName + " " + (card.locationShort || "Vadodara"))}`)}
               target="_blank"
               rel="noopener noreferrer"
-              className={`p-3 sm:p-3.5 rounded-2xl bg-white border border-blue-500/20 text-slate-900 shadow-sm hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98] ${
+              className={`p-3 sm:p-3.5 rounded-2xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98] ${
                 Boolean(card.youtubeUrl && card.youtubeUrl.trim() !== "" && card.youtubeUrl !== "https://youtube.com" && card.youtubeUrl !== "https://www.youtube.com") ? "" : "col-span-2"
               }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-                  <Navigation className="w-4 h-4 text-blue-600 fill-blue-600" />
+                <div className="w-9 h-9 rounded-full bg-rose-500 flex items-center justify-center flex-shrink-0 shadow-xs">
+                  <Navigation className="w-4 h-4 text-white fill-white" />
                 </div>
                 <div className="text-left min-w-0">
-                  <div className="font-black text-xs sm:text-[13px] leading-tight text-slate-900">Location</div>
+                  <div className="font-bold text-xs sm:text-[13px] leading-tight text-slate-900">Location</div>
                   <div className="text-[10px] text-slate-500 truncate">
                     {card.locationShort ? `Get Directions (${card.locationShort.split(",")[0].trim()})` : "Get Directions on Google Maps"}
                   </div>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-blue-600 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
             </a>
 
           </div>
 
           {/* ═══════════════════════════════════════════════════════════════ */}
-          {/* 4. ONLINE ORDERING PLATFORMS (5 ICONS GRID)                     */}
+          {/* 4. ONLINE ORDERING / STORE CATALOG                              */}
           {/* ═══════════════════════════════════════════════════════════════ */}
           <div className="pt-2">
             
-            {/* Cute Section Header */}
+            {/* Section Header (Times New Roman) */}
             <div className="flex items-center justify-center gap-2 mb-3">
               <div className="h-[1px] bg-amber-300/80 flex-1 max-w-[50px]" />
-              <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-slate-800">
+              <div style={timesFont} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-800">
                 <ShoppingBag className="w-3.5 h-3.5 text-amber-600" />
                 <span>
                   {card.subCategories?.toLowerCase().includes("cake") || card.subCategories?.toLowerCase().includes("food")
@@ -417,7 +444,7 @@ END:VCARD`
             </div>
 
             {/* 5 Platforms Row */}
-            <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
+            <div className="grid grid-cols-5 gap-1.5 sm:gap-2 font-sans">
               {orderingList.map((item, idx) => {
                 let badgeColor = item.color || "bg-blue-600"
                 let letter: string | React.ReactNode = "🌐"
@@ -440,7 +467,7 @@ END:VCARD`
                     href={sanitizeUrl(item.url)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 sm:p-2.5 rounded-2xl bg-white/90 backdrop-blur-xs border border-amber-200/60 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center group active:scale-95"
+                    className="p-2 sm:p-2.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-amber-200/60 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center group active:scale-95"
                   >
                     <div className={`w-8 h-8 rounded-full ${badgeColor} text-white flex items-center justify-center font-black text-xs shadow-xs mb-1.5 group-hover:scale-105 transition-transform`}>
                       {letter === "z" ? (
@@ -450,17 +477,17 @@ END:VCARD`
                       ) : letter === "E" ? (
                         <span className="font-bold text-[9px] uppercase">EC</span>
                       ) : letter === "💬" ? (
-                        <MessageCircle className="w-4 h-4 fill-white" />
+                        <OfficialWhatsAppIcon className="w-4 h-4 fill-white" />
                       ) : typeof letter === "string" && letter.length <= 3 ? (
                         <span className="font-black text-[10px] uppercase">{letter}</span>
                       ) : (
                         <Globe className="w-4 h-4" />
                       )}
                     </div>
-                    <span className="font-extrabold text-[9.5px] text-slate-800 leading-tight text-center break-words line-clamp-2 w-full min-h-[20px] flex items-center justify-center">
+                    <span className="font-bold text-[9.5px] text-slate-800 leading-tight text-center break-words line-clamp-2 w-full min-h-[20px] flex items-center justify-center">
                       {item.label}
                     </span>
-                    <span className="text-[8px] font-bold text-slate-500 mt-0.5 flex items-center justify-center gap-0.5 w-full">
+                    <span className="text-[8px] font-medium text-slate-500 mt-0.5 flex items-center justify-center gap-0.5 w-full">
                       {item.sublabel || "Visit"} <ChevronRight className="w-2.5 h-2.5 flex-shrink-0" />
                     </span>
                   </a>
@@ -470,16 +497,16 @@ END:VCARD`
           </div>
 
           {/* ═══════════════════════════════════════════════════════════════ */}
-          {/* 5. BOTTOM UTILITY CARDS: GOOGLE REVIEWS | SHARE CARD | SCAN QR  */}
+          {/* 5. BOTTOM UTILITY CARDS (Times New Roman Text)                  */}
           {/* ═══════════════════════════════════════════════════════════════ */}
-          <div className="grid grid-cols-3 gap-2 pt-1">
+          <div style={timesFont} className="grid grid-cols-3 gap-2 pt-1">
             
             {/* Google Reviews Card */}
             <a
               href={sanitizeUrl(card.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(card.displayName)}`)}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2.5 rounded-2xl bg-white/90 border border-amber-200/60 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center group active:scale-95"
+              className="p-2.5 rounded-2xl bg-white/95 border border-amber-200/60 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center group active:scale-95"
             >
               <div className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center mb-1">
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -489,12 +516,12 @@ END:VCARD`
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
                 </svg>
               </div>
-              <span className="font-extrabold text-[10px] text-slate-800 leading-tight">Google Reviews</span>
-              <div className="flex items-center gap-0.5 mt-0.5 text-amber-500 text-[10px] font-black">
-                <span>{card.googleRating || 4.6}</span>
+              <span className="font-bold text-[11px] text-slate-800 leading-tight">Google Reviews</span>
+              <div className="flex items-center gap-0.5 mt-0.5 text-amber-500 text-[11px] font-bold">
+                <span>{card.googleRating || 4.5}</span>
                 <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" />
               </div>
-              <span className="text-[8px] text-slate-500 font-medium flex items-center justify-center gap-0.5">
+              <span className="text-[9px] text-slate-500 font-medium flex items-center justify-center gap-0.5">
                 {card.googleReviewsCnt || 406} Reviews <ChevronRight className="w-2.5 h-2.5 flex-shrink-0" />
               </span>
             </a>
@@ -502,13 +529,13 @@ END:VCARD`
             {/* Share Card */}
             <button
               onClick={handleShareCard}
-              className="p-2.5 rounded-2xl bg-white/90 border border-amber-200/60 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center group active:scale-95"
+              className="p-2.5 rounded-2xl bg-white/95 border border-amber-200/60 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center group active:scale-95"
             >
               <div className="w-7 h-7 rounded-full bg-amber-50 text-amber-800 flex items-center justify-center mb-1">
                 <Share2 className="w-4 h-4" />
               </div>
-              <span className="font-extrabold text-[10px] text-slate-800 leading-tight">Share Card</span>
-              <span className="text-[9px] text-amber-700 font-bold mt-1 flex items-center justify-center gap-0.5">
+              <span className="font-bold text-[11px] text-slate-800 leading-tight">Share Card</span>
+              <span className="text-[10px] text-amber-700 font-medium mt-1 flex items-center justify-center gap-0.5">
                 {copied ? "Link Copied!" : <>With Friends <ChevronRight className="w-2.5 h-2.5 flex-shrink-0" /></>}
               </span>
             </button>
@@ -516,13 +543,13 @@ END:VCARD`
             {/* Scan QR */}
             <button
               onClick={() => setQrModalOpen(true)}
-              className="p-2.5 rounded-2xl bg-white/90 border border-amber-200/60 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center group active:scale-95"
+              className="p-2.5 rounded-2xl bg-white/95 border border-amber-200/60 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center group active:scale-95"
             >
               <div className="w-7 h-7 rounded-full bg-slate-900 text-white flex items-center justify-center mb-1">
                 <QrCode className="w-4 h-4" />
               </div>
-              <span className="font-extrabold text-[10px] text-slate-800 leading-tight">Scan QR</span>
-              <span className="text-[9px] text-slate-500 font-medium mt-1 flex items-center justify-center gap-0.5">
+              <span className="font-bold text-[11px] text-slate-800 leading-tight">Scan QR</span>
+              <span className="text-[10px] text-slate-500 font-medium mt-1 flex items-center justify-center gap-0.5">
                 Save to Phone <ChevronRight className="w-2.5 h-2.5 flex-shrink-0" />
               </span>
             </button>
@@ -532,23 +559,23 @@ END:VCARD`
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════ */}
-        {/* 6. STICKY FLOATING BOTTOM BAR: "SAVE CONTACT"                   */}
+        {/* 6. STICKY FLOATING BOTTOM BAR: "SAVE CONTACT" (LIGHT LUXURY)    */}
         {/* ═══════════════════════════════════════════════════════════════ */}
         <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-30">
           <button
             onClick={handleSaveContact}
             disabled={savingContact}
-            className="w-full py-3.5 px-6 rounded-2xl bg-[#3e2723] hover:bg-[#2b1b17] active:scale-[0.98] text-[#fff8e7] shadow-2xl border border-amber-500/30 flex items-center justify-between font-black text-sm tracking-wider uppercase transition-all"
+            className="w-full py-3.5 px-6 rounded-2xl bg-white/95 hover:bg-white active:scale-[0.98] text-slate-900 shadow-xl border-2 border-amber-300 flex items-center justify-between font-bold text-sm tracking-wider uppercase transition-all"
           >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shadow-xs">
                 <Contact className="w-4 h-4" />
               </div>
-              <span className="text-white tracking-[0.15em] text-[13px]">
+              <span className="text-slate-900 font-extrabold tracking-[0.15em] text-[13px]">
                 {savingContact ? "Saving to Contacts..." : "Save Contact"}
               </span>
             </div>
-            <ChevronRight className="w-5 h-5 text-amber-300" />
+            <ChevronRight className="w-5 h-5 text-amber-600" />
           </button>
         </div>
 
@@ -562,12 +589,13 @@ END:VCARD`
           <div className="bg-white rounded-3xl max-w-xs w-full p-6 text-center space-y-4 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
             <button
               onClick={() => setQrModalOpen(false)}
+              aria-label="Close QR Code dialog"
               className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-200"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <div className="w-16 h-16 rounded-full bg-white shadow-md border-2 border-amber-400 mx-auto flex items-center justify-center overflow-hidden">
+            <div className="w-40 h-20 rounded-2xl bg-white shadow-md border-2 border-amber-300 mx-auto flex items-center justify-center p-2 overflow-hidden">
               {card.logoUrl ? (
                 <img src={card.logoUrl} alt={card.displayName} className="w-full h-full object-contain" />
               ) : (
@@ -576,8 +604,8 @@ END:VCARD`
             </div>
 
             <div>
-              <h3 className="font-black text-lg text-slate-900">{card.displayName}</h3>
-              <p className="text-xs text-slate-500 font-semibold">Scan to Open Live Digital Business Card</p>
+              <h3 style={timesFont} className="font-bold text-xl text-slate-900">{card.displayName}</h3>
+              <p style={timesFont} className="text-xs text-slate-500 mt-0.5">Scan to Open Live Digital Business Card</p>
             </div>
 
             {/* QR Code Canvas */}
@@ -589,7 +617,7 @@ END:VCARD`
               />
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 font-sans">
               <button
                 onClick={handleCopyLink}
                 className="flex-1 py-2.5 rounded-xl border border-slate-300 font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-slate-50"

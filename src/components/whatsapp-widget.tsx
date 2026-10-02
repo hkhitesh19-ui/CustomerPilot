@@ -22,7 +22,8 @@ export function WhatsAppFloatingWidget({
   }
 
   const encodedMessage = encodeURIComponent(message)
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`
+  const cleanPhone = (phoneNumber || "919033304707").replace(/[^0-9]/g, "")
+  const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`
 
   return (
     <div className="fixed z-50 flex flex-col gap-2 group select-none max-sm:bottom-20 max-sm:left-4 max-sm:items-start sm:bottom-6 sm:right-6 sm:items-end">
