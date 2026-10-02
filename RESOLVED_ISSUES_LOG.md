@@ -3,6 +3,22 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: Pure 2D Flat Printable Poster Inserts (Zero Table & Room Backgrounds)
+- **Symptom**: When clicking "Print A4 Standee", the printout still contained the 3D tabletop photo (showing the marble counter, bread/croissants on the counter, and cafe background lights) rather than the actual flat 2D graphic poster insert that goes inside the clear acrylic stand. The user provided an exact Gemini AI sample (`media_1790907100345.jpg`) showing that the printable format must be the flat 2D paper insert itself ("kya print kare to exact same full image print kare ? tumhe Printable format ka meaning samaj me nahi aa raha he ? see Gemini Ai se hi se mene ye generate karvake tumhe sample de raha hu").
+- **Root Cause**: The print route was loading the 3D photorealistic tabletop presentation mockup rather than isolating and rendering the dedicated flat 2D rectangular poster insert graphic (the physical paper sheet that slides into the acrylic stand).
+- **Resolution**:
+  1. Created dedicated pure 2D flat poster inserts in `public/standees/` for all 3 options without tables, marble counters, or background blur:
+     - `poster_bakery_insert.jpg`: Golden Crown, "Cake Connection - ARTISANAL BAKERY & CAKE STUDIO", chocolate drip cake with cherries, 4 gold perk badges, live scannable QR box, and CustomerPilot logo.
+     - `poster_royal_insert.jpg`: Exact 2D flat insert matching the user's uploaded Gemini AI sample (`media_1790907100345.jpg`), with Cake Connection 3-tier logo, "VIP REWARDS CLUB", caramel tiered cake with stacked macarons, 4 gold perk circles, and CustomerPilot logo.
+     - `poster_celebration_insert.jpg`: Cake Connection logo, "SWEET CELEBRATIONS & PASTRY LOUNGE", strawberry cheesecake with sliced strawberries & chocolate cupcakes, 4 gold perk badges, and CustomerPilot logo.
+  2. Updated `src/app/api/qr/standee/route.ts` with `PRINT_POSTER_COORDS` triggered via `format=print`:
+     - Composites a clean white rounded card backing under the QR code with calibrated coordinates.
+     - Overlays the merchant's real scannable WhatsApp check-in QR code (with centered merchant logo).
+     - Returns the 2D flat printable insert when `format=print` is requested, while preserving the 3D tabletop mockups for the dashboard preview.
+  3. Updated `src/components/qr-generator.tsx` to pass `&format=print` to `standeeUrl` during print, formatting the flat insert on standard A4 portrait paper with outer scissor cut/trim guidelines.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: Preserving Exact Standee Design, Photography & Wordings in Printable A4 Mode
 - **Symptom**: When printing any of the 3 standee options, the user observed that the printout stripped away all cake photography, crowns, ribbons, colors, and wordings, replacing them with a plain generic white page with purple boxes ("print karne ke time pe Design and wordings sab kuch change kyu kar diya - all 3 options me ?").
 - **Root Cause**: `generatePrintableStandeeHtml` had constructed an artificial CSS layout using plain HTML text and div rectangles without embedding the actual rich photorealistic artwork (chocolate drip cakes, velvet tiered cakes, strawberry cheesecakes) or the exact custom typography, banners, and wordings belonging to each specific shortlisted standee option.

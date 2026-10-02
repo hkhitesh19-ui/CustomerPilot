@@ -11,8 +11,10 @@ interface StandeeConfig {
   qr: { left: number; top: number; width: number; height: number }
   darkColor: string
   cpBadge?: { left: number; top: number; width: number; height: number }
+  whiteCard?: { left: number; top: number; width: number; height: number; rx: number }
 }
 
+// 3D Tabletop Studio Mockups (Displayed on Merchant Dashboard preview)
 const STANDEE_COORDS: Record<string, StandeeConfig> = {
   bakery: {
     image: "standee_bakery_mockup.jpg",
@@ -32,7 +34,6 @@ const STANDEE_COORDS: Record<string, StandeeConfig> = {
     darkColor: "#3b1d11",
     cpBadge: { left: 350, top: 935, width: 205, height: 36 },
   },
-  // Backwards-compatible aliases for previously selected design keys
   retail: {
     image: "standee_royal_mockup.jpg",
     qr: { left: 432, top: 598, width: 172, height: 172 },
@@ -47,11 +48,46 @@ const STANDEE_COORDS: Record<string, StandeeConfig> = {
   },
 }
 
+// Pure 2D Flat Printable Poster Inserts (NO tables, NO room backgrounds, NO perspective - for A4 printing)
+const PRINT_POSTER_COORDS: Record<string, StandeeConfig> = {
+  bakery: {
+    image: "poster_bakery_insert.jpg",
+    qr: { left: 465, top: 375, width: 275, height: 275 },
+    darkColor: "#500713",
+    whiteCard: { left: 445, top: 355, width: 315, height: 315, rx: 24 },
+  },
+  royal: {
+    image: "poster_royal_insert.jpg",
+    qr: { left: 425, top: 465, width: 275, height: 275 },
+    darkColor: "#0f2942",
+    whiteCard: { left: 405, top: 445, width: 315, height: 315, rx: 24 },
+  },
+  celebration: {
+    image: "poster_celebration_insert.jpg",
+    qr: { left: 485, top: 435, width: 275, height: 275 },
+    darkColor: "#3b1d11",
+    whiteCard: { left: 465, top: 415, width: 315, height: 315, rx: 24 },
+  },
+  retail: {
+    image: "poster_royal_insert.jpg",
+    qr: { left: 425, top: 465, width: 275, height: 275 },
+    darkColor: "#0f2942",
+    whiteCard: { left: 405, top: 445, width: 315, height: 315, rx: 24 },
+  },
+  pizzeria: {
+    image: "poster_celebration_insert.jpg",
+    qr: { left: 485, top: 435, width: 275, height: 275 },
+    darkColor: "#3b1d11",
+    whiteCard: { left: 465, top: 415, width: 315, height: 315, rx: 24 },
+  },
+}
+
 export async function GET(req: NextRequest) {
   try {
     const url = req.nextUrl
     const design = (url.searchParams.get("design") || "bakery") as string
     const merchantId = url.searchParams.get("m") || req.headers.get("x-merchant-id")
+    const isPrintFormat = url.searchParams.get("format") === "print"
 
     if (!merchantId) {
       return new NextResponse("Merchant ID required", { status: 400 })
@@ -65,7 +101,8 @@ export async function GET(req: NextRequest) {
       return new NextResponse("Merchant not found", { status: 404 })
     }
 
-    const config = STANDEE_COORDS[design] || STANDEE_COORDS.bakery
+    const configMap = isPrintFormat ? PRINT_POSTER_COORDS : STANDEE_COORDS
+    const config = configMap[design] || configMap.bakery
     const baseImagePath = path.join(process.cwd(), "public", "standees", config.image)
 
     if (!fs.existsSync(baseImagePath)) {
@@ -96,13 +133,28 @@ export async function GET(req: NextRequest) {
       .png()
       .toBuffer()
 
-    const composites: sharp.OverlayOptions[] = [
-      {
-        input: qrBuffer,
-        left: config.qr.left,
-        top: config.qr.top,
-      },
-    ]
+    const composites: sharp.OverlayOptions[] = []
+
+    // Prepend clean white rounded card backing under QR if configured
+    if (config.whiteCard) {
+      const cardSvg = Buffer.from(`
+        <svg width="${config.whiteCard.width}" height="${config.whiteCard.height}">
+          <rect x="0" y="0" width="${config.whiteCard.width}" height="${config.whiteCard.height}" rx="${config.whiteCard.rx}" ry="${config.whiteCard.rx}" fill="#ffffff"/>
+        </svg>
+      `)
+      const cardBuf = await sharp(cardSvg).png().toBuffer()
+      composites.push({
+        input: cardBuf,
+        left: config.whiteCard.left,
+        top: config.whiteCard.top,
+      })
+    }
+
+    composites.push({
+      input: qrBuffer,
+      left: config.qr.left,
+      top: config.qr.top,
+    })
 
     // 3. Composite CustomerPilot Logo Badge if configured
     if (config.cpBadge) {

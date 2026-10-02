@@ -278,7 +278,7 @@ function generatePrintableStandeeHtml(
   merchantId: string,
   storeName: string
 ): string {
-  const standeeUrl = `/api/qr/standee?design=${designId}&m=${merchantId}&v=${Date.now()}`
+  const standeeUrl = `/api/qr/standee?design=${designId}&m=${merchantId}&format=print&v=${Date.now()}`
   
   const titleMap: Record<StandeeDesignId, string> = {
     bakery: "Artisanal Bakery & Cake Studio",
@@ -303,7 +303,7 @@ function generatePrintableStandeeHtml(
       padding: 0;
     }
     body {
-      background: #0f172a;
+      background: #f8fafc;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
       justify-content: center;
