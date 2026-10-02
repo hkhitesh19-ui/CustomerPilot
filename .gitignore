@@ -39,3 +39,8 @@ cloudflared.exe
 *.tsbuildinfo
 next-env.d.ts
 prisma/prod_*.db*
+
+# local antigravity agent tools & extensions
+antigravity_extensions/
+.agent/
+

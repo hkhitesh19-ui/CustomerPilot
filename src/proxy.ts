@@ -79,11 +79,18 @@ export async function proxy(request: NextRequest) {
     '/api/google-business/oauth',
     '/api/wallet/',
     '/api/whatsapp/',
+    '/api/digital-card',
     // SECURITY FIX: /api/payments/ removed from public — payments require merchant auth
     // Both create-order and verify are called from the authenticated /dashboard context
   ];
 
-  const isPublicApi = PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  const isPublicApi = PUBLIC_API_PREFIXES.some((prefix) => {
+    if (prefix === '/api/digital-card') {
+      // SECURITY: Only GET is public for public card viewing. Mutations (POST/PUT/DELETE) require merchant auth
+      return pathname.startsWith('/api/digital-card') && request.method === 'GET';
+    }
+    return pathname.startsWith(prefix);
+  });
 
   if (pathname.startsWith('/api/') && !isPublicApi) {
     if (!token) {

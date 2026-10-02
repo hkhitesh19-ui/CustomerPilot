@@ -39,6 +39,33 @@ Violation of this rule (pushing before user confirmation) is a breach of the pro
 Whenever you deploy code to the live Hostinger VPS server (200.97.170.53), you MUST immediately update `Git Commit on VPS Live.txt` in the project root with the active Git commit hash, branch, timestamp, and commit message. 
 Never complete a deployment without keeping `Git Commit on VPS Live.txt` 100% synchronized with the live server.
 
+## Mandatory Dual-Engine Protocol: GSD Planning + CodeRabbit Quality & Security Audit
+For EVERY new task, feature request, or significant bugfix, you MUST systematically execute through this dual-engine pipeline:
+
+1. **Stage 1 — GSD Structured Planning (Break Down)**:
+   - Break down the user's requirement into clear structured phases (Plan ➔ Break Down ➔ Execute ➔ Verify).
+   - Lay out the architecture, impacted files, and step-by-step roadmap before coding.
+
+2. **Stage 2 — Disciplined Execution**:
+   - Implement the code changes phase-by-phase without breaking existing modules.
+
+3. **Stage 3 — CodeRabbit Deep Review & Security Audit**:
+   - Perform an automated code review and security audit on all changed files:
+     - Bug & Edge Case Detection (null safety, async race conditions, state desync)
+     - Security Audit (SQL/ORM injection, unauthorized access, secret exposure)
+     - Performance & Efficiency Check (unnecessary re-renders, DB query optimization)
+   - Summarize findings by severity (Critical / Major / Minor / Clean).
+
+4. **Stage 4 — Autofix & Local Commit**:
+   - Automatically fix any Critical/Major audit findings.
+   - Run `git add` and `git commit` locally.
+
+5. **Stage 5 — User Permission Gate (Strict Rule)**:
+   - Present the completed work along with the CodeRabbit Audit Verdict.
+   - **STOP. Do NOT push or deploy.**
+   - Wait for the user's explicit confirmation and permission before any `git push` or VPS deployment.
+
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

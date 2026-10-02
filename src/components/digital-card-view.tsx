@@ -1,6 +1,23 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
+
+function sanitizeUrl(url?: string | null): string {
+  if (!url) return "#"
+  const trimmed = url.trim()
+  if (
+    trimmed.startsWith("http://") || 
+    trimmed.startsWith("https://") || 
+    trimmed.startsWith("tel:") || 
+    trimmed.startsWith("mailto:")
+  ) {
+    return trimmed
+  }
+  if (trimmed.startsWith("/")) {
+    return trimmed
+  }
+  return `https://${trimmed}`
+}
 import { 
   BadgeCheck, 
   MapPin, 
@@ -52,26 +69,28 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
   const [copied, setCopied] = useState(false)
   const [savingContact, setSavingContact] = useState(false)
 
-  // Parse ordering platforms
-  let orderingList: Array<{ platform: string; label: string; sublabel?: string; url: string; color?: string }> = []
-  try {
-    if (card.orderingLinks) {
-      orderingList = JSON.parse(card.orderingLinks)
+  // Parse ordering platforms with useMemo to prevent redundant parsing on every keystroke
+  const orderingList = useMemo(() => {
+    let list: Array<{ platform: string; label: string; sublabel?: string; url: string; color?: string }> = []
+    try {
+      if (card.orderingLinks) {
+        list = JSON.parse(card.orderingLinks)
+      }
+    } catch {
+      list = []
     }
-  } catch (e) {
-    orderingList = []
-  }
 
-  // Fallback defaults if empty
-  if (orderingList.length === 0) {
-    orderingList = [
-      { platform: "website", label: "Website", sublabel: "Order Now", url: card.websiteUrl || "#", color: "#2563eb" },
-      { platform: "whatsapp", label: "WhatsApp", sublabel: "Order Now", url: `https://wa.me/${card.whatsappNumber || "919876543210"}?text=Hi%20${encodeURIComponent(card.displayName)}%2C%20I%20want%20to%20place%20an%20order`, color: "#16a34a" },
-      { platform: "zomato", label: "Zomato", sublabel: "Order Now", url: "https://www.zomato.com", color: "#ef4444" },
-      { platform: "swiggy", label: "Swiggy", sublabel: "Order Now", url: "https://www.swiggy.com", color: "#f97316" },
-      { platform: "easycater", label: "EasyCater", sublabel: "Order Now", url: "https://www.easycater.com", color: "#7c3aed" }
-    ]
-  }
+    if (list.length === 0) {
+      list = [
+        { platform: "website", label: "Website", sublabel: "Order Now", url: card.websiteUrl || "#", color: "#2563eb" },
+        { platform: "whatsapp", label: "WhatsApp", sublabel: "Order Now", url: card.whatsappNumber ? `https://wa.me/${card.whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(card.displayName)}%2C%20I%20want%20to%20place%20an%20order` : "#", color: "#16a34a" },
+        { platform: "zomato", label: "Zomato", sublabel: "Order Now", url: "https://www.zomato.com", color: "#ef4444" },
+        { platform: "swiggy", label: "Swiggy", sublabel: "Order Now", url: "https://www.swiggy.com", color: "#f97316" },
+        { platform: "easycater", label: "EasyCater", sublabel: "Order Now", url: "https://www.easycater.com", color: "#7c3aed" }
+      ]
+    }
+    return list
+  }, [card.orderingLinks, card.websiteUrl, card.whatsappNumber, card.displayName])
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : `https://customerpilot.in/c/${card.slug}`
 
@@ -180,28 +199,28 @@ END:VCARD`
           {/* ═══════════════════════════════════════════════════════════════ */}
           <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-amber-200/80 shadow-sm p-3 grid grid-cols-3 divide-x divide-slate-100 text-center">
             
-            {/* Pill 1: Location */}
+            {/* Pill 1: Location (Split on comma to avoid ugly truncation) */}
             <div className="flex flex-col items-center px-1">
               <div className="flex items-center gap-1 text-red-600 mb-0.5">
-                <MapPin className="w-3.5 h-3.5 fill-red-600 text-white" />
-                <span className="font-extrabold text-[11px] text-slate-900 line-clamp-1">
-                  {card.locationShort || "Manjalpur"}
+                <MapPin className="w-3.5 h-3.5 fill-red-600 text-white flex-shrink-0" />
+                <span className="font-extrabold text-[11px] text-slate-900 truncate max-w-full">
+                  {card.locationShort ? card.locationShort.split(",")[0].trim() : "Manjalpur"}
                 </span>
               </div>
-              <span className="text-[10px] text-slate-500 font-medium line-clamp-1">
-                {card.locationState || "Gujarat, India"}
+              <span className="text-[10px] text-slate-500 font-medium truncate max-w-full">
+                {card.locationState || (card.locationShort?.includes(",") ? card.locationShort.split(",").slice(1).join(",").trim() : "Vadodara, Gujarat")}
               </span>
             </div>
 
             {/* Pill 2: Open Hours */}
             <div className="flex flex-col items-center px-1">
               <div className="flex items-center gap-1 text-red-600 mb-0.5">
-                <Clock className="w-3.5 h-3.5 text-red-600 stroke-[2.5]" />
-                <span className="font-extrabold text-[11px] text-slate-900 line-clamp-1">
+                <Clock className="w-3.5 h-3.5 text-red-600 stroke-[2.5] flex-shrink-0" />
+                <span className="font-extrabold text-[11px] text-slate-900 truncate max-w-full">
                   Open Daily
                 </span>
               </div>
-              <span className="text-[10px] text-slate-500 font-medium line-clamp-1">
+              <span className="text-[10px] text-slate-500 font-medium truncate max-w-full">
                 {card.businessHours ? card.businessHours.replace("Open Daily • ", "").replace("Open Daily: ", "") : "9:00 AM – 12:00 AM"}
               </span>
             </div>
@@ -209,12 +228,12 @@ END:VCARD`
             {/* Pill 3: Delivery */}
             <div className="flex flex-col items-center px-1">
               <div className="flex items-center gap-1 text-red-600 mb-0.5">
-                <Bike className="w-3.5 h-3.5 text-red-600 stroke-[2.5]" />
-                <span className="font-extrabold text-[11px] text-slate-900 line-clamp-1">
+                <Bike className="w-3.5 h-3.5 text-red-600 stroke-[2.5] flex-shrink-0" />
+                <span className="font-extrabold text-[11px] text-slate-900 truncate max-w-full">
                   Delivery Available
                 </span>
               </div>
-              <span className="text-[10px] text-slate-500 font-medium line-clamp-1">
+              <span className="text-[10px] text-slate-500 font-medium truncate max-w-full">
                 {card.deliveryInfo ? card.deliveryInfo.replace("Delivery Available • ", "").replace("Delivery Available: ", "") : "Vadodara Only"}
               </span>
             </div>
@@ -222,109 +241,123 @@ END:VCARD`
           </div>
 
           {/* ═══════════════════════════════════════════════════════════════ */}
-          {/* 3. PRIMARY ACTION BUTTONS (6 BRIGHT VIBRANT PILLS, 2 COLS)      */}
+          {/* 3. PRIMARY ACTION BUTTONS (VERIFIED LINKS & CONTACTS)           */}
           {/* ═══════════════════════════════════════════════════════════════ */}
           <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
             
             {/* 1. WhatsApp Button */}
-            <a
-              href={`https://wa.me/${card.whatsappNumber || "919876543210"}?text=Hello%20${encodeURIComponent(card.displayName)}%2C%20I%20found%20your%20Digital%20Card`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
-                  <MessageCircle className="w-5 h-5 text-white fill-white" />
+            {Boolean(card.whatsappNumber) && (
+              <a
+                href={`https://wa.me/${card.whatsappNumber!.replace(/[^0-9]/g, "")}?text=Hello%20${encodeURIComponent(card.displayName)}%2C%20I%20found%20your%20Digital%20Card`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
+                    <MessageCircle className="w-5 h-5 text-white fill-white" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <div className="font-black text-xs sm:text-[13px] leading-tight text-white">WhatsApp</div>
+                    <div className="text-[10px] text-white/90 truncate">Chat with Us</div>
+                  </div>
                 </div>
-                <div className="text-left min-w-0">
-                  <div className="font-black text-xs sm:text-[13px] leading-tight text-white">WhatsApp</div>
-                  <div className="text-[10px] text-white/90 truncate">Chat with Us</div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
-            </a>
+                <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+              </a>
+            )}
 
             {/* 2. Call Now Button */}
-            <a
-              href={`tel:${card.phoneNumber || card.whatsappNumber || "+919876543210"}`}
-              className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-4 h-4 text-white fill-white" />
+            {Boolean(card.phoneNumber || card.whatsappNumber) && (
+              <a
+                href={`tel:${card.phoneNumber || (card.whatsappNumber ? `+${card.whatsappNumber.replace(/[^0-9]/g, "")}` : "")}`}
+                className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-4 h-4 text-white fill-white" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <div className="font-black text-xs sm:text-[13px] leading-tight text-white">Call Now</div>
+                    <div className="text-[10px] text-white/90 truncate font-mono">
+                      {card.phoneNumber || (card.whatsappNumber ? `+${card.whatsappNumber}` : "")}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-left min-w-0">
-                  <div className="font-black text-xs sm:text-[13px] leading-tight text-white">Call Now</div>
-                  <div className="text-[10px] text-white/90 truncate">{card.phoneNumber || "+91 98765 43210"}</div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
-            </a>
+                <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+              </a>
+            )}
 
             {/* 3. Instagram Button */}
-            <a
-              href={card.instagramUrl || "https://instagram.com"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
-                  <Instagram className="w-4 h-4 text-white" />
+            {Boolean(card.instagramUrl && card.instagramUrl.trim() !== "" && card.instagramUrl !== "https://instagram.com" && card.instagramUrl !== "https://www.instagram.com") && (
+              <a
+                href={sanitizeUrl(card.instagramUrl)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
+                    <Instagram className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <div className="font-black text-xs sm:text-[13px] leading-tight text-white">Instagram</div>
+                    <div className="text-[10px] text-white/90 truncate">Follow for Updates</div>
+                  </div>
                 </div>
-                <div className="text-left min-w-0">
-                  <div className="font-black text-xs sm:text-[13px] leading-tight text-white">Instagram</div>
-                  <div className="text-[10px] text-white/90 truncate">Follow for Updates</div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
-            </a>
+                <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+              </a>
+            )}
 
             {/* 4. Facebook Button */}
-            <a
-              href={card.facebookUrl || "https://facebook.com"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#1877F2] to-[#0a58ca] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
-                  <Facebook className="w-4 h-4 text-white fill-white" />
+            {Boolean(card.facebookUrl && card.facebookUrl.trim() !== "" && card.facebookUrl !== "https://facebook.com" && card.facebookUrl !== "https://www.facebook.com") && (
+              <a
+                href={sanitizeUrl(card.facebookUrl)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#1877F2] to-[#0a58ca] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
+                    <Facebook className="w-4 h-4 text-white fill-white" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <div className="font-black text-xs sm:text-[13px] leading-tight text-white">Facebook</div>
+                    <div className="text-[10px] text-white/90 truncate">Like Our Page</div>
+                  </div>
                 </div>
-                <div className="text-left min-w-0">
-                  <div className="font-black text-xs sm:text-[13px] leading-tight text-white">Facebook</div>
-                  <div className="text-[10px] text-white/90 truncate">Like Our Page</div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
-            </a>
+                <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+              </a>
+            )}
 
-            {/* 5. YouTube Button */}
-            <a
-              href={card.youtubeUrl || "https://youtube.com"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#FF0000] to-[#b30000] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
-                  <Youtube className="w-4 h-4 text-white fill-white" />
+            {/* 5. YouTube Button (only rendered if a real custom YouTube channel URL is set) */}
+            {Boolean(card.youtubeUrl && card.youtubeUrl.trim() !== "" && card.youtubeUrl !== "https://youtube.com" && card.youtubeUrl !== "https://www.youtube.com") && (
+              <a
+                href={sanitizeUrl(card.youtubeUrl)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-[#FF0000] to-[#b30000] text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between group active:scale-[0.98]"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0">
+                    <Youtube className="w-4 h-4 text-white fill-white" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <div className="font-black text-xs sm:text-[13px] leading-tight text-white">YouTube</div>
+                    <div className="text-[10px] text-white/90 truncate">Watch Our Videos</div>
+                  </div>
                 </div>
-                <div className="text-left min-w-0">
-                  <div className="font-black text-xs sm:text-[13px] leading-tight text-white">YouTube</div>
-                  <div className="text-[10px] text-white/90 truncate">Watch Our Videos</div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
-            </a>
+                <ChevronRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+              </a>
+            )}
 
             {/* 6. Location / Directions Button */}
             <a
-              href={card.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(card.displayName + " " + (card.locationShort || ""))}`}
+              href={sanitizeUrl(card.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(card.displayName + " " + (card.locationShort || "Vadodara"))}`)}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-3 sm:p-3.5 rounded-2xl bg-white border border-blue-500/20 text-slate-900 shadow-sm hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98]"
+              className={`p-3 sm:p-3.5 rounded-2xl bg-white border border-blue-500/20 text-slate-900 shadow-sm hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98] ${
+                Boolean(card.youtubeUrl && card.youtubeUrl.trim() !== "" && card.youtubeUrl !== "https://youtube.com" && card.youtubeUrl !== "https://www.youtube.com") ? "" : "col-span-2"
+              }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
@@ -332,7 +365,9 @@ END:VCARD`
                 </div>
                 <div className="text-left min-w-0">
                   <div className="font-black text-xs sm:text-[13px] leading-tight text-slate-900">Location</div>
-                  <div className="text-[10px] text-slate-500 truncate">Get Directions</div>
+                  <div className="text-[10px] text-slate-500 truncate">
+                    {card.locationShort ? `Get Directions (${card.locationShort.split(",")[0].trim()})` : "Get Directions on Google Maps"}
+                  </div>
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-blue-600 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
@@ -369,7 +404,7 @@ END:VCARD`
                 return (
                   <a
                     key={idx}
-                    href={item.url}
+                    href={sanitizeUrl(item.url)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-2 sm:p-2.5 rounded-2xl bg-white/90 backdrop-blur-xs border border-amber-200/60 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center group active:scale-95"

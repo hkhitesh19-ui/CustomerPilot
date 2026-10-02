@@ -5,17 +5,19 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
     const slug = searchParams.get("slug")
-    const merchantId = searchParams.get("merchantId")
+    const authMerchantId = req.headers.get("x-merchant-id")
+    const queryMerchantId = searchParams.get("merchantId")
+    const targetMerchantId = authMerchantId || queryMerchantId
 
-    let card = null
+    let card: any = null
 
     if (slug) {
       card = await db.digitalBusinessCard.findUnique({
         where: { slug: slug.toLowerCase() },
       })
-    } else if (merchantId) {
+    } else if (targetMerchantId) {
       card = await db.digitalBusinessCard.findUnique({
-        where: { merchantId },
+        where: { merchantId: targetMerchantId },
       })
     } else {
       // Default to first merchant's card
@@ -35,6 +37,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const authMerchantId = req.headers.get("x-merchant-id")
     const body = await req.json()
     const {
       merchantId,
@@ -62,15 +65,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Slug and Display Name are required" }, { status: 400 })
     }
 
-    // Determine target merchantId
-    let targetMerchantId = merchantId
+    // Determine target merchantId from authenticated session first to prevent BOLA
+    let targetMerchantId = authMerchantId || merchantId
     if (!targetMerchantId) {
       const firstMerchant = await db.merchant.findFirst()
       targetMerchantId = firstMerchant?.id
     }
 
     if (!targetMerchantId) {
-      return NextResponse.json({ success: false, error: "No merchant found to associate with card" }, { status: 400 })
+      return NextResponse.json({ success: false, error: "Unauthorized: No merchant found to associate with card" }, { status: 401 })
     }
 
     const cleanSlug = slug.toLowerCase().trim().replace(/[^a-z0-9-]/g, "-")

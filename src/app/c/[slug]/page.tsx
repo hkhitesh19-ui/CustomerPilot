@@ -59,55 +59,9 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
   const cleanSlug = slug.toLowerCase()
 
   // 1. Find the card by slug
-  let card = await db.digitalBusinessCard.findUnique({
+  const card = await db.digitalBusinessCard.findUnique({
     where: { slug: cleanSlug },
   })
-
-  // 2. Fallback: if not found, check if a merchant exists with similar name
-  if (!card) {
-    const merchant = await db.merchant.findFirst({
-      where: {
-        OR: [
-          { name: { contains: "Cake Connection" } },
-          { name: { contains: cleanSlug } },
-        ],
-      },
-    })
-
-    if (merchant) {
-      const defaultOrdering = JSON.stringify([
-        { platform: "website", label: "Website", sublabel: "Order Now", url: "https://cakeconnection.in", color: "#2563eb" },
-        { platform: "whatsapp", label: "WhatsApp", sublabel: "Order Now", url: `https://wa.me/${merchant.whatsappPhone || "919876543210"}?text=Hi%20${encodeURIComponent(merchant.name)}%2C%20I%20want%20to%20place%20an%20order`, color: "#16a34a" },
-        { platform: "zomato", label: "Zomato", sublabel: "Order Now", url: "https://www.zomato.com", color: "#ef4444" },
-        { platform: "swiggy", label: "Swiggy", sublabel: "Order Now", url: "https://www.swiggy.com", color: "#f97316" },
-        { platform: "easycater", label: "EasyCater", sublabel: "Order Now", url: "https://www.easycater.com", color: "#7c3aed" },
-      ])
-
-      card = await db.digitalBusinessCard.create({
-        data: {
-          merchantId: merchant.id,
-          slug: cleanSlug,
-          displayName: merchant.name || "Cake Connection",
-          subCategories: "Cakes • Desserts • Flowers • Party Decor",
-          logoUrl: merchant.logoUrl || "/uploads/1789267721286-IMG_20220502_WA0034.jpg",
-          locationShort: "Manjalpur, Vadodara",
-          locationState: "Gujarat, India",
-          businessHours: "Open Daily • 9:00 AM – 12:00 AM",
-          deliveryInfo: "Delivery Available • Vadodara Only",
-          whatsappNumber: merchant.whatsappPhone || "919876543210",
-          phoneNumber: "+91 98765 43210",
-          instagramUrl: "https://instagram.com",
-          facebookUrl: "https://facebook.com",
-          youtubeUrl: "https://youtube.com",
-          googleMapsUrl: "https://maps.google.com",
-          websiteUrl: "https://cakeconnection.in",
-          orderingLinks: defaultOrdering,
-          googleRating: 4.6,
-          googleReviewsCnt: 689,
-        },
-      })
-    }
-  }
 
   if (!card) {
     notFound()

@@ -23,7 +23,8 @@ import {
   Bike,
   Check,
   MessageCircle,
-  Eye
+  Eye,
+  Loader2
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -48,20 +49,20 @@ export default function DigitalCardDashboardPage() {
     subCategories: "Cakes • Desserts • Flowers • Party Decor",
     logoUrl: "/uploads/1789267721286-IMG_20220502_WA0034.jpg",
     coverUrl: null,
-    locationShort: "Manjalpur, Vadodara",
-    locationState: "Gujarat, India",
+    locationShort: "Manjalpur",
+    locationState: "Vadodara, Gujarat",
     businessHours: "Open Daily • 9:00 AM – 12:00 AM",
     deliveryInfo: "Delivery Available • Vadodara Only",
-    whatsappNumber: "919876543210",
-    phoneNumber: "+91 98765 43210",
-    instagramUrl: "https://instagram.com/cakeconnection",
-    facebookUrl: "https://facebook.com/cakeconnection",
-    youtubeUrl: "https://youtube.com/@cakeconnection",
+    whatsappNumber: "917203824012",
+    phoneNumber: "+91 72038 24012",
+    instagramUrl: "https://www.instagram.com/CakeConnection.in/",
+    facebookUrl: "https://www.facebook.com/CakeConnection.in/",
+    youtubeUrl: "",
     googleMapsUrl: "https://maps.google.com/?q=Cake+Connection+Manjalpur+Vadodara",
     websiteUrl: "https://cakeconnection.in",
     orderingLinks: JSON.stringify([
       { platform: "website", label: "Website", sublabel: "Order Now", url: "https://cakeconnection.in", color: "#2563eb" },
-      { platform: "whatsapp", label: "WhatsApp", sublabel: "Order Now", url: "https://wa.me/919876543210?text=Hi%20Cake%20Connection%2C%20I%20want%20to%20order", color: "#16a34a" },
+      { platform: "whatsapp", label: "WhatsApp", sublabel: "Order Now", url: "https://wa.me/917203824012?text=Hi%20Cake%20Connection%2C%20I%20want%20to%20order", color: "#16a34a" },
       { platform: "zomato", label: "Zomato", sublabel: "Order Now", url: "https://www.zomato.com", color: "#ef4444" },
       { platform: "swiggy", label: "Swiggy", sublabel: "Order Now", url: "https://www.swiggy.com", color: "#f97316" },
       { platform: "easycater", label: "EasyCater", sublabel: "Order Now", url: "https://www.easycater.com", color: "#7c3aed" }
@@ -210,6 +211,15 @@ export default function DigitalCardDashboardPage() {
   const handleWhatsAppShare = () => {
     const text = `🎂 *${formData.displayName} • Official Digital Business Card* ✨\n📍 ${formData.locationShort || "Vadodara"} | ⭐ ${formData.googleRating || 4.6} (${formData.googleReviewsCnt || 689} Reviews)\n\nHamare contacts, menu, Instagram, Zomato & Swiggy online ordering ke liye tap karein:\n👉 ${publicUrl}`
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank")
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+        <p className="text-sm font-semibold text-slate-500">Loading your Digital Business Card...</p>
+      </div>
+    )
   }
 
   return (

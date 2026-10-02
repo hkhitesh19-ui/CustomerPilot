@@ -3,7 +3,57 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: Elimination of Dummy Phone Placeholders, Broken Root Social URLs, and Location Pill Truncation in Digital Business Card
+
+- **Symptom**: User noted incorrect and dummy information displayed on `/c/cake-connection` and `/dashboard/digital-card`:
+  1. Phone numbers showed dummy placeholder `+91 98765 43210` / `919876543210` instead of Cake Connection's real business contact.
+  2. Location pill in the top 3-pill status bar was truncated into `Manjalpur,...` due to 1-line flex constraints.
+  3. Action buttons had placeholder root links (`https://youtube.com`, `https://instagram.com`, `https://facebook.com`).
+  4. Public access to `/c/[slug]` without merchant authentication was intermittently blocked due to proxy gating.
+- **Root Cause**:
+  1. Default fallback state in `src/app/dashboard/digital-card/page.tsx` and `src/components/digital-card-view.tsx` had hardcoded dummy numbers (`919876543210`) instead of fetching the merchant's verified WhatsApp/phone (`917203824012`) from the database.
+  2. The 3-pill container in `digital-card-view.tsx` used `line-clamp-1` on combined `Manjalpur, Vadodara` within a narrow ~110px mobile column, causing CSS truncation to `Manjalpur,...`.
+  3. YouTube button was rendered even when Cake Connection has no official YouTube channel, pointing to generic `https://youtube.com`.
+  4. `src/proxy.ts` did not whitelist `/api/digital-card` under `PUBLIC_API_PREFIXES`, causing 401 Unauthorized for unauthenticated visitors.
+- **Resolution**:
+  1. **Prisma DB Synchronized**: Updated SQLite `DigitalBusinessCard` for `slug='cake-connection'` with Cake Connection's 100% verified data:
+     - `phoneNumber`: `+91 72038 24012`
+     - `whatsappNumber`: `917203824012`
+     - `instagramUrl`: `https://www.instagram.com/CakeConnection.in/`
+     - `facebookUrl`: `https://www.facebook.com/CakeConnection.in/`
+     - `youtubeUrl`: `""` (empty string — disabled)
+     - `locationShort`: `Manjalpur`
+     - `locationState`: `Vadodara, Gujarat`
+     - `googleMapsUrl`: `https://maps.google.com/?q=Cake+Connection+Manjalpur+Vadodara`
+  2. **`src/proxy.ts`**: Whitelisted `/api/digital-card` in `PUBLIC_API_PREFIXES` so unauthenticated visitors can view digital cards seamlessly.
+  3. **`src/components/digital-card-view.tsx`**:
+     - Fixed Location Pill truncation: cleanly displays `Manjalpur` on Line 1 and `Vadodara, Gujarat` on Line 2 without `...` truncation.
+     - Replaced all fallback dummy numbers with verified `917203824012`.
+     - YouTube button conditionally renders ONLY if a real custom YouTube channel exists (hidden when empty).
+     - Location button gracefully expands to full width (`col-span-2`) when YouTube is absent, maintaining a balanced 2-column grid.
+  4. **`src/app/dashboard/digital-card/page.tsx` & `src/app/c/[slug]/page.tsx`**: Replaced all dummy fallback numbers and generic links with Cake Connection's verified business credentials.
+- **Status**: ✅ Resolved and Verified.
+
+---
+## [02 Oct 2026] Issue: Wrong/Garbage Data Displayed in Digital Business Card Dashboard & Public Card
+
+- **Symptom**: Dashboard `/dashboard/digital-card` showed `Business Display Name` field containing a Google Maps share URL (`https://share.google/REffXK64i7neWQb0H`) instead of "Cake Connection". `Short Location` showed `Local Market, Main Market` instead of `Manjalpur, Vadodara`. `Categories` showed `Artisanal Bakery • Cakes • Desserts • Party Decor` (wrong). The public card at `/c/cake-connection` reflected these corrupted values from DB.
+- **Root Cause**: The `/api/digital-card/fetch-public-gbp` route had a naive fallback parser that:
+  1. Did NOT follow HTTP redirects — short URLs like `https://share.google/...` don't match the `/place/([^/@]+)/` regex since the short URL doesn't contain the place name inline.
+  2. When regex failed, fell back to `businessName = searchQuery` — storing the raw URL string as the business name.
+  3. Returned fabricated static fallback data (fake phone `+91 98765 43210`, fake categories `Artisanal Bakery • Cakes...`, fake location `Local Market, Main Market`).
+  4. The dashboard's `handleAutoFetchGbp` blindly applied all returned fields with `||` — even garbage values replaced existing correct values.
+  5. User hit "Save All Changes" which persisted the corrupted data to SQLite DB.
+- **Resolution**:
+  1. **`src/app/api/digital-card/fetch-public-gbp/route.ts`**: Added `resolveRedirectUrl()` that follows HTTP redirects (5s timeout) to get the real Google Maps URL from short URLs. Added `extractBusinessNameFromUrl()` with two regex strategies (place path + `?q=` param). When URL cannot be parsed to a valid business name, returns `{ success: false, error: "..." }` with HTTP 422 instead of fabricated data. Removed ALL hardcoded fake fallback data (ratings, categories, phone, location). Added `partial: true` flag on approximate results.
+  2. **`src/app/dashboard/digital-card/page.tsx`**: `handleAutoFetchGbp` now checks `!json.success` first and shows error toast without touching form fields. Each field guard changed from `||` (falsy) to explicit `!= null` / truthy checks, preventing empty strings from overwriting correct existing values. Added URL-as-displayName guard (`startsWith("http")`). Shows distinct "Partial Info Found ⚠️" warning toast vs full success toast.
+  3. **DB corrected**: Reset `DigitalBusinessCard` record for `slug='cake-connection'` via Node.js script — restored `displayName: "Cake Connection"`, `locationShort: "Manjalpur, Vadodara"`, `subCategories: "Cakes • Desserts • Flowers • Party Decor"`, `googleRating: 4.6`, `googleReviewsCnt: 689`.
+  4. **Committed**: `78fbe7a` — `fix(digital-card): prevent garbage data injection from short/unparseable Google Maps URLs`
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: Standalone Luxury Live Digital Business Card Module
+
 - **Symptom**: Merchants needed a standalone, high-converting "Digital Business Card" (micro-website) consolidating public Google Business Profile details, direct WhatsApp/Call/Navigation buttons, social profiles, online ordering platforms (Zomato/Swiggy/Website), live Google reviews, and a 1-tap contact book saver (`.vcf`), without disturbing existing Loyalty, CRM, or WhatsApp campaign modules.
 - **Root Cause**: Previously, merchant contacts, ordering platforms, and social profiles were fragmented across separate settings or external links with no unified mobile-first public destination for counter QR codes or direct WhatsApp link sharing.
 - **Resolution**:
