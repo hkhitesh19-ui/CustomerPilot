@@ -107,30 +107,50 @@ export default function DigitalCardDashboardPage() {
         body: JSON.stringify({ query: gbpSearchQuery }),
       })
       const json = await res.json()
-      if (json.success && json.details) {
-        setFormData((prev) => ({
-          ...prev,
-          displayName: json.details.displayName || prev.displayName,
-          subCategories: json.details.subCategories || prev.subCategories,
-          locationShort: json.details.locationShort || prev.locationShort,
-          locationState: json.details.locationState || prev.locationState,
-          phoneNumber: json.details.phoneNumber || prev.phoneNumber,
-          googleRating: json.details.googleRating || prev.googleRating,
-          googleReviewsCnt: json.details.googleReviewsCnt || prev.googleReviewsCnt,
-          googleMapsUrl: json.details.googleMapsUrl || prev.googleMapsUrl,
-          websiteUrl: json.details.websiteUrl || prev.websiteUrl,
-          businessHours: json.details.businessHours || prev.businessHours,
-        }))
+
+      if (!json.success) {
+        // API explicitly failed — show the error, do NOT touch form fields
         toast({
-          title: "Public GBP Details Auto-Fetched! ⚡",
-          description: "Business name, location, rating, hours and maps link synced.",
-        })
-      } else {
-        toast({
-          title: "Notice",
-          description: json.error || "Could not auto-fetch. Please enter details manually.",
+          title: "Could Not Extract Business Details",
+          description: json.error || "Please type your business name directly instead of pasting a short link.",
           variant: "destructive",
         })
+        return
+      }
+
+      if (json.success && json.details) {
+        const d = json.details
+        // Only overwrite a field if the API returned a non-empty, non-null, non-URL value
+        setFormData((prev) => ({
+          ...prev,
+          displayName: (d.displayName && !d.displayName.startsWith("http"))
+            ? d.displayName
+            : prev.displayName,
+          subCategories: d.subCategories ? d.subCategories : prev.subCategories,
+          locationShort: d.locationShort ? d.locationShort : prev.locationShort,
+          locationState: d.locationState ? d.locationState : prev.locationState,
+          phoneNumber: d.phoneNumber ? d.phoneNumber : prev.phoneNumber,
+          googleRating: d.googleRating != null ? d.googleRating : prev.googleRating,
+          googleReviewsCnt: d.googleReviewsCnt != null ? d.googleReviewsCnt : prev.googleReviewsCnt,
+          googleMapsUrl: (d.googleMapsUrl && d.googleMapsUrl.length > 20)
+            ? d.googleMapsUrl
+            : prev.googleMapsUrl,
+          websiteUrl: d.websiteUrl ? d.websiteUrl : prev.websiteUrl,
+          businessHours: d.businessHours ? d.businessHours : prev.businessHours,
+          deliveryInfo: d.deliveryInfo ? d.deliveryInfo : prev.deliveryInfo,
+        }))
+
+        if (json.partial) {
+          toast({
+            title: "Partial Info Found ⚠️",
+            description: "Business name pre-filled. Please verify and complete remaining details (location, hours, phone) manually before saving.",
+          })
+        } else {
+          toast({
+            title: "GBP Details Auto-Synced! ⚡",
+            description: `${json.source === "google_places_api" ? "Full Google Places data" : "Business details"} fetched successfully.`,
+          })
+        }
       }
     } catch (err) {
       toast({

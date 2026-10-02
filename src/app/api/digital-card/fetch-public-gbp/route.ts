@@ -1,12 +1,51 @@
 import { NextRequest, NextResponse } from "next/server"
 import { searchGooglePlaces, getPlaceDetails } from "@/lib/google-places-api"
 
+/** Attempt to resolve a short/redirect URL to its final destination */
+async function resolveRedirectUrl(url: string): Promise<string> {
+  try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 5000)
+    const res = await fetch(url, {
+      method: "HEAD",
+      redirect: "follow",
+      signal: controller.signal,
+    })
+    clearTimeout(timeout)
+    return res.url || url
+  } catch {
+    return url
+  }
+}
+
+/** Extract business name from a full Google Maps URL */
+function extractBusinessNameFromUrl(mapsUrl: string): string | null {
+  // Standard place URL: /maps/place/BusinessName/@...
+  const placeMatch = mapsUrl.match(/\/maps\/place\/([^/@?]+)/)
+  if (placeMatch && placeMatch[1]) {
+    const decoded = decodeURIComponent(placeMatch[1]).replace(/\+/g, " ")
+    // If it looks like a URL, reject it
+    if (decoded.startsWith("http")) return null
+    return decoded
+  }
+
+  // Query string: ?q=BusinessName
+  const qMatch = mapsUrl.match(/[?&]q=([^&]+)/)
+  if (qMatch && qMatch[1]) {
+    const decoded = decodeURIComponent(qMatch[1]).replace(/\+/g, " ")
+    if (decoded.startsWith("http")) return null
+    return decoded
+  }
+
+  return null
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const { query, mapsUrl } = body
 
-    const searchQuery = (query || mapsUrl || "").trim()
+    let searchQuery = (query || mapsUrl || "").trim()
 
     if (!searchQuery) {
       return NextResponse.json(
@@ -23,7 +62,6 @@ export async function POST(req: NextRequest) {
           const topResult = searchRes.results[0]
           const details = await getPlaceDetails(topResult.placeId)
 
-          // Format category from types
           const categories = (details.types || [])
             .filter((t) => !["point_of_interest", "establishment"].includes(t))
             .map((t) => t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()))
@@ -40,7 +78,7 @@ export async function POST(req: NextRequest) {
               phoneNumber: details.nationalPhoneNumber || "",
               googleRating: details.rating || 4.6,
               googleReviewsCnt: details.userRatingCount || 100,
-              subCategories: categories || "Artisanal Bakery • Cakes • Desserts",
+              subCategories: categories || "",
               googleMapsUrl: details.googleMapsUri,
               websiteUrl: details.websiteUri || "",
               businessHours: details.currentOpeningHours?.openNow
@@ -55,42 +93,81 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Public Smart Parser Fallback (No OAuth or Google API key required!)
-    let businessName = searchQuery
-    let cleanLocation = "Local Market"
+    // ─── Public Smart Parser Fallback (No OAuth or API key required) ──────────
 
-    // If a Google Maps URL was pasted
-    if (searchQuery.includes("maps.google") || searchQuery.includes("goo.gl") || searchQuery.includes("maps.app")) {
-      const match = searchQuery.match(/place\/([^/@]+)/)
-      if (match && match[1]) {
-        businessName = decodeURIComponent(match[1]).replace(/\+/g, " ")
-      } else {
-        businessName = "Local Business Listing"
+    // STEP 1: If query looks like a URL, try to resolve short URLs first
+    const isUrl = searchQuery.startsWith("http://") || searchQuery.startsWith("https://")
+
+    if (isUrl) {
+      // Short URL patterns that require redirect resolution
+      const isShortUrl =
+        searchQuery.includes("share.google") ||
+        searchQuery.includes("maps.app.goo.gl") ||
+        searchQuery.includes("goo.gl")
+
+      if (isShortUrl) {
+        console.log("[FETCH_GBP] Short URL detected, resolving redirect...")
+        searchQuery = await resolveRedirectUrl(searchQuery)
+        console.log("[FETCH_GBP] Resolved to:", searchQuery)
       }
+
+      // STEP 2: Try to extract business name from the (possibly resolved) URL
+      const businessName = extractBusinessNameFromUrl(searchQuery)
+
+      if (!businessName) {
+        // Could not parse a valid business name from the URL
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "Could not extract business name from this link. Please paste a full Google Maps place URL (e.g., maps.google.com/maps/place/YourBusiness/...) or just type your business name directly.",
+          },
+          { status: 422 }
+        )
+      }
+
+      // STEP 3: Build a clean location hint from the name
+      const words = businessName.split(" ")
+      const locationHint = words.length > 1 ? words[words.length - 1] : businessName
+
+      return NextResponse.json({
+        success: true,
+        source: "public_smart_parser",
+        partial: true, // Signal to frontend: this is partial/approximate — confirm before saving
+        details: {
+          displayName: businessName,
+          locationShort: `${locationHint}`,
+          locationState: "India",
+          phoneNumber: "",
+          googleRating: null,
+          googleReviewsCnt: null,
+          subCategories: "",
+          googleMapsUrl: searchQuery,
+          websiteUrl: "",
+          businessHours: "",
+          deliveryInfo: "",
+        },
+      })
     }
 
-    const words = businessName.split(" ")
-    if (words.length > 1) {
-      cleanLocation = words.slice(-1)[0]
-    }
-
+    // STEP 4: Plain text business name search — return as-is with empty placeholders
+    // (no fabricated data like fake ratings, fake categories, fake phone numbers)
     return NextResponse.json({
       success: true,
-      source: "public_smart_parser",
+      source: "manual_entry",
+      partial: true,
       details: {
-        displayName: businessName,
-        locationShort: `${cleanLocation}, Main Market`,
+        displayName: searchQuery,
+        locationShort: "",
         locationState: "India",
-        phoneNumber: "+91 98765 43210",
-        googleRating: 4.6,
-        googleReviewsCnt: 689,
-        subCategories: "Artisanal Bakery • Cakes • Desserts • Party Decor",
-        googleMapsUrl: searchQuery.startsWith("http")
-          ? searchQuery
-          : `https://maps.google.com/?q=${encodeURIComponent(businessName)}`,
+        phoneNumber: "",
+        googleRating: null,
+        googleReviewsCnt: null,
+        subCategories: "",
+        googleMapsUrl: `https://maps.google.com/?q=${encodeURIComponent(searchQuery)}`,
         websiteUrl: "",
-        businessHours: "Open Daily • 9:00 AM – 12:00 AM",
-        deliveryInfo: "Delivery Available • City Only",
+        businessHours: "",
+        deliveryInfo: "",
       },
     })
   } catch (error: any) {
