@@ -234,6 +234,17 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       border-right: 2px solid #0f172a;
     }
 
+    /* Header Group (Logo + Name + VIP Badge tightly composed) */
+    .standee-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+      margin-top: 1mm;
+      z-index: 1;
+    }
+
     /* 1. Business Logo */
     .logo-wrap {
       display: flex;
@@ -242,7 +253,6 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       height: 52px;
       margin-bottom: 2mm;
       position: relative;
-      z-index: 1;
     }
     .brand-logo {
       max-height: 52px;
@@ -269,12 +279,11 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       font-size: 24px;
       font-weight: 900;
       color: #0f172a;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
       line-height: 1.15;
-      margin-bottom: 3mm;
+      margin-bottom: 2.5mm;
       position: relative;
-      z-index: 1;
     }
 
     /* 3. VIP Reward CLUB */
@@ -288,9 +297,8 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       padding: 5px 22px;
       border-radius: 9999px;
       border: 1px solid #d97706;
-      margin-bottom: 5mm;
+      margin-bottom: 0;
       position: relative;
-      z-index: 1;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     .vip-club-text {
@@ -306,19 +314,19 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
     .qr-vector-box {
       position: relative;
       background: #ffffff;
-      padding: 12px;
+      padding: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 3mm;
+      margin: auto 0;
       z-index: 1;
     }
     .qr-target-tl {
       position: absolute;
       top: 0;
       left: 0;
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       border-top: 3px solid #0f172a;
       border-left: 3px solid #0f172a;
     }
@@ -326,8 +334,8 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       position: absolute;
       top: 0;
       right: 0;
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       border-top: 3px solid #0f172a;
       border-right: 3px solid #0f172a;
     }
@@ -335,8 +343,8 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       position: absolute;
       bottom: 0;
       left: 0;
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       border-bottom: 3px solid #0f172a;
       border-left: 3px solid #0f172a;
     }
@@ -344,16 +352,16 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       position: absolute;
       bottom: 0;
       right: 0;
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       border-bottom: 3px solid #0f172a;
       border-right: 3px solid #0f172a;
     }
     .qr-img {
-      width: 72mm;
-      height: 72mm;
-      max-width: 275px;
-      max-height: 275px;
+      width: 86mm;
+      height: 86mm;
+      max-width: 326px;
+      max-height: 326px;
       display: block;
     }
 
@@ -449,17 +457,15 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
         <div class="corner-bracket corner-bl"></div>
         <div class="corner-bracket corner-br"></div>
 
-        <!-- 1. Business Logo -->
-        <div class="logo-wrap">
-          ${logoHtml}
-        </div>
-
-        <!-- 2. Business Name -->
-        <h1 class="brand-name">${storeName}</h1>
-
-        <!-- 3. VIP Reward CLUB -->
-        <div class="vip-club-badge">
-          <span class="vip-club-text">★ VIP REWARD CLUB ★</span>
+        <!-- Header Group: Logo + Store Name + VIP Badge -->
+        <div class="standee-header">
+          <div class="logo-wrap">
+            ${logoHtml}
+          </div>
+          <h1 class="brand-name">${storeName}</h1>
+          <div class="vip-club-badge">
+            <span class="vip-club-text">★ VIP REWARD CLUB ★</span>
+          </div>
         </div>
 
         <!-- 4. Pure Vector QR Code Box with Precision Target Brackets -->

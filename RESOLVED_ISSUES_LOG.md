@@ -9,13 +9,14 @@ This document serves as a historical record of all major bugs, configuration iss
 - **Resolution**:
   1. **Removed Clutter Lines**:
      - Completely removed `"Scan with WhatsApp to Collect Stamps"`, `"🪙 1 Stamp / Visit"`, `"🎁 Welcome Treat"`, and `"🎂 Birthday Freebie"` from both the on-screen preview and the print template in `src/components/qr-generator.tsx`.
-  2. **High-End 2D Vector Standee Styling**:
+  2. **High-End 2D Vector Standee Styling & Print Synchronization**:
      - Implemented dual hairline borders with gold accenting and 4 geometric vector corner brackets (`┌ ┐ └ ┘`).
      - Maintained the clean hierarchy:
        - `[1]` Business Logo (high-res logo or monogram badge)
        - `[2]` Business Name in bold uppercase `Cinzel` typography
        - `[3]` `★ VIP REWARD CLUB ★` dark onyx & gold badge
        - `[4]` Scannable QR Code enclosed in a precision target frame with 4 corner targeting brackets
+     - Grouped top header elements (`standee-header`) to eliminate accidental flex distribution gaps and enlarged print QR code to 86mm, achieving a 1:1 balanced visual match with the on-screen card.
      - Calibrated the print template for standard 6×8" / A5 countertop acrylic L-stand insert dimensions (`148mm x 210mm`) with dashed scissor cut guides.
      - Verified CustomerPilot footer branding and clean responsiveness.
 - **Status**: ✅ Resolved and Verified.
