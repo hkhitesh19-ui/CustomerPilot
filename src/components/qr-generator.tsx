@@ -275,47 +275,23 @@ export function detectIndustryCategory(businessType?: string | null, category?: 
 
 function generatePrintableStandeeHtml(
   designId: StandeeDesignId,
-  industryId: IndustryCategoryId,
-  storeName: string,
-  logoUrl: string | null,
-  qrDataUrl: string,
-  branchCity?: string | null
+  merchantId: string,
+  storeName: string
 ): string {
-  const ind = INDUSTRY_CONFIGS[industryId] || INDUSTRY_CONFIGS.bakery
-
-  let primary = ind.primary
-  let secondary = ind.secondary
-  let accent = ind.accent
-  let cardBg = ind.cardBg
-  let badgeText = ind.badgeText
-  let title = ind.option1Title
-
-  if (designId === "royal") {
-    primary = "#0f2942"
-    secondary = "#1e3a8a"
-    accent = "#d97706"
-    cardBg = "#f8fafc"
-    badgeText = "👑 ROYAL PRIVILEGE VIP MEMBER"
-    title = "Royal Sapphire VIP Club"
-  } else if (designId === "celebration") {
-    primary = "#581c87"
-    secondary = "#701a75"
-    accent = "#ea580c"
-    cardBg = "#fff7ed"
-    badgeText = "🎉 SWEET CELEBRATIONS & REWARDS"
-    title = "Sweet Celebrations Lounge"
+  const standeeUrl = `/api/qr/standee?design=${designId}&m=${merchantId}&v=${Date.now()}`
+  
+  const titleMap: Record<StandeeDesignId, string> = {
+    bakery: "Artisanal Bakery & Cake Studio",
+    royal: "Royal Sapphire & Gold VIP Club",
+    celebration: "Sweet Celebrations & Rewards Lounge",
   }
-
-  const perks = ind.perks
-  const storeLogoHtml = logoUrl
-    ? `<img src="${logoUrl}" alt="${storeName}" class="store-logo" />`
-    : `<div class="store-logo-placeholder"><span>${storeName.slice(0, 2).toUpperCase()}</span></div>`
+  const title = titleMap[designId] || "VIP Loyalty Standee"
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>A4 Standee Printable - ${storeName} (${title})</title>
+  <title>Print Standee - ${title} - ${storeName}</title>
   <style>
     @page {
       size: A4 portrait;
@@ -327,15 +303,14 @@ function generatePrintableStandeeHtml(
       padding: 0;
     }
     body {
-      background: #f1f5f9;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
-      color: #0f172a;
     }
     .print-sheet {
       width: 210mm;
@@ -346,8 +321,9 @@ function generatePrintableStandeeHtml(
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 12mm 14mm 10mm 14mm;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+      align-items: center;
+      padding: 8mm 10mm 6mm 10mm;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
     }
     @media print {
       body {
@@ -361,291 +337,89 @@ function generatePrintableStandeeHtml(
         max-height: 297mm;
         page-break-after: avoid;
         page-break-inside: avoid;
+        padding: 6mm 8mm 4mm 8mm;
       }
       .no-print {
         display: none !important;
       }
     }
 
-    /* Outer Trim / Crop Guidelines for Standard 6x8" / A5 Acrylic Stands */
-    .trim-guide {
-      position: absolute;
-      top: 6mm;
-      left: 6mm;
-      right: 6mm;
-      bottom: 6mm;
-      border: 1.5px dashed rgba(148, 163, 184, 0.5);
-      border-radius: 12px;
-      pointer-events: none;
+    /* Outer Scissor Trim Guidelines for Standard Acrylic Stands */
+    .trim-guide-box {
+      position: relative;
+      width: 100%;
+      height: 268mm;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 3mm;
+      background: #fafafa;
     }
-    .trim-label {
+    .trim-label-top {
       position: absolute;
-      bottom: 2mm;
-      right: 8mm;
-      font-size: 8.5px;
-      color: #94a3b8;
+      top: -6px;
+      left: 20px;
+      background: #ffffff;
+      padding: 0 8px;
+      font-size: 9px;
+      font-weight: 700;
+      color: #64748b;
       letter-spacing: 0.5px;
       text-transform: uppercase;
+    }
+    .trim-label-bottom {
+      position: absolute;
+      bottom: -6px;
+      right: 20px;
+      background: #ffffff;
+      padding: 0 8px;
+      font-size: 9px;
       font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
-    /* Brand Header */
-    .brand-header {
-      text-align: center;
-      position: relative;
-      z-index: 2;
-      padding-bottom: 2mm;
-    }
-    .theme-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: ${primary};
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 5px 18px;
-      border-radius: 30px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-      margin-bottom: 6px;
-    }
-    .logo-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 3px 0 6px 0;
-      height: 52px;
-    }
-    .store-logo {
-      max-height: 50px;
-      max-width: 200px;
+    /* The Real Standee Artwork - Preserves 100% of Design, Artwork & Wordings */
+    .standee-poster-image {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: 258mm;
       object-fit: contain;
+      border-radius: 6px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      display: block;
     }
-    .store-logo-placeholder {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: ${primary};
-      color: #ffffff;
-      font-weight: 900;
-      font-size: 18px;
+
+    /* Sheet Footer */
+    .print-footer {
+      width: 100%;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-    }
-    .store-title {
-      font-size: 32px;
-      font-weight: 900;
-      color: ${primary};
-      letter-spacing: -0.5px;
-      line-height: 1.15;
-      font-family: "Georgia", "Times New Roman", serif;
-    }
-    .store-subtitle {
-      font-size: 11px;
-      font-weight: 800;
-      color: ${accent};
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-top: 3px;
-    }
-    .branch-badge {
-      display: inline-block;
-      font-size: 10px;
+      font-size: 9.5px;
       color: #64748b;
       font-weight: 600;
-      margin-top: 2px;
-    }
-
-    /* Hero Call to Action Banner */
-    .hero-banner {
-      background: linear-gradient(135deg, ${primary} 0%, ${secondary} 100%);
-      color: #ffffff;
-      border-radius: 16px;
-      padding: 10px 16px;
-      text-align: center;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-      margin: 3mm 0 4mm 0;
-      position: relative;
-    }
-    .hero-title {
-      font-size: 17.5px;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .hero-subtitle {
-      font-size: 11px;
-      font-weight: 600;
-      opacity: 0.92;
-      margin-top: 2px;
-      letter-spacing: 0.3px;
-    }
-
-    /* Centerpiece Massive QR Code Card */
-    .qr-card-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 2mm 0 4mm 0;
-    }
-    .qr-card {
-      background: #ffffff;
-      border: 3.5px solid ${accent};
-      border-radius: 24px;
-      padding: 14px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-      position: relative;
-      text-align: center;
-      width: 82mm;
-      max-width: 320px;
-    }
-    .qr-bracket-tl, .qr-bracket-tr, .qr-bracket-bl, .qr-bracket-br {
-      position: absolute;
-      width: 18px;
-      height: 18px;
-      border-color: ${primary};
-      border-style: solid;
-    }
-    .qr-bracket-tl { top: 6px; left: 6px; border-width: 3.5px 0 0 3.5px; border-top-left-radius: 8px; }
-    .qr-bracket-tr { top: 6px; right: 6px; border-width: 3.5px 3.5px 0 0; border-top-right-radius: 8px; }
-    .qr-bracket-bl { bottom: 6px; left: 6px; border-width: 0 0 3.5px 3.5px; border-bottom-left-radius: 8px; }
-    .qr-bracket-br { bottom: 6px; right: 6px; border-width: 0 3.5px 3.5px 0; border-bottom-right-radius: 8px; }
-
-    .qr-image {
-      width: 68mm;
-      height: 68mm;
-      max-width: 270px;
-      max-height: 270px;
-      display: block;
-      margin: 0 auto;
-      border-radius: 12px;
-    }
-    .qr-scan-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #f1f5f9;
-      color: #0f172a;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 5px 14px;
-      border-radius: 20px;
-      margin-top: 8px;
-      border: 1px solid #cbd5e1;
-    }
-    .wa-icon {
-      color: #16a34a;
-      font-size: 14px;
-    }
-
-    /* 4 Perks Grid */
-    .perks-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px 12px;
-      margin: 2mm 0 3mm 0;
-    }
-    .perk-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: ${cardBg};
-      border: 1px solid rgba(0,0,0,0.06);
-      border-left: 4.5px solid ${primary};
-      border-radius: 10px;
-      padding: 8px 10px;
-    }
-    .perk-icon-wrap {
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-    .perk-text h4 {
-      font-size: 11px;
-      font-weight: 800;
-      color: ${primary};
-      line-height: 1.2;
-    }
-    .perk-text p {
-      font-size: 9.5px;
-      color: #475569;
-      margin-top: 1px;
-      line-height: 1.25;
-    }
-
-    /* 3 Simple Steps */
-    .steps-bar {
-      background: #f8fafc;
-      border: 1px dashed #cbd5e1;
-      border-radius: 10px;
-      padding: 6px 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 9.5px;
-      color: #475569;
-      font-weight: 700;
-      margin-top: 2mm;
-    }
-    .step-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .step-num {
-      background: ${primary};
-      color: #ffffff;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      font-weight: 900;
-    }
-    .step-arrow {
-      color: #94a3b8;
-      font-size: 10px;
-    }
-
-    /* Sheet Footer with Official CustomerPilot Logo */
-    .sheet-footer {
-      border-top: 1.5px solid #e2e8f0;
-      padding-top: 7px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 2mm;
+      padding-top: 3mm;
+      border-top: 1px solid #e2e8f0;
     }
     .footer-left {
-      font-size: 9.5px;
-      color: #64748b;
-      font-weight: 600;
-      line-height: 1.35;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .footer-right {
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-    .cp-logo-img {
-      height: 24px;
-      width: auto;
-      object-fit: contain;
-    }
-    .powered-by-text {
-      font-size: 9px;
-      color: #94a3b8;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      gap: 6px;
+      font-weight: 700;
+      color: #0f172a;
     }
 
-    /* Top Floating Print Bar (Hidden on print) */
+    /* Top Floating Print Bar (Hidden during print) */
     .print-bar {
       position: fixed;
       top: 15px;
@@ -664,7 +438,7 @@ function generatePrintableStandeeHtml(
       font-size: 13.5px;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+      box-shadow: 0 4px 14px rgba(37,99,235,0.4);
       display: flex;
       align-items: center;
       gap: 6px;
@@ -673,13 +447,14 @@ function generatePrintableStandeeHtml(
       background: #1d4ed8;
     }
     .paper-hint {
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.9);
       color: #ffffff;
       font-size: 12px;
       font-weight: 700;
       padding: 8px 14px;
       border-radius: 8px;
       backdrop-blur: 4px;
+      border: 1px solid rgba(255,255,255,0.15);
     }
     .btn-close {
       background: #475569;
@@ -695,106 +470,36 @@ function generatePrintableStandeeHtml(
 </head>
 <body>
   <div class="print-bar no-print">
-    <span class="paper-hint">📐 Paper: A4 Portrait (250+ GSM recommended)</span>
+    <span class="paper-hint">📐 Paper: A4 Portrait (250+ GSM Photo Card recommended)</span>
     <button class="btn-print" onclick="window.print()">🖨️ Print Standee Sheet</button>
     <button class="btn-close" onclick="window.close()">✕ Close</button>
   </div>
 
   <div class="print-sheet">
-    <div class="trim-guide"></div>
-    <span class="trim-label">✂️ Trim guide for standard 6×8" / A5 acrylic counter stand</span>
+    <!-- Outer Trim & Crop Box for Standard Counter Acrylic Stands -->
+    <div class="trim-guide-box">
+      <span class="trim-label-top">✂️ Cut along dashed line to insert into Counter Acrylic Stand</span>
+      
+      <!-- 100% REAL STANDEE ARTWORK WITH CHOSEN DESIGN, PHOTOS & WORDINGS -->
+      <img
+        src="${standeeUrl}"
+        alt="${title}"
+        class="standee-poster-image"
+        onload="setTimeout(function(){ window.print(); }, 500);"
+      />
 
-    <!-- Top Brand Header -->
-    <div class="brand-header">
-      <div class="theme-badge">${badgeText}</div>
-      <div class="logo-container">
-        ${storeLogoHtml}
-      </div>
-      <h1 class="store-title">${storeName}</h1>
-      <div class="store-subtitle">${ind.tagline}</div>
-      <div class="branch-badge">📍 ${branchCity || "Billing Counter Standee"} • Official VIP Member Club</div>
+      <span class="trim-label-bottom">Standard A4 / A5 / 6×8" Tabletop Acrylic Stand Insert</span>
     </div>
 
-    <!-- Hero Call to Action -->
-    <div class="hero-banner">
-      <div class="hero-title">SCAN WITH WHATSAPP TO EARN STAMPS</div>
-      <div class="hero-subtitle">Collect stamps on every visit &amp; unlock exclusive handcrafted member rewards!</div>
-    </div>
-
-    <!-- Massive QR Code Card -->
-    <div class="qr-card-container">
-      <div class="qr-card">
-        <div class="qr-bracket-tl"></div>
-        <div class="qr-bracket-tr"></div>
-        <div class="qr-bracket-bl"></div>
-        <div class="qr-bracket-br"></div>
-        <img src="${qrDataUrl}" alt="VIP Check-in QR" class="qr-image" />
-        <div class="qr-scan-pill">
-          <span class="wa-icon">💬</span>
-          <span>Open WhatsApp Camera &amp; Scan • Instant 5-Sec Check-in</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4 Perks Grid -->
-    <div class="perks-grid">
-      <div class="perk-box">
-        <span class="perk-icon-wrap">${perks[0].icon}</span>
-        <div class="perk-text">
-          <h4>${perks[0].title}</h4>
-          <p>${perks[0].desc}</p>
-        </div>
-      </div>
-      <div class="perk-box">
-        <span class="perk-icon-wrap">${perks[1].icon}</span>
-        <div class="perk-text">
-          <h4>${perks[1].title}</h4>
-          <p>${perks[1].desc}</p>
-        </div>
-      </div>
-      <div class="perk-box">
-        <span class="perk-icon-wrap">${perks[2].icon}</span>
-        <div class="perk-text">
-          <h4>${perks[2].title}</h4>
-          <p>${perks[2].desc}</p>
-        </div>
-      </div>
-      <div class="perk-box">
-        <span class="perk-icon-wrap">${perks[3].icon}</span>
-        <div class="perk-text">
-          <h4>${perks[3].title}</h4>
-          <p>${perks[3].desc}</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3 Simple Steps -->
-    <div class="steps-bar">
-      <div class="step-item">
-        <span class="step-num">1</span>
-        <span>Open WhatsApp Camera</span>
-      </div>
-      <span class="step-arrow">➔</span>
-      <div class="step-item">
-        <span class="step-num">2</span>
-        <span>Scan &amp; Send &lsquo;Hi&rsquo;</span>
-      </div>
-      <span class="step-arrow">➔</span>
-      <div class="step-item">
-        <span class="step-num">3</span>
-        <span>Collect Stamp &amp; Enjoy Treats!</span>
-      </div>
-    </div>
-
-    <!-- Sheet Footer with CustomerPilot Logo -->
-    <div class="sheet-footer">
+    <!-- Printable Sheet Footer -->
+    <div class="print-footer">
       <div class="footer-left">
-        <div><strong>No mobile app download needed.</strong> 100% WhatsApp integrated.</div>
-        <div>Ask counter staff for assistance with loyalty stamp collection.</div>
+        <span>📍 ${storeName} • Official Billing Counter VIP Standee</span>
+        <span>• No App Download Needed (WhatsApp Integrated)</span>
       </div>
       <div class="footer-right">
-        <span class="powered-by-text">Powered by</span>
-        <img src="/cplogo.png" alt="CustomerPilot" class="cp-logo-img" />
+        <span>CustomerPilot</span>
+        <span>• Smart Retention Partner</span>
       </div>
     </div>
   </div>
@@ -886,19 +591,17 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
   }
 
   // True High-Resolution Printable A4 Sheet Generator
+  // Preserves 100% of the exact design, food photography, colors & wordings of the selected option
   const handlePrintStandee = (designId: StandeeDesignId) => {
-    if (!qrData?.qrDataUrl) {
-      toast({ title: "Please wait", description: "QR code data is still loading.", variant: "destructive" })
+    if (!merchantId) {
+      toast({ title: "Please wait", description: "Merchant data is still loading.", variant: "destructive" })
       return
     }
 
     const printHtml = generatePrintableStandeeHtml(
       designId,
-      selectedIndustry,
-      storeName,
-      storeLogo,
-      qrData.qrDataUrl,
-      branchCity
+      merchantId,
+      storeName
     )
 
     const printWindow = window.open("", "_blank")

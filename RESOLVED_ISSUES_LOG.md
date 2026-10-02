@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: Preserving Exact Standee Design, Photography & Wordings in Printable A4 Mode
+- **Symptom**: When printing any of the 3 standee options, the user observed that the printout stripped away all cake photography, crowns, ribbons, colors, and wordings, replacing them with a plain generic white page with purple boxes ("print karne ke time pe Design and wordings sab kuch change kyu kar diya - all 3 options me ?").
+- **Root Cause**: `generatePrintableStandeeHtml` had constructed an artificial CSS layout using plain HTML text and div rectangles without embedding the actual rich photorealistic artwork (chocolate drip cakes, velvet tiered cakes, strawberry cheesecakes) or the exact custom typography, banners, and wordings belonging to each specific shortlisted standee option.
+- **Resolution**:
+  1. Updated `generatePrintableStandeeHtml` in `src/components/qr-generator.tsx` to directly embed the high-resolution composited standee artwork for the chosen design (`/api/qr/standee?design=${designId}&m=${merchantId}`).
+  2. Option 1 now prints Option 1's exact artwork: Golden crown, "Cake Connection - Fresh Bakes & Desserts • HANDMADE DAILY •", "SCAN TO EARN STAMPS" red brush ribbon, luscious chocolate drip cake with cherries, 4 perk badges, live scannable QR code, and CustomerPilot logo.
+  3. Option 2 now prints Option 2's exact artwork: Cake Connection logo, "VIP REWARDS CLUB", tiered velvet cake, royal sapphire blue aesthetic, live scannable QR code, and CustomerPilot logo.
+  4. Option 3 now prints Option 3's exact artwork: Cake Connection logo, "Sweet Celebrations & Pastry Lounge", strawberry cheesecake & cupcakes, rose bronze aesthetic, live scannable QR code, and CustomerPilot logo.
+  5. Framed each standee cleanly inside a dedicated A4 portrait sheet (`210mm x 297mm`) with scissor trim guidelines (`✂️ Cut along dashed line to insert into Counter Acrylic Stand`), paper guidance, floating print action bar, and automatic `window.print()` trigger.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: Dynamic Business Theme Adaptation, True Printable A4 Standee Engine & Prominent Branding
 - **Symptom**:
   1. The user questioned whether the standee designs adapt dynamically to different business categories or if they were only rigid static cake designs (`[1] 3 design to aagayi, but kya ye har business ke hisab se theme set karega ?`).
