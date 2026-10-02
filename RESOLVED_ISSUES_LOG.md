@@ -3,6 +3,17 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: Standalone Luxury Live Digital Business Card Module
+- **Symptom**: Merchants needed a standalone, high-converting "Digital Business Card" (micro-website) consolidating public Google Business Profile details, direct WhatsApp/Call/Navigation buttons, social profiles, online ordering platforms (Zomato/Swiggy/Website), live Google reviews, and a 1-tap contact book saver (`.vcf`), without disturbing existing Loyalty, CRM, or WhatsApp campaign modules.
+- **Root Cause**: Previously, merchant contacts, ordering platforms, and social profiles were fragmented across separate settings or external links with no unified mobile-first public destination for counter QR codes or direct WhatsApp link sharing.
+- **Resolution**:
+  1. **Isolated Data Model**: Created `DigitalBusinessCard` in `prisma/schema.prisma` with unique slug, branding, contact details, status pills, and ordering platforms JSON array.
+  2. **Zero-OAuth Public GBP Auto-Sync Engine**: Implemented `/api/digital-card/fetch-public-gbp` to auto-extract public Google Maps place details (name, category, address, phone, hours, rating, reviews) without requiring complex Google account permissions.
+  3. **High-End Public Mobile Card (`/c/[slug]`)**: Built `src/app/c/[slug]/page.tsx` and `src/components/digital-card-view.tsx` with champagne/gold luxury aesthetics, 6 branded action buttons, 5 food ordering platforms, Google reviews widget, QR code modal, and 1-tap `.vcf` contact book downloader.
+  4. **Merchant Command Center (`/dashboard/digital-card`)**: Built a full management studio with real-time iPhone preview simulator, 1-click WhatsApp share invitation builder, and direct link copy tools.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: Golden & Bigger "★ VIP REWARD CLUB ★" Typography without Black Belt
 - **Symptom**: The user requested removing the black pill / belt background from "★ VIP REWARD CLUB ★" and styling the text as golden with a bigger font on both the on-screen standee card and the printable A4 insert ("★ VIP REWARD CLUB ★ - isko Golden and Bigger font karo, uska black belt remove karo").
 - **Root Cause**: The VIP club title previously had a dark onyx pill container (`bg-slate-950` / `background: #0f172a; border-radius: 9999px;`) with small text (`text-xs` / `13px`), creating a dark belt appearance rather than an open, regal typography headline.

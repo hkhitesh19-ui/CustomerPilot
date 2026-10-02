@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
-import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, ChevronRight, TrendingUp, BarChart3, FileText, Image, Share2, UserPlus, ChevronDown, BookOpen, Star } from "lucide-react"
+import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, ChevronRight, TrendingUp, BarChart3, FileText, Image, Share2, UserPlus, ChevronDown, BookOpen, Star, Smartphone } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { useDashboardState } from "@/hooks/use-dashboard-state"
 import { hasModule, type Module } from "@/lib/feature-gate"
@@ -29,6 +29,7 @@ interface MainNavItem {
 const mainNav: MainNavItem[] = [
   { name: "Complete Setup", href: "/dashboard/settings", icon: Settings },
   { name: "Home", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Digital Business Card", href: "/dashboard/digital-card", icon: Smartphone },
   { name: "Smart AI Google Reviews", href: "/dashboard/reviews", icon: Star, modules: ["REVIEWS", "AUTOREPLY"] },
   { name: "Live Queue", href: "/dashboard/queue", icon: Clock, module: "LOYALTY" as Module },
   { name: "Rewards", href: "/dashboard/rewards", icon: Gift, module: "LOYALTY" as Module },

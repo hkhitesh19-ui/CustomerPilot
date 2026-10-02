@@ -99,6 +99,7 @@ model Merchant {
   waitingCustomers          WaitingCustomer[]
   whatsAppMessages          WhatsAppMessage[]
   winBackEscalations        WinBackEscalation[]
+  digitalBusinessCard       DigitalBusinessCard?
 }
 
 model Incident {
@@ -859,3 +860,56 @@ model ReviewBonusLog {
   @@index([merchantId, customerId, createdAt])
   @@index([decision, recheckAt])
 }
+
+model DigitalBusinessCard {
+  id               String    @id @default(cuid())
+  merchantId       String    @unique
+  slug             String    @unique
+  isActive         Boolean   @default(true)
+  
+  // Theme & Appearance
+  theme            String    @default("champagne_luxury")
+  
+  // Business Identity
+  displayName      String
+  subCategories    String?   // e.g. "Cakes • Desserts • Flowers • Party Decor"
+  logoUrl          String?
+  coverUrl         String?
+  
+  // 3-Pill Quick Status Bar
+  locationShort    String?   // "Manjalpur, Vadodara"
+  locationState    String?   // "Gujarat, India"
+  businessHours    String?   // "Open Daily: 9:00 AM – 12:00 AM"
+  deliveryInfo     String?   // "Delivery Available: Vadodara Only"
+  
+  // Contact & Social Media Links
+  whatsappNumber   String?   // "919876543210"
+  phoneNumber      String?   // "+91 98765 43210"
+  instagramUrl     String?
+  facebookUrl      String?
+  youtubeUrl       String?
+  googleMapsUrl    String?
+  websiteUrl       String?
+  
+  // Online Ordering Platforms (JSON array string)
+  orderingLinks    String?   @default("[]")
+  
+  // Live Google Reviews Widget
+  googleRating     Float?    @default(4.6)
+  googleReviewsCnt Int?      @default(689)
+  googlePlaceId    String?
+  
+  // Analytics
+  viewsCount       Int       @default(0)
+  contactSaves     Int       @default(0)
+  sharesCount      Int       @default(0)
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  merchant         Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@index([slug])
+  @@index([merchantId])
+}
+

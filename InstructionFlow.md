@@ -311,6 +311,9 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   │   ├── merchants/route.ts     # Merchant Fleet List & Profile Editor
 │   │   │   │   └── sync-vps/route.ts      # 1-Click Production Database Sync from Hostinger VPS
 │   │   │   ├── demo/                  # Public Sandboxed Demo APIs (AI Review Reply)
+│   │   │   ├── digital-card/          # Standalone Digital Business Card APIs
+│   │   │   │   ├── route.ts           # Digital Card CRUD API (Get/Save)
+│   │   │   │   └── fetch-public-gbp/route.ts # Public Google Places Auto-Extractor (Zero OAuth)
 │   │   │   ├── reviews/               # 1-Click AI Auto-Reply & List APIs
 │   │   │   ├── qr/                    # Dynamic Standee & QR Generation APIs
 │   │   │   │   ├── generate/route.ts  # Branded QR Code Generator API
@@ -320,6 +323,8 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   ├── queue/                 # Live Waitlist & Queue Management APIs
 │   │   │   └── google-business/       # Google OAuth 2.0 Auth Callback & Sync APIs
 │   │   ├── bakery-loyalty/page.tsx    # Industry Landing Page: Bakery Loyalty
+│   │   ├── c/                         # Public Digital Business Card Routes
+│   │   │   └── [slug]/page.tsx        # High-End Mobile Digital Business Card (Zero App Install)
 │   │   ├── cafe-loyalty/page.tsx      # Industry Landing Page: Cafe Loyalty
 │   │   ├── salon-loyalty/page.tsx     # Industry Landing Page: Salon Loyalty
 │   │   ├── restaurant-loyalty/page.tsx# Industry Landing Page: Restaurant Loyalty
@@ -332,7 +337,8 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   ├── bingage/page.tsx       # Bingage vs CustomerPilot
 │   │   │   └── birdeye/page.tsx       # Birdeye vs CustomerPilot
 │   │   ├── dashboard/                 # Merchant Command Center Dashboard
-│   │   │   ├── reviews/page.tsx       # 1-Click Google Review AI Studio (NEW)
+│   │   │   ├── digital-card/page.tsx  # Digital Business Card Studio & Live Simulator (NEW)
+│   │   │   ├── reviews/page.tsx       # 1-Click Google Review AI Studio
 │   │   │   ├── customers/page.tsx     # VIP Customers CRM Table
 │   │   │   ├── queue/page.tsx         # Live Waitlist & Queue Engine
 │   │   │   ├── rewards/page.tsx       # Loyalty Reward Catalog & Stamp Rules
@@ -348,6 +354,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   └── super-admin/page.tsx       # Platform SuperAdmin Master Control Panel
 │   │
 │   ├── components/                    # Reusable React UI Components
+│   │   ├── digital-card-view.tsx      # Luxury Mobile Digital Card View with VCF & Socials (NEW)
 │   │   ├── impersonation-banner.tsx   # SuperAdmin Impersonation Sticky Banner & Return Action
 │   │   ├── splash-screen.tsx          # Full-Screen 1-Second Animated Splash Overlay
 │   │   ├── brand-logo.tsx             # Pure Vector Transparent SVG Logo Component
@@ -374,6 +381,7 @@ F:\CustomerPilot_ByGLM_July2026
 ### **10.2 Feature & Module Mapping Table**
 | Module / Feature | Main Entry File(s) | Helper Services & Engines | Purpose / Description |
 | :--- | :--- | :--- | :--- |
+| **Luxury Live Digital Business Card** | `src/app/c/[slug]/page.tsx`<br/>`src/app/dashboard/digital-card/page.tsx` | `src/components/digital-card-view.tsx`<br/>`src/app/api/digital-card/route.ts`<br/>`src/lib/google-places-api.ts` | Mobile-first micro-website with auto-fetched public GBP data, 6 branded social/call/WhatsApp buttons, online food ordering platforms, Google reviews, and 1-tap `.vcf` contact downloader. Zero disturbance to existing modules. |
 | **1-Click GoogleReview AutoReply** | `src/app/dashboard/reviews/page.tsx` | `src/lib/ai-review-reply.ts`<br/>`src/lib/google-places-api.ts` | Pre-drafts 5-star Gemini AI replies & provides 1-Click Copy & Post to Google Maps with Quota Safety Dead-Letter Queue (Pre-Approval Mode). |
 | **9-Step Onboarding Engine** | `src/app/onboarding/page.tsx` | `src/lib/onboarding-engine.ts` | Guides store owners through WhatsApp QR scan, GBP link, Stamp Rules, and first test scan. |
 | **WhatsApp Messaging Engine** | `src/communication/services/CommunicationService.ts` | `src/communication/drivers/EvolutionDriver.ts` | Handles all outgoing & incoming WhatsApp messages (Welcome, OTP, Stamp Notifications, Reviews). |
