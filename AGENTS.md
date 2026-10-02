@@ -39,8 +39,8 @@ Violation of this rule (pushing before user confirmation) is a breach of the pro
 Whenever you deploy code to the live Hostinger VPS server (200.97.170.53), you MUST immediately update `Git Commit on VPS Live.txt` in the project root with the active Git commit hash, branch, timestamp, and commit message. 
 Never complete a deployment without keeping `Git Commit on VPS Live.txt` 100% synchronized with the live server.
 
-## Mandatory Dual-Engine Protocol: GSD Planning + CodeRabbit Quality & Security Audit
-For EVERY new task, feature request, or significant bugfix, you MUST systematically execute through this dual-engine pipeline:
+## Mandatory Triple-Engine Protocol: GSD Planning + CodeRabbit Audit + Playwright Visual & Data Ground-Truth Verification
+For EVERY new task, feature request, or bugfix, you MUST systematically execute through this triple-engine pipeline:
 
 1. **Stage 1 — GSD Structured Planning (Break Down)**:
    - Break down the user's requirement into clear structured phases (Plan ➔ Break Down ➔ Execute ➔ Verify).
@@ -49,19 +49,29 @@ For EVERY new task, feature request, or significant bugfix, you MUST systematica
 2. **Stage 2 — Disciplined Execution**:
    - Implement the code changes phase-by-phase without breaking existing modules.
 
-3. **Stage 3 — CodeRabbit Deep Review & Security Audit**:
-   - Perform an automated code review and security audit on all changed files:
+3. **Stage 3 — CodeRabbit Deep Code & Security Audit (Code/AST Level)**:
+   - Perform automated static code review on all changed files:
      - Bug & Edge Case Detection (null safety, async race conditions, state desync)
-     - Security Audit (SQL/ORM injection, unauthorized access, secret exposure)
+     - Security Audit (SQL/ORM injection, unauthorized access, SSRF, secret exposure)
      - Performance & Efficiency Check (unnecessary re-renders, DB query optimization)
-   - Summarize findings by severity (Critical / Major / Minor / Clean).
+   - Classify findings (Critical / Major / Minor / Clean) and autofix Critical/Major findings immediately.
 
-4. **Stage 4 — Autofix & Local Commit**:
-   - Automatically fix any Critical/Major audit findings.
+4. **Stage 4 — Playwright & Ground-Truth Output Verification (Runtime & Visual Level - MANDATORY)**:
+   - *Why this is mandatory*: CodeRabbit only checks code syntax; it CANNOT see if rendered data on the screen is dummy/incorrect or if UI text is cut off (`...`). You MUST perform real output verification:
+     - **Live Headless Execution**: Load the live page in a real browser (Playwright/Puppeteer/Fetch DOM).
+     - **Ground-Truth Data Assertion**: Verify 100% real business data (Real Store Name, Real Address, Real Phone, Real Hours, Real Rating).
+     - **Zero Dummy Data Check**: Strictly verify ZERO instances of dummy placeholders (`98765`, `12345`, `example.com`, `lorem ipsum`).
+     - **Visual Truncation Check**: Verify no button or status pill text is clipped with ellipsis (`...`).
+     - **Visual Snapshot**: Capture screenshot/DOM state to visually audit the final rendered product.
+
+5. **Stage 5 — Autofix & Local Commit**:
+   - Automatically fix any discrepancies found in CodeRabbit or Output Verification.
    - Run `git add` and `git commit` locally.
 
-5. **Stage 5 — User Permission Gate (Strict Rule)**:
-   - Present the completed work along with the CodeRabbit Audit Verdict.
+6. **Stage 6 — User Permission Gate (Strict Rule)**:
+   - Present the completed work along with:
+     1. CodeRabbit Security & Quality Verdict
+     2. Output & Ground-Truth Verification Report (Screenshots + Real Data Confirmation)
    - **STOP. Do NOT push or deploy.**
    - Wait for the user's explicit confirmation and permission before any `git push` or VPS deployment.
 
