@@ -102,13 +102,15 @@ export function AutomationTimerSettings({ merchantId }: { merchantId: string }) 
     <Card className="border border-slate-200 dark:border-slate-800 shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">
-              <Calendar className="w-5 h-5" />
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20">
+              <Calendar className="w-6 h-6" />
             </div>
             <div>
-              <CardTitle className="text-lg font-bold">Custom Automation Timers & Reminder Days</CardTitle>
-              <CardDescription className="text-xs text-slate-500">
+              <CardTitle className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                Custom Automation Timers &amp; Reminder Days
+              </CardTitle>
+              <CardDescription className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Configure exactly how many days of inactivity or expiry trigger automated WhatsApp journeys
               </CardDescription>
             </div>

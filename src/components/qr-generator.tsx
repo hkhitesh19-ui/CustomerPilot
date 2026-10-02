@@ -453,9 +453,11 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <CardTitle className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
-              <QrCode className="w-5 h-5 text-indigo-500" />
-              VIP Loyalty Stamp QR Standee
+            <CardTitle className="text-xl sm:text-2xl font-black flex items-center gap-2.5 text-indigo-600 dark:text-indigo-400 tracking-tight">
+              <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                <QrCode className="w-5 h-5" />
+              </div>
+              Digital Loyalty Stamp QR
             </CardTitle>
             <CardDescription className="text-slate-600 dark:text-slate-400">
               Professional billing counter standee with your business branding, live WhatsApp check-in QR &amp; 1-click A4 printing.

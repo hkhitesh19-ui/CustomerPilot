@@ -322,7 +322,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
       <CardHeader className="bg-amber-50/40 dark:bg-slate-900/40 border-b border-amber-100 dark:border-slate-800/60">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <CardTitle className="text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <CardTitle className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2.5 tracking-tight">
               <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                 <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
               </div>

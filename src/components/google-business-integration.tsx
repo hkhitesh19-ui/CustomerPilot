@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast"
 import { CheckCircle2, Search, MapPin, Store, Star, ExternalLink, RefreshCw, Zap, ShieldCheck, Link2 } from "lucide-react"
 import { useDashboardState } from "@/hooks/use-dashboard-state"
 import { BulkReplyModal } from "@/components/bulk-reply-modal"
+import { GoogleReviewDelaySettings } from "@/components/google-review-delay-settings"
 
 export function GoogleBusinessIntegration({ merchantId }: { merchantId: string }) {
   const { data, refetch } = useDashboardState()
@@ -94,9 +95,11 @@ export function GoogleBusinessIntegration({ merchantId }: { merchantId: string }
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-              Google Business Profile (GBP)
+            <CardTitle className="text-xl sm:text-2xl font-black flex items-center gap-2.5 text-slate-900 dark:text-slate-100 tracking-tight">
+              <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500">
+                <Star className="w-5 h-5 fill-amber-500" />
+              </div>
+              Google Business Profile Integration
             </CardTitle>
             <CardDescription>
               Connect your Google Business Profile to auto-sync Google Reviews and enable instant AI replies.
@@ -263,6 +266,9 @@ export function GoogleBusinessIntegration({ merchantId }: { merchantId: string }
             )}
           </div>
         )}
+
+        {/* ── Merged Google Review Prompt Timers ── */}
+        <GoogleReviewDelaySettings merchantId={merchantId} embedded={true} />
       </CardContent>
     </Card>
   )

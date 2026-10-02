@@ -3,6 +3,33 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: Merged Google Review Prompt Timers into GBP & Prominent Enlarged Section Titles
+- **Symptom**:
+  1. The "Google Review Prompt Timers" setting was isolated in a separate detached card (STEP C) rather than integrated into the primary Google Business Profile (GBP) integration flow.
+  2. Section headings and card titles across the settings page (Business Information, Digital Loyalty Stamp QR, Smart Ai Google Reviews, Google Business Profile Integration, Your Business WhatsApp Connection, Stamps Reward Card Rules Setup, Loyalty Cycle Categories (10 Levels), Custom Automation Timers & Reminder Days, Automated WhatsApp Journey Templates) were small (`text-sm` 14px to `text-lg` 18px), causing visual clutter, inconsistency, and low prominence.
+- **Root Cause**:
+  1. `GoogleReviewDelaySettings` was rendered as a standalone step card in `src/app/dashboard/settings/page.tsx` instead of being an embedded sub-module inside the `GoogleBusinessIntegration` card.
+  2. Section and card headers lacked a unified high-contrast typography hierarchy, with various components using differing font weights and sizes.
+- **Resolution**:
+  1. **Merged Google Review Prompt Timers into GBP**:
+     - Updated `src/components/google-review-delay-settings.tsx` to support `embedded?: boolean`.
+     - When `embedded={true}`, renders as an integrated divider section with a clear Clock emblem, delay dropdown (`Immediately`, `5m`, `15m`, `30m (Recommended Default)`, `1h`, `2h`, `4h`, `24h`), and dedicated Save Timer action with live feedback.
+     - Embedded `<GoogleReviewDelaySettings merchantId={merchantId} embedded={true} />` directly inside `src/components/google-business-integration.tsx`.
+     - Removed the redundant separate Step C card and unused import from `src/app/dashboard/settings/page.tsx`.
+  2. **Prominent & Bigger Section Titles (`text-xl sm:text-2xl font-black`)**:
+     - Upgraded all 8/9 section titles and card titles across `src/app/dashboard/settings/page.tsx` and all child components to `text-xl sm:text-2xl font-black tracking-tight` with colorful matching icon badges:
+       - `Business Information`
+       - `Digital Loyalty Stamp QR`
+       - `Smart Ai Google Reviews`
+       - `Google Business Profile Integration` (with embedded Prompt Timers)
+       - `Your Business WhatsApp Connection`
+       - `Stamps Reward Card Rules Setup`
+       - `Loyalty Cycle Categories (10 Levels)`
+       - `Custom Automation Timers & Reminder Days`
+       - `Automated WhatsApp Journey Templates`
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: Single Simple & Professional VIP Reward CLUB Standee (Logo -> Name -> VIP Club -> QR)
 - **Symptom**: The user requested eliminating the 3 options and complex mockup presentation in favor of a single, clean, ultra-professional QR standee card adhering strictly to a focused hierarchy: Business Logo at the top, Business Name underneath, "VIP Reward CLUB" badge underneath, and the live scannable QR code underneath ("tumne nahi hoga, ek simple and professional QR code hi generate karo with Business Logo, uske niche Business name, uske niche \"VIP Reward CLUB\", uske niche , QR code ( not 3 options )").
 - **Root Cause**: The previous interface presented 3 options with 3D tabletop mockups and multiple industry theme switchers, which introduced visual clutter and diversion from the core operational requirement of an elegant, high-contrast, ready-to-print acrylic standee insert for merchant counters.

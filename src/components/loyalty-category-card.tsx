@@ -72,8 +72,10 @@ export function LoyaltyCategoryCard({ merchantId, initialCategoryJson }: Props) 
       <CardHeader className="bg-amber-50/30 dark:bg-slate-900/40 border-b border-slate-200 dark:border-slate-800/60">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-slate-900 dark:text-slate-200 flex items-center gap-2">
-              <Crown className="w-5 h-5 text-amber-500 dark:text-amber-400" />
+            <CardTitle className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2.5 tracking-tight">
+              <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500 dark:text-amber-400">
+                <Crown className="w-5 h-5" />
+              </div>
               Loyalty Cycle Categories (10 Levels)
             </CardTitle>
             <CardDescription className="text-slate-600 dark:text-slate-400 mt-1">

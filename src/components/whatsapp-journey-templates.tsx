@@ -243,11 +243,11 @@ export function WhatsAppJourneyTemplates({ merchantId }: { merchantId: string })
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-slate-200">
-              <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-lg flex items-center justify-center">
-                <MessageSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <CardTitle className="text-xl sm:text-2xl font-black flex items-center gap-2.5 text-slate-900 dark:text-slate-100 tracking-tight">
+              <div className="w-9 h-9 bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-xl flex items-center justify-center">
+                <MessageSquare className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
-              WhatsApp Journey Templates
+              Automated WhatsApp Journey Templates
             </CardTitle>
             <p className="text-xs text-slate-600 dark:text-slate-500 mt-1.5 leading-relaxed max-w-xl">
               These are the WhatsApp messages automatically sent to customers at each stage of their loyalty journey. Customize them to match your brand voice.

@@ -27,7 +27,6 @@ import {
 import { WhatsAppVerification } from "@/components/whatsapp-verification"
 import { WhatsAppJourneyTemplates } from "@/components/whatsapp-journey-templates"
 import { GoogleBusinessIntegration } from "@/components/google-business-integration"
-import { GoogleReviewDelaySettings } from "@/components/google-review-delay-settings"
 import { GoogleReviewQRGenerator } from "@/components/google-review-qr-generator"
 import { RewardSetupCard } from "@/components/reward-setup-card"
 import { LoyaltyCategoryCard } from "@/components/loyalty-category-card"
@@ -220,12 +219,14 @@ export default function SettingsPage() {
       {isLoyaltyEnabled && (
         <section id="sec-vip-qr" className="space-y-3 pt-2">
           <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">
                 01
               </span>
-              <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                <QrCode className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2.5 tracking-tight">
+                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                  <QrCode className="w-6 h-6" />
+                </div>
                 Digital Loyalty Stamp QR
               </h2>
             </div>
@@ -246,12 +247,14 @@ export default function SettingsPage() {
       {isReviewsEnabled && (
         <section id="sec-google-reviews" className="space-y-4 pt-4">
           <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
                 02
               </span>
-              <h2 className="text-lg sm:text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">
-                <Star className="w-5 h-5 text-amber-500 dark:text-amber-400" />
+              <h2 className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 flex items-center gap-2.5 tracking-tight">
+                <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                  <Star className="w-6 h-6 fill-amber-500" />
+                </div>
                 Smart Ai Google Reviews
               </h2>
             </div>
@@ -264,9 +267,9 @@ export default function SettingsPage() {
             {/* 2A: Smart AI Reviews QR Standee & Posters */}
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
               <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-amber-600 dark:text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded">STEP A</span>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-200">Smart Ai Google Reviews QR Standee &amp; Posters</h3>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs font-black text-amber-600 dark:text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-md">STEP A</span>
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Smart Ai Google Reviews</h3>
                 </div>
               </div>
               <GoogleReviewQRGenerator 
@@ -276,26 +279,15 @@ export default function SettingsPage() {
               />
             </div>
 
-            {/* 2B: Google Business Profile 1-Click Connect */}
+            {/* 2B: Google Business Profile 1-Click Connect (with Merged Review Prompt Timers) */}
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
               <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-amber-600 dark:text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded">STEP B</span>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-200">Google Business Profile Integration</h3>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs font-black text-amber-600 dark:text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-md">STEP B</span>
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Google Business Profile Integration</h3>
                 </div>
               </div>
               <GoogleBusinessIntegration merchantId={merchant?.id || ""} />
-            </div>
-
-            {/* 2C: Google Review Delay Settings */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-amber-600 dark:text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded">STEP C</span>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-200">Google Review Prompt Timers</h3>
-                </div>
-              </div>
-              <GoogleReviewDelaySettings merchantId={merchant?.id || ""} />
             </div>
           </div>
         </section>
@@ -306,12 +298,14 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       <section id="sec-business" className="space-y-3 pt-4">
         <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-black px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
               03
             </span>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Store className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2.5 tracking-tight">
+              <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <Store className="w-6 h-6" />
+              </div>
               Business Information
             </h2>
           </div>
@@ -324,7 +318,7 @@ export default function SettingsPage() {
           <CardHeader className="bg-slate-50/80 dark:bg-slate-900/40 border-b border-slate-200 dark:border-slate-800/60 pb-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <CardTitle className="text-sm font-semibold text-slate-900 dark:text-slate-200">Core Business Identity</CardTitle>
+                <CardTitle className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Business Information</CardTitle>
                 <CardDescription className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                   Your store name, owner details, and business category printed on QR Standees.
                 </CardDescription>
@@ -415,13 +409,15 @@ export default function SettingsPage() {
       {isLoyaltyEnabled && (
         <section id="sec-reward-setup" className="space-y-4 pt-4">
           <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">
                 04
               </span>
-              <h2 className="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-                <Gift className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
-                Reward Card Setup
+              <h2 className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 flex items-center gap-2.5 tracking-tight">
+                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                  <Gift className="w-6 h-6" />
+                </div>
+                Stamps Reward Card Rules Setup
               </h2>
             </div>
             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
@@ -430,12 +426,12 @@ export default function SettingsPage() {
           </div>
 
           <div className="space-y-4">
-            {/* 4A: Reward Card Setup */}
+            {/* 4A: Stamps Reward Card Rules Setup */}
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
               <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded">STEP A</span>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-200">Digital Stamp Card &amp; Bonus Rules</h3>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs font-black text-indigo-600 dark:text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded-md">STEP A</span>
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Stamps Reward Card Rules Setup</h3>
                 </div>
               </div>
               <RewardSetupCard merchantId={merchant?.id || ""} />
@@ -444,9 +440,9 @@ export default function SettingsPage() {
             {/* 4B: Loyalty Cycle Categories (10 Levels) */}
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
               <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded">STEP B</span>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-200">Loyalty Cycle Categories (10 Levels)</h3>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs font-black text-indigo-600 dark:text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded-md">STEP B</span>
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Loyalty Cycle Categories (10 Levels)</h3>
                 </div>
               </div>
               <LoyaltyCategoryCard merchantId={merchant?.id || ""} initialCategoryJson={(merchant as any)?.loyaltyCategoryNames} />
@@ -461,19 +457,21 @@ export default function SettingsPage() {
       {isLoyaltyEnabled && (
         <section id="sec-whatsapp-conn" className="space-y-4 pt-4">
           <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                 05
               </span>
-              <h2 className="text-lg sm:text-xl font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  viewBox="0 0 24 24" 
-                  className="w-5 h-5 text-[#25D366]"
-                  fill="currentColor"
-                >
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                </svg>
+              <h2 className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2.5 tracking-tight">
+                <div className="p-2 rounded-xl bg-emerald-500/10 text-[#25D366] border border-emerald-500/20">
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    viewBox="0 0 24 24" 
+                    className="w-6 h-6 text-[#25D366]"
+                    fill="currentColor"
+                  >
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                  </svg>
+                </div>
                 Your Business WhatsApp Connection
               </h2>
             </div>
@@ -493,13 +491,15 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       <section id="sec-automations" className="space-y-4 pt-4">
         <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-black px-2 py-0.5 rounded-md bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-500/30">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-500/30">
               06
             </span>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-violet-300 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-              Custom Automation Timers &amp; Message Templates
+            <h2 className="text-xl sm:text-2xl font-black text-violet-600 dark:text-violet-400 flex items-center gap-2.5 tracking-tight">
+              <div className="p-2 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20">
+                <Clock className="w-6 h-6" />
+              </div>
+              Custom Automation Timers &amp; Reminder Days
             </h2>
           </div>
           <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
@@ -511,9 +511,9 @@ export default function SettingsPage() {
           {/* 6A: Win-Back & Retention Timers */}
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-violet-600 dark:text-violet-300 bg-violet-500/10 px-2 py-0.5 rounded">STEP A</span>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-200">Customer Retention &amp; Win-Back Timers</h3>
+              <div className="flex items-center gap-2.5">
+                <span className="text-xs font-black text-violet-600 dark:text-violet-300 bg-violet-500/10 px-2 py-0.5 rounded-md">STEP A</span>
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Custom Automation Timers &amp; Reminder Days</h3>
               </div>
             </div>
             <AutomationTimerSettings merchantId={merchant?.id || ""} />
@@ -522,9 +522,9 @@ export default function SettingsPage() {
           {/* 6B: Message Templates */}
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-violet-600 dark:text-violet-300 bg-violet-500/10 px-2 py-0.5 rounded">STEP B</span>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-200">Automated WhatsApp Journey Templates</h3>
+              <div className="flex items-center gap-2.5">
+                <span className="text-xs font-black text-violet-600 dark:text-violet-300 bg-violet-500/10 px-2 py-0.5 rounded-md">STEP B</span>
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Automated WhatsApp Journey Templates</h3>
               </div>
             </div>
             <WhatsAppJourneyTemplates merchantId={merchant?.id || ""} />
@@ -537,12 +537,14 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       <section id="sec-guides" className="space-y-4 pt-4">
         <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-black px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-700/40 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-700/40 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
               07
             </span>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-200 flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2.5 tracking-tight">
+              <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                <BookOpen className="w-6 h-6" />
+              </div>
               Staff &amp; Operations Manual
             </h2>
           </div>
