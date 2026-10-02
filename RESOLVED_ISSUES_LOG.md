@@ -3,6 +3,22 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: Single Simple & Professional VIP Reward CLUB Standee (Logo -> Name -> VIP Club -> QR)
+- **Symptom**: The user requested eliminating the 3 options and complex mockup presentation in favor of a single, clean, ultra-professional QR standee card adhering strictly to a focused hierarchy: Business Logo at the top, Business Name underneath, "VIP Reward CLUB" badge underneath, and the live scannable QR code underneath ("tumne nahi hoga, ek simple and professional QR code hi generate karo with Business Logo, uske niche Business name, uske niche \"VIP Reward CLUB\", uske niche , QR code ( not 3 options )").
+- **Root Cause**: The previous interface presented 3 options with 3D tabletop mockups and multiple industry theme switchers, which introduced visual clutter and diversion from the core operational requirement of an elegant, high-contrast, ready-to-print acrylic standee insert for merchant counters.
+- **Resolution**:
+  1. Rewrote `src/components/qr-generator.tsx` to remove all 3 option cards, tabs, and mockup selectors.
+  2. Implemented a single luxury standee card with the exact requested vertical hierarchy:
+     - `[1]` **Business Logo**: Center-aligned high-res store logo (or luxury monogram fallback).
+     - `[2]` **Business Name**: Clean bold serif/sans typography (`Cinzel` / `Plus Jakarta Sans`).
+     - `[3]` **VIP Reward CLUB**: Refined letter-spaced dark onyx & gold badge (`★ VIP REWARD CLUB ★`).
+     - `[4]` **QR Code**: High-contrast 260px scannable WhatsApp check-in QR code.
+     - Scan CTA pill: `💬 Scan with WhatsApp to Collect Stamps`.
+     - Value proposition strip (`🪙 1 Stamp / Visit`, `🎁 Welcome Treat`, `🎂 Birthday Freebie`) and CustomerPilot footer branding.
+  3. Built an integrated `handlePrintStandee` function that outputs this exact single card formatted for standard A4 portrait paper (`210mm x 297mm`) with scissor trim guides (`✂️ Cut along dashed line to insert into Counter Acrylic Stand`) for direct 1-click physical counter deployment.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: Pure 2D Flat Printable Poster Inserts (Zero Table & Room Backgrounds)
 - **Symptom**: When clicking "Print A4 Standee", the printout still contained the 3D tabletop photo (showing the marble counter, bread/croissants on the counter, and cafe background lights) rather than the actual flat 2D graphic poster insert that goes inside the clear acrylic stand. The user provided an exact Gemini AI sample (`media_1790907100345.jpg`) showing that the printable format must be the flat 2D paper insert itself ("kya print kare to exact same full image print kare ? tumhe Printable format ka meaning samaj me nahi aa raha he ? see Gemini Ai se hi se mene ye generate karvake tumhe sample de raha hu").
 - **Root Cause**: The print route was loading the 3D photorealistic tabletop presentation mockup rather than isolating and rendering the dedicated flat 2D rectangular poster insert graphic (the physical paper sheet that slides into the acrylic stand).
