@@ -3,6 +3,24 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: 2D Vector Standee Design & Perks Clutter Removal
+- **Symptom**: In the Digital Loyalty Stamp QR section, the standee displayed cluttered promotional lines ("Scan with WhatsApp to Collect Stamps", "🪙 1 Stamp / Visit", "🎁 Welcome Treat", "🎂 Birthday Freebie") which cluttered the presentation. The user requested: `[1]` remove all these lines ("ye sab line remove karo") and `[2]` build a clean, high-end 2D vector graphic design ready for physical acrylic stand printing ("vector wala badhiya design banao 2D print ke hisab se").
+- **Root Cause**: The standee card and print template were rendering promotional perk tags and instructional pills, occupying vertical space and diluting the clean, luxury 2D acrylic standee look.
+- **Resolution**:
+  1. **Removed Clutter Lines**:
+     - Completely removed `"Scan with WhatsApp to Collect Stamps"`, `"🪙 1 Stamp / Visit"`, `"🎁 Welcome Treat"`, and `"🎂 Birthday Freebie"` from both the on-screen preview and the print template in `src/components/qr-generator.tsx`.
+  2. **High-End 2D Vector Standee Styling**:
+     - Implemented dual hairline borders with gold accenting and 4 geometric vector corner brackets (`┌ ┐ └ ┘`).
+     - Maintained the clean hierarchy:
+       - `[1]` Business Logo (high-res logo or monogram badge)
+       - `[2]` Business Name in bold uppercase `Cinzel` typography
+       - `[3]` `★ VIP REWARD CLUB ★` dark onyx & gold badge
+       - `[4]` Scannable QR Code enclosed in a precision target frame with 4 corner targeting brackets
+     - Calibrated the print template for standard 6×8" / A5 countertop acrylic L-stand insert dimensions (`148mm x 210mm`) with dashed scissor cut guides.
+     - Verified CustomerPilot footer branding and clean responsiveness.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: Merged Google Review Prompt Timers into GBP & Prominent Enlarged Section Titles
 - **Symptom**:
   1. The "Google Review Prompt Timers" setting was isolated in a separate detached card (STEP C) rather than integrated into the primary Google Business Profile (GBP) integration flow.

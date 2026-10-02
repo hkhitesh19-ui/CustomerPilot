@@ -138,54 +138,100 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       }
     }
 
-    /* Outer Scissor Trim Guidelines for Counter Acrylic Stands */
+    /* Outer Scissor Trim Guidelines for Counter Acrylic Stands (Standard A5 / 6x8") */
     .trim-guide-box {
       position: relative;
-      width: 100%;
-      height: 265mm;
+      width: 148mm;
+      height: 210mm;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      border: 1.5px dashed #cbd5e1;
-      border-radius: 12px;
-      padding: 8mm 8mm 6mm 8mm;
+      border: 1.5px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 6mm;
       background: #ffffff;
     }
     .trim-label-top {
       position: absolute;
-      top: -7px;
-      left: 20px;
+      top: -8px;
+      left: 14px;
       background: #ffffff;
       padding: 0 8px;
-      font-size: 8.5px;
+      font-size: 8px;
       font-weight: 800;
-      color: #94a3b8;
+      color: #64748b;
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
     .trim-label-bottom {
       position: absolute;
-      bottom: -7px;
-      right: 20px;
+      bottom: -8px;
+      right: 14px;
       background: #ffffff;
       padding: 0 8px;
-      font-size: 8.5px;
+      font-size: 8px;
       font-weight: 800;
-      color: #94a3b8;
+      color: #64748b;
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
 
-    /* Standee Card Body */
-    .standee-card {
+    /* Standee Inner Vector Frame */
+    .standee-frame {
+      position: relative;
       width: 100%;
-      max-width: 140mm;
+      height: 100%;
+      border: 1.5px solid #0f172a;
+      border-radius: 12px;
+      padding: 6mm 7mm 4mm 7mm;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
       align-items: center;
       text-align: center;
-      padding-top: 4mm;
+      background: #ffffff;
+    }
+    .standee-frame::before {
+      content: '';
+      position: absolute;
+      inset: 3mm;
+      border: 0.75px solid #d97706;
+      border-radius: 8px;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    /* Vector Corner Brackets */
+    .corner-bracket {
+      position: absolute;
+      width: 8mm;
+      height: 8mm;
+      pointer-events: none;
+    }
+    .corner-tl {
+      top: 1.5mm;
+      left: 1.5mm;
+      border-top: 2px solid #0f172a;
+      border-left: 2px solid #0f172a;
+    }
+    .corner-tr {
+      top: 1.5mm;
+      right: 1.5mm;
+      border-top: 2px solid #0f172a;
+      border-right: 2px solid #0f172a;
+    }
+    .corner-bl {
+      bottom: 1.5mm;
+      left: 1.5mm;
+      border-bottom: 2px solid #0f172a;
+      border-left: 2px solid #0f172a;
+    }
+    .corner-br {
+      bottom: 1.5mm;
+      right: 1.5mm;
+      border-bottom: 2px solid #0f172a;
+      border-right: 2px solid #0f172a;
     }
 
     /* 1. Business Logo */
@@ -193,143 +239,147 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-bottom: 5mm;
-      height: 65px;
+      height: 52px;
+      margin-bottom: 2mm;
+      position: relative;
+      z-index: 1;
     }
     .brand-logo {
-      max-height: 65px;
-      max-width: 220px;
+      max-height: 52px;
+      max-width: 190px;
       object-fit: contain;
     }
     .brand-logo-fallback {
-      width: 60px;
-      height: 60px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
-      color: #ffffff;
-      font-size: 24px;
+      background: #0f172a;
+      color: #fbbf24;
+      font-size: 20px;
       font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border: 1.5px solid #d97706;
     }
 
     /* 2. Business Name */
     .brand-name {
-      font-family: 'Cinzel', -apple-system, sans-serif;
-      font-size: 32px;
+      font-family: 'Cinzel', serif, -apple-system, sans-serif;
+      font-size: 24px;
       font-weight: 900;
       color: #0f172a;
-      letter-spacing: -0.5px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
       line-height: 1.15;
-      margin-bottom: 3.5mm;
+      margin-bottom: 3mm;
+      position: relative;
+      z-index: 1;
     }
 
     /* 3. VIP Reward CLUB */
     .vip-club-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      color: #f8fafc;
-      padding: 7px 26px;
+      justify-content: center;
+      gap: 6px;
+      background: #0f172a;
+      color: #fbbf24;
+      padding: 5px 22px;
       border-radius: 9999px;
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
-      border: 1px solid rgba(217, 119, 6, 0.4);
-      margin-bottom: 7mm;
+      border: 1px solid #d97706;
+      margin-bottom: 5mm;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     .vip-club-text {
       font-family: 'Cinzel', serif;
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: 3px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 3.5px;
       text-transform: uppercase;
       color: #fbbf24;
     }
 
-    /* 4. QR Code */
-    .qr-card-box {
+    /* 4. Vector QR Box with 4-Corner Target Brackets */
+    .qr-vector-box {
       position: relative;
       background: #ffffff;
-      border: 3px solid #e2e8f0;
-      border-radius: 24px;
-      padding: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      padding: 12px;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      margin-bottom: 6mm;
+      justify-content: center;
+      margin-bottom: 3mm;
+      z-index: 1;
+    }
+    .qr-target-tl {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 16px;
+      height: 16px;
+      border-top: 3px solid #0f172a;
+      border-left: 3px solid #0f172a;
+    }
+    .qr-target-tr {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 16px;
+      height: 16px;
+      border-top: 3px solid #0f172a;
+      border-right: 3px solid #0f172a;
+    }
+    .qr-target-bl {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 16px;
+      height: 16px;
+      border-bottom: 3px solid #0f172a;
+      border-left: 3px solid #0f172a;
+    }
+    .qr-target-br {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 16px;
+      height: 16px;
+      border-bottom: 3px solid #0f172a;
+      border-right: 3px solid #0f172a;
     }
     .qr-img {
       width: 72mm;
       height: 72mm;
-      max-width: 280px;
-      max-height: 280px;
+      max-width: 275px;
+      max-height: 275px;
       display: block;
-      border-radius: 12px;
-    }
-    .scan-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #f1f5f9;
-      color: #0f172a;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 5px 16px;
-      border-radius: 20px;
-      margin-top: 10px;
-      border: 1px solid #cbd5e1;
-    }
-    .wa-icon {
-      color: #16a34a;
-      font-size: 14px;
-    }
-
-    /* Perks / Benefits strip */
-    .benefits-row {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      width: 100%;
-      max-width: 140mm;
-      margin-bottom: 4mm;
-    }
-    .benefit-item {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 6px 12px;
-      font-size: 10px;
-      font-weight: 700;
-      color: #334155;
-      display: flex;
-      align-items: center;
-      gap: 5px;
     }
 
     /* CustomerPilot Footer */
     .standee-footer {
       width: 100%;
       border-top: 1px solid #e2e8f0;
-      padding-top: 4mm;
+      padding-top: 2.5mm;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 9.5px;
+      font-size: 8.5px;
       color: #64748b;
       font-weight: 600;
+      position: relative;
+      z-index: 1;
     }
     .cp-logo {
-      height: 22px;
+      height: 18px;
       width: auto;
       object-fit: contain;
     }
     .powered-wrap {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
 
     /* Top Floating Print Bar (Hidden on print) */
@@ -392,7 +442,13 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
     <div class="trim-guide-box">
       <span class="trim-label-top">✂️ Cut along dashed line to insert into Counter Acrylic Stand</span>
 
-      <div class="standee-card">
+      <div class="standee-frame">
+        <!-- Corner Vector Brackets -->
+        <div class="corner-bracket corner-tl"></div>
+        <div class="corner-bracket corner-tr"></div>
+        <div class="corner-bracket corner-bl"></div>
+        <div class="corner-bracket corner-br"></div>
+
         <!-- 1. Business Logo -->
         <div class="logo-wrap">
           ${logoHtml}
@@ -406,35 +462,28 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
           <span class="vip-club-text">★ VIP REWARD CLUB ★</span>
         </div>
 
-        <!-- 4. QR Code -->
-        <div class="qr-card-box">
+        <!-- 4. Pure Vector QR Code Box with Precision Target Brackets -->
+        <div class="qr-vector-box">
+          <div class="qr-target-tl"></div>
+          <div class="qr-target-tr"></div>
+          <div class="qr-target-bl"></div>
+          <div class="qr-target-br"></div>
           <img src="${qrDataUrl}" alt="VIP QR Code" class="qr-img" />
-          <div class="scan-pill">
-            <span class="wa-icon">💬</span>
-            <span>Scan with WhatsApp • Collect Stamps &amp; Rewards</span>
+        </div>
+
+        <!-- Sheet Footer with CustomerPilot -->
+        <div class="standee-footer">
+          <div>
+            100% WhatsApp Verified • Instant Check-In
+          </div>
+          <div class="powered-wrap">
+            <span>Powered by</span>
+            <img src="/cplogo.png" alt="CustomerPilot" class="cp-logo" />
           </div>
         </div>
-
-        <!-- Benefits row -->
-        <div class="benefits-row">
-          <div class="benefit-item"><span>🪙</span> Earn Stamps Every Visit</div>
-          <div class="benefit-item"><span>🎁</span> Unlock Exclusive Treats</div>
-          <div class="benefit-item"><span>🎂</span> Free Birthday Special</div>
-        </div>
       </div>
 
-      <!-- Sheet Footer with CustomerPilot -->
-      <div class="standee-footer">
-        <div>
-          <strong>No app download required.</strong> 100% WhatsApp integrated.
-        </div>
-        <div class="powered-wrap">
-          <span>Powered by</span>
-          <img src="/cplogo.png" alt="CustomerPilot" class="cp-logo" />
-        </div>
-      </div>
-
-      <span class="trim-label-bottom">Standard A4 / A5 / 6×8" Tabletop Acrylic Stand Insert</span>
+      <span class="trim-label-bottom">Standard 6×8" / A5 Tabletop Acrylic Stand Insert</span>
     </div>
   </div>
 </body>
@@ -505,16 +554,22 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
         ) : (
           <div className="flex flex-col items-center justify-center py-4">
             {/* ══════════════════════════════════════════════════════════════════ */}
-            {/* SINGLE PROFESSIONAL STANDEE CARD                                    */}
+            {/* 2D VECTOR STANDEE (NO PERKS, PURE LUXURY & PROMINENT QR)           */}
             {/* [1] Business Logo  [2] Business Name  [3] VIP Reward CLUB  [4] QR   */}
             {/* ══════════════════════════════════════════════════════════════════ */}
-            <div className="w-full max-w-sm rounded-3xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-xl flex flex-col items-center text-center relative overflow-hidden">
+            <div className="w-full max-w-sm rounded-3xl border-2 border-slate-900 dark:border-slate-700 bg-white dark:bg-slate-950 p-6 sm:p-7 shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
               
-              {/* Subtle top decorative accent bar */}
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-500 via-indigo-600 to-amber-500" />
+              {/* Inner vector border with gold hairline accent */}
+              <div className="absolute inset-2.5 rounded-2xl border border-amber-500/40 pointer-events-none" />
+
+              {/* 4 Corner Geometric Vector Brackets */}
+              <div className="absolute top-1.5 left-1.5 w-4 h-4 border-t-2 border-l-2 border-slate-900 dark:border-amber-400 pointer-events-none" />
+              <div className="absolute top-1.5 right-1.5 w-4 h-4 border-t-2 border-r-2 border-slate-900 dark:border-amber-400 pointer-events-none" />
+              <div className="absolute bottom-1.5 left-1.5 w-4 h-4 border-b-2 border-l-2 border-slate-900 dark:border-amber-400 pointer-events-none" />
+              <div className="absolute bottom-1.5 right-1.5 w-4 h-4 border-b-2 border-r-2 border-slate-900 dark:border-amber-400 pointer-events-none" />
 
               {/* 1. Business Logo */}
-              <div className="h-16 flex items-center justify-center mb-3">
+              <div className="h-16 flex items-center justify-center mb-2.5 relative z-10">
                 {storeLogo ? (
                   <img
                     src={storeLogo}
@@ -522,57 +577,47 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
                     className="max-h-16 max-w-[180px] object-contain"
                   />
                 ) : (
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-700 to-slate-900 text-white font-black text-2xl flex items-center justify-center shadow-md">
+                  <div className="w-14 h-14 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-500/50 font-black text-2xl flex items-center justify-center shadow-md">
                     {storeName.slice(0, 2).toUpperCase()}
                   </div>
                 )}
               </div>
 
               {/* 2. Business Name */}
-              <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-tight mb-2">
+              <h3 
+                className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-wider uppercase leading-tight mb-2.5 relative z-10" 
+                style={{ fontFamily: 'Cinzel, Georgia, serif' }}
+              >
                 {storeName}
               </h3>
 
               {/* 3. VIP Reward CLUB */}
-              <div className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-slate-950 text-amber-400 dark:bg-amber-400/10 dark:text-amber-300 font-extrabold text-xs tracking-widest uppercase shadow-sm border border-amber-500/30 mb-5">
+              <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-slate-950 text-amber-400 dark:bg-amber-400/10 dark:text-amber-300 font-black text-xs tracking-[0.25em] uppercase shadow-md border border-amber-500/40 mb-5 relative z-10">
                 <span>★</span>
                 <span>VIP REWARD CLUB</span>
                 <span>★</span>
               </div>
 
-              {/* 4. QR Code Box */}
-              <div className="p-3.5 bg-white dark:bg-white rounded-2xl border-2 border-slate-200 dark:border-slate-300 shadow-md mb-4 flex flex-col items-center">
+              {/* 4. Vector QR Code Box with 4 Precision Corner Target Brackets */}
+              <div className="relative p-3.5 bg-white rounded-2xl border-2 border-slate-200 dark:border-slate-300 shadow-md mb-4 flex flex-col items-center relative z-10">
+                {/* 4 Corner Target Brackets */}
+                <div className="absolute top-1 left-1 w-4 h-4 border-t-[3px] border-l-[3px] border-slate-900 pointer-events-none" />
+                <div className="absolute top-1 right-1 w-4 h-4 border-t-[3px] border-r-[3px] border-slate-900 pointer-events-none" />
+                <div className="absolute bottom-1 left-1 w-4 h-4 border-b-[3px] border-l-[3px] border-slate-900 pointer-events-none" />
+                <div className="absolute bottom-1 right-1 w-4 h-4 border-b-[3px] border-r-[3px] border-slate-900 pointer-events-none" />
+
                 {qrDataUrl && (
                   <img
                     src={qrDataUrl}
                     alt="VIP Loyalty QR Code"
-                    className="w-56 h-56 object-contain rounded-lg"
+                    className="w-60 h-60 object-contain rounded-xs"
                   />
                 )}
               </div>
 
-              {/* Scan with WhatsApp Pill */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold mb-4">
-                <span className="text-emerald-600 font-bold">💬</span>
-                <span>Scan with WhatsApp to Collect Stamps</span>
-              </div>
-
-              {/* Perks Row */}
-              <div className="grid grid-cols-3 gap-2 w-full pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-600 dark:text-slate-400">
-                <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-                  🪙 1 Stamp / Visit
-                </div>
-                <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-                  🎁 Welcome Treat
-                </div>
-                <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-                  🎂 Birthday Freebie
-                </div>
-              </div>
-
               {/* Bottom CustomerPilot Branding */}
-              <div className="w-full pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-slate-400 font-semibold">
-                <span>100% WhatsApp Integrated</span>
+              <div className="w-full pt-3 mt-1 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[10px] text-slate-400 font-semibold relative z-10">
+                <span>100% WhatsApp Verified</span>
                 <span className="font-bold text-slate-600 dark:text-slate-300">CustomerPilot</span>
               </div>
             </div>
