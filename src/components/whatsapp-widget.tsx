@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import { usePathname } from "next/navigation"
-import { MessageCircle, X } from "lucide-react"
+import { X } from "lucide-react"
 
 interface WhatsAppWidgetProps {
   phoneNumber?: string
@@ -15,6 +15,11 @@ export function WhatsAppFloatingWidget({
 }: WhatsAppWidgetProps) {
   const pathname = usePathname()
   const [showTooltip, setShowTooltip] = useState(true)
+
+  // Do not render platform support widget on customer-facing digital cards or stamp pages
+  if (pathname?.startsWith("/c/") || pathname?.startsWith("/s/") || pathname?.startsWith("/queue/")) {
+    return null
+  }
 
   const encodedMessage = encodeURIComponent(message)
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`

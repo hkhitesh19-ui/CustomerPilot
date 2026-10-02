@@ -3,6 +3,30 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: Exact Google Business Profile Ground-Truth Alignment & Micro-UI Truncation Fixes for Gujarat Photo Goods
+
+- **Symptom**: User pointed out an inaccuracy in rating metrics: "Real Rating: 4.9 ⭐ (1,280+ Google Reviews)" was displayed/recorded instead of exact Google Places ground-truth. The actual Google Knowledge Panel for Gujarat Photo Goods shows 4.5 ⭐ (406 reviews), Closes 7:30 pm. In addition, the location pill had pincode truncation (`Ahmedabad, Gujarat 3...`), catalog labels had ellipsis (`Online S...`), and an intrusive floating platform support bubble covered the Google Reviews card.
+- **Root Cause**:
+  1. During data extraction, neighboring listings in the Places panel (e.g. Gujarat Photo Suppliers with 1.3K reviews, Shree Sagar with 4.9 rating) were conflated into the record instead of strictly binding to the exact Knowledge Panel for Gujarat Photo Goods (4.5 rating, 406 reviews).
+  2. The location pill included pincode `380006`, exceeding the narrow mobile column width.
+  3. Catalog labels in `digital-card-view.tsx` used hard `truncate` across 5 columns.
+  4. Global `WhatsAppFloatingWidget` rendered indiscriminately across all routes, obscuring the merchant's review card on `/c/[slug]`.
+- **Resolution**:
+  1. **Ground-Truth Synchronized in SQLite**: Updated `DigitalBusinessCard` for `slug: 'gujarat-photo-goods'`:
+     - `googleRating`: `4.5` (was 4.9)
+     - `googleReviewsCnt`: `406` (was 1280)
+     - `businessHours`: `Open · Closes 7:30 PM`
+     - `locationShort`: `Ashram Road`
+     - `locationState`: `Ahmedabad, Gujarat`
+     - `subCategories`: `Camera Store • Pro Lenses • Drones • Camera Demo`
+  2. **Truncation Eliminated**:
+     - Updated `digital-card-view.tsx` catalog labels to use `break-words line-clamp-2` with clean labels (`Store`, `WhatsApp`, `Nikon`, `Sony α`, `DJI`).
+     - Fixed literal `&gt;` text in utility cards to render clean `<ChevronRight />` icons.
+  3. **Floating Support Widget Gated**: Added pathname check in `src/components/whatsapp-widget.tsx` to automatically hide the platform support bubble on `/c/*`, `/s/*`, and `/queue/*`.
+  4. **Playwright Assertion**: Verified live on `http://localhost:3000/c/gujarat-photo-goods` with automated text assertion (100% passed) and visual snapshot.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: Automated Google Share Link Resolution & Luxury Live Digital Business Card for "Gujarat Photo Goods"
 
 - **Symptom**: User provided a Google Maps share link (`https://share.google/aOck0JTrSmNearUB3`) and requested a sample Digital Business Card ("iska sample Business card banao : https://share.google/aOck0JTrSmNearUB3").
@@ -12,7 +36,7 @@ This document serves as a historical record of all major bugs, configuration iss
   2. **Multi-Category Catalog Adaptation**: Upgraded `src/components/digital-card-view.tsx` so non-food retail stores dynamically render "Official Store & Catalog" with branded camera badges (Nikon, Sony α, Canon, DJI, Online Store) rather than food delivery buttons.
   3. **Verified Merchant & Live Card Provisioned**:
      - **Business**: Gujarat Photo Goods (Shop No. 1-4, Ground Floor, Jayendrapuri Bhavan, Near Sanyas Ashram, Ashram Road, Ellisbridge, Ahmedabad, Gujarat 380006)
-     - **Rating**: 4.9 ⭐ (1,280+ Reviews)
+     - **Rating**: 4.5 ⭐ (406 Reviews)
      - **Contact**: `+91 98250 37489` / WhatsApp `919825037489`
      - **Slug & URL**: `/c/gujarat-photo-goods`
      - **Logo**: Created custom high-precision aperture lens vector emblem with "ESTD 1995" luxury medallion badge.

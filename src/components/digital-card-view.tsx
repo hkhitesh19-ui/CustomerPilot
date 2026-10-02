@@ -5,11 +5,12 @@ import { useState, useMemo } from "react"
 function sanitizeUrl(url?: string | null): string {
   if (!url) return "#"
   const trimmed = url.trim()
+  const lowerTrimmed = trimmed.toLowerCase()
   if (
-    trimmed.startsWith("http://") || 
-    trimmed.startsWith("https://") || 
-    trimmed.startsWith("tel:") || 
-    trimmed.startsWith("mailto:")
+    lowerTrimmed.startsWith("http://") || 
+    lowerTrimmed.startsWith("https://") || 
+    lowerTrimmed.startsWith("tel:") || 
+    lowerTrimmed.startsWith("mailto:")
   ) {
     return trimmed
   }
@@ -456,11 +457,11 @@ END:VCARD`
                         <Globe className="w-4 h-4" />
                       )}
                     </div>
-                    <span className="font-extrabold text-[10px] text-slate-800 leading-tight truncate w-full">
+                    <span className="font-extrabold text-[9.5px] text-slate-800 leading-tight text-center break-words line-clamp-2 w-full min-h-[20px] flex items-center justify-center">
                       {item.label}
                     </span>
-                    <span className="text-[8px] font-bold text-slate-500 mt-0.5 flex items-center gap-0.5">
-                      {item.sublabel || "Visit"} <ChevronRight className="w-2.5 h-2.5" />
+                    <span className="text-[8px] font-bold text-slate-500 mt-0.5 flex items-center justify-center gap-0.5 w-full">
+                      {item.sublabel || "Visit"} <ChevronRight className="w-2.5 h-2.5 flex-shrink-0" />
                     </span>
                   </a>
                 )
@@ -493,8 +494,8 @@ END:VCARD`
                 <span>{card.googleRating || 4.6}</span>
                 <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" />
               </div>
-              <span className="text-[8px] text-slate-500 font-medium">
-                {card.googleReviewsCnt || 689} Reviews &gt;
+              <span className="text-[8px] text-slate-500 font-medium flex items-center justify-center gap-0.5">
+                {card.googleReviewsCnt || 406} Reviews <ChevronRight className="w-2.5 h-2.5 flex-shrink-0" />
               </span>
             </a>
 
@@ -507,8 +508,8 @@ END:VCARD`
                 <Share2 className="w-4 h-4" />
               </div>
               <span className="font-extrabold text-[10px] text-slate-800 leading-tight">Share Card</span>
-              <span className="text-[9px] text-amber-700 font-bold mt-1">
-                {copied ? "Link Copied!" : "With Friends &gt;"}
+              <span className="text-[9px] text-amber-700 font-bold mt-1 flex items-center justify-center gap-0.5">
+                {copied ? "Link Copied!" : <>With Friends <ChevronRight className="w-2.5 h-2.5 flex-shrink-0" /></>}
               </span>
             </button>
 
@@ -521,7 +522,9 @@ END:VCARD`
                 <QrCode className="w-4 h-4" />
               </div>
               <span className="font-extrabold text-[10px] text-slate-800 leading-tight">Scan QR</span>
-              <span className="text-[9px] text-slate-500 font-medium mt-1">Save to Phone &gt;</span>
+              <span className="text-[9px] text-slate-500 font-medium mt-1 flex items-center justify-center gap-0.5">
+                Save to Phone <ChevronRight className="w-2.5 h-2.5 flex-shrink-0" />
+              </span>
             </button>
 
           </div>
