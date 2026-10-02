@@ -81,16 +81,31 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
     }
 
     if (list.length === 0) {
-      list = [
-        { platform: "website", label: "Website", sublabel: "Order Now", url: card.websiteUrl || "#", color: "#2563eb" },
-        { platform: "whatsapp", label: "WhatsApp", sublabel: "Order Now", url: card.whatsappNumber ? `https://wa.me/${card.whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(card.displayName)}%2C%20I%20want%20to%20place%20an%20order` : "#", color: "#16a34a" },
-        { platform: "zomato", label: "Zomato", sublabel: "Order Now", url: "https://www.zomato.com", color: "#ef4444" },
-        { platform: "swiggy", label: "Swiggy", sublabel: "Order Now", url: "https://www.swiggy.com", color: "#f97316" },
-        { platform: "easycater", label: "EasyCater", sublabel: "Order Now", url: "https://www.easycater.com", color: "#7c3aed" }
-      ]
+      const isFood = (card.subCategories || "").toLowerCase().includes("cake") || 
+                     (card.subCategories || "").toLowerCase().includes("food") ||
+                     (card.subCategories || "").toLowerCase().includes("bakery") ||
+                     (card.subCategories || "").toLowerCase().includes("dessert")
+
+      if (isFood) {
+        list = [
+          { platform: "website", label: "Website", sublabel: "Order Now", url: card.websiteUrl || "#", color: "#2563eb" },
+          { platform: "whatsapp", label: "WhatsApp", sublabel: "Order Now", url: card.whatsappNumber ? `https://wa.me/${card.whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(card.displayName)}%2C%20I%20want%20to%20place%20an%20order` : "#", color: "#16a34a" },
+          { platform: "zomato", label: "Zomato", sublabel: "Order Now", url: "https://www.zomato.com", color: "#ef4444" },
+          { platform: "swiggy", label: "Swiggy", sublabel: "Order Now", url: "https://www.swiggy.com", color: "#f97316" },
+          { platform: "easycater", label: "EasyCater", sublabel: "Order Now", url: "https://www.easycater.com", color: "#7c3aed" }
+        ]
+      } else {
+        list = [
+          { platform: "website", label: "Online Store", sublabel: "Explore", url: card.websiteUrl || "#", color: "bg-blue-600" },
+          { platform: "whatsapp", label: "WhatsApp", sublabel: "Inquire", url: card.whatsappNumber ? `https://wa.me/${card.whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(card.displayName)}%2C%20I%20have%20an%20inquiry` : "#", color: "bg-[#25D366]" },
+          { platform: "catalog", label: "Catalog", sublabel: "View All", url: card.websiteUrl || "#", color: "bg-purple-600" },
+          { platform: "quotes", label: "Get Quote", sublabel: "Pricing", url: card.whatsappNumber ? `https://wa.me/${card.whatsappNumber.replace(/[^0-9]/g, "")}?text=Hello%2C%20please%20share%20quotation` : "#", color: "bg-emerald-600" },
+          { platform: "directions", label: "Store Visit", sublabel: "Find Us", url: card.googleMapsUrl || "#", color: "bg-amber-600" }
+        ]
+      }
     }
     return list
-  }, [card.orderingLinks, card.websiteUrl, card.whatsappNumber, card.displayName])
+  }, [card.orderingLinks, card.websiteUrl, card.whatsappNumber, card.displayName, card.subCategories, card.googleMapsUrl])
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : `https://customerpilot.in/c/${card.slug}`
 
@@ -98,16 +113,20 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
   const handleSaveContact = () => {
     setSavingContact(true)
     const cleanPhone = (card.phoneNumber || card.whatsappNumber || "").replace(/[^0-9+]/g, "")
+    const safeDisplayName = card.displayName.replace(/[\r\n]+/g, " ").trim()
+    const safeSubCategories = (card.subCategories || "Business").replace(/[\r\n]+/g, " ").trim()
+    const safeLocationShort = (card.locationShort || "").replace(/[\r\n]+/g, " ").trim()
+    const safeLocationState = (card.locationState || "").replace(/[\r\n]+/g, " ").trim()
     const vcard = `BEGIN:VCARD
 VERSION:3.0
-FN:${card.displayName}
-ORG:${card.displayName}
-TITLE:${card.subCategories || "Business"}
+FN:${safeDisplayName}
+ORG:${safeDisplayName}
+TITLE:${safeSubCategories}
 TEL;TYPE=CELL,VOICE:${cleanPhone}
 TEL;TYPE=WORK,VOICE:${cleanPhone}
-ADR;TYPE=WORK:;;${card.locationShort || ""};${card.locationState || ""};;;India
+ADR;TYPE=WORK:;;${safeLocationShort};${safeLocationState};;;India
 URL:${currentUrl}
-NOTE:${card.displayName} - ${card.subCategories || ""}. Order Online: ${currentUrl}
+NOTE:${safeDisplayName} - ${safeSubCategories}. Contact & Details: ${currentUrl}
 END:VCARD`
 
     const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8;" })
@@ -234,7 +253,9 @@ END:VCARD`
                 </span>
               </div>
               <span className="text-[10px] text-slate-500 font-medium truncate max-w-full">
-                {card.deliveryInfo ? card.deliveryInfo.replace("Delivery Available • ", "").replace("Delivery Available: ", "") : "Vadodara Only"}
+                {card.deliveryInfo
+                  ? card.deliveryInfo.replace("Delivery Available • ", "").replace("Delivery Available: ", "")
+                  : (card.locationState?.toLowerCase().includes("ahmedabad") ? "Gujarat & Pan-India" : "Available")}
               </span>
             </div>
 
@@ -385,7 +406,11 @@ END:VCARD`
               <div className="h-[1px] bg-amber-300/80 flex-1 max-w-[50px]" />
               <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-slate-800">
                 <ShoppingBag className="w-3.5 h-3.5 text-amber-600" />
-                <span>Online Ordering Platforms</span>
+                <span>
+                  {card.subCategories?.toLowerCase().includes("cake") || card.subCategories?.toLowerCase().includes("food")
+                    ? "Online Ordering Platforms"
+                    : "Official Store & Catalog"}
+                </span>
               </div>
               <div className="h-[1px] bg-amber-300/80 flex-1 max-w-[50px]" />
             </div>
@@ -393,13 +418,20 @@ END:VCARD`
             {/* 5 Platforms Row */}
             <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
               {orderingList.map((item, idx) => {
-                let badgeColor = "bg-blue-600"
-                let letter = "W"
+                let badgeColor = item.color || "bg-blue-600"
+                let letter: string | React.ReactNode = "🌐"
                 if (item.platform === "whatsapp") { badgeColor = "bg-[#25D366]"; letter = "💬" }
-                if (item.platform === "zomato") { badgeColor = "bg-[#e23744]"; letter = "z" }
-                if (item.platform === "swiggy") { badgeColor = "bg-[#fc8019]"; letter = "S" }
-                if (item.platform === "easycater") { badgeColor = "bg-[#232f3e]"; letter = "E" }
-                if (item.platform === "website") { badgeColor = "bg-blue-600"; letter = "🌐" }
+                else if (item.platform === "zomato") { badgeColor = "bg-[#e23744]"; letter = "z" }
+                else if (item.platform === "swiggy") { badgeColor = "bg-[#fc8019]"; letter = "S" }
+                else if (item.platform === "easycater") { badgeColor = "bg-[#232f3e]"; letter = "E" }
+                else if (item.platform === "website") { badgeColor = "bg-blue-600"; letter = "🌐" }
+                else if (item.platform === "nikon") { badgeColor = "bg-[#eab308]"; letter = "N" }
+                else if (item.platform === "sony") { badgeColor = "bg-[#0284c7]"; letter = "α" }
+                else if (item.platform === "canon") { badgeColor = "bg-[#dc2626]"; letter = "C" }
+                else if (item.platform === "dji") { badgeColor = "bg-[#0f766e]"; letter = "DJI" }
+                else {
+                  letter = item.label ? item.label.slice(0, 2).toUpperCase() : "★"
+                }
 
                 return (
                   <a
@@ -418,6 +450,8 @@ END:VCARD`
                         <span className="font-bold text-[9px] uppercase">EC</span>
                       ) : letter === "💬" ? (
                         <MessageCircle className="w-4 h-4 fill-white" />
+                      ) : typeof letter === "string" && letter.length <= 3 ? (
+                        <span className="font-black text-[10px] uppercase">{letter}</span>
                       ) : (
                         <Globe className="w-4 h-4" />
                       )}
@@ -426,7 +460,7 @@ END:VCARD`
                       {item.label}
                     </span>
                     <span className="text-[8px] font-bold text-slate-500 mt-0.5 flex items-center gap-0.5">
-                      Order <ChevronRight className="w-2.5 h-2.5" />
+                      {item.sublabel || "Visit"} <ChevronRight className="w-2.5 h-2.5" />
                     </span>
                   </a>
                 )
@@ -441,7 +475,7 @@ END:VCARD`
             
             {/* Google Reviews Card */}
             <a
-              href={card.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(card.displayName)}`}
+              href={sanitizeUrl(card.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(card.displayName)}`)}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2.5 rounded-2xl bg-white/90 border border-amber-200/60 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center group active:scale-95"

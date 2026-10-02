@@ -1,8 +1,30 @@
 import { NextRequest, NextResponse } from "next/server"
 import { searchGooglePlaces, getPlaceDetails } from "@/lib/google-places-api"
 
-/** Attempt to resolve a short/redirect URL to its final destination */
+function safeDecode(val: string): string {
+  try {
+    return decodeURIComponent(val)
+  } catch {
+    return val
+  }
+}
+
+const ALLOWED_SHORTENER_HOSTS = ["share.google", "maps.app.goo.gl", "goo.gl", "google.com", "maps.google.com"]
+
+function isSafeRedirectHost(urlStr: string): boolean {
+  try {
+    const parsed = new URL(urlStr)
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false
+    const host = parsed.hostname.toLowerCase()
+    return ALLOWED_SHORTENER_HOSTS.some(allowed => host === allowed || host.endsWith("." + allowed))
+  } catch {
+    return false
+  }
+}
+
+/** Attempt to resolve a short/redirect URL to its final destination with SSRF host validation */
 async function resolveRedirectUrl(url: string): Promise<string> {
+  if (!isSafeRedirectHost(url)) return url
   try {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 5000)
@@ -20,20 +42,23 @@ async function resolveRedirectUrl(url: string): Promise<string> {
 
 /** Extract business name from a full Google Maps URL */
 function extractBusinessNameFromUrl(mapsUrl: string): string | null {
+  const continueMatch = mapsUrl.match(/[?&]continue=([^&]+)/)
+  const targetUrl = continueMatch ? safeDecode(continueMatch[1]) : mapsUrl
+
   // Standard place URL: /maps/place/BusinessName/@...
-  const placeMatch = mapsUrl.match(/\/maps\/place\/([^/@?]+)/)
+  const placeMatch = targetUrl.match(/\/maps\/place\/([^/@?]+)/)
   if (placeMatch && placeMatch[1]) {
-    const decoded = decodeURIComponent(placeMatch[1]).replace(/\+/g, " ")
+    const decoded = safeDecode(placeMatch[1]).replace(/\+/g, " ")
     // If it looks like a URL, reject it
     if (decoded.startsWith("http")) return null
     return decoded
   }
 
   // Query string: ?q=BusinessName
-  const qMatch = mapsUrl.match(/[?&]q=([^&]+)/)
+  const qMatch = targetUrl.match(/[?&]q=([^&]+)/)
   if (qMatch && qMatch[1]) {
-    const decoded = decodeURIComponent(qMatch[1]).replace(/\+/g, " ")
-    if (decoded.startsWith("http")) return null
+    const decoded = safeDecode(qMatch[1]).replace(/\+/g, " ")
+    if (decoded.startsWith("http") || decoded.startsWith("EgQ")) return null
     return decoded
   }
 
@@ -72,9 +97,9 @@ export async function POST(req: NextRequest) {
             success: true,
             source: "google_places_api",
             details: {
-              displayName: details.displayName.text,
-              locationShort: details.shortAddress || details.formattedAddress.split(",")[0],
-              locationState: details.formattedAddress.split(",").slice(1, 3).join(",").trim(),
+              displayName: details.displayName?.text || searchQuery,
+              locationShort: details.shortAddress || details.formattedAddress?.split(",")[0] || "",
+              locationState: details.formattedAddress ? details.formattedAddress.split(",").slice(1, 3).join(",").trim() : "India",
               phoneNumber: details.nationalPhoneNumber || "",
               googleRating: details.rating || 4.6,
               googleReviewsCnt: details.userRatingCount || 100,

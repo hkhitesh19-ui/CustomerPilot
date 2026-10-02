@@ -24,8 +24,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
   }
 
+  const isFood = (card.subCategories || "").toLowerCase().includes("cake") ||
+                 (card.subCategories || "").toLowerCase().includes("food") ||
+                 (card.subCategories || "").toLowerCase().includes("bakery") ||
+                 (card.subCategories || "").toLowerCase().includes("dessert")
+
+  const actionText = isFood
+    ? "Order on Zomato, Swiggy, WhatsApp or Call Now."
+    : "Chat on WhatsApp, Browse Official Catalog, Get Directions or Call Now."
+
   const title = `${card.displayName} • Official Digital Card`
-  const description = `${card.locationShort || "Vadodara"} • ${card.googleRating || 4.6} ⭐ Google Rating. Order on Zomato, Swiggy, WhatsApp or Call Now.`
+  const description = `${card.locationShort || card.locationState || "Gujarat"} • ${card.googleRating || 4.8} ⭐ Google Rating. ${actionText}`
 
   return {
     title,

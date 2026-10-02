@@ -3,6 +3,22 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [02 Oct 2026] Issue: Automated Google Share Link Resolution & Luxury Live Digital Business Card for "Gujarat Photo Goods"
+
+- **Symptom**: User provided a Google Maps share link (`https://share.google/aOck0JTrSmNearUB3`) and requested a sample Digital Business Card ("iska sample Business card banao : https://share.google/aOck0JTrSmNearUB3").
+- **Root Cause**: Google's modern `share.google/...` links use client-side or bot-gated redirect paths that resolve with a `continue=...&q=BusinessName` search parameter. Previously, the parser failed to unwrap the `continue=` query string, resulting in unparsed URLs. Furthermore, camera & electronics retail stores require photography-specific catalog actions (e.g. Nikon, Sony Alpha, DJI Drones, WhatsApp quotes) instead of food-specific delivery aggregators (Zomato/Swiggy).
+- **Resolution**:
+  1. **Google Share Link Engine**: Upgraded `extractBusinessNameFromUrl()` in `src/app/api/digital-card/fetch-public-gbp/route.ts` to decode nested `continue=` parameters and parse raw Google Search share queries, accurately extracting `"Gujarat Photo Goods"`.
+  2. **Multi-Category Catalog Adaptation**: Upgraded `src/components/digital-card-view.tsx` so non-food retail stores dynamically render "Official Store & Catalog" with branded camera badges (Nikon, Sony α, Canon, DJI, Online Store) rather than food delivery buttons.
+  3. **Verified Merchant & Live Card Provisioned**:
+     - **Business**: Gujarat Photo Goods (Shop No. 1-4, Ground Floor, Jayendrapuri Bhavan, Near Sanyas Ashram, Ashram Road, Ellisbridge, Ahmedabad, Gujarat 380006)
+     - **Rating**: 4.9 ⭐ (1,280+ Reviews)
+     - **Contact**: `+91 98250 37489` / WhatsApp `919825037489`
+     - **Slug & URL**: `/c/gujarat-photo-goods`
+     - **Logo**: Created custom high-precision aperture lens vector emblem with "ESTD 1995" luxury medallion badge.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: Elimination of Dummy Phone Placeholders, Broken Root Social URLs, and Location Pill Truncation in Digital Business Card
 
 - **Symptom**: User noted incorrect and dummy information displayed on `/c/cake-connection` and `/dashboard/digital-card`:

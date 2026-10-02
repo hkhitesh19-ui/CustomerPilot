@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="lensGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="70%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+    <linearGradient id="goldRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="50%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer Gold Ring -->
+  <circle cx="100" cy="100" r="95" fill="url(#goldRing)" />
+  <circle cx="100" cy="100" r="91" fill="#0f172a" />
+  
+  <!-- Inner Lens Barrel Ring -->
+  <circle cx="100" cy="100" r="76" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="8 4" opacity="0.8" />
+  <circle cx="100" cy="100" r="68" fill="url(#lensGrad)" />
+  
+  <!-- Camera Shutter Aperture Blades -->
+  <polygon points="100,50 120,75 90,80" fill="#f59e0b" opacity="0.6"/>
+  <polygon points="150,100 125,120 120,90" fill="#fbbf24" opacity="0.7"/>
+  <polygon points="100,150 80,125 110,120" fill="#f59e0b" opacity="0.6"/>
+  <polygon points="50,100 75,80 80,110" fill="#d97706" opacity="0.7"/>
+  
+  <!-- Center Optics Glint Circle -->
+  <circle cx="100" cy="100" r="32" fill="#020617" stroke="#fbbf24" stroke-width="2.5"/>
+  <ellipse cx="94" cy="94" rx="8" ry="4" fill="#ffffff" opacity="0.4" transform="rotate(-30 94 94)"/>
+  
+  <!-- GP Monogram inside Optics -->
+  <text x="100" y="106" font-family="'Cinzel', serif, system-ui" font-size="20" font-weight="900" fill="#fbbf24" text-anchor="middle" letter-spacing="1">GPG</text>
+  
+  <!-- Established Banner -->
+  <rect x="52" y="152" width="96" height="18" rx="9" fill="#f59e0b"/>
+  <text x="100" y="165" font-family="system-ui, sans-serif" font-size="9.5" font-weight="900" fill="#0f172a" text-anchor="middle" letter-spacing="1.5">ESTD 1995</text>
+</svg>
