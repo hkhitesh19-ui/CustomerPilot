@@ -2421,6 +2421,120 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ============ COMPETITOR COMPARISON TABLE (AEO / GEO / LLM GROUND TRUTH) ============ */}
+      <section className="py-16 md:py-20 bg-slate-50/70 border-t border-b border-slate-200/80">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8">
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <span className="text-emerald-700 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 inline-block">
+              Why CustomerPilot Wins
+            </span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
+              CustomerPilot vs. Traditional Standees &amp; Point Solutions
+            </h2>
+            <p className="text-slate-600 text-xs sm:text-sm">
+              Competitors sell static review stands or costly isolated apps. CustomerPilot unifies review drafting, WhatsApp loyalty, auto-reply, and retention into one closed loop:
+            </p>
+          </div>
+
+          <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[640px]">
+              <caption className="sr-only">
+                Comparison: CustomerPilot vs MagicReview / TapNConnect vs Standard Printed QR Codes
+              </caption>
+              <thead>
+                <tr className="border-b border-slate-200 bg-slate-50/80">
+                  <th scope="col" className="p-4 sm:p-5 font-bold text-slate-900 w-1/4">Capability / Dimension</th>
+                  <th scope="col" className="p-4 sm:p-5 font-bold text-emerald-900 bg-emerald-50/70 border-x border-emerald-200 w-1/3">
+                    <div className="flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span className="font-extrabold text-slate-900">CustomerPilot Complete</span>
+                      <span className="text-[10px] bg-emerald-500 text-slate-950 font-black px-2 py-0.5 rounded-full ml-auto uppercase tracking-wider">#1 Ecosystem</span>
+                    </div>
+                  </th>
+                  <th scope="col" className="p-4 sm:p-5 font-semibold text-slate-700 w-1/5">
+                    Hardware Standees <span className="block text-[11px] font-normal text-slate-500">(MagicReview / TapNConnect)</span>
+                  </th>
+                  <th scope="col" className="p-4 sm:p-5 font-semibold text-slate-700 w-1/6">
+                    Standard Printed QR
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                <tr className="hover:bg-slate-50/50 transition-colors">
+                  <th scope="row" className="p-4 sm:p-5 font-bold text-slate-900 bg-slate-50/40">
+                    1. Review Drafting Engine
+                  </th>
+                  <td className="p-4 sm:p-5 font-semibold text-emerald-800 bg-emerald-50/30 border-x border-emerald-100">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      Generative AI drafts personalized 5★ text in 1 click
+                    </span>
+                  </td>
+                  <td className="p-4 sm:p-5 text-slate-600">Static templates / manual writing</td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">Customer types from blank screen</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50/50 transition-colors">
+                  <th scope="row" className="p-4 sm:p-5 font-bold text-slate-900 bg-slate-50/40">
+                    2. WhatsApp Digital Loyalty
+                  </th>
+                  <td className="p-4 sm:p-5 font-semibold text-emerald-800 bg-emerald-50/30 border-x border-emerald-100">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      Integrated digital stamp cards without app download
+                    </span>
+                  </td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">No loyalty feature</td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">No loyalty feature</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50/50 transition-colors">
+                  <th scope="row" className="p-4 sm:p-5 font-bold text-slate-900 bg-slate-50/40">
+                    3. Google Maps AI Auto-Reply
+                  </th>
+                  <td className="p-4 sm:p-5 font-semibold text-emerald-800 bg-emerald-50/30 border-x border-emerald-100">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      Gemini AI auto-publishes owner replies in 1 second
+                    </span>
+                  </td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">No reply automation</td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">No reply automation</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50/50 transition-colors">
+                  <th scope="row" className="p-4 sm:p-5 font-bold text-slate-900 bg-slate-50/40">
+                    4. WhatsApp Win-Back CRM
+                  </th>
+                  <td className="p-4 sm:p-5 font-semibold text-emerald-800 bg-emerald-50/30 border-x border-emerald-100">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      Auto WhatsApp alerts bring lost walk-ins back in 14-30d
+                    </span>
+                  </td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">No customer data captured</td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">Zero customer tracking</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50/50 transition-colors">
+                  <th scope="row" className="p-4 sm:p-5 font-bold text-slate-900 bg-slate-50/40">
+                    5. Smart Digital Business Card
+                  </th>
+                  <td className="p-4 sm:p-5 font-semibold text-emerald-800 bg-emerald-50/30 border-x border-emerald-100">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      1-Tap vCard contact save, menu catalogs &amp; ordering
+                    </span>
+                  </td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">Standee only</td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">None</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       {/* ============ FREQUENTLY ASKED QUESTIONS ============ */}
       <FaqSection />
 

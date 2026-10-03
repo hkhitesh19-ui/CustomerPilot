@@ -418,6 +418,24 @@ export function FreeAiReviewGeneratorClient() {
           </div>
         </section>
 
+        {/* ============ INTERNAL NAVIGATION STRIP — SEO FLYWHEEL ============ */}
+        <div className="py-4 px-4 sm:px-6 bg-slate-50 border-t border-slate-100">
+          <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-3 text-[11px] font-semibold text-slate-500">
+            <span>You might also need:</span>
+            <Link href="/smart-ai-google-review" className="text-amber-700 hover:text-amber-900 underline underline-offset-2">
+              Smart AI Review Standee (Auto-Generates on WhatsApp)
+            </Link>
+            <span className="text-slate-300">·</span>
+            <Link href="/ai-google-review-autoreply" className="text-amber-700 hover:text-amber-900 underline underline-offset-2">
+              AI Auto-Reply for Google Reviews
+            </Link>
+            <span className="text-slate-300">·</span>
+            <Link href="/customerpilot-complete" className="text-emerald-700 hover:text-emerald-900 underline underline-offset-2">
+              CustomerPilot Complete Ecosystem
+            </Link>
+          </div>
+        </div>
+
         {/* ============ AUTOMATION HOOK & UPSELL SECTION ============ */}
         <section className="py-14 sm:py-20 bg-gradient-to-b from-white via-amber-50/30 to-white border-t border-b border-slate-200/80">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
@@ -467,6 +485,14 @@ export function FreeAiReviewGeneratorClient() {
                     className="border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm px-6 py-4 rounded-xl w-full sm:w-auto shadow-xs"
                   >
                     <Link href="/signup">Start 3-Day Free Trial</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="lg"
+                    className="text-slate-600 hover:text-slate-900 font-bold text-sm px-4 py-4 rounded-xl w-full sm:w-auto"
+                  >
+                    <Link href="/customerpilot-complete">See Full CustomerPilot Ecosystem →</Link>
                   </Button>
                 </div>
               </div>

@@ -1,30 +1,30 @@
 import type { Metadata } from "next"
-import { AiGoogleReviewQrClient } from "@/components/ai-google-review-qr-client"
+import { AiReviewStandeeClient } from "@/components/ai-review-standee-client"
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld"
 
 export const metadata: Metadata = {
-  title: "Smart AI Google Review QR Code Generator | CustomerPilot",
+  title: "AI Google Review QR Standee for Counter | CustomerPilot",
   description:
-    "Generate 5-star Google reviews automatically with CustomerPilot's Smart AI Review QR code. AI auto-writes personalized feedback in 1 click for retail shops.",
+    "Get India's best AI Google Review acrylic QR standee for your billing counter. Auto-generate 5-star Google reviews via WhatsApp in 1 tap. Perfect for retail, cafes and restaurants.",
   keywords: [
-    "Smart AI Google Review",
-    "Smart AI Google Review QR Code Generator",
-    "AI Google Review QR Code Generator",
-    "Smart AI Review QR code",
-    "Scan karte hi Google review option dene wala software",
-    "QR code scan karke review likhne wala AI tool",
-    "Google review QR code generator India",
-    "Automated Google review collector retail",
-    "AI review auto writer for local business",
-    "Increase Google Maps reviews for restaurants"
+    "AI Google review QR standee",
+    "acrylic review stand for counter",
+    "Google review QR stand for retail",
+    "AI QR standee for cafe",
+    "restaurant review standee India",
+    "counter review stand acrylic",
+    "QR standee for billing counter",
+    "automatic Google review standee India",
+    "AI review acrylic display India",
+    "review standee for shop counter"
   ],
   alternates: {
-    canonical: "/ai-google-review-qr-generator"
+    canonical: "https://customerpilot.in/ai-google-review-qr-generator"
   },
   openGraph: {
-    title: "Smart AI Google Review QR Code Generator | CustomerPilot",
+    title: "AI Google Review QR Standee for Counter | CustomerPilot",
     description:
-      "Generate 5-star Google reviews automatically with CustomerPilot's Smart AI Review QR code. AI auto-writes personalized feedback in 1 click for retail shops.",
+      "Get India's best AI Google Review acrylic QR standee for your billing counter. Auto-generate 5-star Google reviews via WhatsApp in 1 tap. Perfect for retail, cafes and restaurants.",
     url: "https://customerpilot.in/ai-google-review-qr-generator"
   }
 }
@@ -33,17 +33,16 @@ const SMART_AI_REVIEW_SCHEMA = {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "SoftwareApplication",
-      "name": "CustomerPilot Smart AI Google Review",
-      "operatingSystem": "All (Web-based, WhatsApp integrated)",
-      "applicationCategory": "BusinessApplication",
+      "@type": "Product",
+      "name": "CustomerPilot AI Google Review QR Standee",
+      "category": "Point of Sale Display",
+      "description":
+        "Premium acrylic counter QR display standee that auto-generates personalized 5-star Google review drafts via WhatsApp in 1 tap for retail stores and restaurants.",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "INR"
-      },
-      "description":
-        "AI-powered tool that automatically drafts Google reviews for customers using smart QR codes and WhatsApp automation."
+      }
     },
     {
       "@type": "FAQPage",
@@ -127,10 +126,11 @@ export default function AiGoogleReviewQrPage() {
         items={[
           { name: "Home", url: "https://customerpilot.in" },
           { name: "Products", url: "https://customerpilot.in/#products" },
-          { name: "Smart AI Google Review QR Generator", url: "https://customerpilot.in/ai-google-review-qr-generator" }
+          { name: "AI Google Review QR Standee", url: "https://customerpilot.in/ai-google-review-qr-generator" }
         ]}
       />
-      <AiGoogleReviewQrClient />
+      <AiReviewStandeeClient />
     </>
   )
 }
+

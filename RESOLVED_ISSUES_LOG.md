@@ -3,6 +3,42 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Oct 2026] Issue: 16-Point SEO, AEO & GEO Master Strategy Full Implementation & Cannibalization Decoupling
+- **Symptom**: User requested full execution of the data-driven Zero-to-Dominance SEO, AEO, and GEO Master Strategy guide. Key challenges: keyword cannibalization between `/smart-ai-google-review` (software) and `/ai-google-review-qr-generator` (hardware standee), missing programmatic industry loyalty landing pages (cafes, salons, restaurants, bakeries, dental clinics), missing `Stamp Me` competitor comparison page, missing internal linking flywheel CTA paths, missing multi-product `hasPart` schema, and lack of a 5-dimension competitor comparison table for LLM scraper ground truth.
+- **Root Cause**:
+  1. Both `/smart-ai-google-review` and `/ai-google-review-qr-generator` were importing and rendering the exact same client component (`AiGoogleReviewQrClient`), diluting search intent and risking Google penalty for duplicate intent.
+  2. Highly lucrative long-tail search intent searches for local niche businesses (`/industry/cafe-loyalty-program`, `/industry/salon-loyalty-program`, etc.) had no dedicated entry points with structured `LocalBusiness` / `SoftwareApplication` data.
+  3. The free review generator tool lacked the 3rd CTA bridge to `/customerpilot-complete`, allowing traffic to drop off without exploring the full paid suite.
+  4. Global JSON-LD schema had no `hasPart` relationship binding the 6 core CustomerPilot sub-modules under `CustomerPilot Complete`.
+- **Resolution**:
+  1. **Keyword Cannibalization Decoupling**:
+     - Built dedicated `src/components/ai-review-standee-client.tsx` exclusively targeting acrylic counter standee, physical dimensions (A5 5mm), and counter checkout ergonomics.
+     - Rewrote `src/app/ai-google-review-qr-generator/page.tsx` targeting physical hardware keywords (`AI Google review QR standee`, `acrylic review stand for counter`).
+     - Rewrote `src/app/smart-ai-google-review/page.tsx` targeting pure software & generative review automation (`AI Google review software`, `WhatsApp review automation`).
+  2. **Multi-Product `hasPart` JSON-LD Architecture**:
+     - Enhanced `SoftwareApplicationJsonLd` in `src/components/seo/json-ld.tsx` with a master `@graph` including `CustomerPilot Complete` and its 6 composite `hasPart` products with direct canonical URLs.
+  3. **Industry Programmatic SEO Pages**:
+     - Created 5 fully-fleshed, non-placeholder landing pages with localized bilingual FAQ schemas:
+       - `src/app/industry/cafe-loyalty-program/page.tsx`
+       - `src/app/industry/salon-loyalty-program/page.tsx`
+       - `src/app/industry/restaurant-loyalty-program/page.tsx`
+       - `src/app/industry/bakery-loyalty-program/page.tsx`
+       - `src/app/industry/dental-clinic-loyalty-program/page.tsx`
+  4. **Competitor Comparison Alternatives Page**:
+     - Created `src/app/alternatives/stamp-me/page.tsx` with side-by-side feature matrix, 95% price saving calculation, and dual-language FAQs for AEO featured snippet scraping.
+  5. **Internal Linking Flywheel Enhancement**:
+     - Added the "You might also need" sticky strip and third CTA linking directly to `/customerpilot-complete` in `src/components/free-ai-review-generator-client.tsx`.
+  6. **5-Dimension Competitor Table on Master Homepage**:
+     - Injected structured HTML comparison table into `src/app/page.tsx` contrasting CustomerPilot Complete vs Hardware Standees vs Standard QR across 5 core capabilities.
+  7. **Tiered Sitemap Updates**:
+     - Updated `src/app/sitemap.ts` with all 10 new routes mapped into 1.0, 0.9, and 0.8 priority tiers.
+  8. **CodeRabbit Quality & Security Audit & Autofix**:
+     - Autofixed schema entity on QR standee page to `@type: "Product"`. Verified 0 Critical, 0 Major defects.
+  9. **Playwright Visual & Ground-Truth Verification**:
+     - Verified all 10 pages return HTTP 200, standee vs software H1s are decoupled, `hasPart` schema is active, and screenshots saved.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [03 Oct 2026] Issue: 5-Stage AI Search & LLM Domination Framework (Stages 1, 2, 4, 5) Implementation & CodeRabbit Autofix
 - **Symptom**: User inquired whether all items from the aggressive 5-Stage framework (for ranking #1 on Google, Bing, ChatGPT, Perplexity & Claude) were implemented. An audit revealed critical missing items: missing dedicated route `/smart-ai-google-review`, H1 Primary Entity wording, 45-word SGE Direct Answer Snippet, `SoftwareApplication` + voice-search FAQ JSON-LD `@graph` schema, structured 4-column GEO comparison table, and the standalone Stage 5 free utility tool `/free-ai-google-review-generator`.
 - **Root Cause**:

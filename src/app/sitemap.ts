@@ -28,6 +28,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/vs/birdeye",
     "/vs/bingage",
     "/vs/stamp-me",
+    "/customerpilot-vs-stamp-me",
+    // Industry-specific programmatic SEO pages
+    "/industry/cafe-loyalty-program",
+    "/industry/salon-loyalty-program",
+    "/industry/restaurant-loyalty-program",
+    "/industry/bakery-loyalty-program",
+    "/industry/dental-clinic-loyalty-program",
+    // Competitor alternatives pages
+    "/alternatives/stamp-me",
     "/for-business",
     "/help",
     "/signup",
@@ -58,6 +67,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
           route.startsWith("/features") ||
           route.endsWith("-loyalty")
         ? 0.9
+        : route.startsWith("/industry/") || route.startsWith("/alternatives/") || route === "/customerpilot-vs-stamp-me"
+        ? 0.8
         : 0.7,
   }))
 }

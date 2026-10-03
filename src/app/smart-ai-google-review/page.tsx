@@ -3,27 +3,28 @@ import { AiGoogleReviewQrClient } from "@/components/ai-google-review-qr-client"
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld"
 
 export const metadata: Metadata = {
-  title: "Smart AI Google Review QR Code Generator | CustomerPilot",
+  title: "Smart AI Google Review Software & Automation | CustomerPilot",
   description:
-    "Generate 5-star Google reviews automatically with CustomerPilot's Smart AI Review QR code. AI auto-writes personalized feedback in 1 click for retail shops.",
+    "CustomerPilot's Smart AI Google Review software automates 5-star review generation using WhatsApp automation and generative AI. Zero customer typing — AI auto-writes keyword-rich reviews for local merchants.",
   keywords: [
-    "Smart AI Google Review",
-    "Smart AI Google Review QR Code Generator",
-    "AI Google Review QR Standee",
+    "AI Google review software",
+    "WhatsApp review automation",
+    "automated Google review writer",
+    "generative AI review system India",
+    "AI auto review generation tool",
+    "Smart AI Google review software",
+    "QR scan review automation SaaS",
+    "local business review automation WhatsApp",
     "Scan karte hi Google review option dene wala software",
-    "QR code scan karke review likhne wala AI tool",
-    "Google review QR code generator India",
-    "Automated Google review collector retail",
-    "AI review auto writer for local business",
-    "Increase Google Maps reviews for restaurants"
+    "QR code scan karke review likhne wala AI tool"
   ],
   alternates: {
     canonical: "https://customerpilot.in/smart-ai-google-review"
   },
   openGraph: {
-    title: "Smart AI Google Review QR Code Generator | CustomerPilot",
+    title: "Smart AI Google Review Software & Automation | CustomerPilot",
     description:
-      "Generate 5-star Google reviews automatically with CustomerPilot's Smart AI Review QR code. AI auto-writes personalized feedback in 1 click for retail shops.",
+      "CustomerPilot's Smart AI Google Review software automates 5-star review generation using WhatsApp automation and generative AI. Zero customer typing — AI auto-writes keyword-rich reviews for local merchants.",
     url: "https://customerpilot.in/smart-ai-google-review"
   }
 }

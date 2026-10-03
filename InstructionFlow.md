@@ -377,6 +377,9 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   ├── brand-logo.tsx             # Pure Vector Transparent SVG Logo Component
 │   │   ├── app-sidebar.tsx            # Merchant Navigation Sidebar with Founder Badge
 │   │   ├── top-nav.tsx                # Merchant Top Header Navigation
+│   │   ├── ai-review-standee-client.tsx # Hardware Acrylic QR Standee Landing Client
+│   │   ├── free-ai-review-generator-client.tsx # Interactive AI Review Generator & SEO Flywheel
+│   │   ├── live-review-reply-animation.tsx # 3-Step Live Animation Engine
 │   │   ├── faq-section.tsx            # 16-Question Interactive Searchable FAQ with English & Hinglish Modes
 │   │   ├── ai-reply-sandbox.tsx       # Gemini AI Review Reply Browser Sandbox
 │   │   ├── vs-page.tsx                # Reusable Competitor Comparison Layout
@@ -395,6 +398,7 @@ F:\CustomerPilot_ByGLM_July2026
 │       └── stamp-engine.ts            # Bill-to-Stamp Award & Redemption Logic
 │
 ├── scripts/                           # Production Health, Seed & Playwright Verification Scripts
+│   ├── verify_seo_master_strategy.js  # Playwright Full SEO / AEO / GEO Master Strategy Assertion Suite
 │   ├── verify_smart_ai_review_framework.js # Playwright AI Search & LLM Domination Framework (Stages 1, 2, 4, 5) Assertion Suite
 │   ├── verify_review_pilot_animation.js # Playwright ReviewPilot-Style 3-Step Live Review & Auto-Reply Flow Verification Suite
 │   ├── verify_landing_pages_enhanced.js # Playwright Enhanced Landing Pages Test Suite (5 Pages, Simulators, $100k Chassis, How It Works Infographics, Indian English)

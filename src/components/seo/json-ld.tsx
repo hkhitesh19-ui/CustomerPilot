@@ -4,17 +4,56 @@ export function SoftwareApplicationJsonLd() {
   const schema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "CustomerPilot",
-    "operatingSystem": "All",
+    "@id": "https://customerpilot.in/#software",
+    "name": "CustomerPilot Complete",
+    "operatingSystem": "All (Web + WhatsApp)",
     "applicationCategory": "BusinessApplication",
-    "description": "Autonomous Merchant Customer Retention SaaS powering WhatsApp stamp cards, Google Review automation, and live queue check-ins.",
+    "description": "CustomerPilot is an all-in-one customer retention platform for Indian retail: WhatsApp Digital Loyalty Stamp Cards, Smart AI Google Reviews, AI Owner Auto-Reply, and Smart Digital Business Cards.",
     "offers": {
       "@type": "Offer",
-      "price": "2999",
+      "price": "2249",
       "priceCurrency": "INR",
       "priceValidUntil": "2027-12-31",
       "availability": "https://schema.org/InStock"
-    }
+    },
+    "hasPart": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "WhatsApp Digital Loyalty Stamp Card",
+        "url": "https://customerpilot.in/whatsapp-digital-loyalty-card",
+        "description": "Digital loyalty stamp card via WhatsApp for retail repeat customers. Replaces paper punch cards with automated WhatsApp stamps, win-back campaigns and reward redemption."
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Smart AI Google Review",
+        "url": "https://customerpilot.in/smart-ai-google-review",
+        "description": "AI-powered automated Google review generation using smart QR codes. Generative AI drafts personalized 5-star reviews for customers, eliminating typing effort with private negative feedback filtering."
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "AI Google Review QR Standee",
+        "url": "https://customerpilot.in/ai-google-review-qr-generator",
+        "description": "Premium acrylic AI Google Review QR counter standee for retail billing counters. Triggers automatic WhatsApp-based review generation on scan."
+      },
+      {
+        "@type": "WebApplication",
+        "name": "Free AI Google Review Generator",
+        "url": "https://customerpilot.in/free-ai-google-review-generator",
+        "description": "Free tool to generate 3 AI-crafted 5-star Google review variations for any retail store, bakery, dental clinic, cafe or salon in seconds."
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "AI Google Review Auto-Reply",
+        "url": "https://customerpilot.in/ai-google-review-autoreply",
+        "description": "Gemini AI-powered auto-responder for Google Business Profile reviews. Automatically generates professional, empathetic owner replies to all reviews."
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Smart Digital Business Card",
+        "url": "https://customerpilot.in/smart-digital-business-card",
+        "description": "NFC and QR-powered digital business card with 1-tap contact saving, ordering links, and real-time analytics for Indian businesses."
+      }
+    ]
   }
 
   return (
