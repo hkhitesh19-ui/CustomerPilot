@@ -322,6 +322,11 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   ├── webhook/               # Evolution API & WhatsApp Incoming Webhooks
 │   │   │   ├── queue/                 # Live Waitlist & Queue Management APIs
 │   │   │   └── google-business/       # Google OAuth 2.0 Auth Callback & Sync APIs
+│   │   ├── ai-google-review-qr-generator/page.tsx # Dedicated Pillar Landing Page: Smart AI Google Reviews & QR Generator
+│   │   ├── ai-google-review-autoreply/page.tsx    # Dedicated Pillar Landing Page: 1-Click AI AutoReply on Google Maps
+│   │   ├── customerpilot-complete/page.tsx        # Flagship Landing Page: CustomerPilot Complete All-in-One Retention Stack
+│   │   ├── smart-digital-business-card/page.tsx   # Dedicated Pillar Landing Page: Smart Digital Business Card
+│   │   ├── whatsapp-digital-loyalty-card/page.tsx # Dedicated Pillar Landing Page: WhatsApp Digital Loyalty Cards
 │   │   ├── bakery-loyalty/page.tsx    # Industry Landing Page: Bakery Loyalty
 │   │   ├── c/                         # Public Digital Business Card Routes
 │   │   │   └── [slug]/page.tsx        # High-End Mobile Digital Business Card (Zero App Install)
@@ -335,7 +340,9 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   ├── vs/                        # Competitor Attack / Comparison Pages
 │   │   │   ├── reelo/page.tsx         # Reelo vs CustomerPilot
 │   │   │   ├── bingage/page.tsx       # Bingage vs CustomerPilot
-│   │   │   └── birdeye/page.tsx       # Birdeye vs CustomerPilot
+│   │   │   ├── birdeye/page.tsx       # Birdeye vs CustomerPilot
+│   │   │   └── stamp-me/page.tsx      # Stamp Me vs CustomerPilot
+│   │   ├── customerpilot-vs-stamp-me/page.tsx # Competitor Interception Alias Route
 │   │   ├── dashboard/                 # Merchant Command Center Dashboard
 │   │   │   ├── digital-card/page.tsx  # Digital Business Card Studio & Live Simulator (NEW)
 │   │   │   ├── reviews/page.tsx       # 1-Click Google Review AI Studio
@@ -354,8 +361,13 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   └── super-admin/page.tsx       # Platform SuperAdmin Master Control Panel
 │   │
 │   ├── components/                    # Reusable React UI Components
-│   │   ├── digital-card-view.tsx      # Luxury Mobile Digital Card View with VCF & Socials (NEW)
-│   │   ├── dual-lang-faq.tsx          # Reusable Dual-Language FAQ (English Default + Hinglish) with Accordion & Theme Support (NEW)
+│   │   ├── ai-google-review-qr-client.tsx      # Smart AI Google Review QR Generator Client Component (SEO/GEO/AEO)
+│   │   ├── ai-google-review-autoreply-client.tsx # 1-Click AI AutoReply Client Component (SEO/GEO/AEO)
+│   │   ├── customerpilot-complete-client.tsx    # CustomerPilot Complete All-in-One Client Component (SEO/GEO/AEO)
+│   │   ├── smart-digital-business-card-client.tsx # Smart Digital Business Card Client Component (SEO/GEO/AEO)
+│   │   ├── whatsapp-digital-loyalty-client.tsx  # WhatsApp Digital Loyalty Client Component (SEO/GEO/AEO)
+│   │   ├── digital-card-view.tsx      # Luxury Mobile Digital Card View with VCF & Socials
+│   │   ├── dual-lang-faq.tsx          # Reusable Dual-Language FAQ (English Default + Hinglish) with Accordion & Theme Support
 │   │   ├── impersonation-banner.tsx   # SuperAdmin Impersonation Sticky Banner & Return Action
 │   │   ├── splash-screen.tsx          # Full-Screen 1-Second Animated Splash Overlay
 │   │   ├── brand-logo.tsx             # Pure Vector Transparent SVG Logo Component

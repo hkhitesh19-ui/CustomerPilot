@@ -15,6 +15,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/car-wash-loyalty",
     "/whatsapp-digital-loyalty-card",
     "/smart-digital-business-card",
+    "/ai-google-review-qr-generator",
+    "/ai-google-review-autoreply",
+    "/customerpilot-complete",
     "/features/whatsapp-stamp-card",
     "/features/google-review-automation",
     "/case-studies/cake-connection",
@@ -37,6 +40,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: route === "" || route === "/marketing" || route === "/pricing" ? "daily" : "weekly",
-    priority: route === "" ? 1.0 : route.startsWith("/features") || route.endsWith("-loyalty") || route === "/pricing" ? 0.9 : 0.7,
+    priority:
+      route === ""
+        ? 1.0
+        : [
+            "/whatsapp-digital-loyalty-card",
+            "/smart-digital-business-card",
+            "/ai-google-review-qr-generator",
+            "/ai-google-review-autoreply",
+            "/customerpilot-complete",
+            "/pricing",
+          ].includes(route) ||
+          route.startsWith("/features") ||
+          route.endsWith("-loyalty")
+        ? 0.9
+        : 0.7,
   }))
 }

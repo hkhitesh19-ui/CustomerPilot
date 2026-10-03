@@ -10,7 +10,7 @@ import {
   Check, ArrowRight, ArrowLeft, Loader2, UserCheck,
   Printer, AlertCircle, CircleDot, Star, Rocket, X, Shield,
   Menu, ChevronDown, Calculator, TrendingUp, Sparkles, Phone,
-  Clock, Target, Camera, Layers, Flame, Coins, Repeat
+  Clock, Target, Camera, Layers, Flame, Coins, Repeat, CreditCard
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -405,34 +405,45 @@ export default function Home() {
               onMouseEnter={() => setProductsOpen(true)}
               onMouseLeave={() => setProductsOpen(false)}
             >
-              <button className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
+              <button
+                type="button"
+                aria-expanded={productsOpen}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition"
+              >
                 Products <ChevronDown className="w-4 h-4 opacity-60" />
               </button>
               {productsOpen && (
                 <div className="absolute top-full left-0 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                  <Link href="/features/whatsapp-stamp-card" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                  <Link href="/whatsapp-digital-loyalty-card" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
                     <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
                       <span className="flex items-center gap-1.5"><Gift className="w-3.5 h-3.5 text-amber-500" /> Digital Loyalty Stamps</span>
                       <span className="text-[10px] bg-amber-50 text-amber-700 font-bold px-1.5 py-0.5 rounded-md">VIP Club</span>
                     </span>
                     <span className="text-[11px] text-slate-500 mt-0.5">WhatsApp stamp cards &amp; automatic repeat rewards</span>
                   </Link>
-                  <Link href="/features/google-review-automation" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                  <Link href="/ai-google-review-qr-generator" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
                     <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
-                      <span className="flex items-center gap-1.5"><Star className="w-3.5 h-3.5 text-emerald-500" /> Smart Ai Google Reviews</span>
+                      <span className="flex items-center gap-1.5"><Star className="w-3.5 h-3.5 text-emerald-500" /> Smart AI Google Reviews</span>
                       <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">AI Drafts</span>
                     </span>
                     <span className="text-[11px] text-slate-500 mt-0.5">Post-purchase WhatsApp 5-star review collector</span>
                   </Link>
-                  <Link href="#features" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                  <Link href="/ai-google-review-autoreply" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
                     <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
                       <span className="flex items-center gap-1.5"><MessageSquare className="w-3.5 h-3.5 text-indigo-500" /> 1-Click AI AutoReply</span>
                       <span className="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">1-Sec Publish</span>
                     </span>
                     <span className="text-[11px] text-slate-500 mt-0.5">Context-aware owner responses on Google Maps</span>
                   </Link>
+                  <Link href="/smart-digital-business-card" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                    <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5 text-cyan-500" /> Smart Digital Business Card</span>
+                      <span className="text-[10px] bg-cyan-50 text-cyan-700 font-bold px-1.5 py-0.5 rounded-md">vCard + QR</span>
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Contactless digital visiting card with 1-tap save</span>
+                  </Link>
                   <div className="border-t border-slate-100 my-1 pt-1">
-                    <Link href="#comparison" className="flex flex-col p-2.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-50 transition border border-emerald-100">
+                    <Link href="/customerpilot-complete" className="flex flex-col p-2.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-50 transition border border-emerald-100">
                       <span className="text-xs font-extrabold text-emerald-950 flex items-center justify-between">
                         <span>🚀 CustomerPilot Complete</span>
                         <span className="text-[9px] bg-emerald-500 text-slate-950 font-black px-1.5 py-0.5 rounded-full uppercase">All-in-One</span>
@@ -516,19 +527,23 @@ export default function Home() {
           <div className="md:hidden bg-white border-b border-slate-200 px-6 py-5 space-y-4 shadow-xl animate-in slide-in-from-top duration-200">
             <div className="space-y-1">
               <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2">Products &amp; Services</div>
-              <Link href="/features/whatsapp-stamp-card" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+              <Link href="/whatsapp-digital-loyalty-card" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
                 <span className="flex items-center gap-2"><Gift className="w-4 h-4 text-amber-500" /> Digital Loyalty Stamps</span>
                 <span className="text-[10px] bg-amber-50 text-amber-700 font-bold px-1.5 py-0.5 rounded-md">VIP Club</span>
               </Link>
-              <Link href="/features/google-review-automation" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
-                <span className="flex items-center gap-2"><Star className="w-4 h-4 text-emerald-500" /> Smart Ai Google Reviews</span>
+              <Link href="/ai-google-review-qr-generator" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                <span className="flex items-center gap-2"><Star className="w-4 h-4 text-emerald-500" /> Smart AI Google Reviews</span>
                 <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">AI Drafts</span>
               </Link>
-              <Link href="#features" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+              <Link href="/ai-google-review-autoreply" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
                 <span className="flex items-center gap-2"><MessageSquare className="w-4 h-4 text-indigo-500" /> 1-Click AI AutoReply</span>
                 <span className="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">1-Sec Publish</span>
               </Link>
-              <Link href="#comparison" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-bold text-emerald-900 rounded-lg bg-emerald-50/70 border border-emerald-200">
+              <Link href="/smart-digital-business-card" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                <span className="flex items-center gap-2"><CreditCard className="w-4 h-4 text-cyan-500" /> Smart Digital Business Card</span>
+                <span className="text-[10px] bg-cyan-50 text-cyan-700 font-bold px-1.5 py-0.5 rounded-md">vCard + QR</span>
+              </Link>
+              <Link href="/customerpilot-complete" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-bold text-emerald-900 rounded-lg bg-emerald-50/70 border border-emerald-200">
                 <span>🚀 CustomerPilot Complete</span>
                 <span className="text-[9px] bg-emerald-500 text-slate-950 font-black px-1.5 py-0.5 rounded-full uppercase">All-in-One</span>
               </Link>
@@ -2440,13 +2455,13 @@ export default function Home() {
             <div className="space-y-3">
               <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Product</h4>
               <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
-                <li><Link href="/guide/5-minute-setup-guide" className="hover:text-emerald-400 transition-colors">🛠️ 5-Min Setup Guide</Link></li>
+                <li><Link href="/whatsapp-digital-loyalty-card" className="hover:text-emerald-400 transition-colors">🎁 Digital Loyalty Stamps</Link></li>
+                <li><Link href="/ai-google-review-qr-generator" className="hover:text-emerald-400 transition-colors">⭐ Smart AI Google Reviews</Link></li>
+                <li><Link href="/ai-google-review-autoreply" className="hover:text-emerald-400 transition-colors">⚡ 1-Click AI AutoReply</Link></li>
+                <li><Link href="/smart-digital-business-card" className="hover:text-emerald-400 transition-colors">🪪 Smart Digital Business Card</Link></li>
+                <li><Link href="/customerpilot-complete" className="hover:text-emerald-400 transition-colors">🚀 CustomerPilot Complete</Link></li>
                 <li><Link href="/guide/operations" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">🔄 Live Operations Manual</Link></li>
                 <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing &amp; Plans</Link></li>
-                <li><Link href="/case-studies/cake-connection" className="hover:text-emerald-400 transition-colors">Case Study: Cake Connection</Link></li>
-                <li><Link href="#faq" className="hover:text-emerald-400 transition-colors">Frequently Asked Questions</Link></li>
-                <li><Link href="/features/whatsapp-stamp-card" className="hover:text-emerald-400 transition-colors">Digital Loyalty stamps</Link></li>
-                <li><Link href="/features/google-review-automation" className="hover:text-emerald-400 transition-colors">Smart Ai Google Review</Link></li>
               </ul>
             </div>
 
@@ -2454,6 +2469,7 @@ export default function Home() {
             <div className="space-y-3">
               <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Compare</h4>
               <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
+                <li><Link href="/vs/stamp-me" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">vs Stamp Me (New)</Link></li>
                 <li><Link href="/vs/reelo" className="hover:text-emerald-400 transition-colors">vs Reelo</Link></li>
                 <li><Link href="/vs/bingage" className="hover:text-emerald-400 transition-colors">vs Bingage</Link></li>
                 <li><Link href="/compare/vs-traditional-pos" className="hover:text-emerald-400 transition-colors">vs Traditional POS</Link></li>
