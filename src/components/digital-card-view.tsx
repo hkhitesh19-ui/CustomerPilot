@@ -518,11 +518,15 @@ END:VCARD`
               </div>
               <span className="font-bold text-[11px] text-slate-800 leading-tight">Google Reviews</span>
               <div className="flex items-center gap-0.5 mt-0.5 text-amber-500 text-[11px] font-bold">
-                <span>{card.googleRating || 4.5}</span>
+                <span>
+                  {Number.isFinite(Number(card.googleRating)) && Number(card.googleRating) > 0
+                    ? Number(card.googleRating).toFixed(1)
+                    : "4.5"}
+                </span>
                 <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" />
               </div>
               <span className="text-[9px] text-slate-500 font-medium flex items-center justify-center gap-0.5">
-                {card.googleReviewsCnt || 406} Reviews <ChevronRight className="w-2.5 h-2.5 flex-shrink-0" />
+                {card.googleReviewsCnt ?? 0} Reviews <ChevronRight className="w-2.5 h-2.5 flex-shrink-0" />
               </span>
             </a>
 

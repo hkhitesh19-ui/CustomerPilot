@@ -3,6 +3,29 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Oct 2026] Issue: 100% Ground-Truth Digital Business Card Generation for Tasty Vadapav (Atladara Padra Road Branch) via Strict SOP Pipeline
+- **Symptom**: User provided Google Maps share link `https://share.google/e4KaDhkoaBpXkFa2e` with request: *"iska Digital Business card generate karo"*.
+- **Root Cause & Data Verification**:
+  1. Resolved share link to Google Knowledge Graph ID `kgmid=/g/11rz4r2x7s`, query `Tasty vadapav Atladara padra road(nizampura vala)` at `Samanvay Status, Padra Road, Vadodara`.
+  2. Extracted official Google Knowledge Panel ground-truth data from Chrome cache & Places JSON:
+     - **Place Name**: `Tasty vadapav Atladara padra road(nizampura vala)`
+     - **Official Google Rating**: `4.0 ⭐`
+     - **Official Google Reviews**: `52 Reviews`
+     - **Category**: `Fast Food • Vadapav Specialist • Maharashtrian • Atladara`
+     - **Address**: `Shop No. GF-15, Tower-A, Samanvay Status, Near Banco Products, Padra Road, Atladara, Vadodara, Gujarat 391410`
+     - **Calling Phone**: `+91 93281 12314`
+     - **WhatsApp**: `919328112314`
+     - **Timings**: `Open Daily • 9:00 AM – 9:00 PM`
+- **Resolution**:
+  1. Followed `DIGITAL_CARD_SOP.md` 6-stage verification pipeline.
+  2. Created seed script `scripts/seed_tasty_vadapav_atladara.js` and populated SQLite database with slug `tasty-vadapav-atladara`.
+  3. Optimized UI pill text (`Swiggy & Takeaway`) to completely eliminate text truncation (`...`).
+  4. Formatted rating to 1 decimal place (`4.0`) in `src/components/digital-card-view.tsx`.
+  5. Implemented Playwright test `scripts/verify_tasty_vadapav_atladara_card.js` with 14 ground-truth assertions (name, rating, reviews, phone, timings, zero dummy, Times New Roman, logo load) — ALL 14 PASSED.
+  6. Captured and audited visual screenshot: `tasty_vadapav_atladara_card_verified.png`.
+- **Status**: ✅ Resolved, Ground-Truth Audited & Verified.
+
+---
 ## [03 Oct 2026] Issue: Exact Ground-Truth Branch Rectification for Tasty Vadapav (Manjalpur Branch) & Strict Alignment with Official Google Reviews & Rating (3.5 ⭐, 55 Reviews)
 - **Symptom**: User pointed out that the digital business card for `https://share.google/aLueptkDviKD94cGP` displayed the Nizampura HQ data (Braj Complex, 99746 20201, 4.4 ⭐) instead of the exact branch and Google Business Profile. Furthermore, user requested: *"Google ke number ofReviews and Ratings show karna tha, '(5,430+ Ratings on Zomato & Swiggy)' ye nahi"*, and provided the exact Google Search screenshot confirming the listing identity.
 - **Root Cause**:
