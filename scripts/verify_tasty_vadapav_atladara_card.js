@@ -37,11 +37,11 @@ async function main() {
     { label: 'Real calling phone 93281 12314 present', pass: bodyText.includes('93281 12314') || bodyText.includes('9328112314') },
   ];
 
-  // Check Google Reviews link does NOT point to raw GPS coordinates
+  // Check Google Reviews link triggers direct review flow
   const reviewHref = await page.$eval('a:has-text("Google Reviews")', el => el.getAttribute('href'));
   console.log('Google Reviews Href:', reviewHref);
-  const reviewsLinkPass = reviewHref.includes('ChIJCYBASZnHXzkRZvLItnjimsk') && !reviewHref.includes('22.2683216');
-  assertions.push({ label: 'Google Reviews card links directly to Place ID (NOT raw GPS coordinates)', pass: reviewsLinkPass });
+  const reviewsLinkPass = reviewHref === 'https://search.google.com/local/writereview?placeid=ChIJCYBASZnHXzkRZvLItnjimsk';
+  assertions.push({ label: 'Google Reviews card triggers direct Google Review modal (search.google.com/local/writereview?placeid=...)', pass: reviewsLinkPass });
 
   let allPassed = true;
   for (const a of assertions) {

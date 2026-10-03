@@ -11,10 +11,13 @@ This document serves as a historical record of all major bugs, configuration iss
   3. The "Google Reviews" utility card in `src/components/digital-card-view.tsx` used `card.googleMapsUrl`, thus inheriting the raw GPS coordinate link.
 - **Resolution**:
   1. Extracted official Google Maps Place ID (`ChIJCYBASZnHXzkRZvLItnjimsk`) and Knowledge Panel CID (`14527172556127531622`).
-  2. Updated `googleMapsUrl` in `prisma/dev.db` and `scripts/seed_tasty_vadapav_atladara.js` to the exact Place ID URL: `https://www.google.com/maps/place/?q=place_id:ChIJCYBASZnHXzkRZvLItnjimsk`.
-  3. Updated Online Ordering "Directions" link to official directions URL with `destination_place_id=ChIJCYBASZnHXzkRZvLItnjimsk`.
-  4. Added automated assertion in `scripts/verify_tasty_vadapav_atladara_card.js` verifying that the Google Reviews card links directly to the Place ID (`ChIJCYBASZnHXzkRZvLItnjimsk`) and never contains raw coordinates (`22.2683216`).
-  5. Ran Playwright test and verified 100% pass: clicking the link now directly opens the official Google Maps business profile with Name, Rating, Photos, and Reviews tab.
+  2. Enhanced `src/components/digital-card-view.tsx` with dedicated `effectiveReviewUrl` hook:
+     - Automatically parses `place_id` from `card.googleMapsUrl` and generates the official Google Reviews modal URL: `https://search.google.com/local/writereview?placeid=${placeId}`.
+     - Allows direct review prompt/dialog to open immediately without landing on generic map overview.
+  3. Updated `googleMapsUrl` in `prisma/dev.db` and `scripts/seed_tasty_vadapav_atladara.js` to the exact Place ID URL: `https://www.google.com/maps/place/?q=place_id:ChIJCYBASZnHXzkRZvLItnjimsk`.
+  4. Updated Online Ordering "Directions" link to official directions URL with `destination_place_id=ChIJCYBASZnHXzkRZvLItnjimsk`.
+  5. Added automated Playwright assertion in `scripts/verify_tasty_vadapav_atladara_card.js` asserting that the Google Reviews card href strictly matches `https://search.google.com/local/writereview?placeid=ChIJCYBASZnHXzkRZvLItnjimsk`.
+  6. Verified in Playwright: 100% assertions passed.
 - **Status**: ✅ Resolved, Ground-Truth Audited & Verified.
 
 ---

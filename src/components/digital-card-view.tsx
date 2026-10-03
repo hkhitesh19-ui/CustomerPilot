@@ -75,6 +75,7 @@ export interface DigitalCardData {
   facebookUrl: string | null
   youtubeUrl: string | null
   googleMapsUrl: string | null
+  googleReviewUrl?: string | null
   websiteUrl: string | null
   orderingLinks: string | null
   googleRating: number | null
@@ -124,6 +125,21 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
     }
     return list
   }, [card.orderingLinks, card.websiteUrl, card.whatsappNumber, card.displayName, card.subCategories, card.googleMapsUrl])
+
+  // Dedicated Google Review link that triggers the review flow directly
+  const effectiveReviewUrl = useMemo(() => {
+    if (card.googleReviewUrl && card.googleReviewUrl.trim() !== "") {
+      return card.googleReviewUrl
+    }
+    if (!card.googleMapsUrl) {
+      return `https://maps.google.com/?q=${encodeURIComponent(card.displayName + " reviews")}`
+    }
+    const placeIdMatch = card.googleMapsUrl.match(/place_?id[:=]([a-zA-Z0-9_-]+)/i)
+    if (placeIdMatch && placeIdMatch[1]) {
+      return `https://search.google.com/local/writereview?placeid=${placeIdMatch[1]}`
+    }
+    return card.googleMapsUrl
+  }, [card.googleReviewUrl, card.googleMapsUrl, card.displayName])
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : `https://customerpilot.in/c/${card.slug}`
 
@@ -503,7 +519,7 @@ END:VCARD`
             
             {/* Google Reviews Card */}
             <a
-              href={sanitizeUrl(card.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(card.displayName)}`)}
+              href={sanitizeUrl(effectiveReviewUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2.5 rounded-2xl bg-white/95 border border-amber-200/60 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center group active:scale-95"
