@@ -3,6 +3,56 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Oct 2026] Issue: Master Homepage Theme Alignment, Rotating Live Ground-Truth Examples, Indian English Copy, GoForReview Concepts & Floating Animations Across All Landing Pages
+- **Symptom**: User requested:
+  1. `http://localhost:3000/smart-digital-business-card`: Showcase rotating live examples of cards actually created (Tasty Vadapav Atladara, Gujarat Photo Goods, Cake Connection).
+  2. Homepage matching theme, typography, text colors, and button styles across all dedicated product landing pages.
+  3. All landing page copy must be written in 100% professional Indian English (no untranslated Hindi in main body).
+  4. Incorporate high-converting concepts from `goforreview.in` and `reviewflowai.in` into `/ai-google-review-qr-generator` (the 3 friction points, AI vs Normal QR, and Private Feedback Shield).
+  5. Add creative floating animations (`.float-card`) matching each product's feature set.
+- **Root Cause**:
+  1. The digital business card landing page had static mockups rather than interactive rotating previews of the real live merchants created in CustomerPilot.
+  2. The dedicated landing pages lacked the visual polish of the master homepage (aurora gradients, subtle dot matrices, animated live pill badges, and matching gradient action buttons).
+  3. Several agitation headers and 3-step guide sections contained raw Hindi/Hinglish copy in the main body instead of clean, professional Indian English.
+  4. The AI review generator page lacked the compelling sales framework used by leading review tools (addressing friction points like walk-out forgetfulness, blank screen anxiety, and public 1-star risk).
+  5. Floating badge animations were absent on dedicated landing pages.
+- **Resolution**:
+  1. **Smart Digital Business Card (`src/components/smart-digital-business-card-client.tsx`)**:
+     - Built live auto-rotating phone simulator featuring 100% verified ground-truth merchant records: **Tasty Vadapav (Atladara Branch)**, **Gujarat Photo Goods**, and **Cake Connection**.
+     - Added tab switcher at top of mockup with ARIA accessibility roles (`tablist`, `tab`, `aria-selected`).
+     - Added 3 floating animation badges: Rating Synced (`fl1`), Direct WhatsApp Chat (`fl2`), and 1-Tap Save Contact (`fl3`).
+     - Aligned with Master Homepage design system (aurora background, dots pattern, cyan/emerald gradient headings, and gradient buttons).
+  2. **Smart AI Google Reviews (`src/components/ai-google-review-qr-client.tsx`)**:
+     - Integrated GoForReview & ReviewFlowAI concepts:
+       - The 3 Big Friction Points: Walk Out & Forget, Blank Screen Anxiety, and Begging Awkwardness.
+       - Head-to-Head Comparison Card: Standard QR vs. CustomerPilot Smart AI Review QR.
+       - Private Feedback Shield deep-dive: 4-5★ to Google Maps vs. 1-3★ to private owner WhatsApp alert.
+     - Added interactive review simulator cycling through realistic drafts for Tasty Vadapav, Gujarat Photo Goods, and Cake Connection with real 1-Tap Copy to clipboard.
+     - Added floating badges: `New 5★ Review Posted`, `+312% Review Velocity`, and `Private Feedback Shield Active`.
+  3. **1-Click AI AutoReply (`src/components/ai-google-review-autoreply-client.tsx`)**:
+     - Added live Google Maps review & Gemini AI owner reply simulator with 1-Click Publish state.
+     - Replaced all raw Hindi headers with 100% Indian English.
+     - Added floating badges: `AI Reply Published in 0.8s`, `Local SEO Keywords Injected`, and `100% Response Rate on Maps`.
+  4. **WhatsApp Digital Loyalty (`src/components/whatsapp-digital-loyalty-client.tsx`)**:
+     - Added animated WhatsApp chat simulator with virtual stamp card progress (4/5 stamps, gift unlock).
+     - Replaced all raw Hindi agitation and step headers with 100% Indian English.
+     - Added floating badges: `Stamp 5/5: Reward Unlocked!`, `+34% Repeat Footfall`, and `Counter QR Scanned in 3s`.
+  5. **CustomerPilot Complete Stack (`src/components/customerpilot-complete-client.tsx`)**:
+     - Added 4-in-1 Unified Hub Simulator linking WhatsApp Loyalty, Smart AI Reviews, AI AutoReply, and Digital Business Card.
+     - Added floating badges: `4-in-1 Unified Growth Engine`, `Save ₹45,000/yr vs 4 Tools`, and `90-Day VIP Retention: +41%`.
+     - 100% Indian English copy and TCO comparison table.
+  6. **Pointer Events & Usability Fix**:
+     - Added `pointer-events: none; user-select: none;` to all `.float-card` CSS across all landing pages to prevent overlay clipping on interactive simulator buttons.
+  7. **CodeRabbit Quality & Security Audit**:
+     - Pruned unused icon imports across all 5 client components.
+     - Replaced placeholder phone numbers with verified ground-truth values (`+91 72038 24012`).
+     - Removed unused state variables and dead arrays.
+  8. **Playwright & Ground-Truth Visual Verification (`scripts/verify_landing_pages_enhanced.js`)**:
+     - 5/5 automated test suites passed 100% with zero errors.
+     - High-resolution visual screenshots captured in artifact directory.
+- **Status**: ✅ Resolved, Ground-Truth Audited & Verified.
+
+---
 ## [03 Oct 2026] Issue: Complete Removal of Dark Mode & Strict Enforcement of Pure Light Mode Platform-Wide
 - **Symptom**: User requested: *"Darkmode nahi rakhna website me , only Lightmode hi rakkho"*. Several dedicated landing pages had legacy dark slate backgrounds (`bg-slate-900`, `bg-slate-950`), a dark/light mode toggle button existed in the dashboard top navigation bar, and system-level dark mode could trigger via OS preference.
 - **Root Cause**:

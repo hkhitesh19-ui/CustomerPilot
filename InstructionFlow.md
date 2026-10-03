@@ -391,6 +391,7 @@ F:\CustomerPilot_ByGLM_July2026
 │       └── stamp-engine.ts            # Bill-to-Stamp Award & Redemption Logic
 │
 ├── scripts/                           # Production Health, Seed & Playwright Verification Scripts
+│   ├── verify_landing_pages_enhanced.js # Playwright Enhanced Landing Pages Test Suite (5 Pages, Simulators, Floating Badges, Indian English)
 │   ├── verify_light_mode.js           # Playwright Strict Light Mode & Theme Lock Assertion Suite (7 Routes)
 │   ├── verify_all_products_landing_pages.js # Playwright Dedicated Product Landing Pages Test Suite (6 Scenarios)
 │   ├── verify_faq_dual_language.js    # Playwright Dual-Language FAQ Switching Suite
@@ -401,6 +402,7 @@ F:\CustomerPilot_ByGLM_July2026
 ### **10.2 Feature & Module Mapping Table**
 | Module / Feature | Main Entry File(s) | Helper Services & Engines | Purpose / Description |
 | :--- | :--- | :--- | :--- |
+| **Dedicated Product Landing Pages & Floating Visual Simulators** | `src/app/smart-digital-business-card/page.tsx`<br/>`src/app/ai-google-review-qr-generator/page.tsx`<br/>`src/app/ai-google-review-autoreply/page.tsx`<br/>`src/app/whatsapp-digital-loyalty-card/page.tsx`<br/>`src/app/customerpilot-complete/page.tsx` | `scripts/verify_landing_pages_enhanced.js`<br/>`src/components/dual-lang-faq.tsx` | Master Homepage theme alignment, pure light mode, 100% Indian English copy, rotating verified live examples (Tasty Vadapav & Gujarat Photo Goods), interactive review/reply/chat simulators, and CSS floating animation badges. |
 | **Pure Light Mode Architecture** | `src/components/providers.tsx`<br/>`src/components/top-nav.tsx`<br/>`src/app/layout.tsx` | `scripts/verify_light_mode.js` | Strictly enforces pure light theme across public pages, landing pages, and dashboard. `NextThemesProvider` locked with `forcedTheme="light"` and `enableSystem={false}`. `<ModeToggle />` removed from top nav. Viewport `themeColor` set to `#ffffff`. |
 | **Luxury Live Digital Business Card** | `src/app/c/[slug]/page.tsx`<br/>`src/app/dashboard/digital-card/page.tsx` | `src/components/digital-card-view.tsx`<br/>`src/app/api/digital-card/route.ts`<br/>`src/lib/google-places-api.ts` | Mobile-first micro-website with auto-fetched public GBP data, 6 branded social/call/WhatsApp buttons, online food ordering platforms, Google reviews, and 1-tap `.vcf` contact downloader. Zero disturbance to existing modules. |
 | **1-Click GoogleReview AutoReply** | `src/app/dashboard/reviews/page.tsx` | `src/lib/ai-review-reply.ts`<br/>`src/lib/google-places-api.ts` | Pre-drafts 5-star Gemini AI replies & provides 1-Click Copy & Post to Google Maps with Quota Safety Dead-Letter Queue (Pre-Approval Mode). |

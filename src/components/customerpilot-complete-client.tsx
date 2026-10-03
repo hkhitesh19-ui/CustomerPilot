@@ -4,21 +4,13 @@ import React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {
-  Sparkles,
   ArrowRight,
   ArrowLeft,
   Gift,
   Star,
   MessageSquare,
   CreditCard,
-  Check,
-  ShieldCheck,
-  Zap,
-  TrendingUp,
-  Layers,
-  Crown,
-  CheckCircle2,
-  XCircle
+  CheckCircle2
 } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
@@ -26,24 +18,24 @@ import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
 const COMPLETE_FAQS: DualLangFaqItem[] = [
   {
     id: 1,
-    questionEn: "What modules are included in CustomerPilot Complete?",
-    answerEn: "CustomerPilot Complete bundles all 4 core growth engines: (1) 100% App-Free WhatsApp Digital Stamp Cards, (2) Smart AI Google Review QR Generator with 5-second submissions, (3) 1-Click AI AutoReply for Google Maps via official GBP APIs, and (4) Smart Digital Business Cards with 1-tap contact saving and catalog links.",
-    questionHi: "CustomerPilot Complete me kaun kaun se modules shamil hain?",
-    answerHi: "CustomerPilot Complete me charon core modules shamil hain: (1) WhatsApp Digital Loyalty Stamp Card, (2) Smart AI Google Review QR Generator, (3) 1-Click Google Maps AI AutoReply, aur (4) Luxury Smart Digital Business Card."
+    questionEn: "What is CustomerPilot Complete and what modules are included?",
+    answerEn: "CustomerPilot Complete is the all-in-one customer retention engine for Indian retail. It unifies all 4 flagship modules: (1) WhatsApp Digital Stamp Cards, (2) Smart AI Google Reviews QR, (3) 1-Click AI AutoReply on Google Maps, and (4) Luxury Digital Business Cards with 1-tap contact saving.",
+    questionHi: "CustomerPilot Complete kya hai aur isme kaun kaun se features aate hain?",
+    answerHi: "CustomerPilot Complete ek all-in-one software suite hai jisme 4 core tools ek sath aate hain: (1) WhatsApp Digital Loyalty Stamp Card, (2) AI Google Reviews QR standee, (3) 1-Click Google Maps AI AutoReply, aur (4) Smart Digital Business Card with 1-tap contact save."
   },
   {
     id: 2,
-    questionEn: "Can I use CustomerPilot without buying any expensive billing POS machine?",
-    answerEn: "Zero special hardware required! CustomerPilot operates 100% in the cloud. You can run the cashier queue on any smartphone, iPad, tablet, or desktop, or simply place our printable counter QR standee for customer self-checkin.",
-    questionHi: "Kya CustomerPilot bina kisi mehenge POS machine ke chal sakta hai?",
-    answerHi: "Zero special machine required! CustomerPilot poori tarah cloud-based hai. Aap standard smartphone, tablet, ya laptop se Cashier Queue chala sakte hain ya customer counter ka QR khud scan kar sakte hain."
+    questionEn: "Can I manage everything from a single unified merchant dashboard?",
+    answerEn: "Yes! Everything connects seamlessly in one place. When a customer scans your counter QR, their loyalty stamps, review submissions, and contact interactions sync in real time under your unified VIP Customers CRM without logging into multiple tools.",
+    questionHi: "Kya main sab kuch ek hi dashboard se manage kar sakta hoon?",
+    answerHi: "Haan! Ek single dashboard se aap loyalty points, Google reviews, AI auto-replies, aur digital card analytics sab kuch live track aur manage kar sakte hain."
   },
   {
     id: 3,
-    questionEn: "How does CustomerPilot Complete compare to separate tools like Birdeye or Stamp Me?",
-    answerEn: "Buying point solutions separately (Stamp Me for loyalty at $49/mo, Birdeye for reviews at $299/mo, and Linktree for links) costs over ₹3,00,000/year and leaves your customer data fragmented. CustomerPilot gives you all four modules unified inside WhatsApp at just ₹2,249/year (₹6.2/day).",
-    questionHi: "Birdeye ya Stamp Me ke mukable CustomerPilot Complete kaise behtar hai?",
-    answerHi: "Alag-alag tools kharidne par saal ka ₹3,00,000+ kharch hota hai aur data alag-alag rehta hai. CustomerPilot me chaaron tools direct WhatsApp ke sath milte hain sirf ₹2,249/saal (₹6.2/din) me."
+    questionEn: "How much money does CustomerPilot Complete save compared to individual SaaS tools?",
+    answerEn: "Buying individual tools costs over ₹49,000 to ₹75,000 annually (Stamp Me $49/mo, Birdeye $299/mo, and Linktree $5/mo). CustomerPilot Complete provides all 4 integrated modules starting at just ₹2,249/year (₹6.2/day) with zero hardware requirements.",
+    questionHi: "Alag alag software lene ke muqable CustomerPilot Complete se kitni bachat hoti hai?",
+    answerHi: "Alag software lene par saal ka ₹49,000 se ₹75,000 kharch hota hai. CustomerPilot Complete me ye sabhi 4 tools sirf ₹2,249/year (₹6.2/din) me mil jate hain — 95% direct cost bachat!"
   },
   {
     id: 4,
@@ -64,6 +56,38 @@ const COMPLETE_FAQS: DualLangFaqItem[] = [
 export function CustomerPilotCompleteClient() {
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-emerald-500 selection:text-white flex flex-col justify-between">
+      {/* Global CSS Theme Styles matching Master Homepage */}
+      <style>{`
+        :root {
+          --em: #10b981; --em-d: #059669; --sky: #0ea5e9; --ind: #6366f1; --ind-d: #4f46e5;
+          --slate: #0f172a; --slate6: #475569; --slate5: #64748b; --slate4: #94a3b8;
+          --line: #e2e8f0;
+        }
+        .grad-txt { background: linear-gradient(90deg, #10b981, #0ea5e9, #6366f1); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .btn-grad { background: linear-gradient(90deg, #10b981, #6366f1); color: #fff; box-shadow: 0 10px 25px -8px rgba(16,185,129,.5); }
+        .btn-grad:hover { filter: brightness(1.08); transform: translateY(-1px); }
+        .aurora { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+        .aurora b { position: absolute; display: block; border-radius: 50%; filter: blur(80px); }
+        .aurora b:nth-child(1) { width: 500px; height: 500px; left: 50%; top: -80px; transform: translateX(-50%); background: rgba(16,185,129,.18); animation: fl 14s ease-in-out infinite; }
+        .aurora b:nth-child(2) { width: 360px; height: 360px; right: -40px; top: 180px; background: rgba(99,102,241,.14); animation: fl 16s ease-in-out infinite 3s; }
+        .aurora b:nth-child(3) { width: 340px; height: 340px; left: -60px; top: 240px; background: rgba(14,165,233,.14); animation: fl 18s ease-in-out infinite 6s; }
+        @keyframes fl { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(25px,-20px) scale(1.06)} }
+        .dots { position: absolute; inset: 0; z-index: 0; opacity: .4; background-image: radial-gradient(circle, rgba(16,185,129,.14) 1px, transparent 1px); background-size: 28px 28px; mask-image: linear-gradient(180deg, #000 60%, transparent); pointer-events: none; }
+        .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.9); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; color: var(--slate6); box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+        .dot-live { position: relative; width: 8px; height: 8px; }
+        .dot-live i { position: absolute; inset: 0; border-radius: 50%; background: #10b981; }
+        .dot-live i:first-child { animation: ping 1.6s cubic-bezier(0,0,.2,1) infinite; opacity: .7; }
+        @keyframes ping { 75%,100%{transform:scale(2.2);opacity:0} }
+        .float-card { position: absolute; z-index: 20; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); border-radius: 16px; padding: 10px 14px; box-shadow: 0 12px 30px -10px rgba(15,23,42,.18); display: flex; align-items: center; gap: 10px; animation: bob 5s ease-in-out infinite; border: 1px solid rgba(226,232,240,.9); pointer-events: none; user-select: none; }
+        @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        .fl1 { top: 20px; left: -20px; }
+        .fl2 { bottom: 50px; right: -20px; animation-delay: 1.5s; }
+        .fl3 { top: 48%; right: -25px; animation-delay: 2.8s; }
+        @media(max-width:640px){ .fl1{left:-5px; top:10px} .fl2{right:-5px; bottom:20px} .fl3{display:none} }
+        .hub-mockup { width: 320px; border-radius: 36px; background: #0f172a; padding: 10px; box-shadow: 0 25px 50px -12px rgba(16,185,129,.28), 0 0 0 1px rgba(255,255,255,0.1); }
+        @media(min-width:640px){ .hub-mockup { width: 340px; } }
+      `}</style>
+
       {/* Sticky Header */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
@@ -82,220 +106,403 @@ export function CustomerPilotCompleteClient() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-20 space-y-16 flex-1 w-full">
-        {/* HERO SECTION */}
-        <section className="text-center space-y-6 max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs sm:text-sm font-bold tracking-wide">
-            <Crown className="w-4 h-4 text-emerald-600" />
-            <span>CustomerPilot Complete · All-in-One Customer Retention Engine</span>
-          </div>
+      <main className="w-full flex-1">
+        
+        {/* ============ HERO SECTION WITH 4-IN-1 UNIFIED SIMULATOR ============ */}
+        <section className="relative overflow-hidden pt-12 pb-16 md:pt-16 md:pb-24 border-b border-slate-200/80">
+          <div className="aurora"><b></b><b></b><b></b></div>
+          <div className="dots"></div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-            The <span className="text-emerald-600">All-In-One</span> Retention, Loyalty &amp; Google Reputation Stack for Indian Retail.
-          </h1>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+              
+              {/* Left Column: Value Proposition in Indian English */}
+              <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+                <span className="badge">
+                  <span className="dot-live"><i></i><i></i></span> The Flagship All-in-One Retention Stack for Indian Retail
+                </span>
 
-          <p className="text-slate-600 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-            Stop juggling 4 fragmented apps. CustomerPilot unifies WhatsApp Digital Stamp Cards, Smart AI Google Reviews, 1-Click AutoReply on Google Maps, and Luxury Digital Business Cards in one intuitive cloud dashboard.
-          </p>
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
+                  The Complete Autonomous Customer Retention Engine for <span className="grad-txt">Local Businesses</span>.
+                </h1>
 
-          {/* SGE Statistic Callout */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 max-w-3xl mx-auto">
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-600">4-in-1</div>
-              <div className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">Unified Platform</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
-              <div className="text-2xl sm:text-3xl font-black text-amber-600">+34%</div>
-              <div className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">Repeat Footfall</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
-              <div className="text-2xl sm:text-3xl font-black text-cyan-600">95%</div>
-              <div className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">Cost Savings</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
-              <div className="text-2xl sm:text-3xl font-black text-slate-900">₹6.2/day</div>
-              <div className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">All-Inclusive Price</div>
-            </div>
-          </div>
+                <p className="text-base sm:text-lg font-bold text-slate-800 tracking-tight">
+                  WhatsApp Loyalty Stamps. Smart AI Reviews. 1-Click AutoReply. Luxury Digital Visiting Card.
+                </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Button asChild size="lg" className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base px-8 py-6 rounded-2xl shadow-xl shadow-emerald-600/20 hover:scale-105 transition-all">
-              <Link href="/signup">
-                Get Complete Stack Free — 3 Days <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto border-slate-300 text-slate-700 bg-white hover:bg-slate-50 font-bold text-base px-8 py-6 rounded-2xl shadow-xs">
-              <Link href="/pricing">
-                View 50% Off Pro Pricing
-              </Link>
-            </Button>
+                <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                  Stop juggling 4 fragmented subscriptions. CustomerPilot Complete unifies WhatsApp loyalty, AI Google review collection, instant owner auto-reply, and smart digital business cards into a single high-impact dashboard.
+                </p>
+
+                {/* Primary CTA Buttons */}
+                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
+                  <Link
+                    href="/signup"
+                    className="btn-grad py-3.5 sm:py-4 px-6 sm:px-8 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all w-full sm:w-auto"
+                  >
+                    <span>Start 3-Day Free Trial (All 4 Included)</span>
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </Link>
+                  <Link
+                    href="/pricing"
+                    className="py-3.5 sm:py-4 px-5 text-sm sm:text-base font-bold rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 shadow-xs flex items-center justify-center gap-2 transition w-full sm:w-auto"
+                  >
+                    <span>Compare TCO Savings (₹45,000/yr)</span>
+                  </Link>
+                </div>
+
+                {/* Trust Badges */}
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-3 text-xs sm:text-sm font-semibold text-slate-600">
+                  <span className="inline-flex items-center gap-1.5"><span className="text-emerald-600 font-bold">✓</span> All 4 Modules Under 1 Subscription</span>
+                  <span className="inline-flex items-center gap-1.5"><span className="text-emerald-600 font-bold">✓</span> Save ₹45,000/yr vs Separate Tools</span>
+                  <span className="inline-flex items-center gap-1.5"><span className="text-emerald-600 font-bold">✓</span> 3-Minute Plug-and-Play Setup</span>
+                </div>
+              </div>
+
+              {/* Right Column: Live Interactive 4-in-1 Ecosystem Hub Simulator */}
+              <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
+                
+                {/* Mobile Device Mockup */}
+                <div className="relative">
+                  {/* Floating Badge 1: Top Left */}
+                  <div className="float-card fl1">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm font-black shadow-xs">
+                      🚀
+                    </div>
+                    <div>
+                      <small className="font-extrabold text-slate-900 block text-xs">4-in-1 Unified Growth Engine</small>
+                      <div className="text-[10px] text-slate-500 font-medium">Complete local business retention</div>
+                    </div>
+                  </div>
+
+                  {/* Floating Badge 2: Bottom Right */}
+                  <div className="float-card fl2">
+                    <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
+                      💰
+                    </div>
+                    <div>
+                      <small className="font-extrabold text-slate-900 block text-xs">Save ₹45,000/yr vs 4 Tools</small>
+                      <div className="text-[10px] text-slate-500 font-medium">Replaces Stamp Me + Birdeye + Linktree</div>
+                    </div>
+                  </div>
+
+                  {/* Floating Badge 3: Center Right */}
+                  <div className="float-card fl3">
+                    <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-xs">
+                      👥
+                    </div>
+                    <div>
+                      <small className="font-extrabold text-slate-900 block text-xs">90-Day VIP Retention: +41%</small>
+                      <div className="text-[10px] text-slate-500 font-medium">Turn walk-ins into regulars</div>
+                    </div>
+                  </div>
+
+                  {/* Hub Screen Mockup */}
+                  <div className="hub-mockup">
+                    <div className="rounded-[28px] overflow-hidden bg-white text-slate-900 shadow-inner flex flex-col">
+                      
+                      {/* Top Ecosystem Header */}
+                      <div className="p-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 text-white space-y-1">
+                        <div className="flex items-center justify-between text-[11px] opacity-90 font-medium">
+                          <span>Unified Merchant Hub</span>
+                          <span className="bg-white/20 px-2 py-0.5 rounded-full font-bold">ALL-IN-ONE</span>
+                        </div>
+                        <h4 className="font-black text-sm text-white truncate">Tasty Vadapav &bull; Atladara</h4>
+                        <div className="text-[10px] text-emerald-100 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-300" /> 4 Active Growth Engines Synced
+                        </div>
+                      </div>
+
+                      {/* 4 Connected Module Cards Inside Simulator */}
+                      <div className="p-3.5 space-y-2.5 bg-slate-50/60 text-xs">
+                        
+                        {/* 1. WhatsApp Loyalty Tile */}
+                        <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
+                              <Gift className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <div className="font-bold text-[11px] text-slate-900">WhatsApp Loyalty</div>
+                              <div className="text-[9px] text-slate-500">4,820 active stamps issued</div>
+                            </div>
+                          </div>
+                          <span className="text-[10px] bg-amber-50 text-amber-800 font-bold px-1.5 py-0.5 rounded border border-amber-200">
+                            +34% Repeat
+                          </span>
+                        </div>
+
+                        {/* 2. Smart AI Reviews Tile */}
+                        <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                              <Star className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <div className="font-bold text-[11px] text-slate-900">Smart AI Reviews</div>
+                              <div className="text-[9px] text-slate-500">120+ verified 5★ reviews</div>
+                            </div>
+                          </div>
+                          <span className="text-[10px] bg-emerald-50 text-emerald-800 font-bold px-1.5 py-0.5 rounded border border-emerald-200">
+                            4.8 ★ Maps
+                          </span>
+                        </div>
+
+                        {/* 3. 1-Click AutoReply Tile */}
+                        <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                              <MessageSquare className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <div className="font-bold text-[11px] text-slate-900">AI AutoReply</div>
+                              <div className="text-[9px] text-slate-500">0.8s Gemini response queue</div>
+                            </div>
+                          </div>
+                          <span className="text-[10px] bg-indigo-50 text-indigo-800 font-bold px-1.5 py-0.5 rounded border border-indigo-200">
+                            100% Rate
+                          </span>
+                        </div>
+
+                        {/* 4. Smart Digital Card Tile */}
+                        <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold">
+                              <CreditCard className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <div className="font-bold text-[11px] text-slate-900">Digital Visiting Card</div>
+                              <div className="text-[9px] text-slate-500">1-Tap vCard + Menu QR</div>
+                            </div>
+                          </div>
+                          <span className="text-[10px] bg-cyan-50 text-cyan-800 font-bold px-1.5 py-0.5 rounded border border-cyan-200">
+                            Live vCard
+                          </span>
+                        </div>
+
+                        {/* Direct CTA inside Mockup */}
+                        <Link
+                          href="/signup"
+                          className="w-full mt-1 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-sm"
+                        >
+                          <span>Launch Complete Retention Stack</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center mt-3 text-[11px] text-slate-400 font-medium">
+                  ✦ Unified 4-in-1 merchant cockpit · Real-time data synchronization
+                </div>
+              </div>
+
+            </div>
           </div>
         </section>
 
-        {/* 4-IN-1 ARCHITECTURE CARDS */}
-        <section className="space-y-8">
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
-              Unified Ecosystem
-            </span>
+        {/* ============ STATISTIC HIGHLIGHTS SECTION ============ */}
+        <section className="py-12 bg-slate-50/70 border-b border-slate-200/80">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-5 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
+                <div className="text-3xl font-black text-emerald-600">4-in-1</div>
+                <div className="text-xs text-slate-600 font-medium">Unified Retention Architecture</div>
+              </div>
+              <div className="p-5 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
+                <div className="text-3xl font-black text-amber-600">+34%</div>
+                <div className="text-xs text-slate-600 font-medium">Repeat Walk-in Footfall Increase</div>
+              </div>
+              <div className="p-5 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
+                <div className="text-3xl font-black text-indigo-600">95%</div>
+                <div className="text-xs text-slate-600 font-medium">Cost Savings vs 4 Separate Tools</div>
+              </div>
+              <div className="p-5 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
+                <div className="text-3xl font-black text-slate-900">₹6.2/day</div>
+                <div className="text-xs text-slate-600 font-medium">All-Inclusive SME Flat Price</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============ 4-IN-1 ECOSYSTEM ARCHITECTURE CARDS ============ */}
+        <section className="py-16 md:py-24">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-12">
+            <div className="text-center max-w-2xl mx-auto space-y-2">
+              <span className="text-emerald-700 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
+                Unified Ecosystem
+              </span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
+                Everything Your Store Needs to Retain 100% of Customers
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 transition-all space-y-4 shadow-xs">
+                <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-700 font-bold shadow-xs">
+                  <Gift className="w-6 h-6" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-slate-900">1. WhatsApp Digital Stamp Cards</h3>
+                  <span className="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">VIP Club</span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  Say goodbye to lost paper cards. Customers collect digital stamps directly in WhatsApp in 5 seconds. Automated milestone celebrations and inactivity reminders bring them back 34% faster.
+                </p>
+                <Link href="/whatsapp-digital-loyalty-card" className="inline-flex items-center text-xs font-bold text-amber-700 hover:underline">
+                  Explore WhatsApp Loyalty Pillar →
+                </Link>
+              </div>
+
+              <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 transition-all space-y-4 shadow-xs">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold shadow-xs">
+                  <Star className="w-6 h-6" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-slate-900">2. Smart AI Google Reviews QR</h3>
+                  <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">AI Drafts</span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  Smart counter QR standees that pre-draft authentic, keyword-rich 5-star reviews on customer phones. Triple your Google review velocity and shield your profile with private negative feedback filtering.
+                </p>
+                <Link href="/ai-google-review-qr-generator" className="inline-flex items-center text-xs font-bold text-emerald-700 hover:underline">
+                  Explore AI Review QR Pillar →
+                </Link>
+              </div>
+
+              <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 transition-all space-y-4 shadow-xs">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold shadow-xs">
+                  <MessageSquare className="w-6 h-6" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-slate-900">3. 1-Click AI AutoReply on Google Maps</h3>
+                  <span className="text-xs bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full">1-Sec Publish</span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  Never leave a review unanswered. Gemini AI crafts context-aware, personalized owner replies in 1 second. Boost your Google Maps Local 3-Pack rankings by 42% through consistent 100% response rates.
+                </p>
+                <Link href="/ai-google-review-autoreply" className="inline-flex items-center text-xs font-bold text-indigo-700 hover:underline">
+                  Explore 1-Click AutoReply Pillar →
+                </Link>
+              </div>
+
+              <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 transition-all space-y-4 shadow-xs">
+                <div className="w-12 h-12 rounded-2xl bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold shadow-xs">
+                  <CreditCard className="w-6 h-6" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-slate-900">4. Luxury Digital Business Card</h3>
+                  <span className="text-xs bg-cyan-100 text-cyan-800 font-bold px-2 py-0.5 rounded-full">vCard + QR</span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  A mobile-first micro-website with 1-tap contact saving (.vcf), direct Google Reviews submission, WhatsApp chat, and online ordering catalogs. Zero re-printing costs when your details change.
+                </p>
+                <Link href="/smart-digital-business-card" className="inline-flex items-center text-xs font-bold text-cyan-700 hover:underline">
+                  Explore Smart Digital Card Pillar →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============ TOTAL COST OF OWNERSHIP (TCO) COMPARISON ============ */}
+        <section className="py-16 bg-slate-50/70 border-t border-b border-slate-200/80">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8">
+            <div className="text-center max-w-2xl mx-auto space-y-2">
+              <span className="text-emerald-700 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
+                Total Cost of Ownership (TCO)
+              </span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
+                CustomerPilot Complete vs. 4 Fragmented Apps
+              </h2>
+              <p className="text-slate-600 text-xs sm:text-sm">
+                Save over ₹45,000 every year while eliminating password headaches and disjointed customer records:
+              </p>
+            </div>
+
+            <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
+              <table className="w-full text-left text-xs sm:text-sm">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase text-[11px] tracking-wider">
+                  <tr>
+                    <th scope="col" className="py-4 px-4 sm:px-6">Feature / Capability</th>
+                    <th scope="col" className="py-4 px-4 sm:px-6 text-emerald-900 bg-emerald-50/80 border-x border-emerald-200">
+                      CustomerPilot Complete
+                    </th>
+                    <th scope="col" className="py-4 px-4 sm:px-6 text-slate-600">Separate Vendors (Stamp Me + Birdeye + Linktree)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-700">
+                  <tr className="hover:bg-slate-50/80 transition">
+                    <td className="py-3.5 px-4 sm:px-6 font-semibold">WhatsApp Digital Stamp Cards</td>
+                    <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">Included</td>
+                    <td className="py-3.5 px-4 sm:px-6 text-slate-500">₹4,100/mo (Stamp Me $49/mo)</td>
+                  </tr>
+
+                  <tr className="hover:bg-slate-50/80 transition">
+                    <td className="py-3.5 px-4 sm:px-6 font-semibold">AI Google Reviews QR Standee</td>
+                    <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">Included</td>
+                    <td className="py-3.5 px-4 sm:px-6 text-slate-500">₹24,500/mo (Birdeye / Podium $299/mo)</td>
+                  </tr>
+
+                  <tr className="hover:bg-slate-50/80 transition">
+                    <td className="py-3.5 px-4 sm:px-6 font-semibold">1-Click Google Maps AutoReply</td>
+                    <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">Included</td>
+                    <td className="py-3.5 px-4 sm:px-6 text-slate-500">Extra addon charge</td>
+                  </tr>
+
+                  <tr className="hover:bg-slate-50/80 transition">
+                    <td className="py-3.5 px-4 sm:px-6 font-semibold">Luxury Digital Business Card</td>
+                    <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">Included</td>
+                    <td className="py-3.5 px-4 sm:px-6 text-slate-500">₹400/mo (Linktree Pro $5/mo)</td>
+                  </tr>
+
+                  <tr className="hover:bg-slate-50/80 transition">
+                    <td className="py-3.5 px-4 sm:px-6 font-semibold">Single Login &amp; Unified CRM</td>
+                    <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">1 Unified Cockpit</td>
+                    <td className="py-3.5 px-4 sm:px-6 text-slate-500">4 Fragmented logins &amp; data silos</td>
+                  </tr>
+
+                  <tr className="bg-emerald-50/40 font-bold border-t-2 border-emerald-200">
+                    <td className="py-4 px-4 sm:px-6 text-slate-900">Total Annual Cost</td>
+                    <td className="py-4 px-4 sm:px-6 text-emerald-700 text-base border-x border-emerald-200">
+                      ₹2,249 / year (₹6.2/day)
+                    </td>
+                    <td className="py-4 px-4 sm:px-6 text-rose-600 text-sm">
+                      ₹49,000 to ₹75,000+ / year
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        {/* ============ DUAL-LANGUAGE FAQ SECTION ============ */}
+        <section className="py-16 max-w-5xl mx-auto px-4 sm:px-6">
+          <DualLangFaq items={COMPLETE_FAQS} accentColor="emerald" theme="light" />
+        </section>
+
+        {/* ============ BOTTOM CALL TO ACTION ============ */}
+        <section className="py-16 max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center p-8 sm:p-12 rounded-3xl bg-gradient-to-b from-emerald-50 to-white border border-emerald-200 shadow-sm space-y-6">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
-              Everything Your Store Needs to Retain 100% of Customers
+              Transform Your Store Retention in Under 3 Minutes
             </h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition-all space-y-4 shadow-xs">
-              <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-700 font-bold">
-                <Gift className="w-6 h-6" />
-              </div>
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-slate-900">1. WhatsApp Digital Stamp Cards</h3>
-                <span className="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">VIP Club</span>
-              </div>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Say goodbye to paper cards. Customers collect digital stamps directly in WhatsApp in 5 seconds. Automated milestone celebrations and inactivity reminders bring them back 34% faster.
-              </p>
-              <Link href="/whatsapp-digital-loyalty-card" className="inline-flex items-center text-xs font-bold text-amber-700 hover:underline">
-                Explore WhatsApp Loyalty Pillar →
-              </Link>
-            </div>
-
-            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition-all space-y-4 shadow-xs">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold">
-                <Star className="w-6 h-6" />
-              </div>
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-slate-900">2. Smart AI Google Reviews QR</h3>
-                <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">AI Drafts</span>
-              </div>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Smart counter QR standees that pre-draft authentic, keyword-rich 5-star reviews on customer phones. Triple your Google review velocity and shield your profile with private negative feedback filtering.
-              </p>
-              <Link href="/ai-google-review-qr-generator" className="inline-flex items-center text-xs font-bold text-emerald-700 hover:underline">
-                Explore AI Review QR Pillar →
-              </Link>
-            </div>
-
-            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition-all space-y-4 shadow-xs">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
-                <MessageSquare className="w-6 h-6" />
-              </div>
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-slate-900">3. 1-Click AI AutoReply on Google Maps</h3>
-                <span className="text-xs bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full">1-Sec Publish</span>
-              </div>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Gemini AI connects to your Google Business Profile to generate warm, appreciative owner responses in 1 second. Boost local Google 3-Pack visibility by 42% with a 100% response rate.
-              </p>
-              <Link href="/ai-google-review-autoreply" className="inline-flex items-center text-xs font-bold text-indigo-700 hover:underline">
-                Explore 1-Click AutoReply Pillar →
-              </Link>
-            </div>
-
-            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition-all space-y-4 shadow-xs">
-              <div className="w-12 h-12 rounded-2xl bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold">
-                <CreditCard className="w-6 h-6" />
-              </div>
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-slate-900">4. Smart Digital Business Cards</h3>
-                <span className="text-xs bg-cyan-100 text-cyan-800 font-bold px-2 py-0.5 rounded-full">vCard + QR</span>
-              </div>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Next-generation mobile visiting cards with 1-Tap Save Contact to phonebook (.vcf), direct Google Reviews submission dialog, WhatsApp chat, and online ordering delivery links.
-              </p>
-              <Link href="/smart-digital-business-card" className="inline-flex items-center text-xs font-bold text-cyan-700 hover:underline">
-                Explore Digital Card Pillar →
-              </Link>
+            <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
+              Get all 4 retention and growth engines in one unified subscription. Start your 3-day unrestricted free trial today.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button asChild size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base px-8 py-6 rounded-2xl shadow-xl shadow-emerald-600/20 hover:scale-105 transition-all">
+                <Link href="/signup">
+                  Get Started Free (All 4 Included) <ArrowRight className="w-5 h-5 ml-2" />
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
 
-        {/* COMPARISON TABLE VS SEPARATE POINT TOOLS */}
-        <section className="space-y-8">
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
-              Total Cost of Ownership
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
-              CustomerPilot Complete vs Buying 4 Separate Tools
-            </h2>
-          </div>
-
-          <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase text-[11px] tracking-wider">
-                <tr>
-                  <th scope="col" className="py-4 px-4 sm:px-6">Feature / Capability</th>
-                  <th scope="col" className="py-4 px-4 sm:px-6 text-emerald-900 bg-emerald-50/80 border-x border-emerald-200">
-                    CustomerPilot Complete
-                  </th>
-                  <th scope="col" className="py-4 px-4 sm:px-6 text-slate-600">Buying 4 Separate Tools (Stamp Me + Birdeye + Reelo + Linktree)</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700">
-                <tr className="hover:bg-slate-50/80 transition">
-                  <td className="py-3.5 px-4 sm:px-6 font-semibold">Annual Subscription Cost</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">
-                    ₹2,249/year (₹6.2/day)
-                  </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">₹3,40,000+/year ($588 + $2,400 + ₹24,000)</td>
-                </tr>
-
-                <tr className="hover:bg-slate-50/80 transition">
-                  <td className="py-3.5 px-4 sm:px-6 font-semibold">App Download Friction for Customers</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">
-                    Zero — 100% Inside WhatsApp
-                  </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">High (&gt;80% drop-off due to app stores)</td>
-                </tr>
-
-                <tr className="hover:bg-slate-50/80 transition">
-                  <td className="py-3.5 px-4 sm:px-6 font-semibold">Unified Customer CRM</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">
-                    Single Database (Stamps + Reviews + Contacts)
-                  </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">Fragmented across 4 logins</td>
-                </tr>
-
-                <tr className="hover:bg-slate-50/80 transition">
-                  <td className="py-3.5 px-4 sm:px-6 font-semibold">Indian Retail &amp; UPI Localization</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">
-                    100% (INR pricing, Hinglish, UPI)
-                  </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">Western focus (USD credit cards only)</td>
-                </tr>
-
-                <tr className="hover:bg-slate-50/80 transition">
-                  <td className="py-3.5 px-4 sm:px-6 font-semibold">Hardware Setup Required</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">
-                    Zero — Simple Acrylic Counter QR
-                  </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">Beacons, complex POS integrations</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* DUAL-LANGUAGE FAQ SECTION (ENGLISH DEFAULT + HINGLISH) */}
-        <DualLangFaq items={COMPLETE_FAQS} accentColor="emerald" theme="light" />
-
-        {/* BOTTOM CALL TO ACTION */}
-        <section className="text-center p-8 sm:p-12 rounded-3xl bg-gradient-to-b from-emerald-50 to-white border border-emerald-200 shadow-sm space-y-6">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
-            Unlock the Complete Customer Retention Engine Today
-          </h2>
-          <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
-            Get instant access to WhatsApp Loyalty, AI Google Reviews, 1-Click AutoReply, and Smart Digital Cards with our 3-day unrestricted free trial.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button asChild size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base px-8 py-6 rounded-2xl shadow-xl shadow-emerald-600/20 hover:scale-105 transition-all">
-              <Link href="/signup">
-                Start 3-Day Free Trial (CustomerPilot Complete) <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-            </Button>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}

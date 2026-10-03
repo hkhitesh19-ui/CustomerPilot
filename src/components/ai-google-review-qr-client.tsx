@@ -1,21 +1,18 @@
 "use client"
 
-import React from "react"
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {
-  Sparkles,
   ArrowRight,
   ArrowLeft,
-  Star,
-  Check,
   ShieldCheck,
-  Zap,
   TrendingUp,
-  QrCode,
-  ThumbsUp,
-  MessageCircle,
-  XCircle
+  XCircle,
+  Copy,
+  ShieldAlert,
+  CheckCircle2,
+  Store
 } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
@@ -23,15 +20,15 @@ import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
 const REVIEW_FAQS: DualLangFaqItem[] = [
   {
     id: 1,
-    questionEn: "How does the AI Google Review QR code generator work for local retail shops?",
-    answerEn: "Place the CustomerPilot acrylic QR standee on your billing counter. When customers scan it (or receive an automated post-visit WhatsApp message), our generative AI drafts an authentic, positive review highlighting their purchase. The customer taps once to open Google Maps directly to the review submission dialog with the text pre-filled.",
+    questionEn: "How does the AI Google Review QR code standee work for local retail shops and cafes?",
+    answerEn: "Place the CustomerPilot acrylic QR standee on your billing counter. When customers scan it (or receive an automated post-visit WhatsApp prompt), our generative AI drafts an authentic, positive review highlighting their purchase. The customer taps once to open Google Maps directly to the review submission dialog with the text pre-filled.",
     questionHi: "Dukan ke liye AI Google Review QR code kaise kaam karta hai?",
     answerHi: "CustomerPilot ka acrylic QR standee apne billing counter par rakhein. Jab customer scan karta hai ya purchase ke baad WhatsApp receive karta hai, generative AI unke liye ek authentic 5-star review draft kar deta hai. Customer sirf 1 tap me Google Maps par review submit kar deta hai."
   },
   {
     id: 2,
     questionEn: "Does CustomerPilot filter or protect my business from negative reviews?",
-    answerEn: "Yes! CustomerPilot features a Smart Sentiment Router. If a customer rates their experience 1 to 3 stars, they are routed to a private merchant feedback dialog where you can resolve their issue directly. Only 4 and 5-star satisfied ratings are directed to publish on Google Maps, safeguarding your public rating.",
+    answerEn: "Yes! CustomerPilot features a Smart Sentiment Router (Private Feedback Shield). If a customer rates their experience 1 to 3 stars, they are routed to a private merchant feedback dialog where you can resolve their issue directly. Only 4 and 5-star satisfied ratings are directed to publish on Google Maps, safeguarding your public rating.",
     questionHi: "Kya ye software kharab reviews ko Google Maps par aane se rok sakta hai?",
     answerHi: "Haan! CustomerPilot me Smart Sentiment Router hota hai. Agar koi customer 1 se 3 star deta hai, toh wo Google Maps par jane ke bajaye private owner feedback form par chala jata hai jisse aap unki problem solve kar sakte hain. Sirf 4 aur 5-star reviews hi seedha Google Maps par publish hote hain."
   },
@@ -52,15 +49,91 @@ const REVIEW_FAQS: DualLangFaqItem[] = [
   {
     id: 5,
     questionEn: "How does getting more Google reviews boost my store's local Google Maps ranking?",
-    answerEn: "Google's local search algorithm places heavy weight on review velocity, recency, average star rating, and keyword-rich text. CustomerPilot reviews naturally include product keywords and location context, accelerating your position into Google Map's top-3 Local Pack.",
+    answerEn: "Google's local search algorithm places heavy weight on review velocity, recency, average star rating, and keyword-rich text. CustomerPilot reviews naturally include product keywords and location context, accelerating your position into Google Maps top-3 Local Pack.",
     questionHi: "Zyada Google reviews aane se Google Maps par dukan ki ranking kaise badhti hai?",
     answerHi: "Google ka algorithm un dukano ko top me dikhata hai jinke paas lagatar naye aur keyword-rich reviews aate hain. CustomerPilot ke AI reviews me business category aur product keywords auto-include hote hain, jisse aapki dukan Local Search me #1 rank karti hai."
   }
 ]
 
+// Sample Real Review Options for Live AI Review Simulator
+const SIMULATED_REVIEWS = [
+  {
+    store: "Tasty Vadapav · Atladara Branch",
+    category: "Fast Food & Snacks",
+    text: "Hot, crispy Vadapav with authentic Mumbai taste and spicy garlic chutney! The service at the counter was super fast and hygienic. Definitely the best vadapav in Atladara!",
+    keywords: ["crispy Vadapav", "Mumbai taste", "fast service"]
+  },
+  {
+    store: "Gujarat Photo Goods · Rajmahal Road",
+    category: "Camera & Studio Equipment",
+    text: "Outstanding collection of professional camera gear and lenses! The team gave genuine advice for my Sony setup and billing was instant. Highly recommended photography store in Vadodara!",
+    keywords: ["camera gear", "genuine pricing", "expert advice"]
+  },
+  {
+    store: "Cake Connection · Alkapuri",
+    category: "Bakery & Desserts",
+    text: "Ordered a custom birthday cake and it tasted absolutely divine! Fresh, moist, and beautifully decorated. Wonderful staff and prompt WhatsApp confirmation.",
+    keywords: ["custom cake", "fresh & moist", "prompt service"]
+  }
+]
+
 export function AiGoogleReviewQrClient() {
+  const [activeReviewIdx, setActiveReviewIdx] = useState(0)
+  const [copied, setCopied] = useState(false)
+
+  // Rotate simulated reviews in hero simulator
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveReviewIdx((prev) => (prev + 1) % SIMULATED_REVIEWS.length)
+      setCopied(false)
+    }, 4500)
+    return () => clearInterval(timer)
+  }, [])
+
+  const currentReview = SIMULATED_REVIEWS[activeReviewIdx]
+
+  const handleCopy = () => {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(currentReview.text).catch(() => {})
+    }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-amber-500 selection:text-white flex flex-col justify-between">
+      {/* Global CSS Theme Styles matching Master Homepage */}
+      <style>{`
+        :root {
+          --em: #10b981; --em-d: #059669; --sky: #0ea5e9; --ind: #6366f1; --ind-d: #4f46e5;
+          --slate: #0f172a; --slate6: #475569; --slate5: #64748b; --slate4: #94a3b8;
+          --line: #e2e8f0; --amber: #f59e0b;
+        }
+        .grad-txt { background: linear-gradient(90deg, #d97706, #f59e0b, #10b981); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .btn-grad { background: linear-gradient(90deg, #f59e0b, #10b981); color: #fff; box-shadow: 0 10px 25px -8px rgba(245,158,11,.5); }
+        .btn-grad:hover { filter: brightness(1.08); transform: translateY(-1px); }
+        .aurora { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+        .aurora b { position: absolute; display: block; border-radius: 50%; filter: blur(80px); }
+        .aurora b:nth-child(1) { width: 500px; height: 500px; left: 50%; top: -80px; transform: translateX(-50%); background: rgba(245,158,11,.15); animation: fl 14s ease-in-out infinite; }
+        .aurora b:nth-child(2) { width: 360px; height: 360px; right: -40px; top: 180px; background: rgba(16,185,129,.12); animation: fl 16s ease-in-out infinite 3s; }
+        .aurora b:nth-child(3) { width: 340px; height: 340px; left: -60px; top: 240px; background: rgba(217,119,6,.12); animation: fl 18s ease-in-out infinite 6s; }
+        @keyframes fl { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(25px,-20px) scale(1.06)} }
+        .dots { position: absolute; inset: 0; z-index: 0; opacity: .4; background-image: radial-gradient(circle, rgba(245,158,11,.15) 1px, transparent 1px); background-size: 28px 28px; mask-image: linear-gradient(180deg, #000 60%, transparent); pointer-events: none; }
+        .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.9); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; color: var(--slate6); box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+        .dot-live { position: relative; width: 8px; height: 8px; }
+        .dot-live i { position: absolute; inset: 0; border-radius: 50%; background: #f59e0b; }
+        .dot-live i:first-child { animation: ping 1.6s cubic-bezier(0,0,.2,1) infinite; opacity: .7; }
+        @keyframes ping { 75%,100%{transform:scale(2.2);opacity:0} }
+        .float-card { position: absolute; z-index: 20; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); border-radius: 16px; padding: 10px 14px; box-shadow: 0 12px 30px -10px rgba(15,23,42,.18); display: flex; align-items: center; gap: 10px; animation: bob 5s ease-in-out infinite; border: 1px solid rgba(226,232,240,.9); pointer-events: none; user-select: none; }
+        @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        .fl1 { top: 20px; left: -20px; }
+        .fl2 { bottom: 50px; right: -20px; animation-delay: 1.5s; }
+        .fl3 { top: 48%; right: -25px; animation-delay: 2.8s; }
+        @media(max-width:640px){ .fl1{left:-5px; top:10px} .fl2{right:-5px; bottom:20px} .fl3{display:none} }
+        .phone-mockup { width: 310px; border-radius: 36px; background: #0f172a; padding: 10px; box-shadow: 0 25px 50px -12px rgba(245,158,11,.28), 0 0 0 1px rgba(255,255,255,0.1); }
+        @media(min-width:640px){ .phone-mockup { width: 330px; } }
+      `}</style>
+
       {/* Sticky Header */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
@@ -79,224 +152,381 @@ export function AiGoogleReviewQrClient() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-20 space-y-16 flex-1 w-full">
-        {/* HERO SECTION */}
-        <section className="text-center space-y-6 max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs sm:text-sm font-bold tracking-wide">
-            <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
-            <span>AI Review QR Engine · 312% More 5-Star Reviews in 30 Days</span>
-          </div>
+      <main className="w-full flex-1">
+        
+        {/* ============ HERO SECTION WITH LIVE AI REVIEW SIMULATOR ============ */}
+        <section className="relative overflow-hidden pt-12 pb-16 md:pt-16 md:pb-24 border-b border-slate-200/80">
+          <div className="aurora"><b></b><b></b><b></b></div>
+          <div className="dots"></div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-            Turn Every Happy Customer into a Verified <span className="text-amber-600">5-Star Google Review</span> with Smart AI QR Codes.
-          </h1>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+              
+              {/* Left Column: Value Proposition in Indian English */}
+              <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+                <span className="badge">
+                  <span className="dot-live"><i></i><i></i></span> India&apos;s #1 AI-Powered Google Review QR Standee for Local Retail
+                </span>
 
-          <p className="text-slate-600 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-            Stop awkwardly begging customers for reviews. Place our Smart AI QR Standee on your counter. When customers scan, our generative AI drafts an authentic, high-converting review they can publish to Google Maps in 1 tap.
-          </p>
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
+                  Turn Every Happy Customer into a Verified <span className="grad-txt">5-Star Google Review</span> on Autopilot.
+                </h1>
 
-          {/* SGE Statistic Callout */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 max-w-3xl mx-auto">
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
-              <div className="text-2xl sm:text-3xl font-black text-amber-600">+312%</div>
-              <div className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">Review Velocity</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-600">5 Seconds</div>
-              <div className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">Submission Time</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
-              <div className="text-2xl sm:text-3xl font-black text-cyan-600">100%</div>
-              <div className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">Negative Filter</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
-              <div className="text-2xl sm:text-3xl font-black text-slate-900">#1 Rank</div>
-              <div className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">Google 3-Pack Boost</div>
-            </div>
-          </div>
+                <p className="text-base sm:text-lg font-bold text-slate-800 tracking-tight">
+                  No Awkward Begging at Billing Counter. Zero Blank Screen Anxiety. 88% Review Conversion.
+                </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Button asChild size="lg" className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-base px-8 py-6 rounded-2xl shadow-xl shadow-amber-500/20 hover:scale-105 transition-all">
-              <Link href="/signup">
-                Get Your AI Review QR Standee <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto border-slate-300 text-slate-700 bg-white hover:bg-slate-50 font-bold text-base px-8 py-6 rounded-2xl shadow-xs">
-              <Link href="/guide/operations">
-                See How It Works in Live Counter
-              </Link>
-            </Button>
+                <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                  Place our smart acrylic QR standee on your billing counter. When customers scan, our generative AI drafts authentic, keyword-rich 5-star reviews in 3 seconds. Customers copy and post to Google Maps with a single tap.
+                </p>
+
+                {/* Primary CTA Buttons */}
+                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
+                  <Link
+                    href="/signup"
+                    className="btn-grad py-3.5 sm:py-4 px-6 sm:px-8 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all w-full sm:w-auto"
+                  >
+                    <span>Get Your Counter QR Standee Free</span>
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </Link>
+                  <Link
+                    href="/guide/operations"
+                    className="py-3.5 sm:py-4 px-5 text-sm sm:text-base font-bold rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 shadow-xs flex items-center justify-center gap-2 transition w-full sm:w-auto"
+                  >
+                    <Store className="w-4 h-4 text-amber-600" />
+                    <span>See Live Counter Operations</span>
+                  </Link>
+                </div>
+
+                {/* Trust Badges */}
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-3 text-xs sm:text-sm font-semibold text-slate-600">
+                  <span className="inline-flex items-center gap-1.5"><span className="text-emerald-600 font-bold">✓</span> 100% Google Policy Compliant</span>
+                  <span className="inline-flex items-center gap-1.5"><span className="text-emerald-600 font-bold">✓</span> Zero App Download Needed</span>
+                  <span className="inline-flex items-center gap-1.5"><span className="text-emerald-600 font-bold">✓</span> Private Feedback Shield Included</span>
+                </div>
+              </div>
+
+              {/* Right Column: Live Interactive Review Simulator with Floating Badges */}
+              <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
+                
+                {/* Mobile Device Mockup */}
+                <div className="relative">
+                  {/* Floating Badge 1: Top Left */}
+                  <div className="float-card fl1">
+                    <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm font-black shadow-xs">
+                      ★
+                    </div>
+                    <div>
+                      <small className="font-extrabold text-slate-900 block text-xs">New 5★ Review Posted</small>
+                      <div className="text-[10px] text-slate-500 font-medium">Rahul M. · Google Maps · Just now</div>
+                    </div>
+                  </div>
+
+                  {/* Floating Badge 2: Bottom Right */}
+                  <div className="float-card fl2">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <small className="font-extrabold text-slate-900 block text-xs">Private Feedback Shield Active</small>
+                      <div className="text-[10px] text-slate-500 font-medium">1-3★ filtered from Google Maps</div>
+                    </div>
+                  </div>
+
+                  {/* Floating Badge 3: Center Right */}
+                  <div className="float-card fl3">
+                    <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
+                      <TrendingUp className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <small className="font-extrabold text-slate-900 block text-xs">+312% Review Velocity</small>
+                      <div className="text-[10px] text-slate-500 font-medium">Ranked #1 on Local 3-Pack</div>
+                    </div>
+                  </div>
+
+                  {/* Phone Mockup Screen */}
+                  <div className="phone-mockup">
+                    <div className="rounded-[28px] overflow-hidden bg-white text-slate-900 shadow-inner flex flex-col">
+                      
+                      {/* Top App Header */}
+                      <div className="p-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white space-y-1">
+                        <div className="flex items-center justify-between text-[11px] opacity-90 font-medium">
+                          <span>Google Review Assistant</span>
+                          <span className="bg-white/20 px-2 py-0.5 rounded-full font-bold">AI Drafted</span>
+                        </div>
+                        <h4 className="font-black text-sm text-white truncate">{currentReview.store}</h4>
+                        <div className="flex items-center gap-1 text-amber-200 text-xs">
+                          ★★★★★ <span className="text-white text-[10px] ml-1 font-semibold">5.0 Star Rating Selected</span>
+                        </div>
+                      </div>
+
+                      {/* Review Card Body */}
+                      <div className="p-4 space-y-3 bg-slate-50/60 text-xs">
+                        <div className="text-[11px] font-bold text-slate-700 flex items-center justify-between">
+                          <span>Choose Your Preferred AI Review:</span>
+                          <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                            SEO Optimized
+                          </span>
+                        </div>
+
+                        {/* AI Draft Bubble */}
+                        <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2">
+                          <p className="text-[11px] text-slate-700 leading-relaxed italic">
+                            &quot;{currentReview.text}&quot;
+                          </p>
+                          <div className="flex flex-wrap gap-1 pt-1">
+                            {currentReview.keywords.map((kw, idx) => (
+                              <span key={idx} className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 text-[9px] font-bold border border-amber-200">
+                                #{kw}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* 1-Tap Copy & Post Button */}
+                        <button
+                          type="button"
+                          onClick={handleCopy}
+                          className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+                        >
+                          {copied ? (
+                            <>
+                              <CheckCircle2 className="w-4 h-4 text-slate-950" />
+                              <span>Copied! Opening Google Maps...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-4 h-4 text-slate-950" />
+                              <span>1-Tap Copy &amp; Post on Google Maps</span>
+                            </>
+                          )}
+                        </button>
+
+                        <div className="text-center text-[10px] text-slate-500 flex items-center justify-center gap-1 pt-1">
+                          <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                          <span>Direct deep-link to official Google review form</span>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center mt-3 text-[11px] text-slate-400 font-medium">
+                  ✦ Live AI Review Assistant simulator · Instant copy &amp; post
+                </div>
+              </div>
+
+            </div>
           </div>
         </section>
 
-        {/* AGITATION SECTION */}
-        <section className="p-6 sm:p-10 rounded-3xl bg-rose-50/50 border border-rose-200/80 shadow-xs space-y-6">
-          <div className="max-w-3xl mx-auto space-y-4">
-            <span className="text-xs font-bold text-rose-700 uppercase tracking-wider px-3 py-1 rounded-full bg-rose-100 border border-rose-200">
-              The Real Problem
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900">
-              Kyun 90% Grahak Dukan Pasand Aane Par Bhi Google Review Nahi Dete?
-            </h2>
-            <div className="grid sm:grid-cols-3 gap-4 pt-2 text-left">
-              <div className="p-4 rounded-xl bg-white border border-rose-100 shadow-xs space-y-2">
-                <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center text-rose-700 font-black">1</div>
-                <div className="text-sm font-bold text-slate-900">Review Likhna Mushkil Hai</div>
-                <p className="text-xs text-slate-600">Mobile par 3-4 sentence likhna customer ke liye boring aur time-taking hota hai.</p>
+        {/* ============ GEO SGE STATISTIC HIGHLIGHTS ============ */}
+        <section className="py-12 bg-slate-50/70 border-b border-slate-200/80">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-5 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
+                <div className="text-3xl font-black text-amber-600">+312%</div>
+                <div className="text-xs text-slate-600 font-medium">Review Velocity within 30 Days</div>
               </div>
-              <div className="p-4 rounded-xl bg-white border border-rose-100 shadow-xs space-y-2">
-                <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center text-rose-700 font-black">2</div>
-                <div className="text-sm font-bold text-slate-900">Google Maps Par Dukan Dhundna</div>
-                <p className="text-xs text-slate-600">Grahak search me galat location ya competitor ki profile par pahunch jate hain.</p>
+              <div className="p-5 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
+                <div className="text-3xl font-black text-emerald-600">&lt;5 Sec</div>
+                <div className="text-xs text-slate-600 font-medium">Average Customer Submission Time</div>
               </div>
-              <div className="p-4 rounded-xl bg-white border border-rose-100 shadow-xs space-y-2">
-                <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center text-rose-700 font-black">3</div>
-                <div className="text-sm font-bold text-slate-900">Ghar Jate Hi Bhool Jana</div>
-                <p className="text-xs text-slate-600">Bina instant WhatsApp prompt aur reward incentive ke koi review post nahi karta.</p>
+              <div className="p-5 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
+                <div className="text-3xl font-black text-cyan-600">100%</div>
+                <div className="text-xs text-slate-600 font-medium">Private Negative Feedback Protection</div>
+              </div>
+              <div className="p-5 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
+                <div className="text-3xl font-black text-slate-900">#1 Rank</div>
+                <div className="text-xs text-slate-600 font-medium">Google Maps Local 3-Pack Boost</div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* GEO / SGE 3-STEP BREAKDOWN */}
-        <section className="space-y-8">
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-bold text-amber-800 uppercase tracking-wider px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200">
-              Generative Engine Blueprint (GEO)
-            </span>
+        {/* ============ AGITATION: THE 3 BIG FRICTION POINTS (IN PURSUIT OF EXCELLENCE) ============ */}
+        <section className="py-16 md:py-24">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-12">
+            <div className="text-center max-w-2xl mx-auto space-y-2">
+              <span className="text-rose-700 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-rose-50 border border-rose-200">
+                The Customer Friction Bottleneck
+              </span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
+                Why 90% of Happy Walk-In Customers Never Leave a Google Review
+              </h2>
+              <p className="text-slate-600 text-xs sm:text-sm">
+                You provide exceptional service, fresh food, or great products. Your customers leave smiling. So why is your Google profile silent?
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-3 gap-6">
+              <div className="p-6 rounded-3xl bg-white border border-slate-200 space-y-3 hover:border-slate-300 shadow-xs hover:shadow-xl transition">
+                <div className="w-12 h-12 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-700 font-black text-lg shadow-xs">
+                  01
+                </div>
+                <h3 className="font-extrabold text-slate-900 text-base">Customers Walk Out and Forget</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Even your most satisfied customers get distracted by phone notifications and daily traffic the second they step outside your shop. Without an immediate counter trigger, reviews never get posted.
+                </p>
+              </div>
+
+              <div className="p-6 rounded-3xl bg-white border border-slate-200 space-y-3 hover:border-slate-300 shadow-xs hover:shadow-xl transition">
+                <div className="w-12 h-12 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-700 font-black text-lg shadow-xs">
+                  02
+                </div>
+                <h3 className="font-extrabold text-slate-900 text-base">Blank Screen Anxiety</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  When a customer opens Google Maps, they freeze when faced with an empty text box. Thinking up articulate sentences feels like homework, causing over 85% of shoppers to close the tab without submitting.
+                </p>
+              </div>
+
+              <div className="p-6 rounded-3xl bg-white border border-slate-200 space-y-3 hover:border-slate-300 shadow-xs hover:shadow-xl transition">
+                <div className="w-12 h-12 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-700 font-black text-lg shadow-xs">
+                  03
+                </div>
+                <h3 className="font-extrabold text-slate-900 text-base">Begging Customers Feels Awkward</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Your billing staff feels hesitant to verbally plead with every customer at the counter. Traditional requests feel intrusive and rarely yield results without a frictionless digital assistant.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============ HEAD-TO-HEAD: STANDARD QR VS CUSTOMERPILOT SMART AI QR ============ */}
+        <section className="py-16 bg-slate-50/70 border-t border-b border-slate-200/80">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-12">
+            <div className="text-center max-w-2xl mx-auto space-y-2">
+              <span className="text-amber-800 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200">
+                AI vs Normal QR
+              </span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
+                Standard QR Code vs. CustomerPilot Smart AI Review QR
+              </h2>
+              <p className="text-slate-600 text-xs sm:text-sm">
+                Why standard Google QR stickers get ignored while CustomerPilot achieves an 88% review completion rate:
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Old Traditional QR */}
+              <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-4">
+                <div className="flex items-center gap-2 text-rose-600 font-bold text-sm">
+                  <XCircle className="w-5 h-5 flex-shrink-0" />
+                  <span>Standard Printed Google QR Code</span>
+                </div>
+                <h4 className="text-lg font-extrabold text-slate-900">Opens Empty Text Box &bull; 85% Drop-Off</h4>
+                <ul className="space-y-3 text-xs text-slate-600">
+                  <li className="flex items-start gap-2">
+                    <span className="text-rose-500 font-bold">✕</span>
+                    <span>Customer must manually brainstorm and type 3-4 sentences on keypad.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-rose-500 font-bold">✕</span>
+                    <span>No protection against angry 1-star reviews posted publicly in anger.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-rose-500 font-bold">✕</span>
+                    <span>Generic reviews without local search keywords (&quot;Good store&quot; gives zero SEO boost).</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-rose-500 font-bold">✕</span>
+                    <span>Zero customer incentive or loyalty points linked to verified review submissions.</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* CustomerPilot Smart AI QR */}
+              <div className="p-6 sm:p-8 rounded-3xl bg-white border-2 border-amber-400 shadow-md space-y-4 relative overflow-hidden">
+                <div className="absolute top-0 right-0 bg-amber-500 text-slate-950 font-black text-[10px] px-3 py-1 rounded-bl-xl uppercase tracking-wider">
+                  Recommended
+                </div>
+                <div className="flex items-center gap-2 text-amber-700 font-bold text-sm">
+                  <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-amber-600" />
+                  <span>CustomerPilot Smart AI Review Standee</span>
+                </div>
+                <h4 className="text-lg font-extrabold text-slate-900">3 AI Drafts in 3 Secs &bull; 88% Publish Rate</h4>
+                <ul className="space-y-3 text-xs text-slate-700">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>Generative AI drafts 3 personalized, positive reviews ready for 1-tap submission.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>Private Feedback Shield routes 1-3 star feedback privately to owner WhatsApp.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>Organic local keyword injection shoots your store to #1 on Google Maps Local 3-Pack.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>Automatic +2 Bonus Loyalty Stamps credited immediately upon Google review verification.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============ PRIVATE FEEDBACK SHIELD DEEP-DIVE ============ */}
+        <section className="py-16 md:py-24">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-emerald-50 via-white to-amber-50 border border-emerald-200/80 shadow-sm grid md:grid-cols-12 gap-8 items-center">
+              <div className="md:col-span-8 space-y-4">
+                <span className="text-emerald-800 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-100 border border-emerald-200 inline-flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-700" /> Negative Feedback Shield
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
+                  Protect Your Public Google Rating from Unfair 1-Star Reviews
+                </h2>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Mistakes happen in busy retail and food service. CustomerPilot incorporates a Smart Sentiment Filter: satisfied 4 and 5-star customers are directed straight to Google Maps. Any unhappy 1 to 3-star feedback is captured privately into your merchant dashboard and WhatsApp, allowing you to resolve complaints and retain the customer before your public score takes a hit.
+                </p>
+                <div className="flex flex-wrap gap-4 pt-2 text-xs font-semibold text-slate-700">
+                  <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> 4-5★ ➔ Published to Google Maps</span>
+                  <span className="flex items-center gap-1.5"><ShieldAlert className="w-4 h-4 text-amber-600" /> 1-3★ ➔ Private Owner WhatsApp Alert</span>
+                </div>
+              </div>
+
+              <div className="md:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center font-black">
+                  4.8★
+                </div>
+                <div className="font-extrabold text-sm text-slate-900">Maintain Pristine Reputation</div>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Keep your public Google score above 4.7 stars to stay in Google Maps top-ranked local recommendations.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============ DUAL-LANGUAGE FAQ SECTION ============ */}
+        <section className="py-16 max-w-5xl mx-auto px-4 sm:px-6">
+          <DualLangFaq items={REVIEW_FAQS} accentColor="amber" theme="light" />
+        </section>
+
+        {/* ============ BOTTOM CALL TO ACTION ============ */}
+        <section className="py-16 max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center p-8 sm:p-12 rounded-3xl bg-gradient-to-b from-amber-50 to-white border border-amber-200 shadow-sm space-y-6">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
-              How Our AI Google Review QR System Works in 3 Steps
+              Ready to Triple Your 5-Star Google Reviews This Month?
             </h2>
-            <p className="text-slate-600 text-xs sm:text-sm">
-              Engineered for seamless frictionless customer submissions in under 5 seconds
+            <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
+              Start your 3-day free trial today. Print your smart acrylic counter standee and watch customer reviews pour in on autopilot.
             </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3 relative overflow-hidden shadow-xs hover:border-slate-300 transition">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-black text-lg">
-                1
-              </div>
-              <h3 className="font-extrabold text-slate-900 text-lg">Counter QR Scan or WhatsApp Trigger</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Customer scans the custom acrylic standee placed at your billing counter, or receives an automated post-purchase WhatsApp message after checkout.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3 relative overflow-hidden shadow-xs hover:border-slate-300 transition">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-black text-lg">
-                2
-              </div>
-              <h3 className="font-extrabold text-slate-900 text-lg">Instant AI Draft Generation</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Generative AI crafts a personalized, authentic 5-star review draft including dish/service recommendations and local SEO keywords tailored to your store.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3 relative overflow-hidden shadow-xs hover:border-slate-300 transition">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-black text-lg">
-                3
-              </div>
-              <h3 className="font-extrabold text-slate-900 text-lg">1-Tap Direct Publish to Google Maps</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Customer taps &quot;Publish to Google Maps&quot;. The review dialog opens directly on their phone with the AI draft pre-copied. 1 tap and it&apos;s live!
-              </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button asChild size="lg" className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-base px-8 py-6 rounded-2xl shadow-xl shadow-amber-500/20 hover:scale-105 transition-all">
+                <Link href="/signup">
+                  Get Your Counter QR Standee Now <ArrowRight className="w-5 h-5 ml-2" />
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
 
-        {/* COMPARISON TABLE */}
-        <section className="space-y-8">
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-bold text-amber-800 uppercase tracking-wider px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200">
-              Direct Comparison
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
-              CustomerPilot AI Reviews vs Standard Google QR vs SMS Feedback
-            </h2>
-          </div>
-
-          <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase text-[11px] tracking-wider">
-                <tr>
-                  <th scope="col" className="py-4 px-4 sm:px-6">Feature</th>
-                  <th scope="col" className="py-4 px-4 sm:px-6 text-amber-900 bg-amber-50/80 border-x border-amber-200">
-                    CustomerPilot AI Review QR
-                  </th>
-                  <th scope="col" className="py-4 px-4 sm:px-6 text-slate-600">Standard Google QR</th>
-                  <th scope="col" className="py-4 px-4 sm:px-6 text-slate-600">SMS Feedback Links</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700">
-                <tr className="hover:bg-slate-50/80 transition">
-                  <td className="py-3.5 px-4 sm:px-6 font-semibold">AI Pre-Drafted Review Content</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-amber-800 bg-amber-50/40 border-x border-amber-100">
-                    Yes (Contextual AI drafts in 1-sec)
-                  </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">No (Blank text box)</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">No</td>
-                </tr>
-
-                <tr className="hover:bg-slate-50/80 transition">
-                  <td className="py-3.5 px-4 sm:px-6 font-semibold">Negative Feedback Protection</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-amber-800 bg-amber-50/40 border-x border-amber-100">
-                    Yes (Private 1-3 star routing)
-                  </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">No (Direct public damage)</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">Partial</td>
-                </tr>
-
-                <tr className="hover:bg-slate-50/80 transition">
-                  <td className="py-3.5 px-4 sm:px-6 font-semibold">Loyalty Stamp Bonus Loop</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-amber-800 bg-amber-50/40 border-x border-amber-100">
-                    Yes (+2 bonus stamps on review)
-                  </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">No incentive</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">No incentive</td>
-                </tr>
-
-                <tr className="hover:bg-slate-50/80 transition">
-                  <td className="py-3.5 px-4 sm:px-6 font-semibold">Customer Open / Conversion Rate</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-amber-800 bg-amber-50/40 border-x border-amber-100">
-                    98% WhatsApp / 40%+ conversion
-                  </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">&lt;5% conversion</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">&lt;2% SMS open rate</td>
-                </tr>
-
-                <tr className="hover:bg-slate-50/80 transition">
-                  <td className="py-3.5 px-4 sm:px-6 font-semibold">Direct Review Modal URL</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-amber-800 bg-amber-50/40 border-x border-amber-100">
-                    Direct Place ID review dialog
-                  </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">Generic Map search pin</td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">External survey link</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* DUAL-LANGUAGE FAQ SECTION (ENGLISH DEFAULT + HINGLISH) */}
-        <DualLangFaq items={REVIEW_FAQS} accentColor="amber" theme="light" />
-
-        {/* BOTTOM CALL TO ACTION */}
-        <section className="text-center p-8 sm:p-12 rounded-3xl bg-gradient-to-b from-amber-50 to-white border border-amber-200 shadow-sm space-y-6">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
-            Ready to Triple Your 5-Star Google Reviews?
-          </h2>
-          <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
-            Set up in 3 minutes. Print your high-resolution counter QR standee today and start collecting AI-assisted Google reviews on WhatsApp.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button asChild size="lg" className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-base px-8 py-6 rounded-2xl shadow-xl shadow-amber-500/20 hover:scale-105 transition-all">
-              <Link href="/signup">
-                Get Your Smart AI Review Standee <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-            </Button>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}
