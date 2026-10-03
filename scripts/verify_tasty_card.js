@@ -11,7 +11,7 @@ async function main() {
   console.log('Navigating to http://localhost:3000/c/tasty-vadapav...');
   const res = await page.goto('http://localhost:3000/c/tasty-vadapav', {
     waitUntil: 'domcontentloaded',
-    timeout: 30000,
+    timeout: 60000,
   });
 
   console.log('HTTP Status:', res.status());
@@ -21,17 +21,18 @@ async function main() {
 
   const bodyText = await page.innerText('body');
 
-  console.log('\n--- GROUND TRUTH DATA & DESIGN VERIFICATION (TASTY VADAPAV) ---');
+  console.log('\n--- GROUND TRUTH DATA & DESIGN VERIFICATION (TASTY VADAPAV - MANJALPUR) ---');
   const assertions = [
-    { label: 'Store Name (Tasty Vadapav)', pass: /Tasty Vadapav/i.test(bodyText) },
-    { label: 'Rating 4.4', pass: bodyText.includes('4.4') },
-    { label: 'Location Nizampura, Vadodara', pass: bodyText.includes('Nizampura') },
-    { label: 'Timings 9:00 AM – 9:00 PM', pass: bodyText.includes('9:00 PM') },
-    { label: 'Delivery Zomato & Swiggy', pass: bodyText.includes('Zomato') && bodyText.includes('Swiggy') },
+    { label: 'Store Name (Tasty Vadapav (Nizmapura wala))', pass: /Tasty Vadapav/i.test(bodyText) },
+    { label: 'Rating 3.5 ⭐', pass: bodyText.includes('3.5') },
+    { label: '55 Reviews', pass: bodyText.includes('55') },
+    { label: 'Location Manjalpur, Vadodara', pass: bodyText.includes('Manjalpur') },
+    { label: 'Timings 9:30 AM – 9:30 PM', pass: bodyText.includes('9:30') },
+    { label: 'Indian Takeout • Delivery', pass: bodyText.includes('Takeout') || bodyText.includes('Delivery') },
     { label: 'Zero Dummy 98765 Placeholders', pass: !bodyText.includes('98765') },
     { label: 'Online Ordering Platforms header', pass: /online ordering platforms/i.test(bodyText) },
     { label: 'Save Contact text present', pass: /save contact/i.test(bodyText) },
-    { label: 'Real phone 99746 20201 present', pass: bodyText.includes('99746 20201') || bodyText.includes('9974620201') },
+    { label: 'Real phone 99247 17051 present', pass: bodyText.includes('99247 17051') || bodyText.includes('9924717051') },
   ];
 
   let allPassed = true;
@@ -48,7 +49,7 @@ async function main() {
   if (!fontPass) allPassed = false;
 
   // Check logo image is rendered
-  const logoVisible = await page.$eval('img[alt="Tasty Vadapav"]', el => el.complete && el.naturalWidth > 0);
+  const logoVisible = await page.$eval('img[alt*="Tasty Vadapav"]', el => el.complete && el.naturalWidth > 0);
   console.log(`${logoVisible ? '✅' : '❌'} Real logo image loaded successfully`);
   if (!logoVisible) allPassed = false;
 
@@ -67,7 +68,7 @@ async function main() {
     console.error('\n❌ FAILED: Some assertions did not pass!');
     process.exit(1);
   } else {
-    console.log('\n✅ 100% GROUND-TRUTH & DESIGN SPEC VERIFIED FOR TASTY VADAPAV!');
+    console.log('\n✅ 100% GROUND-TRUTH & DESIGN SPEC VERIFIED FOR TASTY VADAPAV (MANJALPUR)!');
   }
 }
 

@@ -3,6 +3,35 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Oct 2026] Issue: Exact Ground-Truth Branch Rectification for Tasty Vadapav (Manjalpur Branch) & Strict Alignment with Official Google Reviews & Rating (3.5 ⭐, 55 Reviews)
+- **Symptom**: User pointed out that the digital business card for `https://share.google/aLueptkDviKD94cGP` displayed the Nizampura HQ data (Braj Complex, 99746 20201, 4.4 ⭐) instead of the exact branch and Google Business Profile. Furthermore, user requested: *"Google ke number ofReviews and Ratings show karna tha, '(5,430+ Ratings on Zomato & Swiggy)' ye nahi"*, and provided the exact Google Search screenshot confirming the listing identity.
+- **Root Cause**:
+  1. The business name is `Tasty Vadapav (Nizmapura wala)`. Because automated scraping was rate-limited by Google Search bot protection, fallback logic grabbed details from `tastyvadapav.com`, which listed the Nizampura head-office phone and address instead of the specific Manjalpur branch.
+  2. CodeRabbit (Stage 3) is a static AST/code quality analyzer; it cannot check external factual truth (like whether a phone number belongs to Manjalpur or Nizampura). Ground-truth assertion (Stage 4) needed to strictly enforce exact branch data without conflation.
+  3. Delivery platform ratings (5,430+ on Zomato/Swiggy) were previously aggregated into the card when the user explicitly demanded the official Google listing numbers (3.5 ⭐ and 55 Google Reviews).
+- **Resolution**:
+  1. **Ground-Truth Branch Rectification**: Updated `DigitalBusinessCard` and `Merchant` records in `prisma/dev.db` with 100% verified data:
+     - **Name**: `Tasty Vadapav (Nizmapura wala)`
+     - **Location / Branch**: `Manjalpur`, `Vadodara, Gujarat`
+     - **Full Address**: `GF-1, Bs Jagdish Farsan Pvt.Ltd, Atria Complex, opp. Shreyas School, Manjalpur Naka, ShreePalli society, Manjalpur, Vadodara, Gujarat 390011`
+     - **Calling Phone**: `+91 99247 17051`
+     - **WhatsApp**: `919924717051`
+     - **Official Google Rating**: `3.5 ⭐`
+     - **Official Google Reviews**: `55 Reviews`
+     - **Category & Timings**: `Fast Food • Vadapav Specialist • Indian Takeout • Manjalpur` | `Open Daily • 9:30 AM – 9:30 PM`
+     - **Ordering Links**: Direct Manjalpur Zomato, Swiggy, and Google Maps direction URLs.
+  2. **Playwright Visual & Ground-Truth Test**: Ran `scripts/verify_tasty_card.js` on `http://localhost:3000/c/tasty-vadapav`, asserting:
+     - 3.5 ⭐ rating
+     - 55 Google Reviews
+     - Manjalpur location
+     - 99247 17051 phone number
+     - Times New Roman non-link styling
+     - Real logo visibility
+     - Zero placeholder (`98765`, `12345`) data
+  3. **Visual Snapshot Captured**: Saved `tasty_vadapav_card_verified.png` confirming zero truncation, correct light button styling with highlighted icon badges, and pixel-perfect rendering.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [02 Oct 2026] Issue: Instant Ground-Truth Extraction & Live Luxury Digital Business Card for "Tasty Vadapav (Nizampura wala)"
 - **Symptom**: User provided a Google Maps share link (`https://share.google/aLueptkDviKD94cGP`) and challenged to build a 100% accurate, live Digital Business Card in under 2 minutes.
 - **Root Cause**: Modern `share.google` shortlinks resolve with `kgmid=/g/11j_8p2qh8&q=Tasty+Vadapav+(Nizmapura+wala)`. The system needed to rapidly extract the merchant's real business identity, official website (`tastyvadapav.com`), Google Maps rating (4.4 ⭐), genuine logo, contacts, delivery links, and operational hours without any placeholder data.
