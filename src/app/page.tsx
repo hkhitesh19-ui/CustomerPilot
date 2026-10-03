@@ -428,6 +428,13 @@ export default function Home() {
                     </span>
                     <span className="text-[11px] text-slate-500 mt-0.5">Post-purchase WhatsApp 5-star review collector</span>
                   </Link>
+                  <Link href="/free-ai-google-review-generator" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition bg-amber-50/40">
+                    <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5 text-amber-600" /> Free AI Review Generator</span>
+                      <span className="text-[10px] bg-amber-100 text-amber-800 font-black px-1.5 py-0.5 rounded-md">Free Tool</span>
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Generate 3 free 5-star review drafts in 3 seconds</span>
+                  </Link>
                   <Link href="/ai-google-review-autoreply" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
                     <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
                       <span className="flex items-center gap-1.5"><MessageSquare className="w-3.5 h-3.5 text-indigo-500" /> 1-Click AI AutoReply</span>
@@ -534,6 +541,10 @@ export default function Home() {
               <Link href="/ai-google-review-qr-generator" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
                 <span className="flex items-center gap-2"><Star className="w-4 h-4 text-emerald-500" /> Smart AI Google Reviews</span>
                 <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">AI Drafts</span>
+              </Link>
+              <Link href="/free-ai-google-review-generator" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50 bg-amber-50/50">
+                <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-amber-600" /> Free AI Review Generator</span>
+                <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded-md">Free Tool</span>
               </Link>
               <Link href="/ai-google-review-autoreply" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
                 <span className="flex items-center gap-2"><MessageSquare className="w-4 h-4 text-indigo-500" /> 1-Click AI AutoReply</span>
@@ -2457,6 +2468,7 @@ export default function Home() {
               <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
                 <li><Link href="/whatsapp-digital-loyalty-card" className="hover:text-emerald-400 transition-colors">🎁 Digital Loyalty Stamps</Link></li>
                 <li><Link href="/ai-google-review-qr-generator" className="hover:text-emerald-400 transition-colors">⭐ Smart AI Google Reviews</Link></li>
+                <li><Link href="/free-ai-google-review-generator" className="text-amber-400 font-bold hover:text-amber-300 transition-colors">✨ Free AI Review Generator</Link></li>
                 <li><Link href="/ai-google-review-autoreply" className="hover:text-emerald-400 transition-colors">⚡ 1-Click AI AutoReply</Link></li>
                 <li><Link href="/smart-digital-business-card" className="hover:text-emerald-400 transition-colors">🪪 Smart Digital Business Card</Link></li>
                 <li><Link href="/customerpilot-complete" className="hover:text-emerald-400 transition-colors">🚀 CustomerPilot Complete</Link></li>

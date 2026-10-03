@@ -357,12 +357,15 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   ├── onboarding/page.tsx        # 9-Step Interactive Onboarding Wizard
 │   │   ├── page.tsx                   # Master Homepage & Product Landing Page
 │   │   ├── pricing/page.tsx           # V3.0 Customer Capacity & Founding Merchant Pricing
+│   │   ├── free-ai-google-review-generator/page.tsx # Free Interactive AI Google Review Generator (Traffic & Backlink Flywheel)
+│   │   ├── smart-ai-google-review/page.tsx   # Core AI Search & LLM Domination Blueprint Page (SEO/AEO/GEO)
 │   │   ├── review/page.tsx            # Customer 5-Star WhatsApp Review Collector Page
 │   │   └── super-admin/page.tsx       # Platform SuperAdmin Master Control Panel
 │   │
 │   ├── components/                    # Reusable React UI Components
+│   │   ├── free-ai-review-generator-client.tsx # Free AI Review Generator Interactive Client Engine (3 Variations, Presets, Copy)
 │   │   ├── live-review-reply-animation.tsx     # ReviewPilot-Style 3-Step Live Review & AI Reply Real-Time Simulation Engine (Framer Motion)
-│   │   ├── ai-google-review-qr-client.tsx      # Smart AI Google Review QR Generator Client Component (SEO/GEO/AEO)
+│   │   ├── ai-google-review-qr-client.tsx      # Smart AI Google Review QR Generator Client Component (SEO/GEO/AEO + Stage 4 GEO Table)
 │   │   ├── ai-google-review-autoreply-client.tsx # 1-Click AI AutoReply Client Component (SEO/GEO/AEO)
 │   │   ├── customerpilot-complete-client.tsx    # CustomerPilot Complete All-in-One Client Component (SEO/GEO/AEO)
 │   │   ├── smart-digital-business-card-client.tsx # Smart Digital Business Card Client Component (SEO/GEO/AEO)
@@ -392,6 +395,7 @@ F:\CustomerPilot_ByGLM_July2026
 │       └── stamp-engine.ts            # Bill-to-Stamp Award & Redemption Logic
 │
 ├── scripts/                           # Production Health, Seed & Playwright Verification Scripts
+│   ├── verify_smart_ai_review_framework.js # Playwright AI Search & LLM Domination Framework (Stages 1, 2, 4, 5) Assertion Suite
 │   ├── verify_review_pilot_animation.js # Playwright ReviewPilot-Style 3-Step Live Review & Auto-Reply Flow Verification Suite
 │   ├── verify_landing_pages_enhanced.js # Playwright Enhanced Landing Pages Test Suite (5 Pages, Simulators, $100k Chassis, How It Works Infographics, Indian English)
 │   ├── capture_how_it_works.js        # Playwright How-It-Works Visual Infographics Screenshot Script
@@ -405,6 +409,7 @@ F:\CustomerPilot_ByGLM_July2026
 ### **10.2 Feature & Module Mapping Table**
 | Module / Feature | Main Entry File(s) | Helper Services & Engines | Purpose / Description |
 | :--- | :--- | :--- | :--- |
+| **5-Stage AI Search & LLM Domination Framework (Google SGE + ChatGPT + Perplexity)** | `src/app/smart-ai-google-review/page.tsx`<br/>`src/app/ai-google-review-qr-generator/page.tsx`<br/>`src/app/free-ai-google-review-generator/page.tsx` | `src/components/free-ai-review-generator-client.tsx`<br/>`scripts/verify_smart_ai_review_framework.js`<br/>`src/components/dual-lang-faq.tsx` | **Stage 1 Blueprint**: Target URL `/smart-ai-google-review`, H1 Primary Entity (*Smart AI Google Review: Scan, Auto-Write & Boost 5-Star Reviews in 1 Click*), 45-word SGE Direct Answer Snippet.<br/>**Stage 2 Schema**: JSON-LD `@graph` with `SoftwareApplication` entity + voice-search FAQPage.<br/>**Stage 4 GEO Table**: Structured 4-column `<table>` comparing CustomerPilot against MagicReview, TapNConnect, and normal Google QR.<br/>**Stage 5 Free Utility Trap**: Standalone `/free-ai-google-review-generator` with instant 3 AI review variations, retail category presets, and standee upsell. |
 | **Dedicated Product Landing Pages & Luxury $100k Visual Simulators** | `src/app/smart-digital-business-card/page.tsx`<br/>`src/app/ai-google-review-qr-generator/page.tsx`<br/>`src/app/ai-google-review-autoreply/page.tsx`<br/>`src/app/whatsapp-digital-loyalty-card/page.tsx`<br/>`src/app/customerpilot-complete/page.tsx` | `scripts/verify_landing_pages_enhanced.js`<br/>`scripts/capture_how_it_works.js`<br/>`src/components/dual-lang-faq.tsx` | Master Homepage theme alignment, pure light mode, 100% Indian English copy. Default **Cake Connection** card on `/smart-digital-business-card`. Unobstructed, crystal-clear $100,000 SaaS luxury phone chassis (iPhone 16 Pro styling, Dynamic Island status bar 9:41, bottom home indicator, zero obstructive floating cards). Dedicated animated **"How It Works"** section on every product landing page featuring numbered gradient pills (01, 02, 03), connecting desktop energy lines, visual interactive infographic boxes, and micro-metric badges. |
 | **Pure Light Mode Architecture** | `src/components/providers.tsx`<br/>`src/components/top-nav.tsx`<br/>`src/app/layout.tsx` | `scripts/verify_light_mode.js` | Strictly enforces pure light theme across public pages, landing pages, and dashboard. `NextThemesProvider` locked with `forcedTheme="light"` and `enableSystem={false}`. `<ModeToggle />` removed from top nav. Viewport `themeColor` set to `#ffffff`. |
 | **Luxury Live Digital Business Card** | `src/app/c/[slug]/page.tsx`<br/>`src/app/dashboard/digital-card/page.tsx` | `src/components/digital-card-view.tsx`<br/>`src/app/api/digital-card/route.ts`<br/>`src/lib/google-places-api.ts` | Mobile-first micro-website with auto-fetched public GBP data, 6 branded social/call/WhatsApp buttons, online food ordering platforms, Google reviews, and 1-tap `.vcf` contact downloader. Zero disturbance to existing modules. |
