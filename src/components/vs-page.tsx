@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowRight, CheckCircle2, X, ArrowUpRight } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
+import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
 
 export interface VsPageConfig {
   competitor: string
@@ -17,6 +18,7 @@ export interface VsPageConfig {
   comparisonRows: { feature: string; competitor: string | null; cp: string; winner: "cp" | "tie" | "competitor" }[]
   bestForCompetitor: string
   bestForCP: string
+  faqs?: DualLangFaqItem[]
 }
 
 export function VsPage({ config }: { config: VsPageConfig }) {
@@ -142,6 +144,15 @@ export function VsPage({ config }: { config: VsPageConfig }) {
             </div>
           </div>
         </section>
+
+        {/* ── FAQ Section (Dual-Language English/Hinglish) ── */}
+        {config.faqs && config.faqs.length > 0 && (
+          <section className="py-14 sm:py-20 bg-slate-50 border-b border-slate-200">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6">
+              <DualLangFaq items={config.faqs} theme="light" accentColor="emerald" />
+            </div>
+          </section>
+        )}
 
         {/* ── CTA ── */}
         <section className="py-16 sm:py-20 bg-slate-900 text-white">

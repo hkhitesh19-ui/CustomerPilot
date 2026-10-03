@@ -22,20 +22,36 @@ export const metadata: Metadata = {
   }
 }
 
-const STAMP_ME_FAQS = [
+import { DualLangFaqItem } from "@/components/dual-lang-faq"
+
+const STAMP_ME_FAQS_DUAL: DualLangFaqItem[] = [
   {
-    question: "Why are Indian retailers switching from Stamp Me to CustomerPilot?",
-    answer: "Indian retailers are switching because Stamp Me requires customers to download a third-party mobile app resulting in an 80%+ drop-off rate, charges expensive USD pricing ($49–$99/month), and lacks WhatsApp integration and automated AI Google Review collection."
+    id: 1,
+    questionEn: "Why are Indian retailers switching from Stamp Me to CustomerPilot?",
+    answerEn: "Indian retailers are switching because Stamp Me requires customers to download a third-party mobile app resulting in an 80%+ drop-off rate, charges expensive USD pricing ($49–$99/month), and lacks WhatsApp integration and automated AI Google Review collection.",
+    questionHi: "Indian retailers Stamp Me chhod kar CustomerPilot par kyu switch kar rahe hain?",
+    answerHi: "Indian retailers isliye switch kar rahe hain kyunki Stamp Me me customer ko alag se app download karni padti hai jisse 80%+ log counter par mana kar dete hain. Saath hi Stamp Me me Dollar ($49–$99/month) me mehanga bill aata hai aur usme na WhatsApp bot hai na Google Review auto-writer."
   },
   {
-    question: "Do customers need to download an app on CustomerPilot like they do on Stamp Me?",
-    answer: "No. Unlike Stamp Me which requires an App Store or Google Play Store download, CustomerPilot operates 100% natively on WhatsApp. Customers simply scan the counter QR code and collect digital stamps in 5 seconds."
+    id: 2,
+    questionEn: "Do customers need to download an app on CustomerPilot like they do on Stamp Me?",
+    answerEn: "No. Unlike Stamp Me which requires an App Store or Google Play Store download, CustomerPilot operates 100% natively on WhatsApp. Customers simply scan the counter QR code and collect digital stamps in 5 seconds.",
+    questionHi: "Kya CustomerPilot par customer ko Stamp Me ki tarah koi app download karni padegi?",
+    answerHi: "Nahi, bilkul nahi! Stamp Me me App Store ya Play Store se app download karni padti hai, jabki CustomerPilot 100% seedha WhatsApp par chalta hai. Grahak counter ka QR scan karke 5 second me digital stamp collect kar lete hain."
   },
   {
-    question: "How does the pricing of CustomerPilot compare to Stamp Me?",
-    answer: "Stamp Me costs between $49/mo to $99/mo (approx ₹49,000 to ₹1,00,000/year). CustomerPilot costs just ₹2,249/year (₹6.2/day) with 50% discount locked in, representing over 95% annual cost savings."
+    id: 3,
+    questionEn: "How does the pricing of CustomerPilot compare to Stamp Me?",
+    answerEn: "Stamp Me costs between $49/mo to $99/mo (approx ₹49,000 to ₹1,00,000/year). CustomerPilot costs just ₹2,249/year (₹6.2/day) with 50% discount locked in, representing over 95% annual cost savings.",
+    questionHi: "CustomerPilot aur Stamp Me ke pricing me kitna fark hai?",
+    answerHi: "Stamp Me ka price $49 se $99 per month hai (saal ka lagbhag ₹49,000 se ₹1,00,000). CustomerPilot sirf ₹2,249/year (₹6.2/day) me milta hai, jo 95% se zyada ki saalana bachat deta hai."
   }
 ]
+
+const STAMP_ME_FAQS_SCHEMA = STAMP_ME_FAQS_DUAL.map(f => ({
+  question: f.questionEn,
+  answer: f.answerEn
+}))
 
 const config: VsPageConfig = {
   competitor: "Stamp Me",
@@ -47,6 +63,7 @@ const config: VsPageConfig = {
   heroHeadline: "Looking for a Stamp Me Alternative? Get 100% App-Free WhatsApp Loyalty + AI Google Reviews at 95% Lower Cost.",
   heroSubtext: "Stamp Me forces customers to download an app and charges in expensive US Dollars. CustomerPilot brings digital punch cards directly inside WhatsApp — with zero customer app downloads and built-in AI Google Reviews.",
   coreProblem: "Stamp Me is a popular digital stamp card app built for western markets. However, in Indian retail (bakeries, cafes, restaurants, salons), over 80% of customers refuse to download another mobile app at the cash counter just to collect a stamp. Furthermore, Stamp Me charges in US Dollars ($49–$99/month = ₹49,000–₹1,00,000/year), lacks WhatsApp automation, and does not help you get 5-star Google Maps reviews. CustomerPilot solves this by running 100% on WhatsApp at just ₹2,249/year (₹6.2/day) with built-in AI Google Review automation.",
+  faqs: STAMP_ME_FAQS_DUAL,
   pricingComparison: {
     competitorLabel: "Stamp Me (Standard Plan)",
     competitorCost: "₹49,000+",
@@ -81,7 +98,7 @@ export default function StampMeVsPage() {
           { name: "Stamp Me Alternative", url: "https://customerpilot.in/vs/stamp-me" }
         ]}
       />
-      <FAQPageJsonLd faqs={STAMP_ME_FAQS} />
+      <FAQPageJsonLd faqs={STAMP_ME_FAQS_SCHEMA} />
       <VsPage config={config} />
     </>
   )

@@ -3,6 +3,33 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Oct 2026] Issue: Universal Dual-Language (English Default + Hinglish) FAQ Selection Mode Across All Touchpoints
+- **Symptom**: User requested: *"sare FAQ me two language options selection mode set kar do (1) English (2) Hinglish - yaha English ( Indian English) by default ho"*.
+- **Root Cause**:
+  1. Previously, FAQs were either static English or had a mixture of Hinglish headers with English answers.
+  2. Indian merchants and retail store owners have varying language comfort: some prefer standard professional Indian English, while others connect far more easily with natural Hinglish terminology (e.g. *"Shop ke liye digital loyalty card kaise banaye?"* instead of *"How to create a digital loyalty card"*).
+  3. No interactive switcher existed to seamlessly toggle FAQ languages in real time without page reload or layout shift.
+- **Resolution**:
+  1. **Built Reusable `DualLangFaq` Component (`src/components/dual-lang-faq.tsx`)**:
+     - Includes interactive two-language switcher with `🇮🇳 English (Indian English)` (100% active by default) and `🗣️ Hinglish`.
+     - Supports both dark and light themes (`theme="dark" | "light"`) and custom accent colors (`emerald`, `cyan`, `blue`).
+     - Animated chevron rotation and smooth accordion expansion.
+  2. **Injected into All Public Touchpoints**:
+     - **WhatsApp Loyalty LP** (`/whatsapp-digital-loyalty-card`): Embedded `DualLangFaq` with complete questions and answers in Indian English and Hinglish.
+     - **Smart Digital Business Card LP** (`/smart-digital-business-card`): Embedded `DualLangFaq` with questions and answers tailored to digital cards.
+     - **Stamp Me Competitor Comparison** (`/vs/stamp-me`): Embedded `DualLangFaq` into `VsPage` layout with English and Hinglish competitor comparisons.
+     - **Main Homepage FAQ** (`src/components/faq-section.tsx`): Upgraded all 16 FAQ items with complete `questionHi`, `answerHi`, and `highlightsHi` Hinglish translations. Enhanced search filter to match both languages concurrently.
+  3. **Playwright & Ground-Truth Verification**:
+     - Built test suite `scripts/verify_faq_dual_language.js` testing all 4 pages.
+     - Verified:
+       1. English is selected and displayed by default on initial page load.
+       2. Clicking `🗣️ Hinglish` instantly updates heading, subtitle, category pills, and all questions/answers.
+       3. Clicking `🇮🇳 English (Indian English)` reverts back seamlessly.
+     - Captured and visually audited 8 high-resolution screenshots in artifacts directory.
+     - 100% of Playwright assertions passed.
+- **Status**: ✅ Resolved, Ground-Truth Audited & Verified.
+
+---
 ## [03 Oct 2026] Issue: Strategic SEO, AEO & GEO Triple-Pillar Architecture Implementation (WhatsApp Loyalty Wireframe, Stamp Me Interception & Smart Digital Card Silo)
 - **Symptom**: User requested a comprehensive gap analysis of CustomerPilot against a 5-phase SEO/AEO/GEO guide and commanded: *"Step 1 (WhatsApp Digital Loyalty Card ka wireframed landing page with Hinglish FAQs & Schema), Step 2 (Competitor Interception), Step 3 (Digital Business Card Silo) - one by one implement karo"*.
 - **Root Cause & Missing Pillars**:

@@ -14,6 +14,45 @@ import {
   ExternalLink
 } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
+import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
+
+const CARD_FAQS: DualLangFaqItem[] = [
+  {
+    id: 1,
+    questionEn: "How to create a smart digital visiting card with QR code for my business?",
+    answerEn: "Go to your CustomerPilot dashboard, enter your store name, calling phone, Google Place ID, and online catalog links. In less than 2 minutes, your interactive digital business card and high-resolution printable QR code are ready for sharing.",
+    questionHi: "Dukan ya business ke liye digital visiting card kaise banaye?",
+    answerHi: "CustomerPilot dashboard par jayein, apni dukan ka naam, phone number, Google Place ID, aur digital menu link enter karein. System 2 minute me aapka unique digital card aur printable QR code tayyar kar deta hai."
+  },
+  {
+    id: 2,
+    questionEn: "What interactive features are included in a CustomerPilot digital business card?",
+    answerEn: "It includes 1-Tap Save Contact (native VCF vCard phonebook download), Direct Google Reviews submission modal, WhatsApp quick chat, phone calling, Google Maps turn-by-turn navigation, and Online Ordering (Zomato/Swiggy/PDF menu) buttons.",
+    questionHi: "CustomerPilot digital card me kya kya features hote hain?",
+    answerHi: "CustomerPilot digital card me 1-Tap Save Contact (VCF vCard), Direct Google Reviews submission modal, WhatsApp quick chat, Phone calling, Google Maps navigation, aur Online Ordering links shamil hain."
+  },
+  {
+    id: 3,
+    questionEn: "How does this digital business card help increase 5-star Google Reviews?",
+    answerEn: "The card connects directly to Google's official review modal (search.google.com/local/writereview?placeid=...). When customers tap 'Google Reviews', it bypasses map overviews and directly triggers the 5-star rating dialog on their phone, multiplying review conversions by 5X.",
+    questionHi: "Digital visiting card se Google Reviews kaise badhte hain?",
+    answerHi: "Humara card Google ke official direct review modal se judha hota hai. Customer ke tap karte hi seedha 5-star rating dialog khulta hai, jisse review likhne ka conversion 5X ho jata hai."
+  },
+  {
+    id: 4,
+    questionEn: "What happens if my shop phone number or address changes in the future?",
+    answerEn: "Your card updates in real time on the cloud instantly. Your printed counter QR codes and NFC cards remain identical, saving you 100% of re-printing expenses.",
+    questionHi: "Agar phone number ya address badal gaya toh kya naya card banana padega?",
+    answerHi: "Bilkul nahi. Dashboard me change karte hi aapka digital card real-time me update ho jata hai. Aapka QR code wahi rehta hai, re-printing ka ek rupaya bhi kharch nahi hota."
+  },
+  {
+    id: 5,
+    questionEn: "Can I print the QR code on my counter standees, packaging boxes, and carry bags?",
+    answerEn: "Absolutely yes! You get vector-grade printable QR codes in SVG and PNG formats, ready for counter acrylic stands, stickers, takeaway bags, and smart NFC tap cards.",
+    questionHi: "Kya QR code ko counter standee, packaging aur carry bags par print kar sakte hain?",
+    answerHi: "Haan, bilkul! Aapko high-resolution printable PNG aur SVG QR codes milte hain jo counter standees, delivery boxes, carry bags, aur NFC cards ke liye ready hote hain."
+  }
+]
 
 export function SmartDigitalBusinessCardClient() {
   return (
@@ -238,56 +277,8 @@ export function SmartDigitalBusinessCardClient() {
           </div>
         </section>
 
-        {/* HINGLISH LOCALIZED FAQ SECTION */}
-        <section className="space-y-6">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="text-cyan-400 text-xs font-bold uppercase tracking-wider">Aapke Sawal, Hamare Jawab</span>
-            <h2 className="text-2xl sm:text-3xl font-black text-white">
-              Frequently Asked Questions (FAQ)
-            </h2>
-            <p className="text-slate-400 text-xs sm:text-sm">
-              Digital visiting cards ke bare me vyaparion ke aam sawal:
-            </p>
-          </div>
-
-          <div className="space-y-4 max-w-3xl mx-auto">
-            <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
-              <h3 className="font-bold text-base sm:text-lg text-cyan-400">
-                Dukan ya business ke liye digital visiting card kaise banaye?
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                CustomerPilot dashboard par jayein, apni dukan ka naam, phone number, Google Place ID, aur digital menu link enter karein. System 2 minute me aapka unique digital card aur printable QR code tayyar kar deta hai.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
-              <h3 className="font-bold text-base sm:text-lg text-cyan-400">
-                CustomerPilot digital card me kya kya features hote hain?
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                CustomerPilot digital card me 1-Tap Save Contact (VCF vCard), Direct Google Reviews submission modal, WhatsApp quick chat, Phone calling, Google Maps navigation, aur Online Ordering links shamil hain.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
-              <h3 className="font-bold text-base sm:text-lg text-cyan-400">
-                Digital visiting card se Google Reviews kaise badhte hain?
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Humara card Google ke official direct review modal se judha hota hai. Customer ke tap karte hi seedha 5-star rating dialog khulta hai, jisse review likhne ka conversion 5X ho jata hai.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
-              <h3 className="font-bold text-base sm:text-lg text-cyan-400">
-                Agar phone number ya address badal gaya toh kya naya card banana padega?
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Bilkul nahi. Dashboard me change karte hi aapka digital card real-time me update ho jata hai. Aapka QR code wahi rehta hai, re-printing ka ek rupaya bhi kharch nahi hota.
-              </p>
-            </div>
-          </div>
-        </section>
+        {/* DUAL-LANGUAGE FAQ SECTION (ENGLISH DEFAULT + HINGLISH) */}
+        <DualLangFaq items={CARD_FAQS} accentColor="cyan" />
 
         {/* BOTTOM CALL TO ACTION */}
         <section className="text-center p-8 sm:p-12 rounded-3xl bg-cyan-500/10 border border-cyan-500/30 space-y-6">

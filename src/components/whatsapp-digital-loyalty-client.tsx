@@ -10,6 +10,45 @@ import {
   Check
 } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
+import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
+
+const LOYALTY_FAQS: DualLangFaqItem[] = [
+  {
+    id: 1,
+    questionEn: "How to create a digital loyalty card for my retail shop or restaurant?",
+    answerEn: "Simply sign up on CustomerPilot, enter your business details, and generate your custom WhatsApp QR code standee. Print and place it on your billing counter — customers join your loyalty club instantly with a single 5-second camera scan without installing any third-party app.",
+    questionHi: "Shop ke liye digital loyalty card kaise banaye?",
+    answerHi: "CustomerPilot par signup karein, apni business details dalein, aur apna unique WhatsApp QR code generate karke counter par print karein. Grahak sirf ek scan me bina kisi app download ke aapke loyalty club se jud jate hain."
+  },
+  {
+    id: 2,
+    questionEn: "How do I set up customer reward points and stamp allocation software?",
+    answerEn: "Assign points or stamps seamlessly via your phone, tablet, or existing billing computer. CustomerPilot's CRM automatically updates digital stamps and reward milestone progress directly to the customer's WhatsApp in real time.",
+    questionHi: "Customer ko reward points dene wala software kaise set up karein?",
+    answerHi: "Apne POS ya mobile billing ke through points assign karein. CustomerPilot ka CRM automatically customer ke WhatsApp par digital stamps aur reward points update kar deta hai in real-time."
+  },
+  {
+    id: 3,
+    questionEn: "Which is the best customer rewards and discount app for Indian retail?",
+    answerEn: "CustomerPilot is the top-rated retention software for Indian retailers, cafes, salons, and bakeries because it operates 100% inside WhatsApp with zero app download friction, boosting repeat walk-ins by 34%+.",
+    questionHi: "Grahak ko discount aur points dene wala app kaunsa best hai?",
+    answerHi: "Indian retail stores, cafes, aur bakeries ke liye CustomerPilot sabse best hai kyunki ye without app download, direct WhatsApp par chalta hai aur footfall ko 34%+ increase karta hai."
+  },
+  {
+    id: 4,
+    questionEn: "Can cashiers or store staff cheat with duplicate stamps?",
+    answerEn: "Not at all. CustomerPilot features strict anti-fraud controls: configurable scan cooldown timers (e.g. maximum 1 stamp every 24 hours), minimum bill validation thresholds, and secure 4-digit cashier authorization PINs to prevent staff tampering.",
+    questionHi: "Kya cashier ya staff fake stamps laga sakte hain?",
+    answerHi: "Bilkul nahi. CustomerPilot me strict anti-fraud safeguards hote hain: scan cooldown timers (e.g. 24 ghante me maximum 1 stamp), minimum bill validation, aur cashier authorization PIN. Isse staff cheating 100% block hoti hai."
+  },
+  {
+    id: 5,
+    questionEn: "Does CustomerPilot require a special POS machine or barcode scanner?",
+    answerEn: "Zero special hardware required. CustomerPilot is 100% cloud-based and runs on any standard smartphone, iPad, tablet, or billing PC. Customers can also self-scan the counter QR standee.",
+    questionHi: "Kya kisi special billing POS machine ki zaroorat padegi?",
+    answerHi: "Zero special machine required. CustomerPilot poori tarah cloud-based hai. Aap apne standard smartphone, tablet, ya billing desktop se Cashier Queue chala sakte hain ya customer counter par QR standee khud scan kar sakte hain."
+  }
+]
 
 export function WhatsAppDigitalLoyaltyClient() {
   return (
@@ -288,65 +327,8 @@ export function WhatsAppDigitalLoyaltyClient() {
           </div>
         </section>
 
-        {/* HINGLISH LOCALIZED FAQ SECTION (VOICE / SGE / PAA OPTIMIZED) */}
-        <section className="space-y-6">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="text-emerald-400 text-xs font-bold uppercase tracking-wider">Aapke Sawal, Hamare Jawab</span>
-            <h2 className="text-2xl sm:text-3xl font-black text-white">
-              Frequently Asked Questions (FAQ)
-            </h2>
-            <p className="text-slate-400 text-xs sm:text-sm">
-              Indian shop owners dwara sabse zyada pooche jaane wale sawal aur unke detailed jawab:
-            </p>
-          </div>
-
-          <div className="space-y-4 max-w-3xl mx-auto">
-            <div className="p-6 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2">
-              <h3 className="font-bold text-base sm:text-lg text-emerald-400">
-                Shop ke liye digital loyalty card kaise banaye?
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                CustomerPilot par signup karein, apni business details dalein, aur apna unique WhatsApp QR code generate karke counter par print karein. Grahak sirf ek scan me bina kisi app download ke aapke loyalty club se jud jate hain.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2">
-              <h3 className="font-bold text-base sm:text-lg text-emerald-400">
-                Customer ko reward points dene wala software kaise set up karein?
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Apne POS ya mobile billing ke through points assign karein. CustomerPilot ka CRM automatically customer ke WhatsApp par digital stamps aur reward points update kar deta hai in real-time.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2">
-              <h3 className="font-bold text-base sm:text-lg text-emerald-400">
-                Grahak ko discount aur points dene wala app kaunsa best hai?
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Indian retail stores, cafes, aur bakeries ke liye CustomerPilot sabse best hai kyunki ye without app download, direct WhatsApp par chalta hai aur footfall ko 34%+ increase karta hai.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2">
-              <h3 className="font-bold text-base sm:text-lg text-emerald-400">
-                Kya cashier ya staff fake stamps laga sakte hain?
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Nahi. CustomerPilot me strict anti-fraud safeguards hote hain: scan cooldown timers (e.g. 24 ghante me maximum 1 stamp), minimum bill validation, aur cashier authorization PIN. Isse staff cheating 100% block hoti hai.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2">
-              <h3 className="font-bold text-base sm:text-lg text-emerald-400">
-                Kya kisi special billing POS machine ki zaroorat padegi?
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Zero special machine required. CustomerPilot poori tarah cloud-based hai. Aap apne standard smartphone, tablet, ya billing desktop se Cashier Queue chala sakte hain ya customer counter par QR standee khud scan kar sakte hain.
-              </p>
-            </div>
-          </div>
-        </section>
+        {/* DUAL-LANGUAGE FAQ SECTION (ENGLISH DEFAULT + HINGLISH) */}
+        <DualLangFaq items={LOYALTY_FAQS} accentColor="emerald" />
 
         {/* BOTTOM CALL TO ACTION */}
         <section className="text-center p-8 sm:p-12 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 space-y-6">

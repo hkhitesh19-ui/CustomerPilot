@@ -355,12 +355,13 @@ F:\CustomerPilot_ByGLM_July2026
 │   │
 │   ├── components/                    # Reusable React UI Components
 │   │   ├── digital-card-view.tsx      # Luxury Mobile Digital Card View with VCF & Socials (NEW)
+│   │   ├── dual-lang-faq.tsx          # Reusable Dual-Language FAQ (English Default + Hinglish) with Accordion & Theme Support (NEW)
 │   │   ├── impersonation-banner.tsx   # SuperAdmin Impersonation Sticky Banner & Return Action
 │   │   ├── splash-screen.tsx          # Full-Screen 1-Second Animated Splash Overlay
 │   │   ├── brand-logo.tsx             # Pure Vector Transparent SVG Logo Component
 │   │   ├── app-sidebar.tsx            # Merchant Navigation Sidebar with Founder Badge
 │   │   ├── top-nav.tsx                # Merchant Top Header Navigation
-│   │   ├── faq-section.tsx            # 16-Question Interactive Searchable FAQ
+│   │   ├── faq-section.tsx            # 16-Question Interactive Searchable FAQ with English & Hinglish Modes
 │   │   ├── ai-reply-sandbox.tsx       # Gemini AI Review Reply Browser Sandbox
 │   │   ├── vs-page.tsx                # Reusable Competitor Comparison Layout
 │   │   ├── fastfood-loyalty-client.tsx# Fast Food & QSR Loyalty Client Component
