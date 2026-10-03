@@ -11,10 +11,12 @@ import {
   Copy,
   ShieldAlert,
   CheckCircle2,
-  Store
+  Store,
+  Sparkles
 } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
+import { LiveReviewReplyAnimation } from "@/components/live-review-reply-animation"
 
 const REVIEW_FAQS: DualLangFaqItem[] = [
   {
@@ -194,13 +196,13 @@ export function AiGoogleReviewQrClient() {
                     <span>Get Your Counter QR Standee Free</span>
                     <ArrowRight className="w-4 h-4 ml-1" />
                   </Link>
-                  <Link
-                    href="/guide/operations"
+                  <a
+                    href="#live-animation"
                     className="py-3.5 sm:py-4 px-5 text-sm sm:text-base font-bold rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 shadow-xs flex items-center justify-center gap-2 transition w-full sm:w-auto"
                   >
-                    <Store className="w-4 h-4 text-amber-600" />
-                    <span>See Live Counter Operations</span>
-                  </Link>
+                    <Sparkles className="w-4 h-4 text-indigo-600" />
+                    <span>Watch Live AI Reply Demo ↓</span>
+                  </a>
                 </div>
 
                 {/* Trust Badges */}
@@ -328,6 +330,27 @@ export function AiGoogleReviewQrClient() {
                 <div className="text-xs text-slate-600 font-medium">Google Maps Local 3-Pack Boost</div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* ============ LIVE 3-STEP REAL-TIME REVIEW & OWNER AUTO-REPLY ANIMATION ENGINE (REVIEWPILOT STYLE) ============ */}
+        <section id="live-animation" className="py-16 md:py-24 bg-gradient-to-b from-white via-indigo-50/20 to-white relative overflow-hidden border-b border-slate-200/80">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+            <div className="text-center max-w-3xl mx-auto space-y-3 mb-8">
+              <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200/80 bg-white/90 px-4 py-1.5 shadow-xs backdrop-blur-sm">
+                <Sparkles className="h-3.5 w-3.5 text-indigo-600 animate-pulse" />
+                <span className="text-xs font-bold text-slate-800">21,000+ Reviews Generated &amp; Replied Across India</span>
+              </div>
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+                Review Arrives. AI Drafts. You Approve, It Publishes.
+              </h2>
+              <p className="text-slate-600 text-xs sm:text-base leading-relaxed">
+                Watch how CustomerPilot auto-fetches incoming Google reviews, drafts human-level empathetic replies with Gemini Pro AI, and publishes directly to Google Maps in a continuous automated loop.
+              </p>
+            </div>
+
+            {/* Live Interactive 3-Card Engine */}
+            <LiveReviewReplyAnimation />
           </div>
         </section>
 

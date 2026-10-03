@@ -3,6 +3,25 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Oct 2026] Issue: ReviewPilot-Style Live 3-Step Real-Time Continuous Review & Owner Auto-Reply Animation Flow on /ai-google-review-qr-generator
+- **Symptom**: User requested to replicate the full animated interactive 3-step live flow from `https://reviewpilot.co.in/` onto `http://localhost:3000/ai-google-review-qr-generator` using the provided blueprint and screenshot (`media_1791026078976.png`).
+- **Root Cause**: Previously, `/ai-google-review-qr-generator` featured static infographic cards and a right-column phone simulator, but lacked the continuous, interactive 3-card live automation loop that illustrates the full lifecycle: incoming Google review ➔ AI drafts reply with live typewriter & cursor ➔ 1-click live publish on Google Maps ➔ continuous loop.
+- **Resolution**:
+  1. Built `src/components/live-review-reply-animation.tsx` using `framer-motion`:
+     - Card 1 ("1 A review arrives"): Authentic Google Business Profile card for Smile Studio Dental, Andheri West, Mumbai, displaying customer Ritika's real 3-star review with timestamp and tags.
+     - Connector 1 ("Auto-fetch"): Continuously spinning `RotateCw` icon with animated SVG dashed gradient flow line (`strokeDasharray: "10 90"`, animating `strokeDashoffset`).
+     - Card 2 ("2 AI drafts the reply"): CustomerPilot AI header, fetched review summary, AI Drafted Response container with Gemini Pro badge, live typewriter typing letter-by-letter (22ms per char) with blinking cursor, tone selector ("Empathetic & Professional"), simulated mouse cursor gliding to button with click ripple effect, and dynamic morphing button (`Approve & publish` ➔ `Reply Published · Live on Google Maps`).
+     - Connector 2 ("One-click publish"): Pulsing `Send` icon with animated SVG dashed gradient flow line.
+     - Card 3 ("3 You approve, it publishes"): Google Business Profile card showing live published owner response with verified checkmark and date.
+     - Bottom Track ("Automation Loop Continues"): Spanning horizontal connection track with continuously rotating refresh icon and green status pulse.
+     - Hardened state transitions with `cycleIdRef` preventing race conditions between manual clicks and automatic timer loops.
+     - Added Pause/Resume control button for user inspection.
+  2. Integrated into `src/components/ai-google-review-qr-client.tsx` under `#live-animation` with hero jump button ("Watch Live AI Reply Demo ↓") and trust banner ("21,000+ Reviews Generated & Replied Across India").
+  3. Updated `InstructionFlow.md` Section 10 with `live-review-reply-animation.tsx` and test suite `verify_review_pilot_animation.js`.
+  4. Built and ran Playwright test suite `scripts/verify_review_pilot_animation.js` asserting all 3 cards, animated connectors, live typewriter, button click interaction, owner reply publication, and zero console errors. Saved visual screenshot `landing_ai_reviews_live_flow.png`.
+- **Status**: ✅ Resolved, Ground-Truth Audited & Verified.
+
+---
 ## [03 Oct 2026] Issue: Exact Real Digital Card Simulator Layout & Official 3-Tier Pricing Section (₹349, ₹499, ₹1499)
 - **Symptom**: User requested:
   1. `http://localhost:3000/smart-digital-business-card`: Show the exact layout of the actual Smart Digital Business Card as generated on CustomerPilot inside the mobile phone simulator (matching `/c/cake-connection`), so visitors immediately see exactly what their card looks like upon generation.

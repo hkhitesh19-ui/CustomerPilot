@@ -361,6 +361,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   └── super-admin/page.tsx       # Platform SuperAdmin Master Control Panel
 │   │
 │   ├── components/                    # Reusable React UI Components
+│   │   ├── live-review-reply-animation.tsx     # ReviewPilot-Style 3-Step Live Review & AI Reply Real-Time Simulation Engine (Framer Motion)
 │   │   ├── ai-google-review-qr-client.tsx      # Smart AI Google Review QR Generator Client Component (SEO/GEO/AEO)
 │   │   ├── ai-google-review-autoreply-client.tsx # 1-Click AI AutoReply Client Component (SEO/GEO/AEO)
 │   │   ├── customerpilot-complete-client.tsx    # CustomerPilot Complete All-in-One Client Component (SEO/GEO/AEO)
@@ -391,6 +392,7 @@ F:\CustomerPilot_ByGLM_July2026
 │       └── stamp-engine.ts            # Bill-to-Stamp Award & Redemption Logic
 │
 ├── scripts/                           # Production Health, Seed & Playwright Verification Scripts
+│   ├── verify_review_pilot_animation.js # Playwright ReviewPilot-Style 3-Step Live Review & Auto-Reply Flow Verification Suite
 │   ├── verify_landing_pages_enhanced.js # Playwright Enhanced Landing Pages Test Suite (5 Pages, Simulators, $100k Chassis, How It Works Infographics, Indian English)
 │   ├── capture_how_it_works.js        # Playwright How-It-Works Visual Infographics Screenshot Script
 │   ├── verify_light_mode.js           # Playwright Strict Light Mode & Theme Lock Assertion Suite (7 Routes)
