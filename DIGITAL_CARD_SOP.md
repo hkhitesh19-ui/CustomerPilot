@@ -34,6 +34,7 @@ R-6: PLAYWRIGHT VERIFICATION MUST PASS 100% before showing any result.
 R-7: NO git push or VPS deploy without explicit user confirmation ("kaam kar raha hai", "confirmed", "working").
 R-8: CodeRabbit is NOT a fact-checker. It only checks code quality.
      Business data is verified separately in Stage 4.
+R-9: DIRECT GOOGLE REVIEW MODAL LINK IS MANDATORY. The Google Review button/card MUST directly trigger Google's review submission dialog (`https://search.google.com/local/writereview?placeid=<PLACE_ID>`). NEVER link to raw GPS coordinates (e.g., `22°16'06.0"N...`) or map overview links (`maps/place/...`).
 
 ---
 
@@ -114,6 +115,7 @@ R-8: CodeRabbit is NOT a fact-checker. It only checks code quality.
   [ ] Logo URL: Only from official merchant website (skip if unavailable)
   [ ] Ordering Links: Zomato/Swiggy/Website for THIS specific branch
   [ ] Direction URL: Google Maps deep link for THIS exact branch location
+  [ ] Google Review Direct Link: https://search.google.com/local/writereview?placeid=<PLACE_ID>
 
 ### 2.4 Rating and Reviews — Strict Policy
 
@@ -128,6 +130,23 @@ R-8: CodeRabbit is NOT a fact-checker. It only checks code quality.
   DELIVERY PLATFORM COUNTS:
     Display ONLY IF user explicitly requests it.
     Label it clearly as "Delivery Ratings" — NEVER as "Google Reviews".
+
+### 2.5 Google Review Direct Link vs Google Maps Location Link (STRICT RULE)
+
+  Every digital card features TWO distinct Google map-related touchpoints. They serve completely different purposes and MUST NOT be conflated:
+
+  | Action Touchpoint    | Target URL Format                                                          | Behavior When Clicked                                                  |
+  |----------------------|----------------------------------------------------------------------------|------------------------------------------------------------------------|
+  | **Google Reviews**   | `https://search.google.com/local/writereview?placeid=<PLACE_ID>`           | Directly opens 5-star rating & review popup box immediately            |
+  | **Locate / Navigate**| `https://www.google.com/maps/dir/?api=1&destination=...` or `place_id:...` | Opens Google Maps app or web overview with turn-by-turn navigation      |
+
+  STRICTLY FORBIDDEN FOR GOOGLE REVIEW BUTTON:
+    1. NEVER use raw GPS coordinates (`query=22.2683216,73.138694`).
+       Reason: Drops an unlabelled road pin (`22°16'06.0"N...`) with ZERO business info or review option.
+    2. NEVER use the general Place Overview link (`https://www.google.com/maps/place/...`).
+       Reason: Opens the map photos & overview tab, forcing the customer to hunt for "Write a review".
+    3. MANDATORY FORMAT: Extract the official Google Place ID (e.g., `ChIJCYBASZnHXzkRZvLItnjimsk`) and format as:
+       `https://search.google.com/local/writereview?placeid=<PLACE_ID>`
 
 ---
 
@@ -217,6 +236,12 @@ CodeRabbit CANNOT replace this stage. MUST pass 100% before showing any result.
       pass: /online ordering platforms/i.test(bodyText) },
     { label: 'Save Contact button',
       pass: /save contact/i.test(bodyText) },
+
+    // GOOGLE REVIEW DIRECT LINK (must trigger writereview modal, not raw coordinates or place overview)
+    { label: 'Google Review link triggers writereview?placeid=',
+      pass: /search\.google\.com\/local\/writereview\?placeid=/i.test(googleReviewHref) &&
+            !googleReviewHref.includes('query=22.') &&
+            !googleReviewHref.startsWith('https://www.google.com/maps/place/') },
   ];
 
   // Mandatory font check
@@ -246,6 +271,7 @@ CodeRabbit CANNOT replace this stage. MUST pass 100% before showing any result.
     - Correct phone number
     - Correct business hours
     - ZERO dummy/placeholder data
+    - Google Review link targets `https://search.google.com/local/writereview?placeid=<PLACE_ID>`
     - Times New Roman font on non-link text (h1 element)
     - Logo image loaded (naturalWidth > 0)
     - Screenshot captured AND visually reviewed
@@ -400,6 +426,10 @@ Stage 4 handles data accuracy. Stage 5 handles code quality.
   Root Cause: Misunderstanding CodeRabbit's scope
   Prevention: Stage 4 Playwright is the ONLY data verification tool
 
+  Mistake: Google Review button opened GPS coordinates (22°16'06.0"N...) or Map overview page
+  Root Cause: Used raw latitude/longitude query or standard maps/place overview link instead of write review modal
+  Prevention: Always extract Google Place ID and format as `https://search.google.com/local/writereview?placeid=<PLACE_ID>`. Verify in Playwright that the button targets writereview.
+
 ---
 
 ## FINAL SOP CHECKLIST (COMPLETE PER CARD, EVERY TIME)
@@ -424,6 +454,8 @@ Stage 4 handles data accuracy. Stage 5 handles code quality.
   [ ] Category: from Google Business Profile
   [ ] Logo: from official website only (skipped if unavailable)
   [ ] Ordering Links: branch-specific URLs
+  [ ] Google Review Link: https://search.google.com/local/writereview?placeid=<PLACE_ID>
+  [ ] Navigation Link: Google Maps deep link for THIS branch
 
   STAGE 3 — DATABASE
   [ ] Seed script created/updated with all real data
@@ -435,6 +467,7 @@ Stage 4 handles data accuracy. Stage 5 handles code quality.
   [ ] Business name assertion: PASS
   [ ] Google Rating assertion: PASS
   [ ] Google Reviews Count assertion: PASS
+  [ ] Google Review direct modal link (writereview?placeid=...): PASS
   [ ] Branch area assertion: PASS (NOT brand HQ area)
   [ ] Phone number assertion: PASS
   [ ] Business hours assertion: PASS

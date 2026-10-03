@@ -18,6 +18,7 @@ This document serves as a historical record of all major bugs, configuration iss
   4. Updated Online Ordering "Directions" link to official directions URL with `destination_place_id=ChIJCYBASZnHXzkRZvLItnjimsk`.
   5. Added automated Playwright assertion in `scripts/verify_tasty_vadapav_atladara_card.js` asserting that the Google Reviews card href strictly matches `https://search.google.com/local/writereview?placeid=ChIJCYBASZnHXzkRZvLItnjimsk`.
   6. Verified in Playwright: 100% assertions passed.
+  7. Updated `DIGITAL_CARD_SOP.md` with Rule R-9 codifying the strict requirement for direct Google Review modal URLs (`search.google.com/local/writereview?placeid=...`) vs Navigation URLs, including Playwright assertion rules and mistake prevention.
 - **Status**: ✅ Resolved, Ground-Truth Audited & Verified.
 
 ---
