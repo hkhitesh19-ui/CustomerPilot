@@ -3,6 +3,32 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Oct 2026] Issue: Strategic SEO, AEO & GEO Triple-Pillar Architecture Implementation (WhatsApp Loyalty Wireframe, Stamp Me Interception & Smart Digital Card Silo)
+- **Symptom**: User requested a comprehensive gap analysis of CustomerPilot against a 5-phase SEO/AEO/GEO guide and commanded: *"Step 1 (WhatsApp Digital Loyalty Card ka wireframed landing page with Hinglish FAQs & Schema), Step 2 (Competitor Interception), Step 3 (Digital Business Card Silo) - one by one implement karo"*.
+- **Root Cause & Missing Pillars**:
+  1. High-intent queries ("WhatsApp loyalty program for retail", "Shop ke liye digital loyalty card kaise banaye", "Grahak ko discount dene wala app") were not targeted by a dedicated, zero-overlap silo page with structured schemas.
+  2. Stamp Me competitor interception page (`/vs/stamp-me`) was missing despite Stamp Me's high commercial intent, $49+/mo USD pricing, and 80%+ app download drop-off weakness.
+  3. Digital business card feature lacked a dedicated public marketing silo (`/smart-digital-business-card`).
+  4. FAQPage JSON-LD schemas were missing across feature and comparison subpages.
+- **Resolution**:
+  1. **Step 1 — WhatsApp Digital Loyalty Card Pillar**:
+     - Built `src/app/whatsapp-digital-loyalty-card/page.tsx` and `src/components/whatsapp-digital-loyalty-client.tsx` adhering 100% to the requested wireframe (H1, Agitation H2, GEO 3-Step SGE guide, AI Google Reviews cross-sell, CustomerPilot vs Stamp Me vs Paper Punch Cards table, and Hinglish H3 FAQs).
+     - Injected `FAQPageJsonLd` with Hindi/Hinglish search intent questions and `BreadcrumbJsonLd`.
+  2. **Step 2 — Competitor Interception (`/vs/stamp-me` & `/customerpilot-vs-stamp-me`)**:
+     - Built dedicated comparison pages with side-by-side pricing (₹49,000+ vs ₹2,249/yr), 10-point feature matrix, and FAQPage JSON-LD schema.
+  3. **Step 3 — Smart Digital Business Card Silo (`/smart-digital-business-card`)**:
+     - Built dedicated commerce-oriented landing page showcasing 1-Tap vCard contact saving, direct Google review modal integration, online catalog menus, and interactive feature matrix vs paper cards and Linktree.
+  4. **CodeRabbit Quality & Security Audit & Autofix**:
+     - Fixed `<a><button>` DOM nesting by implementing Radix UI `asChild` on all CTA buttons.
+     - Converted landing components to React Server Components (RSCs) by removing unnecessary `"use client"`.
+     - Hardened JSON-LD schema against script injection with `.replace(/</g, '\\u003c')`.
+     - Removed non-canonical `/customerpilot-vs-stamp-me` from XML sitemap to preserve canonical integrity.
+  5. **Playwright & Ground-Truth Verification**:
+     - Ran 19 automated assertions across all 3 pages (`scripts/verify_whatsapp_digital_loyalty_card.js` & `scripts/verify_seo_aeo_geo_pages.js`).
+     - Verified 100% PASS with zero dummy data and captured visual screenshots.
+- **Status**: ✅ Resolved, Ground-Truth Audited & Verified.
+
+---
 ## [03 Oct 2026] Issue: Google Reviews Card Opened Raw GPS Coordinates (22°16'06.0"N 73°08'19.3"E) Instead of Official Google Business Listing & Reviews
 - **Symptom**: User clicked the "Google Reviews" card on `http://localhost:3000/c/tasty-vadapav-atladara` and observed that Google Maps opened a raw GPS coordinate pin (`https://www.google.com/maps/place/22%C2%B016'06.0%22N+73%C2%B008'19.3%22E/@22.2683216,73.138694...`) instead of the business reviews page. User inquired: *"GoogleReview ki Link me ye kyu open hua ? ... jab ki Review ka page hi directly open hona chahiye tha"*.
 - **Root Cause**:
