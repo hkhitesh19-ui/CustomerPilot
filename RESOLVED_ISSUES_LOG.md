@@ -3,6 +3,21 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Oct 2026] Issue: Google Reviews Card Opened Raw GPS Coordinates (22°16'06.0"N 73°08'19.3"E) Instead of Official Google Business Listing & Reviews
+- **Symptom**: User clicked the "Google Reviews" card on `http://localhost:3000/c/tasty-vadapav-atladara` and observed that Google Maps opened a raw GPS coordinate pin (`https://www.google.com/maps/place/22%C2%B016'06.0%22N+73%C2%B008'19.3%22E/@22.2683216,73.138694...`) instead of the business reviews page. User inquired: *"GoogleReview ki Link me ye kyu open hua ? ... jab ki Review ka page hi directly open hona chahiye tha"*.
+- **Root Cause**:
+  1. The database record `googleMapsUrl` was set to a coordinate search query: `https://www.google.com/maps/search/?api=1&query=22.2683216,73.138694`.
+  2. When Google Maps evaluates a search query consisting purely of latitude/longitude (`22.2683216, 73.138694`) without a `place_id` or query string, it cannot identify which establishment is requested and falls back to dropping a generic pin on the geographic coordinates (`22°16'06.0"N 73°08'19.3"E`).
+  3. The "Google Reviews" utility card in `src/components/digital-card-view.tsx` used `card.googleMapsUrl`, thus inheriting the raw GPS coordinate link.
+- **Resolution**:
+  1. Extracted official Google Maps Place ID (`ChIJCYBASZnHXzkRZvLItnjimsk`) and Knowledge Panel CID (`14527172556127531622`).
+  2. Updated `googleMapsUrl` in `prisma/dev.db` and `scripts/seed_tasty_vadapav_atladara.js` to the exact Place ID URL: `https://www.google.com/maps/place/?q=place_id:ChIJCYBASZnHXzkRZvLItnjimsk`.
+  3. Updated Online Ordering "Directions" link to official directions URL with `destination_place_id=ChIJCYBASZnHXzkRZvLItnjimsk`.
+  4. Added automated assertion in `scripts/verify_tasty_vadapav_atladara_card.js` verifying that the Google Reviews card links directly to the Place ID (`ChIJCYBASZnHXzkRZvLItnjimsk`) and never contains raw coordinates (`22.2683216`).
+  5. Ran Playwright test and verified 100% pass: clicking the link now directly opens the official Google Maps business profile with Name, Rating, Photos, and Reviews tab.
+- **Status**: ✅ Resolved, Ground-Truth Audited & Verified.
+
+---
 ## [03 Oct 2026] Issue: 100% Ground-Truth Digital Business Card Generation for Tasty Vadapav (Atladara Padra Road Branch) via Strict SOP Pipeline
 - **Symptom**: User provided Google Maps share link `https://share.google/e4KaDhkoaBpXkFa2e` with request: *"iska Digital Business card generate karo"*.
 - **Root Cause & Data Verification**:

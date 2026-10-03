@@ -27,7 +27,7 @@ async function main() {
     { platform: "website", label: "Website", sublabel: "Menu", url: "https://tastyvadapav.com", color: "bg-blue-600" },
     { platform: "whatsapp", label: "WhatsApp", sublabel: "Order", url: "https://wa.me/919328112314?text=Hi%20Tasty%20Vadapav%2C%20I%20want%20to%20order", color: "bg-[#25D366]" },
     { platform: "swiggy", label: "Swiggy", sublabel: "Order", url: "https://www.swiggy.com/restaurants/tasty-vadapav-atladara-padra-road-nizampura-vala-vadodara-877717", color: "bg-[#fc8019]" },
-    { platform: "directions", label: "Directions", sublabel: "Visit", url: "https://www.google.com/maps/search/?api=1&query=22.2683216,73.138694", color: "bg-amber-600" }
+    { platform: "directions", label: "Directions", sublabel: "Visit", url: "https://www.google.com/maps/dir/?api=1&destination=Tasty+vadapav+Atladara+padra+road(nizampura+vala)&destination_place_id=ChIJCYBASZnHXzkRZvLItnjimsk", color: "bg-amber-600" }
   ];
 
   // 2. Upsert DigitalBusinessCard
@@ -46,7 +46,7 @@ async function main() {
       instagramUrl: 'https://www.instagram.com/tasty.vadapav/',
       facebookUrl: 'https://www.facebook.com/tastyvadapav/',
       youtubeUrl: '',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=22.2683216,73.138694',
+      googleMapsUrl: 'https://www.google.com/maps/place/?q=place_id:ChIJCYBASZnHXzkRZvLItnjimsk',
       websiteUrl: 'https://tastyvadapav.com',
       googleRating: 4.0,
       googleReviewsCnt: 52,
@@ -68,7 +68,7 @@ async function main() {
       instagramUrl: 'https://www.instagram.com/tasty.vadapav/',
       facebookUrl: 'https://www.facebook.com/tastyvadapav/',
       youtubeUrl: '',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=22.2683216,73.138694',
+      googleMapsUrl: 'https://www.google.com/maps/place/?q=place_id:ChIJCYBASZnHXzkRZvLItnjimsk',
       websiteUrl: 'https://tastyvadapav.com',
       googleRating: 4.0,
       googleReviewsCnt: 52,
