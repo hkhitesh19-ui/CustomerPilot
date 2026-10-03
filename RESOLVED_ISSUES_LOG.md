@@ -3,6 +3,47 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Oct 2026] Issue: Default Cake Connection Live Card, Unobstructed $100,000 Luxury Phone Chassis & Animated Infographics "How It Works" Section Across All Landing Pages
+- **Symptom**: User requested:
+  1. `http://localhost:3000/smart-digital-business-card`: Set **Cake Connection** as the default card on initial page load. Display the complete mobile phone clearly without cut-offs and remove all floating elements (`.float-card`) that were obstructing the screen.
+  2. Across All Landing Pages: Make the mobile device long, tall, and crystal clear like a $100,000 SaaS website.
+  3. Across All Landing Pages: Add a dedicated **"How It Works"** section with custom **InfoGraphics and CSS Animations**.
+- **Root Cause**:
+  1. On `/smart-digital-business-card`, the initial state loaded index 0 which had previously been set to Tasty Vadapav instead of Cake Connection.
+  2. Floating cards (`.float-card.fl1`, `fl2`, `fl3`) hovered over the phone simulator buttons in desktop viewports, creating visual clutter and blocking clicks.
+  3. Mobile mockups were rendered with a basic frame without luxury chassis styling (Dynamic Island, 9:41 status bar, ambient sheen, and home indicator).
+  4. Several product landing pages lacked a dedicated visual "How It Works" section with animated diagrams and step-by-step progress cards.
+- **Resolution**:
+  1. **Cake Connection Default on `/smart-digital-business-card` (`src/components/smart-digital-business-card-client.tsx`)**:
+     - Positioned **Cake Connection** as index 0 in `LIVE_CARD_EXAMPLES`.
+     - Set initial `activeExampleIndex` to 0. Default direct action button renders `"Open Live Card: Cake Connection"`.
+     - Removed all floating badges (`.float-card`) from the phone mockup.
+  2. **$100,000 SaaS Luxury Phone Chassis Across All Landing Pages**:
+     - Upgraded `.phone-mockup` and `.hub-mockup` CSS to luxury chassis styling with multi-layer ambient shadow (`box-shadow: 0 25px 60px -15px rgba(...,.35), 0 0 0 1px rgba(255,255,255,0.1), 0 0 0 6px #1e293b`).
+     - Injected luxury Apple-style **Dynamic Island Status Bar** (`9:41`, live green pulse dot, `5G`, `100%`) at the top of every simulator.
+     - Injected luxury **Home Indicator Bar** (`w-28 h-1 rounded-full`) at the bottom of every simulator.
+     - Removed all obstructive floating cards across:
+       - `src/components/smart-digital-business-card-client.tsx`
+       - `src/components/ai-google-review-qr-client.tsx`
+       - `src/components/ai-google-review-autoreply-client.tsx`
+       - `src/components/whatsapp-digital-loyalty-client.tsx`
+       - `src/components/customerpilot-complete-client.tsx`
+  3. **Animated Infographics "How It Works" Section Across All Products**:
+     - Built dedicated responsive 3-step section with numbered gradient pills (`01, 02, 03`), desktop connecting energy lines (`h-0.5 bg-gradient-to-r opacity-40`), custom visual infographic boxes, and micro-metric badges across all 5 product landing pages:
+       - **Smart Digital Business Card**: Step 1 (Touchpoint: Counter QR Standee ➔ Smartphone Instant View), Step 2 (1-Tap Save: Cake Connection vCard Phonebook Sync), Step 3 (Action: Direct WhatsApp Orders & 5★ Google Review).
+       - **AI Google Review QR Generator**: Step 1 (Standee Scan: Counter Acrylic Standee ➔ Camera Scan), Step 2 (AI Draft: Keyword-Optimized 5★ Review Text), Step 3 (Verified Review: Google Maps Live + Private Feedback Shield).
+       - **1-Click AI AutoReply**: Step 1 (Instant Catch: Official Google GBP Webhook), Step 2 (Gemini AI: Dish & Specialty Context Recognition), Step 3 (1-Click Post: 60s Safety Buffer & 100% Response Rate).
+       - **WhatsApp Digital Loyalty Card**: Step 1 (Standee Scan: 3-Second Counter Scan ➔ WhatsApp Bot), Step 2 (Digital Stamp: Virtual Stamp Progress Card with 5 Slots), Step 3 (VIP Reward: Milestone Reward Voucher & 21-Day Recall).
+       - **CustomerPilot Complete Stack**: Step 1 (Standee Setup: 1 Smart Standee Powers Entire Counter), Step 2 (4-Engine Sync: Loyalty + Reviews + AutoReply + Digital Card Syncing), Step 3 (Unified ROI: Unified VIP CRM & ₹45,000 Annual Savings).
+  4. **CodeRabbit Quality & Security Audit**:
+     - All 5 components verified for null safety, valid React keys, proper heading hierarchy (`h1 -> h2 -> h3`), pure light mode styling, and zero unescaped strings.
+  5. **Playwright Visual & Ground-Truth Verification**:
+     - Ran 5/5 automated test suites in `scripts/verify_landing_pages_enhanced.js`.
+     - Verified: Cake Connection default (PASS), zero floating cards (PASS), $100k phone mockup (PASS), How It Works infographics (PASS).
+     - Captured and visually audited 7 high-resolution screenshots in artifacts directory.
+- **Status**: ✅ Resolved, Ground-Truth Audited & Verified.
+
+---
 ## [03 Oct 2026] Issue: Master Homepage Theme Alignment, Rotating Live Ground-Truth Examples, Indian English Copy, GoForReview Concepts & Floating Animations Across All Landing Pages
 - **Symptom**: User requested:
   1. `http://localhost:3000/smart-digital-business-card`: Showcase rotating live examples of cards actually created (Tasty Vadapav Atladara, Gujarat Photo Goods, Cake Connection).

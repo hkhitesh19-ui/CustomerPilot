@@ -63,6 +63,24 @@ const CARD_FAQS: DualLangFaqItem[] = [
 // 100% Verified Ground-Truth Live Digital Card Examples (Zero dummy data)
 const LIVE_CARD_EXAMPLES = [
   {
+    id: "cake-connection",
+    name: "Cake Connection",
+    branch: "Designer Birthday & Wedding Cakes",
+    category: "Artisan Bakery & Dessert Cafe • Manjalpur",
+    address: "Opp. Shreyas School, Manjalpur, Vadodara, Gujarat 390011",
+    shortAddress: "Opp. Shreyas School, Manjalpur, Vadodara",
+    phone: "+91 72038 24012",
+    rating: "4.8",
+    reviewCount: "520+",
+    hours: "Open Daily • 9:00 AM – 11:00 PM",
+    slug: "cake-connection",
+    bgAccent: "from-rose-500 via-pink-600 to-purple-600",
+    badgeColor: "bg-pink-100 text-pink-900 border-pink-300",
+    icon: ShoppingBag,
+    initials: "CC",
+    specialties: ["Custom Cakes", "Dessert Cafe", "WhatsApp Catalog", "1-Tap vCard"]
+  },
+  {
     id: "tasty-vadapav",
     name: "Tasty Vadapav",
     branch: "Atladara-Padra Road Branch",
@@ -97,24 +115,6 @@ const LIVE_CARD_EXAMPLES = [
     icon: Camera,
     initials: "GP",
     specialties: ["Sony α Cinema", "Nikon Mirrorless", "DJI Gimbals", "Instant WhatsApp Catalog"]
-  },
-  {
-    id: "cake-connection",
-    name: "Cake Connection",
-    branch: "Designer Birthday & Wedding Cakes",
-    category: "Artisan Bakery & Dessert Cafe",
-    address: "Opp. Shreyas School, Manjalpur, Vadodara, Gujarat 390011",
-    shortAddress: "Opp. Shreyas School, Manjalpur, Vadodara",
-    phone: "+91 72038 24012",
-    rating: "4.6",
-    reviewCount: "689+",
-    hours: "Open Daily • 9:00 AM – 11:00 PM",
-    slug: "cake-connection",
-    bgAccent: "from-pink-500 to-rose-600",
-    badgeColor: "bg-pink-100 text-pink-900 border-pink-300",
-    icon: ShoppingBag,
-    initials: "CC",
-    specialties: ["Designer Cakes", "Cupcakes", "WhatsApp Ordering", "Loyalty Rewards"]
   }
 ]
 
@@ -157,14 +157,20 @@ export function SmartDigitalBusinessCardClient() {
         .dot-live i { position: absolute; inset: 0; border-radius: 50%; background: #06b6d4; }
         .dot-live i:first-child { animation: ping 1.6s cubic-bezier(0,0,.2,1) infinite; opacity: .7; }
         @keyframes ping { 75%,100%{transform:scale(2.2);opacity:0} }
-        .float-card { position: absolute; z-index: 20; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); border-radius: 16px; padding: 10px 14px; box-shadow: 0 12px 30px -10px rgba(15,23,42,.18); display: flex; align-items: center; gap: 10px; animation: bob 5s ease-in-out infinite; border: 1px solid rgba(226,232,240,.9); pointer-events: none; user-select: none; }
-        @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        .fl1 { top: 20px; left: -20px; }
-        .fl2 { bottom: 50px; right: -20px; animation-delay: 1.5s; }
-        .fl3 { top: 48%; right: -25px; animation-delay: 2.8s; }
-        @media(max-width:640px){ .fl1{left:-5px; top:10px} .fl2{right:-5px; bottom:20px} .fl3{display:none} }
-        .phone-mockup { width: 310px; border-radius: 36px; background: #0f172a; padding: 10px; box-shadow: 0 25px 50px -12px rgba(6,182,212,.28), 0 0 0 1px rgba(255,255,255,0.1); }
-        @media(min-width:640px){ .phone-mockup { width: 330px; } }
+        .phone-mockup {
+          width: 100%;
+          max-width: 350px;
+          border-radius: 50px;
+          background: #0f172a;
+          padding: 10px;
+          box-shadow: 0 40px 90px -20px rgba(15,23,42,0.35), 0 0 0 1px rgba(255,255,255,0.12), 0 0 0 4px #1e293b;
+          position: relative;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .phone-mockup:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 50px 100px -25px rgba(6,182,212,0.28), 0 0 0 1px rgba(255,255,255,0.18), 0 0 0 4px #1e293b;
+        }
       `}</style>
 
       {/* Sticky Header */}
@@ -275,140 +281,121 @@ export function SmartDigitalBusinessCardClient() {
                   ))}
                 </div>
 
-                {/* Mobile Mockup with Floating Badges */}
-                <div className="relative">
-                  {/* Floating Badge 1: Top Left */}
-                  <div className="float-card fl1">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm font-black shadow-xs">
-                      ★
+                {/* Phone Device Container */}
+                <div className="phone-mockup">
+                  <div className="rounded-[40px] overflow-hidden bg-white text-slate-900 shadow-inner flex flex-col">
+                    
+                    {/* Top Phone Status Bar with Dynamic Island */}
+                    <div className="pt-2.5 pb-2 px-6 flex items-center justify-between text-[11px] font-bold text-white bg-slate-950 select-none border-b border-white/10">
+                      <span className="tracking-tight">9:41</span>
+                      <div className="w-24 h-4 bg-black rounded-full flex items-center justify-end px-2 border border-slate-800">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[10px] opacity-90">
+                        <span>5G</span>
+                        <span>100%</span>
+                      </div>
                     </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">{activeCard.rating} ★ Rating Synced</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Google Business Profile</div>
-                    </div>
-                  </div>
 
-                  {/* Floating Badge 2: Bottom Right */}
-                  <div className="float-card fl2">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
-                      <Download className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">1-Tap Save Contact</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Added to Phonebook (.vcf)</div>
-                    </div>
-                  </div>
-
-                  {/* Floating Badge 3: Center Right */}
-                  <div className="float-card fl3">
-                    <div className="w-8 h-8 rounded-xl bg-cyan-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
-                      <MessageSquare className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">Direct WhatsApp Chat</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Instant Orders &amp; Inquiry</div>
-                    </div>
-                  </div>
-
-                  {/* Phone Device Container */}
-                  <div className="phone-mockup">
-                    <div className="rounded-[28px] overflow-hidden bg-white text-slate-900 shadow-inner flex flex-col">
-                      
-                      {/* Top Phone Status & Card Header */}
-                      <div className={`p-4 bg-gradient-to-r ${activeCard.bgAccent} text-white space-y-2`}>
-                        <div className="flex items-center justify-between text-[11px] opacity-90 font-medium">
-                          <span>Live Digital Card</span>
-                          <span className="bg-white/20 px-2 py-0.5 rounded-full font-bold">100% Real</span>
-                        </div>
-
-                        <div className="flex items-center gap-3 pt-1">
-                          <div className="w-12 h-12 rounded-2xl bg-white text-slate-900 font-black text-lg flex items-center justify-center shadow-md">
-                            {activeCard.initials}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-black text-base leading-tight truncate text-white">{activeCard.name}</h3>
-                            <p className="text-[11px] text-white/90 truncate">{activeCard.branch}</p>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className="bg-white/20 px-1.5 py-0.5 rounded text-[9px] font-bold">
-                                {activeCard.rating} ★ ({activeCard.reviewCount})
-                              </span>
-                              <span className="text-[10px] text-white/90">Verified Merchant</span>
-                            </div>
-                          </div>
-                        </div>
+                    {/* Top Phone Status & Card Header */}
+                    <div className={`p-5 bg-gradient-to-r ${activeCard.bgAccent} text-white space-y-3`}>
+                      <div className="flex items-center justify-between text-[11px] opacity-90 font-medium">
+                        <span>Live Digital Card</span>
+                        <span className="bg-white/20 px-2 py-0.5 rounded-full font-bold">100% Real</span>
                       </div>
 
-                      {/* Card Body Buttons & Details */}
-                      <div className="p-4 space-y-3 bg-slate-50/60 text-xs">
-                        {/* Quick 2-Column Action Grid */}
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2">
-                            <Download className="w-4 h-4 text-emerald-600 shrink-0" />
-                            <div className="min-w-0">
-                              <div className="font-bold text-[11px] text-slate-900 truncate">Save Contact</div>
-                              <div className="text-[9px] text-slate-500">1-Tap vCard</div>
-                            </div>
-                          </div>
-
-                          <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2">
-                            <Phone className="w-4 h-4 text-blue-600 shrink-0" />
-                            <div className="min-w-0">
-                              <div className="font-bold text-[11px] text-slate-900 truncate">Call Direct</div>
-                              <div className="text-[9px] text-slate-500">{activeCard.phone}</div>
-                            </div>
-                          </div>
-
-                          <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2">
-                            <MessageSquare className="w-4 h-4 text-emerald-600 shrink-0" />
-                            <div className="min-w-0">
-                              <div className="font-bold text-[11px] text-slate-900 truncate">WhatsApp</div>
-                              <div className="text-[9px] text-slate-500">Direct order</div>
-                            </div>
-                          </div>
-
-                          <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2">
-                            <Star className="w-4 h-4 text-amber-500 shrink-0" />
-                            <div className="min-w-0">
-                              <div className="font-bold text-[11px] text-slate-900 truncate">Google Review</div>
-                              <div className="text-[9px] text-slate-500">5-Star modal</div>
-                            </div>
-                          </div>
+                      <div className="flex items-center gap-3 pt-1">
+                        <div className="w-13 h-13 rounded-2xl bg-white text-slate-900 font-black text-xl flex items-center justify-center shadow-lg">
+                          {activeCard.initials}
                         </div>
-
-                        {/* Location Pill with shortAddress to prevent ellipsis clipping */}
-                        <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
-                          <div className="min-w-0 flex-1">
-                            <div className="font-bold text-[11px] text-slate-900">{activeCard.shortAddress}</div>
-                            <div className="text-[9px] text-slate-500 flex items-center gap-1 mt-0.5">
-                              <Clock className="w-3 h-3 text-slate-400" />
-                              <span>{activeCard.hours}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Specialties Chips */}
-                        <div className="flex flex-wrap gap-1 pt-1">
-                          {activeCard.specialties.map((s, idx) => (
-                            <span key={idx} className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[10px] font-semibold text-slate-600">
-                              {s}
+                        <div className="flex-1 min-w-0">
+                          <div data-testid="phone-store-name" className="phone-store-name font-black text-base leading-tight truncate text-white">{activeCard.name}</div>
+                          <p className="text-[11px] text-white/90 truncate">{activeCard.branch}</p>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <span className="bg-white/25 px-2 py-0.5 rounded text-[10px] font-extrabold text-white shadow-xs">
+                              {activeCard.rating} ★ ({activeCard.reviewCount})
                             </span>
-                          ))}
+                            <span className="text-[10px] text-white/95 font-semibold">Verified Merchant</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Body Buttons & Details */}
+                    <div className="p-4 space-y-3 bg-slate-50/60 text-xs">
+                      {/* Quick 2-Column Action Grid */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2.5 hover:border-cyan-300 transition">
+                          <Download className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <div className="min-w-0">
+                            <div className="font-bold text-[11px] text-slate-900 truncate">Save Contact</div>
+                            <div className="text-[9px] text-slate-500 font-medium">1-Tap vCard</div>
+                          </div>
                         </div>
 
-                        {/* Click to open full card */}
-                        <Link
-                          href={`/c/${activeCard.slug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full mt-2 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-sm"
-                        >
-                          <span>Open Full Live Card</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </Link>
+                        <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2.5 hover:border-cyan-300 transition">
+                          <Phone className="w-4 h-4 text-blue-600 shrink-0" />
+                          <div className="min-w-0">
+                            <div className="font-bold text-[11px] text-slate-900 truncate">Call Direct</div>
+                            <div className="text-[9px] text-slate-500 font-medium">{activeCard.phone}</div>
+                          </div>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2.5 hover:border-cyan-300 transition">
+                          <MessageSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <div className="min-w-0">
+                            <div className="font-bold text-[11px] text-slate-900 truncate">WhatsApp</div>
+                            <div className="text-[9px] text-slate-500 font-medium">Direct order</div>
+                          </div>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2.5 hover:border-cyan-300 transition">
+                          <Star className="w-4 h-4 text-amber-500 shrink-0" />
+                          <div className="min-w-0">
+                            <div className="font-bold text-[11px] text-slate-900 truncate">Google Review</div>
+                            <div className="text-[9px] text-slate-500 font-medium">5-Star modal</div>
+                          </div>
+                        </div>
                       </div>
 
+                      {/* Location Pill with shortAddress to prevent ellipsis clipping */}
+                      <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2.5">
+                        <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <div className="font-bold text-[11px] text-slate-900">{activeCard.shortAddress}</div>
+                          <div className="text-[9px] text-slate-500 flex items-center gap-1 mt-0.5">
+                            <Clock className="w-3 h-3 text-slate-400" />
+                            <span>{activeCard.hours}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Specialties Chips */}
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {activeCard.specialties.map((s) => (
+                          <span key={`${activeCard.id}-${s}`} className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[10px] font-semibold text-slate-600">
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Click to open full card */}
+                      <Link
+                        href={`/c/${activeCard.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full mt-2 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md hover:scale-[1.02]"
+                      >
+                        <span>Open Full Live Card</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </Link>
                     </div>
+
+                    {/* Bottom Phone Home Indicator */}
+                    <div className="py-2.5 bg-slate-50 flex justify-center border-t border-slate-200">
+                      <div className="w-28 h-1 bg-slate-300 rounded-full"></div>
+                    </div>
+
                   </div>
                 </div>
 
@@ -441,6 +428,156 @@ export function SmartDigitalBusinessCardClient() {
                 <div className="text-3xl font-black text-emerald-600">₹0</div>
                 <div className="text-xs text-slate-600 font-medium">Re-Printing Cost on Detail Updates</div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============ HOW IT WORKS WITH INFOGRAPHICS & ANIMATION ============ */}
+        <section className="py-16 md:py-24 bg-gradient-to-b from-white via-cyan-50/30 to-white relative overflow-hidden border-b border-slate-200/80">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-14 relative z-10">
+            <div className="text-center max-w-2xl mx-auto space-y-3">
+              <span className="text-cyan-700 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-cyan-50 border border-cyan-200">
+                Simple 3-Step Process
+              </span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
+                How Your Smart Digital Business Card Works
+              </h2>
+              <p className="text-slate-600 text-xs sm:text-sm">
+                No apps to download. Zero re-printing costs. Here is how customers experience your store in 3 seamless steps:
+              </p>
+            </div>
+
+            {/* 3-Step Infographics with Animated Connectors */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+              {/* Desktop Connecting Line */}
+              <div className="hidden md:block absolute top-1/2 left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-cyan-400 via-emerald-400 to-indigo-400 -translate-y-8 z-0 opacity-40"></div>
+
+              {/* Step 1 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-cyan-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-cyan-600 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      01
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200">
+                      Step 1 • Touchpoint
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: Counter QR & Phone Tap */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-cyan-50 to-slate-50 border border-cyan-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="flex items-center gap-3">
+                      <div className="w-16 h-20 rounded-xl bg-white border border-slate-300 shadow-sm p-2 flex flex-col items-center justify-center text-center">
+                        <QrCode className="w-8 h-8 text-cyan-600" />
+                        <span className="text-[8px] font-bold text-slate-700 mt-1">Scan Standee</span>
+                      </div>
+                      <div className="text-cyan-500 font-bold text-lg animate-pulse">➔</div>
+                      <div className="w-16 h-20 rounded-xl bg-slate-900 border border-slate-700 shadow-md p-1.5 flex flex-col items-center justify-center text-white">
+                        <Smartphone className="w-6 h-6 text-cyan-400 animate-bounce" />
+                        <span className="text-[8px] font-bold text-slate-300 mt-1">Instant View</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    1. Tap NFC or Scan Counter QR
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Customer taps your smart NFC card or scans your billing counter acrylic QR standee with their phone camera. No mobile app download required.
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-cyan-700 font-semibold">
+                  <span>⚡ Opens in &lt; 1.5 seconds</span>
+                  <span className="text-slate-400">Works on iOS &amp; Android</span>
+                </div>
+              </div>
+
+              {/* Step 2 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-emerald-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      02
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      Step 2 • 1-Tap Save
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: vCard Syncing */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-emerald-50 to-slate-50 border border-emerald-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="p-2.5 rounded-xl bg-white border border-emerald-200 shadow-sm w-full max-w-[200px] space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-xs">
+                          CC
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-[10px] font-bold text-slate-900 truncate">Cake Connection</div>
+                          <div className="text-[8px] text-slate-500">Contact Card (.vcf)</div>
+                        </div>
+                      </div>
+                      <div className="bg-emerald-600 text-white rounded-lg py-1 px-2 text-[9px] font-bold flex items-center justify-center gap-1">
+                        <Download className="w-3 h-3" />
+                        <span>Saved to Contacts</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    2. 1-Tap Save to Phone Contacts
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Customer taps &quot;Save Contact&quot;. Your store name, verified phone, address, and social links instantly download into their native phonebook (.vcf).
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-emerald-700 font-semibold">
+                  <span>📱 100% Phonebook Sync</span>
+                  <span className="text-slate-400">Zero typing errors</span>
+                </div>
+              </div>
+
+              {/* Step 3 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-indigo-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-indigo-600 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      03
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                      Step 3 • Action
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: Orders & Reviews */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-indigo-50 to-slate-50 border border-indigo-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="grid grid-cols-2 gap-2 w-full max-w-[200px]">
+                      <div className="p-2 rounded-xl bg-white border border-slate-200 shadow-xs text-center space-y-1">
+                        <MessageSquare className="w-4 h-4 text-emerald-600 mx-auto" />
+                        <span className="text-[9px] font-bold text-slate-800 block">WhatsApp Order</span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-white border border-slate-200 shadow-xs text-center space-y-1">
+                        <Star className="w-4 h-4 text-amber-500 fill-amber-500 mx-auto" />
+                        <span className="text-[9px] font-bold text-slate-800 block">5★ Google Review</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    3. Direct WhatsApp Orders &amp; Reviews
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Customer connects directly via WhatsApp for orders and inquiries, or taps once to post a 5-star Google Review to boost your store ranking.
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-indigo-700 font-semibold">
+                  <span>⭐ 5X Review Conversion</span>
+                  <span className="text-slate-400">Direct lifetime channel</span>
+                </div>
+              </div>
+
             </div>
           </div>
         </section>

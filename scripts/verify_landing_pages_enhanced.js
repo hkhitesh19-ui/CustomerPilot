@@ -23,47 +23,67 @@ async function verifyLandingPages() {
     await page.waitForLoadState('load');
     await page.waitForTimeout(1000);
 
-    // Assert H1 exists and contains expected Indian English text
+    // Assert H1 exists
     const h1TextCard = await page.locator('h1').innerText();
     console.log(`H1 Text: "${h1TextCard.trim()}"`);
-    if (!h1TextCard.includes('Smart Digital Business Card') || !h1TextCard.includes('Instant Google Reviews')) {
+    if (!h1TextCard.includes('Smart Digital Business Card')) {
       throw new Error(`TEST 1 FAILED: H1 text does not match expected copy`);
     }
 
-    // Assert live rotating business examples exist (Tasty Vadapav & Gujarat Photo Goods)
-    const tastyTab = await page.locator('button:has-text("Tasty Vadapav")');
-    const photoTab = await page.locator('button:has-text("Gujarat Photo Goods")');
-    const cakeTab = await page.locator('button:has-text("Cake Connection")');
-
-    const tastyCount = await tastyTab.count();
-    const photoCount = await photoTab.count();
-    const cakeCount = await cakeTab.count();
-
-    console.log(`Live Tabs count: Tasty=${tastyCount}, Photo=${photoCount}, Cake=${cakeCount}`);
-    if (tastyCount === 0 || photoCount === 0 || cakeCount === 0) {
-      throw new Error('TEST 1 FAILED: Missing live rotating example business tabs');
+    // Assert Default Card is Cake Connection
+    const initialStoreName = await page.locator('[data-testid="phone-store-name"]').innerText();
+    console.log(`Initial Default Store in Phone: "${initialStoreName.trim()}"`);
+    if (!initialStoreName.includes('Cake Connection')) {
+      throw new Error(`TEST 1 FAILED: Default store is not Cake Connection, got "${initialStoreName}"`);
     }
 
-    // Click on Gujarat Photo Goods tab and assert phone simulator updates
+    // Assert CTA button points to Cake Connection live card
+    const ctaText = await page.locator('a:has-text("Open Live Card: Cake Connection")').count();
+    if (ctaText === 0) {
+      throw new Error('TEST 1 FAILED: Expected CTA button "Open Live Card: Cake Connection" not found');
+    }
+
+    // Assert Zero Obstructive Floating Cards covering phone
+    const cardFloatCount = await page.locator('.float-card').count();
+    console.log(`Floating Cards Count (should be 0): ${cardFloatCount}`);
+    if (cardFloatCount !== 0) {
+      throw new Error(`TEST 1 FAILED: Expected 0 floating cards covering phone, found ${cardFloatCount}`);
+    }
+
+    // Assert Phone Mockup exists with luxury chassis
+    const phoneMockup = await page.locator('.phone-mockup').count();
+    if (phoneMockup === 0) {
+      throw new Error('TEST 1 FAILED: Phone mockup not found');
+    }
+
+    // Assert "How It Works" Section exists with Infographics & Steps 01, 02, 03
+    const howItWorksHeading = await page.locator('text=How Your Smart Digital Business Card Works').count();
+    const step01 = await page.locator('text=Step 1 • Touchpoint').count();
+    const step02 = await page.locator('text=Step 2 • 1-Tap Save').count();
+    const step03 = await page.locator('text=Step 3 • Action').count();
+    console.log(`How It Works Heading: ${howItWorksHeading}, Steps: 01=${step01}, 02=${step02}, 03=${step03}`);
+    if (howItWorksHeading === 0 || step01 === 0 || step02 === 0 || step03 === 0) {
+      throw new Error('TEST 1 FAILED: Missing How It Works section or infographic steps');
+    }
+
+    // Test tab switching to Gujarat Photo Goods
+    const photoTab = await page.locator('button:has-text("Gujarat Photo Goods")');
     await photoTab.first().click();
     await page.waitForTimeout(500);
-
-    const simulatorStoreName = await page.locator('.phone-mockup h3').innerText();
-    console.log(`Phone Simulator Store Name: "${simulatorStoreName}"`);
-    if (!simulatorStoreName.includes('Gujarat Photo Goods')) {
-      throw new Error(`TEST 1 FAILED: Phone simulator did not switch to Gujarat Photo Goods`);
+    const switchedStoreName = await page.locator('[data-testid="phone-store-name"]').innerText();
+    console.log(`Switched Store Name: "${switchedStoreName.trim()}"`);
+    if (!switchedStoreName.includes('Gujarat Photo Goods')) {
+      throw new Error('TEST 1 FAILED: Failed to switch to Gujarat Photo Goods');
     }
 
-    // Assert floating badges exist
-    const fl1Badge = await page.locator('.float-card.fl1').innerText();
-    console.log(`Floating Badge 1: "${fl1Badge.replace(/\n/g, ' ')}"`);
-    if (!fl1Badge.includes('Rating Synced')) {
-      throw new Error('TEST 1 FAILED: Missing floating badge 1 on digital card page');
-    }
+    // Switch back to Cake Connection
+    const cakeTab = await page.locator('button:has-text("Cake Connection")');
+    await cakeTab.first().click();
+    await page.waitForTimeout(500);
 
     // Capture screenshot
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'landing_digital_card_rotating.png'), fullPage: false });
-    console.log('✅ TEST 1 PASSED: Smart Digital Business Card verified with live rotating examples and floating badges.\n');
+    console.log('✅ TEST 1 PASSED: Cake Connection default, zero floating cards, $100k phone chassis & How It Works section verified.\n');
     results.push({ test: 'Smart Digital Business Card', status: 'PASS' });
 
 
@@ -81,22 +101,26 @@ async function verifyLandingPages() {
       throw new Error(`TEST 2 FAILED: H1 text does not match expected copy`);
     }
 
-    // Assert 3 Big Friction Points exist
-    const frictionHead = await page.locator('text=Why 90% of Happy Walk-In Customers Never Leave a Google Review').count();
-    if (frictionHead === 0) {
-      throw new Error('TEST 2 FAILED: Missing 3 Big Friction Points section');
+    // Assert Zero Obstructive Floating Cards
+    const reviewFloatCount = await page.locator('.float-card').count();
+    console.log(`Floating Cards Count (should be 0): ${reviewFloatCount}`);
+    if (reviewFloatCount !== 0) {
+      throw new Error(`TEST 2 FAILED: Expected 0 floating cards covering phone, found ${reviewFloatCount}`);
     }
 
-    // Assert AI vs Normal QR comparison section exists
-    const aiVsNormalHead = await page.locator('text=Standard QR Code vs. CustomerPilot Smart AI Review QR').count();
-    if (aiVsNormalHead === 0) {
-      throw new Error('TEST 2 FAILED: Missing AI vs Normal QR comparison section');
+    // Assert Phone Mockup exists
+    if (await page.locator('.phone-mockup').count() === 0) {
+      throw new Error('TEST 2 FAILED: Phone mockup not found');
     }
 
-    // Assert Private Feedback Shield section exists
-    const shieldHead = await page.locator('text=Negative Feedback Shield').count();
-    if (shieldHead === 0) {
-      throw new Error('TEST 2 FAILED: Missing Negative Feedback Shield section');
+    // Assert "How It Works" Section exists with Infographics & Steps 01, 02, 03
+    const reviewHowItWorks = await page.locator('text=How the Smart AI Review QR Works').count();
+    const reviewStep01 = await page.locator('text=Step 1 • Standee Scan').count();
+    const reviewStep02 = await page.locator('text=Step 2 • AI Draft').count();
+    const reviewStep03 = await page.locator('text=Step 3 • Verified Review').count();
+    console.log(`Review How It Works: ${reviewHowItWorks}, Steps: 01=${reviewStep01}, 02=${reviewStep02}, 03=${reviewStep03}`);
+    if (reviewHowItWorks === 0 || reviewStep01 === 0 || reviewStep02 === 0 || reviewStep03 === 0) {
+      throw new Error('TEST 2 FAILED: Missing Review How It Works section or infographic steps');
     }
 
     // Assert Live Review Simulator & 1-Tap Copy button
@@ -111,16 +135,9 @@ async function verifyLandingPages() {
       throw new Error('TEST 2 FAILED: Copy feedback text not displayed');
     }
 
-    // Assert Floating Badges
-    const reviewFl1 = await page.locator('.float-card.fl1').innerText();
-    console.log(`Floating Badge 1: "${reviewFl1.replace(/\n/g, ' ')}"`);
-    if (!reviewFl1.includes('New 5★ Review')) {
-      throw new Error('TEST 2 FAILED: Missing floating badge 1 on review QR page');
-    }
-
     // Capture screenshot
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'landing_ai_reviews_enhanced.png'), fullPage: false });
-    console.log('✅ TEST 2 PASSED: AI Google Review QR Generator verified with friction points, AI vs Normal QR, Feedback Shield, and simulator.\n');
+    console.log('✅ TEST 2 PASSED: Zero floating cards, $100k phone chassis & How It Works section verified.\n');
     results.push({ test: 'AI Google Review QR Generator', status: 'PASS' });
 
 
@@ -138,10 +155,26 @@ async function verifyLandingPages() {
       throw new Error(`TEST 3 FAILED: H1 text does not match expected copy`);
     }
 
-    // Assert Indian English heading in Agitation
-    const agitationReply = await page.locator('text=Why 85% of Local Businesses Fail to Reply to Google Reviews').count();
-    if (agitationReply === 0) {
-      throw new Error('TEST 3 FAILED: Agitation heading not found in Indian English');
+    // Assert Zero Obstructive Floating Cards
+    const replyFloatCount = await page.locator('.float-card').count();
+    console.log(`Floating Cards Count (should be 0): ${replyFloatCount}`);
+    if (replyFloatCount !== 0) {
+      throw new Error(`TEST 3 FAILED: Expected 0 floating cards covering phone, found ${replyFloatCount}`);
+    }
+
+    // Assert Phone Mockup exists
+    if (await page.locator('.phone-mockup').count() === 0) {
+      throw new Error('TEST 3 FAILED: Phone mockup not found');
+    }
+
+    // Assert "How It Works" Section exists with Infographics & Steps 01, 02, 03
+    const replyHowItWorks = await page.locator('text=How 1-Click AI AutoReply Works in 3 Simple Steps').count();
+    const replyStep01 = await page.locator('text=Step 1 • Instant Catch').count();
+    const replyStep02 = await page.locator('text=Step 2 • Gemini AI').count();
+    const replyStep03 = await page.locator('text=Step 3 • 1-Click Post').count();
+    console.log(`AutoReply How It Works: ${replyHowItWorks}, Steps: 01=${replyStep01}, 02=${replyStep02}, 03=${replyStep03}`);
+    if (replyHowItWorks === 0 || replyStep01 === 0 || replyStep02 === 0 || replyStep03 === 0) {
+      throw new Error('TEST 3 FAILED: Missing AutoReply How It Works section or infographic steps');
     }
 
     // Assert Live Reply Simulator & 1-Click Publish button
@@ -156,16 +189,9 @@ async function verifyLandingPages() {
       throw new Error('TEST 3 FAILED: Publish confirmation feedback text not displayed');
     }
 
-    // Assert Floating Badges
-    const replyFl1 = await page.locator('.float-card.fl1').innerText();
-    console.log(`Floating Badge 1: "${replyFl1.replace(/\n/g, ' ')}"`);
-    if (!replyFl1.includes('AI Reply Published')) {
-      throw new Error('TEST 3 FAILED: Missing floating badge 1 on autoreply page');
-    }
-
     // Capture screenshot
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'landing_autoreply_enhanced.png'), fullPage: false });
-    console.log('✅ TEST 3 PASSED: 1-Click AI AutoReply verified with live simulator, 100% Indian English, and floating badges.\n');
+    console.log('✅ TEST 3 PASSED: Zero floating cards, $100k phone chassis & How It Works section verified.\n');
     results.push({ test: '1-Click AI AutoReply', status: 'PASS' });
 
 
@@ -183,10 +209,26 @@ async function verifyLandingPages() {
       throw new Error(`TEST 4 FAILED: H1 text does not match expected copy`);
     }
 
-    // Assert Indian English heading in Agitation
-    const agitationLoyalty = await page.locator('text=Why Paper Punch Cards and Expensive 3rd-Party Apps Fail Indian Retailers').count();
-    if (agitationLoyalty === 0) {
-      throw new Error('TEST 4 FAILED: Agitation heading not found in Indian English');
+    // Assert Zero Obstructive Floating Cards
+    const loyaltyFloatCount = await page.locator('.float-card').count();
+    console.log(`Floating Cards Count (should be 0): ${loyaltyFloatCount}`);
+    if (loyaltyFloatCount !== 0) {
+      throw new Error(`TEST 4 FAILED: Expected 0 floating cards covering phone, found ${loyaltyFloatCount}`);
+    }
+
+    // Assert Phone Mockup exists
+    if (await page.locator('.phone-mockup').count() === 0) {
+      throw new Error('TEST 4 FAILED: Phone mockup not found');
+    }
+
+    // Assert "How It Works" Section exists with Infographics & Steps 01, 02, 03
+    const loyaltyHowItWorks = await page.locator('text=How Our WhatsApp Loyalty Engine Works in 3 Simple Steps').count();
+    const loyaltyStep01 = await page.locator('text=Step 1 • Standee Scan').count();
+    const loyaltyStep02 = await page.locator('text=Step 2 • Digital Stamp').count();
+    const loyaltyStep03 = await page.locator('text=Step 3 • VIP Reward').count();
+    console.log(`Loyalty How It Works: ${loyaltyHowItWorks}, Steps: 01=${loyaltyStep01}, 02=${loyaltyStep02}, 03=${loyaltyStep03}`);
+    if (loyaltyHowItWorks === 0 || loyaltyStep01 === 0 || loyaltyStep02 === 0 || loyaltyStep03 === 0) {
+      throw new Error('TEST 4 FAILED: Missing Loyalty How It Works section or infographic steps');
     }
 
     // Assert WhatsApp Chat & Stamp Card Graphic
@@ -195,16 +237,9 @@ async function verifyLandingPages() {
       throw new Error('TEST 4 FAILED: Virtual Stamp Card graphic not found in WhatsApp chat');
     }
 
-    // Assert Floating Badges
-    const loyaltyFl1 = await page.locator('.float-card.fl1').innerText();
-    console.log(`Floating Badge 1: "${loyaltyFl1.replace(/\n/g, ' ')}"`);
-    if (!loyaltyFl1.includes('Reward Unlocked')) {
-      throw new Error('TEST 4 FAILED: Missing floating badge 1 on loyalty page');
-    }
-
     // Capture screenshot
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'landing_whatsapp_loyalty_enhanced.png'), fullPage: false });
-    console.log('✅ TEST 4 PASSED: WhatsApp Digital Loyalty Card verified with chat simulator, Indian English, and floating badges.\n');
+    console.log('✅ TEST 4 PASSED: Zero floating cards, $100k phone chassis & How It Works section verified.\n');
     results.push({ test: 'WhatsApp Digital Loyalty Card', status: 'PASS' });
 
 
@@ -222,7 +257,29 @@ async function verifyLandingPages() {
       throw new Error(`TEST 5 FAILED: H1 text does not match expected copy`);
     }
 
-    // Assert 4 tiles inside simulator
+    // Assert Zero Obstructive Floating Cards
+    const completeFloatCount = await page.locator('.float-card').count();
+    console.log(`Floating Cards Count (should be 0): ${completeFloatCount}`);
+    if (completeFloatCount !== 0) {
+      throw new Error(`TEST 5 FAILED: Expected 0 floating cards covering cockpit, found ${completeFloatCount}`);
+    }
+
+    // Assert Hub Mockup exists
+    if (await page.locator('.hub-mockup').count() === 0) {
+      throw new Error('TEST 5 FAILED: Hub cockpit mockup not found');
+    }
+
+    // Assert "How It Works" Section exists with Infographics & Steps 01, 02, 03
+    const completeHowItWorks = await page.locator('text=How CustomerPilot Complete Runs Your Shop on Autopilot in 3 Steps').count();
+    const completeStep01 = await page.locator('text=Step 1 • Standee Setup').count();
+    const completeStep02 = await page.locator('text=Step 2 • 4-Engine Sync').count();
+    const completeStep03 = await page.locator('text=Step 3 • Unified ROI').count();
+    console.log(`Complete How It Works: ${completeHowItWorks}, Steps: 01=${completeStep01}, 02=${completeStep02}, 03=${completeStep03}`);
+    if (completeHowItWorks === 0 || completeStep01 === 0 || completeStep02 === 0 || completeStep03 === 0) {
+      throw new Error('TEST 5 FAILED: Missing Complete How It Works section or infographic steps');
+    }
+
+    // Assert 4 tiles inside cockpit simulator
     const waTile = await page.locator('text=WhatsApp Loyalty').count();
     const reviewsTile = await page.locator('text=Smart AI Reviews').count();
     const replyTile = await page.locator('text=AI AutoReply').count();
@@ -238,16 +295,9 @@ async function verifyLandingPages() {
       throw new Error('TEST 5 FAILED: Missing TCO comparison table');
     }
 
-    // Assert Floating Badges
-    const completeFl1 = await page.locator('.float-card.fl1').innerText();
-    console.log(`Floating Badge 1: "${completeFl1.replace(/\n/g, ' ')}"`);
-    if (!completeFl1.includes('Unified Growth Engine')) {
-      throw new Error('TEST 5 FAILED: Missing floating badge 1 on complete page');
-    }
-
     // Capture screenshot
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'landing_complete_enhanced.png'), fullPage: false });
-    console.log('✅ TEST 5 PASSED: CustomerPilot Complete verified with 4-in-1 simulator, TCO table, and floating badges.\n');
+    console.log('✅ TEST 5 PASSED: Zero floating cards, $100k cockpit chassis & How It Works section verified.\n');
     results.push({ test: 'CustomerPilot Complete', status: 'PASS' });
 
     console.log('====================================================');

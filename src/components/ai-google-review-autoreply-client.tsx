@@ -9,7 +9,10 @@ import {
   Clock,
   CheckCircle2,
   Send,
-  Bot
+  Bot,
+  Sparkles,
+  MapPin,
+  Zap
 } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
@@ -123,14 +126,20 @@ export function AiGoogleReviewAutoReplyClient() {
         .dot-live i { position: absolute; inset: 0; border-radius: 50%; background: #6366f1; }
         .dot-live i:first-child { animation: ping 1.6s cubic-bezier(0,0,.2,1) infinite; opacity: .7; }
         @keyframes ping { 75%,100%{transform:scale(2.2);opacity:0} }
-        .float-card { position: absolute; z-index: 20; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); border-radius: 16px; padding: 10px 14px; box-shadow: 0 12px 30px -10px rgba(15,23,42,.18); display: flex; align-items: center; gap: 10px; animation: bob 5s ease-in-out infinite; border: 1px solid rgba(226,232,240,.9); pointer-events: none; user-select: none; }
-        @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        .fl1 { top: 20px; left: -20px; }
-        .fl2 { bottom: 50px; right: -20px; animation-delay: 1.5s; }
-        .fl3 { top: 48%; right: -25px; animation-delay: 2.8s; }
-        @media(max-width:640px){ .fl1{left:-5px; top:10px} .fl2{right:-5px; bottom:20px} .fl3{display:none} }
-        .phone-mockup { width: 320px; border-radius: 36px; background: #0f172a; padding: 10px; box-shadow: 0 25px 50px -12px rgba(99,102,241,.28), 0 0 0 1px rgba(255,255,255,0.1); }
-        @media(min-width:640px){ .phone-mockup { width: 340px; } }
+        .phone-mockup {
+          width: 100%;
+          max-width: 350px;
+          border-radius: 50px;
+          background: #0f172a;
+          padding: 10px;
+          box-shadow: 0 40px 90px -20px rgba(15,23,42,0.35), 0 0 0 1px rgba(255,255,255,0.12), 0 0 0 4px #1e293b;
+          position: relative;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .phone-mockup:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 50px 100px -25px rgba(99,102,241,0.28), 0 0 0 1px rgba(255,255,255,0.18), 0 0 0 4px #1e293b;
+        }
       `}</style>
 
       {/* Sticky Header */}
@@ -207,111 +216,92 @@ export function AiGoogleReviewAutoReplyClient() {
               {/* Right Column: Live Interactive Google Maps Review Reply Simulator */}
               <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
                 
-                {/* Mobile Device Mockup */}
-                <div className="relative">
-                  {/* Floating Badge 1: Top Left */}
-                  <div className="float-card fl1">
-                    <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm font-black shadow-xs">
-                      ⚡
+                {/* Phone Mockup Screen */}
+                <div className="phone-mockup">
+                  <div className="rounded-[40px] overflow-hidden bg-white text-slate-900 shadow-inner flex flex-col">
+                    
+                    {/* Top Phone Status Bar with Dynamic Island */}
+                    <div className="pt-2.5 pb-2 px-6 flex items-center justify-between text-[11px] font-bold text-white bg-slate-950 select-none border-b border-white/10">
+                      <span className="tracking-tight">9:41</span>
+                      <div className="w-24 h-4 bg-black rounded-full flex items-center justify-end px-2 border border-slate-800">
+                        <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[10px] opacity-90">
+                        <span>5G</span>
+                        <span>100%</span>
+                      </div>
                     </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">AI Reply Published in 0.8s</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Context-aware owner response</div>
-                    </div>
-                  </div>
 
-                  {/* Floating Badge 2: Bottom Right */}
-                  <div className="float-card fl2">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
-                      ★
+                    {/* Top App Header */}
+                    <div className="p-5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white space-y-1.5">
+                      <div className="flex items-center justify-between text-[11px] opacity-90 font-medium">
+                        <span>Google Review Reply Studio</span>
+                        <span className="bg-white/20 px-2 py-0.5 rounded-full font-bold">Gemini AI</span>
+                      </div>
+                      <div className="font-black text-base text-white truncate">{currentScenario.store}</div>
+                      <div className="text-[10px] text-indigo-100 flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Connected via official Google GBP OAuth
+                      </div>
                     </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">100% Response Rate on Maps</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Verified Google Business badge</div>
-                    </div>
-                  </div>
 
-                  {/* Floating Badge 3: Center Right */}
-                  <div className="float-card fl3">
-                    <div className="w-8 h-8 rounded-xl bg-cyan-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
-                      🎯
-                    </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">Local SEO Keywords Injected</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Boosts local &quot;near me&quot; ranking</div>
-                    </div>
-                  </div>
-
-                  {/* Phone Mockup Screen */}
-                  <div className="phone-mockup">
-                    <div className="rounded-[28px] overflow-hidden bg-white text-slate-900 shadow-inner flex flex-col">
+                    {/* Review Card Body */}
+                    <div className="p-4 space-y-3 bg-slate-50/60 text-xs">
                       
-                      {/* Top App Header */}
-                      <div className="p-4 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white space-y-1">
-                        <div className="flex items-center justify-between text-[11px] opacity-90 font-medium">
-                          <span>Google Review Reply Studio</span>
-                          <span className="bg-white/20 px-2 py-0.5 rounded-full font-bold">Gemini AI</span>
+                      {/* Customer Review Bubble */}
+                      <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-1.5">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="font-bold text-slate-900">{currentScenario.reviewer}</span>
+                          <span className="text-[10px] text-slate-400">{currentScenario.time}</span>
                         </div>
-                        <h4 className="font-black text-sm text-white truncate">{currentScenario.store}</h4>
-                        <div className="text-[10px] text-indigo-100 flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Connected via official Google GBP OAuth
-                        </div>
+                        <div className="text-amber-500 text-[11px] tracking-tight">★★★★★</div>
+                        <p className="text-[11px] text-slate-600 leading-relaxed italic">
+                          &quot;{currentScenario.customerText}&quot;
+                        </p>
                       </div>
 
-                      {/* Review Card Body */}
-                      <div className="p-4 space-y-3 bg-slate-50/60 text-xs">
-                        
-                        {/* Customer Review Bubble */}
-                        <div className="p-3 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-1.5">
-                          <div className="flex items-center justify-between text-[11px]">
-                            <span className="font-bold text-slate-900">{currentScenario.reviewer}</span>
-                            <span className="text-[10px] text-slate-400">{currentScenario.time}</span>
-                          </div>
-                          <div className="text-amber-500 text-[11px] tracking-tight">★★★★★</div>
-                          <p className="text-[11px] text-slate-600 leading-relaxed italic">
-                            &quot;{currentScenario.customerText}&quot;
-                          </p>
+                      {/* AI Generated Reply Card */}
+                      <div className="p-3.5 rounded-2xl bg-indigo-50/70 border border-indigo-200/80 shadow-xs space-y-1.5">
+                        <div className="flex items-center justify-between text-[10px] text-indigo-800 font-bold">
+                          <span className="flex items-center gap-1">
+                            <Bot className="w-3.5 h-3.5 text-indigo-600" /> Contextual AI Owner Draft
+                          </span>
+                          <span className="bg-indigo-100 px-1.5 py-0.5 rounded text-[9px] font-bold">0.8s</span>
                         </div>
-
-                        {/* AI Generated Reply Card */}
-                        <div className="p-3 rounded-2xl bg-indigo-50/70 border border-indigo-200/80 shadow-xs space-y-1.5">
-                          <div className="flex items-center justify-between text-[10px] text-indigo-800 font-bold">
-                            <span className="flex items-center gap-1">
-                              <Bot className="w-3 h-3 text-indigo-600" /> Contextual AI Owner Draft
-                            </span>
-                            <span className="bg-indigo-100 px-1.5 py-0.5 rounded text-[9px]">0.8s</span>
-                          </div>
-                          <p className="text-[11px] text-slate-800 leading-relaxed font-medium">
-                            {currentScenario.aiReply}
-                          </p>
-                        </div>
-
-                        {/* 1-Click Action Button */}
-                        <button
-                          type="button"
-                          onClick={handlePublish}
-                          className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
-                        >
-                          {isPublished ? (
-                            <>
-                              <CheckCircle2 className="w-4 h-4 text-emerald-300" />
-                              <span>Published to Google Maps!</span>
-                            </>
-                          ) : (
-                            <>
-                              <Send className="w-3.5 h-3.5" />
-                              <span>1-Click Publish to Google Maps</span>
-                            </>
-                          )}
-                        </button>
-
-                        <div className="text-center text-[10px] text-slate-400 flex items-center justify-center gap-1 pt-1">
-                          <Clock className="w-3 h-3 text-slate-400" />
-                          <span>60-second safety delay &bull; Pre-approval mode</span>
-                        </div>
+                        <p className="text-[11px] text-slate-800 leading-relaxed font-medium">
+                          {currentScenario.aiReply}
+                        </p>
                       </div>
 
+                      {/* 1-Click Action Button */}
+                      <button
+                        type="button"
+                        onClick={handlePublish}
+                        className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer hover:scale-[1.02]"
+                      >
+                        {isPublished ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+                            <span>Published to Google Maps!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send className="w-3.5 h-3.5" />
+                            <span>1-Click Publish to Google Maps</span>
+                          </>
+                        )}
+                      </button>
+
+                      <div className="text-center text-[10px] text-slate-400 flex items-center justify-center gap-1 pt-1">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span>60-second safety delay &bull; Pre-approval mode</span>
+                      </div>
                     </div>
+
+                    {/* Bottom Phone Home Indicator */}
+                    <div className="py-2.5 bg-slate-50 flex justify-center border-t border-slate-200">
+                      <div className="w-28 h-1 bg-slate-300 rounded-full"></div>
+                    </div>
+
                   </div>
                 </div>
 
@@ -397,50 +387,155 @@ export function AiGoogleReviewAutoReplyClient() {
           </div>
         </section>
 
-        {/* ============ 3-STEP GEO BLUEPRINT ============ */}
-        <section className="py-16 bg-slate-50/70 border-t border-b border-slate-200/80">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-12">
-            <div className="text-center max-w-2xl mx-auto space-y-2">
-              <span className="text-indigo-700 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-indigo-50 border border-indigo-200">
-                Generative Engine Blueprint (GEO)
+        {/* ============ HOW IT WORKS SECTION WITH INFOGRAPHICS & ANIMATION ============ */}
+        <section className="py-20 md:py-28 bg-gradient-to-b from-indigo-50/50 via-white to-slate-50 border-t border-b border-slate-200/80 relative overflow-hidden">
+          {/* Subtle Ambient Background */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-r from-indigo-200/20 via-blue-200/20 to-purple-200/20 rounded-full blur-3xl pointer-events-none -z-10" />
+
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-16">
+            <div className="text-center max-w-3xl mx-auto space-y-3">
+              <span className="text-indigo-800 text-xs font-black uppercase tracking-wider px-3.5 py-1 rounded-full bg-indigo-50 border border-indigo-200 shadow-xs inline-flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                How It Works • Official Google OAuth + Gemini AI
               </span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
-                How CustomerPilot 1-Click AI AutoReply Works in 3 Steps
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+                How 1-Click AI AutoReply Works in 3 Simple Steps
               </h2>
-              <p className="text-slate-600 text-xs sm:text-sm">
-                Powered by official Google Business Profile OAuth 2.0 and Gemini Generative AI
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                Turn hours of manual typing into effortless 1-click approvals. Protect your Google Maps reputation with 100% policy-compliant AI responses.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-700 font-black flex items-center justify-center text-lg shadow-xs">
-                  1
+            <div className="grid md:grid-cols-3 gap-8 relative">
+              {/* Connecting Energy Line for Desktop */}
+              <div className="hidden md:block absolute top-1/2 left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-indigo-300 via-blue-300 to-emerald-300 -translate-y-12 -z-0 opacity-40" />
+
+              {/* Step 1 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-indigo-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-indigo-600 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      01
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200">
+                      Step 1 • Instant Catch
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: Google Maps Review Webhook Detection */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-indigo-50 to-slate-50 border border-indigo-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="flex items-center gap-3">
+                      <div className="w-18 h-22 rounded-xl bg-white border border-indigo-200 shadow-md p-2 flex flex-col items-center justify-center text-center">
+                        <div className="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center text-white mb-1">
+                          <MapPin className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-[8px] font-black text-slate-900 leading-tight">Google Maps</span>
+                        <span className="text-[7px] text-indigo-700 font-semibold">New Review</span>
+                      </div>
+                      <div className="text-indigo-500 font-bold text-lg animate-pulse">➔</div>
+                      <div className="w-18 h-22 rounded-xl bg-indigo-900 border border-indigo-700 shadow-md p-2 flex flex-col items-center justify-center text-white">
+                        <div className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-white mb-1">
+                          <Zap className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-[8px] font-black text-white leading-tight">Real-Time</span>
+                        <span className="text-[7px] text-indigo-200 font-semibold">Detection</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    1. Real-Time Maps Detection
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    The second a customer leaves a review on Google Maps, CustomerPilot securely catches it via official Google Business Profile APIs. Zero manual monitoring needed.
+                  </p>
                 </div>
-                <h3 className="font-extrabold text-slate-900 text-base">Real-Time Review Detection</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  The instant a customer submits a review on Google Maps, CustomerPilot securely fetches it via the official Google Business Profile API.
-                </p>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-indigo-800 font-semibold">
+                  <span>⚡ Instant API Webhook</span>
+                  <span className="text-slate-400">Zero Delay</span>
+                </div>
               </div>
 
-              <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-700 font-black flex items-center justify-center text-lg shadow-xs">
-                  2
+              {/* Step 2 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-blue-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-blue-600 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      02
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-200">
+                      Step 2 • Gemini AI
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: Contextual AI Draft Generation */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-blue-50 to-slate-50 border border-blue-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="p-2.5 rounded-xl bg-white border border-blue-200 shadow-sm w-full max-w-[210px] space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">Owner Reply Draft</span>
+                        <Bot className="w-3.5 h-3.5 text-blue-600 animate-bounce" />
+                      </div>
+                      <p className="text-[9px] text-slate-700 italic truncate">&quot;Thank you for loving our Dutch Truffle Cake!&quot;</p>
+                      <div className="flex gap-1 text-[7px] text-blue-800 font-bold">
+                        <span className="bg-blue-100 px-1 rounded">100% Policy-Safe</span>
+                        <span className="bg-blue-100 px-1 rounded">Personalized</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    2. Gemini Contextual Draft
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Gemini AI reads every word, mentions the specific food items or services praised, and crafts a warm, authentic owner reply in less than 1 second.
+                  </p>
                 </div>
-                <h3 className="font-extrabold text-slate-900 text-base">Gemini AI Contextual Draft</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Gemini AI parses the review text, recognizes exact dishes or items ordered, and prepares a natural, appreciative owner reply in 1 second.
-                </p>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-blue-700 font-semibold">
+                  <span>🤖 Dish &amp; Item Recognition</span>
+                  <span className="text-slate-400">Zero Robotic Cliches</span>
+                </div>
               </div>
 
-              <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-700 font-black flex items-center justify-center text-lg shadow-xs">
-                  3
+              {/* Step 3 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-emerald-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      03
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                      Step 3 • 1-Click Post
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: 1-Click Publish or Autopilot Buffer */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-emerald-50 to-slate-50 border border-emerald-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="p-2.5 rounded-xl bg-white border border-emerald-200 shadow-sm w-full max-w-[210px] space-y-1.5 text-center">
+                      <div className="flex items-center justify-center gap-1 text-emerald-700 font-bold text-[10px]">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Live on Google Maps</span>
+                      </div>
+                      <div className="text-[9px] text-slate-600">60-second review buffer or 1-tap WhatsApp send</div>
+                      <span className="inline-block bg-emerald-100 text-emerald-800 text-[8px] font-bold px-2 py-0.5 rounded-full">
+                        100% Response Rate Maintained
+                      </span>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    3. 1-Click Publish or Autopilot
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Review and approve directly from your smartphone with a single click, or let our safety-buffered autopilot respond automatically while keeping 100% control.
+                  </p>
                 </div>
-                <h3 className="font-extrabold text-slate-900 text-base">1-Click Publish or Autopilot</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Approve with 1 click from your phone, or enable trusted autopilot to post after a 60-second safety buffer with complete quota protection.
-                </p>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-emerald-700 font-semibold">
+                  <span>🛡️ 60-Second Safety Window</span>
+                  <span className="text-slate-400">100% Response Rate</span>
+                </div>
               </div>
             </div>
           </div>

@@ -7,7 +7,6 @@ import {
   ArrowRight,
   ArrowLeft,
   ShieldCheck,
-  TrendingUp,
   XCircle,
   Copy,
   ShieldAlert,
@@ -124,14 +123,20 @@ export function AiGoogleReviewQrClient() {
         .dot-live i { position: absolute; inset: 0; border-radius: 50%; background: #f59e0b; }
         .dot-live i:first-child { animation: ping 1.6s cubic-bezier(0,0,.2,1) infinite; opacity: .7; }
         @keyframes ping { 75%,100%{transform:scale(2.2);opacity:0} }
-        .float-card { position: absolute; z-index: 20; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); border-radius: 16px; padding: 10px 14px; box-shadow: 0 12px 30px -10px rgba(15,23,42,.18); display: flex; align-items: center; gap: 10px; animation: bob 5s ease-in-out infinite; border: 1px solid rgba(226,232,240,.9); pointer-events: none; user-select: none; }
-        @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        .fl1 { top: 20px; left: -20px; }
-        .fl2 { bottom: 50px; right: -20px; animation-delay: 1.5s; }
-        .fl3 { top: 48%; right: -25px; animation-delay: 2.8s; }
-        @media(max-width:640px){ .fl1{left:-5px; top:10px} .fl2{right:-5px; bottom:20px} .fl3{display:none} }
-        .phone-mockup { width: 310px; border-radius: 36px; background: #0f172a; padding: 10px; box-shadow: 0 25px 50px -12px rgba(245,158,11,.28), 0 0 0 1px rgba(255,255,255,0.1); }
-        @media(min-width:640px){ .phone-mockup { width: 330px; } }
+        .phone-mockup {
+          width: 100%;
+          max-width: 350px;
+          border-radius: 50px;
+          background: #0f172a;
+          padding: 10px;
+          box-shadow: 0 40px 90px -20px rgba(15,23,42,0.35), 0 0 0 1px rgba(255,255,255,0.12), 0 0 0 4px #1e293b;
+          position: relative;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .phone-mockup:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 50px 100px -25px rgba(245,158,11,0.28), 0 0 0 1px rgba(255,255,255,0.18), 0 0 0 4px #1e293b;
+        }
       `}</style>
 
       {/* Sticky Header */}
@@ -206,109 +211,90 @@ export function AiGoogleReviewQrClient() {
                 </div>
               </div>
 
-              {/* Right Column: Live Interactive Review Simulator with Floating Badges */}
+              {/* Right Column: Live Interactive Review Simulator */}
               <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
                 
-                {/* Mobile Device Mockup */}
-                <div className="relative">
-                  {/* Floating Badge 1: Top Left */}
-                  <div className="float-card fl1">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm font-black shadow-xs">
-                      ★
+                {/* Phone Mockup Screen */}
+                <div className="phone-mockup">
+                  <div className="rounded-[40px] overflow-hidden bg-white text-slate-900 shadow-inner flex flex-col">
+                    
+                    {/* Top Phone Status Bar with Dynamic Island */}
+                    <div className="pt-2.5 pb-2 px-6 flex items-center justify-between text-[11px] font-bold text-white bg-slate-950 select-none border-b border-white/10">
+                      <span className="tracking-tight">9:41</span>
+                      <div className="w-24 h-4 bg-black rounded-full flex items-center justify-end px-2 border border-slate-800">
+                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[10px] opacity-90">
+                        <span>5G</span>
+                        <span>100%</span>
+                      </div>
                     </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">New 5★ Review Posted</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Rahul M. · Google Maps · Just now</div>
-                    </div>
-                  </div>
 
-                  {/* Floating Badge 2: Bottom Right */}
-                  <div className="float-card fl2">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
-                      <ShieldCheck className="w-4 h-4" />
+                    {/* Top App Header */}
+                    <div className="p-5 bg-gradient-to-r from-amber-500 to-amber-600 text-white space-y-1.5">
+                      <div className="flex items-center justify-between text-[11px] opacity-90 font-medium">
+                        <span>Google Review Assistant</span>
+                        <span className="bg-white/20 px-2 py-0.5 rounded-full font-bold">AI Drafted</span>
+                      </div>
+                      <div className="font-black text-base text-white truncate">{currentReview.store}</div>
+                      <div className="flex items-center gap-1 text-amber-200 text-xs">
+                        ★★★★★ <span className="text-white text-[10px] ml-1 font-semibold">5.0 Star Rating Selected</span>
+                      </div>
                     </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">Private Feedback Shield Active</small>
-                      <div className="text-[10px] text-slate-500 font-medium">1-3★ filtered from Google Maps</div>
-                    </div>
-                  </div>
 
-                  {/* Floating Badge 3: Center Right */}
-                  <div className="float-card fl3">
-                    <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
-                      <TrendingUp className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">+312% Review Velocity</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Ranked #1 on Local 3-Pack</div>
-                    </div>
-                  </div>
+                    {/* Review Card Body */}
+                    <div className="p-4 space-y-3 bg-slate-50/60 text-xs">
+                      <div className="text-[11px] font-bold text-slate-700 flex items-center justify-between">
+                        <span>Choose Your Preferred AI Review:</span>
+                        <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                          SEO Optimized
+                        </span>
+                      </div>
 
-                  {/* Phone Mockup Screen */}
-                  <div className="phone-mockup">
-                    <div className="rounded-[28px] overflow-hidden bg-white text-slate-900 shadow-inner flex flex-col">
-                      
-                      {/* Top App Header */}
-                      <div className="p-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white space-y-1">
-                        <div className="flex items-center justify-between text-[11px] opacity-90 font-medium">
-                          <span>Google Review Assistant</span>
-                          <span className="bg-white/20 px-2 py-0.5 rounded-full font-bold">AI Drafted</span>
-                        </div>
-                        <h4 className="font-black text-sm text-white truncate">{currentReview.store}</h4>
-                        <div className="flex items-center gap-1 text-amber-200 text-xs">
-                          ★★★★★ <span className="text-white text-[10px] ml-1 font-semibold">5.0 Star Rating Selected</span>
+                      {/* AI Draft Bubble */}
+                      <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2">
+                        <p className="text-[11px] text-slate-700 leading-relaxed italic">
+                          &quot;{currentReview.text}&quot;
+                        </p>
+                        <div className="flex flex-wrap gap-1 pt-1">
+                          {currentReview.keywords.map((kw) => (
+                            <span key={`${currentReview.store}-${kw}`} className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 text-[9px] font-bold border border-amber-200">
+                              #{kw}
+                            </span>
+                          ))}
                         </div>
                       </div>
 
-                      {/* Review Card Body */}
-                      <div className="p-4 space-y-3 bg-slate-50/60 text-xs">
-                        <div className="text-[11px] font-bold text-slate-700 flex items-center justify-between">
-                          <span>Choose Your Preferred AI Review:</span>
-                          <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-                            SEO Optimized
-                          </span>
-                        </div>
+                      {/* 1-Tap Copy & Post Button */}
+                      <button
+                        type="button"
+                        onClick={handleCopy}
+                        className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer hover:scale-[1.02]"
+                      >
+                        {copied ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4 text-slate-950" />
+                            <span>Copied! Opening Google Maps...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4 text-slate-950" />
+                            <span>1-Tap Copy &amp; Post on Google Maps</span>
+                          </>
+                        )}
+                      </button>
 
-                        {/* AI Draft Bubble */}
-                        <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2">
-                          <p className="text-[11px] text-slate-700 leading-relaxed italic">
-                            &quot;{currentReview.text}&quot;
-                          </p>
-                          <div className="flex flex-wrap gap-1 pt-1">
-                            {currentReview.keywords.map((kw, idx) => (
-                              <span key={idx} className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 text-[9px] font-bold border border-amber-200">
-                                #{kw}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* 1-Tap Copy & Post Button */}
-                        <button
-                          type="button"
-                          onClick={handleCopy}
-                          className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
-                        >
-                          {copied ? (
-                            <>
-                              <CheckCircle2 className="w-4 h-4 text-slate-950" />
-                              <span>Copied! Opening Google Maps...</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-4 h-4 text-slate-950" />
-                              <span>1-Tap Copy &amp; Post on Google Maps</span>
-                            </>
-                          )}
-                        </button>
-
-                        <div className="text-center text-[10px] text-slate-500 flex items-center justify-center gap-1 pt-1">
-                          <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                          <span>Direct deep-link to official Google review form</span>
-                        </div>
+                      <div className="text-center text-[10px] text-slate-500 flex items-center justify-center gap-1 pt-1">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Direct deep-link to official Google review form</span>
                       </div>
-
                     </div>
+
+                    {/* Bottom Phone Home Indicator */}
+                    <div className="py-2.5 bg-slate-50 flex justify-center border-t border-slate-200">
+                      <div className="w-28 h-1 bg-slate-300 rounded-full"></div>
+                    </div>
+
                   </div>
                 </div>
 
@@ -341,6 +327,158 @@ export function AiGoogleReviewQrClient() {
                 <div className="text-3xl font-black text-slate-900">#1 Rank</div>
                 <div className="text-xs text-slate-600 font-medium">Google Maps Local 3-Pack Boost</div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============ HOW IT WORKS WITH INFOGRAPHICS & ANIMATION ============ */}
+        <section className="py-16 md:py-24 bg-gradient-to-b from-white via-amber-50/30 to-white relative overflow-hidden border-b border-slate-200/80">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-14 relative z-10">
+            <div className="text-center max-w-2xl mx-auto space-y-3">
+              <span className="text-amber-800 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200">
+                Frictionless 3-Step Flow
+              </span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
+                How the Smart AI Review QR Works
+              </h2>
+              <p className="text-slate-600 text-xs sm:text-sm">
+                Eliminate blank screen anxiety and awkward begging. Watch reviews flow in 3 simple steps:
+              </p>
+            </div>
+
+            {/* 3-Step Infographics with Animated Connectors */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+              {/* Desktop Connecting Line */}
+              <div className="hidden md:block absolute top-1/2 left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-amber-400 via-orange-400 to-emerald-400 -translate-y-8 z-0 opacity-40"></div>
+
+              {/* Step 1 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-amber-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-amber-500 text-slate-950 font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      01
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                      Step 1 • Standee Scan
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: Counter QR Standee */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-amber-50 to-slate-50 border border-amber-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="flex items-center gap-3">
+                      <div className="w-18 h-22 rounded-xl bg-white border border-amber-300 shadow-md p-2 flex flex-col items-center justify-center text-center">
+                        <div className="w-6 h-6 bg-amber-500 rounded-md flex items-center justify-center text-white mb-1">
+                          <Store className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-[8px] font-black text-slate-900 leading-tight">Counter QR</span>
+                        <span className="text-[7px] text-amber-700 font-semibold">Standee</span>
+                      </div>
+                      <div className="text-amber-500 font-bold text-lg animate-pulse">➔</div>
+                      <div className="w-16 h-22 rounded-xl bg-slate-900 border border-slate-700 shadow-md p-1.5 flex flex-col items-center justify-center text-white">
+                        <div className="w-8 h-8 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-300 text-xs font-black animate-pulse">
+                          5★
+                        </div>
+                        <span className="text-[8px] font-bold text-slate-200 mt-1">Tap Camera</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    1. Customer Scans Counter Standee
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Place our premium acrylic standee on your counter. When checking out, happy customers scan with their camera in under 3 seconds. Zero app download.
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-amber-800 font-semibold">
+                  <span>⚡ 3-Second Contactless Scan</span>
+                  <span className="text-slate-400">Works on all phones</span>
+                </div>
+              </div>
+
+              {/* Step 2 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-orange-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-orange-500 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      02
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-orange-50 text-orange-800 border border-orange-200">
+                      Step 2 • AI Draft
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: AI Engine Draft Generation */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-orange-50 to-slate-50 border border-orange-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="p-2.5 rounded-xl bg-white border border-orange-200 shadow-sm w-full max-w-[210px] space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-bold text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded">AI Draft Ready</span>
+                        <span className="text-[9px] text-amber-500">★★★★★</span>
+                      </div>
+                      <p className="text-[9px] text-slate-700 italic truncate">&quot;Authentic taste, great service!&quot;</p>
+                      <div className="flex gap-1 text-[7px] text-orange-800 font-bold">
+                        <span className="bg-orange-100 px-1 rounded">#fresh</span>
+                        <span className="bg-orange-100 px-1 rounded">#fast</span>
+                        <span className="bg-orange-100 px-1 rounded">#5star</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    2. AI Drafts Authentic 5-Star Text
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Our AI instantly generates personalized, keyword-optimized review text referencing your store&apos;s specialties. Zero blank screen anxiety.
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-orange-700 font-semibold">
+                  <span>🤖 Zero Blank Screen Anxiety</span>
+                  <span className="text-slate-400">SEO Keywords Injected</span>
+                </div>
+              </div>
+
+              {/* Step 3 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-emerald-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      03
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      Step 3 • Verified Review
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: Google Maps Submission */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-emerald-50 to-slate-50 border border-emerald-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="p-2.5 rounded-xl bg-white border border-emerald-200 shadow-sm w-full max-w-[210px] space-y-1.5 text-center">
+                      <div className="flex items-center justify-center gap-1 text-emerald-700 font-bold text-[10px]">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Google Maps Live</span>
+                      </div>
+                      <div className="text-[9px] text-slate-600">Review posted publicly with 5-star rating</div>
+                      <span className="inline-block bg-emerald-100 text-emerald-800 text-[8px] font-bold px-2 py-0.5 rounded-full">
+                        Local 3-Pack Boosted
+                      </span>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    3. 1-Tap Copy &amp; Post to Google Maps
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Customer taps once to copy the text and opens Google Maps directly. 4-5★ reviews publish publicly, while 1-3★ ratings route to private owner feedback.
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-emerald-700 font-semibold">
+                  <span>🛡️ Private Shield Protected</span>
+                  <span className="text-slate-400">88% Conversion</span>
+                </div>
+              </div>
+
             </div>
           </div>
         </section>
@@ -416,7 +554,7 @@ export function AiGoogleReviewQrClient() {
                   <XCircle className="w-5 h-5 flex-shrink-0" />
                   <span>Standard Printed Google QR Code</span>
                 </div>
-                <h4 className="text-lg font-extrabold text-slate-900">Opens Empty Text Box &bull; 85% Drop-Off</h4>
+                <h3 className="text-lg font-extrabold text-slate-900">Opens Empty Text Box &bull; 85% Drop-Off</h3>
                 <ul className="space-y-3 text-xs text-slate-600">
                   <li className="flex items-start gap-2">
                     <span className="text-rose-500 font-bold">✕</span>
@@ -446,7 +584,7 @@ export function AiGoogleReviewQrClient() {
                   <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-amber-600" />
                   <span>CustomerPilot Smart AI Review Standee</span>
                 </div>
-                <h4 className="text-lg font-extrabold text-slate-900">3 AI Drafts in 3 Secs &bull; 88% Publish Rate</h4>
+                <h3 className="text-lg font-extrabold text-slate-900">3 AI Drafts in 3 Secs &bull; 88% Publish Rate</h3>
                 <ul className="space-y-3 text-xs text-slate-700">
                   <li className="flex items-start gap-2">
                     <span className="text-emerald-600 font-bold">✓</span>

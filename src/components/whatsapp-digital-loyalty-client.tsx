@@ -8,7 +8,11 @@ import {
   ArrowLeft,
   Star,
   XCircle,
-  CheckCircle2
+  CheckCircle2,
+  Smartphone,
+  Gift,
+  Sparkles,
+  Store
 } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
@@ -109,14 +113,15 @@ export function WhatsAppDigitalLoyaltyClient() {
         .dot-live i { position: absolute; inset: 0; border-radius: 50%; background: #10b981; }
         .dot-live i:first-child { animation: ping 1.6s cubic-bezier(0,0,.2,1) infinite; opacity: .7; }
         @keyframes ping { 75%,100%{transform:scale(2.2);opacity:0} }
-        .float-card { position: absolute; z-index: 20; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); border-radius: 16px; padding: 10px 14px; box-shadow: 0 12px 30px -10px rgba(15,23,42,.18); display: flex; align-items: center; gap: 10px; animation: bob 5s ease-in-out infinite; border: 1px solid rgba(226,232,240,.9); pointer-events: none; user-select: none; }
-        @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        .fl1 { top: 20px; left: -20px; }
-        .fl2 { bottom: 50px; right: -20px; animation-delay: 1.5s; }
-        .fl3 { top: 48%; right: -25px; animation-delay: 2.8s; }
-        @media(max-width:640px){ .fl1{left:-5px; top:10px} .fl2{right:-5px; bottom:20px} .fl3{display:none} }
-        .phone-mockup { width: 310px; border-radius: 36px; background: #0f172a; padding: 10px; box-shadow: 0 25px 50px -12px rgba(16,185,129,.28), 0 0 0 1px rgba(255,255,255,0.1); }
-        @media(min-width:640px){ .phone-mockup { width: 330px; } }
+        .phone-mockup {
+          width: 100%;
+          max-width: 350px;
+          border-radius: 48px;
+          background: #0f172a;
+          padding: 12px;
+          box-shadow: 0 25px 60px -15px rgba(16,185,129,.35), 0 0 0 1px rgba(255,255,255,0.1), 0 0 0 6px #1e293b, 0 30px 60px rgba(0,0,0,0.25);
+          position: relative;
+        }
       `}</style>
 
       {/* Sticky Header */}
@@ -198,41 +203,22 @@ export function WhatsAppDigitalLoyaltyClient() {
                 
                 {/* Mobile Device Mockup */}
                 <div className="relative">
-                  {/* Floating Badge 1: Top Left */}
-                  <div className="float-card fl1">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm font-black shadow-xs">
-                      🎁
-                    </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">Stamp 5/5: Reward Unlocked!</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Sent automatically on WhatsApp</div>
-                    </div>
-                  </div>
-
-                  {/* Floating Badge 2: Bottom Right */}
-                  <div className="float-card fl2">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
-                      📲
-                    </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">Counter QR Scanned in 3s</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Zero app download needed</div>
-                    </div>
-                  </div>
-
-                  {/* Floating Badge 3: Center Right */}
-                  <div className="float-card fl3">
-                    <div className="w-8 h-8 rounded-xl bg-cyan-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
-                      🔥
-                    </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">+34% Repeat Footfall</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Verified for Indian Retail</div>
-                    </div>
-                  </div>
-
                   {/* Phone Device Screen with WhatsApp Chat */}
                   <div className="phone-mockup">
+                    {/* Luxury Dynamic Island Status Bar */}
+                    <div className="flex items-center justify-between px-6 pt-2 pb-2 text-[11px] font-semibold text-white/90">
+                      <span>9:41</span>
+                      <div className="w-20 h-4 bg-black rounded-full flex items-center justify-center">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[10px]">
+                        <span>5G</span>
+                        <span className="w-5 h-2.5 border border-white/80 rounded-xs p-0.5 flex items-center">
+                          <span className="w-full h-full bg-emerald-400 rounded-2xs"></span>
+                        </span>
+                      </div>
+                    </div>
+
                     <div className="rounded-[28px] overflow-hidden bg-[#0b141a] text-white shadow-inner flex flex-col">
                       
                       {/* WhatsApp Header */}
@@ -250,7 +236,7 @@ export function WhatsAppDigitalLoyaltyClient() {
                       </div>
 
                       {/* WhatsApp Chat Area */}
-                      <div className="p-3 space-y-2 min-h-[250px] bg-[#0b141a] flex flex-col justify-end text-xs">
+                      <div className="p-3 space-y-2 min-h-[260px] bg-[#0b141a] flex flex-col justify-end text-xs">
                         {chatMessages.map((m, idx) => (
                           <div
                             key={idx}
@@ -294,6 +280,11 @@ export function WhatsAppDigitalLoyaltyClient() {
                         <div className="w-7 h-7 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center text-xs font-bold">
                           ➤
                         </div>
+                      </div>
+
+                      {/* Bottom Home Indicator Bar */}
+                      <div className="py-2.5 flex justify-center bg-[#0b141a]">
+                        <div className="w-28 h-1 bg-slate-600 rounded-full"></div>
                       </div>
 
                     </div>
@@ -392,56 +383,164 @@ export function WhatsAppDigitalLoyaltyClient() {
           </div>
         </section>
 
-        {/* ============ HOW IT WORKS (3-STEP FLOW IN INDIAN ENGLISH) ============ */}
-        <section className="py-16 bg-slate-50/70 border-t border-b border-slate-200/80">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-12">
-            <div className="text-center max-w-2xl mx-auto space-y-2">
-              <span className="text-emerald-700 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
-                Zero Friction Automation
+        {/* ============ HOW IT WORKS SECTION WITH INFOGRAPHICS & ANIMATION ============ */}
+        <section className="py-20 md:py-28 bg-gradient-to-b from-emerald-50/50 via-white to-slate-50 border-t border-b border-slate-200/80 relative overflow-hidden">
+          {/* Subtle Ambient Background */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-r from-emerald-200/20 via-teal-200/20 to-cyan-200/20 rounded-full blur-3xl pointer-events-none -z-10" />
+
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-16">
+            <div className="text-center max-w-3xl mx-auto space-y-3">
+              <span className="text-emerald-800 text-xs font-black uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 shadow-xs inline-flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                How It Works • 100% WhatsApp Native
               </span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
-                How Our WhatsApp Business Loyalty Engine Works in 3 Steps
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+                How Our WhatsApp Loyalty Engine Works in 3 Simple Steps
               </h2>
-              <p className="text-slate-600 text-xs sm:text-sm">
-                Follow this simple 3-step flow to turn first-time shoppers into lifelong VIP regulars:
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                No cards to lose. No apps to download. Turn first-time shoppers into lifelong VIP regulars directly on India&apos;s favorite messaging app.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-700 font-black text-xl shadow-xs">
-                  1
+            <div className="grid md:grid-cols-3 gap-8 relative">
+              {/* Connecting Energy Line for Desktop */}
+              <div className="hidden md:block absolute top-1/2 left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300 -translate-y-12 -z-0 opacity-40" />
+
+              {/* Step 1 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-emerald-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      01
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                      Step 1 • Standee Scan
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: Counter QR Standee */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-emerald-50 to-slate-50 border border-emerald-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="flex items-center gap-3">
+                      <div className="w-18 h-22 rounded-xl bg-white border border-emerald-200 shadow-md p-2 flex flex-col items-center justify-center text-center">
+                        <div className="w-6 h-6 bg-emerald-600 rounded-md flex items-center justify-center text-white mb-1">
+                          <Store className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-[8px] font-black text-slate-900 leading-tight">Counter QR</span>
+                        <span className="text-[7px] text-emerald-700 font-semibold">Standee</span>
+                      </div>
+                      <div className="text-emerald-500 font-bold text-lg animate-pulse">➔</div>
+                      <div className="w-18 h-22 rounded-xl bg-[#0b141a] border border-[#202c33] shadow-md p-2 flex flex-col items-center justify-center text-white">
+                        <div className="w-6 h-6 rounded-full bg-[#005c4b] flex items-center justify-center text-white mb-1">
+                          <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                        </div>
+                        <span className="text-[8px] font-black text-white leading-tight">WhatsApp</span>
+                        <span className="text-[7px] text-emerald-300 font-semibold">Opens in 3s</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    1. Customer Scans Counter Standee
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Place our acrylic QR standee at your billing counter. The customer scans with their phone camera to instantly connect with your WhatsApp bot. Zero app downloads.
+                  </p>
                 </div>
-                <h3 className="font-extrabold text-base text-slate-900">
-                  Step 1: Customer Scans the Counter QR Code
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Scanning your acrylic counter QR connects the customer directly to your WhatsApp bot in 3 seconds. Zero app downloads or tedious signup forms.
-                </p>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-emerald-800 font-semibold">
+                  <span>⚡ 3-Second Counter Scan</span>
+                  <span className="text-slate-400">Zero Friction</span>
+                </div>
               </div>
 
-              <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-cyan-100 border border-cyan-200 flex items-center justify-center text-cyan-700 font-black text-xl shadow-xs">
-                  2
+              {/* Step 2 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-teal-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-teal-600 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      02
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
+                      Step 2 • Digital Stamp
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: Virtual Punch Card Progress */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-teal-50 to-slate-50 border border-teal-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="p-2.5 rounded-xl bg-white border border-teal-200 shadow-sm w-full max-w-[210px] space-y-1.5 text-center">
+                      <div className="text-[9px] font-bold text-teal-700 uppercase tracking-wider">
+                        Virtual Stamp Progress
+                      </div>
+                      <div className="flex items-center justify-center gap-1.5">
+                        {[1, 2, 3, 4].map((i) => (
+                          <div key={i} className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black text-[10px] flex items-center justify-center shadow-xs">
+                            ⭐️
+                          </div>
+                        ))}
+                        <div className="w-6 h-6 rounded-full border-2 border-dashed border-amber-400 text-amber-500 font-bold text-[10px] flex items-center justify-center animate-pulse">
+                          🎁
+                        </div>
+                      </div>
+                      <span className="inline-block text-[8px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                        +1 Stamp Added Automatically
+                      </span>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    2. Instant Digital Stamp Credited
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Cashier stamps with 1 tap or cashier billing syncs automatically. The customer immediately receives an updated visual stamp progress card on their WhatsApp.
+                  </p>
                 </div>
-                <h3 className="font-extrabold text-base text-slate-900">
-                  Step 2: Instant Digital Stamp Credited
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  After billing, the cashier enters the bill amount or stamps with 1 tap. The customer immediately receives an updated visual stamp progress card on WhatsApp.
-                </p>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-teal-700 font-semibold">
+                  <span>📲 Instant WhatsApp Notification</span>
+                  <span className="text-slate-400">100% Paperless</span>
+                </div>
               </div>
 
-              <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-purple-100 border border-purple-200 flex items-center justify-center text-purple-700 font-black text-xl shadow-xs">
-                  3
+              {/* Step 3 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-cyan-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-cyan-600 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      03
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-cyan-50 text-cyan-800 border border-cyan-200">
+                      Step 3 • VIP Reward
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: Reward Voucher & Re-engagement */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-cyan-50 to-slate-50 border border-cyan-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="p-2.5 rounded-xl bg-white border border-cyan-200 shadow-sm w-full max-w-[210px] space-y-1.5 text-center">
+                      <div className="flex items-center justify-center gap-1 text-cyan-800 font-bold text-[10px]">
+                        <Gift className="w-3.5 h-3.5 text-amber-500" />
+                        <span>FREE 20% Voucher Unlocked!</span>
+                      </div>
+                      <div className="text-[9px] font-mono font-bold bg-amber-50 text-amber-800 py-0.5 rounded border border-amber-200">
+                        VOUCHER: VIP-REWARD-20
+                      </div>
+                      <span className="inline-block bg-cyan-100 text-cyan-800 text-[8px] font-bold px-2 py-0.5 rounded-full">
+                        Automated 21-Day Recall
+                      </span>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    3. Milestone Rewards &amp; Smart Recall
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    When the card fills up, CustomerPilot issues a digital voucher on WhatsApp. If a customer hasn&apos;t visited in 21 days, an automated reminder brings them back.
+                  </p>
                 </div>
-                <h3 className="font-extrabold text-base text-slate-900">
-                  Step 3: Automated Milestone Reward Prompts
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  When 5 stamps are completed, the system automatically sends a personalized voucher: &quot;Claim your 20% discount on your next visit!&quot;, driving prompt repeat walk-ins.
-                </p>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-cyan-700 font-semibold">
+                  <span>🔥 +34% Repeat Walk-Ins</span>
+                  <span className="text-slate-400">Zero Churn</span>
+                </div>
               </div>
             </div>
           </div>

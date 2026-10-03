@@ -10,7 +10,10 @@ import {
   Star,
   MessageSquare,
   CreditCard,
-  CheckCircle2
+  CheckCircle2,
+  Sparkles,
+  Smartphone,
+  Store
 } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
@@ -78,14 +81,15 @@ export function CustomerPilotCompleteClient() {
         .dot-live i { position: absolute; inset: 0; border-radius: 50%; background: #10b981; }
         .dot-live i:first-child { animation: ping 1.6s cubic-bezier(0,0,.2,1) infinite; opacity: .7; }
         @keyframes ping { 75%,100%{transform:scale(2.2);opacity:0} }
-        .float-card { position: absolute; z-index: 20; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); border-radius: 16px; padding: 10px 14px; box-shadow: 0 12px 30px -10px rgba(15,23,42,.18); display: flex; align-items: center; gap: 10px; animation: bob 5s ease-in-out infinite; border: 1px solid rgba(226,232,240,.9); pointer-events: none; user-select: none; }
-        @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        .fl1 { top: 20px; left: -20px; }
-        .fl2 { bottom: 50px; right: -20px; animation-delay: 1.5s; }
-        .fl3 { top: 48%; right: -25px; animation-delay: 2.8s; }
-        @media(max-width:640px){ .fl1{left:-5px; top:10px} .fl2{right:-5px; bottom:20px} .fl3{display:none} }
-        .hub-mockup { width: 320px; border-radius: 36px; background: #0f172a; padding: 10px; box-shadow: 0 25px 50px -12px rgba(16,185,129,.28), 0 0 0 1px rgba(255,255,255,0.1); }
-        @media(min-width:640px){ .hub-mockup { width: 340px; } }
+        .hub-mockup {
+          width: 100%;
+          max-width: 360px;
+          border-radius: 48px;
+          background: #0f172a;
+          padding: 12px;
+          box-shadow: 0 25px 60px -15px rgba(16,185,129,.35), 0 0 0 1px rgba(255,255,255,0.1), 0 0 0 6px #1e293b, 0 30px 60px rgba(0,0,0,0.25);
+          position: relative;
+        }
       `}</style>
 
       {/* Sticky Header */}
@@ -164,41 +168,22 @@ export function CustomerPilotCompleteClient() {
                 
                 {/* Mobile Device Mockup */}
                 <div className="relative">
-                  {/* Floating Badge 1: Top Left */}
-                  <div className="float-card fl1">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm font-black shadow-xs">
-                      🚀
-                    </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">4-in-1 Unified Growth Engine</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Complete local business retention</div>
-                    </div>
-                  </div>
-
-                  {/* Floating Badge 2: Bottom Right */}
-                  <div className="float-card fl2">
-                    <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
-                      💰
-                    </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">Save ₹45,000/yr vs 4 Tools</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Replaces Stamp Me + Birdeye + Linktree</div>
-                    </div>
-                  </div>
-
-                  {/* Floating Badge 3: Center Right */}
-                  <div className="float-card fl3">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-xs">
-                      👥
-                    </div>
-                    <div>
-                      <small className="font-extrabold text-slate-900 block text-xs">90-Day VIP Retention: +41%</small>
-                      <div className="text-[10px] text-slate-500 font-medium">Turn walk-ins into regulars</div>
-                    </div>
-                  </div>
-
                   {/* Hub Screen Mockup */}
                   <div className="hub-mockup">
+                    {/* Luxury Dynamic Island Status Bar */}
+                    <div className="flex items-center justify-between px-6 pt-2 pb-2 text-[11px] font-semibold text-white/90">
+                      <span>9:41</span>
+                      <div className="w-20 h-4 bg-black rounded-full flex items-center justify-center">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[10px]">
+                        <span>5G</span>
+                        <span className="w-5 h-2.5 border border-white/80 rounded-xs p-0.5 flex items-center">
+                          <span className="w-full h-full bg-emerald-400 rounded-2xs"></span>
+                        </span>
+                      </div>
+                    </div>
+
                     <div className="rounded-[28px] overflow-hidden bg-white text-slate-900 shadow-inner flex flex-col">
                       
                       {/* Top Ecosystem Header */}
@@ -207,7 +192,7 @@ export function CustomerPilotCompleteClient() {
                           <span>Unified Merchant Hub</span>
                           <span className="bg-white/20 px-2 py-0.5 rounded-full font-bold">ALL-IN-ONE</span>
                         </div>
-                        <h4 className="font-black text-sm text-white truncate">Tasty Vadapav &bull; Atladara</h4>
+                        <div className="font-black text-sm text-white truncate">Tasty Vadapav &bull; Atladara</div>
                         <div className="text-[10px] text-emerald-100 flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3 text-emerald-300" /> 4 Active Growth Engines Synced
                         </div>
@@ -290,6 +275,11 @@ export function CustomerPilotCompleteClient() {
                         </Link>
                       </div>
 
+                      {/* Bottom Home Indicator Bar */}
+                      <div className="py-2.5 flex justify-center bg-slate-50/60 rounded-b-[24px]">
+                        <div className="w-28 h-1 bg-slate-300 rounded-full"></div>
+                      </div>
+
                     </div>
                   </div>
                 </div>
@@ -322,6 +312,170 @@ export function CustomerPilotCompleteClient() {
               <div className="p-5 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
                 <div className="text-3xl font-black text-slate-900">₹6.2/day</div>
                 <div className="text-xs text-slate-600 font-medium">All-Inclusive SME Flat Price</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============ HOW IT WORKS SECTION WITH INFOGRAPHICS & ANIMATION ============ */}
+        <section className="py-20 md:py-28 bg-gradient-to-b from-emerald-50/50 via-white to-slate-50 border-t border-b border-slate-200/80 relative overflow-hidden">
+          {/* Subtle Ambient Background */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-r from-emerald-200/20 via-teal-200/20 to-indigo-200/20 rounded-full blur-3xl pointer-events-none -z-10" />
+
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-16">
+            <div className="text-center max-w-3xl mx-auto space-y-3">
+              <span className="text-emerald-800 text-xs font-black uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 shadow-xs inline-flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                How It Works • The Autonomous 4-Engine Stack
+              </span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+                How CustomerPilot Complete Runs Your Shop on Autopilot in 3 Steps
+              </h2>
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                One counter touchpoint automates your Google reputation, WhatsApp retention, and direct digital orders.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 relative">
+              {/* Connecting Energy Line for Desktop */}
+              <div className="hidden md:block absolute top-1/2 left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-emerald-300 via-teal-300 to-indigo-300 -translate-y-12 -z-0 opacity-40" />
+
+              {/* Step 1 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-emerald-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      01
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                      Step 1 • Standee Setup
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: Standee & Scan */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-emerald-50 to-slate-50 border border-emerald-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="flex items-center gap-3">
+                      <div className="w-18 h-22 rounded-xl bg-white border border-emerald-200 shadow-md p-2 flex flex-col items-center justify-center text-center">
+                        <div className="w-6 h-6 bg-emerald-600 rounded-md flex items-center justify-center text-white mb-1">
+                          <Store className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-[8px] font-black text-slate-900 leading-tight">1 Standee</span>
+                        <span className="text-[7px] text-emerald-700 font-semibold">Powers All</span>
+                      </div>
+                      <div className="text-emerald-500 font-bold text-lg animate-pulse">➔</div>
+                      <div className="w-18 h-22 rounded-xl bg-slate-900 border border-slate-700 shadow-md p-2 flex flex-col items-center justify-center text-white">
+                        <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white mb-1">
+                          <Smartphone className="w-3.5 h-3.5 text-slate-900" />
+                        </div>
+                        <span className="text-[8px] font-black text-white leading-tight">Customer</span>
+                        <span className="text-[7px] text-emerald-300 font-semibold">Taps &amp; Scans</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    1. One Smart Standee Powers Entire Counter
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Place a single acrylic QR standee on your billing desk. Customers tap with NFC or scan with camera in 3 seconds. Zero app downloads.
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-emerald-800 font-semibold">
+                  <span>⚡ 3-Second Contactless Scan</span>
+                  <span className="text-slate-400">Zero Apps Required</span>
+                </div>
+              </div>
+
+              {/* Step 2 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-teal-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-teal-600 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      02
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
+                      Step 2 • 4-Engine Sync
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: 4 Modules Syncing */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-teal-50 to-slate-50 border border-teal-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="grid grid-cols-2 gap-1.5 w-full max-w-[210px]">
+                      <div className="p-1 rounded bg-amber-50 border border-amber-200 text-center">
+                        <span className="text-[7px] font-bold text-amber-800 block">WhatsApp Loyalty</span>
+                        <span className="text-[6px] text-amber-600 font-semibold">+1 Stamp</span>
+                      </div>
+                      <div className="p-1 rounded bg-emerald-50 border border-emerald-200 text-center">
+                        <span className="text-[7px] font-bold text-emerald-800 block">AI Reviews QR</span>
+                        <span className="text-[6px] text-emerald-600 font-semibold">5★ Draft</span>
+                      </div>
+                      <div className="p-1 rounded bg-indigo-50 border border-indigo-200 text-center">
+                        <span className="text-[7px] font-bold text-indigo-800 block">AI AutoReply</span>
+                        <span className="text-[6px] text-indigo-600 font-semibold">0.8s Draft</span>
+                      </div>
+                      <div className="p-1 rounded bg-cyan-50 border border-cyan-200 text-center">
+                        <span className="text-[7px] font-bold text-cyan-800 block">Digital Card</span>
+                        <span className="text-[6px] text-cyan-600 font-semibold">1-Tap vCard</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    2. Autonomous 4-Engine Processing
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Stamps credit automatically to WhatsApp, 5★ reviews route to Google Maps, Gemini auto-drafts replies, and contact cards save with 1 tap.
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-teal-700 font-semibold">
+                  <span>🤖 100% Autonomous</span>
+                  <span className="text-slate-400">Zero Manual Work</span>
+                </div>
+              </div>
+
+              {/* Step 3 Infographic Card */}
+              <div className="relative z-10 p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 hover:border-indigo-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="w-10 h-10 rounded-2xl bg-indigo-600 text-white font-black text-sm flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                      03
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200">
+                      Step 3 • Unified ROI
+                    </span>
+                  </div>
+
+                  {/* Infographic Visual: Merchant Growth Card */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-b from-indigo-50 to-slate-50 border border-indigo-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
+                    <div className="p-2.5 rounded-xl bg-white border border-indigo-200 shadow-sm w-full max-w-[210px] space-y-1.5 text-center">
+                      <div className="flex items-center justify-center gap-1 text-indigo-800 font-bold text-[10px]">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Unified VIP CRM Growth</span>
+                      </div>
+                      <div className="flex justify-around text-[8px] font-bold text-slate-700 py-0.5 bg-slate-50 rounded">
+                        <span className="text-emerald-700">+34% Walk-ins</span>
+                        <span className="text-indigo-700">₹45k Saved</span>
+                      </div>
+                      <span className="inline-block bg-indigo-100 text-indigo-800 text-[8px] font-bold px-2 py-0.5 rounded-full">
+                        1 Dashboard • Zero Fragility
+                      </span>
+                    </div>
+                  </div>
+
+                  <h3 className="font-extrabold text-slate-900 text-lg">
+                    3. Unified VIP CRM &amp; ₹45,000 Saved
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Track all customer visits, loyalty stamp points, and Google reviews in one centralized merchant cockpit. Save ₹45,000/yr vs separate SaaS tools.
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-indigo-700 font-semibold">
+                  <span>💰 ₹45,000/yr Saved</span>
+                  <span className="text-slate-400">+34% Repeat Footfall</span>
+                </div>
               </div>
             </div>
           </div>
