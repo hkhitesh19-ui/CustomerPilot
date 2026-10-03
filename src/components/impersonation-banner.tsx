@@ -15,10 +15,18 @@ export function ImpersonationBanner() {
         .find((row) => row.startsWith("cp_impersonation="))
 
       if (match) {
-        const value = decodeURIComponent(match.split("=")[1])
-        const parsed = JSON.parse(value)
-        if (parsed?.active) {
-          setImpersonation(parsed)
+        const eqIdx = match.indexOf("=")
+        if (eqIdx !== -1) {
+          const rawValue = match.slice(eqIdx + 1).trim()
+          if (rawValue) {
+            const value = decodeURIComponent(rawValue).trim()
+            if (value && (value.startsWith("{") || value.startsWith("["))) {
+              const parsed = JSON.parse(value)
+              if (parsed?.active) {
+                setImpersonation(parsed)
+              }
+            }
+          }
         }
       }
     } catch {

@@ -17,10 +17,33 @@ import {
   Download,
   Clock,
   Camera,
-  ShoppingBag
+  ShoppingBag,
+  BadgeCheck,
+  Bike,
+  Instagram,
+  Facebook,
+  Navigation,
+  Globe,
+  Share2,
+  Contact,
+  ChevronRight,
+  Check,
+  Sparkles,
+  ShieldCheck,
+  Zap
 } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
+
+function OfficialWhatsAppIcon({ className = "w-5 h-5 fill-current" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  )
+}
+
+const timesFont: React.CSSProperties = { fontFamily: '"Times New Roman", Times, "Liberation Serif", serif' }
 
 const CARD_FAQS: DualLangFaqItem[] = [
   {
@@ -65,56 +88,86 @@ const LIVE_CARD_EXAMPLES = [
   {
     id: "cake-connection",
     name: "Cake Connection",
-    branch: "Designer Birthday & Wedding Cakes",
-    category: "Artisan Bakery & Dessert Cafe • Manjalpur",
-    address: "Opp. Shreyas School, Manjalpur, Vadodara, Gujarat 390011",
-    shortAddress: "Opp. Shreyas School, Manjalpur, Vadodara",
-    phone: "+91 72038 24012",
-    rating: "4.8",
-    reviewCount: "520+",
-    hours: "Open Daily • 9:00 AM – 11:00 PM",
     slug: "cake-connection",
-    bgAccent: "from-rose-500 via-pink-600 to-purple-600",
-    badgeColor: "bg-pink-100 text-pink-900 border-pink-300",
+    tagline: "Cakes • Desserts • Flowers • Party Decor",
+    logoUrl: "/uploads/1789267721286-IMG_20220502_WA0034.jpg",
+    locationCol1: "Manjalpur",
+    locationCol2: "Vadodara, Gujarat",
+    hoursCol1: "Open Daily",
+    hoursCol2: "9:00 AM – 12:00 AM",
+    deliveryCol1: "Delivery",
+    deliveryCol2: "Vadodara Only",
+    phone: "+91 72038 24012",
+    rawPhone: "917203824012",
+    instagram: "CakeConnection.in",
+    facebook: "CakeConnection.in",
+    rating: "4.6",
+    reviewCount: "689",
+    isFood: true,
     icon: ShoppingBag,
-    initials: "CC",
-    specialties: ["Custom Cakes", "Dessert Cafe", "WhatsApp Catalog", "1-Tap vCard"]
+    orderingPlatforms: [
+      { label: "Website", color: "bg-blue-600", letter: "🌐" },
+      { label: "WhatsApp", color: "bg-[#25D366]", letter: "💬" },
+      { label: "Zomato", color: "bg-[#e23744]", letter: "z" },
+      { label: "Swiggy", color: "bg-[#fc8019]", letter: "S" },
+      { label: "EasyCater", color: "bg-[#232f3e]", letter: "EC" }
+    ]
   },
   {
     id: "tasty-vadapav",
     name: "Tasty Vadapav",
-    branch: "Atladara-Padra Road Branch",
-    category: "Fast Food • Vadapav Specialist • Atladara",
-    address: "Shop No. GF-15, Tower-A, Samanvay Status, Padra Road, Atladara, Vadodara, Gujarat 391410",
-    shortAddress: "Samanvay Status, Atladara, Vadodara",
-    phone: "+91 93281 12314",
-    rating: "4.8",
-    reviewCount: "120+",
-    hours: "Open Daily • 9:00 AM – 9:00 PM",
     slug: "tasty-vadapav-atladara",
-    bgAccent: "from-amber-500 to-orange-600",
-    badgeColor: "bg-amber-100 text-amber-900 border-amber-300",
+    tagline: "Fast Food • Vadapav Specialist • Atladara",
+    logoUrl: "/uploads/tasty-vadapav-logo.png",
+    locationCol1: "Atladara",
+    locationCol2: "Padra Road, Vadodara",
+    hoursCol1: "Open Daily",
+    hoursCol2: "9:00 AM – 9:00 PM",
+    deliveryCol1: "Takeaway",
+    deliveryCol2: "Swiggy & Takeaway",
+    phone: "+91 93281 12314",
+    rawPhone: "919328112314",
+    instagram: "tasty.vadapav",
+    facebook: "tastyvadapav",
+    rating: "4.0",
+    reviewCount: "52",
+    isFood: true,
     icon: Utensils,
-    initials: "TV",
-    specialties: ["Vadapav", "Dabeli", "Masala Chaas", "Swiggy & Takeaway"]
+    orderingPlatforms: [
+      { label: "Website", color: "bg-blue-600", letter: "🌐" },
+      { label: "WhatsApp", color: "bg-[#25D366]", letter: "💬" },
+      { label: "Zomato", color: "bg-[#e23744]", letter: "z" },
+      { label: "Swiggy", color: "bg-[#fc8019]", letter: "S" },
+      { label: "Takeaway", color: "bg-[#059669]", letter: "🛍️" }
+    ]
   },
   {
     id: "gujarat-photo",
     name: "Gujarat Photo Goods",
-    branch: "Pro Cameras & Studio Lighting",
-    category: "Camera Store • Pro Lenses • Drones",
-    address: "Shop 1-4, Jayendrapuri Bhavan, Ashram Road, Ellisbridge, Ahmedabad, Gujarat 380006",
-    shortAddress: "Ashram Road, Ellisbridge, Ahmedabad",
-    phone: "+91 98250 37489",
-    rating: "4.5",
-    reviewCount: "406+",
-    hours: "Open · Closes 7:30 PM",
     slug: "gujarat-photo-goods",
-    bgAccent: "from-cyan-600 to-blue-700",
-    badgeColor: "bg-cyan-100 text-cyan-900 border-cyan-300",
+    tagline: "Camera Store • Pro Lenses • Drones • Ahmedabad",
+    logoUrl: "/uploads/gujarat-photo-goods-logo.svg",
+    locationCol1: "Ashram Road",
+    locationCol2: "Ahmedabad, Gujarat",
+    hoursCol1: "Open Daily",
+    hoursCol2: "10:30 AM – 7:30 PM",
+    deliveryCol1: "Delivery",
+    deliveryCol2: "Pan-India Shipping",
+    phone: "+91 98250 37489",
+    rawPhone: "919825037489",
+    instagram: "gujaratphotogoods",
+    facebook: "gujaratphotogoods",
+    rating: "4.5",
+    reviewCount: "406",
+    isFood: false,
     icon: Camera,
-    initials: "GP",
-    specialties: ["Sony α Cinema", "Nikon Mirrorless", "DJI Gimbals", "Instant WhatsApp Catalog"]
+    orderingPlatforms: [
+      { label: "Nikon", color: "bg-[#eab308]", letter: "N" },
+      { label: "Sony", color: "bg-[#0284c7]", letter: "α" },
+      { label: "Canon", color: "bg-[#dc2626]", letter: "C" },
+      { label: "DJI", color: "bg-[#0f766e]", letter: "DJI" },
+      { label: "Store", color: "bg-blue-600", letter: "🌐" }
+    ]
   }
 ]
 
@@ -179,7 +232,13 @@ export function SmartDigitalBusinessCardClient() {
           <Link href="/" className="no-underline flex items-center">
             <BrandLogo size="sm" />
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Link
+              href="#pricing"
+              className="hidden sm:inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition"
+            >
+              Plans &amp; Pricing
+            </Link>
             <Link
               href="/"
               className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition"
@@ -268,7 +327,10 @@ export function SmartDigitalBusinessCardClient() {
                       role="tab"
                       aria-selected={activeCardIndex === idx}
                       type="button"
-                      onClick={() => setActiveCardIndex(idx)}
+                      onClick={() => {
+                        setActiveCardIndex(idx)
+                        setIsPaused(true)
+                      }}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                         activeCardIndex === idx
                           ? "bg-white text-slate-900 shadow-sm border border-slate-200"
@@ -283,117 +345,327 @@ export function SmartDigitalBusinessCardClient() {
 
                 {/* Phone Device Container */}
                 <div className="phone-mockup">
-                  <div className="rounded-[40px] overflow-hidden bg-white text-slate-900 shadow-inner flex flex-col">
+                  <div className="rounded-[40px] overflow-hidden bg-gradient-to-b from-[#fbf8f2] via-[#f7f2e7] to-[#ede4d1] text-slate-900 shadow-inner flex flex-col border border-amber-200/50">
                     
                     {/* Top Phone Status Bar with Dynamic Island */}
-                    <div className="pt-2.5 pb-2 px-6 flex items-center justify-between text-[11px] font-bold text-white bg-slate-950 select-none border-b border-white/10">
-                      <span className="tracking-tight">9:41</span>
-                      <div className="w-24 h-4 bg-black rounded-full flex items-center justify-end px-2 border border-slate-800">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <div className="pt-2.5 pb-2 px-5 flex items-center justify-between text-[11px] font-bold text-white bg-slate-950 select-none border-b border-white/10 shrink-0">
+                      <span className="tracking-tight font-sans">9:41</span>
+                      <div className="w-20 h-3.5 bg-black rounded-full flex items-center justify-end px-1.5 border border-slate-800">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-[10px] opacity-90">
+                      <div className="flex items-center gap-1 text-[10px] opacity-90 font-sans">
                         <span>5G</span>
                         <span>100%</span>
                       </div>
                     </div>
 
-                    {/* Top Phone Status & Card Header */}
-                    <div className={`p-5 bg-gradient-to-r ${activeCard.bgAccent} text-white space-y-3`}>
-                      <div className="flex items-center justify-between text-[11px] opacity-90 font-medium">
-                        <span>Live Digital Card</span>
-                        <span className="bg-white/20 px-2 py-0.5 rounded-full font-bold">100% Real</span>
-                      </div>
-
-                      <div className="flex items-center gap-3 pt-1">
-                        <div className="w-13 h-13 rounded-2xl bg-white text-slate-900 font-black text-xl flex items-center justify-center shadow-lg">
-                          {activeCard.initials}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div data-testid="phone-store-name" className="phone-store-name font-black text-base leading-tight truncate text-white">{activeCard.name}</div>
-                          <p className="text-[11px] text-white/90 truncate">{activeCard.branch}</p>
-                          <div className="flex items-center gap-1.5 mt-1">
-                            <span className="bg-white/25 px-2 py-0.5 rounded text-[10px] font-extrabold text-white shadow-xs">
-                              {activeCard.rating} ★ ({activeCard.reviewCount})
-                            </span>
-                            <span className="text-[10px] text-white/95 font-semibold">Verified Merchant</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card Body Buttons & Details */}
-                    <div className="p-4 space-y-3 bg-slate-50/60 text-xs">
-                      {/* Quick 2-Column Action Grid */}
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2.5 hover:border-cyan-300 transition">
-                          <Download className="w-4 h-4 text-emerald-600 shrink-0" />
-                          <div className="min-w-0">
-                            <div className="font-bold text-[11px] text-slate-900 truncate">Save Contact</div>
-                            <div className="text-[9px] text-slate-500 font-medium">1-Tap vCard</div>
-                          </div>
-                        </div>
-
-                        <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2.5 hover:border-cyan-300 transition">
-                          <Phone className="w-4 h-4 text-blue-600 shrink-0" />
-                          <div className="min-w-0">
-                            <div className="font-bold text-[11px] text-slate-900 truncate">Call Direct</div>
-                            <div className="text-[9px] text-slate-500 font-medium">{activeCard.phone}</div>
-                          </div>
-                        </div>
-
-                        <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2.5 hover:border-cyan-300 transition">
-                          <MessageSquare className="w-4 h-4 text-emerald-600 shrink-0" />
-                          <div className="min-w-0">
-                            <div className="font-bold text-[11px] text-slate-900 truncate">WhatsApp</div>
-                            <div className="text-[9px] text-slate-500 font-medium">Direct order</div>
-                          </div>
-                        </div>
-
-                        <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2.5 hover:border-cyan-300 transition">
-                          <Star className="w-4 h-4 text-amber-500 shrink-0" />
-                          <div className="min-w-0">
-                            <div className="font-bold text-[11px] text-slate-900 truncate">Google Review</div>
-                            <div className="text-[9px] text-slate-500 font-medium">5-Star modal</div>
-                          </div>
+                    {/* Authentic Live Digital Card Viewport (Scrollable inside Phone) */}
+                    <div className="max-h-[530px] overflow-y-auto px-3.5 py-3 space-y-3 relative selection:bg-amber-200">
+                      
+                      {/* 1. Real Logo in White Box with Amber Border */}
+                      <div className="flex justify-center pt-1">
+                        <div className="w-36 h-18 sm:w-40 sm:h-20 rounded-2xl bg-white p-2 shadow-xs border-2 border-amber-300/80 flex items-center justify-center overflow-hidden">
+                          {activeCard.logoUrl ? (
+                            <img
+                              src={activeCard.logoUrl}
+                              alt={activeCard.name}
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            <div className="w-full h-full rounded-xl bg-slate-900 text-amber-400 font-black text-xl flex items-center justify-center">
+                              {activeCard.name.slice(0, 2).toUpperCase()}
+                            </div>
+                          )}
                         </div>
                       </div>
 
-                      {/* Location Pill with shortAddress to prevent ellipsis clipping */}
-                      <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-2.5">
-                        <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <div className="font-bold text-[11px] text-slate-900">{activeCard.shortAddress}</div>
-                          <div className="text-[9px] text-slate-500 flex items-center gap-1 mt-0.5">
-                            <Clock className="w-3 h-3 text-slate-400" />
-                            <span>{activeCard.hours}</span>
-                          </div>
+                      {/* 2. Real Business Title with Verified Badge (Times New Roman) */}
+                      <div className="text-center">
+                        <div 
+                          style={timesFont}
+                          className="text-lg sm:text-[21px] font-bold text-slate-900 tracking-normal flex items-center justify-center gap-1.5 leading-tight"
+                        >
+                          <span data-testid="phone-store-name" className="phone-store-name">{activeCard.name}</span>
+                          <BadgeCheck className="w-5 h-5 text-sky-500 fill-sky-500 text-white shrink-0" />
                         </div>
+                        <p 
+                          style={timesFont}
+                          className="text-[11.5px] italic text-slate-700 tracking-normal mt-0.5"
+                        >
+                          {activeCard.tagline}
+                        </p>
                       </div>
 
-                      {/* Specialties Chips */}
-                      <div className="flex flex-wrap gap-1 pt-1">
-                        {activeCard.specialties.map((s) => (
-                          <span key={`${activeCard.id}-${s}`} className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[10px] font-semibold text-slate-600">
-                            {s}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* Click to open full card */}
-                      <Link
-                        href={`/c/${activeCard.slug}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full mt-2 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md hover:scale-[1.02]"
+                      {/* 3. 3-Pill Status Bar (Times New Roman) */}
+                      <div 
+                        style={timesFont}
+                        className="bg-white/95 backdrop-blur-md rounded-2xl border border-amber-200/80 shadow-xs p-2 grid grid-cols-3 divide-x divide-slate-100 text-center"
                       >
-                        <span>Open Full Live Card</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </Link>
+                        <div className="flex flex-col items-center px-1">
+                          <div className="flex items-center gap-1 text-red-600 mb-0.5">
+                            <MapPin className="w-3 h-3 fill-red-600 text-white shrink-0" />
+                            <span className="font-bold text-[10.5px] text-slate-900 truncate max-w-full">
+                              {activeCard.locationCol1}
+                            </span>
+                          </div>
+                          <span className="text-[9px] text-slate-600 truncate max-w-full">
+                            {activeCard.locationCol2}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-col items-center px-1">
+                          <div className="flex items-center gap-1 text-red-600 mb-0.5">
+                            <Clock className="w-3 h-3 text-red-600 stroke-[2.5] shrink-0" />
+                            <span className="font-bold text-[10.5px] text-slate-900 truncate max-w-full">
+                              {activeCard.hoursCol1}
+                            </span>
+                          </div>
+                          <span className="text-[9px] text-slate-600 truncate max-w-full">
+                            {activeCard.hoursCol2}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-col items-center px-1">
+                          <div className="flex items-center gap-1 text-red-600 mb-0.5">
+                            <Bike className="w-3 h-3 text-red-600 stroke-[2.5] shrink-0" />
+                            <span className="font-bold text-[10.5px] text-slate-900 truncate max-w-full">
+                              {activeCard.deliveryCol1}
+                            </span>
+                          </div>
+                          <span className="text-[9px] text-slate-600 truncate max-w-full">
+                            {activeCard.deliveryCol2}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* 4. Primary Action Buttons (2 cols + Location full width) */}
+                      <div className="grid grid-cols-2 gap-1.5 font-sans">
+                        {/* WhatsApp */}
+                        <a
+                          href={`https://wa.me/${activeCard.rawPhone}?text=Hello%20${encodeURIComponent(activeCard.name)}%2C%20I%20found%20your%20Digital%20Card`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs flex items-center justify-between group active:scale-[0.98] transition"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="w-7 h-7 rounded-full bg-[#25D366] flex items-center justify-center shrink-0 shadow-xs">
+                              <OfficialWhatsAppIcon className="w-4 h-4 fill-white" />
+                            </div>
+                            <div className="text-left min-w-0">
+                              <div className="font-bold text-[11px] leading-tight text-slate-900">WhatsApp</div>
+                              <div className="text-[9px] text-slate-500 truncate">Chat with Us</div>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        </a>
+
+                        {/* Call Now */}
+                        <a
+                          href={`tel:${activeCard.phone}`}
+                          className="p-2 rounded-xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs flex items-center justify-between group active:scale-[0.98] transition"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center shrink-0 shadow-xs">
+                              <Phone className="w-3.5 h-3.5 text-white fill-white" />
+                            </div>
+                            <div className="text-left min-w-0">
+                              <div className="font-bold text-[11px] leading-tight text-slate-900">Call Now</div>
+                              <div className="text-[9px] text-slate-500 truncate font-mono">{activeCard.phone}</div>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        </a>
+
+                        {/* Instagram */}
+                        <a
+                          href={`https://instagram.com/${activeCard.instagram}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs flex items-center justify-between group active:scale-[0.98] transition"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center shrink-0 shadow-xs">
+                              <Instagram className="w-3.5 h-3.5 text-white" />
+                            </div>
+                            <div className="text-left min-w-0">
+                              <div className="font-bold text-[11px] leading-tight text-slate-900">Instagram</div>
+                              <div className="text-[9px] text-slate-500 truncate">Follow for Updates</div>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        </a>
+
+                        {/* Facebook */}
+                        <a
+                          href={`https://facebook.com/${activeCard.facebook}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs flex items-center justify-between group active:scale-[0.98] transition"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="w-7 h-7 rounded-full bg-[#1877F2] flex items-center justify-center shrink-0 shadow-xs">
+                              <Facebook className="w-3.5 h-3.5 text-white fill-white" />
+                            </div>
+                            <div className="text-left min-w-0">
+                              <div className="font-bold text-[11px] leading-tight text-slate-900">Facebook</div>
+                              <div className="text-[9px] text-slate-500 truncate">Like Our Page</div>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        </a>
+
+                        {/* Location (Full width 2 cols) */}
+                        <a
+                          href={`https://maps.google.com/?q=${encodeURIComponent(activeCard.name + " " + activeCard.locationCol1)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="col-span-2 p-2 rounded-xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs flex items-center justify-between group active:scale-[0.98] transition"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="w-7 h-7 rounded-full bg-rose-500 flex items-center justify-center shrink-0 shadow-xs">
+                              <Navigation className="w-3.5 h-3.5 text-white fill-white" />
+                            </div>
+                            <div className="text-left min-w-0">
+                              <div className="font-bold text-[11px] leading-tight text-slate-900">Location</div>
+                              <div className="text-[9px] text-slate-500 truncate">Get Directions ({activeCard.locationCol1})</div>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        </a>
+                      </div>
+
+                      {/* 5. Online Ordering Platforms / Store Catalog */}
+                      <div className="pt-0.5">
+                        <div className="flex items-center justify-center gap-2 mb-1.5">
+                          <div className="h-[1px] bg-amber-300/80 flex-1 max-w-[36px]" />
+                          <div 
+                            style={timesFont}
+                            className="flex items-center gap-1.5 text-[9.5px] font-bold uppercase tracking-wider text-slate-800"
+                          >
+                            <ShoppingBag className="w-3 h-3 text-amber-600" />
+                            <span>{activeCard.isFood ? "Online Ordering Platforms" : "Official Store & Catalog"}</span>
+                          </div>
+                          <div className="h-[1px] bg-amber-300/80 flex-1 max-w-[36px]" />
+                        </div>
+
+                        <div className="grid grid-cols-5 gap-1 font-sans">
+                          {activeCard.orderingPlatforms.map((item) => (
+                            <a
+                              key={`${activeCard.id}-${item.label}`}
+                              href={`/c/${activeCard.slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 rounded-xl bg-white/95 border border-amber-200/60 shadow-xs hover:shadow-sm transition flex flex-col items-center text-center group"
+                            >
+                              <div className={`w-7 h-7 rounded-full ${item.color} text-white flex items-center justify-center font-black text-[10px] shadow-xs mb-1 group-hover:scale-105 transition-transform`}>
+                                {item.letter === "z" ? (
+                                  <span className="font-black italic text-[10px]">z</span>
+                                ) : item.letter === "S" ? (
+                                  <span className="font-black text-[10px]">S</span>
+                                ) : item.letter === "EC" ? (
+                                  <span className="font-bold text-[8px] uppercase">EC</span>
+                                ) : item.letter === "💬" ? (
+                                  <OfficialWhatsAppIcon className="w-3.5 h-3.5 fill-white" />
+                                ) : item.letter === "🛍️" ? (
+                                  <span className="text-[10px]">🛍️</span>
+                                ) : typeof item.letter === "string" && item.letter.length <= 3 ? (
+                                  <span className="font-black text-[9px] uppercase">{item.letter}</span>
+                                ) : (
+                                  <Globe className="w-3 h-3" />
+                                )}
+                              </div>
+                              <span className="font-bold text-[8.5px] text-slate-800 leading-tight truncate w-full">
+                                {item.label}
+                              </span>
+                              <span className="text-[7.5px] text-slate-500 mt-0.5 flex items-center justify-center">
+                                Order &gt;
+                              </span>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 6. Utility Cards (Google Reviews, Share Card, Scan QR) */}
+                      <div style={timesFont} className="grid grid-cols-3 gap-1.5 pt-0.5">
+                        {/* Google Reviews */}
+                        <a
+                          href={`/c/${activeCard.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 rounded-xl bg-white/95 border border-amber-200/60 shadow-xs flex flex-col items-center text-center group hover:shadow-sm transition"
+                        >
+                          <div className="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center mb-0.5">
+                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+                              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                            </svg>
+                          </div>
+                          <span className="font-bold text-[9px] text-slate-800 leading-tight">Google Reviews</span>
+                          <div className="flex items-center gap-0.5 text-amber-500 text-[9px] font-bold mt-0.5">
+                            <span>{activeCard.rating}</span>
+                            <Star className="w-2 h-2 fill-amber-500 text-amber-500" />
+                          </div>
+                          <span className="text-[7.5px] text-slate-500 font-medium">
+                            {activeCard.reviewCount} Reviews &gt;
+                          </span>
+                        </a>
+
+                        {/* Share Card */}
+                        <a
+                          href={`/c/${activeCard.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 rounded-xl bg-white/95 border border-amber-200/60 shadow-xs flex flex-col items-center text-center group hover:shadow-sm transition"
+                        >
+                          <div className="w-6 h-6 rounded-full bg-amber-50 text-amber-800 flex items-center justify-center mb-0.5">
+                            <Share2 className="w-3.5 h-3.5" />
+                          </div>
+                          <span className="font-bold text-[9px] text-slate-800 leading-tight">Share Card</span>
+                          <span className="text-[7.5px] text-amber-700 font-medium mt-1">With Friends &gt;</span>
+                        </a>
+
+                        {/* Scan QR */}
+                        <a
+                          href={`/c/${activeCard.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 rounded-xl bg-white/95 border border-amber-200/60 shadow-xs flex flex-col items-center text-center group hover:shadow-sm transition"
+                        >
+                          <div className="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center mb-0.5">
+                            <QrCode className="w-3.5 h-3.5" />
+                          </div>
+                          <span className="font-bold text-[9px] text-slate-800 leading-tight">Scan QR</span>
+                          <span className="text-[7.5px] text-slate-500 font-medium mt-1">Save to Phone &gt;</span>
+                        </a>
+                      </div>
+
+                      {/* 7. Sticky Save Contact Button */}
+                      <div className="pt-1.5 sticky bottom-0 z-20 pb-0.5">
+                        <Link
+                          href={`/c/${activeCard.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full py-2.5 px-3.5 rounded-xl bg-white/95 hover:bg-white active:scale-[0.98] text-slate-900 shadow-md border-2 border-amber-300 flex items-center justify-between font-bold text-xs tracking-wider uppercase transition-all"
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center shadow-xs">
+                              <Contact className="w-3.5 h-3.5" />
+                            </div>
+                            <span className="text-slate-900 font-black tracking-wider text-[11px]">
+                              SAVE CONTACT
+                            </span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-amber-600" />
+                        </Link>
+                      </div>
+
                     </div>
 
                     {/* Bottom Phone Home Indicator */}
-                    <div className="py-2.5 bg-slate-50 flex justify-center border-t border-slate-200">
-                      <div className="w-28 h-1 bg-slate-300 rounded-full"></div>
+                    <div className="py-2 bg-slate-50 flex justify-center border-t border-slate-200 shrink-0">
+                      <div className="w-24 h-1 bg-slate-300 rounded-full"></div>
                     </div>
 
                   </div>
@@ -736,6 +1008,229 @@ export function SmartDigitalBusinessCardClient() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </section>
+
+        {/* ============ OFFICIAL PRICING PLANS SECTION ============ */}
+        <section id="pricing" className="py-16 md:py-24 bg-gradient-to-b from-white via-cyan-50/20 to-white relative overflow-hidden border-t border-b border-slate-200/80">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10 space-y-12">
+            
+            <div className="text-center max-w-2xl mx-auto space-y-3">
+              <span className="text-cyan-700 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-cyan-50 border border-cyan-200">
+                Transparent &amp; Affordable Plans
+              </span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
+                Simple, Honest Pricing for Every Business
+              </h2>
+              <p className="text-slate-600 text-xs sm:text-sm">
+                No hidden charges. Instant setup in 2 minutes. Choose the plan that fits your retail store, clinic, cafe, or brand.
+              </p>
+            </div>
+
+            {/* 3-Tier Pricing Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+              
+              {/* Plan 1: 6 Months (₹349) */}
+              <div className="p-7 sm:p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                      Starter Plan
+                    </span>
+                    <span className="text-[11px] font-semibold text-slate-500">6 Months Access</span>
+                  </div>
+
+                  <div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl sm:text-5xl font-black text-slate-900">₹349</span>
+                      <span className="text-sm font-semibold text-slate-400 line-through">₹699</span>
+                    </div>
+                    <div className="text-xs font-bold text-cyan-700 mt-1">
+                      Just ~₹58 / month · Save 50%
+                    </div>
+                    <p className="text-xs text-slate-500 mt-2">
+                      Ideal for new businesses and local stores wanting to test digital visiting cards and boost Google reviews.
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 space-y-2.5 text-xs text-slate-700 font-medium">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>1-Tap Save Contact (vCard .vcf phonebook sync)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Direct 5-Star Google Reviews Submission Modal</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>WhatsApp Chat &amp; Direct Calling Connect</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Google Maps Turn-by-Turn Navigation</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>High-Resolution Printable QR Code (PNG &amp; SVG)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>6 Months Cloud Hosting with Real-Time Edits</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Button asChild size="lg" className="w-full py-5 rounded-2xl bg-white border-2 border-slate-300 hover:border-slate-400 text-slate-800 font-bold text-sm shadow-xs hover:bg-slate-50 transition">
+                  <Link href="/signup">
+                    Choose 6 Months (₹349) →
+                  </Link>
+                </Button>
+              </div>
+
+              {/* Plan 2: 1 Year (₹499) - HIGHLIGHTED / POPULAR */}
+              <div className="p-7 sm:p-8 rounded-3xl bg-white border-2 border-cyan-500 shadow-xl hover:shadow-2xl transition-all flex flex-col justify-between space-y-6 relative transform md:-translate-y-2">
+                {/* Popular Ribbon */}
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-cyan-600 to-emerald-600 text-white font-extrabold text-[11px] uppercase tracking-wider shadow-md whitespace-nowrap">
+                  ⭐ Most Popular • Best Annual Value
+                </div>
+
+                <div className="space-y-4 pt-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-cyan-50 text-cyan-800 border border-cyan-200">
+                      Pro Annual Plan
+                    </span>
+                    <span className="text-[11px] font-bold text-cyan-700">12 Months (1 Year)</span>
+                  </div>
+
+                  <div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl sm:text-5xl font-black text-slate-900">₹499</span>
+                      <span className="text-sm font-semibold text-slate-400 line-through">₹1,199</span>
+                    </div>
+                    <div className="text-xs font-extrabold text-emerald-600 mt-1">
+                      Just ~₹41 / month · Billed Annually (Save 58%)
+                    </div>
+                    <p className="text-xs text-slate-500 mt-2">
+                      The complete commerce &amp; reputation hub for retail stores, cafes, bakeries, salons, and clinics.
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 space-y-2.5 text-xs text-slate-700 font-medium">
+                    <div className="flex items-center gap-2 font-bold text-cyan-800">
+                      <Sparkles className="w-4 h-4 text-cyan-600 shrink-0" />
+                      <span>Everything in 6 Months Plan +</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Online Ordering Links (Zomato / Swiggy / Catalog)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Social Media Links (Instagram, Facebook, YouTube)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Printable Counter Acrylic Standee Templates</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>1 Full Year Cloud Hosting with Instant Edits</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Priority WhatsApp &amp; Email Support</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Button asChild size="lg" className="w-full py-5 rounded-2xl btn-grad font-black text-sm shadow-lg hover:scale-[1.02] transition">
+                  <Link href="/signup">
+                    Get 1 Year Plan (₹499) →
+                  </Link>
+                </Button>
+              </div>
+
+              {/* Plan 3: Lifetime Access (₹1499) - BEST VALUE */}
+              <div className="p-7 sm:p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                      👑 Lifetime Deal
+                    </span>
+                    <span className="text-[11px] font-bold text-amber-600">Zero Renewal Fees</span>
+                  </div>
+
+                  <div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl sm:text-5xl font-black text-slate-900">₹1499</span>
+                      <span className="text-sm font-semibold text-slate-400 line-through">₹3,999</span>
+                    </div>
+                    <div className="text-xs font-bold text-amber-700 mt-1">
+                      One-Time Payment · Pay Once, Use Forever
+                    </div>
+                    <p className="text-xs text-slate-500 mt-2">
+                      For established merchants who never want to worry about annual renewals or recurring costs ever again.
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 space-y-2.5 text-xs text-slate-700 font-medium">
+                    <div className="flex items-center gap-2 font-bold text-amber-800">
+                      <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>Unlimited Lifetime Cloud Hosting</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Everything in 1 Year Plan Included</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Zero Annual Renewal Fees Forever</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Unlimited Real-Time Profile &amp; Menu Updates</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Vector Standee &amp; Smart NFC Tap Card Files</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>VIP 1-on-1 Onboarding Assistance</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>All Future Card Features &amp; Upgrades Included</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Button asChild size="lg" className="w-full py-5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-sm shadow-md hover:scale-[1.02] transition">
+                  <Link href="/signup">
+                    Claim Lifetime Deal (₹1499) →
+                  </Link>
+                </Button>
+              </div>
+
+            </div>
+
+            {/* Reassurance Trust Strip */}
+            <div className="max-w-4xl mx-auto p-4 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3 text-center text-xs font-semibold text-slate-600">
+              <div className="flex items-center justify-center gap-1.5">
+                <Zap className="w-4 h-4 text-amber-500 shrink-0" />
+                <span>Instant Activation in 2 Minutes</span>
+              </div>
+              <div className="flex items-center justify-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>100% Secure UPI &amp; Cards Payment</span>
+              </div>
+              <div className="flex items-center justify-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-cyan-600 shrink-0" />
+                <span>₹0 Re-Printing Costs Forever</span>
+              </div>
+            </div>
+
           </div>
         </section>
 

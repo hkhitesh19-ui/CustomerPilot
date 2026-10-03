@@ -3,6 +3,48 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Oct 2026] Issue: Exact Real Digital Card Simulator Layout & Official 3-Tier Pricing Section (₹349, ₹499, ₹1499)
+- **Symptom**: User requested:
+  1. `http://localhost:3000/smart-digital-business-card`: Show the exact layout of the actual Smart Digital Business Card as generated on CustomerPilot inside the mobile phone simulator (matching `/c/cake-connection`), so visitors immediately see exactly what their card looks like upon generation.
+  2. Add the official 3-tier Pricing Section:
+     - 6 Months: ₹349/-
+     - 1 Year (12 Months): ₹499/-
+     - Lifetime: ₹1499/-
+- **Root Cause**:
+  1. The phone simulator previously rendered an abstract card with a generic gradient banner rather than the authentic ivory/cream card layout generated at `/c/[slug]` (which includes the official golden-bordered logo container, Times New Roman headings, blue verified checkmark, 3-pill status bar, action buttons with highlighted circular badges, online ordering platforms, utility cards, and sticky "SAVE CONTACT" luxury button).
+  2. The page lacked a dedicated, clear, transparent pricing section for the 3 official tiers.
+- **Resolution**:
+  1. **Exact Authentic Digital Card in Phone Simulator (`src/components/smart-digital-business-card-client.tsx`)**:
+     - Upgraded phone simulator inner viewport to render the exact structure and styling of `DigitalCardView`:
+       - Warm ivory/cream background (`from-[#fbf8f2] via-[#f7f2e7] to-[#ede4d1]`).
+       - Official logo container with amber border (`/uploads/1789267721286-IMG_20220502_WA0034.jpg` for Cake Connection, `/uploads/tasty-vadapav-logo.png` for Tasty Vadapav, `/uploads/gujarat-photo-goods-logo.svg` for Gujarat Photo Goods).
+       - Business name in Times New Roman (`timesFont`) with blue `BadgeCheck` (sky-500).
+       - Italic category subtitle (`"Cakes • Desserts • Flowers • Party Decor"`).
+       - 3-Pill Status Bar (Location: Manjalpur, Hours: Open Daily 9:00 AM – 12:00 AM, Delivery: Vadodara Only).
+       - Primary Action Buttons: WhatsApp (`#25D366`), Call Now (Blue), Instagram (Gradient), Facebook (Blue), Location (Rose full width).
+       - Online Ordering Platforms section with divider lines and 5 circular platforms (Website, WhatsApp, Zomato, Swiggy, EasyCater / camera brands).
+       - 3 Utility Cards: Google Reviews (4.6★, 689 Reviews), Share Card, Scan QR.
+       - Sticky Bottom "SAVE CONTACT" luxury button with amber border and contact icon.
+     - Interactive tab switching between Cake Connection, Tasty Vadapav, and Gujarat Photo Goods seamlessly updates the phone mockup to that store's authentic live data.
+  2. **Official 3-Tier Pricing Section (`#pricing`)**:
+     - Built dedicated responsive 3-card pricing section:
+       - **Starter Plan**: ₹349 (6 Months Access, ~₹58/mo, 50% discount vs ₹699).
+       - **Pro Annual Plan**: ₹499 (12 Months / 1 Year, ~₹41/mo, Most Popular • Best Annual Value, 58% discount vs ₹1,199).
+       - **Lifetime Deal**: ₹1499 (Zero Renewal Fees, Pay Once, Use Forever, 62% discount vs ₹3,999).
+     - Centered reassurance trust strip (`Instant Activation in 2 Minutes`, `100% Secure UPI & Cards Payment`, `₹0 Re-Printing Costs Forever`).
+     - Added `Plans & Pricing` anchor in the sticky top navigation bar.
+  3. **Impersonation Banner Cookie Hardening (`src/components/impersonation-banner.tsx`)**:
+     - Added validation before `JSON.parse` to prevent browser console syntax errors on malformed cookies.
+  4. **Playwright Visual & Ground-Truth Verification (`scripts/verify_digital_card_real_layout_and_pricing.js`)**:
+     - Automated test suite verifying:
+       - Authentic Cake Connection layout in phone simulator (PASS)
+       - Dynamic tab switching between Tasty Vadapav & Gujarat Photo Goods (PASS)
+       - All 3 pricing plans with exact prices ₹349, ₹499, and ₹1499 (PASS)
+       - Zero dummy data and clean light mode rendering (PASS)
+     - High-resolution visual screenshots saved: `landing_digital_card_real_layout.png` and `landing_digital_card_pricing.png`.
+- **Status**: ✅ Resolved, Ground-Truth Audited & Verified.
+
+---
 ## [03 Oct 2026] Issue: Default Cake Connection Live Card, Unobstructed $100,000 Luxury Phone Chassis & Animated Infographics "How It Works" Section Across All Landing Pages
 - **Symptom**: User requested:
   1. `http://localhost:3000/smart-digital-business-card`: Set **Cake Connection** as the default card on initial page load. Display the complete mobile phone clearly without cut-offs and remove all floating elements (`.float-card`) that were obstructing the screen.
