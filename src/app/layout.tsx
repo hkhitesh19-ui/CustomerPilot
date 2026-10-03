@@ -13,7 +13,7 @@ const inter = {
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.in";
 
 export const viewport = {
-  themeColor: "#020617",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

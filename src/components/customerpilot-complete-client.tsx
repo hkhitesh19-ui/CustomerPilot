@@ -63,18 +63,18 @@ const COMPLETE_FAQS: DualLangFaqItem[] = [
 
 export function CustomerPilotCompleteClient() {
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-emerald-500 selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-emerald-500 selection:text-white flex flex-col justify-between">
       {/* Sticky Header */}
-      <header className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 shadow-md">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           <Link href="/" className="no-underline flex items-center">
             <BrandLogo size="sm" />
           </Link>
           <div className="flex items-center gap-3 sm:gap-4">
-            <Link href="/" className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition">
+            <Link href="/" className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition">
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
             </Link>
-            <Button asChild size="sm" className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm px-4 py-2 rounded-xl shadow-lg transition-all">
+            <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-md transition-all">
               <Link href="/signup">Start Free Trial →</Link>
             </Button>
           </div>
@@ -85,46 +85,46 @@ export function CustomerPilotCompleteClient() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-20 space-y-16 flex-1 w-full">
         {/* HERO SECTION */}
         <section className="text-center space-y-6 max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs sm:text-sm font-bold tracking-wide">
-            <Crown className="w-4 h-4 text-emerald-400" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs sm:text-sm font-bold tracking-wide">
+            <Crown className="w-4 h-4 text-emerald-600" />
             <span>CustomerPilot Complete · All-in-One Customer Retention Engine</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-white tracking-tight leading-tight">
-            The <span className="text-emerald-400">All-In-One</span> Retention, Loyalty &amp; Google Reputation Stack for Indian Retail.
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
+            The <span className="text-emerald-600">All-In-One</span> Retention, Loyalty &amp; Google Reputation Stack for Indian Retail.
           </h1>
 
-          <p className="text-slate-300 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-600 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
             Stop juggling 4 fragmented apps. CustomerPilot unifies WhatsApp Digital Stamp Cards, Smart AI Google Reviews, 1-Click AutoReply on Google Maps, and Luxury Digital Business Cards in one intuitive cloud dashboard.
           </p>
 
           {/* SGE Statistic Callout */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 max-w-3xl mx-auto">
-            <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-400">4-in-1</div>
-              <div className="text-[11px] sm:text-xs text-slate-400 font-semibold mt-1">Unified Platform</div>
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
+              <div className="text-2xl sm:text-3xl font-black text-emerald-600">4-in-1</div>
+              <div className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">Unified Platform</div>
             </div>
-            <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80">
-              <div className="text-2xl sm:text-3xl font-black text-amber-400">+34%</div>
-              <div className="text-[11px] sm:text-xs text-slate-400 font-semibold mt-1">Repeat Footfall</div>
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
+              <div className="text-2xl sm:text-3xl font-black text-amber-600">+34%</div>
+              <div className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">Repeat Footfall</div>
             </div>
-            <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80">
-              <div className="text-2xl sm:text-3xl font-black text-cyan-400">95%</div>
-              <div className="text-[11px] sm:text-xs text-slate-400 font-semibold mt-1">Cost Savings</div>
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
+              <div className="text-2xl sm:text-3xl font-black text-cyan-600">95%</div>
+              <div className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">Cost Savings</div>
             </div>
-            <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80">
-              <div className="text-2xl sm:text-3xl font-black text-white">₹6.2/day</div>
-              <div className="text-[11px] sm:text-xs text-slate-400 font-semibold mt-1">All-Inclusive Price</div>
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
+              <div className="text-2xl sm:text-3xl font-black text-slate-900">₹6.2/day</div>
+              <div className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">All-Inclusive Price</div>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Button asChild size="lg" className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-base px-8 py-6 rounded-2xl shadow-xl hover:scale-105 transition-all">
+            <Button asChild size="lg" className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base px-8 py-6 rounded-2xl shadow-xl shadow-emerald-600/20 hover:scale-105 transition-all">
               <Link href="/signup">
                 Get Complete Stack Free — 3 Days <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto border-slate-700 text-slate-200 hover:bg-slate-800 font-bold text-base px-8 py-6 rounded-2xl">
+            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto border-slate-300 text-slate-700 bg-white hover:bg-slate-50 font-bold text-base px-8 py-6 rounded-2xl shadow-xs">
               <Link href="/pricing">
                 View 50% Off Pro Pricing
               </Link>
@@ -135,75 +135,75 @@ export function CustomerPilotCompleteClient() {
         {/* 4-IN-1 ARCHITECTURE CARDS */}
         <section className="space-y-8">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+            <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
               Unified Ecosystem
             </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
               Everything Your Store Needs to Retain 100% of Customers
             </h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="p-6 sm:p-8 rounded-3xl bg-slate-950/80 border border-slate-800 hover:border-amber-500/40 transition-all space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-400 font-bold">
+            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition-all space-y-4 shadow-xs">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-700 font-bold">
                 <Gift className="w-6 h-6" />
               </div>
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-white">1. WhatsApp Digital Stamp Cards</h3>
-                <span className="text-xs bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded-full">VIP Club</span>
+                <h3 className="text-xl font-bold text-slate-900">1. WhatsApp Digital Stamp Cards</h3>
+                <span className="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">VIP Club</span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                 Say goodbye to paper cards. Customers collect digital stamps directly in WhatsApp in 5 seconds. Automated milestone celebrations and inactivity reminders bring them back 34% faster.
               </p>
-              <Link href="/whatsapp-digital-loyalty-card" className="inline-flex items-center text-xs font-bold text-amber-400 hover:underline">
+              <Link href="/whatsapp-digital-loyalty-card" className="inline-flex items-center text-xs font-bold text-amber-700 hover:underline">
                 Explore WhatsApp Loyalty Pillar →
               </Link>
             </div>
 
-            <div className="p-6 sm:p-8 rounded-3xl bg-slate-950/80 border border-slate-800 hover:border-emerald-500/40 transition-all space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-bold">
+            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition-all space-y-4 shadow-xs">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold">
                 <Star className="w-6 h-6" />
               </div>
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-white">2. Smart AI Google Reviews QR</h3>
-                <span className="text-xs bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full">AI Drafts</span>
+                <h3 className="text-xl font-bold text-slate-900">2. Smart AI Google Reviews QR</h3>
+                <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">AI Drafts</span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                 Smart counter QR standees that pre-draft authentic, keyword-rich 5-star reviews on customer phones. Triple your Google review velocity and shield your profile with private negative feedback filtering.
               </p>
-              <Link href="/ai-google-review-qr-generator" className="inline-flex items-center text-xs font-bold text-emerald-400 hover:underline">
+              <Link href="/ai-google-review-qr-generator" className="inline-flex items-center text-xs font-bold text-emerald-700 hover:underline">
                 Explore AI Review QR Pillar →
               </Link>
             </div>
 
-            <div className="p-6 sm:p-8 rounded-3xl bg-slate-950/80 border border-slate-800 hover:border-indigo-500/40 transition-all space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 font-bold">
+            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition-all space-y-4 shadow-xs">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
                 <MessageSquare className="w-6 h-6" />
               </div>
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-white">3. 1-Click AI AutoReply on Google Maps</h3>
-                <span className="text-xs bg-indigo-500/20 text-indigo-300 font-bold px-2 py-0.5 rounded-full">1-Sec Publish</span>
+                <h3 className="text-xl font-bold text-slate-900">3. 1-Click AI AutoReply on Google Maps</h3>
+                <span className="text-xs bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full">1-Sec Publish</span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                 Gemini AI connects to your Google Business Profile to generate warm, appreciative owner responses in 1 second. Boost local Google 3-Pack visibility by 42% with a 100% response rate.
               </p>
-              <Link href="/ai-google-review-autoreply" className="inline-flex items-center text-xs font-bold text-indigo-400 hover:underline">
+              <Link href="/ai-google-review-autoreply" className="inline-flex items-center text-xs font-bold text-indigo-700 hover:underline">
                 Explore 1-Click AutoReply Pillar →
               </Link>
             </div>
 
-            <div className="p-6 sm:p-8 rounded-3xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/40 transition-all space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold">
+            <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition-all space-y-4 shadow-xs">
+              <div className="w-12 h-12 rounded-2xl bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold">
                 <CreditCard className="w-6 h-6" />
               </div>
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-white">4. Smart Digital Business Cards</h3>
-                <span className="text-xs bg-cyan-500/20 text-cyan-300 font-bold px-2 py-0.5 rounded-full">vCard + QR</span>
+                <h3 className="text-xl font-bold text-slate-900">4. Smart Digital Business Cards</h3>
+                <span className="text-xs bg-cyan-100 text-cyan-800 font-bold px-2 py-0.5 rounded-full">vCard + QR</span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                 Next-generation mobile visiting cards with 1-Tap Save Contact to phonebook (.vcf), direct Google Reviews submission dialog, WhatsApp chat, and online ordering delivery links.
               </p>
-              <Link href="/smart-digital-business-card" className="inline-flex items-center text-xs font-bold text-cyan-400 hover:underline">
+              <Link href="/smart-digital-business-card" className="inline-flex items-center text-xs font-bold text-cyan-700 hover:underline">
                 Explore Digital Card Pillar →
               </Link>
             </div>
@@ -213,64 +213,64 @@ export function CustomerPilotCompleteClient() {
         {/* COMPARISON TABLE VS SEPARATE POINT TOOLS */}
         <section className="space-y-8">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+            <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
               Total Cost of Ownership
             </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
               CustomerPilot Complete vs Buying 4 Separate Tools
             </h2>
           </div>
 
-          <div className="overflow-x-auto rounded-3xl border border-slate-800 bg-slate-950 shadow-2xl">
+          <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
             <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="bg-slate-900 border-b border-slate-800 text-slate-300 font-bold uppercase text-[11px] tracking-wider">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase text-[11px] tracking-wider">
                 <tr>
                   <th scope="col" className="py-4 px-4 sm:px-6">Feature / Capability</th>
-                  <th scope="col" className="py-4 px-4 sm:px-6 text-emerald-400 bg-emerald-950/20 border-x border-emerald-500/20">
+                  <th scope="col" className="py-4 px-4 sm:px-6 text-emerald-900 bg-emerald-50/80 border-x border-emerald-200">
                     CustomerPilot Complete
                   </th>
-                  <th scope="col" className="py-4 px-4 sm:px-6">Buying 4 Separate Tools (Stamp Me + Birdeye + Reelo + Linktree)</th>
+                  <th scope="col" className="py-4 px-4 sm:px-6 text-slate-600">Buying 4 Separate Tools (Stamp Me + Birdeye + Reelo + Linktree)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
-                <tr className="hover:bg-slate-900/50 transition">
+              <tbody className="divide-y divide-slate-100 text-slate-700">
+                <tr className="hover:bg-slate-50/80 transition">
                   <td className="py-3.5 px-4 sm:px-6 font-semibold">Annual Subscription Cost</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-400 bg-emerald-950/20 border-x border-emerald-500/20">
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">
                     ₹2,249/year (₹6.2/day)
                   </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-400">₹3,40,000+/year ($588 + $2,400 + ₹24,000)</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">₹3,40,000+/year ($588 + $2,400 + ₹24,000)</td>
                 </tr>
 
-                <tr className="hover:bg-slate-900/50 transition">
+                <tr className="hover:bg-slate-50/80 transition">
                   <td className="py-3.5 px-4 sm:px-6 font-semibold">App Download Friction for Customers</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-400 bg-emerald-950/20 border-x border-emerald-500/20">
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">
                     Zero — 100% Inside WhatsApp
                   </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-400">High (&gt;80% drop-off due to app stores)</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">High (&gt;80% drop-off due to app stores)</td>
                 </tr>
 
-                <tr className="hover:bg-slate-900/50 transition">
+                <tr className="hover:bg-slate-50/80 transition">
                   <td className="py-3.5 px-4 sm:px-6 font-semibold">Unified Customer CRM</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-400 bg-emerald-950/20 border-x border-emerald-500/20">
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">
                     Single Database (Stamps + Reviews + Contacts)
                   </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-400">Fragmented across 4 logins</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">Fragmented across 4 logins</td>
                 </tr>
 
-                <tr className="hover:bg-slate-900/50 transition">
+                <tr className="hover:bg-slate-50/80 transition">
                   <td className="py-3.5 px-4 sm:px-6 font-semibold">Indian Retail &amp; UPI Localization</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-400 bg-emerald-950/20 border-x border-emerald-500/20">
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">
                     100% (INR pricing, Hinglish, UPI)
                   </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-400">Western focus (USD credit cards only)</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">Western focus (USD credit cards only)</td>
                 </tr>
 
-                <tr className="hover:bg-slate-900/50 transition">
+                <tr className="hover:bg-slate-50/80 transition">
                   <td className="py-3.5 px-4 sm:px-6 font-semibold">Hardware Setup Required</td>
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-400 bg-emerald-950/20 border-x border-emerald-500/20">
+                  <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">
                     Zero — Simple Acrylic Counter QR
                   </td>
-                  <td className="py-3.5 px-4 sm:px-6 text-slate-400">Beacons, complex POS integrations</td>
+                  <td className="py-3.5 px-4 sm:px-6 text-slate-500">Beacons, complex POS integrations</td>
                 </tr>
               </tbody>
             </table>
@@ -278,18 +278,18 @@ export function CustomerPilotCompleteClient() {
         </section>
 
         {/* DUAL-LANGUAGE FAQ SECTION (ENGLISH DEFAULT + HINGLISH) */}
-        <DualLangFaq items={COMPLETE_FAQS} accentColor="emerald" />
+        <DualLangFaq items={COMPLETE_FAQS} accentColor="emerald" theme="light" />
 
         {/* BOTTOM CALL TO ACTION */}
-        <section className="text-center p-8 sm:p-12 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 space-y-6">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white">
+        <section className="text-center p-8 sm:p-12 rounded-3xl bg-gradient-to-b from-emerald-50 to-white border border-emerald-200 shadow-sm space-y-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
             Unlock the Complete Customer Retention Engine Today
           </h2>
-          <p className="text-slate-300 text-sm sm:text-base max-w-xl mx-auto">
+          <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
             Get instant access to WhatsApp Loyalty, AI Google Reviews, 1-Click AutoReply, and Smart Digital Cards with our 3-day unrestricted free trial.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button asChild size="lg" className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-base px-8 py-6 rounded-2xl shadow-xl hover:scale-105 transition-all">
+            <Button asChild size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base px-8 py-6 rounded-2xl shadow-xl shadow-emerald-600/20 hover:scale-105 transition-all">
               <Link href="/signup">
                 Start 3-Day Free Trial (CustomerPilot Complete) <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
@@ -299,14 +299,14 @@ export function CustomerPilotCompleteClient() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800 bg-slate-950 py-8 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+      <footer className="border-t border-slate-200 bg-slate-50 py-8 px-6">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <div>© {new Date().getFullYear()} CustomerPilot Inc. · Autonomous Merchant Retention SaaS · support@customerpilot.in</div>
           <div className="flex items-center gap-6">
-            <Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-white transition">Terms of Service</Link>
-            <Link href="/contact" className="hover:text-white transition">Contact</Link>
-            <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
+            <Link href="/privacy" className="hover:text-slate-900 transition">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-slate-900 transition">Terms of Service</Link>
+            <Link href="/contact" className="hover:text-slate-900 transition">Contact</Link>
+            <Link href="/pricing" className="hover:text-slate-900 transition">Pricing</Link>
           </div>
         </div>
       </footer>

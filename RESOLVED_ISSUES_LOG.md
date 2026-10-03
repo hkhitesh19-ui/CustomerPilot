@@ -3,6 +3,37 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Oct 2026] Issue: Complete Removal of Dark Mode & Strict Enforcement of Pure Light Mode Platform-Wide
+- **Symptom**: User requested: *"Darkmode nahi rakhna website me , only Lightmode hi rakkho"*. Several dedicated landing pages had legacy dark slate backgrounds (`bg-slate-900`, `bg-slate-950`), a dark/light mode toggle button existed in the dashboard top navigation bar, and system-level dark mode could trigger via OS preference.
+- **Root Cause**:
+  1. `next-themes` in `src/components/providers.tsx` had `attribute="class" defaultTheme="system" enableSystem`, allowing OS-level dark theme preferences to inject the `.dark` class onto the root `<html>` element.
+  2. The dashboard top nav (`src/components/top-nav.tsx`) rendered a `<ModeToggle />` button allowing users to switch to dark mode.
+  3. The viewport metadata in `src/app/layout.tsx` specified `themeColor: "#020617"` (dark slate).
+  4. The 5 dedicated product landing pages (`/whatsapp-digital-loyalty-card`, `/ai-google-review-qr-generator`, `/ai-google-review-autoreply`, `/smart-digital-business-card`, and `/customerpilot-complete`) were styled using dark backgrounds (`bg-slate-900`, `bg-slate-950`, dark borders, slate-400 text) instead of a clean, high-contrast light theme.
+- **Resolution**:
+  1. **Global Provider & Theme Lock (`src/components/providers.tsx`)**:
+     - Configured `NextThemesProvider` with `forcedTheme="light"`, `defaultTheme="light"`, and `enableSystem={false}`. This guarantees that `next-themes` strictly mounts `class="light"` on `<html>` and prevents `.dark` from ever being injected, regardless of client OS preferences.
+  2. **Dashboard Navigation Cleanup (`src/components/top-nav.tsx`)**:
+     - Removed `<ModeToggle />` component and its import from the top header navigation.
+  3. **Viewport Color Sync (`src/app/layout.tsx`)**:
+     - Updated viewport `themeColor` from `#020617` to `#ffffff` for consistent mobile browser address bar styling.
+  4. **Dual-Language FAQ Component Default (`src/components/dual-lang-faq.tsx`)**:
+     - Switched default `theme` prop to `"light"` and enhanced `amber` and `indigo` accent variants with WCAG AA compliant text and badge styling.
+  5. **Converted All 5 Dedicated Product Landing Pages to Pure Light Mode**:
+     - `src/components/whatsapp-digital-loyalty-client.tsx`: Converted hero, agitation, 3-step GEO guide, bonus cross-sell, and comparison tables to pure light styling (`bg-white`, `bg-slate-50`, `border-slate-200`, `text-slate-900`).
+     - `src/components/ai-google-review-qr-client.tsx`: Converted to light mode with amber accents.
+     - `src/components/ai-google-review-autoreply-client.tsx`: Converted to light mode with indigo accents.
+     - `src/components/smart-digital-business-card-client.tsx`: Converted to light mode with cyan accents.
+     - `src/components/customerpilot-complete-client.tsx`: Converted to light mode with emerald accents.
+  6. **CodeRabbit Quality & Security Audit**:
+     - Audit passed cleanly (0 Critical, 0 Major, 0 Minor). Verified WCAG AA contrast compliance (e.g. amber buttons using `text-slate-950`).
+  7. **Playwright & Ground-Truth Verification (`scripts/verify_light_mode.js`)**:
+     - Tested 7/7 routes under dark-mode OS emulation (`colorScheme: 'dark'`): Homepage, all 5 product landing pages, and competitor comparison page (`/vs/stamp-me`).
+     - Verified `<html>` class is strictly `light`, `.dark` is never present, and computed body background is `oklch(1 0 0)` (pure white).
+     - Captured and visually audited 7 high-resolution screenshots.
+- **Status**: ✅ Resolved, Ground-Truth Audited & Verified.
+
+---
 ## [03 Oct 2026] Issue: Integration of "Smart Digital Business Card" in Navigation and Dedicated SEO/GEO/AEO Landing Pages for All 5 CustomerPilot Products
 - **Symptom**: User requested: *"is Product List me 'Smart Digital Business Card' Add karo. Sare Products ke Dedicated Landing Pages banao and usme SEO, AEO, GEO optimized CONTENT add karo"*.
 - **Root Cause**:

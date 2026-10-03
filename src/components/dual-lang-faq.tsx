@@ -19,7 +19,7 @@ interface DualLangFaqProps {
   subtitleHi?: string
   badgeEn?: string
   badgeHi?: string
-  accentColor?: "emerald" | "cyan" | "blue"
+  accentColor?: "emerald" | "cyan" | "blue" | "amber" | "indigo"
   theme?: "dark" | "light"
 }
 
@@ -32,7 +32,7 @@ export function DualLangFaq({
   badgeEn = "Got Questions? We Have Answers",
   badgeHi = "Aapke Sawal, Hamare Jawab",
   accentColor = "emerald",
-  theme = "dark"
+  theme = "light"
 }: DualLangFaqProps) {
   // English (Indian English) is the DEFAULT language
   const [lang, setLang] = useState<"en" | "hinglish">("en")
@@ -41,27 +41,47 @@ export function DualLangFaq({
   const isLight = theme === "light"
   const isEmerald = accentColor === "emerald"
   const isCyan = accentColor === "cyan"
+  const isAmber = accentColor === "amber"
+  const isIndigo = accentColor === "indigo"
 
   const activeBadgeBg = isLight
     ? isEmerald
       ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/20"
       : isCyan
       ? "bg-cyan-600 text-white shadow-md shadow-cyan-600/20"
+      : isAmber
+      ? "bg-amber-600 text-white shadow-md shadow-amber-600/20"
+      : isIndigo
+      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
       : "bg-slate-900 text-white shadow-md shadow-slate-900/20"
     : isEmerald
     ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
     : isCyan
     ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20"
+    : isAmber
+    ? "bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20"
+    : isIndigo
+    ? "bg-indigo-500 text-white shadow-md shadow-indigo-500/20"
     : "bg-blue-500 text-white shadow-md shadow-blue-500/20"
 
   const questionColor = isLight
     ? isEmerald
-      ? "text-emerald-950 group-hover:text-emerald-700"
-      : "text-slate-900 group-hover:text-cyan-700"
+      ? "text-slate-900 hover:text-emerald-700"
+      : isCyan
+      ? "text-slate-900 hover:text-cyan-700"
+      : isAmber
+      ? "text-slate-900 hover:text-amber-700"
+      : isIndigo
+      ? "text-slate-900 hover:text-indigo-700"
+      : "text-slate-900 hover:text-blue-700"
     : isEmerald
     ? "text-emerald-400"
     : isCyan
     ? "text-cyan-400"
+    : isAmber
+    ? "text-amber-400"
+    : isIndigo
+    ? "text-indigo-400"
     : "text-blue-400"
 
   const badgeTextColor = isLight
@@ -69,11 +89,19 @@ export function DualLangFaq({
       ? "text-emerald-700 border-emerald-300 bg-emerald-50"
       : isCyan
       ? "text-cyan-700 border-cyan-300 bg-cyan-50"
+      : isAmber
+      ? "text-amber-800 border-amber-300 bg-amber-50"
+      : isIndigo
+      ? "text-indigo-700 border-indigo-300 bg-indigo-50"
       : "text-blue-700 border-blue-300 bg-blue-50"
     : isEmerald
     ? "text-emerald-400 border-emerald-500/20 bg-emerald-500/10"
     : isCyan
     ? "text-cyan-400 border-cyan-500/20 bg-cyan-500/10"
+    : isAmber
+    ? "text-amber-400 border-amber-500/20 bg-amber-500/10"
+    : isIndigo
+    ? "text-indigo-400 border-indigo-500/20 bg-indigo-500/10"
     : "text-blue-400 border-blue-500/20 bg-blue-500/10"
 
   return (
