@@ -19,6 +19,12 @@ export function SoftwareApplicationJsonLd() {
     "hasPart": [
       {
         "@type": "SoftwareApplication",
+        "name": "Smart Digital Business Card",
+        "url": "https://customerpilot.in/smart-digital-business-card",
+        "description": "NFC and QR-powered digital business card with 1-tap contact saving, ordering links, and real-time analytics for Indian businesses."
+      },
+      {
+        "@type": "SoftwareApplication",
         "name": "WhatsApp Digital Loyalty Stamp Card",
         "url": "https://customerpilot.in/whatsapp-digital-loyalty-card",
         "description": "Digital loyalty stamp card via WhatsApp for retail repeat customers. Replaces paper punch cards with automated WhatsApp stamps, win-back campaigns and reward redemption."
@@ -36,22 +42,16 @@ export function SoftwareApplicationJsonLd() {
         "description": "Premium acrylic AI Google Review QR counter standee for retail billing counters. Triggers automatic WhatsApp-based review generation on scan."
       },
       {
-        "@type": "WebApplication",
-        "name": "Free AI Google Review Generator",
-        "url": "https://customerpilot.in/free-ai-google-review-generator",
-        "description": "Free tool to generate 3 AI-crafted 5-star Google review variations for any retail store, bakery, dental clinic, cafe or salon in seconds."
-      },
-      {
         "@type": "SoftwareApplication",
         "name": "AI Google Review Auto-Reply",
         "url": "https://customerpilot.in/ai-google-review-autoreply",
         "description": "Gemini AI-powered auto-responder for Google Business Profile reviews. Automatically generates professional, empathetic owner replies to all reviews."
       },
       {
-        "@type": "SoftwareApplication",
-        "name": "Smart Digital Business Card",
-        "url": "https://customerpilot.in/smart-digital-business-card",
-        "description": "NFC and QR-powered digital business card with 1-tap contact saving, ordering links, and real-time analytics for Indian businesses."
+        "@type": "WebApplication",
+        "name": "Free AI Google Review Generator",
+        "url": "https://customerpilot.in/free-ai-google-review-generator",
+        "description": "Free tool to generate 3 AI-crafted 5-star Google review variations for any retail store, bakery, dental clinic, cafe or salon in seconds."
       }
     ]
   }

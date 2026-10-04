@@ -494,12 +494,30 @@ export function CustomerPilotCompleteClient() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
+              {/* Pillar 1: Smart Digital Business Card */}
+              <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 transition-all space-y-4 shadow-xs">
+                <div className="w-12 h-12 rounded-2xl bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold shadow-xs">
+                  <CreditCard className="w-6 h-6" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-slate-900">1. Smart Digital Business Card</h3>
+                  <span className="text-xs bg-cyan-100 text-cyan-800 font-bold px-2 py-0.5 rounded-full">vCard + QR</span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  A mobile-first micro-website with 1-tap contact saving (.vcf), direct Google Reviews submission, WhatsApp chat, and online ordering catalogs. Zero re-printing costs when your details change.
+                </p>
+                <Link href="/smart-digital-business-card" className="inline-flex items-center text-xs font-bold text-cyan-700 hover:underline">
+                  Explore Smart Digital Card Pillar →
+                </Link>
+              </div>
+
+              {/* Pillar 2: WhatsApp Digital Stamp Cards */}
               <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 transition-all space-y-4 shadow-xs">
                 <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-700 font-bold shadow-xs">
                   <Gift className="w-6 h-6" />
                 </div>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-slate-900">1. WhatsApp Digital Stamp Cards</h3>
+                  <h3 className="text-xl font-bold text-slate-900">2. WhatsApp Digital Stamp Cards</h3>
                   <span className="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">VIP Club</span>
                 </div>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
@@ -510,12 +528,13 @@ export function CustomerPilotCompleteClient() {
                 </Link>
               </div>
 
+              {/* Pillar 3: Smart AI Google Reviews QR */}
               <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 transition-all space-y-4 shadow-xs">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold shadow-xs">
                   <Star className="w-6 h-6" />
                 </div>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-slate-900">2. Smart AI Google Reviews QR</h3>
+                  <h3 className="text-xl font-bold text-slate-900">3. Smart AI Google Reviews QR</h3>
                   <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">AI Drafts</span>
                 </div>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
@@ -526,12 +545,13 @@ export function CustomerPilotCompleteClient() {
                 </Link>
               </div>
 
+              {/* Pillar 4: 1-Click AI AutoReply */}
               <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 transition-all space-y-4 shadow-xs">
                 <div className="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold shadow-xs">
                   <MessageSquare className="w-6 h-6" />
                 </div>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-slate-900">3. 1-Click AI AutoReply on Google Maps</h3>
+                  <h3 className="text-xl font-bold text-slate-900">4. 1-Click AI AutoReply on Google Maps</h3>
                   <span className="text-xs bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full">1-Sec Publish</span>
                 </div>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
@@ -539,22 +559,6 @@ export function CustomerPilotCompleteClient() {
                 </p>
                 <Link href="/ai-google-review-autoreply" className="inline-flex items-center text-xs font-bold text-indigo-700 hover:underline">
                   Explore 1-Click AutoReply Pillar →
-                </Link>
-              </div>
-
-              <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 transition-all space-y-4 shadow-xs">
-                <div className="w-12 h-12 rounded-2xl bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold shadow-xs">
-                  <CreditCard className="w-6 h-6" />
-                </div>
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-slate-900">4. Luxury Digital Business Card</h3>
-                  <span className="text-xs bg-cyan-100 text-cyan-800 font-bold px-2 py-0.5 rounded-full">vCard + QR</span>
-                </div>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  A mobile-first micro-website with 1-tap contact saving (.vcf), direct Google Reviews submission, WhatsApp chat, and online ordering catalogs. Zero re-printing costs when your details change.
-                </p>
-                <Link href="/smart-digital-business-card" className="inline-flex items-center text-xs font-bold text-cyan-700 hover:underline">
-                  Explore Smart Digital Card Pillar →
                 </Link>
               </div>
             </div>

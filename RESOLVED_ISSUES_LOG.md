@@ -3,6 +3,35 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [04 Oct 2026] Issue: 4th Service "Smart Digital Business Card" Integration & Strict Global Sequence Alignment
+- **Symptom**: User identified that the Homepage features section ("Everything Your Store Needs. Nothing It Doesn't.") only showcased 3 services (Digital Loyalty & Stamps, Smart Ai Google Reviews, 1-Click AI AutoReply), missing the 4th core pillar "Smart Digital Business Card". Furthermore, user mandated a strict universal sequence across all listings:
+  1. Smart Digital Business Card
+  2. Digital Loyalty & Stamps
+  3. Smart Ai Google Reviews
+  4. 1-Click AI AutoReply
+- **Root Cause**:
+  1. `src/app/page.tsx` features grid (`#features`) was hardcoded to 3 columns (`repeat(3, 1fr)`) containing only loyalty, reviews, and autoreply cards.
+  2. Hero quick links, top navigation dropdown, mobile drawer menu, footer product column, and complete ecosystem cards in `src/components/customerpilot-complete-client.tsx` were either omitting the digital business card or listing it in an inconsistent order.
+  3. Root `SoftwareApplicationJsonLd` `hasPart` schema did not begin with the Smart Digital Business Card.
+- **Resolution**:
+  1. **Features Section (`#features`)**:
+     - Updated CSS grid to responsive 4-column layout: 1 col on mobile, 2 cols on tablet (`min-width: 640px`), 4 cols on desktop (`min-width: 1024px`).
+     - Added `.ico.cyan` gradient background styling.
+     - Changed section eyebrow to `"Four Core Engines"`.
+     - Injected `Smart Digital Business Card` as Card #1, followed by Card #2 (Digital Loyalty & Stamps), Card #3 (Smart Ai Google Reviews), and Card #4 (1-Click AI AutoReply).
+  2. **Hero Section Quick Navigation**:
+     - Replaced standalone signup links with labeled buttons adhering to the exact 4-step sequence: `🪪 (1) Smart Digital Business Card`, `🎁 (2) Digital Loyalty & Stamps`, `⭐ (3) Smart Ai Google Reviews`, `💬 (4) 1-Click AI AutoReply`.
+  3. **Desktop & Mobile Navigation Drawers**:
+     - Synchronized both desktop dropdown menu and mobile navigation drawer to list the 4 services with sequence numbering (1 to 4) followed by utility and all-in-one ecosystem links.
+  4. **Footer & Complete Suite Sync**:
+     - Reordered footer `Product Services` column to sequence 1 to 4.
+     - Reordered `customerpilot-complete-client.tsx` 4-pillar cards to begin with `1. Smart Digital Business Card`.
+     - Reordered `hasPart` JSON-LD schema array in `src/components/seo/json-ld.tsx`.
+  5. **Playwright E2E Ground-Truth Assertion**:
+     - Verified with Playwright headless browser that `#features .fcard h3` exactly equals `['Smart Digital Business Card', 'Digital Loyalty & Stamps', 'Smart Ai Google Reviews', '1-Click AI AutoReply']`. Captured visual screenshot `homepage_four_services_sequence.png`.
+- **Status**: ✅ Resolved, Verified via Playwright, and Committed Locally.
+
+---
 ## [03 Oct 2026] Issue: 16-Point SEO, AEO & GEO Master Strategy Full Implementation & Cannibalization Decoupling
 - **Symptom**: User requested full execution of the data-driven Zero-to-Dominance SEO, AEO, and GEO Master Strategy guide. Key challenges: keyword cannibalization between `/smart-ai-google-review` (software) and `/ai-google-review-qr-generator` (hardware standee), missing programmatic industry loyalty landing pages (cafes, salons, restaurants, bakeries, dental clinics), missing `Stamp Me` competitor comparison page, missing internal linking flywheel CTA paths, missing multi-product `hasPart` schema, and lack of a 5-dimension competitor comparison table for LLM scraper ground truth.
 - **Root Cause**:

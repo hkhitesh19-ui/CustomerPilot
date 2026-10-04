@@ -324,13 +324,15 @@ export default function Home() {
         @media(min-width:640px){ h2.sec-h { font-size: 42px; } }
         .sec-sub { font-size: 16px; color: var(--slate5); margin-top: 14px; line-height: 1.6; }
         .feat-grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 48px; }
-        @media(min-width:768px){ .feat-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media(min-width:640px){ .feat-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media(min-width:1024px){ .feat-grid { grid-template-columns: repeat(4, 1fr); } }
         .fcard { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 28px; transition: .25s; display: flex; flex-direction: column; }
         .fcard:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -16px rgba(15,23,42,.12); border-color: #cbd5e1; }
         .fcard .ico { width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; box-shadow: 0 8px 16px -6px rgba(0,0,0,.15); }
         .ico.amber { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
         .ico.em { background: linear-gradient(135deg, #34d399, #10b981); }
         .ico.ind { background: linear-gradient(135deg, #60a5fa, #6366f1); }
+        .ico.cyan { background: linear-gradient(135deg, #06b6d4, #0891b2); }
         .fcard h3 { font-size: 20px; font-weight: 800; margin-top: 20px; color: var(--slate); }
         .fcard p { color: var(--slate5); margin-top: 12px; font-size: 14px; line-height: 1.6; }
         .fcard ul { list-style: none; margin-top: 16px; }
@@ -414,48 +416,59 @@ export default function Home() {
               </button>
               {productsOpen && (
                 <div className="absolute top-full left-0 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  {/* Service 1: Smart Digital Business Card */}
+                  <Link href="/smart-digital-business-card" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                    <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5 text-cyan-600" /> 1. Smart Digital Business Card</span>
+                      <span className="text-[10px] bg-cyan-50 text-cyan-700 font-bold px-1.5 py-0.5 rounded-md">vCard + QR</span>
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Contactless digital visiting card with 1-tap save &amp; ordering</span>
+                  </Link>
+
+                  {/* Service 2: Digital Loyalty Stamps */}
                   <Link href="/whatsapp-digital-loyalty-card" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
                     <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
-                      <span className="flex items-center gap-1.5"><Gift className="w-3.5 h-3.5 text-amber-500" /> Digital Loyalty Stamps</span>
+                      <span className="flex items-center gap-1.5"><Gift className="w-3.5 h-3.5 text-amber-500" /> 2. Digital Loyalty &amp; Stamps</span>
                       <span className="text-[10px] bg-amber-50 text-amber-700 font-bold px-1.5 py-0.5 rounded-md">VIP Club</span>
                     </span>
                     <span className="text-[11px] text-slate-500 mt-0.5">WhatsApp stamp cards &amp; automatic repeat rewards</span>
                   </Link>
+
+                  {/* Service 3: Smart AI Google Reviews */}
                   <Link href="/ai-google-review-qr-generator" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
                     <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
-                      <span className="flex items-center gap-1.5"><Star className="w-3.5 h-3.5 text-emerald-500" /> Smart AI Google Reviews</span>
+                      <span className="flex items-center gap-1.5"><Star className="w-3.5 h-3.5 text-emerald-500" /> 3. Smart AI Google Reviews</span>
                       <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">AI Drafts</span>
                     </span>
-                    <span className="text-[11px] text-slate-500 mt-0.5">Post-purchase WhatsApp 5-star review collector</span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Post-purchase WhatsApp 5-star review counter standee</span>
                   </Link>
-                  <Link href="/free-ai-google-review-generator" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition bg-amber-50/40">
+
+                  {/* Service 4: 1-Click AI AutoReply */}
+                  <Link href="/ai-google-review-autoreply" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                    <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5"><MessageSquare className="w-3.5 h-3.5 text-indigo-500" /> 4. 1-Click AI AutoReply</span>
+                      <span className="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">1-Sec Publish</span>
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Context-aware owner responses on Google Maps</span>
+                  </Link>
+
+                  {/* Utility: Free Tool */}
+                  <Link href="/free-ai-google-review-generator" className="flex flex-col p-2 rounded-xl hover:bg-slate-50 transition bg-amber-50/40 mt-1">
                     <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
                       <span className="flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5 text-amber-600" /> Free AI Review Generator</span>
                       <span className="text-[10px] bg-amber-100 text-amber-800 font-black px-1.5 py-0.5 rounded-md">Free Tool</span>
                     </span>
                     <span className="text-[11px] text-slate-500 mt-0.5">Generate 3 free 5-star review drafts in 3 seconds</span>
                   </Link>
-                  <Link href="/ai-google-review-autoreply" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
-                    <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
-                      <span className="flex items-center gap-1.5"><MessageSquare className="w-3.5 h-3.5 text-indigo-500" /> 1-Click AI AutoReply</span>
-                      <span className="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">1-Sec Publish</span>
-                    </span>
-                    <span className="text-[11px] text-slate-500 mt-0.5">Context-aware owner responses on Google Maps</span>
-                  </Link>
-                  <Link href="/smart-digital-business-card" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
-                    <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
-                      <span className="flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5 text-cyan-500" /> Smart Digital Business Card</span>
-                      <span className="text-[10px] bg-cyan-50 text-cyan-700 font-bold px-1.5 py-0.5 rounded-md">vCard + QR</span>
-                    </span>
-                    <span className="text-[11px] text-slate-500 mt-0.5">Contactless digital visiting card with 1-tap save</span>
-                  </Link>
+
+                  {/* Ecosystem: CustomerPilot Complete */}
                   <div className="border-t border-slate-100 my-1 pt-1">
                     <Link href="/customerpilot-complete" className="flex flex-col p-2.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-50 transition border border-emerald-100">
                       <span className="text-xs font-extrabold text-emerald-950 flex items-center justify-between">
                         <span>🚀 CustomerPilot Complete</span>
                         <span className="text-[9px] bg-emerald-500 text-slate-950 font-black px-1.5 py-0.5 rounded-full uppercase">All-in-One</span>
                       </span>
-                      <span className="text-[10px] text-emerald-800 font-medium mt-0.5">Loyalty Stamps + Smart Reviews + AI AutoReply</span>
+                      <span className="text-[10px] text-emerald-800 font-medium mt-0.5">All 4 Services Unified in One Closed-Loop Cockpit</span>
                     </Link>
                   </div>
                 </div>
@@ -534,28 +547,39 @@ export default function Home() {
           <div className="md:hidden bg-white border-b border-slate-200 px-6 py-5 space-y-4 shadow-xl animate-in slide-in-from-top duration-200">
             <div className="space-y-1">
               <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2">Products &amp; Services</div>
+              {/* Service 1: Smart Digital Business Card */}
+              <Link href="/smart-digital-business-card" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                <span className="flex items-center gap-2"><CreditCard className="w-4 h-4 text-cyan-600" /> 1. Smart Digital Business Card</span>
+                <span className="text-[10px] bg-cyan-50 text-cyan-700 font-bold px-1.5 py-0.5 rounded-md">vCard + QR</span>
+              </Link>
+
+              {/* Service 2: Digital Loyalty & Stamps */}
               <Link href="/whatsapp-digital-loyalty-card" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
-                <span className="flex items-center gap-2"><Gift className="w-4 h-4 text-amber-500" /> Digital Loyalty Stamps</span>
+                <span className="flex items-center gap-2"><Gift className="w-4 h-4 text-amber-500" /> 2. Digital Loyalty &amp; Stamps</span>
                 <span className="text-[10px] bg-amber-50 text-amber-700 font-bold px-1.5 py-0.5 rounded-md">VIP Club</span>
               </Link>
+
+              {/* Service 3: Smart AI Google Reviews */}
               <Link href="/ai-google-review-qr-generator" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
-                <span className="flex items-center gap-2"><Star className="w-4 h-4 text-emerald-500" /> Smart AI Google Reviews</span>
+                <span className="flex items-center gap-2"><Star className="w-4 h-4 text-emerald-500" /> 3. Smart AI Google Reviews</span>
                 <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">AI Drafts</span>
               </Link>
+
+              {/* Service 4: 1-Click AI AutoReply */}
+              <Link href="/ai-google-review-autoreply" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                <span className="flex items-center gap-2"><MessageSquare className="w-4 h-4 text-indigo-500" /> 4. 1-Click AI AutoReply</span>
+                <span className="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">1-Sec Publish</span>
+              </Link>
+
+              {/* Utility: Free Tool */}
               <Link href="/free-ai-google-review-generator" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50 bg-amber-50/50">
                 <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-amber-600" /> Free AI Review Generator</span>
                 <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded-md">Free Tool</span>
               </Link>
-              <Link href="/ai-google-review-autoreply" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
-                <span className="flex items-center gap-2"><MessageSquare className="w-4 h-4 text-indigo-500" /> 1-Click AI AutoReply</span>
-                <span className="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">1-Sec Publish</span>
-              </Link>
-              <Link href="/smart-digital-business-card" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
-                <span className="flex items-center gap-2"><CreditCard className="w-4 h-4 text-cyan-500" /> Smart Digital Business Card</span>
-                <span className="text-[10px] bg-cyan-50 text-cyan-700 font-bold px-1.5 py-0.5 rounded-md">vCard + QR</span>
-              </Link>
+
+              {/* Ecosystem: CustomerPilot Complete */}
               <Link href="/customerpilot-complete" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-bold text-emerald-900 rounded-lg bg-emerald-50/70 border border-emerald-200">
-                <span>🚀 CustomerPilot Complete</span>
+                <span>🚀 CustomerPilot Complete (All 4 Services)</span>
                 <span className="text-[9px] bg-emerald-500 text-slate-950 font-black px-1.5 py-0.5 rounded-full uppercase">All-in-One</span>
               </Link>
             </div>
@@ -645,18 +669,21 @@ export default function Home() {
                 </Link>
 
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
-                  <span className="text-[11px] text-slate-500 font-medium">Or choose single module:</span>
-                  <Link href="/signup?module=loyalty" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-[11px] font-bold text-amber-800 transition">
-                    🎁 Digital Loyalty Stamps &amp; VIP Club
+                  <span className="text-[11px] text-slate-500 font-medium">Or explore individual services:</span>
+                  <Link href="/smart-digital-business-card" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 text-[11px] font-bold text-cyan-800 transition">
+                    🪪 (1) Smart Digital Business Card
                   </Link>
-                  <Link href="/signup?module=reviews" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-[11px] font-bold text-emerald-800 transition">
-                    ⭐ Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast
+                  <Link href="/whatsapp-digital-loyalty-card" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-[11px] font-bold text-amber-800 transition">
+                    🎁 (2) Digital Loyalty &amp; Stamps
                   </Link>
-                  <Link href="/signup?module=autoreply" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-[11px] font-bold text-indigo-800 transition">
-                    💬 Ai Drafted SEO Optimized 1-Click Reply to Google Reviews
+                  <Link href="/ai-google-review-qr-generator" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-[11px] font-bold text-emerald-800 transition">
+                    ⭐ (3) Smart Ai Google Reviews
                   </Link>
-                  <Link href="#comparison" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-[11px] font-extrabold text-slate-700 transition">
-                    📊 Compare All 4 Options ↓
+                  <Link href="/ai-google-review-autoreply" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-[11px] font-bold text-indigo-800 transition">
+                    💬 (4) 1-Click AI AutoReply
+                  </Link>
+                  <Link href="#features" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-[11px] font-extrabold text-slate-700 transition">
+                    📊 View All 4 Engines ↓
                   </Link>
                 </div>
               </div>
@@ -1208,19 +1235,49 @@ export default function Home() {
 
       <div className="section-separator" />
 
-      {/* ============ FEATURES (The 3 Core Products) ============ */}
+      {/* ============ FEATURES (The 4 Core Products) ============ */}
       <section className="feat bg-slate-50/50" id="features">
         <div className="wrap">
           <ScrollReveal variant="fadeUp">
           <div className="sec-head">
-            <span className="eyebrow">Three Core Engines</span>
+            <span className="eyebrow">Four Core Engines</span>
             <h2 className="sec-h">Everything Your Store Needs.<br/><span style={{ color: '#94a3b8' }}>Nothing It Doesn&apos;t.</span></h2>
-            <p className="sec-sub">Bring customers back, collect verified 5-star Google reviews, and auto-reply to every customer — all inside WhatsApp.</p>
+            <p className="sec-sub">1-Tap digital visiting cards, WhatsApp loyalty rewards, 5-star Google review boosts, and automated owner replies — all in one unified ecosystem.</p>
           </div>
           </ScrollReveal>
 
-          <StaggerContainer staggerDelay={0.15} className="feat-grid">
-            {/* Product 1: Digital Loyalty Stamps */}
+          <StaggerContainer staggerDelay={0.12} className="feat-grid">
+            {/* Service 1: Smart Digital Business Card */}
+            <StaggerItem variant="fadeUp" className="h-full flex flex-col">
+            <div className="fcard h-full flex flex-col">
+              <div className="flex items-center justify-between">
+                <div className="ico cyan">🪪</div>
+                <span className="text-[10px] bg-cyan-50 text-cyan-800 border border-cyan-200 font-bold px-2.5 py-1 rounded-full">
+                  ⚡ 1-Tap Save
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">Smart Digital Business Card</h3>
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                NFC &amp; QR-powered digital visiting card. Customers save your verified contact (.vcf) in 1 tap, browse menus, and order direct.
+              </p>
+              <ul className="space-y-1.5 mt-4 text-xs text-slate-700 flex-1">
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 1-Tap Contact Download (.vcf)</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Direct WhatsApp Chat &amp; Call</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Google Maps Location Navigation</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Food Ordering &amp; Catalog Links</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Zero Re-Printing Cost Forever</li>
+              </ul>
+              <div className="reply-prev mt-4 text-xs bg-slate-50 border border-slate-100 p-2.5 rounded-xl flex items-center justify-between">
+                <span className="font-bold text-cyan-800">📱 Mobile Micro-Site</span>
+                <span className="text-[10px] text-slate-400 font-semibold">NFC + QR Sync</span>
+              </div>
+              <Link href="/smart-digital-business-card" className="mt-5 w-full py-3 px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+                <span>Explore Digital Card</span> <span>→</span>
+              </Link>
+            </div>
+            </StaggerItem>
+
+            {/* Service 2: Digital Loyalty & Stamps */}
             <StaggerItem variant="fadeUp" className="h-full flex flex-col">
             <div className="fcard h-full flex flex-col">
               <div className="flex items-center justify-between">
@@ -1243,13 +1300,13 @@ export default function Home() {
               <div className="stamp-row mt-4">
                 <span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span><span className="s">★</span>
               </div>
-              <Link href="/signup?module=loyalty" className="mt-5 w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
-                <span>Start 3-Day Free Trial</span> <span>→</span>
+              <Link href="/whatsapp-digital-loyalty-card" className="mt-5 w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+                <span>Explore WhatsApp Loyalty</span> <span>→</span>
               </Link>
             </div>
             </StaggerItem>
 
-            {/* Product 2: Smart Ai Google Reviews */}
+            {/* Service 3: Smart Ai Google Reviews */}
             <StaggerItem variant="fadeUp" className="h-full flex flex-col">
             <div className="fcard h-full flex flex-col">
               <div className="flex items-center justify-between">
@@ -1270,14 +1327,14 @@ export default function Home() {
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Live Rating Growth Analytics</li>
               </ul>
               <div className="stars mt-4"><span style={{ color: '#f59e0b' }}>★★★★★</span><small className="bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full text-[10px]">+412 this month</small></div>
-              <Link href="/signup?module=reviews" className="mt-5 w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+              <Link href="/ai-google-review-qr-generator" className="mt-5 w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
                 <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-                <span>Start 3-Day Free Trial</span> <span>→</span>
+                <span>Explore AI Reviews</span> <span>→</span>
               </Link>
             </div>
             </StaggerItem>
 
-            {/* Product 3: 1-Click AI AutoReply */}
+            {/* Service 4: 1-Click AI AutoReply */}
             <StaggerItem variant="fadeUp" className="h-full flex flex-col">
             <div className="fcard h-full flex flex-col">
               <div className="flex items-center justify-between">
@@ -1298,8 +1355,8 @@ export default function Home() {
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Zero Missed Reviews Guarantee</li>
               </ul>
               <div className="reply-prev mt-4 text-xs bg-slate-50 border border-slate-100 p-2.5 rounded-xl"><strong style={{ color: 'var(--slate)' }}>AI Reply:</strong> &quot;Thank you so much! 💜 See you again soon.&quot;</div>
-              <Link href="/signup?module=autoreply" className="mt-5 w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
-                <span>Start 3-Day Free Trial</span> <span>→</span>
+              <Link href="/ai-google-review-autoreply" className="mt-5 w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+                <span>Explore AI AutoReply</span> <span>→</span>
               </Link>
             </div>
             </StaggerItem>
@@ -2578,15 +2635,15 @@ export default function Home() {
 
             {/* Column 2: Product */}
             <div className="space-y-3">
-              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Product</h4>
+              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Product Services</h4>
               <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
-                <li><Link href="/whatsapp-digital-loyalty-card" className="hover:text-emerald-400 transition-colors">🎁 Digital Loyalty Stamps</Link></li>
-                <li><Link href="/ai-google-review-qr-generator" className="hover:text-emerald-400 transition-colors">⭐ Smart AI Google Reviews</Link></li>
+                <li><Link href="/smart-digital-business-card" className="hover:text-emerald-400 transition-colors">🪪 (1) Smart Digital Business Card</Link></li>
+                <li><Link href="/whatsapp-digital-loyalty-card" className="hover:text-emerald-400 transition-colors">🎁 (2) Digital Loyalty &amp; Stamps</Link></li>
+                <li><Link href="/ai-google-review-qr-generator" className="hover:text-emerald-400 transition-colors">⭐ (3) Smart AI Google Reviews</Link></li>
+                <li><Link href="/ai-google-review-autoreply" className="hover:text-emerald-400 transition-colors">⚡ (4) 1-Click AI AutoReply</Link></li>
                 <li><Link href="/free-ai-google-review-generator" className="text-amber-400 font-bold hover:text-amber-300 transition-colors">✨ Free AI Review Generator</Link></li>
-                <li><Link href="/ai-google-review-autoreply" className="hover:text-emerald-400 transition-colors">⚡ 1-Click AI AutoReply</Link></li>
-                <li><Link href="/smart-digital-business-card" className="hover:text-emerald-400 transition-colors">🪪 Smart Digital Business Card</Link></li>
-                <li><Link href="/customerpilot-complete" className="hover:text-emerald-400 transition-colors">🚀 CustomerPilot Complete</Link></li>
-                <li><Link href="/guide/operations" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">🔄 Live Operations Manual</Link></li>
+                <li><Link href="/customerpilot-complete" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">🚀 CustomerPilot Complete (All-in-One)</Link></li>
+                <li><Link href="/guide/operations" className="text-slate-300 hover:text-emerald-300 transition-colors">🔄 Live Operations Manual</Link></li>
                 <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing &amp; Plans</Link></li>
               </ul>
             </div>
