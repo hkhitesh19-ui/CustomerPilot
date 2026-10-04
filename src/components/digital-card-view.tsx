@@ -53,6 +53,7 @@ import {
   Contact, 
   ChevronRight, 
   Star,
+  Gift,
   Check,
   Copy,
   X
@@ -449,6 +450,59 @@ END:VCARD`
               </span>
             </div>
 
+          </div>
+
+          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* 2.5 CUSTOMERPILOT COMPLETE POWER ENGINES (LOYALTY + AI REVIEW)  */}
+          {/* ═══════════════════════════════════════════════════════════════ */}
+          <div className="pt-1 font-sans">
+            <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
+              {/* Button 1: Digital Loyalty Stamp */}
+              <a
+                href={`https://wa.me/${(card.whatsappNumber || "917203824012").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi ${card.displayName}! Checking in for my VIP Club stamps 🎁`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-br from-indigo-50/90 via-white to-indigo-50/40 hover:from-indigo-100 hover:to-white text-slate-900 border-2 border-indigo-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group active:scale-[0.98]"
+              >
+                <div className="flex items-center justify-between w-full mb-1">
+                  <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-xs">
+                    <Gift className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-[9px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full">
+                    VIP Club
+                  </span>
+                </div>
+                <div>
+                  <div className="font-black text-xs sm:text-[13px] leading-tight text-slate-900">Loyalty Stamps</div>
+                  <div className="text-[10px] text-indigo-600 font-bold mt-0.5 flex items-center gap-0.5">
+                    Collect Stamps <ChevronRight className="w-2.5 h-2.5 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                </div>
+              </a>
+
+              {/* Button 2: Smart AI Google Review */}
+              <a
+                href={sanitizeUrl(effectiveReviewUrl)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-br from-amber-50/90 via-white to-amber-50/40 hover:from-amber-100 hover:to-white text-slate-900 border-2 border-amber-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group active:scale-[0.98]"
+              >
+                <div className="flex items-center justify-between w-full mb-1">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs">
+                    <Star className="w-4 h-4 text-white fill-white" />
+                  </div>
+                  <span className="text-[9px] font-black uppercase tracking-wider text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
+                    AI Review
+                  </span>
+                </div>
+                <div>
+                  <div className="font-black text-xs sm:text-[13px] leading-tight text-slate-900">Google Review</div>
+                  <div className="text-[10px] text-amber-700 font-bold mt-0.5 flex items-center gap-0.5">
+                    Auto-Write 5★ <ChevronRight className="w-2.5 h-2.5 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                </div>
+              </a>
+            </div>
           </div>
 
           {/* ═══════════════════════════════════════════════════════════════ */}

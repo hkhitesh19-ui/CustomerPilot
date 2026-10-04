@@ -124,11 +124,25 @@ export async function GET(req: NextRequest) {
       return new NextResponse("Standee template not found", { status: 404 })
     }
 
-    // 1. Generate live WhatsApp Check-in URL
-    const merchantPhone = normalizePhone(merchant.whatsappPhone) || "919999999999"
-    const bizName = merchant.name || "our store"
-    const joinText = `Hi ${bizName}! Checking in for my VIP Club stamps 🎁`
-    const targetUrl = `https://wa.me/${merchantPhone}?text=${encodeURIComponent(joinText)}`
+    // 1. Generate live target URL
+    // In CustomerPilot Complete ("master" design), if merchant has an active Digital Business Card,
+    // scanning the Master Standee opens their Smart Digital Business Card (/c/[slug]) where both
+    // Digital Loyalty Stamp and Smart AI Google Review modules are available!
+    let targetUrl = ""
+    const digitalCard = await db.digitalBusinessCard.findFirst({
+      where: { merchantId: merchant.id, isActive: true },
+    })
+
+    if (digitalCard && (design === "master" || !design)) {
+      const host = req.headers.get("host") || "localhost:3000"
+      const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https"
+      targetUrl = `${protocol}://${host}/c/${digitalCard.slug}`
+    } else {
+      const merchantPhone = normalizePhone(merchant.whatsappPhone) || "919999999999"
+      const bizName = merchant.name || "our store"
+      const joinText = `Hi ${bizName}! Checking in for my VIP Club stamps 🎁`
+      targetUrl = `https://wa.me/${merchantPhone}?text=${encodeURIComponent(joinText)}`
+    }
 
     // 2. Generate crisp QR code with merchant logo in center
     const qrDataUrl = await generateBrandedQRDataUrl(targetUrl, {

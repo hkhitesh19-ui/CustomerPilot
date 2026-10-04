@@ -17,7 +17,8 @@ export async function GET(req: NextRequest) {
     const merchant = await db.merchant.findUnique({
       where: { id: merchantId },
       include: {
-        merchantGoogleConnections: true
+        merchantGoogleConnections: true,
+        digitalBusinessCard: true,
       }
     })
 
@@ -56,9 +57,15 @@ export async function GET(req: NextRequest) {
       const merchantPhone = normalizePhone(merchant.whatsappPhone)
       if (!merchantPhone) return err("Merchant WhatsApp number not configured. Please configure WhatsApp number first.", 400)
 
-      const bizName = merchant.name || "our store"
-      const joinText = `Hi ${bizName}! Checking in for my VIP Club stamps 🎁`
-      targetUrl = `https://wa.me/${merchantPhone}?text=${encodeURIComponent(joinText)}`
+      if (merchant.digitalBusinessCard && (type === "counter" || type === "card" || type === "complete")) {
+        const host = req.headers.get("host") || "localhost:3000"
+        const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https"
+        targetUrl = `${protocol}://${host}/c/${merchant.digitalBusinessCard.slug}`
+      } else {
+        const bizName = merchant.name || "our store"
+        const joinText = `Hi ${bizName}! Checking in for my VIP Club stamps 🎁`
+        targetUrl = `https://wa.me/${merchantPhone}?text=${encodeURIComponent(joinText)}`
+      }
 
       const loyaltyTitleMap: Record<string, string> = {
         counter: "VIP Loyalty Counter QR Stand",

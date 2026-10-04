@@ -29,8 +29,12 @@ This document serves as a historical record of all major bugs, configuration iss
        - Generates dedicated **Smart AI Google Review Standee** with `✦ Ai - Powered`, `SMART AI GOOGLE REVIEW QR`, Cake Connection logo, `LEAVE US A Google ★★★★★ REVIEW!`, Google-bracketed QR code, and `CustomerPilot - YourReview Partner` footer.
        - Tested via `GET /api/qr/generate?mode=reviews&type=review_counter` and captured screenshot `cake_connection_smart_ai_review_standee.png`.
      - **Scenario 2 (Complete CustomerPilot)**:
-       - **Standee**: Generated 198.6 KB print poster `cake_connection_complete_standee.jpg` via `/api/qr/standee?design=master&format=print&m=cmtymavfx0002kx008lbfvp57` featuring official Cake Connection logo, 3D "SCAN to EARN", "CONFIRM REWARDS", and scannable VIP QR.
-       - **Digital Business Card**: Verified live card at `http://localhost:3000/c/cake-connection` with verified badge, 4.6★ rating (689 reviews), quick action buttons (WhatsApp, Call, Instagram, Facebook, Directions), 5 ordering platforms (Website, WhatsApp, Zomato, Swiggy, EasyCater), and sticky Save Contact button. Captured screenshot `cake_connection_digital_business_card.png`.
+       - **Standee QR Route to Digital Business Card**: Updated `src/app/api/qr/standee/route.ts` and `src/app/api/qr/generate/route.ts` so that in Complete CustomerPilot (`design=master` or `type=counter`), the Standee's QR code directly opens the merchant's **Smart Digital Business Card** (`http://localhost:3000/c/${slug}`).
+       - **Standee Print Output**: Generated 191.5 KB print poster `cake_connection_complete_standee.jpg` via `/api/qr/standee?design=master&format=print&m=cmtymavfx0002kx008lbfvp57` featuring official Cake Connection logo, 3D "SCAN to EARN", "CONFIRM REWARDS", and scannable VIP QR pointing to their live Digital Business Card.
+       - **Digital Business Card CustomerPilot 2-in-1 Power Suite (`src/components/digital-card-view.tsx`)**: Injected two prominent CustomerPilot engines right below status pills:
+         1. 🎁 **Digital Loyalty Stamp** (`VIP Club` pill • `Loyalty Stamps • Collect Stamps ➔`): 1-tap click opens WhatsApp with `Hi Cake Connection! Checking in for my VIP Club stamps 🎁` to start the loyalty stamp module.
+         2. ⭐ **Smart AI Google Review** (`AI Review` pill • `Google Review • Auto-Write 5★ ➔`): 1-tap click activates the Smart AI Google Review module.
+         - Followed by quick action buttons (WhatsApp, Call, Instagram, Facebook, Directions), 5 ordering platforms (Website, WhatsApp, Zomato, Swiggy, EasyCater), and sticky Save Contact button. Captured screenshot `cake_connection_digital_business_card_with_power_buttons.png`.
   5. **Playwright E2E Ground-Truth Automated Verification (`scripts/verify_master_standee_generator.js`)**:
      - Asserted HTTP 200 and >50 KB image output.
      - Asserted Times New Roman serif wordmark fallback.
