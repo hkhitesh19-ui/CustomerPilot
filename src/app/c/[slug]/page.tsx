@@ -97,6 +97,9 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
     orderingLinks: card.orderingLinks,
     googleRating: card.googleRating,
     googleReviewsCnt: card.googleReviewsCnt,
+    createdAt: card.createdAt,
+    theme: card.theme,
+    googlePlaceId: card.googlePlaceId,
   }
 
   return <DigitalCardView card={cardData} />

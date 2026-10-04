@@ -34,7 +34,7 @@ export function DualLangFaq({
   accentColor = "emerald",
   theme = "light"
 }: DualLangFaqProps) {
-  // English (Indian English) is the DEFAULT language
+  // English is the DEFAULT language
   const [lang, setLang] = useState<"en" | "hinglish">("en")
   const [openId, setOpenId] = useState<number | null>(items[0]?.id ?? null)
 
@@ -133,7 +133,7 @@ export function DualLangFaq({
                   : "text-slate-400 hover:text-white"
               }`}
             >
-              🇮🇳 English (Indian English)
+              🇮🇳 English
             </button>
             <button
               type="button"

@@ -2959,3 +2959,28 @@ ode_modules and .next cache. Switched npm registry to mirror to bypass timeouts.
   5. Ran direct Python3 sqlite3 fix on VPS DB to correct M/S DEEP PHARMACY phone
   6. Digimax Album will auto-fix next time they open Settings (ownerJid sync will trigger)
 - **Status**: Resolved and Verified.
+
+---
+## [04 Oct 2026] Issue: Smart Digital Business Card Zero-Signup 3-Day Free Trial Flow & Pricing Section Alignment
+- **Symptom**: 
+  1. On `/pricing`, "Smart Digital Business Card" was not in 1st position in "Select by Desired Business Outcome", and the outdated "Compare All 4 Free Trial Options" matrix was still present.
+  2. On `/smart-digital-business-card`, there was no direct zero-signup generation flow for merchants to enter their Google Review short link, social media links, and online ordering links with a visual guide on where to find the Google link.
+  3. Trial cards lacked a strict 3-day expiration paywall gate requiring payment/subscription after 72 hours.
+- **Root Cause**:
+  1. `pricing-client.tsx` had outcome cards ordered with loyalty and review options ahead of Digital Business Card, and retained the legacy comparison table component.
+  2. `src/proxy.ts` middleware blocked guest `POST` requests to `/api/digital-card` with `401 Unauthorized` because mutations were restricted to authenticated merchants.
+  3. `src/app/api/digital-card/route.ts` used invalid Prisma schema keys (`phone`, `businessType`) during guest merchant creation, throwing a runtime 500 error, and did not reuse existing records on unique phone collisions.
+  4. `digital-card-view.tsx` did not gate public views by `trialEndsAt` timestamp or surface the 3 subscription tiers (Starter ₹349, Pro ₹499, Lifetime ₹1,499) upon expiry.
+- **Resolution**:
+  1. In `src/components/pricing-client.tsx`, placed Smart Digital Business Card at index 0 of `outcomeCards` with 6M ₹349 and 1Y ₹499 pricing, and completely removed the "Compare All 4 Free Trial Options" comparison table.
+  2. In `src/proxy.ts`, allowed public `POST` requests on `/api/digital-card` for guest trial creations.
+  3. In `src/app/api/digital-card/route.ts`, fixed guest merchant creation to use valid schema keys (`name`, `category`, `whatsappPhone`, `status: 'active'`, `plan: 'free'`), safely looked up existing merchants by `whatsappPhone` to prevent unique constraint crashes, and embedded 3-day trial metadata (`isTrial: true`, `trialEndsAt: now + 3d`, `googleReviewLink`) in `theme`.
+  4. In `src/components/smart-digital-business-card-client.tsx`:
+     - Added `#create-card` section with a 3-step visual screenshot walkthrough illustrating where to find the Google Review short link from Google Business Profile ("Ask for reviews" button).
+     - Built zero-signup form for Google Review short link, store details, social media (Instagram, Facebook, YouTube), and ordering platforms (Zomato, Swiggy, Website).
+     - Added 1-click "Fill Demo Store (Try Instant)" autofill button for instant testing.
+     - Implemented live success card with instant `/c/[slug]` link, QR code preview, and 3-day trial countdown.
+     - Updated header and hero CTA buttons to scroll smoothly to `#create-card`.
+  5. In `src/components/digital-card-view.tsx`, implemented active 3-day trial countdown banner and 3-tier luxury paywall screen (Starter ₹349, Pro ₹499, Lifetime ₹1,499) with direct WhatsApp subscription button when expired.
+  6. Verified end-to-end with Playwright tests (`verify_digital_card_free_trial.js` and `verify_paywall_gate.js`).
+- **Status**: ✅ Resolved and Verified.

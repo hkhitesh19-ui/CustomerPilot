@@ -387,7 +387,7 @@ const CATEGORIES = [
 ]
 
 export function FaqSection() {
-  // (1) English (Indian English) is the DEFAULT language
+  // (1) English (English) is the DEFAULT language
   const [lang, setLang] = useState<"en" | "hinglish">("en")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
@@ -447,7 +447,7 @@ export function FaqSection() {
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                🇮🇳 English (Indian English)
+                🇮🇳 English (English)
               </button>
               <button
                 type="button"

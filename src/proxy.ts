@@ -86,8 +86,8 @@ export async function proxy(request: NextRequest) {
 
   const isPublicApi = PUBLIC_API_PREFIXES.some((prefix) => {
     if (prefix === '/api/digital-card') {
-      // SECURITY: Only GET is public for public card viewing. Mutations (POST/PUT/DELETE) require merchant auth
-      return pathname.startsWith('/api/digital-card') && request.method === 'GET';
+      // Allow GET (card viewing) and POST (zero-signup 3-day free trial card generation)
+      return pathname.startsWith('/api/digital-card') && (request.method === 'GET' || request.method === 'POST');
     }
     return pathname.startsWith(prefix);
   });

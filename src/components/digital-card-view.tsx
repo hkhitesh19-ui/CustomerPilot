@@ -80,12 +80,131 @@ export interface DigitalCardData {
   orderingLinks: string | null
   googleRating: number | null
   googleReviewsCnt: number | null
+  createdAt?: string | Date | null
+  theme?: string | null
+  googlePlaceId?: string | null
 }
 
 export function DigitalCardView({ card }: { card: DigitalCardData }) {
   const [qrModalOpen, setQrModalOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [savingContact, setSavingContact] = useState(false)
+
+  // 3-Day Free Trial Logic
+  // Permanent seed cards or subscribed cards are exempt from expiration
+  const isPermanent = card.slug === "cake-connection" || 
+                      card.slug === "gujarat-photo-goods" || 
+                      card.slug.startsWith("tasty-vadapav") || 
+                      (typeof card.theme === "string" && card.theme.includes('"subscribed":true')) ||
+                      (typeof card.theme === "string" && card.theme.includes("subscribed")) ||
+                      card.googlePlaceId === "subscribed"
+
+  let trialEndsAtTime = 0
+  try {
+    if (card.theme && typeof card.theme === "string" && card.theme.startsWith("{")) {
+      const parsedTheme = JSON.parse(card.theme)
+      if (parsedTheme.trialEndsAt) {
+        trialEndsAtTime = new Date(parsedTheme.trialEndsAt).getTime()
+      }
+    }
+  } catch (_) {}
+
+  const createdTime = card.createdAt ? new Date(card.createdAt).getTime() : Date.now()
+  if (!trialEndsAtTime) {
+    trialEndsAtTime = createdTime + (3 * 24 * 60 * 60 * 1000)
+  }
+
+  const isExpired = !isPermanent && Date.now() > trialEndsAtTime
+  const hoursRemaining = Math.max(0, Math.ceil((trialEndsAtTime - Date.now()) / (1000 * 60 * 60)))
+
+  if (isExpired) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-950 to-black text-white flex flex-col items-center justify-center p-4 sm:p-6 font-sans">
+        <div className="max-w-md w-full bg-slate-900/95 border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center mx-auto text-3xl shadow-inner">
+            ⏳
+          </div>
+
+          <div className="space-y-2">
+            <span className="inline-block px-3.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-extrabold text-xs uppercase tracking-wider">
+              3-Day Free Trial Expired
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-black text-white">
+              {card.displayName}
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Is Smart Digital Business Card ka <strong>3-Day Free Trial</strong> samapt ho chuka hai. Is link ko hamesha live rakhne aur customers ke sath share karte rehne ke liye, niche diye gaye plan me subscribe karein:
+            </p>
+          </div>
+
+          {/* Pricing Options */}
+          <div className="space-y-3 text-left">
+            {/* Starter Plan */}
+            <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700 flex items-center justify-between">
+              <div>
+                <div className="font-bold text-sm text-white">Starter Plan (6 Months)</div>
+                <div className="text-[11px] text-slate-400">₹349 · Save 50% (~₹58/mo)</div>
+              </div>
+              <a
+                href={`https://wa.me/919033304707?text=${encodeURIComponent(`Hello CustomerPilot! I want to activate Starter Plan (₹349 / 6 Months) for my Smart Digital Business Card: ${card.displayName} (https://customerpilot.in/c/${card.slug})`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs transition whitespace-nowrap"
+              >
+                Choose ₹349 →
+              </a>
+            </div>
+
+            {/* Pro Annual Plan - Most Popular */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/90 to-slate-800 border-2 border-emerald-500 flex items-center justify-between relative shadow-lg">
+              <span className="absolute -top-2.5 right-4 px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-black uppercase tracking-wider">
+                ⭐ Most Popular
+              </span>
+              <div>
+                <div className="font-bold text-sm text-white">Pro Annual Plan (1 Year)</div>
+                <div className="text-[11px] text-emerald-300">₹499 · Save 58% (~₹41/mo)</div>
+              </div>
+              <a
+                href={`https://wa.me/919033304707?text=${encodeURIComponent(`Hello CustomerPilot! I want to activate Pro Annual Plan (₹499 / 1 Year) for my Smart Digital Business Card: ${card.displayName} (https://customerpilot.in/c/${card.slug})`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition shadow-md whitespace-nowrap"
+              >
+                Choose ₹499 →
+              </a>
+            </div>
+
+            {/* Lifetime Deal */}
+            <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700 flex items-center justify-between">
+              <div>
+                <div className="font-bold text-sm text-white">Lifetime Deal (Forever)</div>
+                <div className="text-[11px] text-slate-400">₹1,499 · Zero Renewal Fees</div>
+              </div>
+              <a
+                href={`https://wa.me/919033304707?text=${encodeURIComponent(`Hello CustomerPilot! I want to claim Lifetime Deal (₹1499) for my Smart Digital Business Card: ${card.displayName} (https://customerpilot.in/c/${card.slug})`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs transition whitespace-nowrap"
+              >
+                Choose ₹1499 →
+              </a>
+            </div>
+          </div>
+
+          {/* Quick Help & Activation */}
+          <div className="pt-2 text-center text-xs text-slate-400 space-y-2">
+            <p>Instant Activation in 2 minutes via WhatsApp Support</p>
+            <a
+              href="tel:+919033304707"
+              className="inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-semibold"
+            >
+              <Phone className="w-3.5 h-3.5" /> Call Support: +91 90333 04707
+            </a>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Parse ordering platforms with useMemo to prevent redundant parsing on every keystroke
   const orderingList = useMemo(() => {
@@ -131,6 +250,17 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
     if (card.googleReviewUrl && card.googleReviewUrl.trim() !== "") {
       return card.googleReviewUrl
     }
+    if (card.googlePlaceId && (card.googlePlaceId.startsWith("http://") || card.googlePlaceId.startsWith("https://"))) {
+      return card.googlePlaceId
+    }
+    if (card.theme && typeof card.theme === "string" && card.theme.startsWith("{")) {
+      try {
+        const parsed = JSON.parse(card.theme)
+        if (parsed.googleReviewLink && typeof parsed.googleReviewLink === "string") {
+          return parsed.googleReviewLink
+        }
+      } catch (_) {}
+    }
     if (!card.googleMapsUrl) {
       return `https://maps.google.com/?q=${encodeURIComponent(card.displayName + " reviews")}`
     }
@@ -139,7 +269,7 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
       return `https://search.google.com/local/writereview?placeid=${placeIdMatch[1]}`
     }
     return card.googleMapsUrl
-  }, [card.googleReviewUrl, card.googleMapsUrl, card.displayName])
+  }, [card.googleReviewUrl, card.googlePlaceId, card.theme, card.googleMapsUrl, card.displayName])
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : `https://customerpilot.in/c/${card.slug}`
 
@@ -212,6 +342,22 @@ END:VCARD`
 
         <div className="relative z-10 space-y-4 sm:space-y-5">
           
+          {/* Active 3-Day Free Trial Notice Banner */}
+          {!isPermanent && (
+            <div className="px-3.5 py-1.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-[11px] font-bold flex items-center justify-between shadow-xs">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span suppressHydrationWarning>3-Day Free Trial Active ({hoursRemaining}h left)</span>
+              </span>
+              <a
+                href="/smart-digital-business-card#pricing"
+                className="text-emerald-800 hover:text-emerald-950 underline font-extrabold text-[10px]"
+              >
+                Subscribe (from ₹349) →
+              </a>
+            </div>
+          )}
+
           {/* ═══════════════════════════════════════════════════════════════ */}
           {/* 1. TOP BRANDING: REAL LOGO + NAME + CATEGORIES                  */}
           {/* ═══════════════════════════════════════════════════════════════ */}

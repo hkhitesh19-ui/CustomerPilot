@@ -30,7 +30,13 @@ import {
   Check,
   Sparkles,
   ShieldCheck,
-  Zap
+  Zap,
+  Copy,
+  CheckCircle2,
+  Loader2,
+  HelpCircle,
+  Store,
+  Youtube
 } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
@@ -186,6 +192,117 @@ export function SmartDigitalBusinessCardClient() {
 
   const activeCard = LIVE_CARD_EXAMPLES[activeCardIndex]
 
+  // ⚡ 3-Day Free Trial Digital Card Generator State (Zero Signup)
+  const [formData, setFormData] = useState({
+    googleReviewLink: "",
+    displayName: "",
+    subCategories: "Cafe & Restaurant",
+    phoneNumber: "",
+    whatsappNumber: "",
+    locationShort: "",
+    instagramUrl: "",
+    facebookUrl: "",
+    youtubeUrl: "",
+    zomatoUrl: "",
+    swiggyUrl: "",
+    websiteUrl: "",
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [createdCard, setCreatedCard] = useState<{ success: boolean; slug: string; card?: any } | null>(null)
+  const [linkCopied, setLinkCopied] = useState(false)
+
+  const handleAutofillDemo = () => {
+    setFormData({
+      googleReviewLink: "https://g.page/r/CbXxY-sample-review/review",
+      displayName: "Sharma Sweets & Cafe",
+      subCategories: "Cafe • Sweets & Snacks • Pure Veg",
+      phoneNumber: "+91 90333 04707",
+      whatsappNumber: "919033304707",
+      locationShort: "Alkapuri, Vadodara, Gujarat",
+      instagramUrl: "https://instagram.com/sharmasweetscafe",
+      facebookUrl: "https://facebook.com/sharmasweetscafe",
+      youtubeUrl: "https://youtube.com/@sharmasweets",
+      zomatoUrl: "https://zomato.com/vadodara/sharma-sweets",
+      swiggyUrl: "https://swiggy.com/restaurants/sharma-sweets-vadodara",
+      websiteUrl: "https://sharmasweets.in",
+    })
+    setSubmitError(null)
+  }
+
+  const handleGenerateCard = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!formData.displayName.trim()) {
+      setSubmitError("Please enter your Store / Business Name.")
+      return
+    }
+    setIsSubmitting(true)
+    setSubmitError(null)
+
+    // Helper to normalize social and platform links
+    const normalizeSocial = (val: string, domain: string) => {
+      const trimmed = val.trim()
+      if (!trimmed) return undefined
+      if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed
+      if (trimmed.includes(domain)) return `https://${trimmed}`
+      return `https://${domain}/${trimmed.replace(/^@/, "")}`
+    }
+
+    try {
+      const orderingLinks = []
+      if (formData.websiteUrl.trim()) {
+        const wUrl = formData.websiteUrl.trim().startsWith("http") ? formData.websiteUrl.trim() : `https://${formData.websiteUrl.trim()}`
+        orderingLinks.push({ platform: "website", label: "Online Store", url: wUrl, color: "bg-blue-600" })
+      }
+      if (formData.whatsappNumber.trim()) {
+        orderingLinks.push({ platform: "whatsapp", label: "WhatsApp Order", url: `https://wa.me/${formData.whatsappNumber.replace(/[^0-9]/g, "")}`, color: "bg-[#25D366]" })
+      }
+      if (formData.zomatoUrl.trim()) {
+        orderingLinks.push({ platform: "zomato", label: "Zomato", url: normalizeSocial(formData.zomatoUrl, "zomato.com") || formData.zomatoUrl.trim(), color: "bg-[#e23744]" })
+      }
+      if (formData.swiggyUrl.trim()) {
+        orderingLinks.push({ platform: "swiggy", label: "Swiggy", url: normalizeSocial(formData.swiggyUrl, "swiggy.com") || formData.swiggyUrl.trim(), color: "bg-[#fc8019]" })
+      }
+
+      const res = await fetch("/api/digital-card", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          displayName: formData.displayName.trim(),
+          subCategories: formData.subCategories.trim() || "Retail Store",
+          phoneNumber: formData.phoneNumber.trim() || undefined,
+          whatsappNumber: formData.whatsappNumber.trim() || undefined,
+          locationShort: formData.locationShort.trim() || undefined,
+          instagramUrl: normalizeSocial(formData.instagramUrl, "instagram.com"),
+          facebookUrl: normalizeSocial(formData.facebookUrl, "facebook.com"),
+          youtubeUrl: normalizeSocial(formData.youtubeUrl, "youtube.com"),
+          googleReviewLink: formData.googleReviewLink.trim() || undefined,
+          websiteUrl: formData.websiteUrl.trim() || undefined,
+          orderingLinks,
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to generate digital card. Please try again.")
+      }
+
+      setCreatedCard(data)
+    } catch (err: any) {
+      setSubmitError(err.message || "Failed to generate digital card.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleCopyLiveLink = () => {
+    if (!createdCard?.slug) return
+    const fullUrl = `${typeof window !== "undefined" ? window.location.origin : "https://customerpilot.in"}/c/${createdCard.slug}`
+    navigator.clipboard.writeText(fullUrl)
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), 2500)
+  }
+
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-cyan-500 selection:text-white flex flex-col justify-between">
       {/* Dynamic Global Keyframe & Visual Styling matching Master Homepage */}
@@ -246,7 +363,7 @@ export function SmartDigitalBusinessCardClient() {
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
             </Link>
             <Button asChild size="sm" className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-md transition-transform hover:scale-105">
-              <Link href="/signup">Create Your Card →</Link>
+              <Link href="#create-card">Create Your Card →</Link>
             </Button>
           </div>
         </div>
@@ -284,10 +401,10 @@ export function SmartDigitalBusinessCardClient() {
                 {/* Primary CTA Buttons */}
                 <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
                   <Link
-                    href="/signup"
+                    href="#create-card"
                     className="btn-grad py-3.5 sm:py-4 px-6 sm:px-8 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all w-full sm:w-auto"
                   >
-                    <span>Create Your Digital Card Free</span>
+                    <span>Create Your Digital Card (3-Day Free Trial)</span>
                     <ArrowRight className="w-4 h-4 ml-1" />
                   </Link>
                   <Link
@@ -1008,6 +1125,555 @@ export function SmartDigitalBusinessCardClient() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </section>
+
+        {/* ============ 3-DAY FREE TRIAL CARD GENERATOR & SCREENSHOT WALKTHROUGH ============ */}
+        <section id="create-card" className="py-16 md:py-24 bg-gradient-to-b from-cyan-50/50 via-white to-slate-50/70 border-t border-slate-200/80 relative overflow-hidden">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10 space-y-12">
+            
+            {/* Header Badge & Title */}
+            <div className="text-center max-w-2xl mx-auto space-y-3">
+              <span className="inline-flex items-center gap-1.5 text-cyan-800 text-xs font-black uppercase tracking-wider px-3.5 py-1 rounded-full bg-cyan-100/80 border border-cyan-300 shadow-xs">
+                <Zap className="w-3.5 h-3.5 text-cyan-600 fill-cyan-600" /> Instant 3-Day Free Trial • Zero Signup Required
+              </span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+                Create Your Smart Digital Business Card in 60 Seconds
+              </h2>
+              <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                Koi signup ya password ki zaroorat nahi hai. Bas apni <strong>Google Review Short Link</strong>, Social Media aur Online Ordering links enter karein. Aapka live card turant <strong>3 Days Free Trial</strong> ke liye chalu ho jayega!
+              </p>
+            </div>
+
+            {/* Step-by-Step Visual Screenshot Guide: Where to find your Google Review Short Link */}
+            <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 flex items-center justify-center font-black">
+                    📍
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">
+                      Step-by-Step Guide: Google Review Short Link Kaha Se Milegi?
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Apne Google Business Profile se official review link nikalne ka 3-step process
+                    </p>
+                  </div>
+                </div>
+                <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Official Google Maps Method
+                </div>
+              </div>
+
+              {/* 3 Visual Step Cards with Realistic Mockups */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                
+                {/* Step 1 Visual Card */}
+                <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-200 flex flex-col justify-between space-y-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-cyan-100 text-cyan-800">
+                        Step 1
+                      </span>
+                      <span className="text-[11px] font-semibold text-slate-400">Search on Google</span>
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-900">
+                      Google Search par Store kholein
+                    </h4>
+                    <p className="text-[11px] text-slate-600 leading-normal">
+                      Google Search ya Maps par apni dukan ka naam search karein (jis Google account se Business registered hai).
+                    </p>
+                  </div>
+
+                  {/* Visual Mockup 1: Google Search Bar */}
+                  <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-xs space-y-2 text-[10px]">
+                    <div className="flex items-center gap-2 border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 text-slate-700 font-medium">
+                      <span className="text-blue-500 font-bold">G</span>
+                      <span className="truncate">Tasty Vadapav Atladara Vadodara</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-emerald-700 font-bold bg-emerald-50/80 px-2 py-1 rounded-md">
+                      <BadgeCheck className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Your business on Google (Manager)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 2 Visual Card */}
+                <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-200 flex flex-col justify-between space-y-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-100 text-amber-800">
+                        Step 2
+                      </span>
+                      <span className="text-[11px] font-semibold text-slate-400">Manager Dashboard</span>
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-900">
+                      &quot;Ask for reviews&quot; par click karein
+                    </h4>
+                    <p className="text-[11px] text-slate-600 leading-normal">
+                      Dashboard par <strong>&quot;Ask for reviews&quot;</strong> (ya &quot;Get more reviews&quot;) button par tap karein.
+                    </p>
+                  </div>
+
+                  {/* Visual Mockup 2: Google Business Profile Actions */}
+                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 shadow-xs grid grid-cols-2 gap-1.5 text-[9.5px]">
+                    <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 flex flex-col items-center text-center">
+                      <span>✏️ Edit profile</span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-amber-50 border-2 border-amber-400 text-amber-900 font-extrabold flex flex-col items-center text-center shadow-xs relative">
+                      <span className="text-amber-500">⭐ Ask for reviews</span>
+                      <span className="text-[8px] bg-amber-500 text-white px-1.5 py-0.2 rounded-full mt-0.5 animate-pulse">Click Here 👈</span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 flex flex-col items-center text-center">
+                      <span>📢 Promote</span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 flex flex-col items-center text-center">
+                      <span>👥 Customers</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 3 Visual Card */}
+                <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-200 flex flex-col justify-between space-y-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
+                        Step 3
+                      </span>
+                      <span className="text-[11px] font-semibold text-slate-400">Instant Link</span>
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-900">
+                      Short Link Copy karke paste karein
+                    </h4>
+                    <p className="text-[11px] text-slate-600 leading-normal">
+                      Popup dialog me diye gaye <strong>&quot;Copy link&quot;</strong> button par click karein aur niche paste karein.
+                    </p>
+                  </div>
+
+                  {/* Visual Mockup 3: Google Review Modal Link */}
+                  <div className="bg-white rounded-xl border border-slate-200 p-2.5 shadow-xs space-y-2 text-[10px]">
+                    <div className="text-slate-700 font-bold">Get more reviews</div>
+                    <div className="p-1.5 rounded-lg bg-slate-100 border border-slate-200 font-mono text-[9px] text-slate-600 truncate">
+                      https://g.page/r/CbXxY.../review
+                    </div>
+                    <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-2 py-1 text-blue-700 font-bold text-[9.5px]">
+                      <span>✓ Link Copied to clipboard</span>
+                      <span className="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[8.5px]">Paste Below</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Dynamic Content: Created Success Card OR Generator Form */}
+            {createdCard ? (
+              <div className="bg-white rounded-3xl border-2 border-emerald-500/80 p-6 sm:p-10 shadow-xl space-y-8 animate-in fade-in zoom-in-95 duration-300">
+                <div className="text-center space-y-3 max-w-xl mx-auto">
+                  <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-3xl shadow-inner">
+                    🎉
+                  </div>
+                  <span className="inline-block px-3.5 py-1 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 font-black text-xs uppercase tracking-wider">
+                    3-Day Free Trial Activated Successfully
+                  </span>
+                  <h3 className="text-2xl sm:text-3xl font-black text-slate-900">
+                    Aapka Smart Digital Business Card Live Hai!
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600">
+                    Aapka card online live ho gaya hai. Aap is link ko WhatsApp, Instagram bio, aur QR code ke zariye customers ke sath share kar sakte hain.
+                  </p>
+                </div>
+
+                {/* Live Card Link & Action Bar */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="min-w-0 flex-1 text-center sm:text-left">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                      Live Digital Card Link
+                    </span>
+                    <a
+                      href={`/c/${createdCard.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-sm sm:text-base font-bold text-cyan-700 hover:text-cyan-800 underline underline-offset-4 break-all"
+                    >
+                      {typeof window !== "undefined" ? `${window.location.origin}/c/${createdCard.slug}` : `https://customerpilot.in/c/${createdCard.slug}`}
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
+                    <Button
+                      onClick={handleCopyLiveLink}
+                      variant="outline"
+                      className="border-slate-300 hover:bg-white text-slate-800 font-bold text-xs rounded-xl flex-1 sm:flex-none"
+                    >
+                      {linkCopied ? (
+                        <>
+                          <Check className="w-4 h-4 text-emerald-600 mr-1.5" /> Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4 mr-1.5 text-slate-500" /> Copy Link
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      asChild
+                      className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs rounded-xl flex-1 sm:flex-none shadow-md"
+                    >
+                      <a href={`/c/${createdCard.slug}`} target="_blank" rel="noopener noreferrer">
+                        Open Live Card <ExternalLink className="w-3.5 h-3.5 ml-1.5" />
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* QR Code & Sharing Options Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                  <div className="flex flex-col items-center justify-center p-6 bg-slate-50 rounded-2xl border border-slate-200 text-center space-y-3">
+                    <span className="text-xs font-bold text-slate-700">Scan or Print Your QR Code</span>
+                    <div className="p-3 bg-white rounded-2xl border-2 border-amber-300 shadow-md">
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
+                          typeof window !== "undefined" ? `${window.location.origin}/c/${createdCard.slug}` : `https://customerpilot.in/c/${createdCard.slug}`
+                        )}`}
+                        alt="Digital Business Card QR Code"
+                        className="w-40 h-40 object-contain"
+                      />
+                    </div>
+                    <span className="text-[11px] text-slate-500">
+                      Scan with any smartphone camera to open live card
+                    </span>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2">
+                      <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
+                        <Clock className="w-4 h-4 text-amber-600" />
+                        <span>3-Day Free Trial Notice</span>
+                      </div>
+                      <p className="text-xs text-amber-800 leading-relaxed">
+                        Aapka card agle <strong>72 ghante (3 days)</strong> tak bilkul free chalega. 3 days ke baad is link ko hamesha live rakhne ke liye sirf <strong>₹349 (6 Months)</strong> ya <strong>₹499 (1 Year)</strong> me subscribe karein. Koi automatic charges nahi kategi.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <a
+                        href={`https://wa.me/?text=${encodeURIComponent(
+                          `Check out my new Smart Digital Business Card: ${typeof window !== "undefined" ? window.location.origin : "https://customerpilot.in"}/c/${createdCard.slug}`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-3 px-4 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition"
+                      >
+                        <OfficialWhatsAppIcon className="w-4 h-4 fill-white" /> Share on WhatsApp with Customers
+                      </a>
+
+                      <Button
+                        onClick={() => {
+                          setCreatedCard(null)
+                          setFormData({
+                            googleReviewLink: "",
+                            displayName: "",
+                            subCategories: "Cafe & Restaurant",
+                            phoneNumber: "",
+                            whatsappNumber: "",
+                            locationShort: "",
+                            instagramUrl: "",
+                            facebookUrl: "",
+                            youtubeUrl: "",
+                            zomatoUrl: "",
+                            swiggyUrl: "",
+                            websiteUrl: "",
+                          })
+                        }}
+                        variant="ghost"
+                        className="w-full text-xs text-slate-600 hover:text-slate-900 font-semibold cursor-pointer"
+                      >
+                        + Create Another Digital Card
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            ) : (
+              <form onSubmit={handleGenerateCard} className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-10 shadow-sm space-y-8">
+                
+                {/* Form Top Header with Demo Autofill */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-slate-100">
+                  <div>
+                    <h3 className="text-lg sm:text-xl font-black text-slate-900">
+                      Merchant Digital Card Details
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Apni dukan ya brand ki information enter karein — zero signup required
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={handleAutofillDemo}
+                    variant="outline"
+                    size="sm"
+                    className="border-cyan-300 bg-cyan-50/70 hover:bg-cyan-100/80 text-cyan-800 font-bold text-xs rounded-xl shadow-2xs self-start sm:self-auto cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 mr-1.5 text-cyan-600" />
+                    Fill Demo Store (Try Instant)
+                  </Button>
+                </div>
+
+                {submitError && (
+                  <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+                    <span>{submitError}</span>
+                  </div>
+                )}
+
+                {/* PART 1: Google Review Link & Basic Details */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-slate-500">
+                    <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-slate-700 font-bold">1</span>
+                    <span>Google Review Link &amp; Business Name</span>
+                  </div>
+
+                  {/* Google Review Short Link (Highlighted) */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-800 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> Google Review Short Link
+                      </span>
+                      <span className="text-[11px] text-cyan-700 font-medium">Recommended for 5X Reviews</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-bold text-xs">
+                        ⭐
+                      </div>
+                      <input
+                        type="url"
+                        placeholder="e.g. https://g.page/r/CbXxY.../review or maps.app.goo.gl/..."
+                        value={formData.googleReviewLink}
+                        onChange={(e) => setFormData({ ...formData, googleReviewLink: e.target.value })}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-amber-50/20 text-slate-900 text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+                    <p className="text-[11px] text-slate-500">
+                      Upar diye gaye Step 1-3 guide se apna link copy karke yaha paste karein. Is se card par &quot;Google Reviews&quot; ka 5-star modal directly khulega.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Business Name */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">
+                        Store / Business Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Sharma Sweets &amp; Cafe"
+                        value={formData.displayName}
+                        onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 bg-white text-slate-900 text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    {/* Category */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">
+                        Category / Business Type
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Cafe • Bakery • Pure Veg"
+                        value={formData.subCategories}
+                        onChange={(e) => setFormData({ ...formData, subCategories: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 bg-white text-slate-900 text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Phone Number */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">
+                        Calling Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        placeholder="+91 98250 12345"
+                        value={formData.phoneNumber}
+                        onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 bg-white text-slate-900 text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    {/* WhatsApp Number */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">
+                        WhatsApp Number
+                      </label>
+                      <input
+                        type="tel"
+                        placeholder="919825012345 (with country code)"
+                        value={formData.whatsappNumber}
+                        onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 bg-white text-slate-900 text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    {/* City / Location */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">
+                        Area &amp; City
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Alkapuri, Vadodara"
+                        value={formData.locationShort}
+                        onChange={(e) => setFormData({ ...formData, locationShort: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 bg-white text-slate-900 text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* PART 2: Social Media Links */}
+                <div className="space-y-4 pt-4 border-t border-slate-100">
+                  <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-slate-500">
+                    <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-slate-700 font-bold">2</span>
+                    <span>Social Media Links (Optional)</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Instagram */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <Instagram className="w-3.5 h-3.5 text-pink-600" /> Instagram Link / Username
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://instagram.com/mybrand"
+                        value={formData.instagramUrl}
+                        onChange={(e) => setFormData({ ...formData, instagramUrl: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 bg-white text-slate-900 text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    {/* Facebook */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <Facebook className="w-3.5 h-3.5 text-blue-600" /> Facebook Page Link
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://facebook.com/mybrand"
+                        value={formData.facebookUrl}
+                        onChange={(e) => setFormData({ ...formData, facebookUrl: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 bg-white text-slate-900 text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    {/* YouTube */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <Youtube className="w-3.5 h-3.5 text-red-600" /> YouTube Channel Link
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://youtube.com/@mybrand"
+                        value={formData.youtubeUrl}
+                        onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 bg-white text-slate-900 text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* PART 3: Online Ordering & Catalog Links */}
+                <div className="space-y-4 pt-4 border-t border-slate-100">
+                  <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-slate-500">
+                    <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-slate-700 font-bold">3</span>
+                    <span>Online Ordering &amp; Delivery Links (Optional)</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Zomato */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded bg-[#e23744] text-white text-[10px] font-black flex items-center justify-center">z</span>
+                        <span>Zomato Link</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://zomato.com/..."
+                        value={formData.zomatoUrl}
+                        onChange={(e) => setFormData({ ...formData, zomatoUrl: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 bg-white text-slate-900 text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    {/* Swiggy */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <span className="w-4 h-4 rounded bg-[#fc8019] text-white text-[10px] font-black flex items-center justify-center">S</span>
+                        <span>Swiggy Link</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://swiggy.com/..."
+                        value={formData.swiggyUrl}
+                        onChange={(e) => setFormData({ ...formData, swiggyUrl: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 bg-white text-slate-900 text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    {/* Website / Catalog */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <Globe className="w-3.5 h-3.5 text-blue-600" /> Website / Menu Catalog
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://mywebsite.com or menu PDF"
+                        value={formData.websiteUrl}
+                        onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 bg-white text-slate-900 text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Trial & Paywall Transparent Notice */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>
+                      <strong>100% Free for 3 Days:</strong> Card generate karte hi live ho jayega. 3 din baad payment karke subscribe karein (from ₹349) tab hi link continue karegi.
+                    </span>
+                  </div>
+                  <span className="text-emerald-700 font-bold shrink-0">No Credit Card Needed</span>
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  size="lg"
+                  className="w-full py-6 rounded-2xl btn-grad font-black text-sm sm:text-base shadow-xl hover:scale-[1.01] transition-transform flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" /> Generating Your Live Digital Card...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-5 h-5 fill-white" /> Generate My 3-Day Free Trial Digital Card Now →
+                    </>
+                  )}
+                </Button>
+
+              </form>
+            )}
+
           </div>
         </section>
 
