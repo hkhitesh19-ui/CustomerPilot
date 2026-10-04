@@ -3,6 +3,41 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [04 Oct 2026] Issue: Universal Master QR Loyalty Standee System Locking & Cake Connection Multi-Tier Scenarios
+- **Symptom**: User mandated locking the physical standee template into the CustomerPilot codebase based on the Master Design Template (`media_1791123925184.jpg`), ensuring only 4 dynamic variables change per merchant (Business Name, Business Logo/Times New Roman serif wordmark, Business Category, Scannable QR code), while all other branding remains 100% locked. Additionally, user requested full manual testing and demonstration for Cake Connection in two scenarios:
+  1. Cake Connection takes **only Smart AI Google Review**: What does their standee look like?
+  2. Cake Connection takes **Complete CustomerPilot**: What does their physical Standee look like, and how is their Smart Digital Business Card generated?
+- **Root Cause**:
+  1. The platform previously used legacy basic mockups that did not match the Master 3D tabletop loyalty standee standard.
+  2. CodeRabbit security audit identified potential SSRF in remote logo fetching, unvalidated local path traversal in file ingestion, and HTML injection vulnerability in print template generation.
+- **Resolution**:
+  1. **Universal Master Base Template Asset (`public/standees/standee_universal_base.jpg`)**:
+     - Prepared clean 723×1024 base template with top dark navy header pill (`left: 132, top: 18, width: 455, height: 130`) and marble pedestal QR target area with yellow corner brackets (`left: 255, top: 400, width: 256, height: 230`).
+  2. **Dynamic Sharp Server Compositor (`src/app/api/qr/standee/route.ts`)**:
+     - Added `master` configuration to `STANDEE_COORDS` and `PRINT_POSTER_COORDS`.
+     - Built dynamic logo overlay with Times New Roman serif wordmark fallback (`#fef08a` gold on `#05101c` navy) for stores without an image logo.
+     - Hardened against SSRF: validated URL protocol, rejected internal/private CIDRs (`127.*`, `10.*`, `192.168.*`, `169.254.*`, `.internal`, `.local`), enforced 5-second `AbortController` timeout, and limited download buffer size to 5MB.
+     - Hardened against Path Traversal: verified `localPath.startsWith(publicDir)`.
+  3. **Universal Master Standee Component & Print Engine (`src/components/qr-generator.tsx`)**:
+     - Updated live preview matching the master design system with 3D "SCAN to EARN", gold satin "CONFIRM REWARDS", 3 benefit pills, VIP Member footer, and CustomerPilot branding.
+     - Updated vector print engine for A4/A5 tabletop acrylic stands with scissor trim lines.
+     - Escaped HTML entities (`safeStoreName`) to eliminate XSS/HTML injection.
+     - Added user toast notification if browser blocks popup for print dialog.
+     - Added **"Download Poster (JPG)"** direct high-res download button.
+  4. **Cake Connection Multi-Tier Scenarios Tested & Verified**:
+     - **Scenario 1 (Only Smart AI Google Review)**:
+       - Generates dedicated **Smart AI Google Review Standee** with `✦ Ai - Powered`, `SMART AI GOOGLE REVIEW QR`, Cake Connection logo, `LEAVE US A Google ★★★★★ REVIEW!`, Google-bracketed QR code, and `CustomerPilot - YourReview Partner` footer.
+       - Tested via `GET /api/qr/generate?mode=reviews&type=review_counter` and captured screenshot `cake_connection_smart_ai_review_standee.png`.
+     - **Scenario 2 (Complete CustomerPilot)**:
+       - **Standee**: Generated 198.6 KB print poster `cake_connection_complete_standee.jpg` via `/api/qr/standee?design=master&format=print&m=cmtymavfx0002kx008lbfvp57` featuring official Cake Connection logo, 3D "SCAN to EARN", "CONFIRM REWARDS", and scannable VIP QR.
+       - **Digital Business Card**: Verified live card at `http://localhost:3000/c/cake-connection` with verified badge, 4.6★ rating (689 reviews), quick action buttons (WhatsApp, Call, Instagram, Facebook, Directions), 5 ordering platforms (Website, WhatsApp, Zomato, Swiggy, EasyCater), and sticky Save Contact button. Captured screenshot `cake_connection_digital_business_card.png`.
+  5. **Playwright E2E Ground-Truth Automated Verification (`scripts/verify_master_standee_generator.js`)**:
+     - Asserted HTTP 200 and >50 KB image output.
+     - Asserted Times New Roman serif wordmark fallback.
+     - Asserted authenticated merchant dashboard settings `/dashboard/settings#sec-vip-qr` renders "SCAN to EARN", "CONFIRM REWARDS", 3 benefits, VIP Member footer, and action buttons. All assertions passed 100%. Captured `standee_generator_dashboard_preview.png`.
+- **Status**: ✅ Resolved, Verified via Playwright, and Committed Locally.
+
+---
 ## [04 Oct 2026] Issue: SuperAdmin On-Behalf Digital Card Generator & Master Pricing Suite with Indian English Standardization
 - **Symptom**: User requested two critical enhancements:
   1. SuperAdmin Panel (`/super-admin`): Allow SuperAdmin to manually enter all merchant details and generate/manage "Smart Digital Business Card" on behalf of any merchant without needing merchant credentials, as well as view and edit all platform pricing plans including "Smart Digital Business Card" pricing (6 Months ₹349, 1 Year ₹499, Lifetime ₹1,499).
