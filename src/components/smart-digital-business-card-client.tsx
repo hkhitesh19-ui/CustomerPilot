@@ -1141,7 +1141,7 @@ export function SmartDigitalBusinessCardClient() {
                 Create Your Smart Digital Business Card in 60 Seconds
               </h2>
               <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                Koi signup ya password ki zaroorat nahi hai. Bas apni <strong>Google Review Short Link</strong>, Social Media aur Online Ordering links enter karein. Aapka live card turant <strong>3 Days Free Trial</strong> ke liye chalu ho jayega!
+                No complex signup or password needed. Simply enter your <strong>Google Review Short Link</strong>, Social Media profiles, and Online Ordering links. Your interactive digital card activates instantly with a <strong>3-Day Free Trial</strong>!
               </p>
             </div>
 
@@ -1154,10 +1154,10 @@ export function SmartDigitalBusinessCardClient() {
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-black text-slate-900">
-                      Step-by-Step Guide: Google Review Short Link Kaha Se Milegi?
+                      Step-by-Step Guide: How to Find Your Google Review Short Link
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Apne Google Business Profile se official review link nikalne ka 3-step process
+                      Simple 3-step process to get your official review link from Google Business Profile
                     </p>
                   </div>
                 </div>
@@ -1179,10 +1179,10 @@ export function SmartDigitalBusinessCardClient() {
                       <span className="text-[11px] font-semibold text-slate-400">Search on Google</span>
                     </div>
                     <h4 className="text-sm font-bold text-slate-900">
-                      Google Search par Store kholein
+                      Search Your Store on Google
                     </h4>
                     <p className="text-[11px] text-slate-600 leading-normal">
-                      Google Search ya Maps par apni dukan ka naam search karein (jis Google account se Business registered hai).
+                      Search your business or store name on Google Search or Maps using the registered Google account.
                     </p>
                   </div>
 
@@ -1209,10 +1209,10 @@ export function SmartDigitalBusinessCardClient() {
                       <span className="text-[11px] font-semibold text-slate-400">Manager Dashboard</span>
                     </div>
                     <h4 className="text-sm font-bold text-slate-900">
-                      &quot;Ask for reviews&quot; par click karein
+                      Click &quot;Ask for reviews&quot;
                     </h4>
                     <p className="text-[11px] text-slate-600 leading-normal">
-                      Dashboard par <strong>&quot;Ask for reviews&quot;</strong> (ya &quot;Get more reviews&quot;) button par tap karein.
+                      On your business profile dashboard, tap the <strong>&quot;Ask for reviews&quot;</strong> (or &quot;Get more reviews&quot;) button.
                     </p>
                   </div>
 
@@ -1244,10 +1244,10 @@ export function SmartDigitalBusinessCardClient() {
                       <span className="text-[11px] font-semibold text-slate-400">Instant Link</span>
                     </div>
                     <h4 className="text-sm font-bold text-slate-900">
-                      Short Link Copy karke paste karein
+                      Copy and Paste Your Short Review Link
                     </h4>
                     <p className="text-[11px] text-slate-600 leading-normal">
-                      Popup dialog me diye gaye <strong>&quot;Copy link&quot;</strong> button par click karein aur niche paste karein.
+                      Click the <strong>&quot;Copy link&quot;</strong> button in the popup dialog and paste it in the form below.
                     </p>
                   </div>
 
@@ -1278,10 +1278,10 @@ export function SmartDigitalBusinessCardClient() {
                     3-Day Free Trial Activated Successfully
                   </span>
                   <h3 className="text-2xl sm:text-3xl font-black text-slate-900">
-                    Aapka Smart Digital Business Card Live Hai!
+                    Your Smart Digital Business Card is Live!
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-600">
-                    Aapka card online live ho gaya hai. Aap is link ko WhatsApp, Instagram bio, aur QR code ke zariye customers ke sath share kar sakte hain.
+                    Your digital business card is now live online. You can share this link with customers via WhatsApp, Instagram bio, or your counter QR code.
                   </p>
                 </div>
 
@@ -1352,7 +1352,7 @@ export function SmartDigitalBusinessCardClient() {
                         <span>3-Day Free Trial Notice</span>
                       </div>
                       <p className="text-xs text-amber-800 leading-relaxed">
-                        Aapka card agle <strong>72 ghante (3 days)</strong> tak bilkul free chalega. 3 days ke baad is link ko hamesha live rakhne ke liye sirf <strong>₹349 (6 Months)</strong> ya <strong>₹499 (1 Year)</strong> me subscribe karein. Koi automatic charges nahi kategi.
+                        Your card is 100% active and free for the next <strong>72 hours (3 days)</strong>. To keep this link live permanently after 3 days, simply subscribe starting at <strong>₹349 (6 Months)</strong> or <strong>₹499 (1 Year)</strong>. No automatic deductions or commitments.
                       </p>
                     </div>
 
@@ -1406,7 +1406,7 @@ export function SmartDigitalBusinessCardClient() {
                       Merchant Digital Card Details
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Apni dukan ya brand ki information enter karein — zero signup required
+                      Enter your store or brand details below — zero signup required
                     </p>
                   </div>
                   <Button
@@ -1456,7 +1456,7 @@ export function SmartDigitalBusinessCardClient() {
                       />
                     </div>
                     <p className="text-[11px] text-slate-500">
-                      Upar diye gaye Step 1-3 guide se apna link copy karke yaha paste karein. Is se card par &quot;Google Reviews&quot; ka 5-star modal directly khulega.
+                      Copy your short link using the 3-step guide above and paste it here. This enables 1-tap 5-star review collection directly on your digital card.
                     </p>
                   </div>
 
@@ -1647,7 +1647,7 @@ export function SmartDigitalBusinessCardClient() {
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                     <span>
-                      <strong>100% Free for 3 Days:</strong> Card generate karte hi live ho jayega. 3 din baad payment karke subscribe karein (from ₹349) tab hi link continue karegi.
+                      <strong>100% Free for 3 Days:</strong> Your digital card goes live instantly upon generation. Continue uninterrupted after 3 days by subscribing to any flexible plan (starting from ₹349).
                     </span>
                   </div>
                   <span className="text-emerald-700 font-bold shrink-0">No Credit Card Needed</span>

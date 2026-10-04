@@ -21,7 +21,11 @@ import {
   RefreshCw,
   Save,
   Globe,
-  Loader2
+  Loader2,
+  Smartphone,
+  Zap,
+  Check,
+  Star
 } from "lucide-react"
 
 export function SubscriptionPlansManager() {
@@ -31,6 +35,7 @@ export function SubscriptionPlansManager() {
   const [plans, setPlans] = useState<any[]>([])
   const [loadingPlans, setLoadingPlans] = useState(true)
   const [savingPlans, setSavingPlans] = useState(false)
+  const [planCategoryFilter, setPlanCategoryFilter] = useState("ALL")
 
   // Coupons state
   const [coupons, setCoupons] = useState<any[]>([])
@@ -209,7 +214,7 @@ export function SubscriptionPlansManager() {
       <Tabs defaultValue="pricing" className="w-full">
         <TabsList className="grid grid-cols-3 max-w-md bg-slate-950 border border-slate-800">
           <TabsTrigger value="pricing" className="flex items-center gap-1.5 text-xs font-semibold data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
-            <CreditCard className="w-4 h-4" /> Pricing Plans (3)
+            <CreditCard className="w-4 h-4" /> Pricing Plans ({plans.length})
           </TabsTrigger>
           <TabsTrigger value="coupons" className="flex items-center gap-1.5 text-xs font-semibold data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
             <Tag className="w-4 h-4" /> Coupons & Offers
@@ -222,119 +227,185 @@ export function SubscriptionPlansManager() {
         {/* 1. PRICING PLANS TAB */}
         <TabsContent value="pricing" className="mt-4 space-y-4">
           <Card className="bg-slate-900/80 border-slate-800/80 shadow-xl backdrop-blur-xl">
-            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-slate-800/60">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800/60">
               <div>
-                <CardTitle className="text-base font-bold text-white">Dynamic Subscription Plans</CardTitle>
+                <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-indigo-400" />
+                  Dynamic Master Pricing Plans ({plans.length})
+                </CardTitle>
                 <CardDescription className="text-xs text-slate-400">
-                  Changes made here update instantly across Homepage Pricing and Merchant Checkout.
+                  Edit selling prices, original MRPs, and discount tags across all platforms including Smart Digital Business Cards. Changes update live in real-time.
                 </CardDescription>
               </div>
               <Button
                 onClick={handleSavePlans}
                 disabled={savingPlans}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg"
+                className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg self-start sm:self-auto cursor-pointer"
               >
                 {savingPlans ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Save All Pricing Changes
               </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               {loadingPlans ? (
                 <div className="py-12 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-stone-400" /></div>
               ) : (
-                <div className="grid md:grid-cols-3 gap-4">
-                  {plans.map((p, idx) => (
-                    <div key={p.id || idx} className="p-4 rounded-2xl border border-slate-800 bg-slate-950 space-y-3 shadow-lg">
-                      <div className="flex items-center justify-between">
-                        <span className="font-extrabold text-sm text-white">{p.name}</span>
-                        <Badge variant="outline" className="text-[10px] font-mono bg-indigo-500/10 text-indigo-300 border-indigo-500/30">{p.days} Days</Badge>
-                      </div>
+                <div className="space-y-6">
+                  {/* Category Filter Pills */}
+                  <div className="flex flex-wrap items-center gap-2 pb-2 border-b border-slate-800/60">
+                    {[
+                      { id: "ALL", label: `All Plans (${plans.length})` },
+                      { id: "DIGITAL_CARD", label: `Smart Digital Cards (${plans.filter(p => (p.planKey || '').startsWith('card_') || p.enabledModules === 'DIGITAL_CARD').length})` },
+                      { id: "COMPLETE", label: `CustomerPilot Complete (${plans.filter(p => (p.planKey || '').startsWith('growth_') || (p.planKey || '').startsWith('enterprise_')).length})` },
+                      { id: "LOYALTY", label: `Loyalty Stamps (${plans.filter(p => (p.planKey || '').startsWith('loyalty_') || p.enabledModules === 'LOYALTY').length})` },
+                      { id: "REVIEWS", label: `AI Google Reviews (${plans.filter(p => (p.planKey || '').startsWith('reviews_') || p.enabledModules === 'REVIEWS').length})` },
+                      { id: "AUTOREPLY", label: `AI AutoReply (${plans.filter(p => (p.planKey || '').startsWith('autoreply_') || p.enabledModules === 'AUTOREPLY').length})` },
+                    ].map(filter => (
+                      <button
+                        key={filter.id}
+                        type="button"
+                        onClick={() => setPlanCategoryFilter(filter.id)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                          planCategoryFilter === filter.id
+                            ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                            : "bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800"
+                        }`}
+                      >
+                        <span>{filter.label}</span>
+                      </button>
+                    ))}
+                  </div>
 
-                      <div className="space-y-1">
-                        <Label className="text-xs text-slate-400">Plan Title</Label>
-                        <Input
-                          value={p.name}
-                          onChange={(e) => {
-                            const copy = [...plans]
-                            copy[idx].name = e.target.value
-                            setPlans(copy)
-                          }}
-                          className="h-8 text-xs font-semibold bg-slate-900 border-slate-800 text-white"
-                        />
-                      </div>
+                  {/* Plans Grid */}
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {plans
+                      .filter(p => {
+                        if (planCategoryFilter === "ALL") return true
+                        const key = p.planKey || ""
+                        if (planCategoryFilter === "DIGITAL_CARD") return key.startsWith("card_") || p.enabledModules === "DIGITAL_CARD"
+                        if (planCategoryFilter === "COMPLETE") return key.startsWith("growth_") || key.startsWith("enterprise_")
+                        if (planCategoryFilter === "LOYALTY") return key.startsWith("loyalty_") || p.enabledModules === "LOYALTY"
+                        if (planCategoryFilter === "REVIEWS") return key.startsWith("reviews_") || p.enabledModules === "REVIEWS"
+                        if (planCategoryFilter === "AUTOREPLY") return key.startsWith("autoreply_") || p.enabledModules === "AUTOREPLY"
+                        return true
+                      })
+                      .map((p) => {
+                        const realIdx = plans.findIndex(item => (item.id && item.id === p.id) || item.planKey === p.planKey)
+                        const isCard = (p.planKey || "").startsWith("card_") || p.enabledModules === "DIGITAL_CARD"
 
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-1">
-                          <Label className="text-xs text-slate-400">Selling Price (₹)</Label>
-                          <Input
-                            type="number"
-                            value={p.price}
-                            onChange={(e) => {
-                              const copy = [...plans]
-                              copy[idx].price = Number(e.target.value)
-                              setPlans(copy)
-                            }}
-                            className="h-8 text-xs font-extrabold text-emerald-400 bg-slate-900 border-slate-800"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs text-slate-400">Original Price (₹)</Label>
-                          <Input
-                            type="number"
-                            value={p.originalPrice || ""}
-                            onChange={(e) => {
-                              const copy = [...plans]
-                              copy[idx].originalPrice = Number(e.target.value)
-                              setPlans(copy)
-                            }}
-                            className="h-8 text-xs text-slate-400 line-through bg-slate-900 border-slate-800"
-                          />
-                        </div>
-                      </div>
+                        return (
+                          <div 
+                            key={p.id || p.planKey || realIdx} 
+                            className={`p-5 rounded-2xl border bg-slate-950 space-y-4 shadow-xl transition-all ${
+                              isCard ? "border-cyan-500/40 bg-gradient-to-b from-slate-950 to-cyan-950/20" : "border-slate-800 hover:border-slate-700"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${
+                                isCard
+                                  ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40"
+                                  : (p.planKey || "").startsWith("growth_") || (p.planKey || "").startsWith("enterprise_")
+                                    ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                                    : (p.planKey || "").startsWith("loyalty_")
+                                      ? "bg-purple-500/20 text-purple-300 border-purple-500/40"
+                                      : (p.planKey || "").startsWith("reviews_")
+                                        ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                                        : "bg-blue-500/20 text-blue-300 border-blue-500/40"
+                              }`}>
+                                {isCard ? "Smart Digital Card" : (p.planKey || "").startsWith("growth_") || (p.planKey || "").startsWith("enterprise_") ? "Complete Suite" : (p.planKey || "").startsWith("loyalty_") ? "Loyalty" : (p.planKey || "").startsWith("reviews_") ? "Google Reviews" : "AutoReply"}
+                              </span>
+                              <Badge variant="outline" className="text-[10px] font-mono bg-indigo-500/10 text-indigo-300 border-indigo-500/30">
+                                {p.days} Days
+                              </Badge>
+                            </div>
 
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-1">
-                          <Label className="text-xs text-slate-400">Discount %</Label>
-                          <Input
-                            type="number"
-                            value={p.discountPercent || 0}
-                            onChange={(e) => {
-                              const copy = [...plans]
-                              copy[idx].discountPercent = Number(e.target.value)
-                              setPlans(copy)
-                            }}
-                            className="h-8 text-xs font-semibold text-amber-400 bg-slate-900 border-slate-800"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs text-slate-400">Badge Tag</Label>
-                          <Input
-                            value={p.badge || ""}
-                            onChange={(e) => {
-                              const copy = [...plans]
-                              copy[idx].badge = e.target.value
-                              setPlans(copy)
-                            }}
-                            placeholder="e.g. Best Value"
-                            className="h-8 text-xs"
-                          />
-                        </div>
-                      </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-slate-400 font-semibold">Plan Name</Label>
+                              <Input
+                                value={p.name}
+                                onChange={(e) => {
+                                  const copy = [...plans]
+                                  copy[realIdx].name = e.target.value
+                                  setPlans(copy)
+                                }}
+                                className="h-8 text-xs font-semibold bg-slate-900 border-slate-800 text-white"
+                              />
+                            </div>
 
-                      <div className="space-y-1">
-                        <Label className="text-xs text-stone-600">Description</Label>
-                        <Input
-                          value={p.description || ""}
-                          onChange={(e) => {
-                            const copy = [...plans]
-                            copy[idx].description = e.target.value
-                            setPlans(copy)
-                          }}
-                          className="h-8 text-xs"
-                        />
-                      </div>
-                    </div>
-                  ))}
+                            <div className="grid grid-cols-2 gap-2.5">
+                              <div className="space-y-1">
+                                <Label className="text-xs text-slate-400 font-semibold">Selling Price (₹)</Label>
+                                <Input
+                                  type="number"
+                                  value={p.price}
+                                  onChange={(e) => {
+                                    const copy = [...plans]
+                                    copy[realIdx].price = Number(e.target.value)
+                                    setPlans(copy)
+                                  }}
+                                  className="h-8 text-xs font-black text-emerald-400 bg-slate-900 border-slate-800"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs text-slate-400 font-semibold">MRP Price (₹)</Label>
+                                <Input
+                                  type="number"
+                                  value={p.originalPrice || ""}
+                                  onChange={(e) => {
+                                    const copy = [...plans]
+                                    copy[realIdx].originalPrice = Number(e.target.value)
+                                    setPlans(copy)
+                                  }}
+                                  className="h-8 text-xs text-slate-400 line-through bg-slate-900 border-slate-800"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2.5">
+                              <div className="space-y-1">
+                                <Label className="text-xs text-slate-400 font-semibold">Discount %</Label>
+                                <Input
+                                  type="number"
+                                  value={p.discountPercent || 0}
+                                  onChange={(e) => {
+                                    const copy = [...plans]
+                                    copy[realIdx].discountPercent = Number(e.target.value)
+                                    setPlans(copy)
+                                  }}
+                                  className="h-8 text-xs font-semibold text-amber-400 bg-slate-900 border-slate-800"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs text-slate-400 font-semibold">Badge Tag</Label>
+                                <Input
+                                  value={p.badge || ""}
+                                  onChange={(e) => {
+                                    const copy = [...plans]
+                                    copy[realIdx].badge = e.target.value
+                                    setPlans(copy)
+                                  }}
+                                  placeholder="e.g. ⭐ Most Popular"
+                                  className="h-8 text-xs bg-slate-900 border-slate-800 text-white"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="space-y-1">
+                              <Label className="text-xs text-slate-400 font-semibold">Description</Label>
+                              <Input
+                                value={p.description || ""}
+                                onChange={(e) => {
+                                  const copy = [...plans]
+                                  copy[realIdx].description = e.target.value
+                                  setPlans(copy)
+                                }}
+                                className="h-8 text-xs bg-slate-900 border-slate-800 text-slate-300"
+                              />
+                            </div>
+                          </div>
+                        )
+                      })}
+                  </div>
                 </div>
               )}
             </CardContent>

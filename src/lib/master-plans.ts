@@ -222,6 +222,71 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     ],
     enabledModules: "AUTOREPLY",
     active: true
+  },
+
+  // ─── Standalone Service 4: Smart Digital Business Card ───
+  {
+    planKey: "card_6mo",
+    name: "Smart Digital Business Card — 6 Months",
+    description: "Interactive NFC/QR digital business card, 1-tap contact saving, direct Google review modal (6 Months Access, ~₹58/mo).",
+    days: 180,
+    price: 349,
+    originalPrice: 699,
+    discountPercent: 50,
+    badge: "Starter (6 Mo)",
+    popular: false,
+    features: [
+      "1-Tap Save Contact (vCard .vcf phonebook sync)",
+      "Direct 5-Star Google Reviews Submission Modal",
+      "WhatsApp Chat & Direct Calling Connect",
+      "Google Maps Turn-by-Turn Navigation",
+      "High-Resolution Printable QR Code (PNG & SVG)",
+      "6 Months Cloud Hosting with Real-Time Edits"
+    ],
+    enabledModules: "DIGITAL_CARD",
+    active: true
+  },
+  {
+    planKey: "card_yearly",
+    name: "Smart Digital Business Card — 1 Year",
+    description: "Full year interactive digital business card with online ordering links, social profiles, and counter standees (~₹41/mo).",
+    days: 365,
+    price: 499,
+    originalPrice: 1199,
+    discountPercent: 58,
+    badge: "⭐ Most Popular",
+    popular: true,
+    features: [
+      "Everything in 6 Months Plan +",
+      "Online Ordering Links (Zomato / Swiggy / Catalog)",
+      "Social Media Links (Instagram, Facebook, YouTube)",
+      "Printable Counter Acrylic Standee Templates",
+      "1 Year Cloud Hosting with Instant Live Updates",
+      "Priority WhatsApp Support (+91 90333 04707)"
+    ],
+    enabledModules: "DIGITAL_CARD",
+    active: true
+  },
+  {
+    planKey: "card_lifetime",
+    name: "Smart Digital Business Card — Lifetime Deal",
+    description: "Zero renewal fees forever. Pay once, keep your digital business card and QR code active for life.",
+    days: 3650,
+    price: 1499,
+    originalPrice: 3999,
+    discountPercent: 62,
+    badge: "Lifetime Deal",
+    popular: false,
+    features: [
+      "Lifetime Permanent Cloud Hosting",
+      "Zero Renewal or Maintenance Fees Forever",
+      "Unlimited Real-Time Profile & Contact Updates",
+      "All Current & Future Features Included",
+      "Custom NFC Card Configuration Guide",
+      "VIP Founder Support Line"
+    ],
+    enabledModules: "DIGITAL_CARD",
+    active: true
   }
 ]
 

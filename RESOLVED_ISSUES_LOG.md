@@ -3,6 +3,32 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [04 Oct 2026] Issue: SuperAdmin On-Behalf Digital Card Generator & Master Pricing Suite with Indian English Standardization
+- **Symptom**: User requested two critical enhancements:
+  1. SuperAdmin Panel (`/super-admin`): Allow SuperAdmin to manually enter all merchant details and generate/manage "Smart Digital Business Card" on behalf of any merchant without needing merchant credentials, as well as view and edit all platform pricing plans including "Smart Digital Business Card" pricing (6 Months ₹349, 1 Year ₹499, Lifetime ₹1,499).
+  2. `/smart-digital-business-card#create-card`: Convert all Hinglish words, sentences, instructions, and visual guide tooltips into professional, natural Indian English.
+- **Root Cause**:
+  1. The SuperAdmin panel lacked an on-behalf digital card creation workflow and API, requiring merchants to log in or self-register.
+  2. The SuperAdmin subscription plans manager only managed standard platform plans without category filtering or digital card plans (`card_6mo`, `card_yearly`, `card_lifetime`).
+  3. The `#create-card` section in `smart-digital-business-card-client.tsx` contained informal Hinglish copy (`"Simple 3-step me official link nikalein"`, `"Google pe apna store search karein"`, etc.).
+- **Resolution**:
+  1. **Indian English Conversion (`src/components/smart-digital-business-card-client.tsx`)**:
+     - Converted all 10+ Hinglish sentences and guide headings in `#create-card` to clear, polished Indian English (e.g. *"Search Your Store on Google"*, *"Click 'Ask for reviews'"*, *"Copy and Paste Your Short Review Link"*, *"Create Your Smart Digital Business Card in 60 Seconds"*).
+     - Verified zero remaining Hinglish strings in `#create-card` via automated regex and Playwright assertions.
+  2. **Digital Card Plans Seeding (`src/lib/master-plans.ts`)**:
+     - Added canonical `card_6mo` (₹349), `card_yearly` (₹499), and `card_lifetime` (₹1,499) plans to `MASTER_PLANS` with auto-seeding.
+  3. **SuperAdmin Dynamic Pricing Plans Manager (`src/components/super-admin/subscription-plans-manager.tsx`)**:
+     - Added category filtering pills (`All Plans`, `Smart Digital Cards`, `CustomerPilot Complete`, `Loyalty Stamps`, `AI Google Reviews`, `AI AutoReply`).
+     - Added interactive editing for selling price, MRP, discount %, and badges with instant DB persistence.
+  4. **SuperAdmin Digital Cards On-Behalf API & Management UI**:
+     - Created `src/app/api/admin/digital-cards/route.ts` supporting GET, POST, and DELETE with deduplication of merchant phone numbers to prevent unique constraint crashes.
+     - Created `src/components/super-admin/digital-cards-manager.tsx` with merchant picker, direct URL generator, live QR code preview, and digital card fleet table.
+     - Registered in `src/app/super-admin/page.tsx` under `CORE OPERATIONS`.
+  5. **Automated Verification Suite (`scripts/verify_superadmin_digital_card_and_indian_english.js`)**:
+     - Automated Playwright verification asserting Indian English copy, pricing API returns 12 plans, on-behalf generation API creates valid card, and live card at `/c/[slug]` displays authentic store name, phone, Alkapuri location pill, and active 3-day trial banner.
+- **Status**: ✅ Resolved, Verified via Playwright, and Committed Locally.
+
+---
 ## [04 Oct 2026] Issue: 4th Service "Smart Digital Business Card" Integration & Strict Global Sequence Alignment
 - **Symptom**: User identified that the Homepage features section ("Everything Your Store Needs. Nothing It Doesn't.") only showcased 3 services (Digital Loyalty & Stamps, Smart Ai Google Reviews, 1-Click AI AutoReply), missing the 4th core pillar "Smart Digital Business Card". Furthermore, user mandated a strict universal sequence across all listings:
   1. Smart Digital Business Card
