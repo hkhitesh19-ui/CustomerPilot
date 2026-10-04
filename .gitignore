@@ -43,4 +43,5 @@ prisma/prod_*.db*
 # local antigravity agent tools & extensions
 antigravity_extensions/
 .agent/
+scripts/*.png
 
