@@ -66,6 +66,32 @@ export default function SuperAdminPage() {
   const allItems = navCategories.flatMap(c => c.items)
   const currentNav = allItems.find(item => item.id === activeSection)
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const tab = params.get("tab") || params.get("section")
+      const hash = window.location.hash.replace("#", "")
+      const target = (tab || hash || "").toLowerCase()
+      if (target) {
+        if (target === "pricing" || target === "plans" || target === "subscription" || target === "subscriptions") {
+          setActiveSection("subscriptions")
+        } else {
+          const match = allItems.find(it => it.id.toLowerCase() === target)
+          if (match) setActiveSection(match.id)
+        }
+      }
+    }
+  }, [])
+
+  const handleNavSelect = (id: string) => {
+    setActiveSection(id)
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href)
+      url.searchParams.set("tab", id)
+      window.history.replaceState({}, "", url.toString())
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex font-sans selection:bg-indigo-500 selection:text-white">
       {/* Sleek Dark Glassmorphism Sidebar */}
@@ -104,7 +130,7 @@ export default function SuperAdminPage() {
                   return (
                     <button
                       key={item.id}
-                      onClick={() => setActiveSection(item.id)}
+                      onClick={() => handleNavSelect(item.id)}
                       className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
                         isActive
                           ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/20 border border-indigo-500/40"

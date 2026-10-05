@@ -1,17 +1,22 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import { jwtVerify } from 'jose';
 import { exec } from 'child_process';
 import path from 'path';
 import util from 'util';
 
 const execPromise = util.promisify(exec);
+const JWT_SECRET = process.env.JWT_SECRET || 'cpilot_jwt_secret_change_this_in_production_2026!';
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session || (session.user as any)?.role !== 'super_admin') {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized: SuperAdmin access required' }, { status: 401 });
+    }
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+    if (payload.role !== 'super_admin') {
       return NextResponse.json({ error: 'Unauthorized: SuperAdmin access required' }, { status: 401 });
     }
 

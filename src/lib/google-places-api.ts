@@ -111,6 +111,8 @@ export const PLACE_DETAILS_FIELDS = [
  * Search for businesses using Google Places Text Search (New API)
  * Returns official Place IDs - NOT simulated/random
  */
+export const searchGooglePlaces = searchPlaces
+
 export async function searchPlaces(
   query: string,
   options?: {
