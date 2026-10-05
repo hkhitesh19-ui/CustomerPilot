@@ -3188,3 +3188,36 @@ ode_modules and .next cache. Switched npm registry to mirror to bypass timeouts.
      - Verified both Super Admin (`admin@customerpilot.in`) and direct merchant (`order.cakeconnection@gmail.com`) navigate directly to `http://localhost:3000/dashboard/settings#sec-reward-setup` with ZERO redirect loop.
      - Confirmed Step A ("Stamps Reward Card Rules Setup") and Step B ("Loyalty Cycle Categories (10 Levels)") are 100% loaded and visible on screen.
 - **Status**: ✅ Resolved and Verified.
+
+---
+## [05 Oct 2026] Issue: SuperAdmin Default Merchant Settings Section & Google Review Light Theme
+- **Symptom**: 
+  1. SuperAdmin lacked a dedicated section to configure universal default stamp rules, reward criteria, bonus points, and 10 loyalty tier levels for all merchants / new merchant signups.
+  2. Scanning the Smart AI Google Review QR code opened `https://customerpilot.in/review?m=...` in a dark mode theme (`bg-slate-950`) instead of the authentic Google Review light mode theme shown in native Google Reviews.
+- **Root Cause**:
+  1. Default merchant reward and stamp settings were scattered and hardcoded across industry rules without a centralized SuperAdmin management interface in `src/app/super-admin/page.tsx` or database persistence for global defaults.
+  2. `src/components/review/ReviewEditor.tsx` and `src/app/review/page.tsx` were styled using dark slate themes (`bg-slate-950`, `bg-slate-900`) and dark borders rather than mirroring the authentic native Google Review layout (`#FFFFFF`, Google yellow stars `#FBBC04`, Roboto/Google typography, criteria ratings for Food/Service/Atmosphere, and Google Blue `#1A73E8`).
+- **Resolution**:
+  1. **SuperAdmin Default Merchant Settings Manager**:
+     - Created `src/lib/default-merchant-settings-types.ts` and `src/lib/default-merchant-settings.ts` storing global defaults with persistence via `SystemContent` key `GLOBAL_DEFAULT_MERCHANT_SETTINGS`.
+     - Built API route `src/app/api/admin/default-settings/route.ts` supporting GET, POST, and fleet-wide batch updates (`applyToAll: true`).
+     - Created `src/components/super-admin/default-merchant-settings-manager.tsx` with Step A (Stamps Reward Card Rules Setup), Step B (10 Loyalty Cycle Categories), Step C (System Automation & Nudge Rules), quick industry presets (Bakery, Restaurant, Cafe, Salon, Retail), and "Save Global Defaults" + "Apply to All Merchants" actions.
+     - Added dedicated left sidebar link `{ id: "default-settings", label: "Default Merchant Settings", icon: Gift, badge: "STAMPS" }` and tab routing in `src/app/super-admin/page.tsx`.
+     - Integrated `getGlobalDefaultMerchantSettings()` into merchant signup (`src/app/api/auth/register/route.ts`) and reward setup (`src/app/api/cards/setup/route.ts`).
+  2. **Authentic Google Review Light Mode Redesign**:
+     - Redesigned `src/components/review/ReviewEditor.tsx` to mirror the native Google Review UI:
+       - Pure light mode container (`#FFFFFF` on `#F8F9FA`).
+       - Header with Back arrow `←`, store name, and VIP Bonus badge.
+       - User profile with Google Local Guide gold star badge and `Posting publicly across Google ⓘ`.
+       - 5 large vibrant Google yellow/gold stars (`#FBBC04`) with bold `Exceptional` rating title.
+       - Google criteria sub-ratings: `Food / Quality ★ ★ ★ ★ ★`, `Service ★ ★ ★ ★ ★`, `Atmosphere ★ ★ ★ ★ ★`.
+       - Clean Google-style filter chips for dual AI review options (Option 1: Product & Taste / Option 2: Service & Packaging).
+       - Rounded review textarea with subtle `#DADCE0` border and 1-click "📋 Copy Text".
+       - Google Blue primary button: `Copy & Post on Google Maps` (`#1A73E8`).
+       - Light-themed bonus stamps and photo guidance cards.
+     - Updated `src/app/review/page.tsx` error screens to clean light mode.
+  3. **Playwright Ground-Truth Verification**:
+     - Verified `/super-admin?tab=default-settings`: Left sidebar link clicked, Step A, B, C loaded, "Save Global Defaults" executed with "Saved Successfully!" toast.
+     - Verified `/review?m=cmtymavfx0002kx008lbfvp57`: Pure white background (`oklch(1 0 0)`), Store title, User section, Exceptional rating, criteria ratings, and primary CTA confirmed.
+- **Status**: ✅ Resolved and Verified.
+

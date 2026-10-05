@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import { applyAuthRateLimit } from '@/lib/rate-limiter';
 import { generateMerchantIdNumber } from '@/lib/merchant-id-generator';
 import { getIndustryLoyaltyRule } from '@/lib/industry-campaigns';
+import { getGlobalDefaultMerchantSettings } from '@/lib/default-merchant-settings';
 import { normalizePhone } from '@/lib/utils';
 
 if (!process.env.JWT_SECRET) {
@@ -85,6 +86,8 @@ export async function POST(req: Request) {
 
     const merchantIdNumber = await generateMerchantIdNumber(db);
 
+    const globalDefaults = await getGlobalDefaultMerchantSettings();
+
     const merchant = await db.merchant.create({
       data: {
         userId: user.id,
@@ -98,7 +101,14 @@ export async function POST(req: Request) {
         plan: 'trial',
         status: 'active',
         trialEndsAt,
-        enabledModules,
+        enabledModules: globalDefaults?.enabledModules || enabledModules,
+        googleReviewDelayMinutes: globalDefaults?.googleReviewDelayMinutes ?? 30,
+        vipUpgradeBonusStamps: globalDefaults?.vipUpgradeBonusStamps ?? 1,
+        loyaltyCategoryNames: JSON.stringify(globalDefaults?.loyaltyCategoryNames),
+        winbackDays1: globalDefaults?.winbackDays1 ?? 30,
+        winbackDays2: globalDefaults?.winbackDays2 ?? 60,
+        winbackDays3: globalDefaults?.winbackDays3 ?? 90,
+        expiryWarningDays: globalDefaults?.expiryWarningDays ?? 7,
         // Fast-track: skip onboarding for standalone module signups
         onboardingCompleted: !!isFastTrack,
         currentStep: isFastTrack ? 99 : 1,
@@ -132,16 +142,16 @@ export async function POST(req: Request) {
       await db.stampCard.create({
         data: {
           merchantId: merchant.id,
-          name: rule.getCardTitle(businessName),
-          stampsRequired: rule.stampsRequired,
-          rewardName: rule.rewardName,
-          stampValue: rule.stampValue,
-          validityDays: rule.validityDays,
-          googleReviewBonus: rule.googleReviewBonus,
-          photoBonus: rule.photoBonus,
-          joiningBonusEnabled: rule.joiningBonusEnabled,
-          joiningBonusStamps: rule.joiningBonusStamps,
-          color: rule.color,
+          name: globalDefaults?.cardName || rule.getCardTitle(businessName),
+          stampsRequired: globalDefaults?.stampsRequired ?? rule.stampsRequired,
+          rewardName: globalDefaults?.rewardName || rule.rewardName,
+          stampValue: globalDefaults?.stampValue ?? rule.stampValue,
+          validityDays: globalDefaults?.validityDays ?? rule.validityDays,
+          googleReviewBonus: globalDefaults?.googleReviewBonus ?? rule.googleReviewBonus,
+          photoBonus: globalDefaults?.photoBonus ?? rule.photoBonus,
+          joiningBonusEnabled: globalDefaults?.joiningBonusEnabled ?? rule.joiningBonusEnabled,
+          joiningBonusStamps: globalDefaults?.joiningBonusStamps ?? rule.joiningBonusStamps,
+          color: globalDefaults?.color || rule.color,
           tierRewardsEnabled: false,
           active: true,
         },

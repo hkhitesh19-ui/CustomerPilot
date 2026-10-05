@@ -1,0 +1,658 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import { Badge } from "@/components/ui/badge"
+import { useToast } from "@/hooks/use-toast"
+import {
+  Gift, Sparkles, RefreshCw, Award, Check, Layers,
+  Save, AlertTriangle, Store, Clock, Bell, Flame
+} from "lucide-react"
+import { FALLBACK_GLOBAL_DEFAULTS, DefaultMerchantSettingsData } from "@/lib/default-merchant-settings-types"
+
+const PRESET_TEMPLATES: Record<string, Partial<DefaultMerchantSettingsData>> = {
+  bakery: {
+    cardName: "Cake Connection VIP Club",
+    rewardName: "250g Free Cake",
+    stampsRequired: 11,
+    stampValue: 500,
+    validityDays: 90,
+    googleReviewBonus: 1,
+    photoBonus: 1,
+    joiningBonusEnabled: true,
+    joiningBonusStamps: 2,
+    vipUpgradeBonusStamps: 1,
+    color: "#6366f1"
+  },
+  restaurant: {
+    cardName: "Gourmet Diner's VIP Club",
+    rewardName: "Free Starter / Dessert",
+    stampsRequired: 10,
+    stampValue: 400,
+    validityDays: 60,
+    googleReviewBonus: 2,
+    photoBonus: 2,
+    joiningBonusEnabled: true,
+    joiningBonusStamps: 2,
+    vipUpgradeBonusStamps: 1,
+    color: "#10b981"
+  },
+  cafe: {
+    cardName: "Coffee Lover's VIP Club",
+    rewardName: "1 Free Specialty Coffee",
+    stampsRequired: 8,
+    stampValue: 200,
+    validityDays: 45,
+    googleReviewBonus: 1,
+    photoBonus: 2,
+    joiningBonusEnabled: true,
+    joiningBonusStamps: 1,
+    vipUpgradeBonusStamps: 1,
+    color: "#f59e0b"
+  },
+  salon: {
+    cardName: "Luxury Beauty VIP Pass",
+    rewardName: "Free Hair Spa / Facial",
+    stampsRequired: 6,
+    stampValue: 800,
+    validityDays: 90,
+    googleReviewBonus: 2,
+    photoBonus: 2,
+    joiningBonusEnabled: true,
+    joiningBonusStamps: 1,
+    vipUpgradeBonusStamps: 1,
+    color: "#ec4899"
+  },
+  retail: {
+    cardName: "Exclusive Shopper's Club",
+    rewardName: "₹500 Shopping Voucher",
+    stampsRequired: 10,
+    stampValue: 1000,
+    validityDays: 90,
+    googleReviewBonus: 2,
+    photoBonus: 1,
+    joiningBonusEnabled: true,
+    joiningBonusStamps: 2,
+    vipUpgradeBonusStamps: 2,
+    color: "#3b82f6"
+  }
+}
+
+export function DefaultMerchantSettingsManager() {
+  const { toast } = useToast()
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [applyingAll, setApplyingAll] = useState(false)
+  const [form, setForm] = useState<DefaultMerchantSettingsData>(FALLBACK_GLOBAL_DEFAULTS)
+
+  useEffect(() => {
+    fetchSettings()
+  }, [])
+
+  async function fetchSettings() {
+    try {
+      setLoading(true)
+      const res = await fetch("/api/admin/default-settings")
+      const json = await res.json()
+      if (res.ok && json.data?.settings) {
+        setForm(json.data.settings)
+      }
+    } catch (err: any) {
+      toast({
+        title: "Failed to load defaults",
+        description: err.message || "Using fallback default settings",
+        variant: "destructive"
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSave = async (applyToAll: boolean = false) => {
+    if (applyToAll) {
+      setApplyingAll(true)
+    } else {
+      setSaving(true)
+    }
+
+    try {
+      const res = await fetch("/api/admin/default-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          settings: form,
+          applyToAll
+        })
+      })
+
+      const json = await res.json()
+      if (!res.ok) {
+        throw new Error(json.error || "Failed to update global defaults")
+      }
+
+      toast({
+        title: applyToAll ? "Applied to Entire Fleet!" : "Saved Successfully!",
+        description: json.data?.message || "Default settings updated.",
+        className: "bg-emerald-600 text-white border-none"
+      })
+    } catch (err: any) {
+      toast({
+        title: "Error Saving Defaults",
+        description: err.message,
+        variant: "destructive"
+      })
+    } finally {
+      setSaving(false)
+      setApplyingAll(false)
+    }
+  }
+
+  const applyPreset = (key: string) => {
+    const preset = PRESET_TEMPLATES[key]
+    if (preset) {
+      setForm(prev => ({ ...prev, ...preset }))
+      toast({
+        title: `Applied ${key.toUpperCase()} Preset`,
+        description: "Template fields updated. Click Save to persist."
+      })
+    }
+  }
+
+  const handleCategoryNameChange = (index: number, value: string) => {
+    const updated = [...form.loyaltyCategoryNames]
+    updated[index] = value
+    setForm(prev => ({ ...prev, loyaltyCategoryNames: updated }))
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 text-slate-400 gap-3">
+        <RefreshCw className="w-8 h-8 animate-spin text-indigo-400" />
+        <p className="text-sm font-medium">Loading Global Default Settings...</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-8 max-w-5xl">
+      {/* Top Header Card */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/60 border border-slate-800 shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+          <Gift className="w-48 h-48 text-indigo-400" />
+        </div>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30 text-xs px-2.5 py-0.5">
+                <Store className="w-3.5 h-3.5 mr-1" />
+                Fleet Configuration Engine
+              </Badge>
+              <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-xs px-2.5 py-0.5">
+                <Sparkles className="w-3.5 h-3.5 mr-1" />
+                Global New Merchant Defaults
+              </Badge>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              Default Merchant Settings & Reward Rules
+            </h1>
+            <p className="text-slate-400 text-sm mt-1.5 max-w-2xl leading-relaxed">
+              Configure universal loyalty stamp rules, reward criteria, bonus stamps, and 10 loyalty tier levels automatically assigned to every new merchant signup and settings page across CustomerPilot.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap sm:flex-nowrap gap-3 shrink-0">
+            <Button
+              onClick={() => handleSave(false)}
+              disabled={saving || applyingAll}
+              className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl px-5 py-2.5 shadow-lg shadow-indigo-600/30 cursor-pointer"
+            >
+              {saving ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              Save Global Defaults
+            </Button>
+            <Button
+              onClick={() => handleSave(true)}
+              disabled={saving || applyingAll}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl px-5 py-2.5 shadow-lg shadow-emerald-600/30 cursor-pointer"
+            >
+              {applyingAll ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Flame className="w-4 h-4 mr-2" />}
+              Apply to All Merchants
+            </Button>
+          </div>
+        </div>
+
+        {/* 1-Click Industry Presets Bar */}
+        <div className="mt-6 pt-5 border-t border-slate-800/80 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold text-slate-400 mr-2 flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-indigo-400" />
+            Quick Presets:
+          </span>
+          {Object.keys(PRESET_TEMPLATES).map((key) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => applyPreset(key)}
+              className="px-3 py-1 text-xs rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-colors uppercase font-bold tracking-wider cursor-pointer"
+            >
+              {key}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => setForm(FALLBACK_GLOBAL_DEFAULTS)}
+            className="px-3 py-1 text-xs rounded-lg bg-indigo-950/60 hover:bg-indigo-900 text-indigo-300 border border-indigo-800/50 transition-colors font-semibold ml-auto cursor-pointer"
+          >
+            Reset to Recommended Defaults
+          </button>
+        </div>
+      </div>
+
+      {/* STEP A: Reward Card Rules Setup */}
+      <Card className="bg-slate-900 border-slate-800 shadow-xl rounded-2xl">
+        <CardHeader className="border-b border-slate-800/80 pb-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-[11px] font-black uppercase tracking-wider text-indigo-400 mb-1">
+                STEP A
+              </div>
+              <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+                <Gift className="w-5 h-5 text-indigo-400" />
+                Stamps Reward Card Rules Setup
+              </CardTitle>
+              <CardDescription className="text-slate-400 text-xs">
+                Default stamp card parameters pre-populated when a new merchant creates their account.
+              </CardDescription>
+            </div>
+            <span className="text-xs px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full font-medium flex items-center gap-1">
+              <Sparkles className="w-3 h-3" /> Universal Rules
+            </span>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6 space-y-6">
+          {/* Joining Bonus Stamps */}
+          <div className="p-4 sm:p-5 bg-emerald-950/20 border border-emerald-500/30 rounded-2xl space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-400" />
+                <Label htmlFor="global-joining-bonus" className="font-bold text-sm text-slate-100">
+                  Joining Bonus Stamps (First Time Scan)
+                </Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${form.joiningBonusEnabled ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40'}`}>
+                  {form.joiningBonusEnabled ? `ACTIVE (+${form.joiningBonusStamps ?? 2} Stamps on Join)` : "DEACTIVATED"}
+                </span>
+                <Switch
+                  id="global-joining-bonus"
+                  checked={form.joiningBonusEnabled}
+                  onCheckedChange={(checked) => setForm({ ...form, joiningBonusEnabled: checked })}
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+              <div className="sm:col-span-2">
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Automatically award advance bonus stamps to new customers when they scan the QR code and join the merchant's loyalty club.
+                </p>
+              </div>
+              <div>
+                <Input
+                  type="number"
+                  min="1"
+                  max="10"
+                  disabled={!form.joiningBonusEnabled}
+                  value={form.joiningBonusStamps ?? 2}
+                  onChange={e => setForm({ ...form, joiningBonusStamps: Math.max(1, Number(e.target.value)) })}
+                  className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="space-y-2">
+              <Label htmlFor="global-card-name" className="text-xs font-semibold text-slate-300">
+                Default Card Display Title
+              </Label>
+              <Input
+                id="global-card-name"
+                value={form.cardName}
+                onChange={e => setForm({ ...form, cardName: e.target.value })}
+                placeholder="e.g. Cake Connection VIP Club"
+                className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="global-reward-name" className="text-xs font-semibold text-slate-300">
+                Default Free Reward
+              </Label>
+              <Input
+                id="global-reward-name"
+                value={form.rewardName}
+                onChange={e => setForm({ ...form, rewardName: e.target.value })}
+                placeholder="e.g. 250g Free Cake"
+                className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="global-stamp-val" className="text-xs font-semibold text-slate-300">
+                Eligible Minimum Purchase Amount for Loyalty stamp (₹)
+              </Label>
+              <Input
+                id="global-stamp-val"
+                type="number"
+                min="10"
+                step="10"
+                value={form.stampValue}
+                onChange={e => setForm({ ...form, stampValue: Number(e.target.value) })}
+                className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
+              />
+              <p className="text-[11px] text-slate-500">Every ₹{form.stampValue || 500} = 1 Stamp</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="global-stamps-req" className="text-xs font-semibold text-slate-300">
+                Stamp Goal (Stamps for Reward)
+              </Label>
+              <Input
+                id="global-stamps-req"
+                type="number"
+                min="2"
+                max="50"
+                value={form.stampsRequired}
+                onChange={e => setForm({ ...form, stampsRequired: Number(e.target.value) })}
+                className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
+              />
+              <p className="text-[11px] text-slate-500">
+                {form.stampsRequired || 11} Stamps needed for 1 {form.rewardName || 'Free Cake'}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="global-validity" className="text-xs font-semibold text-slate-300">
+                Validity (in Days) [Maximum Time Duration to Earn Reward]
+              </Label>
+              <Input
+                id="global-validity"
+                type="number"
+                min="7"
+                max="365"
+                value={form.validityDays}
+                onChange={e => setForm({ ...form, validityDays: Number(e.target.value) })}
+                className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="global-color" className="text-xs font-semibold text-slate-300">
+                Default Card Theme Color
+              </Label>
+              <div className="flex gap-3 items-center">
+                <input
+                  id="global-color"
+                  type="color"
+                  value={form.color}
+                  onChange={e => setForm({ ...form, color: e.target.value })}
+                  className="w-10 h-10 rounded-xl border border-slate-700 bg-transparent cursor-pointer p-0.5"
+                />
+                <Input
+                  value={form.color}
+                  onChange={e => setForm({ ...form, color: e.target.value })}
+                  className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm flex-1 font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="global-review-bonus" className="text-xs font-semibold text-slate-300">
+                Google Review Bonus Stamps
+              </Label>
+              <Input
+                id="global-review-bonus"
+                type="number"
+                min="0"
+                max="5"
+                value={form.googleReviewBonus}
+                onChange={e => setForm({ ...form, googleReviewBonus: Number(e.target.value) })}
+                className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
+              />
+              <p className="text-[11px] text-slate-500">Bonus stamps awarded when customer posts a 5-star Google review</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="global-photo-bonus" className="text-xs font-semibold text-slate-300">
+                Photo Review Bonus Stamps
+              </Label>
+              <Input
+                id="global-photo-bonus"
+                type="number"
+                min="0"
+                max="5"
+                value={form.photoBonus}
+                onChange={e => setForm({ ...form, photoBonus: Number(e.target.value) })}
+                className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
+              />
+              <p className="text-[11px] text-slate-500">Extra bonus stamps if they attach a photo with their review</p>
+            </div>
+          </div>
+
+          {/* Next Level Kickstart Bonus */}
+          <div className="p-4 sm:p-5 bg-indigo-950/20 border border-indigo-500/30 rounded-2xl space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-indigo-400" />
+                <Label htmlFor="global-next-level-bonus" className="font-bold text-sm text-slate-100">
+                  Next Level Kickstart Bonus Stamps (Level Completion Bonus)
+                </Label>
+              </div>
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full border bg-indigo-500/20 text-indigo-300 border-indigo-500/40">
+                ACTIVE (+{form.vipUpgradeBonusStamps ?? 1} Stamp on Next Level)
+              </span>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+              <div className="sm:col-span-2">
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Advance bonus stamps pre-credited when a customer completes their previous level/card and unlocks the next loyalty tier (e.g. Level 1 complete → Level 2 starts with pre-added bonus stamps).
+                </p>
+              </div>
+              <div>
+                <Input
+                  id="global-next-level-bonus"
+                  type="number"
+                  min="0"
+                  max="5"
+                  value={form.vipUpgradeBonusStamps ?? 1}
+                  onChange={e => setForm({ ...form, vipUpgradeBonusStamps: Math.max(0, Number(e.target.value)) })}
+                  className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
+                />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* STEP B: Loyalty Cycle Categories (10 Levels) */}
+      <Card className="bg-slate-900 border-slate-800 shadow-xl rounded-2xl">
+        <CardHeader className="border-b border-slate-800/80 pb-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-[11px] font-black uppercase tracking-wider text-purple-400 mb-1">
+                STEP B
+              </div>
+              <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+                <Award className="w-5 h-5 text-purple-400" />
+                Default Loyalty Cycle Categories (10 Levels)
+              </CardTitle>
+              <CardDescription className="text-slate-400 text-xs">
+                Configure default titles for 10 customer loyalty levels. New customers start at Level 1 upon QR scan, and automatically upgrade upon completing each loyalty stamp card cycle!
+              </CardDescription>
+            </div>
+            <span className="text-xs px-2.5 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-full font-medium flex items-center gap-1">
+              <Sparkles className="w-3 h-3" /> 10 Progression Tiers
+            </span>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+            {form.loyaltyCategoryNames.map((name, idx) => (
+              <div
+                key={idx}
+                className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl space-y-1.5 focus-within:border-indigo-500/50 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-slate-300">Level {idx + 1}</span>
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    {idx === 0 ? "Initial QR" : `${idx} Card${idx > 1 ? "s" : ""}`}
+                  </span>
+                </div>
+                <Input
+                  value={name}
+                  onChange={e => handleCategoryNameChange(idx, e.target.value)}
+                  placeholder={`Level ${idx + 1}`}
+                  className="bg-slate-900 border-slate-700/80 text-white rounded-lg text-xs h-8 px-2 font-medium"
+                />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* STEP C: Default Automation & Nudge Rules */}
+      <Card className="bg-slate-900 border-slate-800 shadow-xl rounded-2xl">
+        <CardHeader className="border-b border-slate-800/80 pb-5">
+          <div className="text-[11px] font-black uppercase tracking-wider text-emerald-400 mb-1">
+            STEP C
+          </div>
+          <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+            <Clock className="w-5 h-5 text-emerald-400" />
+            Default System Automation & Nudge Rules
+          </CardTitle>
+          <CardDescription className="text-slate-400 text-xs">
+            System timings, Google review delays, and customer win-back campaign triggers applied by default.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold text-slate-300">
+                Google Review WhatsApp Prompt Delay
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min="5"
+                  max="1440"
+                  value={form.googleReviewDelayMinutes}
+                  onChange={e => setForm({ ...form, googleReviewDelayMinutes: Number(e.target.value) })}
+                  className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
+                />
+                <span className="text-xs text-slate-400 font-medium">Minutes</span>
+              </div>
+              <p className="text-[11px] text-slate-500">Wait time after bill/stamp before asking for Google Review</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold text-slate-300">
+                Winback Autopilot Nudge 1
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min="7"
+                  max="180"
+                  value={form.winbackDays1}
+                  onChange={e => setForm({ ...form, winbackDays1: Number(e.target.value) })}
+                  className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
+                />
+                <span className="text-xs text-slate-400 font-medium">Days</span>
+              </div>
+              <p className="text-[11px] text-slate-500">First reminder to dormant customers</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold text-slate-300">
+                Winback Autopilot Nudge 2
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min="14"
+                  max="365"
+                  value={form.winbackDays2}
+                  onChange={e => setForm({ ...form, winbackDays2: Number(e.target.value) })}
+                  className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
+                />
+                <span className="text-xs text-slate-400 font-medium">Days</span>
+              </div>
+              <p className="text-[11px] text-slate-500">Second win-back alert with extra incentive</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold text-slate-300">
+                Stamp Card Expiry Warning
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min="1"
+                  max="30"
+                  value={form.expiryWarningDays}
+                  onChange={e => setForm({ ...form, expiryWarningDays: Number(e.target.value) })}
+                  className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
+                />
+                <span className="text-xs text-slate-400 font-medium">Days Prior</span>
+              </div>
+              <p className="text-[11px] text-slate-500">Advance WhatsApp alert before card validity expires</p>
+            </div>
+
+            <div className="space-y-2 sm:col-span-2">
+              <Label className="text-xs font-semibold text-slate-300">
+                Default Enabled Modules
+              </Label>
+              <Input
+                value={form.enabledModules}
+                onChange={e => setForm({ ...form, enabledModules: e.target.value })}
+                className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm font-mono"
+              />
+              <p className="text-[11px] text-slate-500">Comma-separated: LOYALTY, REVIEWS, AUTOREPLY</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Bottom Sticky Action Bar */}
+      <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-4 shadow-2xl">
+        <div className="flex items-center gap-2 text-xs text-slate-400">
+          <Sparkles className="w-4 h-4 text-emerald-400" />
+          <span>Defaults are loaded persistently into database for every new merchant signup.</span>
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <Button
+            onClick={() => handleSave(false)}
+            disabled={saving || applyingAll}
+            className="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl px-5 py-2.5 shadow-lg shadow-indigo-600/30 cursor-pointer"
+          >
+            {saving ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+            Save Global Defaults
+          </Button>
+          <Button
+            onClick={() => handleSave(true)}
+            disabled={saving || applyingAll}
+            className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl px-5 py-2.5 shadow-lg shadow-emerald-600/30 cursor-pointer"
+          >
+            {applyingAll ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Flame className="w-4 h-4 mr-2" />}
+            Apply to All Merchants
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}

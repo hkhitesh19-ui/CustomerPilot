@@ -43,8 +43,10 @@ export default async function ReviewPage({
 
   if (!merchantId) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 text-center">
-        <div className="text-slate-400">Invalid Review Link. Merchant ID is required.</div>
+      <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center p-4 text-center">
+        <div className="p-6 bg-white border border-[#DADCE0] rounded-2xl shadow-xs text-sm font-medium text-[#5F6368] max-w-sm">
+          Invalid Review Link. Merchant ID is required.
+        </div>
       </div>
     )
   }
@@ -55,8 +57,10 @@ export default async function ReviewPage({
 
   if (!merchant) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 text-center">
-        <div className="text-slate-400">Store not found. Please verify the QR code.</div>
+      <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center p-4 text-center">
+        <div className="p-6 bg-white border border-[#DADCE0] rounded-2xl shadow-xs text-sm font-medium text-[#5F6368] max-w-sm">
+          Store not found. Please verify the QR code.
+        </div>
       </div>
     )
   }
@@ -223,7 +227,6 @@ Return ONLY a valid, parseable JSON object with zero additional conversational f
   const hasPreviousPhoto = !!(existingReview?.photoUrl)
   
   return (
-    <>
     <ReviewEditor 
       initialDraft={dynamicDraft}
       draftOptions={draftOptions}
@@ -247,15 +250,6 @@ Return ONLY a valid, parseable JSON object with zero additional conversational f
         stampsRequired: stampCard?.stampsRequired || 10
       }}
     />
-    <div className="mt-6 pt-4 border-t border-slate-200/20 text-center space-y-1">
-      <p className="text-[10px] text-slate-500">
-        Powered by <a href="/for-business" className="text-indigo-400 hover:text-indigo-300 font-semibold">CustomerPilot</a> 🚀
-      </p>
-      <p className="text-[9px] text-slate-600">
-        <a href="/for-business" className="hover:text-slate-400 transition-colors">Want this for your business?</a>
-      </p>
-    </div>
-    </>
   )
 }
 // Force rebuild 2

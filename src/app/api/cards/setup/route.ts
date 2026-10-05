@@ -2,6 +2,7 @@ import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
 import { ok, err, getAuthenticatedMerchant } from "@/lib/api"
 import { getIndustryLoyaltyRule } from "@/lib/industry-campaigns"
+import { getGlobalDefaultMerchantSettings } from "@/lib/default-merchant-settings"
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,7 +19,7 @@ export async function GET(req: NextRequest) {
       return err("Unauthorized", 401)
     }
 
-    const [card, merchant] = await Promise.all([
+    const [card, merchant, globalDefaults] = await Promise.all([
       db.stampCard.findFirst({
         where: { merchantId, active: true },
         orderBy: { updatedAt: "desc" }  // always get the most recently SAVED card
@@ -26,25 +27,26 @@ export async function GET(req: NextRequest) {
       db.merchant.findUnique({
         where: { id: merchantId },
         select: { name: true, businessType: true, vipUpgradeBonusStamps: true }
-      })
+      }),
+      getGlobalDefaultMerchantSettings()
     ])
 
-    console.log(`[CardSetup GET] Card found for merchant ${merchantId}:`, card ? `id=${card.id} stamps=${card.stampsRequired} val=${card.stampValue}` : "NULL → will return INDUSTRY DEFAULTS")
+    console.log(`[CardSetup GET] Card found for merchant ${merchantId}:`, card ? `id=${card.id} stamps=${card.stampsRequired} val=${card.stampValue}` : "NULL → will return GLOBAL DEFAULTS")
 
     if (!card) {
       const rule = getIndustryLoyaltyRule(merchant?.businessType, merchant?.name)
       const defaultCardData = {
-        name: rule.getCardTitle(merchant?.name),
-        stampsRequired: rule.stampsRequired,
-        rewardName: rule.rewardName,
-        stampValue: rule.stampValue,
-        validityDays: rule.validityDays,
-        googleReviewBonus: rule.googleReviewBonus,
-        photoBonus: rule.photoBonus,
-        joiningBonusEnabled: rule.joiningBonusEnabled,
-        joiningBonusStamps: rule.joiningBonusStamps,
-        vipUpgradeBonusStamps: merchant?.vipUpgradeBonusStamps ?? rule.vipUpgradeBonusStamps,
-        color: rule.color,
+        name: globalDefaults?.cardName || rule.getCardTitle(merchant?.name),
+        stampsRequired: globalDefaults?.stampsRequired ?? rule.stampsRequired,
+        rewardName: globalDefaults?.rewardName || rule.rewardName,
+        stampValue: globalDefaults?.stampValue ?? rule.stampValue,
+        validityDays: globalDefaults?.validityDays ?? rule.validityDays,
+        googleReviewBonus: globalDefaults?.googleReviewBonus ?? rule.googleReviewBonus,
+        photoBonus: globalDefaults?.photoBonus ?? rule.photoBonus,
+        joiningBonusEnabled: globalDefaults?.joiningBonusEnabled ?? rule.joiningBonusEnabled,
+        joiningBonusStamps: globalDefaults?.joiningBonusStamps ?? rule.joiningBonusStamps,
+        vipUpgradeBonusStamps: merchant?.vipUpgradeBonusStamps ?? globalDefaults?.vipUpgradeBonusStamps ?? rule.vipUpgradeBonusStamps,
+        color: globalDefaults?.color || rule.color,
         tierRewardsEnabled: false,
         excludedCategories: "",
         rewardImageUrl: ""
@@ -127,7 +129,7 @@ export async function POST(req: NextRequest) {
 
     // Find the canonical active card for this merchant
     // Always pick the most recently UPDATED one as the single source of truth
-    let existingCard = null
+    let existingCard: any = null
     if (id) {
       existingCard = await db.stampCard.findFirst({
         where: { id, merchantId }

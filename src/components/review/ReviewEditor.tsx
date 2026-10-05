@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Copy, Check, ExternalLink, Star, Camera, Sparkles, Gift } from "lucide-react"
+import { Copy, Check, ExternalLink, Star, Camera, Sparkles, Gift, ArrowLeft, Info, MapPin } from "lucide-react"
 import { useSystemContent } from "@/hooks/useSystemContent"
 
 export function ReviewEditor({ 
@@ -30,7 +30,7 @@ export function ReviewEditor({
   const photoBonus = bonusInfo?.photoBonus ?? 2
   const maxPossibleBonus = reviewBonus + photoBonus
 
-  const defaultText = existingReviewText || initialDraft || `The products were fresh, beautiful, and absolutely delicious. Highly recommended!`
+  const defaultText = existingReviewText || initialDraft || `Ordered from ${merchant.name} today. Super fresh quality, loved the taste and packaging. Definitely recommended!`
   const [draft, setDraft] = useState(defaultText)
   const [selectedOption, setSelectedOption] = useState<"draft1" | "draft2">("draft1")
   const [copied, setCopied] = useState(false)
@@ -123,237 +123,321 @@ export function ReviewEditor({
   }
 
   const walletUrl = `/q/wallet/${customer?.id || ""}`
+  const customerDisplayName = customer?.name && customer?.name !== "VIP" ? customer.name : "Hitesh Kumar"
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative">
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 to-teal-400" />
+    <div className="min-h-screen bg-[#F8F9FA] text-[#202124] flex flex-col items-center justify-start sm:py-8 sm:px-4 font-sans selection:bg-[#E8F0FE] selection:text-[#1A73E8]">
+      {/* Google Review Native Modal Container */}
+      <div className="w-full max-w-lg bg-white sm:border sm:border-[#DADCE0] sm:rounded-3xl shadow-xs overflow-hidden">
         
-        {/* Merchant Header */}
-        <div className="p-8 text-center border-b border-slate-800">
-          <div className="w-16 h-16 bg-slate-800 rounded-full mx-auto flex items-center justify-center border border-slate-700 mb-4 shadow-inner overflow-hidden">
-             {merchant.logoUrl ? (
-                <img src={merchant.logoUrl} alt={merchant.name} className="w-full h-full object-cover" />
-             ) : (
-                <span className="text-2xl text-emerald-400 font-bold">{merchant.name?.charAt(0) || "C"}</span>
-             )}
-          </div>
-          <h1 className="text-2xl font-bold text-slate-100">{merchant.name}</h1>
-          <p className="text-slate-400 mt-1 text-sm">
-            Hi {customer?.name || "VIP"} ❤️
-          </p>
-
-          {/* Stamp Rewards Banner */}
-          <div className="mt-4 p-3 bg-gradient-to-r from-emerald-950/60 via-slate-900 to-teal-950/60 border border-emerald-500/30 rounded-2xl flex items-center justify-between text-left">
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400">
-                <Sparkles className="w-4 h-4 text-emerald-400" />
-                <span>Earn up to +{maxPossibleBonus} VIP Bonus Stamps!</span>
-              </div>
-              <p className="text-[11px] text-slate-400">
-                ⭐ Review: <strong>+{reviewBonus} Stamps</strong> · 📸 Photo: <strong>+{photoBonus} Stamps</strong>
+        {/* Top Google Native App Bar */}
+        <header className="sticky top-0 z-10 bg-white border-b border-[#E8EAED] px-4 py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined" && window.history.length > 1) {
+                  window.history.back()
+                } else {
+                  window.location.href = googleLink
+                }
+              }}
+              className="p-1.5 -ml-1.5 rounded-full hover:bg-[#F1F3F4] text-[#5F6368] transition-colors"
+              aria-label="Back"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-base font-medium text-[#202124] truncate tracking-tight">
+                {merchant.name || "Cake Connection"}
+              </h1>
+              <p className="text-[11px] text-[#5F6368] truncate flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-[#1A73E8]" />
+                Google Business Profile Review
               </p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
-              <Gift className="w-5 h-5 text-emerald-400" />
+          </div>
+
+          {/* CustomerPilot VIP Bonus Pill */}
+          <div className="flex items-center gap-1.5 bg-[#E6F4EA] border border-[#CEEAD6] text-[#137333] px-2.5 py-1 rounded-full text-xs font-semibold shrink-0">
+            <Sparkles className="w-3.5 h-3.5 text-[#137333]" />
+            <span>+{maxPossibleBonus} Bonus Stamps</span>
+          </div>
+        </header>
+
+        <div className="p-5 sm:p-7 space-y-6">
+
+          {/* User Profile Header (Exact Google Local Guide Style) */}
+          <div className="flex items-center gap-3.5">
+            <div className="relative">
+              <div className="w-12 h-12 rounded-full bg-[#E8F0FE] text-[#1A73E8] border border-[#DADCE0] flex items-center justify-center font-bold text-lg overflow-hidden shadow-xs">
+                {customerDisplayName.charAt(0)}
+              </div>
+              {/* Google Local Guide / Star Badge */}
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#F4B400] text-white flex items-center justify-center text-[10px] font-black border-2 border-white shadow-xs">
+                ★
+              </div>
+            </div>
+
+            <div>
+              <div className="font-semibold text-sm sm:text-base text-[#202124]">
+                {customerDisplayName}
+              </div>
+              <div className="text-xs text-[#5F6368] flex items-center gap-1 mt-0.5">
+                <span>Posting publicly across Google</span>
+                <Info className="w-3.5 h-3.5 text-[#70757A]" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="p-8 space-y-6">
+          {/* Primary 5-Star Rating Section */}
+          <div className="text-center py-2 space-y-2">
+            <div className="flex justify-center items-center gap-2">
+              {[1, 2, 3, 4, 5].map(i => (
+                <Star
+                  key={i}
+                  className="w-9 h-9 sm:w-10 sm:h-10 text-[#FBBC04] fill-[#FBBC04] transition-transform hover:scale-110 drop-shadow-xs"
+                />
+              ))}
+            </div>
+            <div className="text-base sm:text-lg font-bold text-[#202124] tracking-tight">
+              Exceptional
+            </div>
+          </div>
+
+          {/* Criteria Sub-Scores (Food, Service, Atmosphere as in Google native screenshot) */}
+          <div className="bg-[#F8F9FA] border border-[#E8EAED] rounded-2xl p-4 space-y-2.5">
+            <div className="flex items-center justify-between text-xs sm:text-sm text-[#3C4043] font-medium">
+              <span>Food / Quality</span>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <Star key={i} className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]" />
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-xs sm:text-sm text-[#3C4043] font-medium">
+              <span>Service</span>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <Star key={i} className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]" />
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-xs sm:text-sm text-[#3C4043] font-medium">
+              <span>Atmosphere</span>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <Star key={i} className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]" />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Existing Review Warning (if editing) */}
           {existingReviewText && (
-            <div className="bg-amber-950/40 border border-amber-800/60 rounded-xl p-3 text-xs text-amber-200 flex flex-col gap-2">
-              <div>
-                {getContent('review_policy_notice', '📌 Google allows 1 review per account. Clicking below will open your review in Edit mode — simply paste the text to update!')}
+            <div className="bg-[#FEF7E0] border border-[#FEEFC3] rounded-xl p-3.5 text-xs text-[#7A4B04] space-y-2">
+              <div className="flex items-start gap-2">
+                <Info className="w-4 h-4 text-[#B06000] shrink-0 mt-0.5" />
+                <span>Google allows 1 review per account. Clicking below will open your review in Edit mode — paste this text to update!</span>
               </div>
               <div className="flex gap-2 pt-1">
                 <button
                   type="button"
                   onClick={() => { setDraft(existingReviewText); setIsEditingExisting(true); }}
-                  className={`px-2.5 py-1 rounded-md font-medium transition-all ${isEditingExisting ? "bg-amber-500 text-slate-950" : "bg-slate-800 text-slate-300"}`}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${isEditingExisting ? "bg-[#F4B400] text-slate-900" : "bg-white border border-[#FEEFC3] text-[#7A4B04]"}`}
                 >
-                  {getContent('review_btn_previous', 'Use My Previous Review')}
+                  Use My Previous Review
                 </button>
                 {initialDraft && (
                   <button
                     type="button"
                     onClick={() => { setDraft(initialDraft); setIsEditingExisting(false); }}
-                    className={`px-2.5 py-1 rounded-md font-medium transition-all ${!isEditingExisting ? "bg-emerald-500 text-white" : "bg-slate-800 text-slate-300"}`}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${!isEditingExisting ? "bg-[#1A73E8] text-white" : "bg-white border border-[#FEEFC3] text-[#7A4B04]"}`}
                   >
-                    {getContent('review_btn_fresh', 'Use Fresh AI Draft')}
+                    Use Fresh AI Draft
                   </button>
                 )}
               </div>
             </div>
           )}
 
-          <div className="flex justify-center gap-1 mb-2">
-            {[1, 2, 3, 4, 5].map(i => (
-              <Star key={i} className="w-8 h-8 text-amber-400 fill-amber-400" />
-            ))}
-          </div>
-
-          {/* Dual AI Draft Options (Anti-Detection Matrix) */}
+          {/* Dual AI Draft Options Pills (Google-style Filter Chips) */}
           {draftOptions && !isEditingExisting && (
-            <div className="p-1.5 bg-slate-950/80 border border-slate-800/80 rounded-2xl flex gap-1.5">
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedOption("draft1")
-                  setDraft(draftOptions.draft1)
-                }}
-                className={`flex-1 py-2 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                  selectedOption === "draft1"
-                    ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900"
-                }`}
-              >
-                <span>🍰 Option 1: Product & Taste</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedOption("draft2")
-                  setDraft(draftOptions.draft2)
-                }}
-                className={`flex-1 py-2 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                  selectedOption === "draft2"
-                    ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900"
-                }`}
-              >
-                <span>⚡ Option 2: Service & Pack</span>
-              </button>
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold text-[#5F6368] uppercase tracking-wider block">
+                Choose AI Review Angle:
+              </span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedOption("draft1")
+                    setDraft(draftOptions.draft1)
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
+                    selectedOption === "draft1"
+                      ? "bg-[#E8F0FE] text-[#1A73E8] border-[#1A73E8] shadow-xs"
+                      : "bg-white text-[#3C4043] border-[#DADCE0] hover:bg-[#F1F3F4]"
+                  }`}
+                >
+                  <span>🍰 Option 1: Product & Taste</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedOption("draft2")
+                    setDraft(draftOptions.draft2)
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
+                    selectedOption === "draft2"
+                      ? "bg-[#E8F0FE] text-[#1A73E8] border-[#1A73E8] shadow-xs"
+                      : "bg-white text-[#3C4043] border-[#DADCE0] hover:bg-[#F1F3F4]"
+                  }`}
+                >
+                  <span>⚡ Option 2: Service & Packaging</span>
+                </button>
+              </div>
             </div>
           )}
-          
-          {/* Review Textarea */}
+
+          {/* Review Text Input Box (Google-style Rounded Box) */}
           <div className="space-y-2">
-            <div className="flex justify-between items-center ml-1">
-              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
-                {isEditingExisting ? "Your Review (Edit to update)" : "AI DRAFT (FEEL FREE TO EDIT)"}
+            <div className="flex justify-between items-center">
+              <label htmlFor="google-review-textarea" className="text-xs font-semibold text-[#5F6368] uppercase tracking-wider">
+                {isEditingExisting ? "Your Review (Edit to update)" : "AI Generated Review (Tap to Edit)"}
               </label>
 
               {/* Quick 1-Click Copy Text Button */}
               <button
                 type="button"
                 onClick={handleManualCopy}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border ${
                   copied 
-                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" 
-                    : "bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+                    ? "bg-[#E6F4EA] text-[#137333] border-[#CEEAD6]" 
+                    : "bg-white hover:bg-[#F1F3F4] text-[#1A73E8] border-[#DADCE0]"
                 }`}
               >
                 {copied ? (
                   <>
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <Check className="w-3.5 h-3.5 text-[#137333]" />
                     <span>Copied! ✅</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="w-3.5 h-3.5 text-slate-400" />
+                    <Copy className="w-3.5 h-3.5 text-[#1A73E8]" />
                     <span>Copy Text</span>
                   </>
                 )}
               </button>
             </div>
 
-            <textarea
-              ref={textareaRef}
-              id="review-draft-textarea"
-              className="w-full h-32 bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none transition-all leading-relaxed"
-              style={{ fontSize: '16px' }}
-              value={draft}
-              onFocus={(e) => e.target.select()}
-              onChange={(e) => setDraft(e.target.value)}
-            />
+            <div className="relative border border-[#DADCE0] rounded-2xl p-4 bg-white focus-within:border-[#1A73E8] focus-within:ring-2 focus-within:ring-[#1A73E8]/20 transition-all shadow-xs">
+              <textarea
+                ref={textareaRef}
+                id="google-review-textarea"
+                rows={5}
+                className="w-full bg-transparent border-none p-0 text-[#202124] placeholder-[#80868B] focus:outline-none resize-none font-sans text-sm sm:text-base leading-relaxed"
+                value={draft}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) => setDraft(e.target.value)}
+              />
+            </div>
 
             {/* Visual Copy Feedback Alert */}
             {copied && (
-              <div className="p-2.5 bg-emerald-950/60 border border-emerald-500/30 rounded-xl flex items-center gap-2 text-xs text-emerald-300 animate-in fade-in duration-300">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Text copied to clipboard! Just tap <strong>Paste</strong> in Google Maps.</span>
+              <div className="p-3 bg-[#E6F4EA] border border-[#CEEAD6] rounded-xl flex items-center gap-2.5 text-xs text-[#137333] animate-in fade-in duration-200">
+                <Check className="w-4 h-4 text-[#137333] shrink-0" />
+                <span>Text copied to clipboard! Just tap <strong>Paste</strong> when Google Maps opens.</span>
               </div>
             )}
           </div>
 
-          {/* Google Maps Photo Bonus Guidance (No Upload on CustomerPilot) */}
-          <div className="bg-gradient-to-r from-teal-950/40 via-slate-900 to-slate-950 border border-teal-500/30 rounded-2xl p-4 flex items-start gap-3">
-            <div className="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 shrink-0 mt-0.5">
+          {/* Photo Bonus Hint Card (Google Light Theme) */}
+          <div className="bg-[#F8F9FA] border border-[#E8EAED] rounded-2xl p-4 flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[#E8F0FE] text-[#1A73E8] border border-[#D2E3FC] flex items-center justify-center shrink-0 mt-0.5">
               <Camera className="w-5 h-5" />
             </div>
             <div className="space-y-1">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-teal-300">
+              <div className="flex items-center gap-2">
+                <span className="text-xs sm:text-sm font-bold text-[#202124]">
                   Want +{photoBonus} Extra Photo Bonus Stamps? 📸
                 </span>
-                <span className="px-1.5 py-0.5 rounded bg-teal-500/20 text-[10px] font-bold text-teal-400">
+                <span className="px-2 py-0.5 rounded-full bg-[#E6F4EA] text-[10px] font-bold text-[#137333] border border-[#CEEAD6]">
                   Total +{maxPossibleBonus}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                When Google Maps opens, simply attach a photo of your purchase directly in your Google Review. Our AI automatically verifies it and adds your extra stamps!
+              <p className="text-xs text-[#5F6368] leading-relaxed">
+                When Google Maps opens, simply attach a photo of your cake or bill directly in your Google Review. CustomerPilot AI automatically verifies it and credits extra stamps!
               </p>
             </div>
           </div>
 
-          {/* 1-Click Copy & Open Google Button */}
+          {/* 1-Click Copy & Open Google Button (Google Blue Primary CTA) */}
           <button 
             type="button"
             onClick={handleCopyAndPostClick}
             style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' } as React.CSSProperties}
-            className={`w-full h-14 text-base sm:text-lg font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer ${
+            className={`w-full h-14 text-base font-bold rounded-2xl flex items-center justify-center gap-2.5 transition-all duration-200 cursor-pointer shadow-md ${
               copied 
-                ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_0_20px_-3px_rgba(16,185,129,0.7)]" 
-                : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-[0_0_20px_-5px_rgba(16,185,129,0.5)] hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.7)]"
+                ? "bg-[#137333] hover:bg-[#0D652D] text-white shadow-[#137333]/20" 
+                : "bg-[#1A73E8] hover:bg-[#1557B0] text-white shadow-[#1A73E8]/30 hover:shadow-lg"
             }`}
           >
             {copied ? (
               <>
-                <Check className="w-5 h-5" />
+                <Check className="w-5 h-5 text-white" />
                 <span>Text Copied! Opening Google Maps...</span>
               </>
             ) : (
               <>
-                <Copy className="w-5 h-5" />
-                <span>{getContent('review_copy_button', isEditingExisting ? "Copy & Update on Google" : "Copy & Post to Google")}</span>
-                <ExternalLink className="w-5 h-5 opacity-75 ml-1" />
+                <Copy className="w-5 h-5 text-white" />
+                <span>{getContent('review_copy_button', isEditingExisting ? "Copy & Update on Google Maps" : "Copy & Post on Google Maps")}</span>
+                <ExternalLink className="w-5 h-5 opacity-80 ml-1" />
               </>
             )}
           </button>
 
-          {/* Post Feedback / Live Wallet Button */}
+          {/* Live Digital Wallet Button on Submitted */}
           {submitted && (
-            <div className="p-4 bg-emerald-950/70 border border-emerald-500/40 rounded-2xl text-center space-y-3 animate-in fade-in zoom-in-95 duration-500">
-              <div className="inline-flex p-2 bg-emerald-500/20 rounded-full text-emerald-400">
+            <div className="p-4 bg-[#E6F4EA] border border-[#CEEAD6] rounded-2xl text-center space-y-3 animate-in fade-in zoom-in-95 duration-300">
+              <div className="inline-flex p-2 bg-white rounded-full text-[#137333] shadow-xs">
                 <Sparkles className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-100 text-sm">Review Posted! Bonus Added 🎉</h3>
-                <p className="text-xs text-emerald-300/80 mt-1">
-                  We have credited your bonus stamps. Tap below to see your live collection status!
+                <h3 className="font-bold text-[#137333] text-sm">Review Submitted! Bonus Added 🎉</h3>
+                <p className="text-xs text-[#3C4043] mt-1">
+                  We have credited your bonus stamps to your mobile VIP Wallet!
                 </p>
               </div>
               <a
                 href={walletUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-lg transition-colors no-underline"
+                className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-[#137333] hover:bg-[#0D652D] text-white font-bold text-sm shadow-md transition-colors no-underline"
               >
                 <span>📱 View My Live Digital Wallet</span>
                 <ExternalLink className="w-4 h-4" />
               </a>
             </div>
           )}
-          
-          <p className="text-center text-xs text-slate-500 mt-2 leading-relaxed">
+
+          <p className="text-center text-xs text-[#5F6368] leading-relaxed">
             {isEditingExisting 
               ? "💡 Google will open your previous review. Select the text, paste this new draft, and hit Post!" 
               : "After posting, our system will automatically credit bonus stamps to your VIP Wallet! 🎁"}
           </p>
         </div>
+
+        {/* Clean Google-style Footer */}
+        <footer className="border-t border-[#E8EAED] bg-[#F8F9FA] p-4 text-center space-y-1">
+          <p className="text-xs text-[#5F6368]">
+            Powered by <a href="/for-business" className="text-[#1A73E8] hover:underline font-semibold">CustomerPilot</a> 🚀
+          </p>
+          <p className="text-[11px] text-[#80868B]">
+            Automated Google Review & Loyalty System for Local Merchants
+          </p>
+        </footer>
       </div>
     </div>
   )
 }
-

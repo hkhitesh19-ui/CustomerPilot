@@ -8,11 +8,12 @@ import {
   Settings, Globe, Shield, Code, Zap, Crown, Store, Check, X, Search,
   MessageSquare, RefreshCw, RotateCcw, Activity, Server, Cpu, Sparkles,
   Layers, ArrowUpRight, Lock, CheckCircle2, ChevronRight, Trash2, AlertTriangle, Eye, UserX, LogOut,
-  MapPin, ExternalLink, Clock, Rocket, Loader2, Edit3, Smartphone
+  MapPin, ExternalLink, Clock, Rocket, Loader2, Edit3, Smartphone, Gift
 } from "lucide-react"
 import { WhatsAppTemplateManager } from "@/components/whatsapp-template-manager"
 import { SubscriptionPlansManager } from "@/components/super-admin/subscription-plans-manager"
 import { SuperAdminDigitalCardsManager } from "@/components/super-admin/digital-cards-manager"
+import { DefaultMerchantSettingsManager } from "@/components/super-admin/default-merchant-settings-manager"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -34,6 +35,7 @@ export default function SuperAdminPage() {
       items: [
         { id: "dashboard", label: "Command Center", icon: BarChart3, badge: "LIVE" },
         { id: "merchants", label: "Merchants Fleet", icon: Store },
+        { id: "default-settings", label: "Default Merchant Settings", icon: Gift, badge: "STAMPS" },
         { id: "digital-cards", label: "Smart Digital Cards", icon: Smartphone, badge: "NEW" },
         { id: "subscriptions", label: "Subscriptions & Pricing", icon: CreditCard },
         { id: "analytics", label: "Global Intelligence", icon: Globe },
@@ -75,6 +77,8 @@ export default function SuperAdminPage() {
       if (target) {
         if (target === "pricing" || target === "plans" || target === "subscription" || target === "subscriptions") {
           setActiveSection("subscriptions")
+        } else if (target === "default-settings" || target === "defaults" || target === "reward-setup" || target === "stamps") {
+          setActiveSection("default-settings")
         } else {
           const match = allItems.find(it => it.id.toLowerCase() === target)
           if (match) setActiveSection(match.id)
@@ -219,6 +223,7 @@ export default function SuperAdminPage() {
               {activeSection === "theme" && <ThemeBuilder />}
               {activeSection === "cms" && <CMSPanel />}
               {activeSection === "merchants" && <MerchantManagement />}
+              {activeSection === "default-settings" && <DefaultMerchantSettingsManager />}
               {activeSection === "digital-cards" && <SuperAdminDigitalCardsManager />}
               {activeSection === "subscriptions" && <SubscriptionManagement />}
               {activeSection === "features" && <FeatureFlags />}
