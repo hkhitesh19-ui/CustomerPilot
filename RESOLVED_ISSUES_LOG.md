@@ -3162,3 +3162,29 @@ ode_modules and .next cache. Switched npm registry to mirror to bypass timeouts.
   5. In `src/components/digital-card-view.tsx`, implemented active 3-day trial countdown banner and 3-tier luxury paywall screen (Starter ₹349, Pro ₹499, Lifetime ₹1,499) with direct WhatsApp subscription button when expired.
   6. Verified end-to-end with Playwright tests (`verify_digital_card_free_trial.js` and `verify_paywall_gate.js`).
 - **Status**: ✅ Resolved and Verified.
+
+---
+## [05 Oct 2026] Issue: Infinite Login Redirect Loop on Settings Reward Setup (`#sec-reward-setup`)
+- **Symptom**: When navigating to `http://localhost:3000/dashboard/settings#sec-reward-setup`, the browser repeatedly bounced the user back to `http://localhost:3000/login`. Even after successfully submitting credentials on `/login`, the application entered an unbreakable redirect loop between `/login` and `/dashboard/settings#sec-reward-setup`.
+- **Root Cause**:
+  1. **SuperAdmin Merchant ID Missing in API/Proxy**: When logging in as Super Admin (`admin@customerpilot.in`), the JWT token payload contains `role: 'super_admin'` and `merchantId: 'admin_merchant'`. In `src/proxy.ts`, `if (payload.merchantId && payload.merchantId !== 'admin_merchant')` intentionally skipped injecting the `x-merchant-id` header for downstream API calls. As a result, subsequent calls to `/api/state` and `/api/cards/setup` received no `x-merchant-id` (or `'admin_merchant'`), returning `401 Unauthorized` or `404 Not Found`.
+  2. **Aggressive Redirect Loop in `useDashboardState`**: In `src/hooks/use-dashboard-state.ts`, receiving either HTTP 401 OR HTTP 404 immediately executed `window.location.href = "/login"`. Because `/login` redirected `super_admin` to `/super-admin`, attempting to open `/dashboard/settings#sec-reward-setup` resulted in an immediate 401/404 fetch error from `/api/state`, instantly kicking the user back to `/login`.
+  3. **Lack of `callbackUrl` Preservation**: Neither `src/proxy.ts` nor `src/components/auth/AuthForm.tsx` preserved or honored destination `callbackUrl` parameters upon login redirect. Users were redirected to default routes instead of their intended deep link hash anchor.
+  4. **Direct Merchant Account Missing Password**: The default demo merchant (`order.cakeconnection@gmail.com`) in `prisma/dev.db` had a `NULL` password hash, preventing direct merchant login.
+- **Resolution**:
+  1. In `src/proxy.ts`:
+     - Added `resolveMerchantId(payload, request)` helper. If `payload.role === 'super_admin'` or `merchantId === 'admin_merchant'`, it resolves from `cp_impersonation` cookie or falls back to active primary merchant (`cmtymavfx0002kx008lbfvp57` - Cake Connection).
+     - Injected resolved `x-merchant-id` into downstream request headers for both `/dashboard` page routes and `/api` routes.
+     - Preserved `callbackUrl` query parameter when redirecting unauthenticated users to `/login`.
+  2. In `src/lib/api.ts` & `src/app/api/state/route.ts`:
+     - Updated `getAuthenticatedMerchant()` and `/api/state` to fallback to the active merchant when `userRole === 'super_admin'` or `merchantId === 'admin_merchant'`.
+  3. In `src/hooks/use-dashboard-state.ts`:
+     - Disentangled 401 from 404 handling. 401 now attaches current URL with hash as `callbackUrl` before redirecting to `/login`. 404 logs error without triggering a redirect loop.
+  4. In `src/components/auth/AuthForm.tsx` & `src/app/(auth)/login/page.tsx`:
+     - Read `callbackUrl` using Next.js `useSearchParams()` and redirected to destination upon successful login. Wrapped `AuthForm` inside a `<Suspense>` boundary.
+  5. In `prisma/dev.db`:
+     - Updated `order.cakeconnection@gmail.com` with valid password hash (`Admin@CustomerPilot2026!`).
+  6. **Playwright Ground-Truth Verification**:
+     - Verified both Super Admin (`admin@customerpilot.in`) and direct merchant (`order.cakeconnection@gmail.com`) navigate directly to `http://localhost:3000/dashboard/settings#sec-reward-setup` with ZERO redirect loop.
+     - Confirmed Step A ("Stamps Reward Card Rules Setup") and Step B ("Loyalty Cycle Categories (10 Levels)") are 100% loaded and visible on screen.
+- **Status**: ✅ Resolved and Verified.

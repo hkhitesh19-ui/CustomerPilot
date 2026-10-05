@@ -38,11 +38,16 @@ export function useDashboardState() {
     queryKey: ["dashboard-state"],
     queryFn: async (): Promise<DashboardState> => {
       const res = await fetch("/api/state")
-      if (res.status === 401 || res.status === 404) {
+      if (res.status === 401) {
         if (typeof window !== "undefined") {
-          window.location.href = "/login"
+          const currentPath = window.location.pathname + window.location.search + window.location.hash;
+          window.location.href = `/login?callbackUrl=${encodeURIComponent(currentPath)}`;
         }
         throw new Error("Session expired. Redirecting to login...")
+      }
+      if (res.status === 404) {
+        console.error("Merchant profile not found for active session.")
+        throw new Error("Merchant profile not found")
       }
       if (!res.ok) {
         throw new Error("Failed to fetch dashboard state")

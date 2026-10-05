@@ -10,6 +10,22 @@ async function verifyToken(token: string) {
   return payload;
 }
 
+function resolveMerchantId(payload: any, request: NextRequest): string | undefined {
+  let merchantId = payload.merchantId as string | undefined;
+  if (payload.role === 'super_admin' || merchantId === 'admin_merchant' || !merchantId) {
+    const impCookie = request.cookies.get('cp_impersonation')?.value;
+    if (impCookie) {
+      try {
+        const imp = JSON.parse(impCookie);
+        if (imp?.merchantId) return imp.merchantId;
+      } catch {}
+    }
+    // Default to primary merchant (Cake Connection) so super_admin can inspect dashboard seamlessly
+    return 'cmtymavfx0002kx008lbfvp57';
+  }
+  return merchantId;
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('token')?.value;
@@ -17,18 +33,25 @@ export async function proxy(request: NextRequest) {
   // ─── Protect /dashboard routes ───────────────────────────────
   if (pathname.startsWith('/dashboard')) {
     if (!token) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('callbackUrl', request.nextUrl.pathname + request.nextUrl.search);
+      return NextResponse.redirect(loginUrl);
     }
     try {
       const payload = await verifyToken(token);
       // Inject merchantId header for downstream API use
       const headers = new Headers(request.headers);
-      headers.set('x-merchant-id', payload.merchantId as string);
+      const merchantId = resolveMerchantId(payload, request);
+      if (merchantId) {
+        headers.set('x-merchant-id', merchantId);
+      }
       headers.set('x-user-id', payload.userId as string);
       headers.set('x-user-role', payload.role as string);
       return NextResponse.next({ request: { headers } });
     } catch {
-      return NextResponse.redirect(new URL('/login', request.url));
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('callbackUrl', request.nextUrl.pathname + request.nextUrl.search);
+      return NextResponse.redirect(loginUrl);
     }
   }
 
@@ -104,8 +127,9 @@ export async function proxy(request: NextRequest) {
       const actualToken = token || request.headers.get('authorization')?.substring(7) || '';
       const payload = await verifyToken(actualToken);
       const headers = new Headers(request.headers);
-      if (payload.merchantId && payload.merchantId !== 'admin_merchant') {
-        headers.set('x-merchant-id', payload.merchantId as string);
+      const merchantId = resolveMerchantId(payload, request);
+      if (merchantId) {
+        headers.set('x-merchant-id', merchantId);
       }
       if (payload.userId) {
         headers.set('x-user-id', payload.userId as string);

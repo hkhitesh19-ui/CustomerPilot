@@ -6,14 +6,27 @@ import { ok, err } from "@/lib/api"
 export async function GET(req: NextRequest) {
   try {
     // merchantId is injected by middleware from JWT token
-    const merchantId = req.headers.get('x-merchant-id')
+    let merchantId = req.headers.get('x-merchant-id')
+    const userRole = req.headers.get('x-user-role')
+
+    if (!merchantId || merchantId === 'admin_merchant') {
+      if (userRole === 'super_admin') {
+        merchantId = 'cmtymavfx0002kx008lbfvp57' // Default to Cake Connection
+      }
+    }
 
     // SECURITY: Require authenticated merchantId — never expose other merchants' data
     if (!merchantId) {
       return err('Unauthorized', 401)
     }
 
-    const merchant = await db.merchant.findUnique({ where: { id: merchantId } })
+    let merchant = await db.merchant.findUnique({ where: { id: merchantId } })
+    if (!merchant && userRole === 'super_admin') {
+      merchant = await db.merchant.findFirst({
+        where: { status: 'active' },
+        orderBy: { createdAt: 'asc' }
+      })
+    }
     if (!merchant) return err("Merchant not found", 404)
 
   const [
