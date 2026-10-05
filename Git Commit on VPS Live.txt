@@ -8,17 +8,19 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 9edcceb
-Full Commit Hash  : 9edccebfd0b60cdf4fc79f3d8c1b4a4029237daf
+Active Git Commit : 5874494
+Full Commit Hash  : 5874494c8a9d89f978fb858ad08c3c88fab8b51f
+Target Fix Commit : df0ed49 (df0ed49974e591170ff7bd9d71b342d7b4dd33c1)
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 14 Sep 2026, 02:06 PM IST
-Commit Title      : feat: add self-healing master plans and coupons auto-seeder
+Deployment Date   : 05 Oct 2026, 04:37 PM IST
+Commit Title      : fix(build): resolve whatsapp icon import, sync-vps auth, places search alias, and superadmin deep link (including authentic 3D master artwork df0ed49)
 Status            : Active & Running Live on VPS
-PM2 Services      : customerpilot-web (Online), customerpilot-cron (Online)
+PM2 Services      : customerpilot-web (Online - PID 2755684), customerpilot-cron (Online - PID 2755705)
 ----------------------------------------------------------
 
 Deployment History Log:
 ----------------------------------------------------------
+• [05 Oct 2026, 04:37 PM IST] Commit 5874494 (includes df0ed49) - Authentic 3D Master Artwork & Zero-Cutoff QR pocket standee, build/module resolutions, and Next 16 RSC use-client fix
 • [14 Sep 2026, 02:06 PM IST] Commit 9edcceb - feat: add self-healing master plans and coupons auto-seeder
 • [13 Sep 2026, 05:15 PM IST] Commit 4ea9f12 - fix: desktop whatsapp widget alignment and uploads persistence
 • [13 Sep 2026, 01:55 PM IST] Commit 182e7ea - feat: pure white acrylic style VIP loyalty standee

@@ -3,6 +3,24 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [05 Oct 2026] Issue: Hostinger VPS Live Production Deployment & Next.js 16 RSC Button Component Directive
+- **Symptom**: Deploying commit `df0ed49` to Hostinger VPS (200.97.170.53) initially failed during `npm run build` with `TypeError: e.createContext is not a function` on `/alternatives/stamp-me`.
+- **Root Cause**:
+  1. Next.js 16 / React 19 Turbopack SSR server component bundle does not include `React.createContext`.
+  2. UI components utilizing `@radix-ui/react-slot` (such as `src/components/ui/button.tsx`) require `"use client"` when imported by Server Components (`page.tsx`), otherwise the slot context evaluation fails during static page data collection.
+- **Resolution**:
+  1. Added `"use client"` directive to `src/components/ui/button.tsx`.
+  2. Compiled production standalone bundle on Hostinger VPS: all 188 routes compiled successfully in 48s (Exit Code 0).
+  3. Synchronized `.next/static` and `public` assets into `.next/standalone`.
+  4. Reloaded PM2 process `customerpilot-web` (PID 2755684, online) and `customerpilot-cron` (PID 2755705, online).
+  5. Verified live endpoints returning HTTP 200 OK:
+     - `https://customerpilot.in/` (HTTP 200 OK, 135 KB)
+     - `https://customerpilot.in/api/qr/standee?design=master&format=print&m=cmtymavfx0002kx008lbfvp57` (HTTP 200 OK, image/jpeg)
+     - `https://customerpilot.in/c/cake-connection` (HTTP 200 OK)
+  6. Synchronized `Git Commit on VPS Live.txt` locally and on the VPS server with commit `5874494` (incorporating `df0ed49`).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [05 Oct 2026] Issue: Restoration of 100% Authentic 3D Master Artwork & Zero Design/Text Cutoff Around QR
 - **Symptom**: User reviewed the previous iteration and flagged two critical visual deviations:
   1. Main 3D Design & Logo Background Alteration: Rebuilding the template with synthetic SVG canvases and pasting cropped slices altered the authentic 3D photorealistic lighting, reflections, and depth of the master design (`media_1791174551320.jpg`). In particular, adding an artificial white rectangular container over the top header arch destroyed the authentic navy blue arch styling and 3D Cake Connection cake emblem.
