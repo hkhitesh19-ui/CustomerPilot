@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Copy, Check, ExternalLink, Star, Camera, Sparkles, Gift, ArrowLeft, Info, MapPin } from "lucide-react"
+import { Copy, Check, ExternalLink, Sparkles, Gift, ArrowLeft, Info, MapPin } from "lucide-react"
 import { useSystemContent } from "@/hooks/useSystemContent"
 
 export function ReviewEditor({ 
@@ -123,7 +123,6 @@ export function ReviewEditor({
   }
 
   const walletUrl = `/q/wallet/${customer?.id || ""}`
-  const customerDisplayName = customer?.name && customer?.name !== "VIP" ? customer.name : "Hitesh Kumar"
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-[#202124] flex flex-col items-center justify-start sm:py-8 sm:px-4 font-sans selection:bg-[#E8F0FE] selection:text-[#1A73E8]">
@@ -166,72 +165,6 @@ export function ReviewEditor({
         </header>
 
         <div className="p-5 sm:p-7 space-y-6">
-
-          {/* User Profile Header (Exact Google Local Guide Style) */}
-          <div className="flex items-center gap-3.5">
-            <div className="relative">
-              <div className="w-12 h-12 rounded-full bg-[#E8F0FE] text-[#1A73E8] border border-[#DADCE0] flex items-center justify-center font-bold text-lg overflow-hidden shadow-xs">
-                {customerDisplayName.charAt(0)}
-              </div>
-              {/* Google Local Guide / Star Badge */}
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#F4B400] text-white flex items-center justify-center text-[10px] font-black border-2 border-white shadow-xs">
-                ★
-              </div>
-            </div>
-
-            <div>
-              <div className="font-semibold text-sm sm:text-base text-[#202124]">
-                {customerDisplayName}
-              </div>
-              <div className="text-xs text-[#5F6368] flex items-center gap-1 mt-0.5">
-                <span>Posting publicly across Google</span>
-                <Info className="w-3.5 h-3.5 text-[#70757A]" />
-              </div>
-            </div>
-          </div>
-
-          {/* Primary 5-Star Rating Section */}
-          <div className="text-center py-2 space-y-2">
-            <div className="flex justify-center items-center gap-2">
-              {[1, 2, 3, 4, 5].map(i => (
-                <Star
-                  key={i}
-                  className="w-9 h-9 sm:w-10 sm:h-10 text-[#FBBC04] fill-[#FBBC04] transition-transform hover:scale-110 drop-shadow-xs"
-                />
-              ))}
-            </div>
-            <div className="text-base sm:text-lg font-bold text-[#202124] tracking-tight">
-              Exceptional
-            </div>
-          </div>
-
-          {/* Criteria Sub-Scores (Food, Service, Atmosphere as in Google native screenshot) */}
-          <div className="bg-[#F8F9FA] border border-[#E8EAED] rounded-2xl p-4 space-y-2.5">
-            <div className="flex items-center justify-between text-xs sm:text-sm text-[#3C4043] font-medium">
-              <span>Food / Quality</span>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map(i => (
-                  <Star key={i} className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]" />
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center justify-between text-xs sm:text-sm text-[#3C4043] font-medium">
-              <span>Service</span>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map(i => (
-                  <Star key={i} className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]" />
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center justify-between text-xs sm:text-sm text-[#3C4043] font-medium">
-              <span>Atmosphere</span>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map(i => (
-                  <Star key={i} className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]" />
-                ))}
-              </div>
-            </div>
-          </div>
 
           {/* Existing Review Warning (if editing) */}
           {existingReviewText && (
@@ -350,26 +283,6 @@ export function ReviewEditor({
                 <span>Text copied to clipboard! Just tap <strong>Paste</strong> when Google Maps opens.</span>
               </div>
             )}
-          </div>
-
-          {/* Photo Bonus Hint Card (Google Light Theme) */}
-          <div className="bg-[#F8F9FA] border border-[#E8EAED] rounded-2xl p-4 flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#E8F0FE] text-[#1A73E8] border border-[#D2E3FC] flex items-center justify-center shrink-0 mt-0.5">
-              <Camera className="w-5 h-5" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="text-xs sm:text-sm font-bold text-[#202124]">
-                  Want +{photoBonus} Extra Photo Bonus Stamps? 📸
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-[#E6F4EA] text-[10px] font-bold text-[#137333] border border-[#CEEAD6]">
-                  Total +{maxPossibleBonus}
-                </span>
-              </div>
-              <p className="text-xs text-[#5F6368] leading-relaxed">
-                When Google Maps opens, simply attach a photo of your cake or bill directly in your Google Review. CustomerPilot AI automatically verifies it and credits extra stamps!
-              </p>
-            </div>
           </div>
 
           {/* 1-Click Copy & Open Google Button (Google Blue Primary CTA) */}

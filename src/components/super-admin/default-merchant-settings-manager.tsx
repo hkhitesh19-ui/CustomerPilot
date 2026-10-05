@@ -96,10 +96,18 @@ export function DefaultMerchantSettingsManager() {
   async function fetchSettings() {
     try {
       setLoading(true)
-      const res = await fetch("/api/admin/default-settings")
+      const res = await fetch("/api/admin/default-settings", {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+          "Pragma": "no-cache"
+        }
+      })
       const json = await res.json()
       if (res.ok && json.data?.settings) {
         setForm(json.data.settings)
+      } else if (!res.ok) {
+        throw new Error(json.error || `Failed to fetch settings (HTTP ${res.status})`)
       }
     } catch (err: any) {
       toast({
@@ -122,7 +130,11 @@ export function DefaultMerchantSettingsManager() {
     try {
       const res = await fetch("/api/admin/default-settings", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+          "Pragma": "no-cache"
+        },
         body: JSON.stringify({
           settings: form,
           applyToAll
@@ -132,6 +144,10 @@ export function DefaultMerchantSettingsManager() {
       const json = await res.json()
       if (!res.ok) {
         throw new Error(json.error || "Failed to update global defaults")
+      }
+
+      if (json.data?.settings) {
+        setForm(json.data.settings)
       }
 
       toast({

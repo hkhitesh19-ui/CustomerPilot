@@ -3221,3 +3221,39 @@ ode_modules and .next cache. Switched npm registry to mirror to bypass timeouts.
      - Verified `/review?m=cmtymavfx0002kx008lbfvp57`: Pure white background (`oklch(1 0 0)`), Store title, User section, Exceptional rating, criteria ratings, and primary CTA confirmed.
 - **Status**: ✅ Resolved and Verified.
 
+---
+## [05 Oct 2026] Issue: SuperAdmin Default Settings Persistence & Fleet-wide Synchronization Fix + Smart AI Google Review Streamlining
+- **Symptom**: 
+  1. In Superadmin Panel (`/super-admin?tab=default-settings`), after clicking "Save Global Defaults" or "Apply to All Merchants", modifications were not persisting across page reloads or fleet-wide updates.
+  2. On the Smart AI Google Review page (`/review?m=cmtymavfx0002kx008lbfvp57`), the user requested the removal of:
+     - The simulated Photo Bonus card: *"Want +2 Extra Photo Bonus Stamps? 📸 Total +4 When Google Maps opens, simply attach a photo of your cake or bill directly in your Google Review. CustomerPilot AI automatically verifies it and credits extra stamps!"*
+     - The simulated profile and criteria ratings block: *"H ★ Hitesh Kumar Posting publicly across Google Exceptional Food / Quality Service Atmosphere"*
+- **Root Cause**:
+  1. For SuperAdmin default settings:
+     - The route handler `src/app/api/admin/default-settings/route.ts` lacked `export const dynamic = 'force-dynamic'` and `revalidate = 0`. As a result, the browser or Next.js cached GET requests aggressively, returning stale defaults on page refresh.
+     - Neither GET nor POST returned explicit `Cache-Control: no-store, no-cache, max-age=0` headers.
+     - `src/components/super-admin/default-merchant-settings-manager.tsx` called `fetch("/api/admin/default-settings")` without `{ cache: "no-store" }` and did not immediately synchronize the local `form` React state with `json.data.settings` on save.
+     - When `applyToAll` was triggered, the batch update `db.stampCard.updateMany` was missing `name` (`cardName`) and `rewardName`, leaving existing merchant cards with old names and rewards.
+  2. For the Google Review page:
+     - `src/components/review/ReviewEditor.tsx` included a simulated Google local guide avatar header (which hardcoded a fallback name "Hitesh Kumar"), a 5-star rating header with "Exceptional", sub-ratings for Food/Service/Atmosphere, and an extra photo bonus incentive card, causing visual clutter when the user only wanted the clean AI review generator, angle picker, and 1-tap Google Maps CTA.
+- **Resolution**:
+  1. **SuperAdmin Default Settings Persistence & Fleet Sync**:
+     - Updated `src/app/api/admin/default-settings/route.ts`:
+       - Added `export const dynamic = "force-dynamic"` and `export const revalidate = 0`.
+       - Added strict `Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0` headers to all responses.
+       - Upgraded `applyToAll` logic to update `StampCard.name` (`cardName`) and `StampCard.rewardName` (`rewardName`), plus `Merchant.enabledModules`.
+     - Updated `src/components/super-admin/default-merchant-settings-manager.tsx`:
+       - Added `cache: "no-store"` and no-cache headers to `fetchSettings()`.
+       - In `handleSave()`, immediately synchronized `setForm(json.data.settings)` with the server response.
+  2. **Smart AI Google Review Screen Streamlining**:
+     - In `src/components/review/ReviewEditor.tsx`:
+       - Removed the simulated avatar header, "Hitesh Kumar" fallback, and "Posting publicly across Google ⓘ" text.
+       - Removed the 5-star "Exceptional" rating title and criteria sub-scores ("Food / Quality", "Service", "Atmosphere").
+       - Removed the Photo Bonus Hint Card ("Want +2 Extra Photo Bonus Stamps? 📸...").
+       - Cleaned up unused imports (`Star`, `Camera`).
+       - Preserved: Clean merchant header with back navigation, +4 Bonus Stamps pill, dual AI angle picker ("Option 1: Product & Taste" / "Option 2: Service & Packaging"), editable AI review text area with 1-click "Copy Text", big Google Blue primary CTA "Copy & Post on Google Maps", and the digital wallet reward confirmation.
+  3. **Playwright & Ground-Truth Verification**:
+     - Executed automated test suite `scripts/verify_superadmin_and_review_fixes.js`:
+       - **Test 1**: Set card title, reward, stamp value (450), and stamp goal (9) in `/super-admin?tab=default-settings`, clicked "Save Global Defaults", reloaded page — asserted 100% of persisted values remained intact. Clicked "Apply to All Merchants" and verified active DB cards received the updated rules.
+       - **Test 2**: Inspected `http://localhost:3000/review?m=cmtymavfx0002kx008lbfvp57` — asserted 0 occurrences of Photo Bonus card, 0 occurrences of "Hitesh Kumar", 0 occurrences of "Posting publicly across Google", 0 occurrences of "Exceptional", and 0 occurrences of sub-ratings. Verified textarea, Dual AI angle chips, and "Copy & Post on Google Maps" CTA button are 100% visible and functional.
+- **Status**: ✅ Resolved and Verified.
