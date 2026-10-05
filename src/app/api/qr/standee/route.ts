@@ -19,10 +19,10 @@ interface StandeeConfig {
 const STANDEE_COORDS: Record<string, StandeeConfig> = {
   master: {
     image: "standee_universal_base.jpg",
-    qr: { left: 255, top: 400, width: 256, height: 230 },
+    qr: { left: 170, top: 298, width: 384, height: 384 },
     darkColor: "#0f172a",
-    whiteCard: { left: 248, top: 392, width: 270, height: 246, rx: 16 },
-    headerPill: { left: 132, top: 18, width: 455, height: 130 },
+    whiteCard: { left: 152, top: 280, width: 420, height: 420, rx: 20 },
+    headerPill: { left: 122, top: 16, width: 480, height: 104 },
   },
   bakery: {
     image: "standee_bakery_mockup.jpg",
@@ -60,10 +60,10 @@ const STANDEE_COORDS: Record<string, StandeeConfig> = {
 const PRINT_POSTER_COORDS: Record<string, StandeeConfig> = {
   master: {
     image: "standee_universal_base.jpg",
-    qr: { left: 255, top: 400, width: 256, height: 230 },
+    qr: { left: 170, top: 298, width: 384, height: 384 },
     darkColor: "#0f172a",
-    whiteCard: { left: 248, top: 392, width: 270, height: 246, rx: 16 },
-    headerPill: { left: 132, top: 18, width: 455, height: 130 },
+    whiteCard: { left: 152, top: 280, width: 420, height: 420, rx: 20 },
+    headerPill: { left: 122, top: 16, width: 480, height: 104 },
   },
   bakery: {
     image: "poster_bakery_insert.jpg",
@@ -166,9 +166,19 @@ export async function GET(req: NextRequest) {
 
     // Prepend clean white rounded card backing under QR if configured
     if (config.whiteCard) {
+      const w = config.whiteCard.width
+      const h = config.whiteCard.height
+      const rx = config.whiteCard.rx
+      const bracketLen = 34
       const cardSvg = Buffer.from(`
-        <svg width="${config.whiteCard.width}" height="${config.whiteCard.height}">
-          <rect x="0" y="0" width="${config.whiteCard.width}" height="${config.whiteCard.height}" rx="${config.whiteCard.rx}" ry="${config.whiteCard.rx}" fill="#ffffff"/>
+        <svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">
+          <!-- White card backdrop -->
+          <rect x="0" y="0" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="#ffffff"/>
+          <!-- Gold corner scan framing brackets -->
+          <path d="M 12 ${12 + bracketLen} L 12 12 L ${12 + bracketLen} 12" fill="none" stroke="#d4af37" stroke-width="4" stroke-linecap="round"/>
+          <path d="M ${w - 12 - bracketLen} 12 L ${w - 12} 12 L ${w - 12} ${12 + bracketLen}" fill="none" stroke="#d4af37" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 12 ${h - 12 - bracketLen} L 12 ${h - 12} L ${12 + bracketLen} ${h - 12}" fill="none" stroke="#d4af37" stroke-width="4" stroke-linecap="round"/>
+          <path d="M ${w - 12 - bracketLen} ${h - 12} L ${w - 12} ${h - 12} L ${w - 12} ${h - 12 - bracketLen}" fill="none" stroke="#d4af37" stroke-width="4" stroke-linecap="round"/>
         </svg>
       `)
       const cardBuf = await sharp(cardSvg).png().toBuffer()
@@ -216,10 +226,15 @@ export async function GET(req: NextRequest) {
     if (config.headerPill) {
       let headerContentBuf: Buffer | null = null
 
-      if (merchant.logoUrl && (merchant.logoUrl.startsWith("http") || merchant.logoUrl.startsWith("/"))) {
+      if (merchant.logoUrl && (merchant.logoUrl.startsWith("http") || merchant.logoUrl.startsWith("/") || merchant.logoUrl.startsWith("data:"))) {
         try {
           let logoBuf: Buffer | null = null
-          if (merchant.logoUrl.startsWith("http")) {
+          if (merchant.logoUrl.startsWith("data:")) {
+            const base64Data = merchant.logoUrl.split(",")[1]
+            if (base64Data) {
+              logoBuf = Buffer.from(base64Data, "base64")
+            }
+          } else if (merchant.logoUrl.startsWith("http")) {
             const parsedUrl = new URL(merchant.logoUrl)
             const host = parsedUrl.hostname.toLowerCase()
             const isDisallowedHost = 
@@ -236,7 +251,7 @@ export async function GET(req: NextRequest) {
               const controller = new AbortController()
               const timeout = setTimeout(() => controller.abort(), 5000)
               try {
-                const logoRes = await fetch(merchant.logoUrl, { signal: controller.signal })
+                const logoRes = await fetch(merchant.logoUrl, { signal: controller.signal, redirect: "error" })
                 clearTimeout(timeout)
                 const contentLength = Number(logoRes.headers.get("content-length")) || 0
                 if (logoRes.ok && contentLength < 5 * 1024 * 1024) {
@@ -256,14 +271,19 @@ export async function GET(req: NextRequest) {
           }
 
           if (logoBuf) {
+            const innerWidth = config.headerPill.width - 24
+            const innerHeight = config.headerPill.height - 18
             const resizedLogo = await sharp(logoBuf)
-              .resize({ width: Math.round(config.headerPill.width * 0.75), height: Math.round(config.headerPill.height * 0.75), fit: "inside" })
+              .resize({ width: Math.round(innerWidth * 0.90), height: Math.round(innerHeight * 0.85), fit: "inside" })
               .png()
               .toBuffer()
 
             const pillSvg = Buffer.from(`
               <svg width="${config.headerPill.width}" height="${config.headerPill.height}" viewBox="0 0 ${config.headerPill.width} ${config.headerPill.height}">
-                <rect x="2" y="2" width="${config.headerPill.width - 4}" height="${config.headerPill.height - 4}" rx="20" fill="#05101c" stroke="#d4af37" stroke-width="2"/>
+                <!-- Outer luxury dark navy container with gold border -->
+                <rect x="2" y="2" width="${config.headerPill.width - 4}" height="${config.headerPill.height - 4}" rx="22" fill="#081829" stroke="#d4af37" stroke-width="2.5"/>
+                <!-- Inner crisp white badge for 100% logo visibility (guarantees dark/black text logos pop) -->
+                <rect x="12" y="9" width="${innerWidth}" height="${innerHeight}" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
               </svg>
             `)
             headerContentBuf = await sharp(pillSvg)
@@ -276,16 +296,15 @@ export async function GET(req: NextRequest) {
         }
       }
 
-      // If no logo or logo overlay failed, render Times New Roman serif wordmark
+      // If no logo or logo overlay failed, render Times New Roman serif wordmark (Zero Truncation Rule)
       if (!headerContentBuf) {
         const rawName = merchant.name || "CustomerPilot VIP"
-        const displayName = rawName.length > 25 ? rawName.slice(0, 24) + "…" : rawName
-        const fontSize = displayName.length > 18 ? 26 : displayName.length > 12 ? 30 : 34
+        const fontSize = rawName.length > 28 ? 20 : rawName.length > 22 ? 24 : rawName.length > 16 ? 28 : 32
 
         const wordmarkSvg = Buffer.from(`
           <svg width="${config.headerPill.width}" height="${config.headerPill.height}" viewBox="0 0 ${config.headerPill.width} ${config.headerPill.height}">
-            <rect x="2" y="2" width="${config.headerPill.width - 4}" height="${config.headerPill.height - 4}" rx="20" fill="#05101c" stroke="#d4af37" stroke-width="2"/>
-            <text x="50%" y="58%" font-family="'Times New Roman', Georgia, serif" font-size="${fontSize}" font-weight="bold" fill="#fef08a" text-anchor="middle" letter-spacing="0.5">${displayName.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</text>
+            <rect x="2" y="2" width="${config.headerPill.width - 4}" height="${config.headerPill.height - 4}" rx="22" fill="#081829" stroke="#d4af37" stroke-width="2.5"/>
+            <text x="50%" y="58%" font-family="'Times New Roman', Georgia, serif" font-size="${fontSize}" font-weight="bold" fill="#fef08a" text-anchor="middle" letter-spacing="0.5">${rawName.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</text>
           </svg>
         `)
         headerContentBuf = await sharp(wordmarkSvg).png().toBuffer()

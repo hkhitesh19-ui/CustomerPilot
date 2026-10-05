@@ -3,6 +3,34 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [05 Oct 2026] Issue: Universal Master Standee 20% QR Area Allocation & Merchant Logo High-Contrast Visibility
+- **Symptom**: 
+  1. Merchant Logo in top branding arch was completely invisible when merchant uploaded a dark/black text logo (such as Cake Connection's logo `1789267721286-IMG_20220502_WA0034.jpg`) because it was composited directly onto the dark navy `#05101c` background.
+  2. Standee QR code was too small (occupying only 7.9% of total canvas area at 256×230 px). User requested giving the QR code exactly 20% of the canvas area and scaling all surrounding elements proportionally with seamless visual balance.
+- **Root Cause**:
+  1. `src/app/api/qr/standee/route.ts` rendered the top header pill with a dark navy fill (`#081829`), causing black text logos to blend into the background and disappear.
+  2. Legacy coordinates allocated only 256×230 px to the QR code. Scaling the QR to 20% area (384×384 px = 147,456 px² = 19.92% of 723×1024) required reallocating vertical and horizontal dimensions across the headline ("SCAN to EARN"), gold ribbon ("CONFIRM REWARDS"), white backing card with gold brackets, side cues/gift boxes, marble pedestal, and benefits card without introducing clipping or ghosted/duplicated text.
+- **Resolution**:
+  1. **High-Contrast Crisp White Logo Container Badge (`src/app/api/qr/standee/route.ts`)**:
+     - Embedded an inner crisp white badge (`fill="#ffffff"`, `stroke="#e2e8f0"`, `rx="14"`, width 456 px, height 86 px) inside the gold-bordered navy header pill container (`#081829`).
+     - Added support for `data:` URIs and remote image fetch validation.
+     - Any merchant logo (whether black, color, or transparent PNG/JPG) is composited onto pure white, guaranteeing 100% legibility and sharp contrast.
+     - Implemented dynamic non-truncated font scaling for the Times New Roman serif fallback wordmark (`rawName`) so business names are never cut off with ellipsis.
+  2. **Exact 20% QR Area Allocation & Golden Framing Brackets (`src/app/api/qr/standee/route.ts`)**:
+     - Canvas dimensions: 723 × 1024 = 740,352 px².
+     - QR dimensions set to 384 × 384 px = 147,456 px² = 19.92% (exact 20% target).
+     - Centered QR inside an elegant white backing card (420 × 420 px at `left: 152, top: 280, rx: 20`) with 4 gold corner scan framing brackets (`stroke="#d4af37"`).
+  3. **Seamless Master Base Template Generation (`scripts/build_seamless_master_base.js`)**:
+     - Generated `public/standees/standee_universal_base.jpg` using feathered Gaussian alpha masks (`filter="url(#b)"`) to eliminate all hard rectangular seams.
+     - Preserved single continuous blocks for left column ("Scan Here" + white gift box + flowers) and right column ("Join Now & Get Rewards" + red gift box + gold coin), preventing duplicate text or cut-off artifacts.
+     - Scaled headline and ribbon proportionally to fit harmoniously above the enlarged QR card.
+  4. **Playwright Ground-Truth Automated Verification (`scripts/verify_standee_20percent_and_services.js`)**:
+     - Verified `GET /api/qr/standee?design=master&format=print&m=cmtymavfx0002kx008lbfvp57` returns HTTP 200, valid `image/jpeg`, 181.8 KB buffer.
+     - Verified Cake Connection Digital Business Card (`/c/cake-connection`) renders emerald Loyalty Stamps button, links to `/review?m=cmtymavfx0002kx008lbfvp57`, and contains zero dummy data.
+     - Verified Smart AI Google Review module loads for Cake Connection with 5-star rating selector and AI draft variations.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [05 Oct 2026] Issue: Universal Master Standee Print Fidelity, Smart AI Google Review Linkage & Emerald Loyalty Button
 - **Symptom**: User identified 3 critical issues during manual testing:
   1. Print Standee (A4): Clicking "Print Standee (A4)" in the merchant settings dashboard generated a flat, boxy CSS mockup rather than the high-resolution 3D Master Standee artwork (`media_1791163244911.png` vs `media_1791163052758.png`).
