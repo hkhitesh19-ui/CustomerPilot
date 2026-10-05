@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [05 Oct 2026] Issue: Complete CodeRabbit Removal and Uninstallation
+- **Symptom**: User requested complete removal and uninstallation of CodeRabbit from the project and local environment.
+- **Root Cause**: CodeRabbit plugins, skills, and extension packages were installed across `.agent/plugins/coderabbit`, `.agent/skills/autofix`, `.agent/skills/code-review`, `antigravity_extensions`, and global Gemini configuration directories.
+- **Resolution**:
+  1. Completely deleted project-level CodeRabbit plugin: `.agent/plugins/coderabbit`.
+  2. Deleted CodeRabbit skills: `.agent/skills/autofix` and `.agent/skills/code-review`.
+  3. Deleted CodeRabbit VS Code extension package: `antigravity_extensions/coderabbit-vscode-0.21.9.vsix`.
+  4. Deleted global Gemini CodeRabbit plugin and skill configurations from `C:\Users\Admin\.gemini\config\plugins\coderabbit`, `skills\autofix`, `skills\code-review`, and `plugin_data\coderabbit`.
+  5. Updated `AGENTS.md` protocol to replace CodeRabbit requirements with standard static AST and code security review.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [05 Oct 2026] Issue: Hostinger VPS Live Production Deployment & Next.js 16 RSC Button Component Directive
 - **Symptom**: Deploying commit `df0ed49` to Hostinger VPS (200.97.170.53) initially failed during `npm run build` with `TypeError: e.createContext is not a function` on `/alternatives/stamp-me`.
 - **Root Cause**:
