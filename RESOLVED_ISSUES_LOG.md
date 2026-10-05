@@ -3,6 +3,34 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [05 Oct 2026] Issue: Universal Master Standee Print Fidelity, Smart AI Google Review Linkage & Emerald Loyalty Button
+- **Symptom**: User identified 3 critical issues during manual testing:
+  1. Print Standee (A4): Clicking "Print Standee (A4)" in the merchant settings dashboard generated a flat, boxy CSS mockup rather than the high-resolution 3D Master Standee artwork (`media_1791163244911.png` vs `media_1791163052758.png`).
+  2. Smart AI Google Review Link on Digital Business Card (`/c/cake-connection`): The "Google Review (AI Review)" power button was opening the raw Google Maps search link instead of activating CustomerPilot's dedicated Smart AI Google Review module (`/review?m=[merchantId]`).
+  3. Loyalty Stamp Button Color on Digital Business Card: The "Loyalty Stamps" button color was indigo/purple, clashing with the brand and WhatsApp aesthetic. User requested updating it to an authentic WhatsApp emerald green theme.
+- **Root Cause**:
+  1. `handlePrintStandee` in `src/components/qr-generator.tsx` programmatically generated a flat CSS DOM structure rather than utilizing the backend Sharp dynamic image compositor (`/api/qr/standee?design=master&format=print&m=[merchantId]`). Additionally, the dashboard preview displayed a simplified DOM mock instead of the actual Sharp-composited master graphic.
+  2. `src/app/c/[slug]/page.tsx` omitted `card.merchantId` from `cardData`. Consequently, `src/components/digital-card-view.tsx` defaulted the review button to `effectiveReviewUrl` (raw Google Maps query) rather than routing to CustomerPilot's Smart AI review generator route (`/review?m=[merchantId]`).
+  3. The Loyalty Stamps button used indigo classes (`from-indigo-50/90`, `border-indigo-200`, `bg-indigo-600`, `text-indigo-700`).
+- **Resolution**:
+  1. **Exact 3D Master Standee Print Engine & Live Preview (`src/components/qr-generator.tsx`)**:
+     - Rewrote `handlePrintStandee` to directly fetch the high-resolution Master Standee composite image (`/api/qr/standee?design=master&format=print&m=${merchantId}`), embed it as a base64 Data URL inside the printable A4 document with 1.5px dashed scissor trim guidelines (`✂️ Cut along dashed line for Counter Acrylic Stand (A5 / 6×8" / 2:3)`), and trigger high-fidelity printing.
+     - Updated dashboard live preview to render the live composite Master Standee graphic (`/api/qr/standee?design=master&m=${merchantId}`) with live status pill for 100% WYSIWYG parity.
+  2. **Smart AI Google Review Link Routing (`src/app/c/[slug]/page.tsx` & `src/components/digital-card-view.tsx`)**:
+     - Passed `merchantId: card.merchantId` in `cardData` within `src/app/c/[slug]/page.tsx`.
+     - Added `merchantId?: string | null` to `DigitalCardData` interface.
+     - Defined `smartAiReviewUrl = card.merchantId ? `/review?m=${card.merchantId}` : effectiveReviewUrl`.
+     - Linked "Google Review (AI Review)" button directly to `smartAiReviewUrl`.
+  3. **Official WhatsApp Emerald Green Loyalty Button Styling (`src/components/digital-card-view.tsx`)**:
+     - Converted the Loyalty Stamps button to an emerald palette: `bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/40`, `border-2 border-emerald-300`, `bg-emerald-600` icon, `text-emerald-800 bg-emerald-100` VIP Club pill, and `text-emerald-700 font-bold` subtext.
+  4. **Playwright Ground-Truth Automated Verification (`scripts/verify_standee_and_digital_card_fixes.js`)**:
+     - Asserted emerald styling on `/c/cake-connection` Loyalty Stamps button.
+     - Asserted `/review?m=cmtymavfx0002kx008lbfvp57` link on Google Review button.
+     - Navigated to `/review?m=cmtymavfx0002kx008lbfvp57` and verified full Smart AI Review editor loads for Cake Connection with 5 stars, AI draft variations, and Google Maps copy actions.
+     - Asserted `/api/qr/standee?design=master&format=print&m=cmtymavfx0002kx008lbfvp57` returns HTTP 200, `image/jpeg`, and >190 KB high-res buffer.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [04 Oct 2026] Issue: Universal Master QR Loyalty Standee System Locking & Cake Connection Multi-Tier Scenarios
 - **Symptom**: User mandated locking the physical standee template into the CustomerPilot codebase based on the Master Design Template (`media_1791123925184.jpg`), ensuring only 4 dynamic variables change per merchant (Business Name, Business Logo/Times New Roman serif wordmark, Business Category, Scannable QR code), while all other branding remains 100% locked. Additionally, user requested full manual testing and demonstration for Cake Connection in two scenarios:
   1. Cake Connection takes **only Smart AI Google Review**: What does their standee look like?

@@ -78,6 +78,7 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
 
   const cardData: DigitalCardData = {
     id: card.id,
+    merchantId: card.merchantId,
     slug: card.slug,
     displayName: card.displayName,
     subCategories: card.subCategories,
