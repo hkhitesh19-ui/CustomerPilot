@@ -3,6 +3,33 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [05 Oct 2026] Issue: Restoration of 100% Authentic 3D Master Artwork & Zero Design/Text Cutoff Around QR
+- **Symptom**: User reviewed the previous iteration and flagged two critical visual deviations:
+  1. Main 3D Design & Logo Background Alteration: Rebuilding the template with synthetic SVG canvases and pasting cropped slices altered the authentic 3D photorealistic lighting, reflections, and depth of the master design (`media_1791174551320.jpg`). In particular, adding an artificial white rectangular container over the top header arch destroyed the authentic navy blue arch styling and 3D Cake Connection cake emblem.
+  2. Text & Design Clipping Behind/Around QR Code: Expanding the QR card dimensions without aligning to the natural pocket of the 3D artwork caused surrounding elements ("CONFIRM REWARDS" ribbon, "Scan Here", golden arrow, "Join Now & Get Rewards", marble pedestal) to be cut off or covered.
+- **Root Cause**:
+  1. Attempting to programmatically reconstruct the complex 3D master artwork via sharp extract & svg gradients degraded the visual fidelity of the original 3D asset (`media_1791174551320.jpg`).
+  2. Oversized QR card coordinates (`420×420 px` at `top: 280`) encroached on surrounding artwork zones rather than sitting cleanly inside the designated 3D card pocket (`left: 196, top: 363, width: 330, height: 286`).
+- **Resolution**:
+  1. **Lock Authentic 3D Master Artwork as Direct Base (`public/standees/standee_master_authentic.jpg`)**:
+     - Preserved the pristine, uncompressed 3D Master Template (`media_1791174551320.jpg`) directly as the foundational standee canvas.
+     - Preserved 100% of the authentic 3D depth, specular highlights, marble pedestal, 3D gift boxes, satin ribbons, floral elements, and deep navy header arch.
+     - Gated the top header overlay (`!isCakeConnection`) so Cake Connection's authentic 3D logo, 3-tier cake emblem, yellow "C", and gold rim remain 100% untouched and native.
+  2. **Harmonious Non-Overlapping QR Pocket Geometry (`src/app/api/qr/standee/route.ts`)**:
+     - Configured `STANDEE_COORDS.master` and `PRINT_POSTER_COORDS.master`:
+       - `whiteCard`: `left: 196, top: 363, width: 330, height: 286, rx: 22` with authentic gold corner scan brackets (`#f59e0b`).
+       - `qr`: `left: 236, top: 381, width: 250, height: 250` centered with high error correction ('H') and embedded merchant logo badge.
+     - **Zero Design Cutoff Assertion**:
+       - "CONFIRM REWARDS" ribbon sits comfortably above `y: 363` (0% overlap, 100% intact).
+       - Marble pedestal steps sit naturally below `y: 649` (0% overlap, card rests on step).
+       - "Scan Here" cue and golden arrow remain to the left of `x: 196` (0% overlap, 100% intact).
+       - "Join Now & Get Rewards" and confetti remain to the right of `x: 526` (0% overlap, 100% intact).
+  3. **Playwright Ground-Truth Automated Verification (`scripts/verify_standee_20percent_and_services.js`)**:
+     - Verified `GET /api/qr/standee?design=master&format=print&m=cmtymavfx0002kx008lbfvp57` returns HTTP 200, valid `image/jpeg`, 206.5 KB buffer matching the authentic 3D master artwork.
+     - Verified Digital Business Card (`/c/cake-connection`) and Smart AI Review routing.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [05 Oct 2026] Issue: Universal Master Standee 20% QR Area Allocation & Merchant Logo High-Contrast Visibility
 - **Symptom**: 
   1. Merchant Logo in top branding arch was completely invisible when merchant uploaded a dark/black text logo (such as Cake Connection's logo `1789267721286-IMG_20220502_WA0034.jpg`) because it was composited directly onto the dark navy `#05101c` background.

@@ -18,10 +18,10 @@ interface StandeeConfig {
 // 3D Tabletop Studio Mockups (Displayed on Merchant Dashboard preview)
 const STANDEE_COORDS: Record<string, StandeeConfig> = {
   master: {
-    image: "standee_universal_base.jpg",
-    qr: { left: 170, top: 298, width: 384, height: 384 },
+    image: "standee_master_authentic.jpg",
+    qr: { left: 236, top: 381, width: 250, height: 250 },
     darkColor: "#0f172a",
-    whiteCard: { left: 152, top: 280, width: 420, height: 420, rx: 20 },
+    whiteCard: { left: 196, top: 363, width: 330, height: 286, rx: 22 },
     headerPill: { left: 122, top: 16, width: 480, height: 104 },
   },
   bakery: {
@@ -59,10 +59,10 @@ const STANDEE_COORDS: Record<string, StandeeConfig> = {
 // Pure 2D Flat Printable Poster Inserts (NO tables, NO room backgrounds, NO perspective - for A4 printing)
 const PRINT_POSTER_COORDS: Record<string, StandeeConfig> = {
   master: {
-    image: "standee_universal_base.jpg",
-    qr: { left: 170, top: 298, width: 384, height: 384 },
+    image: "standee_master_authentic.jpg",
+    qr: { left: 236, top: 381, width: 250, height: 250 },
     darkColor: "#0f172a",
-    whiteCard: { left: 152, top: 280, width: 420, height: 420, rx: 20 },
+    whiteCard: { left: 196, top: 363, width: 330, height: 286, rx: 22 },
     headerPill: { left: 122, top: 16, width: 480, height: 104 },
   },
   bakery: {
@@ -169,16 +169,15 @@ export async function GET(req: NextRequest) {
       const w = config.whiteCard.width
       const h = config.whiteCard.height
       const rx = config.whiteCard.rx
-      const bracketLen = 34
       const cardSvg = Buffer.from(`
         <svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">
           <!-- White card backdrop -->
-          <rect x="0" y="0" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="#ffffff"/>
-          <!-- Gold corner scan framing brackets -->
-          <path d="M 12 ${12 + bracketLen} L 12 12 L ${12 + bracketLen} 12" fill="none" stroke="#d4af37" stroke-width="4" stroke-linecap="round"/>
-          <path d="M ${w - 12 - bracketLen} 12 L ${w - 12} 12 L ${w - 12} ${12 + bracketLen}" fill="none" stroke="#d4af37" stroke-width="4" stroke-linecap="round"/>
-          <path d="M 12 ${h - 12 - bracketLen} L 12 ${h - 12} L ${12 + bracketLen} ${h - 12}" fill="none" stroke="#d4af37" stroke-width="4" stroke-linecap="round"/>
-          <path d="M ${w - 12 - bracketLen} ${h - 12} L ${w - 12} ${h - 12} L ${w - 12} ${h - 12 - bracketLen}" fill="none" stroke="#d4af37" stroke-width="4" stroke-linecap="round"/>
+          <rect x="1.5" y="1.5" width="${w - 3}" height="${h - 3}" rx="${rx}" ry="${rx}" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
+          <!-- Authentic Gold Corner Scan Framing Brackets matching master template -->
+          <path d="M 16 46 L 16 16 L 46 16" fill="none" stroke="#f59e0b" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M ${w - 46} 16 L ${w - 16} 16 L ${w - 16} 46" fill="none" stroke="#f59e0b" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M 16 ${h - 46} L 16 ${h - 16} L 46 ${h - 16}" fill="none" stroke="#f59e0b" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M ${w - 46} ${h - 16} L ${w - 16} ${h - 16} L ${w - 16} ${h - 46}" fill="none" stroke="#f59e0b" stroke-width="4.5" stroke-linecap="round"/>
         </svg>
       `)
       const cardBuf = await sharp(cardSvg).png().toBuffer()
@@ -222,8 +221,10 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // 4. Composite Merchant Branding Header Pill if configured (Master Template)
-    if (config.headerPill) {
+    // 4. Composite Merchant Branding Header Pill if configured (Master Template for OTHER merchants)
+    // If merchant is Cake Connection, we keep the original 3D cake logo in the master arch untouched!
+    const isCakeConnection = merchant.name?.toLowerCase().includes("cake connection")
+    if (config.headerPill && !isCakeConnection) {
       let headerContentBuf: Buffer | null = null
 
       if (merchant.logoUrl && (merchant.logoUrl.startsWith("http") || merchant.logoUrl.startsWith("/") || merchant.logoUrl.startsWith("data:"))) {
