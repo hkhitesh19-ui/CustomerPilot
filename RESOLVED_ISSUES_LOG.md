@@ -3,6 +3,24 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [06 Oct 2026] Feature: Live ROI Calculator — Homepage Theme Alignment & Top Cost vs Opportunity Hero Section
+- **Symptom**: User requested moving the "Your Cost vs Your Opportunity" section (CustomerPilot ₹2,249 vs Potential Extra Sales with dynamic break-even text and signup button) to the very top, and redesigning the entire Live ROI Calculator page to match the CustomerPilot Homepage aesthetic.
+- **Root Cause**: The initial layout had the Cost vs Opportunity comparison at the bottom of the right column, and used a dark purple background instead of the Homepage's signature light styling with emerald gradients, BrandLogo, and ambient lighting.
+- **Resolution**:
+  1. Relocated the "Your Cost vs Your Opportunity" section to the very top of `src/components/roi-calculator-client.tsx`:
+     - Styled with luxury emerald/indigo card with ambient glow, prominent "CustomerPilot ₹2,249 / year" vs "Potential Extra Sales" comparison cards.
+     - Dynamic break-even calculation statement: "You need only ~15 extra visits / year (~2 / month) to cover the fee. Every ₹1 of fee opens up ~₹303 of sales opportunity."
+     - Emerald CTA button: "Start Free Trial — No Credit Card →" linking to `/signup`.
+     - Sub-pills for Repeat Rate, Extra Visits, and Net Profit Opportunity.
+  2. Aligned entire page with Master Homepage theme:
+     - Header with `BrandLogo size="sm"`, "Back to Home" with `ArrowLeft`, and emerald "Start Free Trial →" button.
+     - Ambient background aurora glow circles and light slate foundation (`bg-slate-50/60`).
+     - Re-styled all input cards, slider rails, and output tiles with crisp white backgrounds, emerald accents, and subtle borders.
+     - Integrated master footer with Indian retail merchant credits and direct navigation links.
+  3. Verified 100% via Playwright (`scripts/verify_roi_calculator.js`) and captured visual artifact.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [06 Oct 2026] Feature: Dedicated Live ROI Calculator Page Implementation
 - **Symptom**: User requested a dedicated, high-converting Live ROI Calculator page based on specifications in "CustomerPilot — Live ROI Calculator.md" and "CustomerPilot — Live ROI Calculator.html".
 - **Root Cause**: Previously, the ROI calculator was an inline snippet on the homepage without dedicated URL, full SEO metadata, WebApplication/FAQPage schema, or interactive controls matching the complete specification.

@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useCallback } from "react"
 import Link from "next/link"
-import { ArrowRight, RotateCcw } from "lucide-react"
+import { ArrowRight, ArrowLeft, RotateCcw, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { BrandLogo } from "@/components/brand-logo"
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 interface CalcValues {
@@ -26,14 +27,14 @@ interface CalcFlags {
   g: boolean
 }
 
-// ─── Defaults ──────────────────────────────────────────────────────────────
+// ─── Defaults (Matching Original Reference Specification) ───────────────────
 const DEFAULTS: CalcValues = {
   cpd: 30, days: 30, bill: 300, cur: 50, rec: 30,
   stamps: 5, rew: 200, food: 50, fee: 2249,
   g: 3.5, ref: 10, per: 4,
 }
 
-// ─── Helpers ───────────────────────────────────────────────────────────────
+// ─── Number Format Helpers ───────────────────────────────────────────────────
 function n0(x: number): string {
   return Math.round(x).toLocaleString("en-IN")
 }
@@ -49,7 +50,7 @@ function pc(x: number): string {
   return (Math.round(x * 10) / 10) + "%"
 }
 
-// ─── Input Slider Row ──────────────────────────────────────────────────────
+// ─── Input Slider Row ────────────────────────────────────────────────────────
 function SliderRow({
   id, label, min, max, step, unit, value, onChange,
 }: {
@@ -61,11 +62,13 @@ function SliderRow({
     onChange(id, v)
   }
   return (
-    <div className="mb-3">
-      <div className="flex justify-between items-center gap-2 mb-1">
-        <label htmlFor={`n_${id}`} className="text-[0.88rem] text-slate-700 dark:text-slate-300">{label}</label>
-        <div className="flex items-center gap-1 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 rounded-lg px-2 py-0.5 min-w-[90px]">
-          {unit === "₹" && <span className="text-[0.78rem] text-slate-500">₹</span>}
+    <div className="mb-3.5">
+      <div className="flex justify-between items-center gap-2 mb-1.5">
+        <label htmlFor={`n_${id}`} className="text-xs sm:text-sm font-medium text-slate-700">
+          {label}
+        </label>
+        <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 min-w-[92px] shadow-xs">
+          {unit === "₹" && <span className="text-xs text-slate-400 font-semibold">₹</span>}
           <input
             type="number"
             id={`n_${id}`}
@@ -73,9 +76,9 @@ function SliderRow({
             step={step}
             value={value}
             onChange={e => handleChange(e.target.value)}
-            className="w-16 bg-transparent border-0 text-right font-bold text-[0.95rem] text-slate-900 dark:text-slate-100 focus:outline-none"
+            className="w-16 bg-transparent border-0 text-right font-bold text-sm text-slate-900 focus:outline-hidden"
           />
-          {unit === "%" && <span className="text-[0.78rem] text-slate-500">%</span>}
+          {unit === "%" && <span className="text-xs text-slate-400 font-semibold">%</span>}
         </div>
       </div>
       <input
@@ -86,86 +89,105 @@ function SliderRow({
         step={step}
         value={value}
         onChange={e => handleChange(e.target.value)}
-        className="w-full accent-indigo-600 cursor-pointer"
+        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
       />
     </div>
   )
 }
 
-// ─── Stat Tile ─────────────────────────────────────────────────────────────
+// ─── Stat Tile ───────────────────────────────────────────────────────────────
 function Tile({ value, label, variant = "default" }: { value: string; label: string; variant?: "default" | "good" | "warn" }) {
-  const colors = {
-    default: "bg-indigo-50 dark:bg-indigo-950/30",
-    good: "bg-emerald-50 dark:bg-emerald-950/30",
-    warn: "bg-amber-50 dark:bg-amber-950/30",
+  const styles = {
+    default: "bg-slate-50 border-slate-200 text-slate-900",
+    good: "bg-emerald-50/80 border-emerald-200/80 text-emerald-950",
+    warn: "bg-amber-50/80 border-amber-200/80 text-amber-950",
   }
-  const textColors = {
-    default: "text-indigo-700 dark:text-indigo-300",
-    good: "text-emerald-700 dark:text-emerald-300",
-    warn: "text-amber-700 dark:text-amber-300",
+  const textStyles = {
+    default: "text-slate-900",
+    good: "text-emerald-700 font-extrabold",
+    warn: "text-amber-700 font-extrabold",
   }
   return (
-    <div className={`${colors[variant]} rounded-2xl p-3 text-center`}>
-      <div className={`text-[1.25rem] font-black leading-tight ${textColors[variant]}`}>{value}</div>
-      <div className="text-[0.76rem] text-slate-500 dark:text-slate-400 mt-0.5">{label}</div>
+    <div className={`rounded-2xl p-3 sm:p-3.5 text-center border shadow-2xs ${styles[variant]}`}>
+      <div className={`text-lg sm:text-xl font-black leading-tight ${textStyles[variant]}`}>{value}</div>
+      <div className="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">{label}</div>
     </div>
   )
 }
 
-// ─── Waterfall Row ─────────────────────────────────────────────────────────
+// ─── Waterfall Row ───────────────────────────────────────────────────────────
 function WaterfallRow({ label, value, barPct, color }: { label: string; value: string; barPct: number; color: string }) {
   return (
-    <div className="grid grid-cols-[110px_1fr_90px] gap-2 items-center my-2 text-[0.84rem]">
-      <span className="text-slate-700 dark:text-slate-300">{label}</span>
-      <div className="bg-slate-200 dark:bg-slate-700 rounded-lg h-[22px] overflow-hidden">
+    <div className="grid grid-cols-[115px_1fr_95px] gap-2 items-center my-2 text-xs sm:text-sm">
+      <span className="text-slate-700 font-medium">{label}</span>
+      <div className="bg-slate-100 rounded-lg h-5 sm:h-6 overflow-hidden border border-slate-200/60">
         <div
-          className="h-full rounded-lg transition-all duration-300"
+          className="h-full rounded-md transition-all duration-300"
           style={{ width: `${Math.max(0, Math.min(100, barPct))}%`, background: color }}
         />
       </div>
-      <span className="text-right font-bold text-slate-800 dark:text-slate-200">{value}</span>
+      <span className="text-right font-bold text-slate-900">{value}</span>
     </div>
   )
 }
 
-// ─── Donut Ring ─────────────────────────────────────────────────────────────
+// ─── Donut Ring ───────────────────────────────────────────────────────────────
 function RepeatDonut({ cur, rate }: { cur: number; rate: number }) {
   const RC = 314.16
-  const curDash = Math.min(100, cur) / 100 * RC
-  const rateDash = Math.min(100, rate) / 100 * RC
+  const curDash = (Math.min(100, cur) / 100) * RC
+  const rateDash = (Math.min(100, rate) / 100) * RC
   return (
-    <div className="relative w-[140px] h-[140px] flex-none">
+    <div className="relative w-36 h-36 flex-none">
       <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
-        <circle cx="60" cy="60" r="50" fill="none" stroke="var(--cp-line, #e2e8f0)" strokeWidth="12" />
-        <circle cx="60" cy="60" r="50" fill="none" stroke="#22c55e" strokeWidth="12" strokeLinecap="round"
-          strokeDasharray={`${rateDash} ${RC}`} className="transition-all duration-300" />
-        <circle cx="60" cy="60" r="50" fill="none" stroke="#6366f1" strokeWidth="12" strokeLinecap="round"
-          strokeDasharray={`${curDash} ${RC}`} className="transition-all duration-300" />
+        <circle cx="60" cy="60" r="50" fill="none" stroke="#e2e8f0" strokeWidth="12" />
+        <circle
+          cx="60"
+          cy="60"
+          r="50"
+          fill="none"
+          stroke="#10b981"
+          strokeWidth="12"
+          strokeLinecap="round"
+          strokeDasharray={`${rateDash} ${RC}`}
+          className="transition-all duration-300"
+        />
+        <circle
+          cx="60"
+          cy="60"
+          r="50"
+          fill="none"
+          stroke="#6366f1"
+          strokeWidth="12"
+          strokeLinecap="round"
+          strokeDasharray={`${curDash} ${RC}`}
+          className="transition-all duration-300"
+        />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        <span className="text-[1.7rem] font-black text-slate-900 dark:text-slate-100 leading-none">{pc(rate)}</span>
-        <span className="text-[0.7rem] text-slate-500">repeat rate</span>
+        <span className="text-2xl font-black text-slate-900 leading-none">{pc(rate)}</span>
+        <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mt-0.5">repeat rate</span>
       </div>
     </div>
   )
 }
 
-// ─── Dot Grid ──────────────────────────────────────────────────────────────
+// ─── Dot Grid (20 Dots: 1 dot = 5%) ──────────────────────────────────────────
 function DotGrid({ cur, rate }: { cur: number; rate: number }) {
   const a = Math.round(cur / 5)
   const p = Math.round(Math.min(100, rate) / 5)
   return (
-    <div className="grid grid-cols-10 gap-[5px] max-w-[280px] flex-1 min-w-[200px]">
+    <div className="grid grid-cols-10 gap-1.5 max-w-[280px] flex-1 min-w-[200px]">
       {Array.from({ length: 20 }, (_, i) => (
         <div
           key={i}
-          className={`aspect-square rounded-full flex items-center justify-center text-[0.72rem] transition-all duration-200 ${
+          className={`aspect-square rounded-full flex items-center justify-center text-[10px] transition-all duration-200 ${
             i < a
-              ? "bg-indigo-500 text-white"
+              ? "bg-indigo-600 text-white shadow-xs"
               : i < p
-              ? "bg-emerald-500 text-white shadow-[0_0_0_3px_rgba(34,197,94,0.3)]"
-              : "bg-slate-200 dark:bg-slate-700 opacity-70"
+              ? "bg-emerald-500 text-white shadow-[0_0_0_3px_rgba(16,185,129,0.25)]"
+              : "bg-slate-200 text-slate-400 opacity-70"
           }`}
+          title={i < a ? "Already repeating" : i < p ? "Won back by CustomerPilot" : "Don't return"}
         >
           👤
         </div>
@@ -174,42 +196,42 @@ function DotGrid({ cur, rate }: { cur: number; rate: number }) {
   )
 }
 
-// ─── Main Component ─────────────────────────────────────────────────────────
+// ─── Main Component ───────────────────────────────────────────────────────────
 export function RoiCalculatorClient() {
   const [V, setV] = useState<CalcValues>({ ...DEFAULTS })
   const [F, setF] = useState<CalcFlags>({ ref: true, g: false })
 
-  // Derived calculations
+  // Derived financial & customer retention modeling
   const calc = useCallback(() => {
     const { cpd, days, bill, cur, rec, stamps, rew, food, fee, g } = V
     const st = Math.max(1, stamps)
     const month = cpd * days
-    const rep = month * cur / 100
+    const rep = (month * cur) / 100
     const non = month - rep
-    const recd = non * rec / 100
+    const recd = (non * rec) / 100
     const proj = rep + recd
-    const rate = month > 0 ? proj / month * 100 : 0
+    const rate = month > 0 ? (proj / month) * 100 : 0
     const sm = recd * bill
     const sy = sm * 12
     const vy = recd * 12
     const rm = proj / st
     const ry = rm * 12
     const rf = ry * rew
-    const rc = rf * food / 100
-    const gm = month * g / 100
+    const rc = (rf * food) / 100
+    const gm = (month * g) / 100
     const gy = gm * 12
     const gs = gy * bill
     const lc = recd * 12
-    const rr = lc * V.ref / 100
+    const rr = (lc * V.ref) / 100
     const rn = rr * V.per
     const rs = rn * bill
     const refS = F.ref ? rs : 0
     const gS = F.g ? gs : 0
     const tot = sy + refS + gS
-    const fc = tot * food / 100
+    const fc = (tot * food) / 100
     const left = tot - fc - rc - fee
     const nv = vy + (F.ref ? rn : 0) + (F.g ? gy : 0)
-    const burden = bill > 0 ? rew * food / 100 / (st * bill) * 100 : 0
+    const burden = bill > 0 ? (((rew * food) / 100) / (st * bill)) * 100 : 0
     const roiX = fee > 0 ? Math.max(0, left / fee) : 0
     const mg = bill * (1 - food / 100)
     const breakEven = fee > 0 && mg > 0 ? Math.ceil(fee / mg) : 0
@@ -218,9 +240,9 @@ export function RoiCalculatorClient() {
       month, rep, non, recd, proj, rate, sm, sy, vy,
       rm, ry, rf, rc, gm, gy, gs, lc, rr, rn, rs,
       refS, gS, tot, fc, left, nv, burden, roiX, mg, breakEven,
-      pctRepeat: sy > 0 && tot > 0 ? sy / tot * 100 : 0,
-      pctRef: refS > 0 && tot > 0 ? refS / tot * 100 : 0,
-      pctG: gS > 0 && tot > 0 ? gS / tot * 100 : 0,
+      pctRepeat: sy > 0 && tot > 0 ? (sy / tot) * 100 : 0,
+      pctRef: refS > 0 && tot > 0 ? (refS / tot) * 100 : 0,
+      pctG: gS > 0 && tot > 0 ? (gS / tot) * 100 : 0,
     }
   }, [V, F])
 
@@ -241,156 +263,302 @@ export function RoiCalculatorClient() {
 
   const inputGroups = [
     {
-      label: "🏪 Your business",
+      label: "🏪 Your Store Traffic & Spend",
       fields: [
         { id: "cpd", label: "Customers / day", min: 1, max: 300, step: 1, unit: "" },
         { id: "days", label: "Days / month", min: 1, max: 31, step: 1, unit: "" },
-        { id: "bill", label: "Average bill", min: 10, max: 3000, step: 10, unit: "₹" },
-        { id: "cur", label: "Current repeat customers", min: 0, max: 100, step: 1, unit: "%" },
+        { id: "bill", label: "Average bill amount", min: 10, max: 3000, step: 10, unit: "₹" },
+        { id: "cur", label: "Current repeat customer %", min: 0, max: 100, step: 1, unit: "%" },
       ],
     },
     {
-      label: "🎁 Loyalty reward",
+      label: "🎁 Loyalty Reward Settings",
       fields: [
         { id: "stamps", label: "Stamps needed for reward", min: 1, max: 20, step: 1, unit: "" },
         { id: "rew", label: "Reward menu value", min: 10, max: 1500, step: 10, unit: "₹" },
-        { id: "food", label: "Food cost", min: 0, max: 100, step: 1, unit: "%" },
+        { id: "food", label: "Food / inventory cost %", min: 0, max: 100, step: 1, unit: "%" },
       ],
     },
     {
-      label: "💳 CustomerPilot & Google",
+      label: "💳 CustomerPilot Subscription & Google",
       fields: [
-        { id: "fee", label: "Fee / year", min: 0, max: 20000, step: 50, unit: "₹" },
-        { id: "g", label: "Extra customers from Google", min: 0, max: 15, step: 0.5, unit: "%" },
+        { id: "fee", label: "CustomerPilot annual fee", min: 0, max: 20000, step: 50, unit: "₹" },
+        { id: "g", label: "Extra customers from Google %", min: 0, max: 15, step: 0.5, unit: "%" },
       ],
     },
   ]
 
   return (
-    <div className="min-h-screen bg-[#f3f5fb] dark:bg-[#0b1020] text-slate-900 dark:text-slate-100 font-sans">
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 no-underline">
-            <span className="font-black text-lg text-indigo-600 dark:text-indigo-400">🚀 CustomerPilot</span>
+    <div className="min-h-screen bg-slate-50/60 text-slate-900 font-sans selection:bg-emerald-500 selection:text-white flex flex-col justify-between relative">
+      {/* ── Background Aurora Glows (Matching Homepage Theme) ────────────── */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[120px]" />
+        <div className="absolute top-96 -right-20 w-[450px] h-[450px] bg-cyan-500/10 rounded-full blur-[140px]" />
+        <div className="absolute top-[800px] -left-20 w-[450px] h-[450px] bg-indigo-500/10 rounded-full blur-[140px]" />
+      </div>
+
+      {/* ── Sticky Top Navigation (Matching Homepage Theme) ───────────────── */}
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
+          <Link href="/" className="no-underline flex items-center">
+            <BrandLogo size="sm" />
           </Link>
-          <div className="flex items-center gap-3">
-            <span className="text-xs bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 px-3 py-1 rounded-full font-semibold">
-              Live ROI Calculator
-            </span>
-            <Button asChild size="sm" className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs px-4 rounded-xl hidden sm:flex">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
+            </Link>
+            <Button
+              asChild
+              size="sm"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-md transition-transform hover:scale-105"
+            >
               <Link href="/signup">Start Free Trial →</Link>
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 pb-16">
+      {/* ── Main Container ────────────────────────────────────────────────── */}
+      <main className="w-full flex-1 relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-20">
 
-        {/* ── Hero Banner ──────────────────────────────────────────────────── */}
-        <div className="mt-5 rounded-3xl bg-gradient-to-br from-[#312e81] via-[#6d28d9] to-[#db2777] text-white p-6 sm:p-8 text-center shadow-xl">
-          <p className="text-sm opacity-90 mb-1">This is the extra sales opportunity you could unlock every year</p>
-          <div id="hero-roi-total" className="text-[clamp(2.2rem,8vw,3.5rem)] font-black leading-tight my-2">
-            {lk(R.tot)}
-          </div>
-          <p className="text-sm opacity-90">
-            Invest just <strong>{inr(V.fee)}</strong> / year &nbsp;•&nbsp; Estimated Return ~<strong>{lk(R.left)}</strong> / year
-          </p>
-          <div className="flex flex-wrap justify-center gap-2 mt-4">
-            <span className="bg-white/20 border border-white/30 rounded-full px-4 py-1.5 text-sm">
-              Repeat rate <strong>{pc(V.cur)} → {pc(R.rate)}</strong>
-            </span>
-            <span className="bg-white/20 border border-white/30 rounded-full px-4 py-1.5 text-sm">
-              Extra visits <strong>{n0(R.nv)}</strong> / year
-            </span>
-          </div>
-        </div>
+        {/* ================================================================= */}
+        {/* [USER REQUIREMENT 1]: SECTION KO SAB SE UPAR TOP ME LELO          */}
+        {/* "your cost vs your opportunity" HERO COMPARISON BLOCK             */}
+        {/* ================================================================= */}
+        <section className="mb-6">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-emerald-950 text-white p-6 sm:p-10 shadow-xl border border-slate-800">
+            {/* Ambient decorative glow */}
+            <div className="absolute -top-24 -right-24 w-80 h-80 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
 
-        {/* ── Sticky Mini-Summary ──────────────────────────────────────────── */}
-        <div className="sticky top-14 z-40 grid grid-cols-3 gap-2 bg-[#f3f5fb] dark:bg-[#0b1020] py-3">
+            <div className="relative z-10 text-center max-w-3xl mx-auto">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-emerald-300 text-xs font-bold uppercase tracking-wider mb-4 shadow-xs">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                </span>
+                <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+                Live ROI Calculator
+              </div>
+
+              {/* Title */}
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight mb-2">
+                Your Cost vs Your Opportunity
+              </h1>
+              <p className="text-xs sm:text-base text-slate-300 mb-6">
+                This is the extra sales opportunity you could unlock every year with CustomerPilot
+              </p>
+
+              {/* Cost vs Opportunity Comparison Cards */}
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 my-6">
+                {/* Cost Card */}
+                <div className="w-full sm:w-64 bg-white/10 backdrop-blur-md rounded-2xl border border-white/15 p-5 text-center shadow-lg transition-transform hover:scale-102">
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-300">CustomerPilot</div>
+                  <div className="text-3xl sm:text-4xl font-black text-white mt-1 mb-0.5">
+                    {inr(V.fee)}
+                  </div>
+                  <div className="text-xs text-slate-300 font-medium">/ year</div>
+                </div>
+
+                {/* VS Badge */}
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500 text-slate-950 font-black text-xs uppercase shadow-md flex-none">
+                  vs
+                </div>
+
+                {/* Opportunity Card */}
+                <div className="w-full sm:w-72 bg-gradient-to-b from-emerald-500/20 to-emerald-600/30 backdrop-blur-md rounded-2xl border border-emerald-400/40 p-5 text-center shadow-lg transition-transform hover:scale-102">
+                  <div className="text-xs font-bold uppercase tracking-wider text-emerald-300">Potential Extra Sales</div>
+                  <div id="hero-roi-total" className="text-3xl sm:text-4xl lg:text-5xl font-black text-emerald-300 mt-1 mb-0.5">
+                    {lk(R.tot)}
+                  </div>
+                  <div className="text-xs text-emerald-200/90 font-medium">/ year</div>
+                </div>
+              </div>
+
+              {/* Dynamic Break-even Statement (as requested by user) */}
+              <div id="roi-breakeven-banner" className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 my-5 text-xs sm:text-sm text-slate-200 leading-relaxed max-w-2xl mx-auto">
+                {V.fee > 0 && R.mg > 0 && R.breakEven > 0 ? (
+                  <>
+                    You need only ~<strong className="text-emerald-300 font-extrabold">{n0(R.breakEven)} extra visits / year</strong> (~{n0(Math.max(1, Math.ceil(R.breakEven / 12)))} / month) to cover the fee. Every ₹1 of fee opens up ~<strong className="text-emerald-300 font-extrabold">₹{(R.tot / V.fee).toFixed(0)}</strong> of sales opportunity.
+                  </>
+                ) : (
+                  <>Adjust your store numbers below to compute your live break-even point and multiplier.</>
+                )}
+              </div>
+
+              {/* Primary Call to Action Button */}
+              <div className="pt-2">
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm sm:text-base px-8 py-6 rounded-2xl shadow-xl transition-all duration-200 hover:scale-105"
+                >
+                  <Link href="/signup">
+                    Start Free Trial — No Credit Card <ArrowRight className="w-5 h-5 ml-2" />
+                  </Link>
+                </Button>
+              </div>
+
+              {/* Sub-Pills Indicator */}
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-6 text-xs text-slate-300">
+                <span className="bg-white/10 border border-white/15 rounded-full px-3.5 py-1.5 backdrop-blur-xs">
+                  Repeat rate: <strong className="text-white">{pc(V.cur)} → {pc(R.rate)}</strong>
+                </span>
+                <span className="bg-white/10 border border-white/15 rounded-full px-3.5 py-1.5 backdrop-blur-xs">
+                  Extra visits: <strong className="text-white">{n0(R.nv)} / year</strong>
+                </span>
+                <span className="bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 rounded-full px-3.5 py-1.5 font-bold backdrop-blur-xs">
+                  Net Profit Opportunity: ~{lk(R.left)} / year
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Sticky Mini Summary Bar (Homepage theme) ─────────────────────── */}
+        <div className="sticky top-16 sm:top-20 z-40 grid grid-cols-3 gap-2 sm:gap-3 py-3 bg-slate-50/80 backdrop-blur-md">
           {[
-            { label: "Repeat rate", value: pc(R.rate) },
-            { label: "Extra sales / year", value: lk(R.tot) },
-            { label: "Savings / year", value: lk(R.left) },
+            { label: "Repeat Rate", value: pc(R.rate), color: "text-indigo-600" },
+            { label: "Extra Sales / Year", value: lk(R.tot), color: "text-emerald-600 font-black" },
+            { label: "Savings / Year", value: lk(R.left), color: "text-teal-600 font-black" },
           ].map(item => (
-            <div key={item.label} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-2 text-center shadow-sm">
-              <div className="text-[0.68rem] text-slate-500 dark:text-slate-400">{item.label}</div>
-              <div className="font-black text-[1.0rem] text-indigo-600 dark:text-indigo-400 leading-tight">{item.value}</div>
+            <div
+              key={item.label}
+              className="bg-white border border-slate-200/90 rounded-2xl p-2 sm:p-2.5 text-center shadow-2xs hover:shadow-xs transition"
+            >
+              <div className="text-[10px] sm:text-xs text-slate-500 font-semibold">{item.label}</div>
+              <div className={`text-sm sm:text-base lg:text-lg font-bold leading-tight ${item.color}`}>
+                {item.value}
+              </div>
             </div>
           ))}
         </div>
 
-        {/* ── Main 2-column Layout ─────────────────────────────────────────── */}
-        <div className="lg:grid lg:grid-cols-[340px_1fr] lg:gap-5 lg:items-start mt-4 space-y-4 lg:space-y-0">
+        {/* ── Two-Column Layout (Controls + Live Results) ──────────────────── */}
+        <div className="lg:grid lg:grid-cols-[360px_1fr] lg:gap-6 lg:items-start mt-4 space-y-5 lg:space-y-0">
 
-          {/* ── LEFT SIDEBAR: Controls ─────────────────────────────────────── */}
-          <aside className="lg:sticky lg:top-[calc(3.5rem+56px+8px)] space-y-4">
+          {/* ════ LEFT COLUMN: Controls & Sliders (Homepage Theme) ═══════════ */}
+          <aside className="lg:sticky lg:top-36 space-y-4">
 
-            {/* Recovery Rate — Primary Slider */}
-            <div className="bg-white dark:bg-slate-900 border-2 border-indigo-500 dark:border-indigo-400 rounded-2xl p-5 shadow-md bg-gradient-to-b from-indigo-50/60 dark:from-indigo-950/30 to-white dark:to-slate-900">
-              <h2 className="text-[1.05rem] font-black text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-1">
-                <span className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-lg">🎯</span>
-                Repeat rate: <span className="text-indigo-600 dark:text-indigo-400">{pc(V.cur)}</span> →{" "}
-                <span className="text-emerald-600 dark:text-emerald-400">{pc(R.rate)}</span>
-              </h2>
-              <p className="text-[0.82rem] text-slate-500 dark:text-slate-400 mb-3">
+            {/* Target Recovery Win-back Hero Card */}
+            <div className="bg-white border-2 border-emerald-500 rounded-3xl p-5 sm:p-6 shadow-sm bg-gradient-to-b from-emerald-50/60 to-white">
+              <div className="flex items-center gap-2.5 mb-1">
+                <span className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg">
+                  🎯
+                </span>
+                <h2 className="text-base sm:text-lg font-black text-slate-900">
+                  Repeat Rate:{" "}
+                  <span className="text-slate-500 line-through text-sm">{pc(V.cur)}</span>{" "}
+                  ➔ <span className="text-emerald-600">{pc(R.rate)}</span>
+                </h2>
+              </div>
+              <p className="text-xs text-slate-600 mb-4 leading-relaxed">
                 Of the customers who don&apos;t return, how many can you win back?{" "}
-                <strong className="text-emerald-600 dark:text-emerald-400">+{pc(R.rate - V.cur)} points</strong>
+                <strong className="text-emerald-700 font-bold">+{pc(R.rate - V.cur)} points</strong>
               </p>
-              <SliderRow id="rec" label="% who return" min={0} max={100} step={1} unit="%" value={V.rec} onChange={handleChange} />
+              <SliderRow
+                id="rec"
+                label="% of lost walk-ins won back"
+                min={0}
+                max={100}
+                step={1}
+                unit="%"
+                value={V.rec}
+                onChange={handleChange}
+              />
             </div>
 
-            {/* Input Controls */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
-              <h2 className="text-[1.05rem] font-black text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-3">
-                <span className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg">✏️</span>
-                Enter your own numbers
-              </h2>
-              {inputGroups.map(group => (
-                <div key={group.label}>
-                  <div className="text-[0.72rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-4 mb-1">{group.label}</div>
-                  {group.fields.map(f => (
-                    <SliderRow key={f.id} {...f} value={V[f.id as keyof CalcValues]} onChange={handleChange} />
-                  ))}
+            {/* Business Numbers Input Form */}
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-sm font-bold">
+                    ✏️
+                  </span>
+                  <h2 className="text-sm sm:text-base font-extrabold text-slate-900">
+                    Enter Your Own Numbers
+                  </h2>
                 </div>
-              ))}
-              <div className="flex justify-between items-center mt-3 text-[0.82rem] text-slate-500 dark:text-slate-400">
-                <span>Monthly customers: <strong className="text-slate-900 dark:text-slate-100">{n0(R.month)}</strong></span>
                 <button
                   onClick={handleReset}
-                  className="flex items-center gap-1 px-3 py-1.5 border border-indigo-400 dark:border-indigo-600 text-indigo-600 dark:text-indigo-400 rounded-full text-[0.82rem] hover:bg-indigo-50 dark:hover:bg-indigo-950 transition-colors cursor-pointer"
+                  className="flex items-center gap-1 px-2.5 py-1 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
+                  title="Reset to recommended defaults"
                 >
                   <RotateCcw className="w-3 h-3" /> Reset
                 </button>
               </div>
+
+              {inputGroups.map(group => (
+                <div key={group.label} className="pt-3 border-t border-slate-100 first:border-0 first:pt-0">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                    {group.label}
+                  </div>
+                  {group.fields.map(f => (
+                    <SliderRow
+                      key={f.id}
+                      {...f}
+                      value={V[f.id as keyof CalcValues]}
+                      onChange={handleChange}
+                    />
+                  ))}
+                </div>
+              ))}
+
+              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                <span>Calculated monthly walk-ins:</span>
+                <span className="font-bold text-slate-900">{n0(R.month)} customers</span>
+              </div>
             </div>
           </aside>
 
-          {/* ── RIGHT MAIN: Results ────────────────────────────────────────── */}
-          <main className="space-y-4">
+          {/* ════ RIGHT COLUMN: Output Breakdown Cards (Homepage Theme) ═════ */}
+          <main className="space-y-5">
 
-            {/* Section: Repeat Customers */}
-            <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
-              <h2 className="text-[1.05rem] font-black flex items-center gap-2 mb-1">
-                <span className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-lg">🔁</span>
-                Repeat customers
-              </h2>
-              <p className="text-[0.82rem] text-slate-500 dark:text-slate-400 mb-4">
-                Earlier <strong>{pc(V.cur)}</strong> returned → now <strong>{pc(R.rate)}</strong> will return
-              </p>
-              {/* Donut + Dots */}
-              <div className="flex items-center gap-6 flex-wrap justify-center mb-4">
+            {/* Section 1: Repeat Customers Visualizer */}
+            <section className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg">
+                  🔁
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-black text-slate-900">
+                    Repeat Customers Growth
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Earlier <strong>{pc(V.cur)}</strong> returned ➔ now <strong>{pc(R.rate)}</strong> will return
+                  </p>
+                </div>
+              </div>
+
+              {/* Donut + 20-Dot Visualizer */}
+              <div className="flex items-center gap-6 flex-wrap justify-center my-5 p-4 rounded-2xl bg-slate-50/70 border border-slate-100">
                 <RepeatDonut cur={V.cur} rate={R.rate} />
                 <DotGrid cur={V.cur} rate={R.rate} />
               </div>
+
               {/* Legend */}
-              <div className="flex flex-wrap gap-x-4 gap-y-1 justify-center text-[0.74rem] text-slate-500 dark:text-slate-400 mb-4">
-                <span><i className="inline-block w-2.5 h-2.5 rounded-full bg-indigo-500 mr-1" />Already repeating</span>
-                <span><i className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1" />Won back by CustomerPilot</span>
-                <span><i className="inline-block w-2.5 h-2.5 rounded-full bg-slate-300 mr-1" />Don&apos;t return</span>
-                <span>1 dot = 5%</span>
+              <div className="flex flex-wrap gap-x-4 gap-y-1.5 justify-center text-xs text-slate-600 mb-4 font-medium">
+                <span className="flex items-center gap-1.5">
+                  <i className="w-2.5 h-2.5 rounded-full bg-indigo-600 inline-block" />
+                  Already repeating
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <i className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+                  Won back by CustomerPilot
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <i className="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block" />
+                  Don&apos;t return
+                </span>
+                <span className="text-slate-400 font-normal">1 dot = 5%</span>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+
+              {/* 4 Outcome Tiles */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 <Tile value={n0(R.non)} label="don't return / month" />
                 <Tile value={`+${n0(R.recd)}`} label="new repeat / month" variant="good" />
                 <Tile value={n0(R.proj)} label="total repeat / month" variant="good" />
@@ -398,14 +566,23 @@ export function RoiCalculatorClient() {
               </div>
             </section>
 
-            {/* Section: Extra Sales */}
-            <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
-              <h2 className="text-[1.05rem] font-black flex items-center gap-2 mb-1">
-                <span className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center text-lg">💰</span>
-                Extra sales from repeat visits
-              </h2>
-              <p className="text-[0.82rem] text-slate-500 dark:text-slate-400 mb-4">Recovered customers × your average bill</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {/* Section 2: Extra Sales from Repeat Visits */}
+            <section className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+                  💰
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-black text-slate-900">
+                    Extra Sales from Repeat Visits
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Recovered customers × your store&apos;s average bill (₹{V.bill})
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-4">
                 <Tile value={n0(R.recd)} label="extra visits / month" />
                 <Tile value={inr(R.sm)} label="extra sales / month" />
                 <Tile value={n0(R.vy)} label="extra visits / year" />
@@ -413,224 +590,281 @@ export function RoiCalculatorClient() {
               </div>
             </section>
 
-            {/* Section: Reward Cost */}
-            <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
-              <h2 className="text-[1.05rem] font-black flex items-center gap-2 mb-1">
-                <span className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900 flex items-center justify-center text-lg">🎁</span>
-                Cost of rewards
-              </h2>
-              <p className="text-[0.82rem] text-slate-500 dark:text-slate-400 mb-4">Not menu value — your actual food cost</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <Tile value={n0(R.rm)} label="rewards / month" />
-                <Tile value={n0(R.ry)} label="rewards / year" />
-                <Tile value={lk(R.rf)} label="menu value / year" />
-                <Tile value={lk(R.rc)} label="actual food cost / year" variant="warn" />
+            {/* Section 3: Cost of Rewards (Real Food Cost, Not Menu Value) */}
+            <section className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+                  🎁
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-black text-slate-900">
+                    Actual Cost of Loyalty Rewards
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Calculated on your actual cost price ({V.food}%), not MRP
+                  </p>
+                </div>
               </div>
-              <div className="mt-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-3 text-[0.82rem] text-slate-700 dark:text-slate-300">
-                Reward burden: <strong>{pc(R.burden)}</strong> — this share of value goes to the reward on every purchase cycle.
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-4">
+                <Tile value={n0(R.rm)} label="rewards claimed / month" />
+                <Tile value={n0(R.ry)} label="rewards claimed / year" />
+                <Tile value={lk(R.rf)} label="menu value / year" />
+                <Tile value={lk(R.rc)} label="actual cost to you / year" variant="warn" />
+              </div>
+
+              <div className="mt-3.5 bg-amber-50/70 border border-amber-200/80 rounded-2xl p-3 text-xs text-amber-900 leading-relaxed">
+                <strong>Reward Burden: {pc(R.burden)}</strong> — Only this small percentage of purchase value is consumed by the reward across the customer cycle.
               </div>
             </section>
 
-            {/* Section: Total Sales & Savings */}
-            <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
-              <h2 className="text-[1.05rem] font-black flex items-center gap-2 mb-3">
-                <span className="w-8 h-8 rounded-xl bg-teal-100 dark:bg-teal-900 flex items-center justify-center text-lg">📊</span>
-                Total sales and savings
-              </h2>
+            {/* Section 4: Total Sales and Savings Waterfall */}
+            <section className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center gap-2.5 mb-2">
+                <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-lg">
+                  📊
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-black text-slate-900">
+                    Total Sales &amp; Savings Waterfall
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Full financial breakdown including referrals and reviews
+                  </p>
+                </div>
+              </div>
+
               {/* Toggles */}
-              <div className="flex flex-wrap gap-4 text-[0.85rem] mb-4">
+              <div className="flex flex-wrap gap-4 text-xs font-semibold text-slate-700 my-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={F.ref}
                     onChange={e => setF(p => ({ ...p, ref: e.target.checked }))}
-                    className="accent-indigo-600 w-4 h-4"
+                    className="accent-emerald-600 w-4 h-4 rounded-sm"
                   />
-                  Include referral sales
+                  Include referral revenue
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={F.g}
                     onChange={e => setF(p => ({ ...p, g: e.target.checked }))}
-                    className="accent-indigo-600 w-4 h-4"
+                    className="accent-emerald-600 w-4 h-4 rounded-sm"
                   />
-                  Include Google sales
+                  Include Google Reviews revenue
                 </label>
               </div>
+
               {/* Stacked bar */}
-              <div className="flex h-5 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700 mb-1">
+              <div className="flex h-5 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 my-2">
                 <div className="h-full transition-all duration-300" style={{ width: `${R.pctRepeat}%`, background: "#4f46e5" }} />
-                <div className="h-full transition-all duration-300" style={{ width: `${R.pctRef}%`, background: "#22c55e" }} />
+                <div className="h-full transition-all duration-300" style={{ width: `${R.pctRef}%`, background: "#10b981" }} />
                 <div className="h-full transition-all duration-300" style={{ width: `${R.pctG}%`, background: "#f59e0b" }} />
               </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[0.76rem] text-slate-500 dark:text-slate-400 mb-4">
-                <span><i className="inline-block w-2.5 h-2.5 rounded-sm bg-indigo-600 mr-1" />Repeat <strong>{pc(R.pctRepeat)}</strong></span>
-                <span><i className="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-500 mr-1" />Referral <strong>{pc(R.pctRef)}</strong></span>
-                <span><i className="inline-block w-2.5 h-2.5 rounded-sm bg-amber-400 mr-1" />Google <strong>{pc(R.pctG)}</strong></span>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-4 font-medium">
+                <span><i className="inline-block w-2.5 h-2.5 rounded-xs bg-indigo-600 mr-1" />Repeat: <strong>{pc(R.pctRepeat)}</strong></span>
+                <span><i className="inline-block w-2.5 h-2.5 rounded-xs bg-emerald-500 mr-1" />Referral: <strong>{pc(R.pctRef)}</strong></span>
+                <span><i className="inline-block w-2.5 h-2.5 rounded-xs bg-amber-500 mr-1" />Google: <strong>{pc(R.pctG)}</strong></span>
               </div>
-              {/* Waterfall */}
-              <WaterfallRow label="Repeat sales" value={lk(R.sy)} barPct={R.tot > 0 ? R.sy / R.tot * 100 : 0} color="#4f46e5" />
-              <WaterfallRow label="+ Referral sales" value={lk(R.refS)} barPct={R.tot > 0 ? R.refS / R.tot * 100 : 0} color="#22c55e" />
-              <WaterfallRow label="+ Google sales" value={lk(R.gS)} barPct={R.tot > 0 ? R.gS / R.tot * 100 : 0} color="#f59e0b" />
-              <div className="border-t border-dashed border-slate-200 dark:border-slate-700 pt-2 mt-1">
-                <WaterfallRow label="= Total sales" value={lk(R.tot)} barPct={100} color="#0f766e" />
-              </div>
-              <WaterfallRow label="− Food cost" value={lk(R.fc)} barPct={R.tot > 0 ? R.fc / R.tot * 100 : 0} color="#ea580c" />
-              <WaterfallRow label="− Reward cost" value={lk(R.rc)} barPct={R.tot > 0 ? R.rc / R.tot * 100 : 0} color="#ca8a04" />
-              <WaterfallRow label="− CustomerPilot" value={inr(V.fee)} barPct={R.tot > 0 ? V.fee / R.tot * 100 : 0} color="#dc2626" />
 
-              {/* Savings block */}
-              <div className="mt-4 bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-500 dark:border-emerald-600 rounded-2xl p-4 text-center">
-                <p className="text-[0.84rem] text-slate-700 dark:text-slate-300">
-                  = Extra Profit Opportunity using CustomerPilot <strong>{inr(V.fee)}</strong>/year
+              {/* Waterfall rows */}
+              <div className="space-y-1">
+                <WaterfallRow label="Repeat sales" value={lk(R.sy)} barPct={R.tot > 0 ? (R.sy / R.tot) * 100 : 0} color="#4f46e5" />
+                <WaterfallRow label="+ Referral sales" value={lk(R.refS)} barPct={R.tot > 0 ? (R.refS / R.tot) * 100 : 0} color="#10b981" />
+                <WaterfallRow label="+ Google sales" value={lk(R.gS)} barPct={R.tot > 0 ? (R.gS / R.tot) * 100 : 0} color="#f59e0b" />
+                <div className="border-t border-dashed border-slate-300 pt-2 my-1">
+                  <WaterfallRow label="= Total sales" value={lk(R.tot)} barPct={100} color="#0f766e" />
+                </div>
+                <WaterfallRow label="− Food cost" value={lk(R.fc)} barPct={R.tot > 0 ? (R.fc / R.tot) * 100 : 0} color="#ea580c" />
+                <WaterfallRow label="− Reward cost" value={lk(R.rc)} barPct={R.tot > 0 ? (R.rc / R.tot) * 100 : 0} color="#ca8a04" />
+                <WaterfallRow label="− CustomerPilot" value={inr(V.fee)} barPct={R.tot > 0 ? (V.fee / R.tot) * 100 : 0} color="#dc2626" />
+              </div>
+
+              {/* Extra Profit Opportunity Highlight */}
+              <div className="mt-5 bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-500 rounded-2xl p-5 text-center shadow-xs">
+                <p className="text-xs sm:text-sm font-bold text-slate-700">
+                  = Extra Profit Opportunity using CustomerPilot ({inr(V.fee)}/year fee)
                 </p>
                 <div
-                  className="text-[2rem] font-black my-2 transition-colors"
-                  style={{ color: R.left < 0 ? "#b91c1c" : "#15803d" }}
+                  className="text-3xl sm:text-4xl font-black my-2 transition-colors"
+                  style={{ color: R.left < 0 ? "#b91c1c" : "#047857" }}
                 >
                   {lk(R.left)}
                 </div>
                 {V.fee > 0 && (
-                  <span className="inline-block bg-emerald-600 text-white rounded-full px-4 py-1 text-[0.82rem] font-bold">
-                    ≈ {R.roiX.toFixed(0)}x return on your CustomerPilot fee
+                  <span className="inline-block bg-emerald-600 text-white rounded-full px-4 py-1 text-xs font-extrabold shadow-xs">
+                    ≈ {R.roiX.toFixed(0)}x return on your software investment
                   </span>
                 )}
               </div>
-              <div className="mt-3 bg-amber-50 dark:bg-amber-950/30 rounded-xl p-3 text-[0.8rem] text-slate-600 dark:text-slate-400">
-                This is not net profit — rent, salaries, electricity, GST, payment charges and wastage are not included.
-              </div>
+              <p className="mt-2 text-[11px] text-slate-400 text-center">
+                *Note: Illustrative projection. Rent, staff salaries, electricity, GST and wastage are excluded.
+              </p>
             </section>
 
-            {/* Section: Google Reviews */}
-            <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
-              <h2 className="text-[1.05rem] font-black flex items-center gap-2 mb-1">
-                <span className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900 flex items-center justify-center text-lg">⭐</span>
-                New customers from Google Reviews
-              </h2>
-              <p className="text-[0.82rem] text-slate-500 dark:text-slate-400 mb-4">Better, more reviews = more visibility on Google</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Section 5: Google Reviews Discovery Impact */}
+            <section className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg">
+                  ⭐
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-black text-slate-900">
+                    New Customers from Google Reviews
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Higher star rating on Google Maps = more organic walk-ins
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-4">
                 <Tile value={n0(R.gm)} label="new customers / month" />
                 <Tile value={n0(R.gy)} label="new customers / year" />
                 <Tile value={lk(R.gs)} label="potential sales / year" variant="good" />
               </div>
-              <div className="mt-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-3 text-[0.82rem] text-slate-700 dark:text-slate-300">
-                Repeat + Google total opportunity: <strong>{lk(R.sy + R.gs)}</strong> / year (may overlap). Track referrals separately.
+
+              <div className="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600">
+                Repeat + Google total opportunity: <strong className="text-slate-900">{lk(R.sy + R.gs)}</strong> / year (may overlap).
               </div>
             </section>
 
-            {/* Section: Referrals */}
-            <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
-              <h2 className="text-[1.05rem] font-black flex items-center gap-2 mb-1">
-                <span className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-lg">🤝</span>
-                Referrals: loyal customers → new customers
-              </h2>
-              <p className="text-[0.82rem] text-slate-500 dark:text-slate-400 mb-3">
-                Loyal customers recovered × % who refer × new customers each referrer brings
-              </p>
-              {/* Preset buttons */}
-              <div className="flex flex-wrap gap-2 mb-4">
+            {/* Section 6: Word-of-Mouth Referrals Multiplier */}
+            <section className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg">
+                  🤝
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-black text-slate-900">
+                    Referrals: Loyal Customers ➔ New Friends
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Recovered regulars × % who refer × friends each referrer brings
+                  </p>
+                </div>
+              </div>
+
+              {/* Presets */}
+              <div className="flex flex-wrap gap-2 my-3">
                 {[
                   { label: "Conservative", ref: 10, per: 1 },
                   { label: "Average", ref: 20, per: 2 },
                   { label: "Strong", ref: 30, per: 3 },
-                  { label: "3–5 assumption", ref: 100, per: 4 },
+                  { label: "All Refer", ref: 100, per: 4 },
                 ].map(preset => (
                   <button
                     key={preset.label}
                     onClick={() => setReferralPreset(preset.ref, preset.per)}
-                    className="px-3 py-1 border border-indigo-400 dark:border-indigo-600 text-indigo-600 dark:text-indigo-400 rounded-full text-[0.76rem] hover:bg-indigo-50 dark:hover:bg-indigo-950 transition-colors cursor-pointer"
+                    className="px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 text-slate-700 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700 transition cursor-pointer"
                   >
                     {preset.label}
                   </button>
                 ))}
               </div>
-              <SliderRow id="ref" label="% of loyal customers who refer" min={0} max={100} step={1} unit="%" value={V.ref} onChange={handleChange} />
-              <SliderRow id="per" label="New customers each referrer brings (per 365 days)" min={0} max={10} step={0.5} unit="" value={V.per} onChange={handleChange} />
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
-                <Tile value={n0(R.lc)} label="loyal customers / year" />
+
+              <SliderRow
+                id="ref"
+                label="% of loyal customers who refer friends"
+                min={0}
+                max={100}
+                step={1}
+                unit="%"
+                value={V.ref}
+                onChange={handleChange}
+              />
+              <SliderRow
+                id="per"
+                label="New customers each referrer brings (per 365 days)"
+                min={0}
+                max={10}
+                step={0.5}
+                unit=""
+                value={V.per}
+                onChange={handleChange}
+              />
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3">
+                <Tile value={n0(R.lc)} label="loyal regulars / year" />
                 <Tile value={n0(R.rr)} label="customers who refer" />
                 <Tile value={n0(R.rn)} label="new customers / year" variant="good" />
-                <Tile value={lk(R.rs)} label="potential sales / year (1 visit)" variant="good" />
-              </div>
-              <div className="mt-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-3 text-[0.8rem] text-slate-600 dark:text-slate-400">
-                On average, each loyal customer brings ~<strong>{(V.ref * V.per / 100).toFixed(2)}</strong> new customer (over 365 days).{" "}
-                {V.ref >= 60 && (
-                  <span className="text-amber-700 dark:text-amber-400">
-                    ⚠️ Best case: assumes every loyal customer refers — real-world rates are usually much lower.{" "}
-                  </span>
-                )}
-                <br />
-                These referral sales are added into &quot;Total sales&quot; and &quot;Savings&quot; above. Turn the toggle off above to avoid double-counting with Google.
+                <Tile value={lk(R.rs)} label="referral revenue / year" variant="good" />
               </div>
             </section>
 
-            {/* Section: Extra Benefits */}
-            <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
-              <h2 className="text-[1.05rem] font-black flex items-center gap-2 mb-1">
-                <span className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-lg">✨</span>
-                Extra benefits — beyond just sales
-              </h2>
-              <p className="text-[0.82rem] text-slate-500 dark:text-slate-400 mb-4">
-                Things CustomerPilot does for you behind the scenes, every single day
-              </p>
-              <ul className="space-y-2">
+            {/* Section 7: Beyond Sales — Intangible Software Benefits */}
+            <section className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg">
+                  ✨
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-black text-slate-900">
+                    Extra Benefits — Beyond Just Direct Sales
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    What CustomerPilot handles automatically every single day
+                  </p>
+                </div>
+              </div>
+
+              <ul className="space-y-2.5 mt-4">
                 {[
-                  { icon: "🗂️", title: "Customer database, built automatically", desc: "Every scan saves name, visits & spend — no manual Excel or register needed." },
-                  { icon: "💬", title: "WhatsApp reminders, sent for you", desc: "Inactive customers get nudged automatically — no staff follow-up required." },
-                  { icon: "⭐", title: "Google reviews, requested on autopilot", desc: "Happy repeat customers are prompted for a review at the right moment." },
-                  { icon: "📊", title: "Live dashboard, always up to date", desc: "See repeat rate, top customers & rewards claimed anytime, on any device." },
-                  { icon: "🔒", title: "Your data, safely backed up", desc: "No risk of a lost register or a staff member's personal phone holding your customer list." },
-                  { icon: "🕒", title: "Time saved for staff", desc: "No manual stamping registers or counting — one scan does it all." },
+                  { icon: "🗂️", title: "Automated Customer Database", desc: "Every QR scan saves customer name, visits & spend history — zero manual registers or Excel." },
+                  { icon: "💬", title: "Automated WhatsApp Retention Nudges", desc: "Lapsed customers receive personalized WhatsApp prompts automatically — no staff follow-ups." },
+                  { icon: "⭐", title: "Google Reviews on Autopilot", desc: "Happy customers are prompted to post 5-star Google reviews right when they earn rewards." },
+                  { icon: "📊", title: "Live Real-Time Dashboard", desc: "Track repeat rate, top spenders, and claimed rewards from your mobile phone anytime." },
+                  { icon: "🔒", title: "100% Secure Cloud Backup", desc: "Never lose your customer contacts if a staff member leaves or a phone is lost." },
+                  { icon: "🕒", title: "Zero Billing Counter Delays", desc: "Quick 2-second QR scan — no paper punch card stamping or register lookups." },
                 ].map(item => (
-                  <li key={item.title} className="flex gap-3 items-start bg-indigo-50 dark:bg-indigo-950/30 rounded-xl px-4 py-3">
+                  <li key={item.title} className="flex gap-3 items-start bg-slate-50 border border-slate-100 rounded-2xl p-3.5">
                     <span className="text-xl flex-none">{item.icon}</span>
                     <div>
-                      <div className="font-bold text-[0.9rem] text-slate-900 dark:text-slate-100">{item.title}</div>
-                      <div className="text-[0.8rem] text-slate-500 dark:text-slate-400">{item.desc}</div>
+                      <div className="font-bold text-xs sm:text-sm text-slate-900">{item.title}</div>
+                      <div className="text-xs text-slate-500 mt-0.5 leading-relaxed">{item.desc}</div>
                     </div>
                   </li>
                 ))}
               </ul>
             </section>
 
-            {/* ── CTA Block ─────────────────────────────────────────────────── */}
-            <div className="rounded-3xl bg-gradient-to-br from-[#15803d] to-[#0f766e] text-white p-6 sm:p-8 text-center shadow-xl">
-              <p className="text-sm opacity-90 mb-3 font-semibold">Your cost vs your opportunity</p>
-              <div className="flex justify-center items-center gap-6 flex-wrap mb-4">
-                <div className="bg-white/15 rounded-2xl px-6 py-3 text-center">
-                  <div className="text-xs opacity-80">CustomerPilot</div>
-                  <div className="text-[1.7rem] font-black leading-tight">{inr(V.fee)}</div>
-                  <div className="text-xs opacity-80">/ year</div>
-                </div>
-                <div className="text-2xl opacity-60">vs</div>
-                <div className="bg-white/15 rounded-2xl px-6 py-3 text-center">
-                  <div className="text-xs opacity-80">Potential extra sales</div>
-                  <div className="text-[1.7rem] font-black leading-tight">{lk(R.tot)}</div>
-                  <div className="text-xs opacity-80">/ year</div>
-                </div>
-              </div>
-              {V.fee > 0 && R.mg > 0 && R.breakEven > 0 && (
-                <p className="text-sm opacity-90 mb-5">
-                  You need only ~<strong>{n0(R.breakEven)} extra visits / year</strong> (~{n0(Math.max(1, Math.ceil(R.breakEven / 12)))} / month) to cover the fee.
-                  Every ₹1 of fee opens up ~₹{(R.tot / V.fee).toFixed(0)} of sales opportunity.
-                </p>
-              )}
-              <Button asChild size="lg" className="bg-white text-emerald-800 hover:bg-emerald-50 font-black text-sm px-8 py-4 rounded-2xl shadow-lg">
+            {/* Bottom Final Sign-Up Card */}
+            <div className="rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white p-6 sm:p-8 text-center shadow-lg">
+              <h3 className="text-xl sm:text-2xl font-black mb-2">
+                Ready to Turn Walk-ins into Regulars?
+              </h3>
+              <p className="text-xs sm:text-sm text-emerald-100 max-w-lg mx-auto mb-5 leading-relaxed">
+                Start your 3-day full access trial today. Setup takes under 5 minutes with zero special hardware.
+              </p>
+              <Button
+                asChild
+                size="lg"
+                className="bg-white text-emerald-800 hover:bg-emerald-50 font-black text-sm px-8 py-5 rounded-2xl shadow-md transition-transform hover:scale-105"
+              >
                 <Link href="/signup">
-                  Start Free Trial — No Credit Card <ArrowRight className="w-4 h-4 ml-2" />
+                  Get Started Free Now <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </Button>
             </div>
 
           </main>
         </div>
+      </main>
 
-        {/* Footer */}
-        <footer className="text-center text-[0.75rem] text-slate-400 dark:text-slate-600 pt-8 pb-4">
-          Illustrative projection — based on the numbers you entered. No sales are guaranteed. Please don&apos;t incentivise reviews with rewards.
-        </footer>
-      </div>
+      {/* ── Footer (Matching Master Homepage Theme) ──────────────────────── */}
+      <footer className="border-t border-slate-200 bg-white py-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <p>© {new Date().getFullYear()} CustomerPilot. All rights reserved. Built for Indian Retail Merchants.</p>
+          <div className="flex items-center gap-6">
+            <Link href="/" className="hover:text-slate-900 transition">Home</Link>
+            <Link href="/pricing" className="hover:text-slate-900 transition">Pricing</Link>
+            <Link href="/whatsapp-digital-loyalty-card" className="hover:text-slate-900 transition">WhatsApp Loyalty</Link>
+            <Link href="/smart-ai-google-review" className="hover:text-slate-900 transition">AI Google Reviews</Link>
+            <Link href="/signup" className="hover:text-slate-900 font-bold transition text-emerald-600">Free Trial</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
