@@ -517,7 +517,7 @@ export default function Home() {
             <Link href="/case-studies/cake-connection" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
               Case Study
             </Link>
-            <Link href="#roi" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
+            <Link href="/roi-calculator" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
               ROI Calculator
             </Link>
             <Link href="#faq" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
@@ -613,7 +613,7 @@ export default function Home() {
               <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-bold text-slate-900">
                 ⚡ Pricing
               </Link>
-              <Link href="#roi" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-bold text-slate-900">
+              <Link href="/roi-calculator" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-bold text-slate-900">
                 📊 Calculate Your Store ROI
               </Link>
               <Link href="#faq" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-bold text-slate-900">

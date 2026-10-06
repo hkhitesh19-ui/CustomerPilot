@@ -37,6 +37,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/industry/dental-clinic-loyalty-program",
     // Competitor alternatives pages
     "/alternatives/stamp-me",
+    // Tools
+    "/roi-calculator",
     "/for-business",
     "/help",
     "/signup",
@@ -63,6 +65,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
             "/ai-google-review-autoreply",
             "/customerpilot-complete",
             "/pricing",
+            "/roi-calculator",
           ].includes(route) ||
           route.startsWith("/features") ||
           route.endsWith("-loyalty")

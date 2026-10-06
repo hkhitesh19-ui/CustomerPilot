@@ -3,6 +3,24 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [06 Oct 2026] Feature: Dedicated Live ROI Calculator Page Implementation
+- **Symptom**: User requested a dedicated, high-converting Live ROI Calculator page based on specifications in "CustomerPilot — Live ROI Calculator.md" and "CustomerPilot — Live ROI Calculator.html".
+- **Root Cause**: Previously, the ROI calculator was an inline snippet on the homepage without dedicated URL, full SEO metadata, WebApplication/FAQPage schema, or interactive controls matching the complete specification.
+- **Resolution**:
+  1. Built `src/components/roi-calculator-client.tsx`:
+     - Interactive two-column responsive layout with sticky mini-summary and real-time calculations.
+     - Live mathematical modeling for repeat rate recovery, extra sales from visits, actual reward food cost, referral multiplier, and Google Reviews revenue impact.
+     - SVG ring gauge and dynamic 20-dot customer retention visualizer (1 dot = 5%).
+     - Multi-layer waterfall breakdown and extra profit opportunity badge.
+  2. Built `src/app/roi-calculator/page.tsx`:
+     - Full SEO metadata, OpenGraph tags, canonical URL `https://customerpilot.in/roi-calculator`.
+     - Structured JSON-LD schema (`WebApplication` and `FAQPage`).
+     - Breadcrumb navigation (`BreadcrumbJsonLd`).
+  3. Linked `/roi-calculator` in `src/app/sitemap.ts` (0.9 priority tier) and updated homepage desktop & mobile navs.
+  4. Verified via Playwright (`scripts/verify_roi_calculator.js`): HTTP 200, valid math output (e.g. ₹6.80 lakh extra sales), sliders, and UI components.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [06 Oct 2026] Issue: Universal Merchant Settings Synchronization & Reward Rule Defaults
 - **Symptom**: SuperAdmin and newly onboarded merchants required consistent, standardized default loyalty values: Joining Bonus (+1 Stamps on Join), Eligible Minimum Purchase Amount (₹300 = 1 Stamp), Stamp Goal (10 Stamps needed for 1 Free Cake), and Validity Days (180 Days).
 - **Root Cause**:
