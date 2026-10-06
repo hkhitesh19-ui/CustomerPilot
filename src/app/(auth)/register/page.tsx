@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { AuthForm } from '@/components/auth/AuthForm';
 
 export const metadata: Metadata = {
@@ -21,7 +22,9 @@ export default function RegisterPage() {
         <img src="/cplogo.png" alt="CustomerPilot Logo" className="h-14 w-auto object-contain mx-auto mb-4" />
         <h1 className="text-2xl font-extrabold text-stone-900 mb-1">Merchant Registration</h1>
         <p className="text-xs text-stone-500 mb-6">Create your CustomerPilot merchant account</p>
-        <AuthForm mode="register" />
+        <Suspense fallback={<div className="text-stone-500 text-xs text-center py-4">Loading registration form...</div>}>
+          <AuthForm mode="register" />
+        </Suspense>
       </div>
     </div>
   );
