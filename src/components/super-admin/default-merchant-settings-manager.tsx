@@ -17,14 +17,14 @@ import { FALLBACK_GLOBAL_DEFAULTS, DefaultMerchantSettingsData } from "@/lib/def
 const PRESET_TEMPLATES: Record<string, Partial<DefaultMerchantSettingsData>> = {
   bakery: {
     cardName: "Cake Connection VIP Club",
-    rewardName: "250g Free Cake",
-    stampsRequired: 11,
-    stampValue: 500,
-    validityDays: 90,
+    rewardName: "1 Free Cake",
+    stampsRequired: 10,
+    stampValue: 300,
+    validityDays: 180,
     googleReviewBonus: 1,
     photoBonus: 1,
     joiningBonusEnabled: true,
-    joiningBonusStamps: 2,
+    joiningBonusStamps: 1,
     vipUpgradeBonusStamps: 1,
     color: "#6366f1"
   },

@@ -3,6 +3,26 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [06 Oct 2026] Issue: Universal Merchant Settings Synchronization & Reward Rule Defaults
+- **Symptom**: SuperAdmin and newly onboarded merchants required consistent, standardized default loyalty values: Joining Bonus (+1 Stamps on Join), Eligible Minimum Purchase Amount (₹300 = 1 Stamp), Stamp Goal (10 Stamps needed for 1 Free Cake), and Validity Days (180 Days).
+- **Root Cause**:
+  1. Default fallback constants in `src/lib/default-merchant-settings-types.ts`, `src/components/super-admin/default-merchant-settings-manager.tsx`, and `src/components/reward-setup-card.tsx` were set to mismatched older values (`stampValue: 500`, `stampsRequired: 11`, `validityDays: 90`, `joiningBonusStamps: 2`).
+  2. Database records in `SystemContent` key `GLOBAL_DEFAULT_MERCHANT_SETTINGS` and active `StampCard` records had differing values across legacy accounts.
+- **Resolution**:
+  1. Updated `FALLBACK_GLOBAL_DEFAULTS` in `src/lib/default-merchant-settings-types.ts` to:
+     - `rewardName`: `"1 Free Cake"`
+     - `stampsRequired`: `10`
+     - `stampValue`: `300`
+     - `validityDays`: `180`
+     - `joiningBonusEnabled`: `true`
+     - `joiningBonusStamps`: `1`
+  2. Synchronized `PRESET_TEMPLATES.bakery` in `src/components/super-admin/default-merchant-settings-manager.tsx`.
+  3. Synchronized default state in `src/components/reward-setup-card.tsx`.
+  4. Executed universal database update script (`scripts/apply_universal_settings.js`) ensuring `GLOBAL_DEFAULT_MERCHANT_SETTINGS`, active stamp cards, and merchant settings reflect the exact parameters.
+  5. Verified 100% via Playwright runtime assertions in both SuperAdmin (`/super-admin?tab=default-settings`) and Merchant Dashboard (`/dashboard/settings#sec-reward-setup`).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [05 Oct 2026] Issue: Complete CodeRabbit Removal and Uninstallation
 - **Symptom**: User requested complete removal and uninstallation of CodeRabbit from the project and local environment.
 - **Root Cause**: CodeRabbit plugins, skills, and extension packages were installed across `.agent/plugins/coderabbit`, `.agent/skills/autofix`, `.agent/skills/code-review`, `antigravity_extensions`, and global Gemini configuration directories.
