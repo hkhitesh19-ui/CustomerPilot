@@ -8,18 +8,19 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 5874494
-Full Commit Hash  : 5874494c8a9d89f978fb858ad08c3c88fab8b51f
-Target Fix Commit : df0ed49 (df0ed49974e591170ff7bd9d71b342d7b4dd33c1)
+Active Git Commit : bd3654a
+Full Commit Hash  : bd3654aad985324555bef02ebe3893b64cbb1841
+Target Fix Commit : 232276a (232276aec206805fcda7f4a006fece6d4b917740)
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 05 Oct 2026, 04:37 PM IST
-Commit Title      : fix(build): resolve whatsapp icon import, sync-vps auth, places search alias, and superadmin deep link (including authentic 3D master artwork df0ed49)
+Deployment Date   : 06 Oct 2026, 10:23 AM IST
+Commit Title      : feat(roi): align Live ROI Calculator with homepage theme and relocate cost vs opportunity comparison to top (includes bd3654a Suspense build compliance)
 Status            : Active & Running Live on VPS
-PM2 Services      : customerpilot-web (Online - PID 2755684), customerpilot-cron (Online - PID 2755705)
+PM2 Services      : customerpilot-web (Online - PID 3000137), customerpilot-cron (Online - PID 3000158)
 ----------------------------------------------------------
 
 Deployment History Log:
 ----------------------------------------------------------
+• [06 Oct 2026, 10:23 AM IST] Commit bd3654a (includes 232276a & d05e838) - Dedicated Live ROI Calculator with Homepage Theme, Top Cost vs Opportunity Section, and /register Suspense build compliance
 • [05 Oct 2026, 04:37 PM IST] Commit 5874494 (includes df0ed49) - Authentic 3D Master Artwork & Zero-Cutoff QR pocket standee, build/module resolutions, and Next 16 RSC use-client fix
 • [14 Sep 2026, 02:06 PM IST] Commit 9edcceb - feat: add self-healing master plans and coupons auto-seeder
 • [13 Sep 2026, 05:15 PM IST] Commit 4ea9f12 - fix: desktop whatsapp widget alignment and uploads persistence
