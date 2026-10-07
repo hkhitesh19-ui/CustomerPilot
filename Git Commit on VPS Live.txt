@@ -8,18 +8,19 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : bd3654a
-Full Commit Hash  : bd3654aad985324555bef02ebe3893b64cbb1841
-Target Fix Commit : 232276a (232276aec206805fcda7f4a006fece6d4b917740)
+Active Git Commit : 3d97049
+Full Commit Hash  : 3d9704922e227d1bd30b367e384aa7e6f8836309
+Target Fix Commit : 3d97049 (3d9704922e227d1bd30b367e384aa7e6f8836309)
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 06 Oct 2026, 10:23 AM IST
-Commit Title      : feat(roi): align Live ROI Calculator with homepage theme and relocate cost vs opportunity comparison to top (includes bd3654a Suspense build compliance)
+Deployment Date   : 07 Oct 2026, 11:58 PM IST
+Commit Title      : fix(review-and-digital-card): resolve 504 timeout on ai review page with 2.5s fallback cap and add full link/ordering editor fields to merchant digital card builder
 Status            : Active & Running Live on VPS
-PM2 Services      : customerpilot-web (Online - PID 3000137), customerpilot-cron (Online - PID 3000158)
+PM2 Services      : customerpilot-web (Online), customerpilot-cron (Online)
 ----------------------------------------------------------
 
 Deployment History Log:
 ----------------------------------------------------------
+• [07 Oct 2026, 11:58 PM IST] Commit 3d97049 - Smart AI Review Page 504 Timeout Resolution & Complete Merchant Digital Card Builder Form Integration
 • [06 Oct 2026, 10:23 AM IST] Commit bd3654a (includes 232276a & d05e838) - Dedicated Live ROI Calculator with Homepage Theme, Top Cost vs Opportunity Section, and /register Suspense build compliance
 • [05 Oct 2026, 04:37 PM IST] Commit 5874494 (includes df0ed49) - Authentic 3D Master Artwork & Zero-Cutoff QR pocket standee, build/module resolutions, and Next 16 RSC use-client fix
 • [14 Sep 2026, 02:06 PM IST] Commit 9edcceb - feat: add self-healing master plans and coupons auto-seeder
