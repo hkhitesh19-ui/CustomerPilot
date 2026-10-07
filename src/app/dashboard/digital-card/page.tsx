@@ -24,7 +24,10 @@ import {
   Check,
   MessageCircle,
   Eye,
-  Loader2
+  Loader2,
+  Star,
+  Image as ImageIcon,
+  UtensilsCrossed
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -40,6 +43,13 @@ export default function DigitalCardDashboardPage() {
   const [fetchingGbp, setFetchingGbp] = useState(false)
   const [copied, setCopied] = useState(false)
   const [gbpSearchQuery, setGbpSearchQuery] = useState("")
+
+  // Dedicated Platform Links
+  const [googleReviewLink, setGoogleReviewLink] = useState("")
+  const [zomatoUrl, setZomatoUrl] = useState("")
+  const [swiggyUrl, setSwiggyUrl] = useState("")
+  const [otherOrderUrl, setOtherOrderUrl] = useState("")
+  const [otherOrderLabel, setOtherOrderLabel] = useState("EasyCater / Other")
 
   // Form State
   const [formData, setFormData] = useState<DigitalCardData>({
@@ -59,6 +69,7 @@ export default function DigitalCardDashboardPage() {
     facebookUrl: "https://www.facebook.com/CakeConnection.in/",
     youtubeUrl: "",
     googleMapsUrl: "https://maps.google.com/?q=Cake+Connection+Manjalpur+Vadodara",
+    googleReviewUrl: "",
     websiteUrl: "https://cakeconnection.in",
     orderingLinks: JSON.stringify([
       { platform: "website", label: "Website", sublabel: "Order Now", url: "https://cakeconnection.in", color: "#2563eb" },
@@ -71,6 +82,53 @@ export default function DigitalCardDashboardPage() {
     googleReviewsCnt: 689,
   })
 
+  // Synchronize orderingLinks into formData for live interactive phone simulator
+  const syncSimulatorLinks = (
+    newZomato: string,
+    newSwiggy: string,
+    newOtherU: string,
+    newOtherL: string,
+    newWebsite: string,
+    newWhatsapp: string,
+    newReview: string
+  ) => {
+    const list: any[] = []
+    if (newWebsite?.trim()) {
+      list.push({ platform: "website", label: "Website", sublabel: "Order Now", url: newWebsite.trim(), color: "#2563eb" })
+    }
+    if (newWhatsapp?.trim()) {
+      list.push({
+        platform: "whatsapp",
+        label: "WhatsApp",
+        sublabel: "Order Now",
+        url: `https://wa.me/${newWhatsapp.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(formData.displayName)}%2C%20I%20want%20to%20order`,
+        color: "#16a34a"
+      })
+    }
+    if (newZomato?.trim()) {
+      list.push({ platform: "zomato", label: "Zomato", sublabel: "Order Now", url: newZomato.trim(), color: "#ef4444" })
+    }
+    if (newSwiggy?.trim()) {
+      list.push({ platform: "swiggy", label: "Swiggy", sublabel: "Order Now", url: newSwiggy.trim(), color: "#f97316" })
+    }
+    if (newOtherU?.trim()) {
+      list.push({
+        platform: "easycater",
+        label: newOtherL?.trim() || "Catalog",
+        sublabel: "Order Now",
+        url: newOtherU.trim(),
+        color: "#7c3aed"
+      })
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      orderingLinks: JSON.stringify(list),
+      googleReviewUrl: newReview ? newReview.trim() : prev.googleReviewUrl,
+      googlePlaceId: newReview ? newReview.trim() : prev.googlePlaceId
+    }))
+  }
+
   // Load existing card
   useEffect(() => {
     async function loadCard() {
@@ -78,7 +136,43 @@ export default function DigitalCardDashboardPage() {
         const res = await fetch("/api/digital-card")
         const json = await res.json()
         if (json.success && json.card) {
-          setFormData(json.card)
+          const c = json.card
+          setFormData(c)
+
+          // Extract ordering platforms
+          let zomato = ""
+          let swiggy = ""
+          let otherU = ""
+          let otherL = "EasyCater / Other"
+          try {
+            const arr = JSON.parse(c.orderingLinks || "[]")
+            if (Array.isArray(arr)) {
+              zomato = arr.find((l: any) => l.platform?.toLowerCase() === "zomato")?.url || ""
+              swiggy = arr.find((l: any) => l.platform?.toLowerCase() === "swiggy")?.url || ""
+              const o = arr.find((l: any) => l.platform?.toLowerCase() === "easycater" || (!["website", "whatsapp", "zomato", "swiggy"].includes(l.platform?.toLowerCase())))
+              if (o) {
+                otherU = o.url || ""
+                otherL = o.label || "EasyCater / Other"
+              }
+            }
+          } catch {}
+          setZomatoUrl(zomato)
+          setSwiggyUrl(swiggy)
+          setOtherOrderUrl(otherU)
+          setOtherOrderLabel(otherL)
+
+          // Extract Google Review link
+          let revLink = c.googleReviewUrl || ""
+          if (!revLink && c.theme && typeof c.theme === "string" && c.theme.startsWith("{")) {
+            try {
+              const th = JSON.parse(c.theme)
+              if (th.googleReviewLink) revLink = th.googleReviewLink
+            } catch {}
+          }
+          if (!revLink && c.googlePlaceId && (c.googlePlaceId.startsWith("http://") || c.googlePlaceId.startsWith("https://"))) {
+            revLink = c.googlePlaceId
+          }
+          setGoogleReviewLink(revLink)
         }
       } catch (err) {
         console.error("Failed to load digital card", err)
@@ -110,7 +204,6 @@ export default function DigitalCardDashboardPage() {
       const json = await res.json()
 
       if (!json.success) {
-        // API explicitly failed — show the error, do NOT touch form fields
         toast({
           title: "Could Not Extract Business Details",
           description: json.error || "Please type your business name directly instead of pasting a short link.",
@@ -121,7 +214,6 @@ export default function DigitalCardDashboardPage() {
 
       if (json.success && json.details) {
         const d = json.details
-        // Only overwrite a field if the API returned a non-empty, non-null, non-URL value
         setFormData((prev) => ({
           ...prev,
           displayName: (d.displayName && !d.displayName.startsWith("http"))
@@ -141,10 +233,14 @@ export default function DigitalCardDashboardPage() {
           deliveryInfo: d.deliveryInfo ? d.deliveryInfo : prev.deliveryInfo,
         }))
 
+        if (d.googleReviewLink && !googleReviewLink) {
+          setGoogleReviewLink(d.googleReviewLink)
+        }
+
         if (json.partial) {
           toast({
             title: "Partial Info Found ⚠️",
-            description: "Business name pre-filled. Please verify and complete remaining details (location, hours, phone) manually before saving.",
+            description: "Business name pre-filled. Please verify and complete remaining details manually before saving.",
           })
         } else {
           toast({
@@ -168,10 +264,20 @@ export default function DigitalCardDashboardPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
+      const payload = {
+        ...formData,
+        googleReviewLink: googleReviewLink.trim(),
+        zomatoUrl: zomatoUrl.trim(),
+        swiggyUrl: swiggyUrl.trim(),
+        websiteUrl: formData.websiteUrl?.trim() || "",
+        otherOrderUrl: otherOrderUrl.trim(),
+        otherOrderLabel: otherOrderLabel.trim(),
+      }
+
       const res = await fetch("/api/digital-card", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       })
       const json = await res.json()
       if (json.success) {
@@ -319,12 +425,42 @@ export default function DigitalCardDashboardPage() {
             </CardContent>
           </Card>
 
-          {/* 2. Identity & Branding */}
+          {/* 2. Google Review Short Link Highlighted Card */}
+          <Card className="border-amber-500/30 bg-amber-50/30 dark:bg-amber-950/20 shadow-sm">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-black flex items-center gap-2 text-amber-800 dark:text-amber-400">
+                  <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                  ⭐ Google Review Short Link (Auto 5-Star Reviews Modal)
+                </CardTitle>
+                <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 px-2.5 py-0.5 rounded-full border border-amber-300">
+                  Recommended for Reviews
+                </span>
+              </div>
+              <CardDescription className="text-xs text-slate-600 dark:text-slate-400">
+                When visitors tap &quot;Google Review&quot; on your digital card, this link opens the direct 5-star review submission modal.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Input
+                value={googleReviewLink}
+                onChange={(e) => {
+                  const val = e.target.value
+                  setGoogleReviewLink(val)
+                  syncSimulatorLinks(zomatoUrl, swiggyUrl, otherOrderUrl, otherOrderLabel, formData.websiteUrl || "", formData.whatsappNumber || "", val)
+                }}
+                placeholder="e.g. https://g.page/r/CbXxY.../review or maps.app.goo.gl/..."
+                className="rounded-xl text-xs bg-white dark:bg-slate-900 border-amber-500/40 text-amber-900 dark:text-amber-200 font-medium"
+              />
+            </CardContent>
+          </Card>
+
+          {/* 3. Identity & Branding */}
           <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-black flex items-center gap-2">
                 <Globe className="w-4 h-4 text-indigo-600" />
-                Store Identity &amp; Status Info
+                Store Identity, Logo &amp; Google Rating
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -357,47 +493,70 @@ export default function DigitalCardDashboardPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <Label className="text-xs font-bold">📍 Short Location</Label>
+              {/* Logo URL with Live Preview */}
+              <div>
+                <Label className="text-xs font-bold flex items-center gap-1.5">
+                  <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
+                  Store Logo Image URL
+                </Label>
+                <div className="flex items-center gap-2.5 mt-1">
                   <Input
-                    value={formData.locationShort || ""}
-                    onChange={(e) => setFormData({ ...formData, locationShort: e.target.value })}
-                    placeholder="Manjalpur, Vadodara"
-                    className="mt-1 rounded-xl text-xs"
+                    value={formData.logoUrl || ""}
+                    onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
+                    placeholder="/uploads/... or https://..."
+                    className="rounded-xl text-xs font-mono flex-1"
+                  />
+                  {formData.logoUrl && (
+                    <div className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-1 flex-shrink-0 flex items-center justify-center overflow-hidden shadow-xs">
+                      <img src={formData.logoUrl} alt="Logo preview" className="w-full h-full object-contain" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Google Rating & Review Count */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div>
+                  <Label className="text-xs font-bold flex items-center gap-1">
+                    <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                    Google Star Rating
+                  </Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="1"
+                    max="5"
+                    value={formData.googleRating || 4.6}
+                    onChange={(e) => setFormData({ ...formData, googleRating: parseFloat(e.target.value) || 4.6 })}
+                    className="mt-1 rounded-xl text-xs font-bold text-amber-600 dark:text-amber-400"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs font-bold">🕒 Business Hours</Label>
+                  <Label className="text-xs font-bold flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-500" />
+                    Google Reviews Count
+                  </Label>
                   <Input
-                    value={formData.businessHours || ""}
-                    onChange={(e) => setFormData({ ...formData, businessHours: e.target.value })}
-                    placeholder="Open Daily • 9:00 AM – 12:00 AM"
-                    className="mt-1 rounded-xl text-xs"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs font-bold">🛵 Delivery Scope</Label>
-                  <Input
-                    value={formData.deliveryInfo || ""}
-                    onChange={(e) => setFormData({ ...formData, deliveryInfo: e.target.value })}
-                    placeholder="Delivery Available • Vadodara Only"
-                    className="mt-1 rounded-xl text-xs"
+                    type="number"
+                    min="0"
+                    value={formData.googleReviewsCnt || 689}
+                    onChange={(e) => setFormData({ ...formData, googleReviewsCnt: parseInt(e.target.value, 10) || 0 })}
+                    className="mt-1 rounded-xl text-xs font-mono"
                   />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* 3. Direct Contact & Social Links */}
+          {/* 4. Contact & 3-Pill Status Details */}
           <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-black flex items-center gap-2">
-                <Phone className="w-4 h-4 text-emerald-600" />
-                Direct Contact &amp; Social Channels
+                <MapPin className="w-4 h-4 text-emerald-600" />
+                Contact &amp; 3-Pill Status Details
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs font-bold flex items-center gap-1.5">
@@ -406,7 +565,11 @@ export default function DigitalCardDashboardPage() {
                   </Label>
                   <Input
                     value={formData.whatsappNumber || ""}
-                    onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setFormData({ ...formData, whatsappNumber: val })
+                      syncSimulatorLinks(zomatoUrl, swiggyUrl, otherOrderUrl, otherOrderLabel, formData.websiteUrl || "", val, googleReviewLink)
+                    }}
                     placeholder="919876543210"
                     className="mt-1 rounded-xl text-xs font-mono"
                   />
@@ -425,6 +588,154 @@ export default function DigitalCardDashboardPage() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <Label className="text-xs font-bold">📍 Area &amp; City (Pill 1)</Label>
+                  <Input
+                    value={formData.locationShort || ""}
+                    onChange={(e) => setFormData({ ...formData, locationShort: e.target.value })}
+                    placeholder="Manjalpur, Vadodara"
+                    className="mt-1 rounded-xl text-xs"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-bold">🕒 Business Hours (Pill 2)</Label>
+                  <Input
+                    value={formData.businessHours || ""}
+                    onChange={(e) => setFormData({ ...formData, businessHours: e.target.value })}
+                    placeholder="Open Daily • 9:00 AM – 12:00 AM"
+                    className="mt-1 rounded-xl text-xs"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-bold">🛵 Delivery Scope (Pill 3)</Label>
+                  <Input
+                    value={formData.deliveryInfo || ""}
+                    onChange={(e) => setFormData({ ...formData, deliveryInfo: e.target.value })}
+                    placeholder="Delivery Available • Vadodara Only"
+                    className="mt-1 rounded-xl text-xs"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 5. Online Ordering Platforms & Catalog */}
+          <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-black flex items-center gap-2">
+                  <UtensilsCrossed className="w-4 h-4 text-orange-500" />
+                  Online Ordering Platforms &amp; Store Catalog
+                </CardTitle>
+                <span className="text-[10px] font-black uppercase tracking-wider bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300 px-2.5 py-0.5 rounded-full border border-orange-300">
+                  Instant Buttons
+                </span>
+              </div>
+              <CardDescription className="text-xs">
+                Configure direct ordering and menu catalog links displayed on your live digital business card.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Zomato */}
+                <div>
+                  <Label className="text-xs font-bold flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-[#e23744] text-white text-[10px] font-black flex items-center justify-center">z</span>
+                    Zomato Order Link
+                  </Label>
+                  <Input
+                    value={zomatoUrl}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setZomatoUrl(val)
+                      syncSimulatorLinks(val, swiggyUrl, otherOrderUrl, otherOrderLabel, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink)
+                    }}
+                    placeholder="https://www.zomato.com/..."
+                    className="mt-1 rounded-xl text-xs"
+                  />
+                </div>
+
+                {/* Swiggy */}
+                <div>
+                  <Label className="text-xs font-bold flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-[#fc8019] text-white text-[10px] font-black flex items-center justify-center">S</span>
+                    Swiggy Order Link
+                  </Label>
+                  <Input
+                    value={swiggyUrl}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setSwiggyUrl(val)
+                      syncSimulatorLinks(zomatoUrl, val, otherOrderUrl, otherOrderLabel, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink)
+                    }}
+                    placeholder="https://www.swiggy.com/..."
+                    className="mt-1 rounded-xl text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Website / Online Menu */}
+                <div>
+                  <Label className="text-xs font-bold flex items-center gap-1.5">
+                    <Globe className="w-3.5 h-3.5 text-blue-600" />
+                    Website / Online Menu Link
+                  </Label>
+                  <Input
+                    value={formData.websiteUrl || ""}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setFormData({ ...formData, websiteUrl: val })
+                      syncSimulatorLinks(zomatoUrl, swiggyUrl, otherOrderUrl, otherOrderLabel, val, formData.whatsappNumber || "", googleReviewLink)
+                    }}
+                    placeholder="https://cakeconnection.in"
+                    className="mt-1 rounded-xl text-xs"
+                  />
+                </div>
+
+                {/* Other Platform / Custom Catalog */}
+                <div>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-bold flex items-center gap-1.5">
+                      <ShoppingBag className="w-3.5 h-3.5 text-purple-600" />
+                      Other Platform / Catalog Link
+                    </Label>
+                    <Input
+                      value={otherOrderLabel}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        setOtherOrderLabel(val)
+                        syncSimulatorLinks(zomatoUrl, swiggyUrl, otherOrderUrl, val, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink)
+                      }}
+                      placeholder="Label e.g. EasyCater"
+                      className="h-5 w-28 text-[10px] rounded-md px-1.5 py-0 border-slate-300"
+                    />
+                  </div>
+                  <Input
+                    value={otherOrderUrl}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setOtherOrderUrl(val)
+                      syncSimulatorLinks(zomatoUrl, swiggyUrl, val, otherOrderLabel, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink)
+                    }}
+                    placeholder="https://..."
+                    className="mt-1 rounded-xl text-xs"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 6. Social Media & Direction Channels */}
+          <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-black flex items-center gap-2">
+                <Share2 className="w-4 h-4 text-pink-600" />
+                Social Media &amp; Directions Channels
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs font-bold flex items-center gap-1.5">
@@ -481,12 +792,12 @@ export default function DigitalCardDashboardPage() {
             </CardContent>
           </Card>
 
-          {/* 4. Save Button Action */}
+          {/* 7. Save Button Action */}
           <div className="pt-2">
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="w-full py-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm tracking-wider uppercase shadow-xl transition-all"
+              className="w-full py-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm tracking-wider uppercase shadow-xl transition-all cursor-pointer"
             >
               {saving ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
               Save All Changes to Live Digital Card

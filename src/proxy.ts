@@ -115,31 +115,38 @@ export async function proxy(request: NextRequest) {
     return pathname.startsWith(prefix);
   });
 
-  if (pathname.startsWith('/api/') && !isPublicApi) {
-    if (!token) {
-      const authHeader = request.headers.get('authorization');
-      const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
-      if (!bearerToken) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (pathname.startsWith('/api/')) {
+    if (!isPublicApi) {
+      if (!token) {
+        const authHeader = request.headers.get('authorization');
+        const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+        if (!bearerToken) {
+          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
       }
     }
-    try {
-      const actualToken = token || request.headers.get('authorization')?.substring(7) || '';
-      const payload = await verifyToken(actualToken);
-      const headers = new Headers(request.headers);
-      const merchantId = resolveMerchantId(payload, request);
-      if (merchantId) {
-        headers.set('x-merchant-id', merchantId);
+
+    const actualToken = token || request.headers.get('authorization')?.substring(7) || '';
+    if (actualToken) {
+      try {
+        const payload = await verifyToken(actualToken);
+        const headers = new Headers(request.headers);
+        const merchantId = resolveMerchantId(payload, request);
+        if (merchantId) {
+          headers.set('x-merchant-id', merchantId);
+        }
+        if (payload.userId) {
+          headers.set('x-user-id', payload.userId as string);
+        }
+        if (payload.role) {
+          headers.set('x-user-role', payload.role as string);
+        }
+        return NextResponse.next({ request: { headers } });
+      } catch {
+        if (!isPublicApi) {
+          return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+        }
       }
-      if (payload.userId) {
-        headers.set('x-user-id', payload.userId as string);
-      }
-      if (payload.role) {
-        headers.set('x-user-role', payload.role as string);
-      }
-      return NextResponse.next({ request: { headers } });
-    } catch {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
   }
 

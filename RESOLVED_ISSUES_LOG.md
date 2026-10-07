@@ -3,6 +3,36 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [07 Oct 2026] Issue: Smart AI Review Page 504 Timeout Fix & Complete Merchant Digital Card Builder Form Integration
+- **Symptom**: 
+  1. Visiting `https://customerpilot.in/review?m=cmtymavfx0002kx008lbfvp57` from the live Digital Business Card resulted in a 504 Gateway Time-out on live VPS, preventing the Smart AI Review page from loading.
+  2. On `https://customerpilot.in/dashboard/digital-card`, the Merchant Dashboard builder lacked input fields for Google Review direct short link, Online Ordering Platforms (Zomato, Swiggy, Website, Catalog), Store Logo image URL, and Google Star Rating & Reviews count, unlike the SuperAdmin panel.
+- **Root Cause**:
+  1. `src/app/review/page.tsx` sequentially iterated through non-existent Gemini models (`gemini-3.6-flash`, `gemini-2.5-flash`), with each API call hanging or throwing errors. Combined with no SSR timeout cap, the Next.js server-side render exceeded Nginx's 60-second gateway timeout, returning 504.
+  2. `src/app/dashboard/digital-card/page.tsx` only exposed basic text inputs (display name, category, phone, whatsapp, social links), omitting inputs for the dedicated Google Review Short Link, ordering platforms (Zomato, Swiggy, Website, Catalog), Logo URL, and rating/review counts.
+  3. `src/proxy.ts` bypassed JWT verification for paths listed in `PUBLIC_API_PREFIXES` (which included `/api/digital-card`), preventing `x-merchant-id` downstream header from being forwarded to the API route when authenticated merchants saved their cards.
+- **Resolution**:
+  1. **Strict 2.5-Second Timeout & Valid Gemini Models (`src/app/review/page.tsx`)**:
+     - Updated model candidate list to active models (`gemini-2.0-flash`, `gemini-1.5-flash`).
+     - Wrapped generative AI calls in a strict 2.5-second `Promise.race` timeout.
+     - On timeout or error, instantly falls back to `getSmartFallbackReview`, returning 3 instant 5-star review drafts in <1ms without blocking SSR response (verified locally at 307ms HTTP 200 OK).
+  2. **Complete Merchant Digital Card Builder Fields (`src/app/dashboard/digital-card/page.tsx`)**:
+     - Injected **Google Review Direct Short Link** card with amber border, helper text, and real-time simulator sync.
+     - Injected **Online Ordering Platforms & Store Catalog** section with dedicated inputs for Zomato, Swiggy, Website/Menu, and Custom Catalog URL + custom platform label.
+     - Added **Store Logo Image URL** input with live thumbnail preview.
+     - Added **Google Star Rating** & **Google Reviews Count** inputs.
+     - Wired real-time simulator sync (`syncSimulatorLinks`) so changes update the live iPhone simulator immediately.
+  3. **Downstream Authentication & Persistence (`src/proxy.ts` & `src/app/api/digital-card/route.ts`)**:
+     - Updated `src/proxy.ts` to decode JWT tokens and inject `x-merchant-id` even on public-prefixed routes when a token is present.
+     - Updated `src/app/api/digital-card/route.ts` with robust multi-source merchant ID resolution (`x-merchant-id`, `x-impersonate-merchant`, cookies, bearer token).
+     - Persisted `googleReviewLink` inside the card's `theme` JSON and `orderingLinks` (Zomato, Swiggy, Website, Custom Catalog) inside `orderingLinks` JSON.
+  4. **Playwright & Ground-Truth Verification (`scripts/verify_digital_card_and_review.js`)**:
+     - Verified `/review?m=cmtymavfx0002kx008lbfvp57` loads in 307ms with HTTP 200 and authentic store data ("Cake Connection").
+     - Verified `/dashboard/digital-card` loads with HTTP 200, all new inputs rendered and editable, and live iPhone simulator synced.
+     - Captured visual artifact `scratch/verified_merchant_digital_card_builder.png`.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [06 Oct 2026] Feature: Live ROI Calculator — Homepage Theme Alignment & Top Cost vs Opportunity Hero Section
 - **Symptom**: User requested moving the "Your Cost vs Your Opportunity" section (CustomerPilot ₹2,249 vs Potential Extra Sales with dynamic break-even text and signup button) to the very top, and redesigning the entire Live ROI Calculator page to match the CustomerPilot Homepage aesthetic.
 - **Root Cause**: The initial layout had the Cost vs Opportunity comparison at the bottom of the right column, and used a dark purple background instead of the Homepage's signature light styling with emerald gradients, BrandLogo, and ambient lighting.

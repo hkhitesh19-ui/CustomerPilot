@@ -160,21 +160,32 @@ Return ONLY a valid, parseable JSON object with zero additional conversational f
 }`
 
       let responseText = ""
-      const candidates = ["gemini-3.6-flash", "gemini-2.5-flash", "gemini-1.5-flash", "gemini-flash-latest"]
-      for (const modelName of candidates) {
-        try {
-          const model = genAI.getGenerativeModel({ 
-            model: modelName,
-            generationConfig: { temperature: 0.85 }
-          })
-          const result = await model.generateContent(prompt)
-          const response = await result.response
-          responseText = response.text().trim()
-          if (responseText && responseText.includes("{")) break
-        } catch (_) {
-          continue
+      const candidates = ["gemini-2.0-flash", "gemini-1.5-flash"]
+
+      const generateWithTimeout = async (): Promise<string> => {
+        for (const modelName of candidates) {
+          try {
+            const model = genAI.getGenerativeModel({ 
+              model: modelName,
+              generationConfig: { temperature: 0.85 }
+            })
+            const result = await model.generateContent(prompt)
+            const response = await result.response
+            const text = response.text().trim()
+            if (text && text.includes("{")) return text
+          } catch (_) {
+            continue
+          }
         }
+        return ""
       }
+
+      // Hard 2.5-second timeout to prevent any Nginx 504 Gateway Time-out
+      const timeoutPromise = new Promise<string>((resolve) =>
+        setTimeout(() => resolve(""), 2500)
+      )
+
+      responseText = await Promise.race([generateWithTimeout(), timeoutPromise])
 
       if (responseText) {
         const jsonMatch = responseText.match(/\{[\s\S]*\}/)
