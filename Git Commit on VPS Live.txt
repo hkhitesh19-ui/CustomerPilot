@@ -8,18 +8,19 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 3d97049
-Full Commit Hash  : 3d9704922e227d1bd30b367e384aa7e6f8836309
-Target Fix Commit : 3d97049 (3d9704922e227d1bd30b367e384aa7e6f8836309)
+Active Git Commit : 4d18f0d
+Full Commit Hash  : 4d18f0db13ed1508ee125e8be0d57ab5d50a1351
+Target Fix Commit : 4d18f0d (4d18f0db13ed1508ee125e8be0d57ab5d50a1351)
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 07 Oct 2026, 11:58 PM IST
-Commit Title      : fix(review-and-digital-card): resolve 504 timeout on ai review page with 2.5s fallback cap and add full link/ordering editor fields to merchant digital card builder
+Deployment Date   : 08 Oct 2026, 10:50 AM IST
+Commit Title      : feat(review): add prominent Photo Bonus Stamp Highlight Banner to Google Review screen
 Status            : Active & Running Live on VPS
 PM2 Services      : customerpilot-web (Online), customerpilot-cron (Online)
 ----------------------------------------------------------
 
 Deployment History Log:
 ----------------------------------------------------------
+• [08 Oct 2026, 10:50 AM IST] Commit 4d18f0d (includes 2f5f194, 460dd94) - Google Review +2 Photo Bonus Highlight Banner, 3-Angle AI Review Engine, 10-Category SEO Fallbacks, Native Contact Save & 5 SuperAdmin Ordering Channels
 • [07 Oct 2026, 11:58 PM IST] Commit 3d97049 - Smart AI Review Page 504 Timeout Resolution & Complete Merchant Digital Card Builder Form Integration
 • [06 Oct 2026, 10:23 AM IST] Commit bd3654a (includes 232276a & d05e838) - Dedicated Live ROI Calculator with Homepage Theme, Top Cost vs Opportunity Section, and /register Suspense build compliance
 • [05 Oct 2026, 04:37 PM IST] Commit 5874494 (includes df0ed49) - Authentic 3D Master Artwork & Zero-Cutoff QR pocket standee, build/module resolutions, and Next 16 RSC use-client fix
