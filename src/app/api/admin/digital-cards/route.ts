@@ -88,8 +88,11 @@ export async function POST(req: NextRequest) {
       facebookUrl,
       youtubeUrl,
       websiteUrl,
+      whatsappOrderUrl,
       zomatoUrl,
       swiggyUrl,
+      easycaterUrl,
+      orderingLinks,
       statusMode = "TRIAL", // "TRIAL" | "ACTIVE" | "LIFETIME"
       trialDays = 3,
       isActive = true
@@ -167,11 +170,85 @@ export async function POST(req: NextRequest) {
       googleReviewLink: googleReviewLink || null,
     })
 
-    // Prepare ordering links array
-    const orderingList: any[] = []
-    if (zomatoUrl && zomatoUrl.trim()) orderingList.push({ platform: "Zomato", url: zomatoUrl.trim() })
-    if (swiggyUrl && swiggyUrl.trim()) orderingList.push({ platform: "Swiggy", url: swiggyUrl.trim() })
-    if (websiteUrl && websiteUrl.trim()) orderingList.push({ platform: "Website", url: websiteUrl.trim() })
+    // Prepare ordering links array with canonical platforms, labels, and colors
+    const cleanPhone = (whatsappNumber || phoneNumber || "").replace(/[^0-9]/g, "")
+    const orderingList: Array<{ platform: string; label: string; sublabel: string; url: string; color: string }> = []
+
+    // 1. Website / Online Store
+    if (websiteUrl && websiteUrl.trim()) {
+      orderingList.push({
+        platform: "website",
+        label: "Website",
+        sublabel: "Order Now",
+        url: websiteUrl.trim(),
+        color: "#2563eb",
+      })
+    }
+
+    // 2. WhatsApp Direct Ordering
+    const effectiveWhatsapp = (whatsappOrderUrl && whatsappOrderUrl.trim())
+      ? whatsappOrderUrl.trim()
+      : cleanPhone
+        ? `https://wa.me/${cleanPhone}?text=Hi%20${encodeURIComponent(displayName.trim())}%2C%20I%20want%20to%20place%20an%20order`
+        : ""
+    if (effectiveWhatsapp) {
+      orderingList.push({
+        platform: "whatsapp",
+        label: "WhatsApp",
+        sublabel: "Order Now",
+        url: effectiveWhatsapp,
+        color: "#16a34a",
+      })
+    }
+
+    // 3. Zomato
+    if (zomatoUrl && zomatoUrl.trim()) {
+      orderingList.push({
+        platform: "zomato",
+        label: "Zomato",
+        sublabel: "Order Now",
+        url: zomatoUrl.trim(),
+        color: "#ef4444",
+      })
+    }
+
+    // 4. Swiggy
+    if (swiggyUrl && swiggyUrl.trim()) {
+      orderingList.push({
+        platform: "swiggy",
+        label: "Swiggy",
+        sublabel: "Order Now",
+        url: swiggyUrl.trim(),
+        color: "#f97316",
+      })
+    }
+
+    // 5. EasyCater / Custom Ordering
+    if (easycaterUrl && easycaterUrl.trim()) {
+      orderingList.push({
+        platform: "easycater",
+        label: "EasyCater",
+        sublabel: "Order Now",
+        url: easycaterUrl.trim(),
+        color: "#7c3aed",
+      })
+    }
+
+    let finalOrderingLinksJson = JSON.stringify(orderingList)
+    if (orderingList.length === 0 && orderingLinks) {
+      try {
+        const parsed = typeof orderingLinks === "string" ? JSON.parse(orderingLinks) : orderingLinks
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          finalOrderingLinksJson = JSON.stringify(parsed.map((item: any) => ({
+            platform: (item.platform || "website").toLowerCase(),
+            label: item.label || item.platform || "Visit",
+            sublabel: item.sublabel || "Order Now",
+            url: item.url || "#",
+            color: item.color || "#2563eb",
+          })))
+        }
+      } catch {}
+    }
 
     // Safe number parsing
     const parsedRating = typeof googleRating === "number" && !isNaN(googleRating)
@@ -206,7 +283,7 @@ export async function POST(req: NextRequest) {
         googlePlaceId: googleReviewLink || null,
         websiteUrl: websiteUrl || null,
         theme: themeData,
-        orderingLinks: JSON.stringify(orderingList),
+        orderingLinks: finalOrderingLinksJson,
         googleRating: parsedRating,
         googleReviewsCnt: parsedReviewsCnt,
         isActive: Boolean(isActive),
@@ -230,7 +307,7 @@ export async function POST(req: NextRequest) {
         googlePlaceId: googleReviewLink || null,
         websiteUrl: websiteUrl || null,
         theme: themeData,
-        orderingLinks: JSON.stringify(orderingList),
+        orderingLinks: finalOrderingLinksJson,
         googleRating: parsedRating,
         googleReviewsCnt: parsedReviewsCnt,
         isActive: Boolean(isActive),

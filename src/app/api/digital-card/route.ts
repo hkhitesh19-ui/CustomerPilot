@@ -32,7 +32,8 @@ async function getMerchantIdFromReq(req: NextRequest): Promise<string | null> {
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url)
+    const parsedUrl = new URL(req.url)
+    const searchParams = parsedUrl.searchParams
     const slug = searchParams.get("slug")
     const resolvedMerchantId = await getMerchantIdFromReq(req)
     const queryMerchantId = searchParams.get("merchantId")
@@ -55,6 +56,85 @@ export async function GET(req: NextRequest) {
 
     if (!card) {
       return NextResponse.json({ success: false, error: "Card not found" }, { status: 404 })
+    }
+
+    const isVcardFormat = searchParams.get("format") === "vcard" || searchParams.get("vcard") === "true"
+    if (isVcardFormat) {
+      const safeDisplayName = card.displayName.replace(/[\r\n]+/g, " ").trim()
+      const cleanPhone = (card.phoneNumber || card.whatsappNumber || "").replace(/[^0-9+]/g, "")
+      const cleanWhatsapp = (card.whatsappNumber || card.phoneNumber || "").replace(/[^0-9+]/g, "")
+      const safeSubCategories = (card.subCategories || "Local Business").replace(/[\r\n]+/g, " ").trim()
+      const safeLocationShort = (card.locationShort || "").replace(/[\r\n]+/g, " ").trim()
+      const safeLocationState = (card.locationState || "India").replace(/[\r\n]+/g, " ").trim()
+      const cardUrl = `https://customerpilot.in/c/${card.slug}`
+      const fileName = `${safeDisplayName.replace(/\s+/g, "_")}.vcf`
+
+      let absoluteLogoUrl = ""
+      if (card.logoUrl) {
+        absoluteLogoUrl = card.logoUrl.startsWith("http")
+          ? card.logoUrl
+          : `https://customerpilot.in${card.logoUrl.startsWith("/") ? "" : "/"}${card.logoUrl}`
+      }
+
+      const nameParts = safeDisplayName.split(" ")
+      const givenName = nameParts[0] || safeDisplayName
+      const familyName = nameParts.slice(1).join(" ") || ""
+
+      const vcardLines = [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
+        "PRODID:-//CustomerPilot//Smart Digital Business Card//EN",
+        `FN;CHARSET=UTF-8:${safeDisplayName}`,
+        `N;CHARSET=UTF-8:${familyName};${givenName};;;`,
+        `ORG;CHARSET=UTF-8:${safeDisplayName}`,
+        `TITLE;CHARSET=UTF-8:${safeSubCategories}`,
+        "ROLE:Business",
+      ]
+
+      if (cleanPhone) {
+        vcardLines.push(`TEL;TYPE=CELL,VOICE,pref:${cleanPhone}`)
+        vcardLines.push(`TEL;TYPE=WORK,VOICE:${cleanPhone}`)
+      }
+
+      if (cleanWhatsapp) {
+        vcardLines.push(`TEL;TYPE=WHATSAPP:${cleanWhatsapp}`)
+        vcardLines.push(`X-SOCIALPROFILE;TYPE=whatsapp:https://wa.me/${cleanWhatsapp.replace(/[^0-9]/g, "")}`)
+      }
+
+      if (card.instagramUrl) {
+        vcardLines.push(`X-SOCIALPROFILE;TYPE=instagram:${card.instagramUrl}`)
+      }
+      if (card.facebookUrl) {
+        vcardLines.push(`X-SOCIALPROFILE;TYPE=facebook:${card.facebookUrl}`)
+      }
+
+      if (safeLocationShort || safeLocationState) {
+        vcardLines.push(`ADR;TYPE=WORK,POSTAL,PARCEL;CHARSET=UTF-8:;;${safeLocationShort};${safeLocationState};;;India`)
+      }
+
+      vcardLines.push(`URL;TYPE=WORK:${cardUrl}`)
+      if (card.websiteUrl) {
+        vcardLines.push(`URL;TYPE=WEBSITE:${card.websiteUrl}`)
+      }
+
+      const note = `${safeDisplayName} - ${safeSubCategories}\\n📍 ${safeLocationShort}, ${safeLocationState}\\n🕒 ${card.businessHours || "Open Daily"}\\n🔗 Digital Card: ${cardUrl}`
+      vcardLines.push(`NOTE;CHARSET=UTF-8:${note}`)
+
+      if (absoluteLogoUrl) {
+        vcardLines.push(`PHOTO;VALUE=URI:${absoluteLogoUrl}`)
+      }
+
+      vcardLines.push("END:VCARD")
+      const vcardContent = vcardLines.join("\r\n")
+
+      return new NextResponse(vcardContent, {
+        status: 200,
+        headers: {
+          "Content-Type": "text/vcard; charset=utf-8",
+          "Content-Disposition": `inline; filename="${fileName}"`,
+          "Cache-Control": "public, max-age=3600, s-maxage=3600",
+        },
+      })
     }
 
     return NextResponse.json({ success: true, card })

@@ -3,6 +3,50 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [08 Oct 2026] Issue: Mobile Native Phonebook Contact Saving ("Save Contact") on Digital Business Card
+- **Symptom**: On the Digital Business Card (`/c/[slug]`), clicking the "Save Contact" button only downloaded a raw `.vcf` file (`Cake_Connection.vcf`) to the device's storage/downloads folder instead of directly saving or importing the contact into the mobile phonebook (Google Contacts on Android / Contacts on iOS).
+- **Root Cause**:
+  1. Standard browser `<a download="contact.vcf">` links trigger a passive file download in Chromium and Safari rather than opening the operating system's native contact manager application or contact card preview intent.
+  2. Mobile browsers required either the modern Web Share API Level 2 (`navigator.share({ files: [...] })`) to directly push the contact file to the device's native Contacts app, or an explicit RFC 3.0 vCard endpoint with mobile phonebook guidance so users can tap and import in one gesture.
+- **Resolution**:
+  1. **RFC 3.0 High-Fidelity vCard Endpoint (`src/app/api/digital-card/route.ts`)**:
+     - Added `format=vcard` query handling with `Content-Type: text/vcard; charset=utf-8` and `Content-Disposition: inline; filename="[Merchant_Name].vcf"`.
+     - Populated complete RFC 3.0 vCard structure: `FN`, `N`, `ORG`, `TITLE`, `TEL;TYPE=CELL,VOICE,pref`, `TEL;TYPE=WHATSAPP`, `ADR;TYPE=WORK`, `URL`, `NOTE`, and embedded `PHOTO;VALUE=URI`.
+  2. **Multi-Engine Client Contact Saving (`src/components/digital-card-view.tsx`)**:
+     - **Engine A (Native Contact Share Intent)**: Implemented Web Share API Level 2 file sharing (`navigator.canShare({ files: [file] })` -> `navigator.share(...)`), allowing mobile Android and iOS devices to directly open the native Contacts app import sheet.
+     - **Engine B (One-Tap Guidance Modal & Direct Intent Fallback)**: For desktop browsers and devices without file sharing support, triggers instant RFC download and immediately displays a luxury modal (`Contact Ready to Save!`) with step-by-step guidance for Android (swipe notification shade to save to Google Contacts) and iPhone (tap to open Contact card and create new contact), alongside a direct `Open in Phone Contacts` action button.
+  3. **Playwright & Ground-Truth Verification (`scripts/verify_save_contact_and_ordering.js`)**:
+     - Verified `GET /api/digital-card?slug=cake-connection&format=vcard` returns HTTP 200, valid `text/vcard` content type, RFC markers, and store data.
+     - Verified clicking "Save Contact" triggers download and launches interactive guidance modal with verified action links.
+     - Visual proof captured at `scratch/verified_cake_connection_save_contact_modal.png`.
+- **Status**: ✅ Resolved and Verified.
+
+---
+## [08 Oct 2026] Issue: SuperAdmin Smart Business Card 5-Channel Online Ordering Restoration & Official Brand Logo Preservation
+- **Symptom**: When editing a Smart Business Card from SuperAdmin (`/super-admin?tab=digital-cards`), online ordering channels were not showing all options (only 2-3 appeared) and their brand logos (Zomato red 'z', Swiggy orange 'S', WhatsApp chat, EasyCater 'EC') were removed/blank or replaced by generic icons.
+- **Root Cause**:
+  1. **Case Sensitivity Mismatch**: `digital-card-view.tsx` checked exact lowercase strings (`item.platform === "zomato"`). When SuperAdmin saved title-cased platform names (`"Zomato"`, `"Swiggy"`), all conditions failed and fell back to `letter = "★"` with a generic `<Globe />` icon.
+  2. **Tailwind Hex Class Incompatibility**: `item.color` hex codes (e.g. `#ef4444`, `#f97316`) were injected directly as Tailwind classes (`className={badgeColor}`). Tailwind CSS ignores arbitrary hex codes passed as class names, resulting in transparent badge backgrounds without brand colors.
+  3. **SuperAdmin Form Omission**: The SuperAdmin form (`SuperAdminDigitalCardsManager`) only had inputs for Zomato, Swiggy, and Website, completely lacking fields for WhatsApp Order and EasyCater.
+  4. **SuperAdmin API Data Loss**: `POST /api/admin/digital-cards` previously hardcoded a 3-item array without labels, sublabels, or colors, overwriting any rich ordering link array whenever an admin saved the card.
+- **Resolution**:
+  1. **Dynamic Hex Styling & Resilient Platform Normalization (`src/components/digital-card-view.tsx`)**:
+     - Normalized platform keys with `(item.platform || "website").toLowerCase()`.
+     - Injected inline styling `style={isHexColor ? { backgroundColor: badgeColor } : undefined}` so official brand hex colors (`#ef4444`, `#f97316`, `#16a34a`, `#7c3aed`, `#2563eb`) render with 100% fidelity.
+     - Preserved high-contrast brand icons for Zomato ('z'), Swiggy ('S'), WhatsApp (SVG chat), EasyCater ('EC'), and Website (Globe).
+     - Auto-heals food merchants to ensure all 5 canonical online ordering slots are always available.
+  2. **SuperAdmin 5-Channel Live Grid (`src/components/super-admin/digital-cards-manager.tsx`)**:
+     - Added `whatsappOrderUrl`, `easycaterUrl`, and `orderingLinksJson` to state and editing handlers.
+     - Created a 5-channel ordering section in the SuperAdmin UI with dedicated brand badges for Website (🌐), WhatsApp (💬), Zomato (z), Swiggy (S), and EasyCater (EC).
+  3. **SuperAdmin API Preservation (`src/app/api/admin/digital-cards/route.ts`)**:
+     - Reconstructed the complete 5-channel ordering array with platform identifiers, standard labels, sublabels ("Order Now"), and brand hex colors.
+  4. **Playwright & Ground-Truth Verification (`scripts/verify_save_contact_and_ordering.js`)**:
+     - Verified all 5 ordering channels render on `/c/cake-connection` with official brand logos and colors.
+     - Verified round-trip persistence through SuperAdmin POST API update.
+     - Visual proof captured at `scratch/verified_cake_connection_ordering_channels.png`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [07 Oct 2026] Issue: Smart AI Review Page 504 Timeout Fix & Complete Merchant Digital Card Builder Form Integration
 - **Symptom**: 
   1. Visiting `https://customerpilot.in/review?m=cmtymavfx0002kx008lbfvp57` from the live Digital Business Card resulted in a 504 Gateway Time-out on live VPS, preventing the Smart AI Review page from loading.

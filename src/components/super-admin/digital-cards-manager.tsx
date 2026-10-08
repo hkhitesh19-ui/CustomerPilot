@@ -62,6 +62,7 @@ interface DigitalCardItem {
   facebookUrl?: string
   youtubeUrl?: string
   websiteUrl?: string
+  googleMapsUrl?: string
   orderingLinks?: string
   googleRating?: number
   googleReviewsCnt?: number
@@ -119,8 +120,11 @@ export function SuperAdminDigitalCardsManager() {
     facebookUrl: "",
     youtubeUrl: "",
     websiteUrl: "",
+    whatsappOrderUrl: "",
     zomatoUrl: "",
     swiggyUrl: "",
+    easycaterUrl: "",
+    orderingLinksJson: "",
     statusMode: "TRIAL", // "TRIAL" | "ACTIVE" | "LIFETIME"
     trialDays: 3,
     isActive: true,
@@ -171,8 +175,11 @@ export function SuperAdminDigitalCardsManager() {
         facebookUrl: "",
         youtubeUrl: "",
         websiteUrl: "",
+        whatsappOrderUrl: "",
         zomatoUrl: "",
         swiggyUrl: "",
+        easycaterUrl: "",
+        orderingLinksJson: "",
         statusMode: "TRIAL",
         trialDays: 3,
         isActive: true,
@@ -188,12 +195,23 @@ export function SuperAdminDigitalCardsManager() {
       let zomato = ""
       let swiggy = ""
       let website = existingCard.websiteUrl || ""
+      let whatsappOrder = ""
+      let easycater = ""
       try {
         const orderLinks = JSON.parse(existingCard.orderingLinks || "[]")
-        zomato = orderLinks.find((l: any) => l.platform?.toLowerCase() === "zomato")?.url || ""
-        swiggy = orderLinks.find((l: any) => l.platform?.toLowerCase() === "swiggy")?.url || ""
-        if (!website) website = orderLinks.find((l: any) => l.platform?.toLowerCase() === "website")?.url || ""
+        if (Array.isArray(orderLinks)) {
+          zomato = orderLinks.find((l: any) => (l.platform || "").toLowerCase() === "zomato")?.url || ""
+          swiggy = orderLinks.find((l: any) => (l.platform || "").toLowerCase() === "swiggy")?.url || ""
+          website = orderLinks.find((l: any) => (l.platform || "").toLowerCase() === "website" || (l.platform || "").toLowerCase() === "store")?.url || website
+          whatsappOrder = orderLinks.find((l: any) => (l.platform || "").toLowerCase() === "whatsapp")?.url || ""
+          easycater = orderLinks.find((l: any) => (l.platform || "").toLowerCase() === "easycater" || (l.platform || "").toLowerCase() === "catalog")?.url || ""
+        }
       } catch {}
+
+      if (!whatsappOrder && existingCard.whatsappNumber) {
+        const cleanW = existingCard.whatsappNumber.replace(/[^0-9]/g, "")
+        whatsappOrder = `https://wa.me/${cleanW}?text=Hi%20${encodeURIComponent(existingCard.displayName)}%2C%20I%20want%20to%20place%20an%20order`
+      }
 
       // Parse theme
       let statusMode = "TRIAL"
@@ -222,8 +240,11 @@ export function SuperAdminDigitalCardsManager() {
         facebookUrl: existingCard.facebookUrl || "",
         youtubeUrl: existingCard.youtubeUrl || "",
         websiteUrl: website,
+        whatsappOrderUrl: whatsappOrder,
         zomatoUrl: zomato,
         swiggyUrl: swiggy,
+        easycaterUrl: easycater,
+        orderingLinksJson: existingCard.orderingLinks || "",
         statusMode,
         trialDays: 3,
         isActive: existingCard.isActive !== false,
@@ -252,8 +273,11 @@ export function SuperAdminDigitalCardsManager() {
         facebookUrl: "",
         youtubeUrl: "",
         websiteUrl: "",
+        whatsappOrderUrl: "",
         zomatoUrl: "",
         swiggyUrl: "",
+        easycaterUrl: "",
+        orderingLinksJson: "",
         statusMode: "TRIAL",
         trialDays: 3,
         isActive: true,
@@ -736,43 +760,81 @@ export function SuperAdminDigitalCardsManager() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="space-y-1.5">
-                        <Label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                          <span className="w-3.5 h-3.5 rounded bg-red-600 text-white text-[9px] font-black flex items-center justify-center">z</span>
-                          Zomato Link
-                        </Label>
-                        <Input
-                          placeholder="https://zomato.com/..."
-                          value={formData.zomatoUrl}
-                          onChange={(e) => setFormData({ ...formData, zomatoUrl: e.target.value })}
-                          className="h-9 text-xs bg-slate-950 border-slate-800 text-white"
-                        />
-                      </div>
+                    {/* 5 Online Ordering Channels Grid */}
+                    <div className="pt-2">
+                      <Label className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider block mb-2">
+                        Online Ordering &amp; Store Channels (All 5 Live Slots)
+                      </Label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                        {/* Channel 1: Website */}
+                        <div className="space-y-1.5 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                          <Label className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+                            <span className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">🌐</span>
+                            1. Website / Store URL
+                          </Label>
+                          <Input
+                            placeholder="https://mybrand.com"
+                            value={formData.websiteUrl}
+                            onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
+                            className="h-8 text-xs bg-slate-950 border-slate-800 text-white"
+                          />
+                        </div>
 
-                      <div className="space-y-1.5">
-                        <Label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                          <span className="w-3.5 h-3.5 rounded bg-orange-600 text-white text-[9px] font-black flex items-center justify-center">S</span>
-                          Swiggy Link
-                        </Label>
-                        <Input
-                          placeholder="https://swiggy.com/..."
-                          value={formData.swiggyUrl}
-                          onChange={(e) => setFormData({ ...formData, swiggyUrl: e.target.value })}
-                          className="h-9 text-xs bg-slate-950 border-slate-800 text-white"
-                        />
-                      </div>
+                        {/* Channel 2: WhatsApp Order */}
+                        <div className="space-y-1.5 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                          <Label className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+                            <span className="w-4 h-4 rounded-full bg-[#16a34a] text-white flex items-center justify-center text-[10px]">💬</span>
+                            2. WhatsApp Order Link
+                          </Label>
+                          <Input
+                            placeholder="https://wa.me/91... (Auto-generated if empty)"
+                            value={formData.whatsappOrderUrl}
+                            onChange={(e) => setFormData({ ...formData, whatsappOrderUrl: e.target.value })}
+                            className="h-8 text-xs bg-slate-950 border-slate-800 text-white"
+                          />
+                        </div>
 
-                      <div className="space-y-1.5">
-                        <Label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                          <Globe className="w-3.5 h-3.5 text-blue-400" /> Website / Menu Catalog
-                        </Label>
-                        <Input
-                          placeholder="https://mybrand.com"
-                          value={formData.websiteUrl}
-                          onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
-                          className="h-9 text-xs bg-slate-950 border-slate-800 text-white"
-                        />
+                        {/* Channel 3: Zomato */}
+                        <div className="space-y-1.5 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                          <Label className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+                            <span className="w-4 h-4 rounded-full bg-[#ef4444] text-white flex items-center justify-center text-[10px] font-black italic">z</span>
+                            3. Zomato Restaurant Link
+                          </Label>
+                          <Input
+                            placeholder="https://zomato.com/..."
+                            value={formData.zomatoUrl}
+                            onChange={(e) => setFormData({ ...formData, zomatoUrl: e.target.value })}
+                            className="h-8 text-xs bg-slate-950 border-slate-800 text-white"
+                          />
+                        </div>
+
+                        {/* Channel 4: Swiggy */}
+                        <div className="space-y-1.5 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                          <Label className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+                            <span className="w-4 h-4 rounded-full bg-[#f97316] text-white flex items-center justify-center text-[10px] font-black">S</span>
+                            4. Swiggy Restaurant Link
+                          </Label>
+                          <Input
+                            placeholder="https://swiggy.com/..."
+                            value={formData.swiggyUrl}
+                            onChange={(e) => setFormData({ ...formData, swiggyUrl: e.target.value })}
+                            className="h-8 text-xs bg-slate-950 border-slate-800 text-white"
+                          />
+                        </div>
+
+                        {/* Channel 5: EasyCater / Custom Ordering */}
+                        <div className="space-y-1.5 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                          <Label className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+                            <span className="w-4 h-4 rounded-full bg-[#7c3aed] text-white flex items-center justify-center text-[9px] font-black">EC</span>
+                            5. EasyCater / Custom Link
+                          </Label>
+                          <Input
+                            placeholder="https://easycater.com/... or custom"
+                            value={formData.easycaterUrl}
+                            onChange={(e) => setFormData({ ...formData, easycaterUrl: e.target.value })}
+                            className="h-8 text-xs bg-slate-950 border-slate-800 text-white"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -55,6 +55,7 @@ import {
   Star,
   Gift,
   Check,
+  CheckCircle2,
   Copy,
   X
 } from "lucide-react"
@@ -91,6 +92,13 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
   const [qrModalOpen, setQrModalOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [savingContact, setSavingContact] = useState(false)
+  const [contactToast, setContactToast] = useState<{
+    open: boolean
+    message: string
+    submessage: string
+    vcardUrl: string
+    fileName: string
+  } | null>(null)
 
   // 3-Day Free Trial Logic
   // Permanent seed cards or subscribed cards are exempt from expiration
@@ -211,21 +219,105 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
   // Parse ordering platforms with useMemo to prevent redundant parsing on every keystroke
   const orderingList = useMemo(() => {
     let list: Array<{ platform: string; label: string; sublabel?: string; url: string; color?: string }> = []
+    const isFood = (card.subCategories || "").toLowerCase().includes("cake") || 
+                   (card.subCategories || "").toLowerCase().includes("food") ||
+                   (card.subCategories || "").toLowerCase().includes("bakery") ||
+                   (card.subCategories || "").toLowerCase().includes("dessert")
+
     try {
       if (card.orderingLinks) {
         const parsed = JSON.parse(card.orderingLinks)
-        if (Array.isArray(parsed)) list = parsed
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          list = parsed.map((item: any) => {
+            const p = (item.platform || "website").toLowerCase()
+            let defaultLabel = item.label
+            let defaultSublabel = item.sublabel || "Order Now"
+            let defaultColor = item.color
+
+            if (p === "whatsapp") {
+              defaultLabel = defaultLabel || "WhatsApp"
+              defaultColor = defaultColor || "#16a34a"
+            } else if (p === "zomato") {
+              defaultLabel = defaultLabel || "Zomato"
+              defaultColor = defaultColor || "#ef4444"
+            } else if (p === "swiggy") {
+              defaultLabel = defaultLabel || "Swiggy"
+              defaultColor = defaultColor || "#f97316"
+            } else if (p === "easycater") {
+              defaultLabel = defaultLabel || "EasyCater"
+              defaultColor = defaultColor || "#7c3aed"
+            } else if (p === "website" || p === "store") {
+              defaultLabel = defaultLabel || "Website"
+              defaultColor = defaultColor || "#2563eb"
+            } else if (p === "nikon") {
+              defaultLabel = defaultLabel || "Nikon"
+              defaultSublabel = item.sublabel || "Mirrorless"
+              defaultColor = defaultColor || "#eab308"
+            } else if (p === "sony") {
+              defaultLabel = defaultLabel || "Sony α"
+              defaultSublabel = item.sublabel || "Cinema & Lens"
+              defaultColor = defaultColor || "#0284c7"
+            } else if (p === "canon") {
+              defaultLabel = defaultLabel || "Canon"
+              defaultSublabel = item.sublabel || "Lenses"
+              defaultColor = defaultColor || "#dc2626"
+            } else if (p === "dji") {
+              defaultLabel = defaultLabel || "DJI"
+              defaultSublabel = item.sublabel || "Gimbals"
+              defaultColor = defaultColor || "#0f766e"
+            } else if (p === "catalog") {
+              defaultLabel = defaultLabel || "Catalog"
+              defaultSublabel = item.sublabel || "View All"
+              defaultColor = defaultColor || "#7c3aed"
+            } else if (p === "quotes") {
+              defaultLabel = defaultLabel || "Get Quote"
+              defaultSublabel = item.sublabel || "Pricing"
+              defaultColor = defaultColor || "#059669"
+            } else if (p === "directions") {
+              defaultLabel = defaultLabel || "Store Visit"
+              defaultSublabel = item.sublabel || "Find Us"
+              defaultColor = defaultColor || "#d97706"
+            }
+
+            return {
+              platform: p,
+              label: defaultLabel || item.platform || "Visit",
+              sublabel: defaultSublabel,
+              url: item.url || "#",
+              color: defaultColor || "#2563eb",
+            }
+          })
+        }
       }
     } catch {
       list = []
     }
 
-    if (list.length === 0) {
-      const isFood = (card.subCategories || "").toLowerCase().includes("cake") || 
-                     (card.subCategories || "").toLowerCase().includes("food") ||
-                     (card.subCategories || "").toLowerCase().includes("bakery") ||
-                     (card.subCategories || "").toLowerCase().includes("dessert")
+    // If food card is missing WhatsApp order or Website, ensure complete 5-channel presence
+    if (isFood && list.length > 0) {
+      const hasWhatsApp = list.some(i => i.platform === "whatsapp")
+      if (!hasWhatsApp && card.whatsappNumber) {
+        list.splice(1, 0, {
+          platform: "whatsapp",
+          label: "WhatsApp",
+          sublabel: "Order Now",
+          url: `https://wa.me/${card.whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(card.displayName)}%2C%20I%20want%20to%20place%20an%20order`,
+          color: "#16a34a"
+        })
+      }
+      const hasEasyCater = list.some(i => i.platform === "easycater")
+      if (!hasEasyCater && list.length < 5) {
+        list.push({
+          platform: "easycater",
+          label: "EasyCater",
+          sublabel: "Order Now",
+          url: "https://www.easycater.com",
+          color: "#7c3aed"
+        })
+      }
+    }
 
+    if (list.length === 0) {
       if (isFood) {
         list = [
           { platform: "website", label: "Website", sublabel: "Order Now", url: card.websiteUrl || "#", color: "#2563eb" },
@@ -280,38 +372,104 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : `https://customerpilot.in/c/${card.slug}`
 
-  // 📇 1-Tap Save Contact (VCF Download)
-  const handleSaveContact = () => {
+  // 📇 1-Tap Save Contact (Native Mobile Contacts Phonebook Integration)
+  const handleSaveContact = async () => {
     setSavingContact(true)
-    const cleanPhone = (card.phoneNumber || card.whatsappNumber || "").replace(/[^0-9+]/g, "")
-    const safeDisplayName = card.displayName.replace(/[\r\n]+/g, " ").trim()
-    const safeSubCategories = (card.subCategories || "Business").replace(/[\r\n]+/g, " ").trim()
-    const safeLocationShort = (card.locationShort || "").replace(/[\r\n]+/g, " ").trim()
-    const safeLocationState = (card.locationState || "").replace(/[\r\n]+/g, " ").trim()
-    const vcard = `BEGIN:VCARD
-VERSION:3.0
-FN:${safeDisplayName}
-ORG:${safeDisplayName}
-TITLE:${safeSubCategories}
-TEL;TYPE=CELL,VOICE:${cleanPhone}
-TEL;TYPE=WORK,VOICE:${cleanPhone}
-ADR;TYPE=WORK:;;${safeLocationShort};${safeLocationState};;;India
-URL:${currentUrl}
-NOTE:${safeDisplayName} - ${safeSubCategories}. Contact & Details: ${currentUrl}
-END:VCARD`
+    try {
+      const cleanPhone = (card.phoneNumber || card.whatsappNumber || "").replace(/[^0-9+]/g, "")
+      const cleanWhatsapp = (card.whatsappNumber || card.phoneNumber || "").replace(/[^0-9+]/g, "")
+      const safeDisplayName = card.displayName.replace(/[\r\n]+/g, " ").trim()
+      const safeSubCategories = (card.subCategories || "Business").replace(/[\r\n]+/g, " ").trim()
+      const safeLocationShort = (card.locationShort || "").replace(/[\r\n]+/g, " ").trim()
+      const safeLocationState = (card.locationState || "India").replace(/[\r\n]+/g, " ").trim()
+      const fileName = `${safeDisplayName.replace(/\s+/g, "_")}.vcf`
+      const vcardApiUrl = `/api/digital-card?slug=${encodeURIComponent(card.slug)}&format=vcard`
 
-    const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8;" })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.setAttribute("download", `${card.displayName.replace(/\s+/g, "_")}.vcf`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    setTimeout(() => {
-      URL.revokeObjectURL(url)
+      let absoluteLogoUrl = ""
+      if (card.logoUrl) {
+        absoluteLogoUrl = card.logoUrl.startsWith("http")
+          ? card.logoUrl
+          : `https://customerpilot.in${card.logoUrl.startsWith("/") ? "" : "/"}${card.logoUrl}`
+      }
+
+      const nameParts = safeDisplayName.split(" ")
+      const givenName = nameParts[0] || safeDisplayName
+      const familyName = nameParts.slice(1).join(" ") || ""
+
+      const vcard = [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
+        "PRODID:-//CustomerPilot//Smart Digital Business Card//EN",
+        `FN;CHARSET=UTF-8:${safeDisplayName}`,
+        `N;CHARSET=UTF-8:${familyName};${givenName};;;`,
+        `ORG;CHARSET=UTF-8:${safeDisplayName}`,
+        `TITLE;CHARSET=UTF-8:${safeSubCategories}`,
+        "ROLE:Business",
+        cleanPhone ? `TEL;TYPE=CELL,VOICE,pref:${cleanPhone}` : "",
+        cleanPhone ? `TEL;TYPE=WORK,VOICE:${cleanPhone}` : "",
+        cleanWhatsapp ? `TEL;TYPE=WHATSAPP:${cleanWhatsapp}` : "",
+        cleanWhatsapp ? `X-SOCIALPROFILE;TYPE=whatsapp:https://wa.me/${cleanWhatsapp.replace(/[^0-9]/g, "")}` : "",
+        card.instagramUrl ? `X-SOCIALPROFILE;TYPE=instagram:${card.instagramUrl}` : "",
+        card.facebookUrl ? `X-SOCIALPROFILE;TYPE=facebook:${card.facebookUrl}` : "",
+        (safeLocationShort || safeLocationState) ? `ADR;TYPE=WORK,POSTAL,PARCEL;CHARSET=UTF-8:;;${safeLocationShort};${safeLocationState};;;India` : "",
+        `URL;TYPE=WORK:${currentUrl}`,
+        card.websiteUrl ? `URL;TYPE=WEBSITE:${card.websiteUrl}` : "",
+        `NOTE;CHARSET=UTF-8:${safeDisplayName} - ${safeSubCategories}\\n📍 ${safeLocationShort}, ${safeLocationState}\\n🕒 ${card.businessHours || "Open Daily"}\\n🔗 Digital Card: ${currentUrl}`,
+        absoluteLogoUrl ? `PHOTO;VALUE=URI:${absoluteLogoUrl}` : "",
+        "END:VCARD"
+      ].filter(Boolean).join("\r\n")
+
+      const isMobile = typeof navigator !== "undefined" && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      const isIOS = typeof navigator !== "undefined" && (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1))
+
+      // METHOD 1: Web Share API Level 2 (Files) — Native Contact Sheet on iOS & Android
+      if (typeof navigator !== "undefined" && typeof File !== "undefined" && navigator.canShare) {
+        try {
+          const file = new File([vcard], fileName, { type: "text/vcard;charset=utf-8" })
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: safeDisplayName,
+              text: `Save ${safeDisplayName} to phone contacts`,
+            })
+            setContactToast({
+              open: true,
+              message: "Opening Phone Contacts...",
+              submessage: "Tap 'Save' or 'Done' in your phone to complete adding the contact.",
+              vcardUrl: vcardApiUrl,
+              fileName,
+            })
+            setSavingContact(false)
+            return
+          }
+        } catch (err: any) {
+          if (err?.name === "AbortError") {
+            setSavingContact(false)
+            return
+          }
+        }
+      }
+
+      // METHOD 2: Direct vCard Link Download + Interactive Guidance Modal
+      const link = document.createElement("a")
+      link.href = vcardApiUrl
+      link.setAttribute("download", fileName)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      setContactToast({
+        open: true,
+        message: isMobile ? "Contact Ready to Save!" : "Contact File Downloaded!",
+        submessage: isMobile
+          ? "Tap the download notification or tap 'Open in Phone Contacts' below to save into your mobile phonebook."
+          : "Open the downloaded file to add to your contacts address book.",
+        vcardUrl: vcardApiUrl,
+        fileName,
+      })
+    } finally {
       setSavingContact(false)
-    }, 1200)
+    }
   }
 
   // 🔗 Share Card
@@ -668,20 +826,73 @@ END:VCARD`
             {/* 5 Platforms Row */}
             <div className="grid grid-cols-5 gap-1.5 sm:gap-2 font-sans">
               {orderingList.map((item, idx) => {
-                let badgeColor = item.color || "bg-blue-600"
+                const platKey = (item.platform || "").toLowerCase()
+                let badgeColor = item.color || "#2563eb"
                 let letter: string | React.ReactNode = "🌐"
-                if (item.platform === "whatsapp") { badgeColor = "bg-[#25D366]"; letter = "💬" }
-                else if (item.platform === "zomato") { badgeColor = "bg-[#e23744]"; letter = "z" }
-                else if (item.platform === "swiggy") { badgeColor = "bg-[#fc8019]"; letter = "S" }
-                else if (item.platform === "easycater") { badgeColor = "bg-[#232f3e]"; letter = "E" }
-                else if (item.platform === "website") { badgeColor = "bg-blue-600"; letter = "🌐" }
-                else if (item.platform === "nikon") { badgeColor = "bg-[#eab308]"; letter = "N" }
-                else if (item.platform === "sony") { badgeColor = "bg-[#0284c7]"; letter = "α" }
-                else if (item.platform === "canon") { badgeColor = "bg-[#dc2626]"; letter = "C" }
-                else if (item.platform === "dji") { badgeColor = "bg-[#0f766e]"; letter = "DJI" }
-                else {
-                  letter = item.label ? item.label.slice(0, 2).toUpperCase() : "★"
+                let label = item.label
+                let sublabel = item.sublabel || "Order Now"
+
+                if (platKey === "whatsapp") {
+                  badgeColor = item.color || "#16a34a"
+                  letter = "💬"
+                  label = label || "WhatsApp"
+                } else if (platKey === "zomato") {
+                  badgeColor = item.color || "#e23744"
+                  letter = "z"
+                  label = label || "Zomato"
+                } else if (platKey === "swiggy") {
+                  badgeColor = item.color || "#fc8019"
+                  letter = "S"
+                  label = label || "Swiggy"
+                } else if (platKey === "easycater") {
+                  badgeColor = item.color || "#7c3aed"
+                  letter = "E"
+                  label = label || "EasyCater"
+                } else if (platKey === "website" || platKey === "store") {
+                  badgeColor = item.color || "#2563eb"
+                  letter = "🌐"
+                  label = label || "Website"
+                } else if (platKey === "nikon") {
+                  badgeColor = item.color || "#eab308"
+                  letter = "N"
+                  label = label || "Nikon"
+                  sublabel = item.sublabel || "Mirrorless"
+                } else if (platKey === "sony") {
+                  badgeColor = item.color || "#0284c7"
+                  letter = "α"
+                  label = label || "Sony α"
+                  sublabel = item.sublabel || "Cinema & Lens"
+                } else if (platKey === "canon") {
+                  badgeColor = item.color || "#dc2626"
+                  letter = "C"
+                  label = label || "Canon"
+                  sublabel = item.sublabel || "Lenses"
+                } else if (platKey === "dji") {
+                  badgeColor = item.color || "#0f766e"
+                  letter = "DJI"
+                  label = label || "DJI"
+                  sublabel = item.sublabel || "Gimbals"
+                } else if (platKey === "catalog") {
+                  badgeColor = item.color || "#7c3aed"
+                  letter = "📖"
+                  label = label || "Catalog"
+                  sublabel = item.sublabel || "View All"
+                } else if (platKey === "quotes") {
+                  badgeColor = item.color || "#059669"
+                  letter = "💬"
+                  label = label || "Get Quote"
+                  sublabel = item.sublabel || "Pricing"
+                } else if (platKey === "directions") {
+                  badgeColor = item.color || "#d97706"
+                  letter = "📍"
+                  label = label || "Store Visit"
+                  sublabel = item.sublabel || "Find Us"
+                } else {
+                  label = label || item.platform || "Visit"
+                  letter = label ? label.slice(0, 2).toUpperCase() : "★"
                 }
+
+                const isHexColor = badgeColor.startsWith("#") || badgeColor.startsWith("rgb")
 
                 return (
                   <a
@@ -691,7 +902,10 @@ END:VCARD`
                     rel="noopener noreferrer"
                     className="p-2 sm:p-2.5 rounded-2xl bg-white/95 backdrop-blur-xs border border-amber-200/60 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center group active:scale-95"
                   >
-                    <div className={`w-8 h-8 rounded-full ${badgeColor} text-white flex items-center justify-center font-black text-xs shadow-xs mb-1.5 group-hover:scale-105 transition-transform`}>
+                    <div
+                      className={`w-8 h-8 rounded-full ${!isHexColor ? badgeColor : ""} text-white flex items-center justify-center font-black text-xs shadow-xs mb-1.5 group-hover:scale-105 transition-transform`}
+                      style={isHexColor ? { backgroundColor: badgeColor } : undefined}
+                    >
                       {letter === "z" ? (
                         <span className="font-black italic text-[11px]">z</span>
                       ) : letter === "S" ? (
@@ -707,10 +921,10 @@ END:VCARD`
                       )}
                     </div>
                     <span className="font-bold text-[9.5px] text-slate-800 leading-tight text-center break-words line-clamp-2 w-full min-h-[20px] flex items-center justify-center">
-                      {item.label}
+                      {label}
                     </span>
                     <span className="text-[8px] font-medium text-slate-500 mt-0.5 flex items-center justify-center gap-0.5 w-full">
-                      {item.sublabel || "Visit"} <ChevronRight className="w-2.5 h-2.5 flex-shrink-0" />
+                      {sublabel} <ChevronRight className="w-2.5 h-2.5 flex-shrink-0" />
                     </span>
                   </a>
                 )
@@ -860,6 +1074,72 @@ END:VCARD`
               >
                 Save QR
               </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/* MODAL / TOAST: NATIVE PHONE CONTACTS CONFIRMATION & GUIDANCE    */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {contactToast?.open && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-5 sm:p-6 text-center space-y-4 shadow-2xl relative border-2 border-amber-300 animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200">
+            <button
+              onClick={() => setContactToast(null)}
+              aria-label="Close contact guidance"
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-200 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Glowing Icon */}
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-white flex items-center justify-center mx-auto shadow-md">
+              <Contact className="w-7 h-7" />
+            </div>
+
+            <div>
+              <h3 className="font-extrabold text-lg text-slate-900 leading-tight">
+                {contactToast.message}
+              </h3>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                {contactToast.submessage}
+              </p>
+            </div>
+
+            {/* Mobile Instructions Card */}
+            <div className="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-left space-y-2">
+              <div className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <span className="text-[11px] text-slate-700 leading-snug">
+                  <strong>Android:</strong> Swipe down your notification shade &amp; tap <span className="font-mono text-[10px] bg-amber-100 px-1 py-0.5 rounded">{contactToast.fileName}</span> to save into Google Contacts.
+                </span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <span className="text-[11px] text-slate-700 leading-snug">
+                  <strong>iPhone:</strong> Tap the button below to view the Contact card, then tap <strong>&ldquo;Create New Contact&rdquo;</strong>.
+                </span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="space-y-2 font-sans pt-1">
+              <a
+                href={contactToast.vcardUrl}
+                download={contactToast.fileName}
+                className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-md transition-colors"
+              >
+                <Contact className="w-4 h-4 text-amber-400" />
+                <span>Open in Phone Contacts</span>
+              </a>
+
+              <button
+                onClick={() => setContactToast(null)}
+                className="w-full py-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors"
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>
