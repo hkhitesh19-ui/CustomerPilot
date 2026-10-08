@@ -35,9 +35,18 @@ The correct workflow is:
 
 Violation of this rule (pushing before user confirmation) is a breach of the project workflow.
 
-## VPS Live Deployment Tracking (MANDATORY)
-Whenever you deploy code to the live Hostinger VPS server (200.97.170.53), you MUST immediately update `Git Commit on VPS Live.txt` in the project root with the active Git commit hash, branch, timestamp, and commit message. 
-Never complete a deployment without keeping `Git Commit on VPS Live.txt` 100% synchronized with the live server.
+## VPS Live Deployment & Long-Running Execution Protocol (MANDATORY)
+1. **Never End Turn on In-Progress Deployments (Strict Prohibition)**:
+   - When running Live VPS deployments (200.97.170.53) or Next.js production builds, you are STRICTLY FORBIDDEN from posting an interim text message (e.g. "Deploying... I will notify you once finished") and ending your turn while the task is still running in the background.
+   - Root Cause Safeguard: In this platform, if the agent outputs text and ends its turn, the system goes into an idle state waiting for the user's next message. A completing background task does NOT wake the agent up autonomously to generate an unprompted reply.
+2. **Mandatory Single-Turn Synchronous Execution**:
+   - You MUST keep deployment execution completely within the current active turn:
+     - Keep polling the running task status using `manage_task` in a loop across tool calls WITHOUT outputting premature text to the user.
+     - Do NOT output conversational text until the deployment script finishes, PM2 reloads, and live curl health checks pass (HTTP 200).
+   - ONLY send your message to the user once the entire deployment is 100% finished and verified, delivering the final success report in that single turn.
+3. **VPS Tracking File Sync (Mandatory)**:
+   - Whenever you deploy code to the live Hostinger VPS server (200.97.170.53), you MUST immediately update `Git Commit on VPS Live.txt` in the project root with the active Git commit hash, branch, timestamp, and commit message.
+   - Never complete a deployment without keeping `Git Commit on VPS Live.txt` 100% synchronized with the live server.
 
 ## Mandatory Triple-Engine Protocol: GSD Planning + Deep Code & Security Audit + Playwright Visual & Data Ground-Truth Verification
 For EVERY new task, feature request, or bugfix, you MUST systematically execute through this triple-engine pipeline:
