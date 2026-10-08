@@ -3,6 +3,30 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [08 Oct 2026] Feature: Smart AI Google Review 3-Angle Engine & 10-Category Local SEO Entity Fallback Integration
+- **Symptom**: Previously, Google Review drafts generated for customers lacked diverse psychological angles (only 2 generic options), fallback was limited to bakery/cake shops, length wasn't strictly capped to WhatsApp message size (12-22 words), and AI review prompts lacked comprehensive anti-AI detection banned words (`delve`, `testament`, `pristine`, `exceptional`, etc.) and Google Maps entity/attribute SEO triggers.
+- **Root Cause**:
+  1. `src/app/review/page.tsx` only generated 2 drafts with a wider word range (15-40 words) and generic fallback templates.
+  2. Fallback logic did not have specific domain-knowledge templates for India's top 10 local retail sectors (Hotels, Cafes, Bakeries, Restaurants, Salons, Beauty Parlors, Gift Shops, Garment Shops, Supermarkets, Car Washes).
+  3. `ReviewEditor.tsx` UI only rendered 2 filter chips, restricting customer choice.
+- **Resolution**:
+  1. **3-Angle Psychology Matrix (`src/app/review/page.tsx`)**:
+     - **Draft 1 (Quality & Taste / Core Service)**: Focuses on exact purchased entity/dish/service with universal everyday Indian English tone.
+     - **Draft 2 (Service & Vibes / Popularity Marker)**: Controlled Hinglish with safe, positive-offset high-demand markers (*"thodi bheed thi Sunday ko par counter service fast thi"*) without harmful negative flaws.
+     - **Draft 3 (Short 1-Liner)**: Ultra-short, punchy 8-15 word mobile text for instant 1-click copy.
+  2. **Strict WhatsApp Length & 18-Word Banned AI Filter**:
+     - Strict 12-22 word cap enforced in prompts and fallbacks.
+     - Blacklisted 18 AI clichés: `delve`, `top-notch`, `highly recommend`, `hidden gem`, `pristine`, `testament`, `exceptional`, `outstanding`, `spot on`, `must visit`, `best in town`, `best in the city`, `world class`, `plethora`, `masterpiece`, `exceeded expectations`.
+  3. **10-Category Zero-Latency Offline Fallback Library (`getSmartFallbackReview`)**:
+     - Integrated 50 battle-tested review drafts across all 10 local retail categories, ensuring instant 0ms generation with zero API dependency if Gemini hits the 2.5s timeout.
+  4. **Responsive 3-Column UI Chip Selector (`src/components/review/ReviewEditor.tsx`)**:
+     - Upgraded options to a 3-column mobile-optimized grid (`🍰 Quality & Taste`, `⚡ Service & Vibes`, `💬 Short 1-Liner`).
+  5. **Playwright & Ground-Truth Verification (`scripts/verify_smart_ai_review_3angles.js`)**:
+     - Verified all 3 angles render, update textarea on click, contain 14-16 words, and have zero banned AI words.
+     - Captured screenshot artifact: `scratch/verified_smart_ai_review_3angles.png`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [08 Oct 2026] Issue: Mobile Native Phonebook Contact Saving ("Save Contact") on Digital Business Card
 - **Symptom**: On the Digital Business Card (`/c/[slug]`), clicking the "Save Contact" button only downloaded a raw `.vcf` file (`Cake_Connection.vcf`) to the device's storage/downloads folder instead of directly saving or importing the contact into the mobile phonebook (Google Contacts on Android / Contacts on iOS).
 - **Root Cause**:

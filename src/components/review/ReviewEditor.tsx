@@ -16,7 +16,7 @@ export function ReviewEditor({
   customer: any, 
   initialDraft?: string,
   existingReviewText?: string | null,
-  draftOptions?: { draft1: string; draft2: string } | null,
+  draftOptions?: { draft1: string; draft2: string; draft3?: string } | null,
   bonusInfo?: {
     googleReviewBonus: number,
     photoBonus: number,
@@ -32,7 +32,7 @@ export function ReviewEditor({
 
   const defaultText = existingReviewText || initialDraft || `Ordered from ${merchant.name} today. Super fresh quality, loved the taste and packaging. Definitely recommended!`
   const [draft, setDraft] = useState(defaultText)
-  const [selectedOption, setSelectedOption] = useState<"draft1" | "draft2">("draft1")
+  const [selectedOption, setSelectedOption] = useState<"draft1" | "draft2" | "draft3">("draft1")
   const [copied, setCopied] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [isEditingExisting, setIsEditingExisting] = useState(!!existingReviewText)
@@ -194,26 +194,26 @@ export function ReviewEditor({
             </div>
           )}
 
-          {/* Dual AI Draft Options Pills (Google-style Filter Chips) */}
+          {/* Multi AI Draft Options Pills (Google-style Filter Chips - 3 Angles) */}
           {draftOptions && !isEditingExisting && (
             <div className="space-y-1.5">
               <span className="text-[11px] font-bold text-[#5F6368] uppercase tracking-wider block">
                 Choose AI Review Angle:
               </span>
-              <div className="flex gap-2">
+              <div className={`grid ${draftOptions.draft3 ? "grid-cols-3" : "grid-cols-2"} gap-1.5 sm:gap-2`}>
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedOption("draft1")
                     setDraft(draftOptions.draft1)
                   }}
-                  className={`flex-1 py-2 px-3 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
+                  className={`py-2 px-1.5 sm:px-2 rounded-xl font-semibold text-[11px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer border text-center ${
                     selectedOption === "draft1"
-                      ? "bg-[#E8F0FE] text-[#1A73E8] border-[#1A73E8] shadow-xs"
+                      ? "bg-[#E8F0FE] text-[#1A73E8] border-[#1A73E8] shadow-xs font-bold"
                       : "bg-white text-[#3C4043] border-[#DADCE0] hover:bg-[#F1F3F4]"
                   }`}
                 >
-                  <span>🍰 Option 1: Product & Taste</span>
+                  <span className="truncate">🍰 Quality &amp; Taste</span>
                 </button>
                 <button
                   type="button"
@@ -221,14 +221,30 @@ export function ReviewEditor({
                     setSelectedOption("draft2")
                     setDraft(draftOptions.draft2)
                   }}
-                  className={`flex-1 py-2 px-3 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
+                  className={`py-2 px-1.5 sm:px-2 rounded-xl font-semibold text-[11px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer border text-center ${
                     selectedOption === "draft2"
-                      ? "bg-[#E8F0FE] text-[#1A73E8] border-[#1A73E8] shadow-xs"
+                      ? "bg-[#E8F0FE] text-[#1A73E8] border-[#1A73E8] shadow-xs font-bold"
                       : "bg-white text-[#3C4043] border-[#DADCE0] hover:bg-[#F1F3F4]"
                   }`}
                 >
-                  <span>⚡ Option 2: Service & Packaging</span>
+                  <span className="truncate">⚡ Service &amp; Vibes</span>
                 </button>
+                {draftOptions.draft3 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedOption("draft3")
+                      setDraft(draftOptions.draft3!)
+                    }}
+                    className={`py-2 px-1.5 sm:px-2 rounded-xl font-semibold text-[11px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer border text-center ${
+                      selectedOption === "draft3"
+                        ? "bg-[#E8F0FE] text-[#1A73E8] border-[#1A73E8] shadow-xs font-bold"
+                        : "bg-white text-[#3C4043] border-[#DADCE0] hover:bg-[#F1F3F4]"
+                    }`}
+                  >
+                    <span className="truncate">💬 Short 1-Liner</span>
+                  </button>
+                )}
               </div>
             </div>
           )}
