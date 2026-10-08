@@ -1,5 +1,17 @@
 # CustomerPilot Agent Rules
 
+## Universal Autonomous Execution & Zero-Premature-Turn Protocol (MANDATORY FOR ALL TASKS)
+1. **Strict Prohibition of Interim Messages & Premature Turn Ending**:
+   - For ANY task (coding, debugging, testing, building, database scripts, migrations, deployments), you are STRICTLY FORBIDDEN from posting interim progress text (e.g. "I am checking...", "Tests are running...", "I will notify you once done") and ending your turn while work is still in progress.
+   - Root Cause Safeguard: Outputting conversational text ends the agent's active turn, putting the platform into an idle state that requires a new user prompt to resume. 
+2. **Mandatory Single-Turn Autonomous Completion**:
+   - Once the user gives an objective, you MUST execute the entire end-to-end pipeline (Code ➔ Audit ➔ Test/Verify ➔ Local Commit) synchronously within the SAME active turn.
+   - If any command, build, script, or test is running in the background, you MUST keep checking and waiting using tool calls (`manage_task`) in that same turn without emitting chat text until the operation completely terminates.
+   - Never stop midway to ask trivial permission (e.g. "Should I proceed to step 2?"). Proceed autonomously until the entire objective is achieved.
+3. **Single Conclusive Final Response**:
+   - Keep all intermediate thoughts and actions inside tool calls.
+   - Output conversational text to the user ONLY ONCE at the very end, delivering the final, 100% verified result and status report.
+
 ## Automated Bug Documentation (MANDATORY)
 Whenever you successfully resolve a bug, issue, or error in this repository, you MUST automatically append a full technical report of the resolution to `RESOLVED_ISSUES_LOG.md`. 
 Do NOT wait for the user to remind you or ask you to document it.
