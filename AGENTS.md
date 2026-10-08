@@ -40,12 +40,13 @@ You are STRICTLY FORBIDDEN from running `git push` after fixing a bug or issue U
 The correct workflow is:
 1. Make the code fix/changes locally.
 2. Run `git add` and `git commit` to save the fix locally.
-3. **STOP. Do NOT push yet.**
-4. Inform the user: "Fix is committed locally. Please test it manually and confirm it's working."
-5. Wait for the user's explicit confirmation (e.g., "haan kaam kar raha hai", "confirmed", "working").
-6. ONLY AFTER user confirmation: run `git push`.
+3. **Mandatory Commit ID Reporting (STRICT RULE)**: In every single user response where a local commit is performed or reported, you MUST explicitly and prominently display the **Local Git Commit ID** (both the short hash e.g. `460dd94` and full 40-character SHA e.g. `460dd94e21024142367e222ef0e2ed0ced6827f7`), branch name, and commit message in a dedicated highlighted block. Never omit or hide the commit ID.
+4. **STOP. Do NOT push yet.**
+5. Inform the user: "Fix is committed locally (Commit ID: <short_hash>). Please test it manually and confirm it's working."
+6. Wait for the user's explicit confirmation (e.g., "haan kaam kar raha hai", "confirmed", "working").
+7. ONLY AFTER user confirmation: run `git push`.
 
-Violation of this rule (pushing before user confirmation) is a breach of the project workflow.
+Violation of this rule (pushing before user confirmation or omitting the Commit ID) is a breach of the project workflow.
 
 ## VPS Live Deployment & Long-Running Execution Protocol (MANDATORY)
 1. **Never End Turn on In-Progress Deployments (Strict Prohibition)**:
