@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Copy, Check, ExternalLink, Sparkles, Gift, ArrowLeft, Info, MapPin } from "lucide-react"
+import { Copy, Check, ExternalLink, Sparkles, Gift, ArrowLeft, Info, MapPin, Camera } from "lucide-react"
 import { useSystemContent } from "@/hooks/useSystemContent"
 
 export function ReviewEditor({ 
@@ -301,6 +301,28 @@ export function ReviewEditor({
             )}
           </div>
 
+          {/* Photo Bonus Incentive Highlight Card */}
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-50/90 via-emerald-50/80 to-amber-50/90 border-2 border-emerald-300 p-3.5 sm:p-4 shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-amber-400 via-emerald-500 to-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight flex items-center gap-1">
+                    <span>🎁 +{photoBonus || 2} Bonus Stamps</span>
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider shadow-2xs">
+                    Photo Reward
+                  </span>
+                </div>
+                <p className="text-[11.5px] sm:text-xs text-slate-700 font-medium mt-0.5 leading-snug">
+                  Upload a <strong>Product Photo</strong> or <strong>Shop Photo</strong> with your Google review to unlock <strong>+{photoBonus || 2} Extra Bonus Stamps</strong>! 📸
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* 1-Click Copy & Open Google Button (Google Blue Primary CTA) */}
           <button 
             type="button"
@@ -350,11 +372,17 @@ export function ReviewEditor({
             </div>
           )}
 
-          <p className="text-center text-xs text-[#5F6368] leading-relaxed">
-            {isEditingExisting 
-              ? "💡 Google will open your previous review. Select the text, paste this new draft, and hit Post!" 
-              : "After posting, our system will automatically credit bonus stamps to your VIP Wallet! 🎁"}
-          </p>
+          <div className="text-center space-y-1">
+            <p className="text-xs text-[#5F6368] leading-relaxed">
+              {isEditingExisting 
+                ? "💡 Google will open your previous review. Select the text, paste this new draft, and hit Post!" 
+                : "After posting, our system will automatically credit bonus stamps to your VIP Wallet! 🎁"}
+            </p>
+            <p className="text-[11px] text-emerald-700 font-semibold flex items-center justify-center gap-1">
+              <Camera className="w-3.5 h-3.5 text-emerald-600 shrink-0 inline" />
+              <span>Attach a photo on Google Maps for +{photoBonus || 2} extra stamps!</span>
+            </p>
+          </div>
         </div>
 
         {/* Clean Google-style Footer */}

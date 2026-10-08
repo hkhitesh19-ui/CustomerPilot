@@ -3,6 +3,22 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [08 Oct 2026] Feature: Google Review "+2 Bonus Stamps for Product/Shop Photo" High-Conversion Highlight Card
+- **Symptom**: On the Smart AI Google Review page (`/review`), customers were not prominently incentivized to attach photos of their purchased product or the merchant's storefront. Google Maps heavily prioritizes reviews with photos (10x local SEO ranking multiplier), and merchants wanted a clear, eye-catching message showing "+2 Bonus Stamps (when you upload Product Photo or Shop Photo)".
+- **Root Cause**: The review screen previously only showed a small badge `+2 Bonus Stamps` in the top corner and generic post text, with no prominent visual card explaining that uploading photos unlocks extra bonus stamps.
+- **Resolution**:
+  1. **High-Impact Photo Bonus Callout Card (`src/components/review/ReviewEditor.tsx`)**:
+     - Positioned directly between the review text editor and the `[Copy & Post on Google Maps]` CTA button.
+     - Styled with an emerald/amber gradient background, emerald border, camera icon badge, `PHOTO REWARD` pill, and prominent text:
+       **"🎁 +2 Bonus Stamps (PHOTO REWARD) — Upload a Product Photo or Shop Photo with your Google review to unlock +2 Extra Bonus Stamps! 📸"**
+  2. **Footer Pro-Tip Guidance**:
+     - Added an inline reminder below the CTA button: *"Attach a photo on Google Maps for +2 extra stamps!"*
+  3. **Playwright & Ground-Truth Verification (`scripts/verify_photo_bonus_banner.js`)**:
+     - Verified the card is rendered with verified photo keywords and camera icon.
+     - Captured screenshot artifact: `scratch/verified_smart_ai_review_photo_bonus_highlight.png`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [08 Oct 2026] Feature: Smart AI Google Review 3-Angle Engine & 10-Category Local SEO Entity Fallback Integration
 - **Symptom**: Previously, Google Review drafts generated for customers lacked diverse psychological angles (only 2 generic options), fallback was limited to bakery/cake shops, length wasn't strictly capped to WhatsApp message size (12-22 words), and AI review prompts lacked comprehensive anti-AI detection banned words (`delve`, `testament`, `pristine`, `exceptional`, etc.) and Google Maps entity/attribute SEO triggers.
 - **Root Cause**:
