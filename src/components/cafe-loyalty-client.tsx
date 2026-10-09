@@ -18,7 +18,7 @@ const FAQS = [
   },
   {
     question: "How fast is counter check-in during busy cafe morning rushes?",
-    answer: "Check-in takes only 5 seconds. The customer scans your acrylic counter QR standee with their phone camera while ordering, and the cashier validates the stamp with 1 tap on the CustomerPilot Tap-to-Claim screen."
+    answer: "Check-in takes only 5 seconds. The customer scans your counter QR Code with their phone camera while ordering, and the cashier validates the stamp with 1 tap on the CustomerPilot Tap-to-Claim screen."
   }
 ]
 

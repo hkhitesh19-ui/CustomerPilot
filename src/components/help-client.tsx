@@ -51,7 +51,7 @@ export function HelpClient() {
               </div>
               <h3 className="font-extrabold text-slate-900 text-lg">Printing &amp; Positioning QR Codes</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Best practices for printing counter stands, table standees, and cake box seals for high customer scan rates.
+                Best practices for printing counter QR codes, table displays, and cake box seals for high customer scan rates.
               </p>
             </CardContent>
           </Card>

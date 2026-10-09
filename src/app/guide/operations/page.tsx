@@ -87,7 +87,7 @@ const I18N = {
     ctaBadge: "Need to Configure First?",
     ctaTitle: "Want to Learn the 5-Minute Setup First?",
     ctaSubtitle:
-      "Configure store details, choose your industry rules & rewards, connect WhatsApp Web, and download counter QR standees in under 5 minutes.",
+      "Configure store details, choose your industry rules & rewards, connect WhatsApp Web, and download counter QR codes in under 5 minutes.",
     ctaBtnSetup: "Open 5-Minute Setup Guide →",
     ctaBtnQueue: "Launch Live Queue Desk",
     ctaBtnSettings: "Open Store Settings",
@@ -95,8 +95,8 @@ const I18N = {
       {
         tag: "Step M1 • Morning (One-Time Placement)",
         time: "0 Min Daily",
-        title: "Place QR Standee on the Billing Counter",
-        desc: "Download the printable QR Standee PDF from your dashboard and place it in an acrylic stand on your billing desk (right next to your UPI payment scanner). No wires, POS cables, or electricity needed.",
+        title: "Place QR Code on the Billing Counter",
+        desc: "Download the printable QR Code PDF from your dashboard and place it on your billing desk (right next to your UPI payment scanner). No wires, POS cables, or electricity needed.",
         pitchTitle: "🗣️ How to invite customers at the counter (Verbal Pitch):",
         pitch: "You can say: 'Sir/Madam, you can now become a VIP Club Member of our Restaurant/Shop. Just scan this QR code on your phone — it is 100% free with no charges and you will earn rewards on every visit!'",
       },
@@ -144,8 +144,8 @@ const I18N = {
       {
         tag: "Step C1 • At Billing Counter",
         time: "Friction: Zero",
-        title: "Scan Standee QR with Phone Camera or WhatsApp",
-        desc: "Customer sees the desk standee: 'Scan to Earn Free Pastry on Every Visit!'. They point their standard mobile camera or WhatsApp scanner at the QR code. No Google Play or App Store download needed.",
+        title: "Scan Counter QR Code with Phone Camera or WhatsApp",
+        desc: "Customer sees the desk QR Code: 'Scan to Earn Free Pastry on Every Visit!'. They point their standard mobile camera or WhatsApp scanner at the QR code. No Google Play or App Store download needed.",
       },
       {
         tag: "Step C2 • 1-Tap Join",
@@ -181,7 +181,7 @@ const I18N = {
     matrixRows: [
       {
         step: "1. Joining the Loyalty Program",
-        merchant: "Keep QR standee on the counter & invite customer to scan",
+        merchant: "Keep QR code on the counter & invite customer to scan",
         customer: "Point phone camera to scan & tap Send",
         ai: "Instant WhatsApp welcome message & live digital wallet creation",
       },
@@ -269,7 +269,7 @@ const I18N = {
     ctaBadge: "Pehle Setup Karna Hai?",
     ctaTitle: "Pehle 5-Minute Setup Guide Dekhna Chahte Hain?",
     ctaSubtitle:
-      "Store details bharna, apne business ke hisaab se rules & rewards set karna, WhatsApp connect karna aur counter QR standee download karne ka pura guide dekhein.",
+      "Store details bharna, apne business ke hisaab se rules & rewards set karna, WhatsApp connect karna aur counter QR code download karne ka pura guide dekhein.",
     ctaBtnSetup: "5-Minute Setup Guide Kholein →",
     ctaBtnQueue: "Live Queue Desk Kholein",
     ctaBtnSettings: "Store Settings Kholein",
@@ -277,8 +277,8 @@ const I18N = {
       {
         tag: "Step M1 • Subah (Ek Baar Setup)",
         time: "Daily: 0 Minutes",
-        title: "Counter Par Standee QR Rakhna & Customer Ko Invite Karna",
-        desc: "Dashboard se downloaded printable PDF QR Standee ko cash counter / billing desk par acrylic stand me rakh dein (UPI scanner ke bagal me). Isme koi wire ya electricity ki zaroorat nahi hoti.",
+        title: "Counter Par QR Code Rakhna & Customer Ko Invite Karna",
+        desc: "Dashboard se downloaded printable PDF QR Code ko cash counter / billing desk par rakh dein (UPI scanner ke bagal me). Isme koi wire ya electricity ki zaroorat nahi hoti.",
         pitchTitle: "🗣️ Customer ko cashier kya bol sakta hai (Verbal Pitch):",
         pitch: "Customer ko aisa bata sakte ho ki : 'Sir/Mam aap ab hamare Restaurant/Shop ke VIP Club me Member ban sakte ho, uske liye just ye QR code Scan kijiye, uska koi charges nahi he, bilkul Free he.'",
       },
@@ -326,8 +326,8 @@ const I18N = {
       {
         tag: "Step C1 • Billing Counter Par",
         time: "Friction: Zero",
-        title: "Standee QR Scan Karna (Phone Camera Ya WhatsApp Se)",
-        desc: "Customer bill counter par Standee dekhta hai: 'Scan to Earn Free Pastry on Every Visit!'. Customer apne mobile camera ya WhatsApp scanner se QR scan karta hai. Use koi bhi Play Store app install nahi karni padti.",
+        title: "QR Code Scan Karna (Phone Camera Ya WhatsApp Se)",
+        desc: "Customer bill counter par QR Code dekhta hai: 'Scan to Earn Free Pastry on Every Visit!'. Customer apne mobile camera ya WhatsApp scanner se QR scan karta hai. Use koi bhi Play Store app install nahi karni padti.",
       },
       {
         tag: "Step C2 • 1-Tap Join",
@@ -363,7 +363,7 @@ const I18N = {
     matrixRows: [
       {
         step: "1. Joining Loyalty",
-        merchant: "Counter par standee QR rakhna & customer ko scan karne bolna",
+        merchant: "Counter par QR Code rakhna & customer ko scan karne bolna",
         customer: "Phone camera se scan & send",
         ai: "Instant WhatsApp welcome & digital wallet creation",
       },

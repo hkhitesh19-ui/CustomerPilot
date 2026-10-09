@@ -21,10 +21,10 @@ import { LiveReviewReplyAnimation } from "@/components/live-review-reply-animati
 const REVIEW_FAQS: DualLangFaqItem[] = [
   {
     id: 1,
-    questionEn: "How does the AI Google Review QR code standee work for local retail shops and cafes?",
-    answerEn: "Place the CustomerPilot acrylic QR standee on your billing counter. When customers scan it (or receive an automated post-visit WhatsApp prompt), our generative AI drafts an authentic, positive review highlighting their purchase. The customer taps once to open Google Maps directly to the review submission dialog with the text pre-filled.",
+    questionEn: "How does the Smart Ai Google Review QR work for local retail shops and cafes?",
+    answerEn: "Place the CustomerPilot Smart Ai Google Review QR code on your billing counter. When customers scan it (or receive an automated post-visit WhatsApp prompt), our generative AI drafts an authentic, positive review highlighting their purchase. The customer taps once to open Google Maps directly to the review submission dialog with the text pre-filled.",
     questionHi: "Dukan ke liye AI Google Review QR code kaise kaam karta hai?",
-    answerHi: "CustomerPilot ka acrylic QR standee apne billing counter par rakhein. Jab customer scan karta hai ya purchase ke baad WhatsApp receive karta hai, generative AI unke liye ek authentic 5-star review draft kar deta hai. Customer sirf 1 tap me Google Maps par review submit kar deta hai."
+    answerHi: "CustomerPilot ka Smart Ai Google Review QR apne billing counter par rakhein. Jab customer scan karta hai ya purchase ke baad WhatsApp receive karta hai, generative AI unke liye ek authentic 5-star review draft kar deta hai. Customer sirf 1 tap me Google Maps par review submit kar deta hai."
   },
   {
     id: 2,
@@ -179,7 +179,7 @@ export function AiGoogleReviewQrClient() {
               {/* Left Column: Value Proposition in Indian English */}
               <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
                 <span className="badge">
-                  <span className="dot-live"><i></i><i></i></span> India&apos;s #1 AI-Powered Google Review QR Standee for Local Retail
+                  <span className="dot-live"><i></i><i></i></span> India&apos;s #1 Smart Ai Google Review QR System for Local Retail
                 </span>
 
                 <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
@@ -203,7 +203,7 @@ export function AiGoogleReviewQrClient() {
                     href="/signup"
                     className="btn-grad py-3.5 sm:py-4 px-6 sm:px-8 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all w-full sm:w-auto"
                   >
-                    <span>Get Your Counter QR Standee Free</span>
+                    <span>Get Your Smart Ai Google Review QR Free</span>
                     <ArrowRight className="w-4 h-4 ml-1" />
                   </Link>
                   <a
@@ -392,11 +392,11 @@ export function AiGoogleReviewQrClient() {
                       01
                     </span>
                     <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-                      Step 1 • Standee Scan
+                      Step 1 • QR Scan
                     </span>
                   </div>
 
-                  {/* Infographic Visual: Counter QR Standee */}
+                  {/* Infographic Visual: Counter QR Code */}
                   <div className="p-4 rounded-2xl bg-gradient-to-b from-amber-50 to-slate-50 border border-amber-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
                     <div className="flex items-center gap-3">
                       <div className="w-18 h-22 rounded-xl bg-white border border-amber-300 shadow-md p-2 flex flex-col items-center justify-center text-center">
@@ -404,7 +404,7 @@ export function AiGoogleReviewQrClient() {
                           <Store className="w-3.5 h-3.5" />
                         </div>
                         <span className="text-[8px] font-black text-slate-900 leading-tight">Counter QR</span>
-                        <span className="text-[7px] text-amber-700 font-semibold">Standee</span>
+                        <span className="text-[7px] text-amber-700 font-semibold">QR Code</span>
                       </div>
                       <div className="text-amber-500 font-bold text-lg animate-pulse">➔</div>
                       <div className="w-16 h-22 rounded-xl bg-slate-900 border border-slate-700 shadow-md p-1.5 flex flex-col items-center justify-center text-white">
@@ -417,10 +417,10 @@ export function AiGoogleReviewQrClient() {
                   </div>
 
                   <h3 className="font-extrabold text-slate-900 text-lg">
-                    1. Customer Scans Counter Standee
+                    1. Customer Scans Counter QR Code
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    Place our premium acrylic standee on your counter. When checking out, happy customers scan with their camera in under 3 seconds. Zero app download.
+                    Display your branded QR Code on your counter. When checking out, happy customers scan with their camera in under 3 seconds. Zero app download.
                   </p>
                 </div>
 
@@ -716,7 +716,7 @@ export function AiGoogleReviewQrClient() {
                 </div>
                 <div className="flex items-center gap-2 text-amber-700 font-bold text-sm">
                   <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-amber-600" />
-                  <span>CustomerPilot Smart AI Review Standee</span>
+                  <span>CustomerPilot Smart AI Review System</span>
                 </div>
                 <h3 className="text-lg font-extrabold text-slate-900">3 AI Drafts in 3 Secs &bull; 88% Publish Rate</h3>
                 <ul className="space-y-3 text-xs text-slate-700">
@@ -787,12 +787,12 @@ export function AiGoogleReviewQrClient() {
               Ready to Triple Your 5-Star Google Reviews This Month?
             </h2>
             <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
-              Start your 3-day free trial today. Print your smart acrylic counter standee and watch customer reviews pour in on autopilot.
+              Start your 3-day free trial today. Print your smart counter QR Code and watch customer reviews pour in on autopilot.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button asChild size="lg" className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-base px-8 py-6 rounded-2xl shadow-xl shadow-amber-500/20 hover:scale-105 transition-all">
                 <Link href="/signup">
-                  Get Your Counter QR Standee Now <ArrowRight className="w-5 h-5 ml-2" />
+                  Get Your Smart Ai Google Review QR Now <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>
             </div>

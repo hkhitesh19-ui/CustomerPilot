@@ -214,7 +214,7 @@ export default function SettingsPage() {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════ */}
-      {/* SECTION 1: WHATSAPP VIP LOYALTY & STAMP CHECK-IN QR STANDEE        */}
+      {/* SECTION 1: WHATSAPP VIP LOYALTY & STAMP CHECK-IN QR CODE        */}
       {/* ══════════════════════════════════════════════════════════════════ */}
       {isLoyaltyEnabled && (
         <section id="sec-vip-qr" className="space-y-3 pt-2">
@@ -231,7 +231,7 @@ export default function SettingsPage() {
               </h2>
             </div>
             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
-              Counter Standee, Table Tents &amp; Packaging QR Stickers
+              Counter QR Code, Table Tents &amp; Packaging QR Stickers
             </span>
           </div>
 
@@ -259,12 +259,12 @@ export default function SettingsPage() {
               </h2>
             </div>
             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
-              Google Business Profile &amp; Review Standees
+              Google Business Profile &amp; Review QR Codes
             </span>
           </div>
 
           <div className="space-y-4">
-            {/* 2A: Smart AI Reviews QR Standee & Posters */}
+            {/* 2A: Smart AI Reviews QR Code & Posters */}
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
               <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
                 <div className="flex items-center gap-2.5">
@@ -320,7 +320,7 @@ export default function SettingsPage() {
               <div>
                 <CardTitle className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Business Information</CardTitle>
                 <CardDescription className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                  Your store name, owner details, and business category printed on QR Standees.
+                  Your store name, owner details, and business category printed on QR Codes.
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">

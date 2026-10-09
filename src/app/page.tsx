@@ -440,7 +440,7 @@ export default function Home() {
                       <span className="flex items-center gap-1.5"><Star className="w-3.5 h-3.5 text-emerald-500" /> Smart AI Google Reviews</span>
                       <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">AI Drafts</span>
                     </span>
-                    <span className="text-[11px] text-slate-500 mt-0.5">Post-purchase WhatsApp 5-star review counter standee</span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Post-purchase WhatsApp 5-star review counter QR Code</span>
                   </Link>
 
                   {/* Service 4: 1-Click AI AutoReply */}
@@ -1261,7 +1261,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold text-slate-900 mt-4">Smart Digital Business Card</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                NFC &amp; QR-powered digital visiting card. Customers save your verified contact (.vcf) in 1 tap, browse menus, and order direct.
+                Smart QR-powered digital visiting card. Customers save your verified contact (.vcf) in 1 tap, browse menus, and order direct.
               </p>
               <ul className="space-y-1.5 mt-4 text-xs text-slate-700 flex-1">
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 1-Tap Contact Download (.vcf)</li>
@@ -1272,7 +1272,7 @@ export default function Home() {
               </ul>
               <div className="reply-prev mt-4 text-xs bg-slate-50 border border-slate-100 p-2.5 rounded-xl flex items-center justify-between">
                 <span className="font-bold text-cyan-800">📱 Mobile Micro-Site</span>
-                <span className="text-[10px] text-slate-400 font-semibold">NFC + QR Sync</span>
+                <span className="text-[10px] text-slate-400 font-semibold">Smart QR Sync</span>
               </div>
               <Link href="/smart-digital-business-card" className="mt-5 w-full py-3 px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
                 <span>Explore Digital Card</span> <span>→</span>
@@ -1551,7 +1551,7 @@ export default function Home() {
               <div className="num" style={{ background: 'linear-gradient(135deg,#34d399,#10b981)' }}>🛒</div>
               <div className="tag">Step 1</div>
               <h3>Customer purchases</h3>
-              <p>A customer buys from your shop. You ask them to scan the counter QR standee.</p>
+              <p>A customer buys from your shop. You ask them to scan the counter QR Code.</p>
             </div>
             </StaggerItem>
 
@@ -1714,7 +1714,7 @@ export default function Home() {
               Why CustomerPilot Wins
             </span>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
-              CustomerPilot vs. Traditional Standees &amp; Point Solutions
+              CustomerPilot vs. Traditional QR Displays &amp; Point Solutions
             </h2>
             <p className="text-slate-600 text-xs sm:text-sm">
               Competitors sell static review stands or costly isolated apps. CustomerPilot unifies review drafting, WhatsApp loyalty, auto-reply, and retention into one closed loop:
@@ -1737,7 +1737,7 @@ export default function Home() {
                     </div>
                   </th>
                   <th scope="col" className="p-4 sm:p-5 font-semibold text-slate-700 w-1/5">
-                    Hardware Standees <span className="block text-[11px] font-normal text-slate-500">(MagicReview / TapNConnect)</span>
+                    Standard QR Displays <span className="block text-[11px] font-normal text-slate-500">(MagicReview / TapNConnect)</span>
                   </th>
                   <th scope="col" className="p-4 sm:p-5 font-semibold text-slate-700 w-1/6">
                     Standard Printed QR
@@ -1811,7 +1811,7 @@ export default function Home() {
                       1-Tap vCard contact save, menu catalogs &amp; ordering
                     </span>
                   </td>
-                  <td className="p-4 sm:p-5 text-rose-600 font-medium">Standee only</td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">QR Display only</td>
                   <td className="p-4 sm:p-5 text-rose-600 font-medium">None</td>
                 </tr>
               </tbody>
@@ -2725,7 +2725,7 @@ function Step6QRCode({ data, setData }: any) {
   return (
     <div className="p-6 sm:p-8 text-center space-y-6">
       <div className="space-y-1">
-        <h2 className="text-xl font-bold text-slate-900">Your Counter QR Standee</h2>
+        <h2 className="text-xl font-bold text-slate-900">Your Counter QR Code</h2>
         <p className="text-xs text-slate-500">Customers scan this QR at your counter — directly opens WhatsApp (No App Required)</p>
       </div>
 
@@ -2776,14 +2776,14 @@ function Step7PrintQR({ data, setData }: any) {
   return (
     <div className="p-6 sm:p-8 space-y-6">
       <div className="text-center space-y-1">
-        <h2 className="text-xl font-bold text-slate-900">Print Counter QR Standee & Posters</h2>
+        <h2 className="text-xl font-bold text-slate-900">Print Counter QR Code & Posters</h2>
         <p className="text-xs text-slate-500">Preview and print your physical QR displays for counter & tables</p>
       </div>
 
       {/* Format Selector Tabs */}
       <div className="flex justify-center gap-2 flex-wrap">
         {[
-          { id: "table", label: "🪧 Table Standee", desc: "A5 / Acrylic" },
+          { id: "table", label: "🪧 Table QR Code", desc: "A5 / High-Res" },
           { id: "counter", label: "🪟 Counter Display", desc: "Horizontal" },
           { id: "poster", label: "📄 A4 Poster", desc: "Wall Poster" },
           { id: "sticker", label: "🏷️ Box Sticker", desc: "Cake Box / Pack" },
@@ -2846,12 +2846,12 @@ function Step7PrintQR({ data, setData }: any) {
       {/* Action Buttons */}
       <div className="flex justify-center gap-3 pt-2">
         <Button onClick={handlePrint} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-5 px-6 shadow-md gap-2">
-          <Printer className="w-5 h-5" /> Print Standee (PDF) 🖨️
+          <Printer className="w-5 h-5" /> Print QR Code (PDF) 🖨️
         </Button>
         <Button
           variant="outline"
           onClick={() => {
-            alert(`Standee format (${standeeType.toUpperCase()}) prepared for printing! Click 'Print Standee' to save as PDF or print on paper.`)
+            alert(`QR Code format (${standeeType.toUpperCase()}) prepared for printing! Click 'Print QR Code' to save as PDF or print on paper.`)
           }}
           className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-xs"
         >
@@ -2930,7 +2930,7 @@ function Step9Launch({ data, activationScore }: any) {
           <Check className="w-4 h-4 text-emerald-600" /> Google Place Linked ({data.googleBusiness || "Connected"})
         </div>
         <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-          <Check className="w-4 h-4 text-emerald-600" /> Counter QR Standee Ready
+          <Check className="w-4 h-4 text-emerald-600" /> Counter QR Code Ready
         </div>
       </div>
 

@@ -47,7 +47,7 @@ const config: VsPageConfig = {
     { feature: "Negative Review Smart Gate", competitor: "Survey form redirect", cp: "Private escalation to owner before it hits Google", winner: "cp" },
     { feature: "Customer App Required", competitor: "Web review widget (some mobile)", cp: "Zero — all inside WhatsApp chat", winner: "cp" },
     { feature: "India WhatsApp API Support", competitor: "Limited / US-focused integration", cp: "Native Evolution API for Indian WhatsApp numbers", winner: "cp" },
-    { feature: "Counter Onboarding", competitor: "Complex setup, POS integration needed", cp: "One QR standee — zero POS needed, 5-second flow", winner: "cp" },
+    { feature: "Counter Onboarding", competitor: "Complex setup, POS integration needed", cp: "One counter QR Code — zero POS needed, 5-second flow", winner: "cp" },
     { feature: "Data Ownership", competitor: "Platform-hosted, export limited", cp: "100% merchant-owned, 1-click CSV export", winner: "cp" },
   ],
   bestForCompetitor: "You're a large multi-location chain with a dedicated marketing team, US/global presence, and need enterprise-grade multi-platform review management across Google, Yelp, Trustpilot, Facebook — with CRM integrations.",

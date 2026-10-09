@@ -244,7 +244,7 @@ export function SubscriptionPlansManager() {
                   }`}
                 >
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Pricing Studio v4</span>
+                  <span>Pricing Plans</span>
                   <Badge variant="outline" className="text-[9px] bg-emerald-500/20 text-emerald-300 border-none font-bold">Interactive</Badge>
                 </button>
                 <button

@@ -38,7 +38,7 @@ const config: VsPageConfig = {
     { feature: "Google Review AutoReply", competitor: "Template-based alerts", cp: "Autonomous AI (context & tone-aware)", winner: "cp" },
     { feature: "AI Review Draft for Customers", competitor: null, cp: "✅ AI drafts SEO-optimized review for customer", winner: "cp" },
     { feature: "Negative Review Filtering", competitor: "Basic survey form link", cp: "Smart Gate — private escalation before Google", winner: "cp" },
-    { feature: "Counter Setup Friction", competitor: "Requires POS tie-up or web console", cp: "5-second standee QR flow — zero POS needed", winner: "cp" },
+    { feature: "Counter Setup Friction", competitor: "Requires POS tie-up or web console", cp: "5-second counter QR flow — zero POS needed", winner: "cp" },
     { feature: "Google Business Profile Connect", competitor: "Manual / limited", cp: "1-click OAuth — fully automated", winner: "cp" },
     { feature: "Win-Back Automation", competitor: "Manual campaigns", cp: "Automated 14/30/60-day inactive triggers", winner: "cp" },
     { feature: "Data Export", competitor: "Dashboard reports", cp: "1-click Excel/CSV export, 100% merchant-owned", winner: "cp" },

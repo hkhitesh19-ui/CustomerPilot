@@ -127,10 +127,10 @@ const FREE_TOOL_FAQS: DualLangFaqItem[] = [
     id: 3,
     questionEn: "Can CustomerPilot generate reviews for my customers automatically at the billing counter?",
     answerEn:
-      "Yes! While this online page is a manual test generator, CustomerPilot's Smart Acrylic Counter Standee does this completely on autopilot. When walk-in customers scan the standee with their phone camera, our AI drafts personalized reviews directly on their WhatsApp in 3 seconds.",
+      "Yes! While this online page is a manual test generator, CustomerPilot's Smart Ai Google Review System does this completely on autopilot. When walk-in customers scan the counter QR Code with their phone camera, our AI drafts personalized reviews directly on their WhatsApp in 3 seconds.",
     questionHi: "Kya CustomerPilot billing counter par customers ke liye automatically reviews likh sakta hai?",
     answerHi:
-      "Bilkul! Ye page manual testing ke liye hai, par CustomerPilot ka Smart Counter Standee yahi kaam billing counter par autopilot par karta hai. Customer QR scan karta hai aur AI 3 second me unke phone me review draft kar deta hai."
+      "Bilkul! Ye page manual testing ke liye hai, par CustomerPilot ka Smart Ai Google Review System yahi kaam billing counter par autopilot par karta hai. Customer QR scan karta hai aur AI 3 second me unke phone me review draft kar deta hai."
   },
   {
     id: 4,
@@ -199,14 +199,14 @@ export function FreeAiReviewGeneratorClient() {
               href="/smart-ai-google-review"
               className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition"
             >
-              <ArrowLeft className="w-3.5 h-3.5" /> Smart Review Standee
+              <ArrowLeft className="w-3.5 h-3.5" /> Smart Ai Google Review QR
             </Link>
             <Button
               asChild
               size="sm"
               className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-md transition-all"
             >
-              <Link href="/signup">Get Free Standee →</Link>
+              <Link href="/signup">Get Smart QR Free →</Link>
             </Button>
           </div>
         </div>
@@ -423,7 +423,7 @@ export function FreeAiReviewGeneratorClient() {
           <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-3 text-[11px] font-semibold text-slate-500">
             <span>You might also need:</span>
             <Link href="/smart-ai-google-review" className="text-amber-700 hover:text-amber-900 underline underline-offset-2">
-              Smart AI Review Standee (Auto-Generates on WhatsApp)
+              Smart Ai Google Review System (Auto-Generates on WhatsApp)
             </Link>
             <span className="text-slate-300">·</span>
             <Link href="/ai-google-review-autoreply" className="text-amber-700 hover:text-amber-900 underline underline-offset-2">
@@ -449,7 +449,7 @@ export function FreeAiReviewGeneratorClient() {
                   Put This Entire Review Engine on Autopilot at Your Billing Counter.
                 </h3>
                 <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                  With CustomerPilot&apos;s Smart Acrylic QR Standee, customers don&apos;t have to open websites or think of words. When they scan your counter QR or pay via UPI, our AI automatically crafts 3 personalized 5-star review drafts directly in their WhatsApp. They tap once, and it publishes directly to Google Maps!
+                  With CustomerPilot&apos;s Smart Ai Google Review System, customers don&apos;t have to open websites or think of words. When they scan your counter QR Code or pay via UPI, our AI automatically crafts 3 personalized 5-star review drafts directly in their WhatsApp. They tap once, and it publishes directly to Google Maps!
                 </p>
 
                 <div className="flex flex-wrap gap-4 pt-2 text-xs font-bold text-slate-700">
@@ -463,7 +463,7 @@ export function FreeAiReviewGeneratorClient() {
                   </span>
                   <span className="flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    Free Counter Standee Included
+                    Free Counter QR Code Included
                   </span>
                 </div>
 
@@ -474,7 +474,7 @@ export function FreeAiReviewGeneratorClient() {
                     className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-sm px-6 py-4 rounded-xl shadow-md w-full sm:w-auto transition-all"
                   >
                     <Link href="/smart-ai-google-review">
-                      <span>Explore Smart Review Standee</span>
+                      <span>Explore Smart Ai Google Review QR</span>
                       <ArrowRight className="w-4 h-4 ml-1.5" />
                     </Link>
                   </Button>

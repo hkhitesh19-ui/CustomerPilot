@@ -87,7 +87,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Print Smart AI Google Review Standee - ${storeName}</title>
+          <title>Print Smart AI Google Review QR - ${storeName}</title>
           <link rel="preconnect" href="https://fonts.googleapis.com">
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
           <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&family=Product+Sans:wght@700;900&display=swap" rel="stylesheet">
@@ -326,10 +326,10 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
               <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                 <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
               </div>
-              Smart Ai Google Reviews QR Standee &amp; Posters
+              Smart Ai Google Reviews QR Code &amp; Posters
             </CardTitle>
             <CardDescription className="text-slate-600 dark:text-slate-400 mt-1">
-              Official Acrylic Tabletop Standee designed for maximum 5-star Google review conversions.
+              Official Tabletop QR Code designed for maximum 5-star Google review conversions.
             </CardDescription>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -360,7 +360,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
               className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs shadow-md shadow-amber-500/20 rounded-xl"
             >
               <Printer className="w-3.5 h-3.5 mr-1" />
-              Print A4 Standee
+              Print A4 QR Code
             </Button>
           </div>
         </div>
@@ -373,11 +373,11 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
           <div className="lg:col-span-6 space-y-4">
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                Choose QR Standee Placement
+                Choose QR Code Placement
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { id: "review_counter", label: "Counter Standee", icon: "🏢" },
+                  { id: "review_counter", label: "Counter QR Code", icon: "🏢" },
                   { id: "review_table", label: "Table Tent Card", icon: "🍽️" },
                   { id: "review_sticker", label: "Bill / Box Sticker", icon: "🏷️" },
                   { id: "review_poster", label: "Window Poster", icon: "🖼️" },
@@ -402,7 +402,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
             <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-50/80 via-white to-blue-50/50 dark:from-slate-800/60 dark:to-slate-900/60 border border-amber-200/60 dark:border-slate-700/60 space-y-2.5 shadow-xs">
               <div className="flex items-center gap-2 text-xs font-extrabold text-amber-800 dark:text-amber-400">
                 <Sparkles className="w-4 h-4 text-amber-500" />
-                <span>Smart AI Google Review Standee Highlights:</span>
+                <span>Smart AI Google Review QR Highlights:</span>
               </div>
               <ul className="text-xs text-slate-700 dark:text-slate-300 space-y-2">
                 <li className="flex items-start gap-2">
@@ -415,7 +415,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-500 font-bold">✓</span>
-                  <span><strong>Ready for Acrylic Fabrication:</strong> High-definition vector layout ready to print or insert directly into store counter standees.</span>
+                  <span><strong>Ready for Counter Display:</strong> High-definition vector layout ready to print or display on store counters.</span>
                 </li>
               </ul>
             </div>
@@ -442,7 +442,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
             {/* Mockup Canvas */}
             <div className="relative w-full max-w-[420px] flex items-center justify-center p-4 sm:p-6 bg-gradient-to-b from-slate-100/80 via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-inner">
               
-              {/* ── The Acrylic Standee ───────────────── */}
+              {/* ── The Counter QR Code Display ───────────────── */}
               <div className="relative w-[290px] sm:w-[320px]">
                 
                 {/* Standee Body */}
@@ -559,7 +559,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
             {/* Quick Helper Labels */}
             <div className="flex items-center justify-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400 mt-3">
               <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-blue-500" /> Counter Standee
+                <span className="w-2 h-2 rounded-full bg-blue-500" /> Counter QR Code
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-500" /> Table Tent

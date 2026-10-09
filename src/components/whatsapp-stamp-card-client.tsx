@@ -47,7 +47,7 @@ export function WhatsAppStampCardClient() {
           <div className="flex gap-4 items-start">
             <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-700 font-extrabold text-lg flex-shrink-0 border border-emerald-100">1</div>
             <div>
-              <h3 className="font-bold text-lg text-slate-900">Customer Scans Store QR Standee</h3>
+              <h3 className="font-bold text-lg text-slate-900">Customer Scans Store QR Code</h3>
               <p className="text-xs text-slate-500 mt-1 leading-relaxed">Available on counter stands, dining tables, window posters, and packaging stickers. Works on every camera phone without downloading an app.</p>
             </div>
           </div>

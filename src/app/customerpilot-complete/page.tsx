@@ -30,7 +30,7 @@ const FAQS = [
   },
   {
     question: "Can I use CustomerPilot without buying any expensive billing POS machine?",
-    answer: "Zero special hardware required! CustomerPilot operates 100% in the cloud. You can run the cashier queue on any smartphone, iPad, tablet, or desktop, or simply place our printable counter QR standee for customer self-checkin."
+    answer: "Zero special hardware required! CustomerPilot operates 100% in the cloud. You can run the cashier queue on any smartphone, iPad, tablet, or desktop, or simply place our printable counter QR Code for customer self-checkin."
   },
   {
     question: "How does CustomerPilot Complete compare to separate tools like Birdeye or Stamp Me?",
@@ -38,7 +38,7 @@ const FAQS = [
   },
   {
     question: "How fast can my store go live with the complete retention suite?",
-    answer: "You can go live in under 3 minutes! Simply sign up, connect your WhatsApp bot and Google Business Profile, print your auto-generated counter QR standee, and start rewarding customers immediately."
+    answer: "You can go live in under 3 minutes! Simply sign up, connect your WhatsApp bot and Google Business Profile, print your auto-generated counter QR Code, and start rewarding customers immediately."
   },
   {
     question: "What is the pricing for the full CustomerPilot Complete suite?",

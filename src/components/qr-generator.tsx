@@ -79,14 +79,14 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
       const blobUrl = URL.createObjectURL(blob)
       const link = document.createElement("a")
       link.href = blobUrl
-      link.download = `${storeName.replace(/\s+/g, "_")}-Master-QR-Standee.jpg`
+      link.download = `${storeName.replace(/\s+/g, "_")}-Master-QR-Code.jpg`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
       URL.revokeObjectURL(blobUrl)
-      toast({ title: "Downloaded Standee!", description: "Universal Master Standee poster image downloaded successfully." })
+      toast({ title: "Downloaded QR Code!", description: "Universal Master QR poster image downloaded successfully." })
     } catch (e: any) {
-      toast({ title: "Download Failed", description: e.message || "Could not download standee image", variant: "destructive" })
+      toast({ title: "Download Failed", description: e.message || "Could not download QR code image", variant: "destructive" })
     } finally {
       setDownloadingPoster(false)
     }
@@ -117,7 +117,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Master QR Loyalty Standee - ${safeStoreName}</title>
+  <title>Master QR Loyalty Poster - ${safeStoreName}</title>
   <style>
     @page {
       size: A4 portrait;
@@ -266,15 +266,15 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
 <body>
   <div class="print-bar no-print">
     <span class="paper-hint">📐 Paper: Standard A4 Portrait (250+ GSM recommended)</span>
-    <button class="btn-print" onclick="window.print()">🖨️ Print Standee</button>
+    <button class="btn-print" onclick="window.print()">🖨️ Print QR Code</button>
     <button class="btn-close" onclick="window.close()">✕ Close</button>
   </div>
 
   <div class="print-sheet">
     <div class="trim-guide-box">
       <span class="trim-label-top">✂️ Cut along dashed line for Counter Acrylic Stand (A5 / 6×8" / 2:3)</span>
-      <img src="${standeeDataUrl}" alt="${safeStoreName} Universal Master Standee" class="standee-master-img" />
-      <span class="trim-label-bottom">CustomerPilot Master Standee • Universal Master Design</span>
+      <img src="${standeeDataUrl}" alt="${safeStoreName} Universal Master QR Code" class="standee-master-img" />
+      <span class="trim-label-bottom">CustomerPilot Master QR • Universal Master Design</span>
     </div>
   </div>
 </body>
@@ -288,7 +288,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
         } else {
           toast({
             title: "Popup Blocked",
-            description: "Please allow popups in your browser to open the printable standee view.",
+            description: "Please allow popups in your browser to open the printable QR code view.",
             variant: "destructive",
           })
         }
@@ -297,7 +297,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
     } catch (e: any) {
       toast({
         title: "Print Failed",
-        description: e.message || "Could not prepare master standee for printing",
+        description: e.message || "Could not prepare master QR code for printing",
         variant: "destructive",
       })
     } finally {
@@ -314,10 +314,10 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
               <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
                 <QrCode className="w-5 h-5" />
               </div>
-              Digital Loyalty Stamp QR Standee
+              Digital Loyalty Stamp QR Code
             </CardTitle>
             <CardDescription className="text-slate-600 dark:text-slate-400">
-              Universal Master QR Loyalty Standee with your branding, live WhatsApp check-in QR &amp; print-ready A4 export.
+              Universal Master QR Loyalty Display with your branding, live WhatsApp check-in QR &amp; print-ready A4 export.
             </CardDescription>
           </div>
 
@@ -357,7 +357,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
               size="sm"
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md"
             >
-              <Printer className="w-4 h-4 mr-1.5" /> {printingPoster ? "Preparing..." : "Print Standee (A4)"}
+              <Printer className="w-4 h-4 mr-1.5" /> {printingPoster ? "Preparing..." : "Print QR Code (A4)"}
             </Button>
           </div>
         </div>
@@ -367,7 +367,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
         {loading ? (
           <div className="p-16 flex flex-col items-center justify-center text-slate-400 gap-3">
             <RefreshCw className="w-8 h-8 animate-spin text-indigo-600" />
-            <span className="text-sm font-semibold">Generating Master QR Standee...</span>
+            <span className="text-sm font-semibold">Generating Master QR Code...</span>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-4">
@@ -376,7 +376,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
             <div className="w-full max-w-sm flex flex-col items-center relative">
               <img
                 src={`/api/qr/standee?design=master&m=${merchantId}`}
-                alt={`${storeName} Universal Master Standee`}
+                alt={`${storeName} Universal Master QR Code`}
                 className="w-full h-auto rounded-[24px] shadow-2xl border-2 border-slate-900 object-contain"
               />
               <div className="mt-3 flex items-center justify-between w-full px-2 text-xs text-slate-500 font-semibold">
@@ -392,7 +392,7 @@ export function QRGenerator({ merchantId }: { merchantId: string }) {
             <div className="mt-6 max-w-md w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-400">
               <span className="flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
-                Click <strong>&quot;Print Standee (A4)&quot;</strong> or <strong>&quot;Download Poster&quot;</strong> for instant acrylic counter display inserts.
+                Click <strong>&quot;Print QR Code (A4)&quot;</strong> or <strong>&quot;Download Poster&quot;</strong> for instant counter display inserts.
               </span>
               <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-md whitespace-nowrap">
                 Master Template Locked

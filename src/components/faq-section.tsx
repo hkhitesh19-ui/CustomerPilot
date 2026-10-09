@@ -80,17 +80,17 @@ const FAQ_DATA: FaqItem[] = [
     categoryLabelHi: "Shuruat",
     icon: "⚡",
     question: "How fast can I get started and launch CustomerPilot in my store?",
-    answer: "You can be fully live in less than 3 minutes! Simply sign up with your business name, set your reward criteria (e.g. 'Visit 6 times, get ₹200 discount'), connect your Google Business Profile in 1 click, and download your auto-generated branded counter QR standee. Place the standee at your billing counter and start issuing stamps and collecting Google reviews immediately.",
+    answer: "You can be fully live in less than 3 minutes! Simply sign up with your business name, set your reward criteria (e.g. 'Visit 6 times, get ₹200 discount'), connect your Google Business Profile in 1 click, and download your auto-generated branded counter QR Code. Place the QR Code display at your billing counter and start issuing stamps and collecting Google reviews immediately.",
     highlights: [
       "Live in under 3 minutes",
-      "Instant printable QR standee generator included",
+      "Instant printable QR code generator included",
       "Free onboarding assistance via WhatsApp"
     ],
     questionHi: "Main CustomerPilot ko apni dukan me kitni jaldi shuru kar sakta hoon?",
-    answerHi: "Aap sirf 3 minute me poori tarah live ho sakte hain! Apne business name ke sath signup karein, apna reward rule set karein (jaise '6 visits par ₹200 discount'), apna Google Business Profile connect karein, aur auto-generated counter QR standee print karke billing counter par rakh dein.",
+    answerHi: "Aap sirf 3 minute me poori tarah live ho sakte hain! Apne business name ke sath signup karein, apna reward rule set karein (jaise '6 visits par ₹200 discount'), apna Google Business Profile connect karein, aur auto-generated counter QR Code print karke billing counter par rakh dein.",
     highlightsHi: [
       "3 minute ke andar live ho jayein",
-      "Instant printable QR standee generator shamil hai",
+      "Instant printable QR code generator shamil hai",
       "WhatsApp par free onboarding assistance"
     ]
   },
@@ -101,18 +101,18 @@ const FAQ_DATA: FaqItem[] = [
     categoryLabelHi: "Hardware & POS",
     icon: "🖥️",
     question: "Do I need an expensive POS system, barcode scanner, or special hardware?",
-    answer: "Zero special hardware required! CustomerPilot operates entirely in the cloud. You can run our Cashier 1-Tap Counter Queue from any billing desktop, iPad, tablet, or staff smartphone. Alternatively, you can simply place our printed QR standee on your counter for customers to self-scan—meaning you don't even need a billing computer to run your loyalty program.",
+    answer: "Zero special hardware required! CustomerPilot operates entirely in the cloud. You can run our Cashier 1-Tap Counter Queue from any billing desktop, iPad, tablet, or staff smartphone. Alternatively, you can simply place our printed QR Code on your counter for customers to self-scan—meaning you don't even need a billing computer to run your loyalty program.",
     highlights: [
       "Works on any smartphone, iPad, tablet, or laptop",
       "Compatible with all existing billing software (Petpooja, Vyapar, Tally, Marg, etc.)",
-      "Counter QR standee allows 100% contactless customer self-checkin"
+      "Counter QR Code allows 100% contactless customer self-checkin"
     ],
     questionHi: "Kya mujhe kisi expensive POS system, barcode scanner, ya special hardware ki zaroorat padegi?",
     answerHi: "Zero special hardware required! CustomerPilot poori tarah cloud-based hai. Aap apne smartphone, tablet, iPad, ya billing desktop se 1-Tap Cashier Counter Queue chala sakte hain, ya grahak counter QR khud scan kar sakte hain.",
     highlightsHi: [
       "Kisi bhi smartphone, tablet, ya laptop par chalta hai",
       "Sabhi billing software (Petpooja, Vyapar, Tally, Marg) ke sath compatible",
-      "Counter QR standee contactless self-checkin allow karta hai"
+      "Counter QR Code contactless self-checkin allow karta hai"
     ]
   },
 
@@ -361,17 +361,17 @@ const FAQ_DATA: FaqItem[] = [
     categoryLabelHi: "Support & Help",
     icon: "🤝",
     question: "What kind of customer support and training is provided?",
-    answer: "Every merchant gets direct access to our priority WhatsApp support (+91 90333 04707), phone support, and email helpdesk. Our dedicated merchant success specialists assist you with designing and printing your counter standees, configuring custom reward milestones, verifying your Google Business Profile connection, and training your cashier staff.",
+    answer: "Every merchant gets direct access to our priority WhatsApp support (+91 90333 04707), phone support, and email helpdesk. Our dedicated merchant success specialists assist you with designing and printing your counter QR codes, configuring custom reward milestones, verifying your Google Business Profile connection, and training your cashier staff.",
     highlights: [
       "Direct WhatsApp support with real humans: +91 90333 04707",
-      "Free custom counter standee print-ready design file",
+      "Free custom counter QR Code print-ready design file",
       "Staff training cheat-sheets and quick-start videos"
     ],
     questionHi: "Kis tarah ka customer support aur training provide ki jaati hai?",
-    answerHi: "Har merchant ko hamari priority WhatsApp support (+91 90333 04707), phone support, aur free custom counter standee print-ready design file milti hai. Sath hi staff training cheat-sheets aur onboarding videos provide kiye jaate hain.",
+    answerHi: "Har merchant ko hamari priority WhatsApp support (+91 90333 04707), phone support, aur free custom counter QR Code print-ready design file milti hai. Sath hi staff training cheat-sheets aur onboarding videos provide kiye jaate hain.",
     highlightsHi: [
       "Real humans ke sath direct WhatsApp support: +91 90333 04707",
-      "Free custom counter standee print-ready design file",
+      "Free custom counter QR Code print-ready design file",
       "Staff training cheat-sheets aur quick-start videos"
     ]
   }

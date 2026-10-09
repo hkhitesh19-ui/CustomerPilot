@@ -39,7 +39,7 @@ const config: VsPageConfig = {
     { feature: "AI Review Draft for Customers", competitor: null, cp: "✅ AI pre-fills review draft for customer", winner: "cp" },
     { feature: "1-Click Google AutoReply", competitor: "Manual or basic templates", cp: "Autonomous context-aware AI replies", winner: "cp" },
     { feature: "Negative Feedback Routing", competitor: "Form-based", cp: "Smart Gate — private before public Google", winner: "cp" },
-    { feature: "Counter POS Dependency", competitor: "Requires POS or app dashboard", cp: "One standee QR — zero POS needed", winner: "cp" },
+    { feature: "Counter POS Dependency", competitor: "Requires POS or app dashboard", cp: "One counter QR Code — zero POS needed", winner: "cp" },
     { feature: "WhatsApp Win-Back Campaigns", competitor: "SMS-based re-engagement", cp: "Automated WhatsApp with personalized offers", winner: "cp" },
     { feature: "Data Ownership", competitor: "Platform-managed data", cp: "100% merchant-owned, 1-click export", winner: "cp" },
   ],

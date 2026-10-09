@@ -72,7 +72,7 @@ const SMART_AI_REVIEW_SCHEMA = {
           "acceptedAnswer": {
             "@type": "Answer",
             "text":
-              "Place the CustomerPilot acrylic QR standee on your billing counter. When customers scan it, our generative AI drafts an authentic, positive review highlighting their purchase. The customer taps once to open Google Maps directly to the review submission dialog with the text pre-filled."
+              "Place the CustomerPilot Smart Ai Google Review QR code on your billing counter. When customers scan it, our generative AI drafts an authentic, positive review highlighting their purchase. The customer taps once to open Google Maps directly to the review submission dialog with the text pre-filled."
           }
         },
         {

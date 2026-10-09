@@ -3,6 +3,32 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [09 Oct 2026] Feature & Copy Refactor: Universal Terminology Cleanup (NFC Removal, Standee to QR Code, Pricing Hierarchy & Product Naming)
+- **Symptom**: User requested 6 comprehensive copy and product identity adjustments:
+  1. Remove "Simple, Transparent Pricing" completely.
+  2. Remove "Studio v4" from "Pricing Studio v4" across all website, SuperAdmin, and Merchant surfaces.
+  3. Remove "NFC" word completely across the entire website and rephrase sentences naturally to highlight smart QR code technology without requiring hardware.
+  4. On `/whatsapp-digital-loyalty-card`, rename "How Our WhatsApp Loyalty Engine Works in 3 Simple Steps" to "How Our WhatsApp Digital Loyalty Stamps System Works in 3 Simple Steps".
+  5. On `/ai-google-review-qr-generator`, rename headline to "Smart Ai Google Review QR", establish the official product name as "Smart Ai Google Review System", and remove all "Acrylic QR Standee" references.
+  6. Replace the word "Standee" with "QR Code" (or "Counter QR Code" / "Table QR Code" / "QR Code Display") across the entire website with grammatically natural sentence adjustments.
+- **Root Cause**: Earlier iterations contained legacy hardware-centric terminology ("NFC", "Acrylic Standee") which caused merchant confusion regarding hardware dependencies vs software SaaS capabilities, plus leftover development versioning labels ("Studio v4", "Simple, Transparent Pricing").
+- **Resolution**:
+  1. **Pricing Decluttering**:
+     - Removed `<span>Simple, Transparent Pricing</span>` badge from `src/components/pricing/pricing-studio.tsx`.
+     - Renamed all UI tabs and page titles from `Pricing Studio v4` to `Pricing Plans` / `Pricing` in `src/app/pricing/page.tsx`, `src/app/dashboard/subscription/page.tsx`, and `src/components/super-admin/subscription-plans-manager.tsx`.
+  2. **100% NFC Elimination**:
+     - Audited all 17 occurrences of "NFC" across `src/` and replaced them with "Smart QR", "Printable High-Res QR", or "custom cards" with natural sentence flow. Zero instances of "NFC" remain.
+  3. **Standee Terminology Modernization**:
+     - Replaced 145+ instances of "Standee" across 26 UI files with "QR Code", "Counter QR Code", "Table QR Code", or "QR Code Display".
+     - Updated `/whatsapp-digital-loyalty-card` headline to "How Our WhatsApp Digital Loyalty Stamps System Works in 3 Simple Steps".
+     - Updated `/ai-google-review-qr-generator` headline to "Smart Ai Google Review QR" and product references to "Smart Ai Google Review System".
+  4. **Compilation & Ground-Truth Verification**:
+     - Cleaned TypeScript imports in `src/app/llms.txt/route.ts`, `src/app/dashboard/subscription/page.tsx`, and `src/components/smart-digital-business-card-client.tsx`.
+     - Executed full production build (`npm run build`) compiling all 189 static and dynamic routes with 0 errors.
+     - Ran Playwright end-to-end verification (`scripts/verify_branding_changes.js`), asserting zero occurrences of "Simple, Transparent Pricing", "Studio v4", "NFC", and "Acrylic QR Standee", and verifying exact H1s and section titles across all target URLs.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [09 Oct 2026] Feature: Professional 3-Tier Pricing Hierarchy & Decluttering Across Website, SuperAdmin & Merchant Panels
 - **Symptom**: On `http://localhost:3000/pricing`, multiple duplicate pricing tables and product grids (legacy outcome cards, capacity cards, standalone table, bundle cards) were rendering concurrently, exposing dozens of conflicting price tags and causing cognitive overload/confusion for retail merchants.
 - **Root Cause**:

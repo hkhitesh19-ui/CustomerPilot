@@ -10,7 +10,7 @@ import { QrCode, Crown, Utensils, ArrowRight, ShieldCheck, TrendingUp, Star } fr
 const FAQS = [
   {
     question: "How to increase repeat customers in restaurant without app?",
-    answer: "By using CustomerPilot's WhatsApp digital stamp cards. Instead of forcing diners to download a heavy mobile app, customers scan your table acrylic QR standee and join your VIP club in 5 seconds directly on WhatsApp. Automated visit reminders and VIP multiplier rewards bring diners back 35%+ more frequently."
+    answer: "By using CustomerPilot's WhatsApp digital stamp cards. Instead of forcing diners to download a heavy mobile app, customers scan your table QR Code and join your VIP club in 5 seconds directly on WhatsApp. Automated visit reminders and VIP multiplier rewards bring diners back 35%+ more frequently."
   },
   {
     question: "How does CustomerPilot help restaurants eliminate heavy Zomato and Swiggy commissions?",
@@ -22,7 +22,7 @@ const FAQS = [
   },
   {
     question: "Where should QR codes be placed in a restaurant?",
-    answer: "Place durable acrylic QR standees on dining tables so customers scan while awaiting their food, and a secondary QR standee at the billing checkout counter."
+    answer: "Place durable QR codes on dining tables so customers scan while awaiting their food, and a secondary QR Code at the billing checkout counter."
   }
 ]
 
@@ -64,9 +64,9 @@ export function RestaurantLoyaltyClient() {
             <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
               <Utensils className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-lg text-foreground">Table Standee QR</h3>
+            <h3 className="font-bold text-lg text-foreground">Table QR Code</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Diners scan the table standee while waiting for their food. Registration happens in 5 seconds over WhatsApp—no slow app downloads, no friction.
+              Diners scan the table QR Code while waiting for their food. Registration happens in 5 seconds over WhatsApp—no slow app downloads, no friction.
             </p>
           </CardContent>
         </Card>

@@ -10,7 +10,7 @@ import { Zap, UtensilsCrossed, Star, ArrowRight, Clock, ShieldCheck, Repeat } fr
 const FAQS = [
   {
     question: "How does fast food loyalty software on WhatsApp speed up checkout during rush hours?",
-    answer: "Customers simply point their camera at the acrylic counter QR standee while waiting in line or at pickup. Registration takes under 5 seconds with zero app downloads or OTP typing, keeping your cashier billing line moving at top speed."
+    answer: "Customers simply point their camera at the counter QR Code while waiting in line or at pickup. Registration takes under 5 seconds with zero app downloads or OTP typing, keeping your cashier billing line moving at top speed."
   },
   {
     question: "How to increase repeat customers in a QSR or street food shop without an app?",
@@ -62,7 +62,7 @@ export function FastFoodLoyaltyClient() {
             </div>
             <h3 className="font-bold text-lg text-foreground">5-Second Counter Scan</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Fast food counters cannot afford cashier delays. Customers scan the counter standee QR, and cashiers tap to claim in 5 seconds without changing your existing POS or UPI setup.
+              Fast food counters cannot afford cashier delays. Customers scan the counter QR Code, and cashiers tap to claim in 5 seconds without changing your existing POS or UPI setup.
             </p>
           </CardContent>
         </Card>

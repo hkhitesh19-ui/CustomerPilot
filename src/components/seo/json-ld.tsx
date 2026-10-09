@@ -21,7 +21,7 @@ export function SoftwareApplicationJsonLd() {
         "@type": "SoftwareApplication",
         "name": "Smart Digital Business Card",
         "url": "https://customerpilot.in/smart-digital-business-card",
-        "description": "NFC and QR-powered digital business card with 1-tap contact saving, ordering links, and real-time analytics for Indian businesses."
+        "description": "Smart QR-powered digital business card with 1-tap contact saving, ordering links, and real-time analytics for Indian businesses."
       },
       {
         "@type": "SoftwareApplication",
@@ -37,9 +37,9 @@ export function SoftwareApplicationJsonLd() {
       },
       {
         "@type": "SoftwareApplication",
-        "name": "AI Google Review QR Standee",
+        "name": "Smart Ai Google Review QR",
         "url": "https://customerpilot.in/ai-google-review-qr-generator",
-        "description": "Premium acrylic AI Google Review QR counter standee for retail billing counters. Triggers automatic WhatsApp-based review generation on scan."
+        "description": "CustomerPilot Smart Ai Google Review System with high-resolution counter QR code for retail billing counters. Triggers automatic WhatsApp-based review generation on scan."
       },
       {
         "@type": "SoftwareApplication",

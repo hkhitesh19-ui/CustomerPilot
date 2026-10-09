@@ -80,7 +80,7 @@ const config: VsPageConfig = {
     { feature: "AI Google Review Auto-Writer", competitor: null, cp: "✅ Built-in QR Engine & AI Review Drafts", winner: "cp" },
     { feature: "Negative Feedback Protection", competitor: "None", cp: "Private Feedback Filter before Google Maps", winner: "cp" },
     { feature: "Indian Retail & UPI Optimization", competitor: "Western focus (US/AU/UK)", cp: "100% India-ready (Hinglish API & UPI)", winner: "cp" },
-    { feature: "Counter Setup Hardware", competitor: "Stamp-Me Bluetooth Beacon or manual app", cp: "Simple Acrylic QR Standee — zero hardware", winner: "cp" },
+    { feature: "Counter Setup Hardware", competitor: "Stamp-Me Bluetooth Beacon or manual app", cp: "Simple Counter QR Code — zero hardware", winner: "cp" },
     { feature: "Automated Inactivity Win-Back", competitor: "Basic broadcast notifications", cp: "Automated 14/30/60-day WhatsApp triggers", winner: "cp" },
     { feature: "Data Export & Ownership", competitor: "Web dashboard export", cp: "1-Click Excel/CSV export, 100% merchant-owned", winner: "cp" }
   ],

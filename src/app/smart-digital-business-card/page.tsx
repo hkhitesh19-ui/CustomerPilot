@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Smart digital visiting card India",
     "Bio link QR code generator",
     "Contactless digital menu QR",
-    "NFC business card software",
+    "smart digital business card software",
     "Google review digital business card",
     "Dukan ke liye digital visiting card",
   ],
@@ -39,8 +39,8 @@ const DIGITAL_CARD_FAQS = [
     answer: "Humara card Google ke official direct review modal (search.google.com/local/writereview?placeid=...) se judha hota hai. Customer ke tap karte hi seedha 5-star rating dialog khulta hai, jisse review conversion 5X ho jata hai."
   },
   {
-    question: "Can I print the QR code on my counter standees, packaging boxes, and stickers?",
-    answer: "Yes. CustomerPilot provides high-resolution printable QR codes in SVG and PNG formats, ready for acrylic counter standees, carry bags, delivery boxes, and NFC cards."
+    question: "Can I print the QR code on my counter QR displays, packaging boxes, and stickers?",
+    answer: "Yes. CustomerPilot provides high-resolution printable QR codes in SVG and PNG formats, ready for counter QR codes, carry bags, delivery boxes, and custom cards."
   },
   {
     question: "What happens when I change my phone number or business hours?",

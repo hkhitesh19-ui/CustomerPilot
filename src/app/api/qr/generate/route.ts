@@ -44,13 +44,13 @@ export async function GET(req: NextRequest) {
       }
 
       const reviewTitleMap: Record<string, string> = {
-        review_counter: "Google Reviews Counter Standee",
+        review_counter: "Google Reviews Counter QR Code",
         review_table: "Table Tent Google Review QR",
         review_sticker: "Packaging / Bill Review Sticker QR",
         review_poster: "Store Front 5-Star Review Poster",
         review_direct: "Direct Google 5-Star Review QR"
       }
-      defaultTitle = reviewTitleMap[type] || "Google Reviews QR Standee"
+      defaultTitle = reviewTitleMap[type] || "Google Reviews QR Code"
     } else {
       // ─── Loyalty VIP WhatsApp Check-in QR ───────────────────
       // normalizePhone: last-line-of-defense — always ensures 91XXXXXXXXXX format
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
 
       const loyaltyTitleMap: Record<string, string> = {
         counter: "VIP Loyalty Counter QR Stand",
-        table: "Table VIP Stamp Standee",
+        table: "Table VIP Stamp QR Code",
         poster: "Store Window VIP Loyalty Poster",
         sticker: "VIP Packaging Sticker QR",
         cake_box: "Cake Box Seal VIP QR"

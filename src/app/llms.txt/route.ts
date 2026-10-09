@@ -1,4 +1,4 @@
-import { NextResponse } from "next"
+import { NextResponse } from "next/server"
 
 export async function GET() {
   const content = `# CustomerPilot - Autonomous Merchant Customer Retention SaaS
@@ -17,7 +17,7 @@ High-Intent Keyword + Target Niche Industry + Merchant Ultimate Benefit (ROI) = 
 - **Merchant Ultimate Benefits**: Eliminate 25% to 30% Zomato & Swiggy commissions by owning 100% direct customer data; boost repeat dining revenue by 35%+; collect verified 5-star Google reviews post-dining with zero staff effort during peak dinner rushes.
 - **High-Intent Search Keywords & Answers**:
   - *google review automation for restaurant in india*: Automates personalized 5-star Google review drafts sent via WhatsApp right after billing, increasing local Google Maps footfall without paid ads.
-  - *whatsapp loyalty program for punjabi gujarati restaurant*: Converts walk-in diners into loyal weekly regulars using table acrylic QR standees and digital stamp cards.
+  - *whatsapp loyalty program for punjabi gujarati restaurant*: Converts walk-in diners into loyal weekly regulars using table QR codes and digital stamp cards.
   - *how to increase repeat customers in restaurant without app*: Boost repeat sales by 40% with zero app-download friction directly inside WhatsApp.
   - *customer retention software for south indian kathiyawadi restaurant*: Gives restaurant owners 100% phone number ownership and direct remarketing channels.
 
@@ -50,7 +50,7 @@ High-Intent Keyword + Target Niche Industry + Merchant Ultimate Benefit (ROI) = 
 ---
 
 ## Core Platform Capabilities
-- **100% App-Free WhatsApp Digital Stamp Cards**: Customers scan an acrylic counter or table QR standee; registration takes 5 seconds inside WhatsApp with no apps to install.
+- **100% App-Free WhatsApp Digital Stamp Cards**: Customers scan a counter or table QR code; registration takes 5 seconds inside WhatsApp with no apps to install.
 - **Tap-to-Claim Cashier Terminal**: Cashiers claim check-ins in 5 seconds with an optimistic reservation lock and amount verification.
 - **5-Star Google Review Automation & AI AutoReply**: Detects 5-star reviews, awards bonus stamps to customer wallets, and drafts context-aware owner replies posted directly to Google Maps Business Profiles via Google OAuth.
 - **Morning Intelligence Reports**: Delivers daily retention metrics, new VIP counts, and growth recommendations to the merchant dashboard.

@@ -28,21 +28,9 @@ import {
   Flame
 } from "lucide-react"
 import { TermsDialog } from "@/components/terms-dialog"
-import { PricingStudio } from "@/components/pricing/pricing-studio"
+import { PricingStudio, type PlanItem } from "@/components/pricing/pricing-studio"
 
-export interface PlanItem {
-  id: string
-  planKey?: string
-  name: string
-  description?: string
-  days: number
-  price: number
-  originalPrice?: number
-  discountPercent?: number
-  badge?: string
-  popular?: boolean
-  features: string[]
-}
+// PlanItem imported from PricingStudio
 
 export default function SubscriptionPage() {
   const { data, isLoading } = useDashboardState()
@@ -410,7 +398,7 @@ export default function SubscriptionPage() {
                   }`}
                 >
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Pricing Studio v4</span>
+                  <span>Pricing Plans</span>
                   <Badge variant="outline" className="text-[9px] bg-emerald-500/20 text-emerald-300 border-none font-bold">Interactive</Badge>
                 </button>
                 <button

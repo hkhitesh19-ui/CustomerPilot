@@ -63,7 +63,7 @@ export default function CakeConnectionCaseStudy() {
               </span>
             </h1>
             <p className="mt-6 text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
-              A single-outlet bakery in Vadodara, Gujarat turned walk-in foot traffic into a fully owned customer database, boosted its Google Maps rating, and unlocked ₹42,600/month in new revenue — all using CustomerPilot with one counter QR standee.
+              A single-outlet bakery in Vadodara, Gujarat turned walk-in foot traffic into a fully owned customer database, boosted its Google Maps rating, and unlocked ₹42,600/month in new revenue — all using CustomerPilot with one counter QR Code.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-xs font-bold text-slate-400">
               <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-400" />Business Type: Retail Bakery & Cafe</span>
@@ -133,7 +133,7 @@ export default function CakeConnectionCaseStudy() {
                     ["Customer Phone Numbers (CRM)", "0 (Lost traffic)", "2,840 verified profiles", "100% Owned CRM 📱"],
                     ["Repeat Visit Rate (30 Days)", "14%", "31.4%", "+124% Repeat Lift 🔄"],
                     ["Monthly Revenue from Reminders", "₹0", "₹42,600", "Direct ROI 💰"],
-                    ["Staff Training Time", "N/A", "< 15 minutes", "One standee, done ✅"],
+                    ["Staff Training Time", "N/A", "< 15 minutes", "One QR Code, done ✅"],
                     ["Customer App Downloads Required", "N/A", "ZERO", "100% WhatsApp ✅"],
                   ].map(([metric, before, after, growth], i) => (
                     <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50/60"}>
@@ -185,7 +185,7 @@ export default function CakeConnectionCaseStudy() {
                 </div>
                 <ul className="space-y-3 mt-4">
                   {[
-                    "Countertop Acrylic QR Standee placed at billing counter: \"Scan to claim instant ₹50 welcome reward on WhatsApp\"",
+                    "Countertop QR Code placed at billing counter: \"Scan to claim instant ₹50 welcome reward on WhatsApp\"",
                     "Zero POS friction — cashier only needs to scan-confirm each purchase (5-second action)",
                     "Automated post-purchase WhatsApp flow: 2 hours after billing, customer receives a soft review invitation",
                     "5-star customers: Instantly redirected to Google Maps with AI-drafted review pre-filled (just paste & post)",
@@ -251,7 +251,7 @@ export default function CakeConnectionCaseStudy() {
               Ready to Get Results Like Cake Connection?
             </h2>
             <p className="text-slate-400 text-sm sm:text-base mt-4 max-w-xl mx-auto">
-              Start your 3-day free trial — no credit card, no app for customers, no POS dependency. Just one counter QR standee.
+              Start your 3-day free trial — no credit card, no app for customers, no POS dependency. Just one counter QR Code.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link href="/signup" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-black text-sm shadow-lg transition-all hover:scale-[1.02]">

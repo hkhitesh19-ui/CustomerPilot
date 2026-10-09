@@ -49,9 +49,9 @@ const LOYALTY_FAQS: DualLangFaqItem[] = [
   {
     id: 5,
     questionEn: "Does CustomerPilot require special POS hardware or a barcode scanner?",
-    answerEn: "Zero hardware required. All you need is our high-resolution printed acrylic QR standee placed at your billing counter. Customers scan with their own smartphone cameras, making setup 100% plug-and-play in under 5 minutes.",
+    answerEn: "Zero hardware required. All you need is our high-resolution printed counter QR Code placed at your billing counter. Customers scan with their own smartphone cameras, making setup 100% plug-and-play in under 5 minutes.",
     questionHi: "Kya iske liye koi special machine ya POS scanner khareedna padega?",
-    answerHi: "Zero machine kharch! Sirf humara diya gaya high-quality QR standee counter par rakhna hai. Grahak apne phone se scan karte hain, kisi extra device ki zaroorat nahi hoti."
+    answerHi: "Zero machine kharch! Sirf humara diya gaya high-quality counter QR Code counter par rakhna hai. Grahak apne phone se scan karte hain, kisi extra device ki zaroorat nahi hoti."
   }
 ]
 
@@ -395,7 +395,7 @@ export function WhatsAppDigitalLoyaltyClient() {
                 How It Works • 100% WhatsApp Native
               </span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
-                How Our WhatsApp Loyalty Engine Works in 3 Simple Steps
+                How Our WhatsApp Digital Loyalty Stamps System Works in 3 Simple Steps
               </h2>
               <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
                 No cards to lose. No apps to download. Turn first-time shoppers into lifelong VIP regulars directly on India&apos;s favorite messaging app.
@@ -414,19 +414,19 @@ export function WhatsAppDigitalLoyaltyClient() {
                       01
                     </span>
                     <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      Step 1 • Standee Scan
+                      Step 1 • QR Code Scan
                     </span>
                   </div>
 
-                  {/* Infographic Visual: Counter QR Standee */}
+                  {/* Infographic Visual: Counter QR Code */}
                   <div className="p-4 rounded-2xl bg-gradient-to-b from-emerald-50 to-slate-50 border border-emerald-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
                     <div className="flex items-center gap-3">
                       <div className="w-18 h-22 rounded-xl bg-white border border-emerald-200 shadow-md p-2 flex flex-col items-center justify-center text-center">
                         <div className="w-6 h-6 bg-emerald-600 rounded-md flex items-center justify-center text-white mb-1">
                           <Store className="w-3.5 h-3.5" />
                         </div>
-                        <span className="text-[8px] font-black text-slate-900 leading-tight">Counter QR</span>
-                        <span className="text-[7px] text-emerald-700 font-semibold">Standee</span>
+                        <span className="text-[8px] font-black text-slate-900 leading-tight">Counter</span>
+                        <span className="text-[7px] text-emerald-700 font-semibold">QR Code</span>
                       </div>
                       <div className="text-emerald-500 font-bold text-lg animate-pulse">➔</div>
                       <div className="w-18 h-22 rounded-xl bg-[#0b141a] border border-[#202c33] shadow-md p-2 flex flex-col items-center justify-center text-white">
@@ -440,10 +440,10 @@ export function WhatsAppDigitalLoyaltyClient() {
                   </div>
 
                   <h3 className="font-extrabold text-slate-900 text-lg">
-                    1. Customer Scans Counter Standee
+                    1. Customer Scans Counter QR Code
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    Place our acrylic QR standee at your billing counter. The customer scans with their phone camera to instantly connect with your WhatsApp bot. Zero app downloads.
+                    Place our counter QR Code at your billing counter. The customer scans with their phone camera to instantly connect with your WhatsApp bot. Zero app downloads.
                   </p>
                 </div>
 
@@ -559,7 +559,7 @@ export function WhatsAppDigitalLoyaltyClient() {
                 Bonus: In-Built AI Google Review QR Generator Included
               </h2>
               <p className="text-slate-700 text-sm sm:text-base leading-relaxed max-w-3xl">
-                CustomerPilot features a built-in <strong>SEO-friendly AI Google review assistant</strong>. Along with collecting loyalty stamps, the system prompts happy customers to leave a 5-star Google review with pre-drafted AI options. You achieve: <strong>WhatsApp Customer Retention + #1 Google Maps Local Ranking</strong> from a single counter standee!
+                CustomerPilot features a built-in <strong>SEO-friendly AI Google review assistant</strong>. Along with collecting loyalty stamps, the system prompts happy customers to leave a 5-star Google review with pre-drafted AI options. You achieve: <strong>WhatsApp Customer Retention + #1 Google Maps Local Ranking</strong> from a single counter QR Code!
               </p>
               <div className="flex flex-wrap gap-4 pt-2 text-xs text-slate-800 font-semibold">
                 <div className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Official Google GBP API Integration</div>
@@ -669,12 +669,12 @@ export function WhatsAppDigitalLoyaltyClient() {
               Ready to Replace Paper Punch Cards with WhatsApp Automation?
             </h2>
             <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
-              Start your 3-day unrestricted free trial today. Set up in 3 minutes, print your QR standee, and watch repeat walk-ins increase.
+              Start your 3-day unrestricted free trial today. Set up in 3 minutes, print your counter QR Code, and watch repeat walk-ins increase.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button asChild size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base px-8 py-6 rounded-2xl shadow-xl hover:scale-105 transition-all">
                 <Link href="/signup">
-                  Get Your Counter QR Standee Now <ArrowRight className="w-5 h-5 ml-2" />
+                  Get Your Counter QR Code Now <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>
             </div>

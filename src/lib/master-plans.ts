@@ -45,7 +45,7 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
       "AI Google Review 5-Star Filter",
       "1-Click Google Maps AutoReply",
       "Automated 30/60/90 Day Win-Backs",
-      "Printable Counter Standee",
+      "Printable Counter QR Code",
       "Basic Morning Intelligence"
     ],
     enabledModules: "LOYALTY,REVIEWS,AUTOREPLY",
@@ -228,7 +228,7 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
   {
     planKey: "card_6mo",
     name: "Smart Digital Business Card — 6 Months",
-    description: "Interactive NFC/QR digital business card, 1-tap contact saving, direct Google review modal (6 Months Access, ~₹58/mo).",
+    description: "Interactive Smart QR digital business card, 1-tap contact saving, direct Google review modal (6 Months Access, ~₹58/mo).",
     days: 180,
     price: 349,
     originalPrice: 699,
@@ -249,7 +249,7 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
   {
     planKey: "card_yearly",
     name: "Smart Digital Business Card — 1 Year",
-    description: "Full year interactive digital business card with online ordering links, social profiles, and counter standees (~₹41/mo).",
+    description: "Full year interactive digital business card with online ordering links, social profiles, and counter QR codes (~₹41/mo).",
     days: 365,
     price: 499,
     originalPrice: 1199,
@@ -260,7 +260,7 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
       "Everything in 6 Months Plan +",
       "Online Ordering Links (Zomato / Swiggy / Catalog)",
       "Social Media Links (Instagram, Facebook, YouTube)",
-      "Printable Counter Acrylic Standee Templates",
+      "Printable Counter QR Code Templates",
       "1 Year Cloud Hosting with Instant Live Updates",
       "Priority WhatsApp Support (+91 90333 04707)"
     ],
@@ -282,7 +282,7 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
       "Zero Renewal or Maintenance Fees Forever",
       "Unlimited Real-Time Profile & Contact Updates",
       "All Current & Future Features Included",
-      "Custom NFC Card Configuration Guide",
+      "Custom Counter QR Code Display Guide",
       "VIP Founder Support Line"
     ],
     enabledModules: "DIGITAL_CARD",

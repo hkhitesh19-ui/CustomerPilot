@@ -123,7 +123,7 @@ export async function POST(req: Request) {
       { stepKey: 'logo_upload', label: 'Logo Upload' },
       { stepKey: 'reward_setup', label: 'Reward Card Setup' },
       { stepKey: 'qr_code', label: 'QR Code Generation' },
-      { stepKey: 'print_standee', label: 'Print Standee' },
+      { stepKey: 'print_standee', label: 'Print QR Code' },
       { stepKey: 'system_test', label: 'Live System Test' },
     ];
 

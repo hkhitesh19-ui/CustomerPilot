@@ -1616,7 +1616,7 @@ function OnboardStep7Print({ data, setData }: any) {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Print Counter Standee - ${businessName}</title>
+          <title>Print Counter QR Code - ${businessName}</title>
           <style>
             @page { size: A4 portrait; margin: 0; }
             * {
@@ -1774,7 +1774,7 @@ function OnboardStep7Print({ data, setData }: any) {
   return (
     <div className="p-6 sm:p-8 space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-bold text-slate-900">Print Counter QR Standee</h2>
+        <h2 className="text-xl font-bold text-slate-900">Print Counter QR Code</h2>
         <p className="text-xs text-slate-500">Preview and print your physical QR display</p>
       </div>
 
@@ -1809,7 +1809,7 @@ function OnboardStep7Print({ data, setData }: any) {
 
       <div className="flex justify-center gap-3">
         <Button onClick={handlePrintStandeePDF} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-5 px-6 gap-2 shadow-lg">
-          <Printer className="w-5 h-5" /> Print Standee (PDF) 🖨️
+          <Printer className="w-5 h-5" /> Print QR Code (PDF) 🖨️
         </Button>
       </div>
 

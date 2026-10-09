@@ -57,7 +57,7 @@ const I18N = {
     stat2Label: "3-Day Full Access Trial",
     stat3Val: "Zero Tech Skills",
     stat3Label: "Works on Any Mobile Phone",
-    stat4Val: "Free Standee",
+    stat4Val: "Free QR Code",
     stat4Label: "Printable Desk QR Included",
     tabAll: "All Setup Steps",
     tabSignup: "Step 1: 1-Min Signup",
@@ -76,7 +76,7 @@ const I18N = {
     step3Sub: "Step 3 • 60 Seconds",
     step4Title: "Customize 5 WhatsApp Message Templates",
     step4Sub: "Step 4 • 60 Seconds",
-    step5Title: "Pro Features, Counter Standee & Launch",
+    step5Title: "Pro Features, Counter QR Code & Launch",
     step5Sub: "Step 5 • 30 Seconds",
     checklistTitle: "5-Minute Complete Setup Checklist",
     checklistBadge: "Go-Live Checklist",
@@ -108,7 +108,7 @@ const I18N = {
     stat2Label: "3-Day Full Trial Access",
     stat3Val: "Zero Tech Skills",
     stat3Label: "Kisi Bhi Mobile Par Chalta Hai",
-    stat4Val: "Free Standee",
+    stat4Val: "Free QR Code",
     stat4Label: "Printable Counter QR PDF",
     tabAll: "Sabhi Steps",
     tabSignup: "Step 1: 1-Min Signup",
@@ -127,7 +127,7 @@ const I18N = {
     step3Sub: "Step 3 • 60 Seconds",
     step4Title: "WhatsApp Message Templates Customize Karna",
     step4Sub: "Step 4 • 60 Seconds",
-    step5Title: "Counter QR Standee & Pro Marketing Setup",
+    step5Title: "Counter QR Code & Pro Marketing Setup",
     step5Sub: "Step 5 • 30 Seconds",
     checklistTitle: "5-Minute Complete Setup Checklist",
     checklistBadge: "Go-Live Checklist",
@@ -780,9 +780,9 @@ Agli visit par payein: Free Extra Treat with Your Bill!
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
               <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2">
                 <QrCode className="w-5 h-5 text-indigo-600 mb-1" />
-                <h4 className="font-bold text-slate-900 text-sm">Download Counter Standee QR</h4>
+                <h4 className="font-bold text-slate-900 text-sm">Download Counter QR Code</h4>
                 <p className="text-slate-600 leading-relaxed">
-                  Dashboard se high-resolution printable PDF download karein. Acrylic stand me daalkar UPI payment scanner ke bagal me rakh dein.
+                  Dashboard se high-resolution printable PDF download karein. Counter par UPI payment scanner ke bagal me display kar dein.
                 </p>
               </div>
 
@@ -835,7 +835,7 @@ Agli visit par payein: Free Extra Treat with Your Bill!
               { id: "reviewDelay", title: "3. Google Review Link Time-Delay Set", time: "30 Sec", desc: "Configure delay (e.g. 15-30 min for cafe/bakery, 1-2h for dining)" },
               { id: "whatsapp", title: "4. WhatsApp Web Connected", time: "1 Min", desc: "Scan QR code via Linked Devices in store phone" },
               { id: "templates", title: "5. Message Templates Reviewed", time: "1 Min", desc: "Customize text, language and emojis in settings" },
-              { id: "standee", title: "6. Counter Standee QR Printed", time: "1 Min", desc: "Download PDF and place on acrylic stand at counter" },
+              { id: "standee", title: "6. Counter QR Code Printed", time: "1 Min", desc: "Download PDF and display at counter" },
               { id: "testScan", title: "7. Self Test Scan Completed", time: "1 Min", desc: "Scan counter QR with your phone and approve in /queue" },
             ].map((task) => {
               const isChecked = checklist[task.id]

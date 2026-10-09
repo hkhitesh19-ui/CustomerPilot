@@ -76,16 +76,16 @@ const CARD_FAQS: DualLangFaqItem[] = [
   {
     id: 4,
     questionEn: "What happens if my shop phone number or address changes in the future?",
-    answerEn: "Your card updates in real time on the cloud instantly. Your printed counter QR codes and NFC cards remain identical, saving you 100% of re-printing expenses.",
+    answerEn: "Your card updates in real time on the cloud instantly. Your printed counter QR codes remain identical, saving you 100% of re-printing expenses.",
     questionHi: "Agar phone number ya address badal gaya toh kya naya card banana padega?",
     answerHi: "Bilkul nahi. Dashboard me change karte hi aapka digital card real-time me update ho jata hai. Aapka QR code wahi rehta hai, re-printing ka ek rupaya bhi kharch nahi hota."
   },
   {
     id: 5,
-    questionEn: "Can I print the QR code on my counter standees, packaging boxes, and carry bags?",
-    answerEn: "Absolutely yes! You get vector-grade printable QR codes in SVG and PNG formats, ready for counter acrylic stands, stickers, takeaway bags, and smart NFC tap cards.",
-    questionHi: "Kya QR code ko counter standee, packaging aur carry bags par print kar sakte hain?",
-    answerHi: "Haan, bilkul! Aapko high-resolution printable PNG aur SVG QR codes milte hain jo counter standees, delivery boxes, carry bags, aur NFC cards ke liye ready hote hain."
+    questionEn: "Can I print the QR code on my counter QR displays, packaging boxes, and carry bags?",
+    answerEn: "Absolutely yes! You get vector-grade printable QR codes in SVG and PNG formats, ready for counter QR displays, stickers, takeaway bags, and custom cards.",
+    questionHi: "Kya QR code ko counter displays, packaging aur carry bags par print kar sakte hain?",
+    answerHi: "Haan, bilkul! Aapko high-resolution printable PNG aur SVG QR codes milte hain jo counter QR codes, delivery boxes, carry bags, aur custom cards ke liye ready hote hain."
   }
 ]
 
@@ -249,7 +249,7 @@ export function SmartDigitalBusinessCardClient() {
     }
 
     try {
-      const orderingLinks = []
+      const orderingLinks: Array<{ platform: string; label: string; url: string; color: string }> = []
       if (formData.websiteUrl.trim()) {
         const wUrl = formData.websiteUrl.trim().startsWith("http") ? formData.websiteUrl.trim() : `https://${formData.websiteUrl.trim()}`
         orderingLinks.push({ platform: "website", label: "Online Store", url: wUrl, color: "bg-blue-600" })
@@ -383,7 +383,7 @@ export function SmartDigitalBusinessCardClient() {
               {/* Left Column: Value Proposition */}
               <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
                 <span className="badge">
-                  <span className="dot-live"><i></i><i></i></span> India&apos;s #1 Smart Digital Business Card &amp; NFC Platform
+                  <span className="dot-live"><i></i><i></i></span> India&apos;s #1 Smart Digital Business Card Platform
                 </span>
 
                 <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
@@ -858,7 +858,7 @@ export function SmartDigitalBusinessCardClient() {
                     <div className="flex items-center gap-3">
                       <div className="w-16 h-20 rounded-xl bg-white border border-slate-300 shadow-sm p-2 flex flex-col items-center justify-center text-center">
                         <QrCode className="w-8 h-8 text-cyan-600" />
-                        <span className="text-[8px] font-bold text-slate-700 mt-1">Scan Standee</span>
+                        <span className="text-[8px] font-bold text-slate-700 mt-1">Scan QR Code</span>
                       </div>
                       <div className="text-cyan-500 font-bold text-lg animate-pulse">➔</div>
                       <div className="w-16 h-20 rounded-xl bg-slate-900 border border-slate-700 shadow-md p-1.5 flex flex-col items-center justify-center text-white">
@@ -869,10 +869,10 @@ export function SmartDigitalBusinessCardClient() {
                   </div>
 
                   <h3 className="font-extrabold text-slate-900 text-lg">
-                    1. Tap NFC or Scan Counter QR
+                    1. Scan Counter QR Code
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    Customer taps your smart NFC card or scans your billing counter acrylic QR standee with their phone camera. No mobile app download required.
+                    Customer scans your billing counter QR Code with their phone camera. No mobile app download required.
                   </p>
                 </div>
 
@@ -1041,9 +1041,9 @@ export function SmartDigitalBusinessCardClient() {
                 <div className="w-12 h-12 rounded-2xl bg-pink-100 border border-pink-200 flex items-center justify-center text-pink-700 shadow-xs">
                   <QrCode className="w-6 h-6" />
                 </div>
-                <h3 className="font-extrabold text-slate-900 text-base">Printable QR &amp; NFC Ready</h3>
+                <h3 className="font-extrabold text-slate-900 text-base">Printable High-Res QR Ready</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Download high-resolution printable vector QR codes for counter acrylic stands, takeout bags, and smart NFC tap cards for effortless offline sharing.
+                  Download high-resolution printable vector QR codes for counter QR displays, takeout bags, and custom cards for effortless offline sharing.
                 </p>
               </div>
             </div>
@@ -1797,7 +1797,7 @@ export function SmartDigitalBusinessCardClient() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>Printable Counter Acrylic Standee Templates</span>
+                      <span>Printable Counter QR Code Templates</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -1859,7 +1859,7 @@ export function SmartDigitalBusinessCardClient() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>Vector Standee &amp; Smart NFC Tap Card Files</span>
+                      <span>Vector Print-Ready QR Code Files</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" />

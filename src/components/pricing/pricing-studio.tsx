@@ -77,14 +77,14 @@ export const PRODUCT_MODULES: ProductModule[] = [
     icon: "🪪",
     badge: "Instant 2-Min Setup",
     tagline: "1-Tap Contact Save (.vcf) + Direct Google Reviews + Ordering Links",
-    description: "Interactive NFC/QR digital business card. 1-Tap save contact to mobile phonebook, instant 5-star Google review trigger, and online ordering catalog.",
+    description: "Interactive digital business card. 1-Tap save contact to mobile phonebook, instant 5-star Google review trigger, and online ordering catalog.",
     features: [
       "1-Tap Save Contact (vCard .vcf phonebook sync)",
       "Direct 5-Star Google Reviews Submission Modal",
       "WhatsApp Chat & Direct Calling Connect",
       "Google Maps Turn-by-Turn Navigation",
       "Online Ordering Links (Zomato / Swiggy / Catalog)",
-      "Printable High-Res QR Code & NFC Tap Compatible"
+      "Printable High-Resolution QR Code"
     ],
     planKey6Mo: "card_6mo",
     planKey1Yr: "card_yearly",
@@ -456,13 +456,8 @@ export function PricingStudio({
     >
       {/* ─── HEADER & BILLING TOGGLE ─── */}
       <div className="text-center space-y-4 mb-10">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-wider">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Simple, Transparent Pricing</span>
-        </div>
-
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">
-          Pricing Studio v4
+          Pricing
         </h1>
 
         <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
@@ -667,7 +662,7 @@ export function PricingStudio({
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 stroke-[3]" />
-                  <span>Printable QR Code &amp; NFC Tap Compatible</span>
+                  <span>Printable High-Resolution QR Code</span>
                 </li>
               </ul>
             </div>
@@ -828,7 +823,7 @@ export function PricingStudio({
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 stroke-[3]" />
-                  <span>Print-Ready Counter QR Standee Master Graphic</span>
+                  <span>Print-Ready Counter QR Code Master Graphic</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 stroke-[3]" />
@@ -1254,10 +1249,10 @@ export function PricingStudio({
                 <td className="p-3.5 sm:p-4 text-center text-emerald-500 font-bold bg-emerald-500/5">✓ 365-Day Automation</td>
               </tr>
               <tr>
-                <td className="p-3.5 sm:p-4 font-semibold text-slate-900 dark:text-white">Print-Ready Counter QR Standee</td>
+                <td className="p-3.5 sm:p-4 font-semibold text-slate-900 dark:text-white">Print-Ready Counter QR Code Display</td>
                 <td className="p-3.5 sm:p-4 text-center text-slate-400">QR Only</td>
                 <td className="p-3.5 sm:p-4 text-center text-slate-400">Standard Graphic</td>
-                <td className="p-3.5 sm:p-4 text-center text-emerald-500 font-bold bg-emerald-500/5">✓ Master Standee Graphic</td>
+                <td className="p-3.5 sm:p-4 text-center text-emerald-500 font-bold bg-emerald-500/5">✓ Master QR Code Graphic</td>
               </tr>
               <tr className="bg-slate-50/60 dark:bg-slate-950 font-bold">
                 <td className="p-3.5 sm:p-4 text-slate-900 dark:text-white">Total Annual Cost (1 Year Pro)</td>

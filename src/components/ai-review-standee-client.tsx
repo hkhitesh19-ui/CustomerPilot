@@ -21,48 +21,48 @@ import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
 const STANDEE_FAQS: DualLangFaqItem[] = [
   {
     id: 1,
-    questionEn: "What is the AI Google Review QR Standee by CustomerPilot?",
+    questionEn: "What is the Smart Ai Google Review QR by CustomerPilot?",
     answerEn:
-      "It is a premium acrylic counter display unit containing a smart QR code. When customers scan it at your billing counter, CustomerPilot AI auto-generates a personalized 5-star Google review draft in their WhatsApp for instant 1-tap submission to Google Maps — zero typing, zero app download.",
-    questionHi: "CustomerPilot ka AI Google Review QR Standee kya hota hai?",
+      "It is a Smart Ai Google Review System powered by a smart counter QR code. When customers scan it at your billing counter, CustomerPilot AI auto-generates a personalized 5-star Google review draft in their WhatsApp for instant 1-tap submission to Google Maps — zero typing, zero app download.",
+    questionHi: "CustomerPilot ka Smart Ai Google Review QR kya hota hai?",
     answerHi:
-      "Ye ek premium acrylic counter display hai jisme ek smart QR code laga hota hai. Jab customer billing counter par scan karta hai, CustomerPilot AI unke WhatsApp mein ek personalized 5-star Google review draft bhejta hai — 1 tap mein Google Maps par publish, koi typing nahi, koi app download nahi."
+      "Ye ek Smart Ai Google Review System hai jisme smart QR code laga hota hai. Jab customer billing counter par scan karta hai, CustomerPilot AI unke WhatsApp mein ek personalized 5-star Google review draft bhejta hai — 1 tap mein Google Maps par publish, koi typing nahi, koi app download nahi."
   },
   {
     id: 2,
-    questionEn: "What material is the QR review standee made of and what are its dimensions?",
+    questionEn: "What format is the Smart Ai Google Review QR provided in?",
     answerEn:
-      "CustomerPilot's counter standee is made of premium 5mm acrylic glass with UV-printed QR code, double-sided mounting tape for counter fixing, and comes in A5 size (14.8cm × 21cm) — ideal for restaurant tables, salon reception desks, and retail billing counters.",
-    questionHi: "QR review standee kis material ka bana hota hai aur iska size kya hota hai?",
+      "CustomerPilot provides print-ready vector-grade QR layouts in SVG, PNG, and PDF formats in standard A5/A4 sizes with custom store branding — ready to display on tables, reception desks, and retail billing counters.",
+    questionHi: "Smart Ai Google Review QR kis format mein milta hai?",
     answerHi:
-      "CustomerPilot ka standee 5mm premium acrylic glass se bana hota hai, UV-printed QR code ke sath. Iska size A5 (14.8cm × 21cm) hota hai aur iske sath double-sided mounting tape aata hai — restaurant tables, salon counters aur retail billing counters ke liye perfect."
+      "CustomerPilot aapko high-resolution vector SVG, PNG aur PDF formats mein print-ready QR codes deta hai jisme aapka store logo aur branding hoti hai — counter par display karne ke liye perfect."
   },
   {
     id: 3,
-    questionEn: "Does CustomerPilot filter or protect my business from negative reviews posted via the standee?",
+    questionEn: "Does CustomerPilot filter or protect my business from negative reviews?",
     answerEn:
       "Yes! CustomerPilot features a Smart Sentiment Router (Private Feedback Shield). If a customer rates their experience 1 to 3 stars, they are routed to a private merchant feedback dialog where you can resolve their issue directly. Only 4 and 5-star ratings are directed to publish on Google Maps, safeguarding your public rating.",
-    questionHi: "Kya standee se aane wale kharab reviews se business protect hota hai?",
+    questionHi: "Kya is system se kharab reviews se business protect hota hai?",
     answerHi:
       "Haan! CustomerPilot mein Smart Sentiment Router hota hai. Agar koi customer 1 se 3 star deta hai, toh wo Google Maps par jane ke bajaye private owner feedback form par chala jata hai. Sirf 4 aur 5-star reviews hi Google Maps par publish hote hain."
   },
   {
     id: 4,
-    questionEn: "Do customers need to download any app to use the QR standee?",
+    questionEn: "Do customers need to download any app to use the Smart Ai Google Review QR?",
     answerEn:
-      "Zero app download required. The review flow works 100% inside WhatsApp and mobile web browsers. The standee QR triggers a WhatsApp message with the AI review pre-drafted — customers just tap 'Send to Google Maps'.",
-    questionHi: "Kya customer ko koi naya app download karna padega standee use karne ke liye?",
+      "Zero app download required. The review flow works 100% inside WhatsApp and mobile web browsers. The QR triggers a WhatsApp message with the AI review pre-drafted — customers just tap 'Send to Google Maps'.",
+    questionHi: "Kya customer ko koi naya app download karna padega review dene ke liye?",
     answerHi:
-      "Zero app download! QR standee scan karne par WhatsApp mein seedha AI-drafted review aa jata hai. Customer sirf 1 tap mein Google Maps par submit kar sakta hai — koi naya app install karne ki zaroorat nahi."
+      "Zero app download! QR scan karne par WhatsApp mein seedha AI-drafted review aa jata hai. Customer sirf 1 tap mein Google Maps par submit kar sakta hai — koi naya app install karne ki zaroorat nahi."
   },
   {
     id: 5,
-    questionEn: "Can I reward customers with bonus stamps for giving a 5-star Google review via the standee?",
+    questionEn: "Can I reward customers with bonus stamps for giving a 5-star Google review?",
     answerEn:
-      "Absolutely! You can configure CustomerPilot to automatically award +2 bonus loyalty stamps once a customer submits their verified Google Review via the standee QR. This powerful incentive loop triples monthly review volume.",
-    questionHi: "Kya standee se review dene wale customer ko loyalty bonus milta hai?",
+      "Absolutely! You can configure CustomerPilot to automatically award +2 bonus loyalty stamps once a customer submits their verified Google Review via the QR Code. This powerful incentive loop triples monthly review volume.",
+    questionHi: "Kya review dene wale customer ko loyalty bonus milta hai?",
     answerHi:
-      "Bilkul! Aap CustomerPilot configure kar sakte hain ki standee se review submit karne wale customers ko turant +2 bonus loyalty stamps auto-credit ho jayein. Is incentive loop se monthly Google reviews 3X speed se badhte hain."
+      "Bilkul! Aap CustomerPilot configure kar sakte hain ki review submit karne wale customers ko turant +2 bonus loyalty stamps auto-credit ho jayein. Is incentive loop se monthly Google reviews 3X speed se badhte hain."
   }
 ]
 
@@ -166,7 +166,7 @@ export function AiReviewStandeeClient() {
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
             </Link>
             <Button asChild size="sm" className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-md transition-all">
-              <Link href="/signup">Get Standee Free →</Link>
+              <Link href="/signup">Get Smart QR Free →</Link>
             </Button>
           </div>
         </div>
@@ -185,21 +185,21 @@ export function AiReviewStandeeClient() {
               {/* Left Column */}
               <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
                 <span className="badge">
-                  <span className="dot-live"><i></i><i></i></span> India&apos;s Best AI Google Review Acrylic QR Counter Standee
+                  <span className="dot-live"><i></i><i></i></span> India&apos;s Best Smart Ai Google Review QR System
                 </span>
 
                 <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
-                  AI Google Review QR Standee: <span className="grad-txt">Acrylic Counter Display That Auto-Generates 5-Star Reviews</span>
+                  Smart Ai Google Review QR
                 </h1>
 
                 {/* Direct Answer Snippet for LLM Citation */}
                 <div className="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-4 sm:p-5 shadow-xs text-left space-y-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-amber-800 uppercase tracking-wider">
                     <Package className="w-3.5 h-3.5 text-amber-600" />
-                    <span>What Is It • AI Google Review QR Standee</span>
+                    <span>What Is It • Smart Ai Google Review System</span>
                   </div>
                   <p className="text-sm sm:text-base text-slate-800 leading-relaxed font-medium">
-                    CustomerPilot&apos;s AI Google Review QR Standee is a premium acrylic counter display that auto-generates personalized 5-star Google review drafts via WhatsApp when customers scan it — zero typing, zero app download, instant Google Maps submission for local retail stores.
+                    CustomerPilot&apos;s Smart Ai Google Review System is powered by a high-resolution counter QR Code that auto-generates personalized 5-star Google review drafts via WhatsApp when customers scan it — zero typing, zero app download, instant Google Maps submission for local retail stores.
                   </p>
                 </div>
 
@@ -209,7 +209,7 @@ export function AiReviewStandeeClient() {
                     href="/signup"
                     className="btn-grad py-3.5 sm:py-4 px-6 sm:px-8 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all w-full sm:w-auto"
                   >
-                    <span>Get Your Acrylic Review Standee Free</span>
+                    <span>Get Your Smart Ai Google Review QR Free</span>
                     <ArrowRight className="w-4 h-4 ml-1" />
                   </Link>
                   <Link
@@ -223,8 +223,8 @@ export function AiReviewStandeeClient() {
 
                 {/* Trust Badges */}
                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-3 text-xs sm:text-sm font-semibold text-slate-600">
-                  <span className="inline-flex items-center gap-1.5"><span className="text-emerald-600 font-bold">✓</span> Free Standee Setup on Signup</span>
-                  <span className="inline-flex items-center gap-1.5"><span className="text-emerald-600 font-bold">✓</span> Premium 5mm Acrylic Build</span>
+                  <span className="inline-flex items-center gap-1.5"><span className="text-emerald-600 font-bold">✓</span> Free QR Setup on Signup</span>
+                  <span className="inline-flex items-center gap-1.5"><span className="text-emerald-600 font-bold">✓</span> Print-Ready High-Res QR Export</span>
                   <span className="inline-flex items-center gap-1.5"><span className="text-emerald-600 font-bold">✓</span> Private Feedback Shield Included</span>
                 </div>
               </div>
@@ -246,7 +246,7 @@ export function AiReviewStandeeClient() {
 
                     <div className="p-5 bg-gradient-to-r from-amber-500 to-amber-600 text-white space-y-1.5">
                       <div className="flex items-center justify-between text-[11px] opacity-90 font-medium">
-                        <span>AI Review QR Standee</span>
+                        <span>Smart Ai Google Review QR</span>
                         <span className="bg-white/20 px-2 py-0.5 rounded-full font-bold">Auto-Drafted</span>
                       </div>
                       <div className="font-black text-base text-white truncate">{currentReview.store}</div>
@@ -257,7 +257,7 @@ export function AiReviewStandeeClient() {
 
                     <div className="p-4 space-y-3 bg-slate-50/60 text-xs">
                       <div className="text-[11px] font-bold text-slate-700 flex items-center justify-between">
-                        <span>AI-Drafted via Counter Standee QR:</span>
+                        <span>AI-Drafted via Counter QR Code:</span>
                         <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
                           SEO Optimized
                         </span>
@@ -306,7 +306,7 @@ export function AiReviewStandeeClient() {
                   </div>
                 </div>
                 <div className="text-center mt-3 text-[11px] text-slate-400 font-medium">
-                  ✦ Counter Standee QR triggers this WhatsApp flow automatically
+                  ✦ Counter QR Code triggers this WhatsApp flow automatically
                 </div>
               </div>
 
@@ -319,12 +319,12 @@ export function AiReviewStandeeClient() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="p-5 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
-                <div className="text-3xl font-black text-amber-600">A5 Size</div>
-                <div className="text-xs text-slate-600 font-medium">14.8cm × 21cm Premium Acrylic</div>
+                <div className="text-3xl font-black text-amber-600">A5 & A4</div>
+                <div className="text-xs text-slate-600 font-medium">Standard High-Res Counter Sizes</div>
               </div>
               <div className="p-5 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
-                <div className="text-3xl font-black text-emerald-600">5mm</div>
-                <div className="text-xs text-slate-600 font-medium">Crystal Clear Acrylic Thickness</div>
+                <div className="text-3xl font-black text-emerald-600">Vector</div>
+                <div className="text-xs text-slate-600 font-medium">Print-Ready SVG & PDF Formats</div>
               </div>
               <div className="p-5 rounded-2xl bg-white border border-slate-200 text-center space-y-1 shadow-xs">
                 <div className="text-3xl font-black text-cyan-600">88%</div>
@@ -338,7 +338,7 @@ export function AiReviewStandeeClient() {
           </div>
         </section>
 
-        {/* ============ HOW THE STANDEE WORKS ============ */}
+        {/* ============ HOW THE SYSTEM WORKS ============ */}
         <section className="py-16 md:py-24 bg-gradient-to-b from-white via-amber-50/30 to-white relative overflow-hidden border-b border-slate-200/80">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-14 relative z-10">
             <div className="text-center max-w-2xl mx-auto space-y-3">
@@ -346,7 +346,7 @@ export function AiReviewStandeeClient() {
                 Frictionless 3-Step Flow
               </span>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
-                How the Acrylic QR Standee Works at Your Counter
+                How the Smart Ai Google Review QR Works at Your Counter
               </h2>
               <p className="text-slate-600 text-xs sm:text-sm">
                 Place on counter. Customer scans. AI auto-drafts. Review published. That simple.
@@ -362,8 +362,8 @@ export function AiReviewStandeeClient() {
                   color: "bg-amber-500 text-slate-950",
                   tag: "Step 1 • Counter Scan",
                   tagColor: "bg-amber-50 text-amber-800 border-amber-200",
-                  h3: "1. Customer Scans Acrylic Standee",
-                  p: "Place our premium acrylic standee on your billing counter. Customers scan the QR with their camera in under 3 seconds. No app download required — works on every smartphone.",
+                  h3: "1. Customer Scans Counter QR Code",
+                  p: "Display your custom branded QR Code on your billing counter. Customers scan the QR with their camera in under 3 seconds. No app download required — works on every smartphone.",
                   foot: "⚡ 3-Second Contactless Scan",
                   footRight: "Works on all phones"
                 },
@@ -416,13 +416,13 @@ export function AiReviewStandeeClient() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-12">
             <div className="text-center max-w-2xl mx-auto space-y-2">
               <span className="text-amber-800 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200">
-                Standee vs Standard QR
+                Smart AI System vs Standard QR
               </span>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
-                AI Review QR Standee vs. Standard Counter QR Sticker
+                Smart Ai Google Review System vs. Standard Counter QR Sticker
               </h2>
               <p className="text-slate-600 text-xs sm:text-sm">
-                Why plain QR stickers get ignored while CustomerPilot&apos;s acrylic standee achieves an 88% review rate:
+                Why plain QR stickers get ignored while CustomerPilot&apos;s Smart Ai Google Review System achieves an 88% review rate:
               </p>
             </div>
 
@@ -430,7 +430,7 @@ export function AiReviewStandeeClient() {
             <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
               <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[620px]">
                 <caption className="sr-only">
-                  Feature comparison: CustomerPilot AI Review QR Standee vs MagicReview/TapNConnect vs Normal QR Sticker
+                  Feature comparison: CustomerPilot Smart Ai Google Review System vs MagicReview/TapNConnect vs Normal QR Sticker
                 </caption>
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50/80">
@@ -438,12 +438,12 @@ export function AiReviewStandeeClient() {
                     <th scope="col" className="p-4 sm:p-5 font-bold text-amber-900 bg-amber-50/70 border-x border-amber-200 w-1/3">
                       <div className="flex items-center gap-1.5">
                         <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
-                        <span className="font-extrabold text-slate-900">CustomerPilot AI Standee</span>
+                        <span className="font-extrabold text-slate-900">CustomerPilot Smart AI System</span>
                         <span className="text-[10px] bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded-full ml-auto uppercase tracking-wider">#1 Best</span>
                       </div>
                     </th>
                     <th scope="col" className="p-4 sm:p-5 font-semibold text-slate-700 w-1/5">
-                      Standard QR Stands <span className="block text-[11px] font-normal text-slate-500">(MagicReview / TapNConnect)</span>
+                      Standard QR Displays <span className="block text-[11px] font-normal text-slate-500">(MagicReview / TapNConnect)</span>
                     </th>
                     <th scope="col" className="p-4 sm:p-5 font-semibold text-slate-700 w-1/6">Plain QR Sticker</th>
                   </tr>
@@ -453,7 +453,7 @@ export function AiReviewStandeeClient() {
                     ["Review Drafting", "Instant AI-generated personalized text", "Generic template suggestions", "Manual typing required"],
                     ["WhatsApp Integration", "Direct billing-triggered review links", "Stand-alone QR scan only", "No integration"],
                     ["Negative Feedback Filter", "Private internal feedback gateway", "Basic web form gating", "Public negative review risk"],
-                    ["Physical Build Quality", "5mm premium acrylic, UV-printed", "Plastic laminate or paper", "Paper sticker only"],
+                    ["Design & Branding Quality", "High-res vector print with store branding", "Plastic laminate or paper", "Paper sticker only"],
                     ["Conversion Rate", "Up to 4.2x higher walk-in reviews", "1.8x standard scan rate", "Less than 5% conversion"],
                   ].map(([feature, cp, std, plain], i) => (
                     <tr key={i} className="hover:bg-slate-50/50 transition-colors">
@@ -480,10 +480,10 @@ export function AiReviewStandeeClient() {
             <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-emerald-50 via-white to-amber-50 border border-emerald-200/80 shadow-sm grid md:grid-cols-12 gap-8 items-center">
               <div className="md:col-span-8 space-y-4">
                 <span className="text-emerald-800 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-100 border border-emerald-200 inline-flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-700" /> Standee Negative Feedback Shield
+                  <ShieldCheck className="w-4 h-4 text-emerald-700" /> Negative Feedback Shield
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
-                  Your Standee Protects Your Rating — Not Just Collects Reviews
+                  Your Smart QR Protects Your Rating — Not Just Collects Reviews
                 </h2>
                 <p className="text-sm text-slate-600 leading-relaxed">
                   CustomerPilot&apos;s Smart Sentiment Filter ensures that satisfied 4 and 5-star customers are directed straight to Google Maps while unhappy 1 to 3-star feedback is captured privately into your merchant dashboard and WhatsApp — allowing you to resolve issues before your public score takes a hit.
@@ -515,15 +515,15 @@ export function AiReviewStandeeClient() {
         <section className="py-16 max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center p-8 sm:p-12 rounded-3xl bg-gradient-to-b from-amber-50 to-white border border-amber-200 shadow-sm space-y-6">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
-              Get Your Premium AI Review Acrylic Standee — Free on Signup
+              Get Your Smart Ai Google Review QR — Free on Signup
             </h2>
             <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
-              Start your 3-day free trial today. Print your smart acrylic counter standee and watch customer reviews pour in on autopilot. Also explore our AI Software solution:
+              Start your 3-day free trial today. Download your print-ready counter QR Code and watch customer reviews pour in on autopilot. Also explore our AI Software solution:
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button asChild size="lg" className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-base px-8 py-6 rounded-2xl shadow-xl shadow-amber-500/20 hover:scale-105 transition-all">
                 <Link href="/signup">
-                  Get Acrylic Standee Now <ArrowRight className="w-5 h-5 ml-2" />
+                  Get Smart Ai Google Review QR Now <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-slate-300 text-slate-800 font-bold text-sm px-6 py-6 rounded-2xl">

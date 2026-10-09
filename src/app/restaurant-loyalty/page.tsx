@@ -3,14 +3,14 @@ import { RestaurantLoyaltyClient } from "@/components/restaurant-loyalty-client"
 
 export const metadata: Metadata = {
   title: "Restaurant Loyalty Program WhatsApp & Google Review Automation — CustomerPilot",
-  description: "Eliminate 25% Zomato/Swiggy commissions, own 100% customer data, and convert dine-in guests into repeat buyers with table QR standees and automated 5-star Google reviews.",
+  description: "Eliminate 25% Zomato/Swiggy commissions, own 100% customer data, and convert dine-in guests into repeat buyers with table QR codes and automated 5-star Google reviews.",
   keywords: [
     "google review automation for restaurant in india",
     "whatsapp loyalty program for punjabi gujarati restaurant",
     "how to increase repeat customers in restaurant without app",
     "customer retention software for south indian kathiyawadi restaurant",
     "restaurant customer retention software india",
-    "table qr standee loyalty",
+    "table qr code loyalty",
     "diner rewards whatsapp"
   ],
   alternates: {

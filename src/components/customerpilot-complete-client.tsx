@@ -24,7 +24,7 @@ const COMPLETE_FAQS: DualLangFaqItem[] = [
     questionEn: "What is CustomerPilot Complete and what modules are included?",
     answerEn: "CustomerPilot Complete is the all-in-one customer retention engine for Indian retail. It unifies all 4 flagship modules: (1) WhatsApp Digital Stamp Cards, (2) Smart AI Google Reviews QR, (3) 1-Click AI AutoReply on Google Maps, and (4) Luxury Digital Business Cards with 1-tap contact saving.",
     questionHi: "CustomerPilot Complete kya hai aur isme kaun kaun se features aate hain?",
-    answerHi: "CustomerPilot Complete ek all-in-one software suite hai jisme 4 core tools ek sath aate hain: (1) WhatsApp Digital Loyalty Stamp Card, (2) AI Google Reviews QR standee, (3) 1-Click Google Maps AI AutoReply, aur (4) Smart Digital Business Card with 1-tap contact save."
+    answerHi: "CustomerPilot Complete ek all-in-one software suite hai jisme 4 core tools ek sath aate hain: (1) WhatsApp Digital Loyalty Stamp Card, (2) Smart Ai Google Review QR, (3) 1-Click Google Maps AI AutoReply, aur (4) Smart Digital Business Card with 1-tap contact save."
   },
   {
     id: 2,
@@ -43,9 +43,9 @@ const COMPLETE_FAQS: DualLangFaqItem[] = [
   {
     id: 4,
     questionEn: "How fast can my store go live with the complete retention suite?",
-    answerEn: "You can go live in under 3 minutes! Simply sign up, connect your WhatsApp bot and Google Business Profile, print your auto-generated counter QR standee, and start rewarding customers immediately.",
+    answerEn: "You can go live in under 3 minutes! Simply sign up, connect your WhatsApp bot and Google Business Profile, print your auto-generated counter QR Code, and start rewarding customers immediately.",
     questionHi: "Meri dukan CustomerPilot Complete ke sath kitni der me live ho sakti hai?",
-    answerHi: "Aap sirf 3 minute ke andar poori tarah live ho sakte hain! Signup karein, reward set karein, Google profile connect karein aur counter QR standee print karke rakh dein."
+    answerHi: "Aap sirf 3 minute ke andar poori tarah live ho sakte hain! Signup karein, reward set karein, Google profile connect karein aur counter QR Code print karke rakh dein."
   },
   {
     id: 5,
@@ -348,18 +348,18 @@ export function CustomerPilotCompleteClient() {
                       01
                     </span>
                     <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      Step 1 • Standee Setup
+                      Step 1 • Smart QR Setup
                     </span>
                   </div>
 
-                  {/* Infographic Visual: Standee & Scan */}
+                  {/* Infographic Visual: Counter QR & Scan */}
                   <div className="p-4 rounded-2xl bg-gradient-to-b from-emerald-50 to-slate-50 border border-emerald-100 flex items-center justify-center min-h-[120px] relative overflow-hidden">
                     <div className="flex items-center gap-3">
                       <div className="w-18 h-22 rounded-xl bg-white border border-emerald-200 shadow-md p-2 flex flex-col items-center justify-center text-center">
                         <div className="w-6 h-6 bg-emerald-600 rounded-md flex items-center justify-center text-white mb-1">
                           <Store className="w-3.5 h-3.5" />
                         </div>
-                        <span className="text-[8px] font-black text-slate-900 leading-tight">1 Standee</span>
+                        <span className="text-[8px] font-black text-slate-900 leading-tight">1 QR Code</span>
                         <span className="text-[7px] text-emerald-700 font-semibold">Powers All</span>
                       </div>
                       <div className="text-emerald-500 font-bold text-lg animate-pulse">➔</div>
@@ -374,10 +374,10 @@ export function CustomerPilotCompleteClient() {
                   </div>
 
                   <h3 className="font-extrabold text-slate-900 text-lg">
-                    1. One Smart Standee Powers Entire Counter
+                    1. One Smart QR Code Powers Entire Counter
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    Place a single acrylic QR standee on your billing desk. Customers tap with NFC or scan with camera in 3 seconds. Zero app downloads.
+                    Place a single smart QR Code display on your billing desk. Customers scan with their phone camera in 3 seconds. Zero app downloads.
                   </p>
                 </div>
 
@@ -538,7 +538,7 @@ export function CustomerPilotCompleteClient() {
                   <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">AI Drafts</span>
                 </div>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Smart counter QR standees that pre-draft authentic, keyword-rich 5-star reviews on customer phones. Triple your Google review velocity and shield your profile with private negative feedback filtering.
+                  Smart counter QR codes that pre-draft authentic, keyword-rich 5-star reviews on customer phones. Triple your Google review velocity and shield your profile with private negative feedback filtering.
                 </p>
                 <Link href="/ai-google-review-qr-generator" className="inline-flex items-center text-xs font-bold text-emerald-700 hover:underline">
                   Explore AI Review QR Pillar →
@@ -599,7 +599,7 @@ export function CustomerPilotCompleteClient() {
                   </tr>
 
                   <tr className="hover:bg-slate-50/80 transition">
-                    <td className="py-3.5 px-4 sm:px-6 font-semibold">AI Google Reviews QR Standee</td>
+                    <td className="py-3.5 px-4 sm:px-6 font-semibold">Smart Ai Google Reviews QR Code</td>
                     <td className="py-3.5 px-4 sm:px-6 font-bold text-emerald-800 bg-emerald-50/40 border-x border-emerald-100">Included</td>
                     <td className="py-3.5 px-4 sm:px-6 text-slate-500">₹24,500/mo (Birdeye / Podium $299/mo)</td>
                   </tr>
