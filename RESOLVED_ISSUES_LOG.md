@@ -3,6 +3,35 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [09 Oct 2026] Feature: CustomerPilot Pricing Studio v4 Ascending Price Architecture & Complete Section Layout
+- **Symptom**: User requested updating `http://localhost:3000/pricing` to precisely match the Markdown specification layout:
+  - Header: `# CustomerPilot Pricing Studio v4`
+  - Subtitle: `Pick a product, compare tenures, build your bundle — all prices live`
+  - Control: `[ ] Admin edit mode`
+  - Section 1: `### 🧺 Your Bundle` (Dynamic configurator with live bundle presets, 4 module toggle cards, and real-time reactive math calculator)
+  - Section 2: `## Compare all tenures` arranged in strict low-to-high ascending price order (Lifetime Deal ₹1,499 ➔ 6 Months ₹1,749 ➔ 1 Year Pro ₹2,249)
+  - Section 3: `## Standalone services — 6 Months & 1 Year (with total)` with granular comparative pricing across all modules, sum total row, and Complete Suite savings row.
+  - Strict Brand Rules: Zero instances of "NFC" or "Standee" permitted anywhere.
+- **Root Cause**: The pricing page previously had a different layout arrangement that did not follow the specified sections (`🧺 Your Bundle`, `Compare all tenures`, `Standalone services — 6 Months & 1 Year (with total)`) in the exact ascending price order.
+- **Resolution**:
+  1. **Pricing Studio v4 Architecture (`src/components/pricing/pricing-studio.tsx`)**:
+     - Maintained `# CustomerPilot Pricing Studio v4` and live subtitle.
+     - Preserved interactive `[ ] Admin edit mode` toggle with direct price & MRP editing and database sync via `/api/pricing/plans`.
+     - Rendered `### 🧺 Your Bundle` interactive dynamic builder with quick presets (`All 4 Tools`, `Complete Trio`, `Google Reputation`, `Card + Loyalty`), 4 selectable product cards, and live basket summary calculator.
+     - Rendered `## Compare all tenures` in strict ascending order: Lifetime Deal (₹1,499) ➔ 6 Months (₹1,749) ➔ 1 Year Pro (₹2,249).
+     - Rendered `## Standalone services — 6 Months & 1 Year (with total)` featuring side-by-side comparison of 6 Months and 1 Year tenures, Standalone Services Total row (₹1,996 / ₹2,896), and CustomerPilot Complete Suite savings row (₹1,749 / ₹2,249 with up to ₹647 savings).
+     - Enforced 100% brand terminology hygiene: 0 occurrences of "NFC", 0 occurrences of "Standee".
+  2. **Production Build & Asset Packaging**:
+     - Executed full production build (`npm run build`) compiling all 189 routes without errors.
+     - Synced static build assets (`.next/static`, `public`, `prisma`) to `.next/standalone`.
+  3. **Playwright & Ground-Truth Runtime Verification**:
+     - Verified page rendered at `http://localhost:3000/pricing` via headless browser (`scripts/verify_pricing_ascending.js`).
+     - Confirmed all required headings and sections present with 0 errors.
+     - Asserted zero instances of "NFC" and zero instances of "Standee".
+     - Captured and archived visual verification snapshot at `verified_pricing_studio_v4_ascending.png`.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [09 Oct 2026] Feature & Copy Refactor: Universal Terminology Cleanup (NFC Removal, Standee to QR Code, Pricing Hierarchy & Product Naming)
 - **Symptom**: User requested 6 comprehensive copy and product identity adjustments:
   1. Remove "Simple, Transparent Pricing" completely.
