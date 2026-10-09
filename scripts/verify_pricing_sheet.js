@@ -10,7 +10,7 @@ async function main() {
   await page.waitForTimeout(2500);
 
   // 1. Check title & headers
-  const title = await page.textContent("h1");
+  const title = (await page.textContent("h1")).trim();
   console.log("Page H1:", title);
 
   const subTitle = await page.locator("text=Pick a product, compare tenures, build your bundle — all prices live").first().textContent();
@@ -20,7 +20,7 @@ async function main() {
   const section1 = await page.locator("text=Your Bundle").first().textContent();
   console.log("Section 1 header found:", section1);
 
-  const section2 = await page.locator("text=Compare all tenures").first().textContent();
+  const section2 = await page.locator("text=CustomerPilot Complete Business Growth").first().textContent();
   console.log("Section 2 header found:", section2);
 
   const section3 = await page.locator("text=Standalone services — 6 Months & 1 Year (with total)").first().textContent();
@@ -30,8 +30,11 @@ async function main() {
   const content = await page.content();
 
   const assertions = [
-    { label: "Lifetime Card ₹1,499", test: content.includes("1,499") },
-    { label: "Lifetime Card MRP ₹3,999", test: content.includes("3,999") },
+    { label: "H1 is 'Pricing'", test: title === "Pricing" },
+    { label: "No 'Studio v4' on page", test: !content.includes("Studio v4") },
+    { label: "Section 2 Title: CustomerPilot Complete Business Growth", test: content.includes("CustomerPilot Complete Business Growth") },
+    { label: "No Live Bundle Summary", test: !content.includes("Live Bundle Summary") },
+    { label: "No Section 2 Lifetime Deal Card", test: !content.includes("Zero Renewal Fees Forever") },
     { label: "Complete 6 Months ₹2,499", test: content.includes("2,499") },
     { label: "Complete 6 Months MRP ₹4,998", test: content.includes("4,998") },
     { label: "Complete 12 Months ₹4,899", test: content.includes("4,899") },

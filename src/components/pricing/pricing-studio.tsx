@@ -463,10 +463,10 @@ export function PricingStudio({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200/60 dark:border-slate-800/80">
           <div>
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-wider mb-2">
-              <Sparkles className="w-3.5 h-3.5 animate-pulse" /> CustomerPilot Pricing Studio v4
+              <Sparkles className="w-3.5 h-3.5 animate-pulse" /> CustomerPilot Pricing
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
-              Pricing Studio v4
+              Pricing
             </h1>
             <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-1 max-w-3xl">
               Pick a product, compare tenures, build your bundle — all prices live
@@ -526,338 +526,164 @@ export function PricingStudio({
         )}
       </div>
 
-      {/* ─── SECTION 1: Your Bundle (Interactive Dynamic Builder) ─── */}
+      {/* ─── SECTION 1: Standalone Modules (Your Bundle) ─── */}
       <section className="space-y-6 mb-16">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
           <div>
             <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider mb-1">
               <Sliders className="w-3.5 h-3.5" />
-              <span>Dynamic Configurator</span>
+              <span>Modular Growth Tools</span>
             </div>
             <h3 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-2.5 text-slate-900 dark:text-white">
               <ShoppingBag className="w-6 h-6 text-indigo-600 dark:text-indigo-400 shrink-0" />
-              <span>Your Bundle</span>
+              <span>Your Bundle &amp; Standalone Modules</span>
             </h3>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Select any combination of tools below. The live engine bundles them with automatic volume discounts.
+              Select any individual tool for your store, or upgrade to CustomerPilot Complete Business Growth below.
             </p>
           </div>
 
-          {/* Quick Presets Pills */}
-          <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 dark:bg-slate-900/90 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800">
+          {/* Tenure Switcher */}
+          <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shrink-0">
             <button
               type="button"
-              onClick={() => selectPreset("all4")}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 cursor-pointer flex items-center gap-1.5"
+              onClick={() => setSelectedTenure("6mo")}
+              className={`py-2 px-4 rounded-lg text-xs font-bold transition cursor-pointer ${
+                selectedTenure === "6mo"
+                  ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span>All 4 Tools</span>
+              6 Months (Semi-Annual)
             </button>
             <button
               type="button"
-              onClick={() => selectPreset("complete")}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 cursor-pointer flex items-center gap-1.5"
+              onClick={() => setSelectedTenure("1year")}
+              className={`py-2 px-4 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                selectedTenure === "1year"
+                  ? "bg-slate-900 dark:bg-indigo-600 text-white shadow-xs"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              }`}
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span>Complete Trio</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => selectPreset("reviews_only")}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 cursor-pointer flex items-center gap-1.5"
-            >
-              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />
-              <span>Google Reputation</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => selectPreset("card_loyalty")}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 cursor-pointer flex items-center gap-1.5"
-            >
-              <CreditCard className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span>Card + Loyalty</span>
+              <span>1 Year</span>
+              <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-white">50% OFF</span>
             </button>
           </div>
         </div>
 
-        {/* Tenure Switcher For Bundle */}
-        <div className="flex items-center justify-center p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-w-md mx-auto shadow-inner">
-          <button
-            type="button"
-            onClick={() => setSelectedTenure("6mo")}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
-              selectedTenure === "6mo"
-                ? "bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-sm"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
-          >
-            6 Months (Semi-Annual)
-          </button>
-          <button
-            type="button"
-            onClick={() => setSelectedTenure("1year")}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
-              selectedTenure === "1year"
-                ? "bg-slate-900 dark:bg-indigo-600 text-white shadow-sm"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
-          >
-            <span>1 Year</span>
-            <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-emerald-500 text-white">50% OFF</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSelectedTenure("lifetime")}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
-              selectedTenure === "lifetime"
-                ? "bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-sm"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
-          >
-            Lifetime (Card)
-          </button>
-        </div>
+        {/* 4 Professional Standalone Product Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {PRODUCT_MODULES.map((mod) => {
+            const pricing = getProductPrice(mod, selectedTenure)
+            const planRecord = pricing.plan
 
-        {/* Interactive Products Grid + Live Basket Summary */}
-        <div className="grid lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: 4 Selectable Product Cards (8 cols) */}
-          <div className="lg:col-span-7 xl:col-span-8 grid sm:grid-cols-2 gap-4">
-            {PRODUCT_MODULES.map((mod) => {
-              const isChecked = Boolean(selectedModules[mod.id])
-              const pricing = getProductPrice(mod, selectedTenure)
-              const planRecord = pricing.plan
-
-              return (
-                <div
-                  key={mod.id}
-                  onClick={() => toggleModule(mod.id)}
-                  className={`p-5 rounded-3xl border transition-all cursor-pointer relative flex flex-col justify-between ${
-                    isChecked
-                      ? isDark
-                        ? "bg-slate-900/95 border-indigo-500 shadow-xl shadow-indigo-500/10 ring-1 ring-indigo-500/30"
-                        : "bg-white border-indigo-500 shadow-xl shadow-indigo-500/10 ring-2 ring-indigo-500"
-                      : isDark
-                      ? "bg-slate-950/60 border-slate-800/80 opacity-75 hover:opacity-100 hover:border-slate-700"
-                      : "bg-slate-50 border-slate-200/80 opacity-80 hover:opacity-100 hover:border-slate-300"
-                  }`}
-                >
-                  <div className="space-y-3">
-                    {/* Header with Icon, Badge & Checkbox */}
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2.5">
-                        <div className="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 shrink-0">
-                          {getModuleIcon(mod.id, "w-5 h-5")}
-                        </div>
-                        <div>
-                          <Badge variant="outline" className="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-none">
-                            {mod.badge}
-                          </Badge>
-                          <h4 className="text-base font-bold leading-tight mt-1">
-                            {mod.shortTitle}
-                          </h4>
-                        </div>
+            return (
+              <div
+                key={mod.id}
+                className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-sm transition-all flex flex-col justify-between"
+              >
+                <div className="space-y-3">
+                  {/* Header with Icon & Badge */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 shrink-0">
+                        {getModuleIcon(mod.id, "w-5 h-5")}
                       </div>
-
-                      {/* Custom Checkbox */}
-                      <div className={`w-6 h-6 rounded-lg flex items-center justify-center border transition ${
-                        isChecked
-                          ? "bg-indigo-600 border-indigo-600 text-white shadow-sm"
-                          : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900"
-                      }`}>
-                        {isChecked && <Check className="w-4 h-4 font-black stroke-[3]" />}
+                      <div>
+                        <Badge variant="outline" className="text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-none">
+                          {mod.badge}
+                        </Badge>
+                        <h4 className="text-base font-bold leading-tight mt-1 text-slate-900 dark:text-white">
+                          {mod.shortTitle}
+                        </h4>
                       </div>
                     </div>
-
-                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
-                      {mod.tagline}
-                    </p>
-
-                    {/* Features list */}
-                    <ul className="space-y-1.5 pt-1 text-[11px] text-slate-600 dark:text-slate-300">
-                      {mod.features.slice(0, 3).map((feat, fidx) => (
-                        <li key={fidx} className="flex items-center gap-1.5">
-                          <Check className="w-3 h-3 text-emerald-500 shrink-0" />
-                          <span className="truncate">{feat}</span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
 
-                  {/* Price Tag & Admin Inline Edit */}
-                  <div className="pt-4 mt-3 border-t border-slate-200/70 dark:border-slate-800/70 flex items-baseline justify-between">
-                    <div>
-                      <div className="flex items-baseline gap-2">
-                        {adminEditMode && planRecord ? (
-                          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                            <span className="text-xs font-bold">₹</span>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                    {mod.tagline}
+                  </p>
+
+                  {/* Features list */}
+                  <ul className="space-y-1.5 pt-1 text-[11px] text-slate-600 dark:text-slate-300">
+                    {mod.features.slice(0, 4).map((feat, fidx) => (
+                      <li key={fidx} className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        <span className="truncate">{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Price Tag & CTA Button */}
+                <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800/80 space-y-3">
+                  <div>
+                    <div className="flex items-baseline gap-2">
+                      {adminEditMode && planRecord ? (
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs font-bold">₹</span>
+                          <Input
+                            type="number"
+                            value={planRecord.price}
+                            onChange={(e) => handlePlanChange(planRecord.planKey!, "price", Number(e.target.value))}
+                            className="w-20 h-7 text-xs font-black bg-white dark:bg-slate-900 text-emerald-600"
+                          />
+                        </div>
+                      ) : (
+                        <span className="text-2xl font-black text-slate-900 dark:text-white">
+                          ₹{pricing.price.toLocaleString("en-IN")}
+                        </span>
+                      )}
+
+                      {pricing.mrp && (
+                        adminEditMode && planRecord ? (
+                          <div className="flex items-center gap-1">
+                            <span className="text-[10px] text-slate-400">MRP:</span>
                             <Input
                               type="number"
-                              value={planRecord.price}
-                              onChange={(e) => handlePlanChange(planRecord.planKey!, "price", Number(e.target.value))}
-                              className="w-20 h-7 text-xs font-black bg-white dark:bg-slate-900 text-emerald-600"
+                              value={planRecord.originalPrice}
+                              onChange={(e) => handlePlanChange(planRecord.planKey!, "originalPrice", Number(e.target.value))}
+                              className="w-16 h-7 text-[11px] text-slate-400 bg-white dark:bg-slate-900"
                             />
                           </div>
                         ) : (
-                          <span className="text-xl font-black text-slate-900 dark:text-white">
-                            ₹{pricing.price.toLocaleString("en-IN")}
+                          <span className="text-xs font-semibold text-slate-400 line-through font-mono">
+                            ₹{pricing.mrp.toLocaleString("en-IN")}
                           </span>
-                        )}
-
-                        {pricing.mrp && (
-                          adminEditMode && planRecord ? (
-                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                              <span className="text-[10px] text-slate-400">MRP:</span>
-                              <Input
-                                type="number"
-                                value={planRecord.originalPrice}
-                                onChange={(e) => handlePlanChange(planRecord.planKey!, "originalPrice", Number(e.target.value))}
-                                className="w-16 h-7 text-[11px] text-slate-400 bg-white dark:bg-slate-900"
-                              />
-                            </div>
-                          ) : (
-                            <span className="text-xs font-semibold text-slate-400 line-through">
-                              ₹{pricing.mrp.toLocaleString("en-IN")}
-                            </span>
-                          )
-                        )}
-                      </div>
-                      <span className="text-[10px] text-slate-400 font-medium">
-                        {selectedTenure === "6mo" ? "for 6 months" : selectedTenure === "1year" ? "for 1 year" : "lifetime access"}
-                      </span>
+                        )
+                      )}
                     </div>
-
-                    <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
-                      isChecked
-                        ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300"
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-500"
-                    }`}>
-                      {isChecked ? "In Bundle ✓" : "+ Add"}
+                    <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
+                      {selectedTenure === "6mo" ? "for 6 months (180 days)" : "for 1 year (365 days · 50% OFF)"}
                     </span>
                   </div>
-                </div>
-              )
-            })}
-          </div>
 
-          {/* Right Column: Live Reactive Bundle Calculator (5 cols / 4 cols) */}
-          <div className="lg:col-span-5 xl:col-span-4 sticky top-24">
-            <Card className={`rounded-3xl border-2 transition-all shadow-2xl ${
-              isDark
-                ? "bg-slate-900/90 border-indigo-500/50 shadow-indigo-500/10 backdrop-blur-xl"
-                : "bg-white border-slate-900/90 shadow-2xl shadow-indigo-500/10"
-            }`}>
-              <CardHeader className="p-6 pb-4 border-b border-slate-200/80 dark:border-slate-800">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <ShoppingBag className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                    <CardTitle className="text-lg font-black">Live Bundle Summary</CardTitle>
-                  </div>
-                  <Badge className="bg-emerald-500 text-white font-extrabold text-[10px]">
-                    {bundleCalculation.savingsPercent}% TOTAL SAVINGS
-                  </Badge>
-                </div>
-                <CardDescription className="text-xs">
-                  {bundleCalculation.selectedCount} product{bundleCalculation.selectedCount !== 1 ? "s" : ""} selected for {selectedTenure === "6mo" ? "6 Months" : selectedTenure === "1year" ? "1 Year" : "Lifetime"}
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent className="p-6 space-y-5">
-                {/* Selected Products List */}
-                <div className="space-y-2">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Included In Your Package:</p>
-                  <div className="space-y-1.5">
-                    {PRODUCT_MODULES.filter((m) => selectedModules[m.id]).map((m) => {
-                      const p = getProductPrice(m, selectedTenure)
-                      return (
-                        <div key={m.id} className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-100 dark:border-slate-800/80">
-                          <span className="flex items-center gap-2 font-semibold">
-                            <span className="shrink-0">{getModuleIcon(m.id, "w-4 h-4")}</span>
-                            <span className="truncate max-w-[170px]">{m.shortTitle}</span>
-                          </span>
-                          <span className="font-mono text-slate-500 dark:text-slate-400 font-semibold">
-                            ₹{p.price}
-                          </span>
-                        </div>
-                      )
-                    })}
-
-                    {bundleCalculation.selectedCount === 0 && (
-                      <p className="text-xs text-amber-500 italic p-3 text-center bg-amber-500/10 rounded-xl">
-                        Please select at least 1 product above to build your bundle.
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Highlight Deal Pill */}
-                {bundleCalculation.appliedBundleBadge && (
-                  <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200/80 dark:border-indigo-800/60 text-xs font-bold text-indigo-900 dark:text-indigo-200 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                    <span>{bundleCalculation.appliedBundleBadge}</span>
-                  </div>
-                )}
-
-                {/* Math Breakdown */}
-                <div className="space-y-2 pt-2 border-t border-slate-200/80 dark:border-slate-800/80 text-xs">
-                  <div className="flex justify-between text-slate-500 dark:text-slate-400">
-                    <span>Standalone Total (MRP):</span>
-                    <span className="line-through font-mono">₹{bundleCalculation.bundleTotalMrp.toLocaleString("en-IN")}</span>
-                  </div>
-
-                  <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
-                    <span>Bundle Discount Savings:</span>
-                    <span>-₹{bundleCalculation.totalSavings.toLocaleString("en-IN")} ({bundleCalculation.savingsPercent}% OFF)</span>
-                  </div>
-
-                  <div className="flex justify-between items-baseline pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
-                    <div>
-                      <span className="text-sm font-black text-slate-900 dark:text-white">Final Bundle Price</span>
-                      <p className="text-[10px] text-slate-400 font-medium">All taxes included · No hidden fees</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
-                        ₹{bundleCalculation.bundleOfferPrice.toLocaleString("en-IN")}
-                      </div>
-                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                        Just ₹{bundleCalculation.dailyCost}/day (~₹{bundleCalculation.monthlyCost}/mo)
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action CTA */}
-                <div className="pt-2">
                   {mode === "public" ? (
-                    <Link href={`/signup?tenure=${selectedTenure}&modules=${Object.keys(selectedModules).filter(k => selectedModules[k]).join(",")}`}>
-                      <Button className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm h-12 rounded-2xl shadow-xl shadow-indigo-600/25 cursor-pointer">
-                        Start 3 Days Free Trial with this Bundle →
+                    <Link href={`/signup?module=${mod.id}&tenure=${selectedTenure}`}>
+                      <Button variant="outline" className="w-full border-slate-300 hover:border-slate-900 hover:bg-slate-900 hover:text-white text-slate-900 font-bold text-xs h-9 rounded-xl transition cursor-pointer">
+                        Select {mod.shortTitle} →
                       </Button>
                     </Link>
                   ) : mode === "merchant" ? (
                     <Button
-                      onClick={handleBundleAction}
-                      disabled={bundleCalculation.selectedCount === 0}
-                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm h-12 rounded-2xl shadow-xl shadow-emerald-600/25 cursor-pointer"
+                      onClick={() => {
+                        const p = pricing.plan
+                        if (p && onSelectPlan) onSelectPlan(p)
+                      }}
+                      variant="outline"
+                      className="w-full border-slate-300 hover:bg-slate-900 hover:text-white font-bold text-xs h-9 rounded-xl transition cursor-pointer"
                     >
-                      Proceed to Checkout (₹{bundleCalculation.bundleOfferPrice.toLocaleString("en-IN")}) →
+                      Choose Plan
                     </Button>
                   ) : (
-                    <Button
-                      onClick={handleBundleAction}
-                      className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm h-12 rounded-2xl cursor-pointer"
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      Preview Active Bundle
+                    <Button variant="outline" className="w-full text-xs font-medium h-9 rounded-xl">
+                      Active Module ✓
                     </Button>
                   )}
-                  <p className="text-[11px] text-center text-slate-400 mt-2 flex items-center justify-center gap-1.5">
-                    <Lock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Instant Activation · 100% WhatsApp-Native Delivery</span>
-                  </p>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            )
+          })}
         </div>
       </section>
 
@@ -867,11 +693,11 @@ export function PricingStudio({
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
             <Layers className="w-3.5 h-3.5" /> Long-Term Value Multiplier
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight">
-            Compare all tenures
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+            CustomerPilot Complete Business Growth
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Choose between flexible Semi-Annual, the maximum-savings 1-Year Pro plan, or permanent Lifetime access for your Smart Digital Card.
+            Compare 6 Months Semi-Annual &amp; 12 Months Annual Pro Suite — all 4 customer retention tools unified.
           </p>
         </div>
 
@@ -888,104 +714,19 @@ export function PricingStudio({
           </Link>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 pt-4">
-          {/* Card 1: Lifetime Deal (Lowest Price: ₹1,499) */}
-          <Card className={`rounded-3xl border transition-all p-6 sm:p-7 flex flex-col justify-between ${
-            selectedTenure === "lifetime"
-              ? isDark
-                ? "border-cyan-500 bg-slate-900/90 ring-2 ring-cyan-500/20 shadow-xl"
-                : "border-cyan-600 bg-white ring-2 ring-cyan-600/20 shadow-xl"
-              : isDark
-              ? "border-slate-800 bg-slate-950/60 hover:border-slate-700"
-              : "border-slate-200 bg-white hover:border-slate-300"
-          }`}>
+        {/* 2 Complete Plans Grid */}
+        <div className="grid md:grid-cols-2 max-w-4xl mx-auto gap-6 sm:gap-8 pt-4">
+          {/* Card 1: 6 Months Complete (₹2,499) */}
+          <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 transition-all p-6 sm:p-7 flex flex-col justify-between shadow-xs">
             <div className="space-y-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <Badge variant="outline" className="text-[10px] font-bold border-cyan-500/40 text-cyan-600 dark:text-cyan-400">
-                    One-Time Purchase
-                  </Badge>
-                  <h3 className="text-xl font-black mt-1 text-slate-900 dark:text-white">Lifetime Deal</h3>
-                </div>
-                <div className="p-2.5 rounded-2xl bg-cyan-50 dark:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400 border border-cyan-200/60 dark:border-cyan-800/50">
-                  <Zap className="w-5 h-5" />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-black text-cyan-600 dark:text-cyan-400">₹1,499</span>
-                  <span className="text-sm text-slate-400 line-through font-mono">₹3,999</span>
-                </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  ₹0.41/day (MRP ₹1.10/day) · Save ₹2,500 (~62% OFF)
-                </p>
-                <span className="inline-block mt-2 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
-                  Zero Renewal Fees Forever
-                </span>
-              </div>
-
-              <div className="space-y-2.5 pt-3 border-t border-slate-200/70 dark:border-slate-800/70 text-xs">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Lifetime Privileges:</p>
-                <ul className="space-y-2 text-slate-600 dark:text-slate-300">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-cyan-500 shrink-0" />
-                    <span>Permanent Cloud Hosting (10 Years Guaranteed)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-cyan-500 shrink-0" />
-                    <span>1-Tap Phonebook Sync (.vcf) &amp; Review Trigger</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-cyan-500 shrink-0" />
-                    <span>Unlimited Real-Time Profile &amp; Menu Edits</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-cyan-500 shrink-0" />
-                    <span>Custom Smart Digital Card Setup Guidance</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-cyan-500 shrink-0" />
-                    <span>Founder Direct Support Line</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="pt-6">
-              <Button
-                onClick={() => setSelectedTenure("lifetime")}
-                variant={selectedTenure === "lifetime" ? "default" : "outline"}
-                className={`w-full font-bold text-xs h-11 rounded-xl cursor-pointer ${
-                  selectedTenure === "lifetime"
-                    ? "bg-cyan-600 hover:bg-cyan-500 text-white"
-                    : "border-slate-300 dark:border-slate-700"
-                }`}
-              >
-                {selectedTenure === "lifetime" ? "Selected Tenure ✓" : "Choose Lifetime"}
-              </Button>
-            </div>
-          </Card>
-
-          {/* Card 2: 6 Months Complete (₹2,499) */}
-          <Card className={`rounded-3xl border transition-all p-6 sm:p-7 flex flex-col justify-between ${
-            selectedTenure === "6mo"
-              ? isDark
-                ? "border-indigo-500 bg-slate-900/90 ring-2 ring-indigo-500/20 shadow-xl"
-                : "border-indigo-600 bg-white ring-2 ring-indigo-600/20 shadow-xl"
-              : isDark
-              ? "border-slate-800 bg-slate-950/60 hover:border-slate-700"
-              : "border-slate-200 bg-white hover:border-slate-300"
-          }`}>
-            <div className="space-y-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Badge variant="outline" className="text-[10px] font-bold border-indigo-400 text-indigo-600 dark:text-indigo-400">
+                  <Badge variant="outline" className="text-[10px] font-bold border-indigo-200 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">
                     Best Value
                   </Badge>
                   <h3 className="text-xl font-black mt-1 text-slate-900 dark:text-white">6 Months Complete</h3>
                 </div>
-                <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50">
+                <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50">
                   <Calendar className="w-5 h-5" />
                 </div>
               </div>
@@ -1031,28 +772,21 @@ export function PricingStudio({
             </div>
 
             <div className="pt-6">
-              <Button
-                onClick={() => setSelectedTenure("6mo")}
-                variant={selectedTenure === "6mo" ? "default" : "outline"}
-                className={`w-full font-bold text-xs h-11 rounded-xl cursor-pointer ${
-                  selectedTenure === "6mo"
-                    ? "bg-indigo-600 hover:bg-indigo-500 text-white"
-                    : "border-slate-300 dark:border-slate-700"
-                }`}
-              >
-                {selectedTenure === "6mo" ? "Selected Tenure ✓" : "Choose 6 Months"}
-              </Button>
+              <Link href="/signup?plan=growth_180">
+                <Button
+                  variant="outline"
+                  className="w-full font-bold text-xs h-11 rounded-xl border-slate-300 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition cursor-pointer"
+                >
+                  Choose 6 Months
+                </Button>
+              </Link>
             </div>
           </Card>
 
-          {/* Card 3: 12 Months Complete (₹4,899) */}
-          <Card className={`rounded-3xl border-2 transition-all p-6 sm:p-7 flex flex-col justify-between relative ${
-            isDark
-              ? "border-indigo-500 bg-slate-900/90 shadow-2xl shadow-indigo-500/10 ring-2 ring-indigo-500/40"
-              : "border-indigo-600 bg-white shadow-xl shadow-indigo-600/10 ring-2 ring-indigo-600/20"
-          }`}>
+          {/* Card 2: 12 Months Complete (₹4,899) */}
+          <Card className="rounded-2xl border-2 border-indigo-600 dark:border-indigo-500 bg-white dark:bg-slate-900 shadow-md relative p-6 sm:p-7 flex flex-col justify-between">
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-              <span className="bg-indigo-600 text-white font-bold text-[10px] tracking-wider uppercase px-3.5 py-1 rounded-full shadow-md flex items-center gap-1.5">
+              <span className="bg-indigo-600 text-white font-bold text-[10px] tracking-wider uppercase px-3.5 py-1 rounded-full shadow-sm flex items-center gap-1.5">
                 <Sparkles className="w-3 h-3" />
                 <span>12 MONTHS · ANNUAL PRO SUITE</span>
               </span>
@@ -1066,7 +800,7 @@ export function PricingStudio({
                   </Badge>
                   <h3 className="text-xl font-black mt-1 text-slate-900 dark:text-white">12 Months Complete</h3>
                 </div>
-                <div className="p-2.5 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/50">
+                <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/50">
                   <Crown className="w-5 h-5" />
                 </div>
               </div>
@@ -1112,16 +846,16 @@ export function PricingStudio({
             </div>
 
             <div className="pt-6">
-              <Button
-                onClick={() => setSelectedTenure("1year")}
-                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs h-11 rounded-xl shadow-lg shadow-indigo-600/20 cursor-pointer"
-              >
-                {selectedTenure === "1year" ? "Selected Tenure (50% OFF) ✓" : "Choose 12 Months (Save 50%)"}
-              </Button>
+              <Link href="/signup?plan=enterprise_365">
+                <Button
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-11 rounded-xl shadow-sm transition cursor-pointer"
+                >
+                  Choose 12 Months (Save 50%)
+                </Button>
+              </Link>
             </div>
           </Card>
-
-          </div>
+        </div>
       </section>
 
       {/* ─── SECTION 3: ## Standalone services — 6 Months & 1 Year (with total) ─── */}
