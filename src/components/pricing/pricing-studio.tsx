@@ -96,28 +96,6 @@ export const PRODUCT_MODULES: ProductModule[] = [
     defaultMrpLifetime: 3999
   },
   {
-    id: "loyalty",
-    name: "Digital Loyalty Stamps & VIP Club",
-    shortTitle: "Loyalty Stamps & VIP",
-    icon: "🎁",
-    badge: "Repeat Visit Engine",
-    tagline: "WhatsApp Digital Stamp Cards & Automated Birthday Rewards",
-    description: "Turn walk-in shoppers into loyal repeat customers with WhatsApp digital stamp cards, cashier counter queue, and automated win-back triggers.",
-    features: [
-      "Digital WhatsApp Stamp Card (No App Download)",
-      "Cashier 1-Tap Counter Check-In Mode",
-      "Automated Birthday & Anniversary Rewards Engine",
-      "14/30/60-Day Inactivity Win-Back WhatsApp Alerts",
-      "VIP Tier Upgrades & Customer Loyalty Analytics"
-    ],
-    planKey6Mo: "loyalty_6mo",
-    planKey1Yr: "loyalty_yearly",
-    defaultPrice6Mo: 549,
-    defaultMrp6Mo: 1099,
-    defaultPrice1Yr: 799,
-    defaultMrp1Yr: 1599
-  },
-  {
     id: "reviews",
     name: "Smart Ai (SEO Optimized) Google Reviews",
     shortTitle: "Smart AI Google Reviews",
@@ -160,6 +138,28 @@ export const PRODUCT_MODULES: ProductModule[] = [
     defaultMrp6Mo: 1099,
     defaultPrice1Yr: 799,
     defaultMrp1Yr: 1599
+  },
+  {
+    id: "loyalty",
+    name: "Digital Loyalty Stamps & VIP Club",
+    shortTitle: "Loyalty Stamps & VIP",
+    icon: "🎁",
+    badge: "Repeat Visit Engine",
+    tagline: "WhatsApp Digital Stamp Cards & Automated Birthday Rewards",
+    description: "Turn walk-in shoppers into loyal repeat customers with WhatsApp digital stamp cards, cashier counter queue, and automated win-back triggers.",
+    features: [
+      "Digital WhatsApp Stamp Card (No App Download)",
+      "Cashier 1-Tap Counter Check-In Mode",
+      "Automated Birthday & Anniversary Rewards Engine",
+      "14/30/60-Day Inactivity Win-Back WhatsApp Alerts",
+      "VIP Tier Upgrades & Customer Loyalty Analytics"
+    ],
+    planKey6Mo: "loyalty_6mo",
+    planKey1Yr: "loyalty_yearly",
+    defaultPrice6Mo: 799,
+    defaultMrp6Mo: 1598,
+    defaultPrice1Yr: 1299,
+    defaultMrp1Yr: 2598
   }
 ]
 
@@ -330,10 +330,10 @@ export function PricingStudio({
   const complete1YrPlan = getPlanByKey("enterprise_365")
   const enterprisePlan = getPlanByKey("enterprise_unlimited_365")
 
-  const completePrice6Mo = complete6MoPlan ? complete6MoPlan.price : 1749
-  const completeMrp6Mo = complete6MoPlan?.originalPrice || 3499
-  const completePrice1Yr = complete1YrPlan ? complete1YrPlan.price : 2249
-  const completeMrp1Yr = complete1YrPlan?.originalPrice || 4499
+  const completePrice6Mo = complete6MoPlan ? complete6MoPlan.price : 2499
+  const completeMrp6Mo = complete6MoPlan?.originalPrice || 4998
+  const completePrice1Yr = complete1YrPlan ? complete1YrPlan.price : 4899
+  const completeMrp1Yr = complete1YrPlan?.originalPrice || 9798
 
   // Bundle calculations
   const bundleCalculation = useMemo(() => {
@@ -355,63 +355,34 @@ export function PricingStudio({
       }
     })
 
-    // Determine smart bundle price
+    // Determine smart bundle price: live sum of selected tools
     let bundleOfferPrice = standaloneSumPrice
     let bundleTotalMrp = standaloneSumMrp
     let appliedBundleBadge = ""
     let matchedPlan: PlanItem | null = null
 
-    if (selectedTenure === "6mo") {
-      if (hasCard && hasCompleteTrio) {
-        // All 4 Products: Complete (₹1,749) + Card (₹349) = ₹2,098 -> Special All-Inclusive: ₹1,999
-        bundleOfferPrice = 1999
-        bundleTotalMrp = completeMrp6Mo + 699
-        appliedBundleBadge = "🔥 4-in-1 All-Inclusive Bundle Deal"
-        matchedPlan = complete6MoPlan || null
-      } else if (hasCompleteTrio) {
-        // Complete 3-in-1 Suite
-        bundleOfferPrice = completePrice6Mo
-        bundleTotalMrp = completeMrp6Mo
-        appliedBundleBadge = "⭐ CustomerPilot Complete (3-in-1)"
-        matchedPlan = complete6MoPlan || null
-      } else if (selectedCount === 1) {
-        // Single service selected
-        const singleMod = PRODUCT_MODULES.find((m) => selectedModules[m.id])
-        if (singleMod) {
-          const p = getPlanByKey(singleMod.planKey6Mo)
-          matchedPlan = p || null
+    if (selectedCount === 4) {
+      appliedBundleBadge = "👑 All 4 Tools Selected (Live Sum)"
+      if (selectedTenure === "6mo") matchedPlan = complete6MoPlan || null
+      else if (selectedTenure === "1year") matchedPlan = complete1YrPlan || null
+    } else if (hasCompleteTrio) {
+      appliedBundleBadge = "⭐ Complete 3-in-1 Trio Selected (Live Sum)"
+      if (selectedTenure === "6mo") matchedPlan = complete6MoPlan || null
+      else if (selectedTenure === "1year") matchedPlan = complete1YrPlan || null
+    } else if (selectedCount === 1) {
+      const singleMod = PRODUCT_MODULES.find((m) => selectedModules[m.id])
+      if (singleMod) {
+        if (selectedTenure === "6mo") {
+          matchedPlan = getPlanByKey(singleMod.planKey6Mo) || null
+        } else if (selectedTenure === "1year") {
+          matchedPlan = getPlanByKey(singleMod.planKey1Yr) || null
+        } else if (selectedTenure === "lifetime" && singleMod.id === "card") {
+          matchedPlan = getPlanByKey("card_lifetime") || null
         }
+        appliedBundleBadge = `${singleMod.shortTitle} Plan`
       }
-    } else if (selectedTenure === "1year") {
-      if (hasCard && hasCompleteTrio) {
-        // All 4 Products: Complete (₹2,249) + Card (₹499) = ₹2,748 -> Special All-Inclusive: ₹2,499
-        bundleOfferPrice = 2499
-        bundleTotalMrp = completeMrp1Yr + 1199
-        appliedBundleBadge = "👑 Ultimate Growth Bundle (All 4 Products)"
-        matchedPlan = complete1YrPlan || null
-      } else if (hasCompleteTrio) {
-        // Complete 3-in-1 Suite
-        bundleOfferPrice = completePrice1Yr
-        bundleTotalMrp = completeMrp1Yr
-        appliedBundleBadge = "⭐ Pro Scaling Suite (CustomerPilot Complete)"
-        matchedPlan = complete1YrPlan || null
-      } else if (selectedCount === 1) {
-        // Single service selected
-        const singleMod = PRODUCT_MODULES.find((m) => selectedModules[m.id])
-        if (singleMod) {
-          const p = getPlanByKey(singleMod.planKey1Yr)
-          matchedPlan = p || null
-        }
-      }
-    } else if (selectedTenure === "lifetime") {
-      // Lifetime mode applies primarily to Digital Card, plus 1Yr for others if picked
-      if (hasCard && selectedCount === 1) {
-        const cardLifetime = getPlanByKey("card_lifetime")
-        bundleOfferPrice = cardLifetime ? cardLifetime.price : 1499
-        bundleTotalMrp = cardLifetime?.originalPrice || 3999
-        appliedBundleBadge = "💎 Permanent Lifetime Deal (Smart Digital Card)"
-        matchedPlan = cardLifetime || null
-      }
+    } else if (selectedCount > 1) {
+      appliedBundleBadge = `🧺 Custom Bundle (${selectedCount} Tools Selected)`
     }
 
     const totalSavings = Math.max(0, bundleTotalMrp - bundleOfferPrice)
@@ -879,8 +850,21 @@ export function PricingStudio({
           </p>
         </div>
 
+        {/* Monthly Option Callout */}
+        <div className="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs max-w-4xl mx-auto text-indigo-950 dark:text-indigo-200">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
+            <span>
+              <strong>Also Available — Complete Monthly:</strong> <strong>₹449/mo</strong> (₹14.97/day · MRP <span className="line-through">₹898</span> · 50% OFF · Save ₹449). 6-Months saves ~7%/mo extra and 12-Months saves ~9%/mo extra!
+            </span>
+          </div>
+          <Link href="/signup?tenure=monthly" className="shrink-0 font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+            Choose Monthly →
+          </Link>
+        </div>
+
         <div className="grid md:grid-cols-3 gap-6 pt-4">
-          {/* Card 3: Lifetime Deal */}
+          {/* Card 1: Lifetime Deal (Lowest Price: ₹1,499) */}
           <Card className={`rounded-3xl border transition-all p-6 sm:p-7 flex flex-col justify-between ${
             selectedTenure === "lifetime"
               ? isDark
@@ -907,7 +891,7 @@ export function PricingStudio({
                   <span className="text-sm text-slate-400 line-through">₹3,999</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Pay Once · Keep Digital Card &amp; QR Active Forever
+                  ₹0.41/day (MRP ₹1.10/day) · Save ₹2,500 (~62% OFF)
                 </p>
                 <span className="inline-block mt-2 text-[10px] font-black px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
                   Zero Renewal Fees Forever
@@ -955,7 +939,8 @@ export function PricingStudio({
               </Button>
             </div>
           </Card>
-        {/* Card 1: 6 Months */}
+
+          {/* Card 2: 6 Months Complete (₹2,499) */}
           <Card className={`rounded-3xl border transition-all p-6 sm:p-7 flex flex-col justify-between ${
             selectedTenure === "6mo"
               ? isDark
@@ -968,29 +953,29 @@ export function PricingStudio({
             <div className="space-y-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <Badge variant="outline" className="text-[10px] font-bold border-slate-300 dark:border-slate-700">
-                    Semi-Annual
+                  <Badge variant="outline" className="text-[10px] font-bold border-indigo-400 text-indigo-600 dark:text-indigo-400">
+                    ⭐ Best Value
                   </Badge>
-                  <h3 className="text-xl font-black mt-1">6 Months</h3>
+                  <h3 className="text-xl font-black mt-1">6 Months Complete</h3>
                 </div>
                 <span className="text-2xl">⏳</span>
               </div>
 
               <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-black">₹1,749</span>
-                  <span className="text-sm text-slate-400 line-through">₹3,499</span>
+                  <span className="text-3xl sm:text-4xl font-black">₹2,499</span>
+                  <span className="text-sm text-slate-400 line-through">₹4,998</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  ~₹10/day · Complete Suite for 1,000 Customers
+                  ₹13.88/day (MRP ₹27.77/day) · ~₹417/mo · 180 days
                 </p>
                 <span className="inline-block mt-2 text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  Flat 50% OFF Applied
+                  50% OFF · Save ₹2,499 (~7% sasta/mo)
                 </span>
               </div>
 
               <div className="space-y-2.5 pt-3 border-t border-slate-200/70 dark:border-slate-800/70 text-xs">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tenure Inclusions:</p>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Complete Suite Inclusions:</p>
                 <ul className="space-y-2 text-slate-600 dark:text-slate-300">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
@@ -1006,11 +991,11 @@ export function PricingStudio({
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span>Printable Counter QR Code Display</span>
+                    <span>WhatsApp Digital Loyalty Stamp Cards</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span>Standard WhatsApp Helpdesk</span>
+                    <span>Printable Counter QR Code Display</span>
                   </li>
                 </ul>
               </div>
@@ -1031,7 +1016,7 @@ export function PricingStudio({
             </div>
           </Card>
 
-          {/* Card 2: 1 Year (Recommended) */}
+          {/* Card 3: 12 Months Complete (₹4,899) */}
           <Card className={`rounded-3xl border-2 transition-all p-6 sm:p-7 flex flex-col justify-between relative ${
             isDark
               ? "border-amber-500 bg-gradient-to-b from-slate-900 via-slate-900 to-amber-950/20 shadow-2xl shadow-amber-500/10 ring-2 ring-amber-500/50"
@@ -1039,7 +1024,7 @@ export function PricingStudio({
           }`}>
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
               <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-[10px] tracking-wider uppercase px-3 py-1 rounded-full shadow-lg">
-                ⭐ RECOMMENDED · BEST VALUE
+                👑 12 MONTHS · ANNUAL PRO SUITE
               </span>
             </div>
 
@@ -1047,23 +1032,23 @@ export function PricingStudio({
               <div className="flex items-center justify-between pt-1">
                 <div>
                   <Badge className="bg-amber-500 text-white font-extrabold text-[10px]">
-                    Annual Scaling
+                    Annual Scaling (365 Days)
                   </Badge>
-                  <h3 className="text-xl font-black mt-1">1 Year Pro</h3>
+                  <h3 className="text-xl font-black mt-1">12 Months Complete</h3>
                 </div>
                 <span className="text-3xl">👑</span>
               </div>
 
               <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-black text-amber-700 dark:text-amber-400">₹2,249</span>
-                  <span className="text-sm text-slate-400 line-through">₹4,499</span>
+                  <span className="text-3xl sm:text-4xl font-black text-amber-700 dark:text-amber-400">₹4,899</span>
+                  <span className="text-sm text-slate-400 line-through">₹9,798</span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-300 font-bold mt-1">
-                  Just ₹6.2/day · Up to 2,500 VIP Customers
+                  ₹13.42/day (MRP ₹26.84/day) · ~₹408/mo · 365 days
                 </p>
                 <span className="inline-block mt-2 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs">
-                  50% OFF · Save ₹2,250
+                  50% OFF · Save ₹4,899 (~9% sasta/mo)
                 </span>
               </div>
 
@@ -1099,7 +1084,7 @@ export function PricingStudio({
                 onClick={() => setSelectedTenure("1year")}
                 className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs h-11 rounded-xl shadow-lg shadow-orange-500/30 cursor-pointer"
               >
-                {selectedTenure === "1year" ? "Selected Tenure (50% OFF) ✓" : "Choose 1 Year (Save 50%)"}
+                {selectedTenure === "1year" ? "Selected Tenure (50% OFF) ✓" : "Choose 12 Months (Save 50%)"}
               </Button>
             </div>
           </Card>
@@ -1295,25 +1280,31 @@ export function PricingStudio({
                     <span className="text-lg">📊</span>
                     <div>
                       <div className="text-slate-900 dark:text-white uppercase tracking-wider text-xs">
-                        Standalone Services Total (If Bought Separately)
+                        TOTAL (4 Standalone Services)
                       </div>
                       <span className="text-[11px] text-slate-500 font-normal">
-                        Combined sum of all 4 standalone modules (Card + Loyalty + Reviews + AutoReply)
+                        Combined sum of all 4 standalone modules (Card + Reviews + AutoReply + Loyalty)
                       </span>
                     </div>
                   </div>
                 </td>
                 <td className="p-4 text-center">
                   <div className="text-base font-black text-slate-900 dark:text-white">
-                    ₹1,996
+                    ₹2,246
                   </div>
-                  <span className="text-[11px] text-slate-400 line-through">MRP ₹3,996</span>
+                  <span className="text-[11px] text-slate-400 line-through">MRP ₹4,495</span>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block font-bold mt-0.5">
+                    ₹12.48/day · Save ₹2,249 (50%)
+                  </span>
                 </td>
                 <td className="p-4 text-center bg-amber-100/50 dark:bg-amber-950/30">
                   <div className="text-base font-black text-amber-700 dark:text-amber-400">
-                    ₹2,896
+                    ₹3,396
                   </div>
-                  <span className="text-[11px] text-slate-400 line-through">MRP ₹5,996</span>
+                  <span className="text-[11px] text-slate-400 line-through">MRP ₹6,995</span>
+                  <span className="text-[10px] text-amber-700 dark:text-amber-300 block font-bold mt-0.5">
+                    ₹9.30/day · Save ₹3,599 (~51%)
+                  </span>
                 </td>
                 <td className="p-4 text-center text-xs text-slate-400 font-normal">
                   Sum Total
@@ -1321,44 +1312,49 @@ export function PricingStudio({
               </tr>
 
               {/* ─── COMPLETE BUNDLE COMPARISON ROW ─── */}
-              <tr className="bg-gradient-to-r from-emerald-500/10 via-amber-500/10 to-indigo-500/10 dark:from-emerald-950/30 dark:via-amber-950/30 dark:to-indigo-950/30 border-2 border-emerald-500/50">
+              <tr className="bg-gradient-to-r from-emerald-500/10 via-amber-500/10 to-indigo-500/10 dark:from-emerald-950/30 dark:via-amber-950/30 dark:to-indigo-950/30 border-2 border-indigo-500/50">
                 <td className="p-4 sm:p-5">
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">🚀</span>
                     <div>
-                      <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm sm:text-base flex items-center gap-2">
-                        <span>CustomerPilot Complete All-in-One Suite</span>
-                        <Badge className="bg-emerald-600 text-white text-[10px]">SAVE MORE</Badge>
+                      <div className="text-indigo-700 dark:text-indigo-400 font-black text-sm sm:text-base flex items-center gap-2">
+                        <span>CustomerPilot Complete All-in-One Engine</span>
+                        <Badge className="bg-indigo-600 text-white text-[10px]">ALL-IN-ONE ENGINE</Badge>
                       </div>
                       <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
-                        Full Loyalty + Smart AI Reviews + 1-Click AutoReply + VIP QR Code + CRM
+                        Unified Dashboard + Loyalty Stamps + AI Reviews + 1-Click AutoReply + VIP QR + Direct GBP Sync
                       </span>
                     </div>
                   </div>
                 </td>
                 <td className="p-4 text-center">
-                  <div className="text-lg font-black text-emerald-700 dark:text-emerald-400">
-                    ₹1,749
+                  <div className="text-lg font-black text-indigo-700 dark:text-indigo-400">
+                    ₹2,499
                   </div>
-                  <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-bold block">
-                    Save ₹247 vs standalone!
+                  <span className="text-[11px] text-slate-400 line-through">MRP ₹4,998</span>
+                  <span className="text-[10px] text-indigo-700 dark:text-indigo-300 font-bold block mt-0.5">
+                    ₹13.88/day · ~₹417/mo
+                  </span>
+                  <span className="text-[9px] text-slate-500 block font-semibold mt-1">
+                    Complete ₹253 difference (Premium Unified Engine)
                   </span>
                 </td>
-                <td className="p-4 text-center bg-emerald-500/15 dark:bg-emerald-950/40">
-                  <div className="text-xl font-black text-emerald-700 dark:text-emerald-400">
-                    ₹2,249
+                <td className="p-4 text-center bg-indigo-500/15 dark:bg-indigo-950/40">
+                  <div className="text-xl font-black text-indigo-700 dark:text-indigo-400">
+                    ₹4,899
                   </div>
-                  <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-300 block">
-                    Save ₹647 vs standalone!
+                  <span className="text-[11px] text-slate-400 line-through">MRP ₹9,798</span>
+                  <span className="text-[10px] font-black text-indigo-700 dark:text-indigo-300 block mt-0.5">
+                    ₹13.42/day · ~₹408/mo (50% OFF)
                   </span>
-                  <span className="text-[9px] text-slate-500 font-semibold block">
-                    (Just ₹6.2/day Billed yearly)
+                  <span className="text-[9px] text-slate-500 block font-semibold mt-1">
+                    Complete ₹1,503 difference (Enterprise Multi-Tool Synergies)
                   </span>
                 </td>
                 <td className="p-4 text-center">
                   {mode === "public" ? (
                     <Link href="/signup">
-                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl h-9 px-4 shadow-md cursor-pointer">
+                      <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl h-9 px-4 shadow-md cursor-pointer">
                         Get Suite →
                       </Button>
                     </Link>
@@ -1368,12 +1364,12 @@ export function PricingStudio({
                       onClick={() => {
                         if (complete1YrPlan && onSelectPlan) onSelectPlan(complete1YrPlan)
                       }}
-                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl h-9 px-4 shadow-md cursor-pointer"
+                      className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl h-9 px-4 shadow-md cursor-pointer"
                     >
                       Choose Suite
                     </Button>
                   ) : (
-                    <Badge className="bg-emerald-600 text-white text-[10px]">
+                    <Badge className="bg-indigo-600 text-white text-[10px]">
                       Best Seller
                     </Badge>
                   )}

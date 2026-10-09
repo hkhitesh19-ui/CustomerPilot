@@ -41,7 +41,7 @@ export function PricingClient() {
                 Flat 50% OFF on All 1-Year Pro Plans
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
-                Complete WhatsApp loyalty, 5★ Google reviews &amp; 1-click replies at half price. From just ₹6.1/day.
+                Complete WhatsApp loyalty, 5★ Google reviews &amp; 1-click replies at half price. Starting from ₹1.37/day for standalone tools, or ₹13.42/day for Complete.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-3">

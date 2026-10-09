@@ -30,14 +30,35 @@ export interface MasterCouponDefinition {
 export const MASTER_PLANS: MasterPlanDefinition[] = [
   // ─── CustomerPilot Complete Capacity Plans ───
   {
+    planKey: "complete_monthly",
+    name: "CustomerPilot Complete — Monthly (30 Days)",
+    description: "Full CustomerPilot Complete suite for 30 days (₹14.97/day).",
+    days: 30,
+    price: 449,
+    originalPrice: 898,
+    discountPercent: 50,
+    badge: "Monthly",
+    popular: false,
+    features: [
+      "All 4 Core Retention Engines",
+      "30-Day WhatsApp Automations",
+      "AI Google Reviews & AutoReply",
+      "Digital Loyalty Stamp Cards",
+      "Smart Digital Business Card",
+      "Printable High-Res QR Code"
+    ],
+    enabledModules: "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD",
+    active: true
+  },
+  {
     planKey: "growth_180",
     name: "Starter Growth Plan (CustomerPilot Complete) (6 Months)",
-    description: "Full CustomerPilot Complete suite for up to 1,000 VIP customers (₹10/day).",
+    description: "Full CustomerPilot Complete suite for up to 1,000 VIP customers (₹13.88/day, ~₹417/mo).",
     days: 180,
-    price: 1749,
-    originalPrice: 3499,
+    price: 2499,
+    originalPrice: 4998,
     discountPercent: 50,
-    badge: "Complete (6 Mo)",
+    badge: "⭐ Best Value",
     popular: false,
     features: [
       "Up to 1,000 VIP Customers",
@@ -48,18 +69,18 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
       "Printable Counter QR Code",
       "Basic Morning Intelligence"
     ],
-    enabledModules: "LOYALTY,REVIEWS,AUTOREPLY",
+    enabledModules: "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD",
     active: true
   },
   {
     planKey: "enterprise_365",
     name: "Pro Scaling Plan (CustomerPilot Complete) (1 Year)",
-    description: "Full CustomerPilot Complete suite for up to 2,500 VIP customers (₹6.2/day).",
+    description: "Full CustomerPilot Complete suite for up to 2,500 VIP customers (₹13.42/day, ~₹408/mo).",
     days: 365,
-    price: 2249,
-    originalPrice: 4499,
+    price: 4899,
+    originalPrice: 9798,
     discountPercent: 50,
-    badge: "⭐ Most Popular",
+    badge: "Annual Pro",
     popular: true,
     features: [
       "Up to 2,500 VIP Customers",
@@ -70,7 +91,7 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
       "Live Queue Cashier Tablet Mode",
       "Priority WhatsApp Helpdesk (+91 90333 04707)"
     ],
-    enabledModules: "LOYALTY,REVIEWS,AUTOREPLY",
+    enabledModules: "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD",
     active: true
   },
   {
@@ -92,7 +113,7 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
       "Custom ERP/POS Sync Assistance",
       "Maximum ROI Guarantee"
     ],
-    enabledModules: "LOYALTY,REVIEWS,AUTOREPLY",
+    enabledModules: "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD",
     active: true
   },
 
@@ -100,10 +121,10 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
   {
     planKey: "loyalty_6mo",
     name: "Digital Loyalty Stamps & VIP Club — 6 Months",
-    description: "WhatsApp digital loyalty stamp card and VIP rewards automation for 6 months (₹3/day).",
+    description: "WhatsApp digital loyalty stamp card and VIP rewards automation for 6 months (₹4.44/day).",
     days: 180,
-    price: 549,
-    originalPrice: 1099,
+    price: 799,
+    originalPrice: 1598,
     discountPercent: 50,
     badge: "Loyalty (6 Mo)",
     popular: false,
@@ -121,10 +142,10 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
   {
     planKey: "loyalty_yearly",
     name: "Digital Loyalty Stamps & VIP Club — 1 Year",
-    description: "Full year of loyalty automation (₹2.2/day Billed yearly).",
+    description: "Full year of loyalty automation (₹3.56/day Billed yearly).",
     days: 365,
-    price: 799,
-    originalPrice: 1599,
+    price: 1299,
+    originalPrice: 2598,
     discountPercent: 50,
     badge: "Loyalty (1 Year)",
     popular: false,

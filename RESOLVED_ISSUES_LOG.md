@@ -3,6 +3,36 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [09 Oct 2026] Feature: CustomerPilot Pricing Studio v4 Verified Price Sheet Synchronization & Ascending Price Architecture
+- **Symptom**: User requested updating `http://localhost:3000/pricing` with the exact pricing numbers from the verified price sheet specification (`CustomerPilot Pricing Studio v4: Verified Price Sheet`), arranged in ascending price order (low price to high price):
+  - CustomerPilot Complete: Monthly ₹449 (MRP ₹898), 6 Months ₹2,499 (MRP ₹4,998 · Best Value), 12 Months ₹4,899 (MRP ₹9,798 · Annual Pro).
+  - Standalone Services (6M & 1Y): Digital Loyalty Stamps (₹799 / ₹1,299), Smart AI Google Reviews (₹549 / ₹799), AI AutoReply (₹549 / ₹799), Smart Digital Business Card (₹349 / ₹499).
+  - Standalone Total (4 services): 6M ₹2,246 (MRP ₹4,495 · Save ₹2,249), 1Y ₹3,396 (MRP ₹6,995 · Save ₹3,599).
+  - Lifetime Deal: Smart Digital Business Card ₹1,499 (MRP ₹3,999 · Save ₹2,500).
+  - Complete vs Standalone Differences: 6M Complete ₹253 difference (Premium Unified Engine), 1Y Complete ₹1,503 difference (Enterprise Multi-Tool Synergies).
+  - Bundle Builder: Live dynamic sum of selected plans (no hardcoded bundle rates).
+  - Strict Brand Rules: 0 occurrences of "NFC", 0 occurrences of "Standee".
+- **Root Cause**: The pricing page previously had outdated plan price points (6M Complete ₹1,749, 1Y Complete ₹2,249, Loyalty 6M ₹549 / 1Y ₹799) and hardcoded bundle formulas instead of the newly ratified verified price sheet.
+- **Resolution**:
+  1. **Database & Master Plans Synchronization**:
+     - Updated canonical plan records in `src/lib/master-plans.ts` and SQLite DB (`prisma/dev.db`): `complete_monthly` (₹449 / ₹898), `growth_180` (₹2,499 / ₹4,998), `enterprise_365` (₹4,899 / ₹9,798), `loyalty_6mo` (₹799 / ₹1,598), `loyalty_yearly` (₹1,299 / ₹2,598).
+  2. **Pricing Studio v4 Architecture (`src/components/pricing/pricing-studio.tsx`)**:
+     - Reordered `PRODUCT_MODULES` in strict ascending order: Digital Card (₹349/₹499) ➔ Reviews (₹549/₹799) ➔ AutoReply (₹549/₹799) ➔ Loyalty Stamps (₹799/₹1,299).
+     - Updated Bundle Builder to dynamically compute the live sum of selected products per specification.
+     - Updated Section 2 tenure cards in ascending order: Lifetime Deal (₹1,499) ➔ 6 Months Complete (₹2,499) ➔ 12 Months Complete (₹4,899), with dedicated Complete Monthly callout (₹449/mo).
+     - Updated Section 3 Standalone comparison table with exact totals (₹2,246 / ₹3,396) and Complete comparison row (₹2,499 / ₹4,899 with exact ₹253 and ₹1,503 value notes).
+  3. **Global Copy & SEO Synchronization**:
+     - Updated `src/components/pricing-client.tsx` promo banner per-day rates.
+     - Updated `src/components/seo/json-ld.tsx` schema offer price to ₹4,899.
+     - Updated `src/app/page.tsx` ROI calculator annual plan cost to ₹4,899.
+  4. **Compilation, Standalone Packaging & Ground-Truth Verification**:
+     - Ran full production build (`npm run build`) compiling all 189 routes cleanly.
+     - Synced assets to `.next/standalone` and restarted standalone daemon.
+     - Executed Playwright ground-truth assertion test (`scripts/verify_pricing_sheet.js`), verifying all 18 price points and confirming 0 instances of "NFC" and "Standee".
+     - Captured and archived full visual snapshot `verified_pricing_studio_v4_sheet.png`.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [09 Oct 2026] Feature: CustomerPilot Pricing Studio v4 Ascending Price Architecture & Complete Section Layout
 - **Symptom**: User requested updating `http://localhost:3000/pricing` to precisely match the Markdown specification layout:
   - Header: `# CustomerPilot Pricing Studio v4`
