@@ -7,7 +7,8 @@ import {
   Check, Sparkles, Shield, Crown, Zap, Gift, Star, Users, ArrowRight,
   Database, HelpCircle, CheckCircle2, Lock, Award, HeartHandshake, Flame,
   ShieldCheck, RefreshCw, MessageSquare, Edit3, Save, CheckSquare, Square,
-  Layers, ChevronRight, Tag, Sliders, Info, AlertCircle, ShoppingBag, Eye
+  Layers, ChevronRight, Tag, Sliders, Info, AlertCircle, ShoppingBag, Eye,
+  CreditCard, Calendar, QrCode
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -73,7 +74,7 @@ export const PRODUCT_MODULES: ProductModule[] = [
     id: "card",
     name: "Smart Digital Business Card",
     shortTitle: "Smart Digital Card",
-    icon: "🪪",
+    icon: "credit-card",
     badge: "Instant 2-Min Setup",
     tagline: "1-Tap Contact Save (.vcf) + Direct Google Reviews + Ordering Links",
     description: "Interactive digital business card. 1-Tap save contact to mobile phonebook, instant 5-star Google review trigger, and online ordering catalog.",
@@ -99,7 +100,7 @@ export const PRODUCT_MODULES: ProductModule[] = [
     id: "reviews",
     name: "Smart Ai (SEO Optimized) Google Reviews",
     shortTitle: "Smart AI Google Reviews",
-    icon: "⭐",
+    icon: "star",
     badge: "Local SEO Growth",
     tagline: "Automated WhatsApp Prompts & 3-Angle AI Drafts [upto 2500 Reviews]",
     description: "Collect authentic 5-star Google Maps reviews via WhatsApp after purchase. Generates 3 AI psychological review angles with zero banned AI words.",
@@ -121,7 +122,7 @@ export const PRODUCT_MODULES: ProductModule[] = [
     id: "autoreply",
     name: "Ai Drafted (SEO Optimized) 1-Click AutoReply",
     shortTitle: "1-Click AutoReply",
-    icon: "💬",
+    icon: "message-square",
     badge: "Owner Assistant Mode",
     tagline: "Google Business Profile Sync & 1-Click AI Owner Responses",
     description: "Gemini AI crafts appreciative, contextual owner replies to Google Maps reviews. Store owners review and publish to Google Maps in 1-Click.",
@@ -143,7 +144,7 @@ export const PRODUCT_MODULES: ProductModule[] = [
     id: "loyalty",
     name: "Digital Loyalty Stamps & VIP Club",
     shortTitle: "Loyalty Stamps & VIP",
-    icon: "🎁",
+    icon: "gift",
     badge: "Repeat Visit Engine",
     tagline: "WhatsApp Digital Stamp Cards & Automated Birthday Rewards",
     description: "Turn walk-in shoppers into loyal repeat customers with WhatsApp digital stamp cards, cashier counter queue, and automated win-back triggers.",
@@ -162,6 +163,21 @@ export const PRODUCT_MODULES: ProductModule[] = [
     defaultMrp1Yr: 2598
   }
 ]
+
+export function getModuleIcon(id: string, className = "w-5 h-5") {
+  switch (id) {
+    case "card":
+      return <CreditCard className={`${className} text-indigo-600 dark:text-indigo-400`} />
+    case "reviews":
+      return <Star className={`${className} text-amber-500 fill-amber-500/20`} />
+    case "autoreply":
+      return <MessageSquare className={`${className} text-blue-600 dark:text-blue-400`} />
+    case "loyalty":
+      return <Gift className={`${className} text-purple-600 dark:text-purple-400`} />
+    default:
+      return <Sparkles className={`${className} text-indigo-600`} />
+  }
+}
 
 export function PricingStudio({
   mode = "public",
@@ -278,7 +294,7 @@ export function PricingStudio({
       if (!res.ok || !data.ok) throw new Error(data.error || "Failed to update plans")
 
       toast({
-        title: "Pricing Saved! 🚀",
+        title: "Pricing Saved Successfully",
         description: "Updated pricing live across Main Website, SuperAdmin & Merchant Panels."
       })
     } catch (e: any) {
@@ -362,11 +378,11 @@ export function PricingStudio({
     let matchedPlan: PlanItem | null = null
 
     if (selectedCount === 4) {
-      appliedBundleBadge = "👑 All 4 Tools Selected (Live Sum)"
+      appliedBundleBadge = "All 4 Tools Selected (Live Sum)"
       if (selectedTenure === "6mo") matchedPlan = complete6MoPlan || null
       else if (selectedTenure === "1year") matchedPlan = complete1YrPlan || null
     } else if (hasCompleteTrio) {
-      appliedBundleBadge = "⭐ Complete 3-in-1 Trio Selected (Live Sum)"
+      appliedBundleBadge = "Complete 3-in-1 Trio Selected (Live Sum)"
       if (selectedTenure === "6mo") matchedPlan = complete6MoPlan || null
       else if (selectedTenure === "1year") matchedPlan = complete1YrPlan || null
     } else if (selectedCount === 1) {
@@ -382,7 +398,7 @@ export function PricingStudio({
         appliedBundleBadge = `${singleMod.shortTitle} Plan`
       }
     } else if (selectedCount > 1) {
-      appliedBundleBadge = `🧺 Custom Bundle (${selectedCount} Tools Selected)`
+      appliedBundleBadge = `Custom Bundle (${selectedCount} Tools Selected)`
     }
 
     const totalSavings = Math.max(0, bundleTotalMrp - bundleOfferPrice)
@@ -510,15 +526,17 @@ export function PricingStudio({
         )}
       </div>
 
-      {/* ─── SECTION 1: ### 🧺 Your Bundle (Interactive Dynamic Builder) ─── */}
+      {/* ─── SECTION 1: Your Bundle (Interactive Dynamic Builder) ─── */}
       <section className="space-y-6 mb-16">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
           <div>
-            <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <Sliders className="w-3.5 h-3.5" />
               <span>Dynamic Configurator</span>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-2.5">
-              <span>🧺 Your Bundle</span>
+            <h3 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-2.5 text-slate-900 dark:text-white">
+              <ShoppingBag className="w-6 h-6 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span>Your Bundle</span>
             </h3>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
               Select any combination of tools below. The live engine bundles them with automatic volume discounts.
@@ -526,34 +544,38 @@ export function PricingStudio({
           </div>
 
           {/* Quick Presets Pills */}
-          <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 dark:bg-slate-900/90 p-1 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 dark:bg-slate-900/90 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800">
             <button
               type="button"
               onClick={() => selectPreset("all4")}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 cursor-pointer"
+              className="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 cursor-pointer flex items-center gap-1.5"
             >
-              👑 All 4 Tools
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span>All 4 Tools</span>
             </button>
             <button
               type="button"
               onClick={() => selectPreset("complete")}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 cursor-pointer"
+              className="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 cursor-pointer flex items-center gap-1.5"
             >
-              ⭐ Complete Trio
+              <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span>Complete Trio</span>
             </button>
             <button
               type="button"
               onClick={() => selectPreset("reviews_only")}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 cursor-pointer"
+              className="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 cursor-pointer flex items-center gap-1.5"
             >
-              ⭐ Google Reputation
+              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />
+              <span>Google Reputation</span>
             </button>
             <button
               type="button"
               onClick={() => selectPreset("card_loyalty")}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 cursor-pointer"
+              className="px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 cursor-pointer flex items-center gap-1.5"
             >
-              🪪 Card + Loyalty
+              <CreditCard className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span>Card + Loyalty</span>
             </button>
           </div>
         </div>
@@ -623,7 +645,9 @@ export function PricingStudio({
                     {/* Header with Icon, Badge & Checkbox */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2.5">
-                        <span className="text-2xl p-2 rounded-2xl bg-slate-100 dark:bg-slate-800">{mod.icon}</span>
+                        <div className="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 shrink-0">
+                          {getModuleIcon(mod.id, "w-5 h-5")}
+                        </div>
                         <div>
                           <Badge variant="outline" className="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-none">
                             {mod.badge}
@@ -745,12 +769,12 @@ export function PricingStudio({
                     {PRODUCT_MODULES.filter((m) => selectedModules[m.id]).map((m) => {
                       const p = getProductPrice(m, selectedTenure)
                       return (
-                        <div key={m.id} className="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-100 dark:border-slate-800/80">
+                        <div key={m.id} className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-100 dark:border-slate-800/80">
                           <span className="flex items-center gap-2 font-semibold">
-                            <span>{m.icon}</span>
+                            <span className="shrink-0">{getModuleIcon(m.id, "w-4 h-4")}</span>
                             <span className="truncate max-w-[170px]">{m.shortTitle}</span>
                           </span>
-                          <span className="font-mono text-slate-500 dark:text-slate-400">
+                          <span className="font-mono text-slate-500 dark:text-slate-400 font-semibold">
                             ₹{p.price}
                           </span>
                         </div>
@@ -767,8 +791,8 @@ export function PricingStudio({
 
                 {/* Highlight Deal Pill */}
                 {bundleCalculation.appliedBundleBadge && (
-                  <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-emerald-500/15 border border-amber-500/30 text-xs font-black text-amber-800 dark:text-amber-300 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                  <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200/80 dark:border-indigo-800/60 text-xs font-bold text-indigo-900 dark:text-indigo-200 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                     <span>{bundleCalculation.appliedBundleBadge}</span>
                   </div>
                 )}
@@ -826,8 +850,9 @@ export function PricingStudio({
                       Preview Active Bundle
                     </Button>
                   )}
-                  <p className="text-[11px] text-center text-slate-400 mt-2">
-                    🔒 Instant Activation · 100% WhatsApp-Native Delivery
+                  <p className="text-[11px] text-center text-slate-400 mt-2 flex items-center justify-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Instant Activation · 100% WhatsApp-Native Delivery</span>
                   </p>
                 </div>
               </CardContent>
@@ -868,8 +893,8 @@ export function PricingStudio({
           <Card className={`rounded-3xl border transition-all p-6 sm:p-7 flex flex-col justify-between ${
             selectedTenure === "lifetime"
               ? isDark
-                ? "border-cyan-500 bg-slate-900/90 ring-2 ring-cyan-500 shadow-xl"
-                : "border-cyan-600 bg-white ring-2 ring-cyan-600 shadow-xl"
+                ? "border-cyan-500 bg-slate-900/90 ring-2 ring-cyan-500/20 shadow-xl"
+                : "border-cyan-600 bg-white ring-2 ring-cyan-600/20 shadow-xl"
               : isDark
               ? "border-slate-800 bg-slate-950/60 hover:border-slate-700"
               : "border-slate-200 bg-white hover:border-slate-300"
@@ -877,23 +902,25 @@ export function PricingStudio({
             <div className="space-y-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <Badge variant="outline" className="text-[10px] font-bold border-cyan-500/40 text-cyan-500">
+                  <Badge variant="outline" className="text-[10px] font-bold border-cyan-500/40 text-cyan-600 dark:text-cyan-400">
                     One-Time Purchase
                   </Badge>
-                  <h3 className="text-xl font-black mt-1">Lifetime Deal</h3>
+                  <h3 className="text-xl font-black mt-1 text-slate-900 dark:text-white">Lifetime Deal</h3>
                 </div>
-                <span className="text-2xl">💎</span>
+                <div className="p-2.5 rounded-2xl bg-cyan-50 dark:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400 border border-cyan-200/60 dark:border-cyan-800/50">
+                  <Zap className="w-5 h-5" />
+                </div>
               </div>
 
               <div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl sm:text-4xl font-black text-cyan-600 dark:text-cyan-400">₹1,499</span>
-                  <span className="text-sm text-slate-400 line-through">₹3,999</span>
+                  <span className="text-sm text-slate-400 line-through font-mono">₹3,999</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   ₹0.41/day (MRP ₹1.10/day) · Save ₹2,500 (~62% OFF)
                 </p>
-                <span className="inline-block mt-2 text-[10px] font-black px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+                <span className="inline-block mt-2 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
                   Zero Renewal Fees Forever
                 </span>
               </div>
@@ -944,8 +971,8 @@ export function PricingStudio({
           <Card className={`rounded-3xl border transition-all p-6 sm:p-7 flex flex-col justify-between ${
             selectedTenure === "6mo"
               ? isDark
-                ? "border-indigo-500 bg-slate-900/90 ring-2 ring-indigo-500 shadow-xl"
-                : "border-indigo-600 bg-white ring-2 ring-indigo-600 shadow-xl"
+                ? "border-indigo-500 bg-slate-900/90 ring-2 ring-indigo-500/20 shadow-xl"
+                : "border-indigo-600 bg-white ring-2 ring-indigo-600/20 shadow-xl"
               : isDark
               ? "border-slate-800 bg-slate-950/60 hover:border-slate-700"
               : "border-slate-200 bg-white hover:border-slate-300"
@@ -954,22 +981,24 @@ export function PricingStudio({
               <div className="flex items-center justify-between">
                 <div>
                   <Badge variant="outline" className="text-[10px] font-bold border-indigo-400 text-indigo-600 dark:text-indigo-400">
-                    ⭐ Best Value
+                    Best Value
                   </Badge>
-                  <h3 className="text-xl font-black mt-1">6 Months Complete</h3>
+                  <h3 className="text-xl font-black mt-1 text-slate-900 dark:text-white">6 Months Complete</h3>
                 </div>
-                <span className="text-2xl">⏳</span>
+                <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50">
+                  <Calendar className="w-5 h-5" />
+                </div>
               </div>
 
               <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-black">₹2,499</span>
-                  <span className="text-sm text-slate-400 line-through">₹4,998</span>
+                  <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">₹2,499</span>
+                  <span className="text-sm text-slate-400 line-through font-mono">₹4,998</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   ₹13.88/day (MRP ₹27.77/day) · ~₹417/mo · 180 days
                 </p>
-                <span className="inline-block mt-2 text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <span className="inline-block mt-2 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                   50% OFF · Save ₹2,499 (~7% sasta/mo)
                 </span>
               </div>
@@ -1019,12 +1048,13 @@ export function PricingStudio({
           {/* Card 3: 12 Months Complete (₹4,899) */}
           <Card className={`rounded-3xl border-2 transition-all p-6 sm:p-7 flex flex-col justify-between relative ${
             isDark
-              ? "border-amber-500 bg-gradient-to-b from-slate-900 via-slate-900 to-amber-950/20 shadow-2xl shadow-amber-500/10 ring-2 ring-amber-500/50"
-              : "border-amber-500 bg-gradient-to-b from-white via-amber-50/20 to-orange-50/30 shadow-2xl shadow-amber-500/15 ring-2 ring-amber-500/80"
+              ? "border-indigo-500 bg-slate-900/90 shadow-2xl shadow-indigo-500/10 ring-2 ring-indigo-500/40"
+              : "border-indigo-600 bg-white shadow-xl shadow-indigo-600/10 ring-2 ring-indigo-600/20"
           }`}>
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-              <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-[10px] tracking-wider uppercase px-3 py-1 rounded-full shadow-lg">
-                👑 12 MONTHS · ANNUAL PRO SUITE
+              <span className="bg-indigo-600 text-white font-bold text-[10px] tracking-wider uppercase px-3.5 py-1 rounded-full shadow-md flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3" />
+                <span>12 MONTHS · ANNUAL PRO SUITE</span>
               </span>
             </div>
 
@@ -1034,41 +1064,43 @@ export function PricingStudio({
                   <Badge className="bg-amber-500 text-white font-extrabold text-[10px]">
                     Annual Scaling (365 Days)
                   </Badge>
-                  <h3 className="text-xl font-black mt-1">12 Months Complete</h3>
+                  <h3 className="text-xl font-black mt-1 text-slate-900 dark:text-white">12 Months Complete</h3>
                 </div>
-                <span className="text-3xl">👑</span>
+                <div className="p-2.5 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/50">
+                  <Crown className="w-5 h-5" />
+                </div>
               </div>
 
               <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-black text-amber-700 dark:text-amber-400">₹4,899</span>
-                  <span className="text-sm text-slate-400 line-through">₹9,798</span>
+                  <span className="text-3xl sm:text-4xl font-black text-indigo-600 dark:text-indigo-400">₹4,899</span>
+                  <span className="text-sm text-slate-400 line-through font-mono">₹9,798</span>
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-300 font-bold mt-1">
+                <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold mt-1">
                   ₹13.42/day (MRP ₹26.84/day) · ~₹408/mo · 365 days
                 </p>
-                <span className="inline-block mt-2 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs">
+                <span className="inline-block mt-2 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                   50% OFF · Save ₹4,899 (~9% sasta/mo)
                 </span>
               </div>
 
-              <div className="space-y-2.5 pt-3 border-t border-amber-500/20 text-xs">
+              <div className="space-y-2.5 pt-3 border-t border-slate-200/70 dark:border-slate-800/70 text-xs">
                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Everything in 6 Mo, Plus:</p>
                 <ul className="space-y-2 text-slate-700 dark:text-slate-200">
                   <li className="flex items-center gap-2 font-semibold">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                     <span>Up to 2,500 VIP Customers Capacity</span>
                   </li>
                   <li className="flex items-center gap-2 font-semibold">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                     <span>365-Day Continuous Automation (Zero Pauses)</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                     <span>VIP Customer CRM &amp; CSV Export</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                     <span>Custom High-Resolution Counter QR Code</span>
                   </li>
                   <li className="flex items-center gap-2 font-semibold text-emerald-600 dark:text-emerald-400">
@@ -1082,7 +1114,7 @@ export function PricingStudio({
             <div className="pt-6">
               <Button
                 onClick={() => setSelectedTenure("1year")}
-                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs h-11 rounded-xl shadow-lg shadow-orange-500/30 cursor-pointer"
+                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs h-11 rounded-xl shadow-lg shadow-indigo-600/20 cursor-pointer"
               >
                 {selectedTenure === "1year" ? "Selected Tenure (50% OFF) ✓" : "Choose 12 Months (Save 50%)"}
               </Button>
@@ -1143,15 +1175,15 @@ export function PricingStudio({
         <div className="overflow-x-auto rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl bg-white dark:bg-slate-950">
           <table className="w-full text-left border-collapse min-w-[840px]">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-900 text-white">
-                <th className="p-4 sm:p-5 text-xs sm:text-sm font-extrabold w-[36%]">Standalone Service &amp; Core Engine</th>
-                <th className="p-4 text-center text-xs sm:text-sm font-extrabold w-[24%]">
+              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90 text-slate-700 dark:text-slate-200">
+                <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider w-[36%]">Standalone Service &amp; Core Engine</th>
+                <th className="p-4 text-center text-xs font-bold uppercase tracking-wider w-[24%]">
                   6 Months Plan
                 </th>
-                <th className="p-4 text-center text-xs sm:text-sm font-extrabold text-amber-300 w-[24%]">
+                <th className="p-4 text-center text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 w-[24%]">
                   1 Year Plan (50% OFF)
                 </th>
-                <th className="p-4 text-center text-xs sm:text-sm font-extrabold w-[16%]">Action</th>
+                <th className="p-4 text-center text-xs font-bold uppercase tracking-wider w-[16%]">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs sm:text-sm">
@@ -1171,7 +1203,9 @@ export function PricingStudio({
                   <tr key={mod.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-900/50 transition">
                     <td className="p-4 sm:p-5">
                       <div className="flex items-start gap-3">
-                        <span className="text-2xl p-2 rounded-xl bg-slate-100 dark:bg-slate-900 shrink-0">{mod.icon}</span>
+                        <div className="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 shrink-0">
+                          {getModuleIcon(mod.id, "w-5 h-5")}
+                        </div>
                         <div>
                           <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
                             <span>{mod.name}</span>
@@ -1183,8 +1217,9 @@ export function PricingStudio({
                             {mod.tagline}
                           </p>
                           {mod.id === "card" && (
-                            <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold block mt-1">
-                              💎 Lifetime Deal also available: ₹1,499 one-time
+                            <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold flex items-center gap-1 mt-1">
+                              <Zap className="w-3 h-3" />
+                              <span>Lifetime Deal also available: ₹1,499 one-time</span>
                             </span>
                           )}
                         </div>
@@ -1207,7 +1242,7 @@ export function PricingStudio({
                         <div>
                           <div className="flex items-baseline justify-center gap-1.5">
                             <span className="text-base font-black text-slate-900 dark:text-white">₹{price6}</span>
-                            <span className="text-xs text-slate-400 line-through">₹{mrp6}</span>
+                            <span className="text-xs text-slate-400 line-through font-mono">₹{mrp6}</span>
                           </div>
                           <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">
                             ₹{daily6}/day · 180 days
@@ -1232,7 +1267,7 @@ export function PricingStudio({
                         <div>
                           <div className="flex items-baseline justify-center gap-1.5">
                             <span className="text-base font-black text-amber-700 dark:text-amber-400">₹{price1}</span>
-                            <span className="text-xs text-slate-400 line-through">₹{mrp1}</span>
+                            <span className="text-xs text-slate-400 line-through font-mono">₹{mrp1}</span>
                           </div>
                           <span className="text-[11px] font-bold text-amber-800 dark:text-amber-300 block mt-0.5">
                             ₹{daily1}/day · 365 days
@@ -1276,8 +1311,10 @@ export function PricingStudio({
               {/* ─── STANDALONE SERVICES ROW TOTAL ─── */}
               <tr className="bg-slate-100/80 dark:bg-slate-900/90 font-black border-t-2 border-slate-300 dark:border-slate-700">
                 <td className="p-4 sm:p-5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">📊</span>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
+                      <Layers className="w-4 h-4" />
+                    </div>
                     <div>
                       <div className="text-slate-900 dark:text-white uppercase tracking-wider text-xs">
                         TOTAL (4 Standalone Services)
@@ -1292,7 +1329,7 @@ export function PricingStudio({
                   <div className="text-base font-black text-slate-900 dark:text-white">
                     ₹2,246
                   </div>
-                  <span className="text-[11px] text-slate-400 line-through">MRP ₹4,495</span>
+                  <span className="text-[11px] text-slate-400 line-through font-mono">MRP ₹4,495</span>
                   <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block font-bold mt-0.5">
                     ₹12.48/day · Save ₹2,249 (50%)
                   </span>
@@ -1301,7 +1338,7 @@ export function PricingStudio({
                   <div className="text-base font-black text-amber-700 dark:text-amber-400">
                     ₹3,396
                   </div>
-                  <span className="text-[11px] text-slate-400 line-through">MRP ₹6,995</span>
+                  <span className="text-[11px] text-slate-400 line-through font-mono">MRP ₹6,995</span>
                   <span className="text-[10px] text-amber-700 dark:text-amber-300 block font-bold mt-0.5">
                     ₹9.30/day · Save ₹3,599 (~51%)
                   </span>
@@ -1314,8 +1351,10 @@ export function PricingStudio({
               {/* ─── COMPLETE BUNDLE COMPARISON ROW ─── */}
               <tr className="bg-gradient-to-r from-emerald-500/10 via-amber-500/10 to-indigo-500/10 dark:from-emerald-950/30 dark:via-amber-950/30 dark:to-indigo-950/30 border-2 border-indigo-500/50">
                 <td className="p-4 sm:p-5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🚀</span>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 shrink-0">
+                      <Sparkles className="w-5 h-5" />
+                    </div>
                     <div>
                       <div className="text-indigo-700 dark:text-indigo-400 font-black text-sm sm:text-base flex items-center gap-2">
                         <span>CustomerPilot Complete All-in-One Engine</span>
@@ -1331,7 +1370,7 @@ export function PricingStudio({
                   <div className="text-lg font-black text-indigo-700 dark:text-indigo-400">
                     ₹2,499
                   </div>
-                  <span className="text-[11px] text-slate-400 line-through">MRP ₹4,998</span>
+                  <span className="text-[11px] text-slate-400 line-through font-mono">MRP ₹4,998</span>
                   <span className="text-[10px] text-indigo-700 dark:text-indigo-300 font-bold block mt-0.5">
                     ₹13.88/day · ~₹417/mo
                   </span>
@@ -1343,7 +1382,7 @@ export function PricingStudio({
                   <div className="text-xl font-black text-indigo-700 dark:text-indigo-400">
                     ₹4,899
                   </div>
-                  <span className="text-[11px] text-slate-400 line-through">MRP ₹9,798</span>
+                  <span className="text-[11px] text-slate-400 line-through font-mono">MRP ₹9,798</span>
                   <span className="text-[10px] font-black text-indigo-700 dark:text-indigo-300 block mt-0.5">
                     ₹13.42/day · ~₹408/mo (50% OFF)
                   </span>
