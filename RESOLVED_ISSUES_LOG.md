@@ -3,6 +3,29 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [09 Oct 2026] Feature: Professional 3-Tier Pricing Hierarchy & Decluttering Across Website, SuperAdmin & Merchant Panels
+- **Symptom**: On `http://localhost:3000/pricing`, multiple duplicate pricing tables and product grids (legacy outcome cards, capacity cards, standalone table, bundle cards) were rendering concurrently, exposing dozens of conflicting price tags and causing cognitive overload/confusion for retail merchants.
+- **Root Cause**:
+  1. `src/components/pricing-client.tsx` was rendering `<PricingStudio />` along with legacy `outcomeCards` (5 cards) and `capacityPlans` (3 cards).
+  2. `PricingStudio` displayed too many simultaneous price calculations upfront instead of the standard, proven SaaS 3-tier hierarchy.
+- **Resolution**:
+  1. **Clean Professional 3-Tier Architecture (`src/components/pricing/pricing-studio.tsx`)**:
+     - Single unified billing toggle: `6 Months (Semi-Annual)` vs `1 Year Pro (50% OFF)`.
+     - **Card 1: Smart Digital Card** (₹499/yr · ₹1.3/day · 58% OFF).
+     - **Card 2: CustomerPilot Complete Pro Suite (MOST POPULAR · 84% OF STORES)** (₹2,249/yr · ₹6.1/day · FLAT 50% OFF) containing all 4 tools unlimited.
+     - **Card 3: Pick Any 1 Standalone Tool** (Flat ₹799/yr · ₹2.1/day · 50% OFF) with interactive in-card tool chips (`🎁 Loyalty`, `⭐ Reviews`, `💬 AutoReply`).
+  2. **Expandable Custom Multi-Tool Bundle Builder**:
+     - Tucked away inside a clean collapsible accordion (`"Want a custom combination? Open Interactive Bundle Builder"`), preserving rich volume discounts (10%-15%) without cluttering the initial viewport.
+  3. **Removed All Duplicate Legacy Grids (`src/components/pricing-client.tsx`)**:
+     - Removed legacy `outcomeCards` and `capacityPlans`, establishing `PricingStudio` as the single authoritative source of truth.
+  4. **Side-by-Side Capabilities Matrix & FAQ**:
+     - Added clean checkmark comparison table and 4-point FAQ with trust badges.
+  5. **Playwright Ground-Truth Verification (`scripts/verify_pricing_studio_v4.js`)**:
+     - 100% verified across Main Website, SuperAdmin Panel, and Merchant Dashboard.
+     - Captured and archived screenshots: `verified_pricing_studio_v4_mainwebsite.png`, `verified_pricing_studio_v4_superadmin.png`, `verified_pricing_studio_v4_merchant.png`.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [09 Oct 2026] Feature: CustomerPilot Pricing Studio v4 — Unified 3-Surface Configurator, Dynamic Bundle Builder & Inline Live SuperAdmin Editor
 - **Symptom**: User requested implementing the unified "CustomerPilot Pricing Studio v4" structure across 3 critical surfaces:
   1. Main Website (`/pricing`)

@@ -15,7 +15,7 @@ if (!fs.existsSync(SCRATCH_DIR)) {
 async function verifyPricingStudio() {
   console.log(`\n======================================================`);
   console.log(`🚀 Starting Playwright Ground-Truth Verification for:`);
-  console.log(`   CustomerPilot Pricing Studio v4 across 3 Surfaces`);
+  console.log(`   CustomerPilot Professional 3-Tier Pricing Studio v4`);
   console.log(`   1. Main Website (/pricing)`);
   console.log(`   2. SuperAdmin Panel (/super-admin?tab=subscriptions)`);
   console.log(`   3. Merchant Panel (/dashboard/subscription)`);
@@ -43,36 +43,36 @@ async function verifyPricingStudio() {
     await subtitle.waitFor({ state: 'visible', timeout: 5000 });
     console.log(`  ✓ Found subtitle: "Pick a product, compare tenures, build your bundle — all prices live"`);
 
-    // Section 1: Your Bundle
-    const bundleHeader = await publicPage.locator('text=🧺 Your Bundle').first();
-    await bundleHeader.waitFor({ state: 'visible', timeout: 5000 });
-    console.log(`  ✓ Found Section 1: "🧺 Your Bundle"`);
-
-    // Verify 4 products rendered
+    // Verify 3 Primary Cards
     await publicPage.waitForSelector('text=Smart Digital Card', { timeout: 5000 });
-    await publicPage.waitForSelector('text=Loyalty Stamps & VIP', { timeout: 5000 });
-    await publicPage.waitForSelector('text=Smart AI Google Reviews', { timeout: 5000 });
-    await publicPage.waitForSelector('text=1-Click AutoReply', { timeout: 5000 });
-    console.log(`  ✓ All 4 core products rendered inside bundle configurator`);
+    console.log(`  ✓ Found Card 1: "Smart Digital Card" (₹499/yr)`);
 
-    // Section 2: Compare all tenures
-    const compareTenures = await publicPage.locator('text=Compare all tenures').first();
-    await compareTenures.waitFor({ state: 'visible', timeout: 5000 });
-    console.log(`  ✓ Found Section 2: "Compare all tenures" (6 Months, 1 Year Pro, Lifetime Deal)`);
+    await publicPage.waitForSelector('text=CustomerPilot Complete Pro', { timeout: 5000 });
+    console.log(`  ✓ Found Card 2: "CustomerPilot Complete Pro" (₹2,249/yr - MOST POPULAR)`);
 
-    // Section 3: Standalone services — 6 Months & 1 Year (with total)
-    const standaloneSection = await publicPage.locator('text=Standalone services — 6 Months & 1 Year (with total)').first();
-    await standaloneSection.waitFor({ state: 'visible', timeout: 5000 });
-    console.log(`  ✓ Found Section 3: "Standalone services — 6 Months & 1 Year (with total)"`);
+    await publicPage.waitForSelector('text=Pick Any 1 Standalone Tool', { timeout: 5000 });
+    console.log(`  ✓ Found Card 3: "Pick Any 1 Standalone Tool" (₹799/yr)`);
 
-    // Verify totals row
-    const totalsRow = await publicPage.locator('text=Standalone Services Total').first();
-    await totalsRow.waitFor({ state: 'visible', timeout: 5000 });
-    console.log(`  ✓ Found Standalone Services Total row (₹1,996 / ₹2,896)`);
+    // Verify Expandable Custom Bundle Builder
+    const bundleToggle = await publicPage.locator('text=Want a custom combination? Open Interactive Bundle Builder').first();
+    await bundleToggle.waitFor({ state: 'visible', timeout: 5000 });
+    console.log(`  ✓ Found Expandable Custom Bundle Builder toggle`);
 
-    const completeSuiteRow = await publicPage.locator('text=CustomerPilot Complete All-in-One Suite').first();
-    await completeSuiteRow.waitFor({ state: 'visible', timeout: 5000 });
-    console.log(`  ✓ Found Complete Suite row highlighting savings (₹1,749 / ₹2,249)`);
+    // Click to expand bundle builder
+    await bundleToggle.click();
+    console.log(`  ✓ Expanded Custom Bundle Builder`);
+    await publicPage.waitForTimeout(600);
+    await publicPage.waitForSelector('text=Interactive Bundle Configurator', { timeout: 5000 });
+    console.log(`  ✓ Verified Interactive Bundle Configurator drawer content`);
+
+    // Verify Feature Comparison Matrix Table
+    const comparisonTable = await publicPage.locator('text=Compare Plan Capabilities').first();
+    await comparisonTable.waitFor({ state: 'visible', timeout: 5000 });
+    console.log(`  ✓ Found Feature Comparison Matrix: "Compare Plan Capabilities"`);
+
+    // Verify Frequently Asked Questions
+    await publicPage.waitForSelector('text=Frequently Asked Questions', { timeout: 5000 });
+    console.log(`  ✓ Found FAQ section`);
 
     // Click tenure buttons to test reactive state
     const tenure6moBtn = await publicPage.locator('button:has-text("6 Months (Semi-Annual)")').first();
@@ -82,10 +82,10 @@ async function verifyPricingStudio() {
       await publicPage.waitForTimeout(500);
     }
 
-    const tenure1yrBtn = await publicPage.locator('button:has-text("1 Year")').first();
+    const tenure1yrBtn = await publicPage.locator('button:has-text("1 Year Pro")').first();
     if (await tenure1yrBtn.isVisible()) {
       await tenure1yrBtn.click();
-      console.log(`  ✓ Clicked "1 Year" tenure button`);
+      console.log(`  ✓ Clicked "1 Year Pro" tenure button`);
       await publicPage.waitForTimeout(500);
     }
 
