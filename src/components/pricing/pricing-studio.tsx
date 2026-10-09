@@ -348,8 +348,8 @@ export function PricingStudio({
 
   const completePrice6Mo = complete6MoPlan ? complete6MoPlan.price : 2499
   const completeMrp6Mo = complete6MoPlan?.originalPrice || 4998
-  const completePrice1Yr = complete1YrPlan ? complete1YrPlan.price : 4899
-  const completeMrp1Yr = complete1YrPlan?.originalPrice || 9798
+  const completePrice1Yr = complete1YrPlan ? complete1YrPlan.price : 4788
+  const completeMrp1Yr = complete1YrPlan?.originalPrice || 9576
 
   // Bundle calculations
   const bundleCalculation = useMemo(() => {
@@ -706,7 +706,7 @@ export function PricingStudio({
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
             <span>
-              <strong>Also Available — Complete Monthly:</strong> <strong>₹449/mo</strong> (₹14.97/day · MRP <span className="line-through">₹898</span> · 50% OFF · Save ₹449). 6-Months saves ~7%/mo extra and 12-Months saves ~9%/mo extra!
+              <strong>Also Available — Complete Monthly:</strong> <strong>₹449/mo</strong> (₹14.97/day · MRP <span className="line-through">₹898</span> · 50% OFF · Save ₹449). 6-Months saves ~7%/mo extra and 12-Months saves ~11%/mo extra!
             </span>
           </div>
           <Link href="/signup?tenure=monthly" className="shrink-0 font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
@@ -783,7 +783,7 @@ export function PricingStudio({
             </div>
           </Card>
 
-          {/* Card 2: 12 Months Complete (₹4,899) */}
+          {/* Card 2: 12 Months Complete (₹4,788) */}
           <Card className="rounded-2xl border-2 border-indigo-600 dark:border-indigo-500 bg-white dark:bg-slate-900 shadow-md relative p-6 sm:p-7 flex flex-col justify-between">
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
               <span className="bg-indigo-600 text-white font-bold text-[10px] tracking-wider uppercase px-3.5 py-1 rounded-full shadow-sm flex items-center gap-1.5">
@@ -807,14 +807,14 @@ export function PricingStudio({
 
               <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-black text-indigo-600 dark:text-indigo-400">₹4,899</span>
-                  <span className="text-sm text-slate-400 line-through font-mono">₹9,798</span>
+                  <span className="text-3xl sm:text-4xl font-black text-indigo-600 dark:text-indigo-400">₹4,788</span>
+                  <span className="text-sm text-slate-400 line-through font-mono">₹9,576</span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold mt-1">
-                  ₹13.42/day (MRP ₹26.84/day) · ~₹408/mo · 365 days
+                  ₹13.12/day (MRP ₹26.23/day) · ~₹399/mo · 365 days
                 </p>
                 <span className="inline-block mt-2 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  50% OFF · Save ₹4,899 (~9% sasta/mo)
+                  50% OFF · Save ₹4,788 (~11% sasta/mo)
                 </span>
               </div>
 
@@ -1114,14 +1114,14 @@ export function PricingStudio({
                 </td>
                 <td className="p-4 text-center bg-indigo-500/15 dark:bg-indigo-950/40">
                   <div className="text-xl font-black text-indigo-700 dark:text-indigo-400">
-                    ₹4,899
+                    ₹4,788
                   </div>
-                  <span className="text-[11px] text-slate-400 line-through font-mono">MRP ₹9,798</span>
+                  <span className="text-[11px] text-slate-400 line-through font-mono">MRP ₹9,576</span>
                   <span className="text-[10px] font-black text-indigo-700 dark:text-indigo-300 block mt-0.5">
-                    ₹13.42/day · ~₹408/mo (50% OFF)
+                    ₹13.12/day · ~₹399/mo (50% OFF)
                   </span>
                   <span className="text-[9px] text-slate-500 block font-semibold mt-1">
-                    Complete ₹1,503 difference (Enterprise Multi-Tool Synergies)
+                    Complete ₹1,392 difference (Enterprise Multi-Tool Synergies)
                   </span>
                 </td>
                 <td className="p-4 text-center">

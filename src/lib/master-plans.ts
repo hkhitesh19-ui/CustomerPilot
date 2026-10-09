@@ -75,10 +75,10 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
   {
     planKey: "enterprise_365",
     name: "Pro Scaling Plan (CustomerPilot Complete) (1 Year)",
-    description: "Full CustomerPilot Complete suite for up to 2,500 VIP customers (₹13.42/day, ~₹408/mo).",
+    description: "Full CustomerPilot Complete suite for up to 2,500 VIP customers (₹13.12/day, ~₹399/mo).",
     days: 365,
-    price: 4899,
-    originalPrice: 9798,
+    price: 4788,
+    originalPrice: 9576,
     discountPercent: 50,
     badge: "Annual Pro",
     popular: true,

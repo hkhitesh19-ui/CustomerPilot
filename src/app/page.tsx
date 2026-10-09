@@ -140,7 +140,7 @@ export default function Home() {
 
     const additionalMonthlySales = recoveredCustomers * avgBill
     const additionalAnnualSales = additionalMonthlySales * 12
-    const planCostAnnual = 4899 // Pro Scaling Complete 1-Year (50% OFF)
+    const planCostAnnual = 4788 // Pro Scaling Complete 1-Year (50% OFF)
     const monthlyCost = Math.round(planCostAnnual / 12)
     const breakEvenVisits = Math.max(1, Math.ceil(monthlyCost / (avgBill || 1)))
     const multiple = additionalAnnualSales > 0 ? Math.round(additionalAnnualSales / planCostAnnual) : 0

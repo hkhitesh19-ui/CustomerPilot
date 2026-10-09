@@ -37,8 +37,9 @@ async function main() {
     { label: "No Section 2 Lifetime Deal Card", test: !content.includes("Zero Renewal Fees Forever") },
     { label: "Complete 6 Months ₹2,499", test: content.includes("2,499") },
     { label: "Complete 6 Months MRP ₹4,998", test: content.includes("4,998") },
-    { label: "Complete 12 Months ₹4,899", test: content.includes("4,899") },
-    { label: "Complete 12 Months MRP ₹9,798", test: content.includes("9,798") },
+    { label: "Complete 12 Months ₹4,788", test: content.includes("4,788") },
+    { label: "Complete 12 Months MRP ₹9,576", test: content.includes("9,576") },
+    { label: "Complete 12 Months ₹399/mo", test: content.includes("399") },
     { label: "Complete Monthly ₹449", test: content.includes("449") },
     { label: "Standalone 6M Total ₹2,246", test: content.includes("2,246") },
     { label: "Standalone 6M MRP ₹4,495", test: content.includes("4,495") },
@@ -50,7 +51,7 @@ async function main() {
     { label: "Digital Card 1Y ₹499", test: content.includes("499") },
     { label: "Reviews 6M ₹549", test: content.includes("549") },
     { label: "Difference Complete ₹253", test: content.includes("253") },
-    { label: "Difference Complete ₹1,503", test: content.includes("1,503") }
+    { label: "Difference Complete ₹1,392", test: content.includes("1,392") }
   ];
 
   console.log("\n--- Ground-Truth Price Assertions ---");

@@ -11,7 +11,7 @@ export function SoftwareApplicationJsonLd() {
     "description": "CustomerPilot is an all-in-one customer retention platform for Indian retail: WhatsApp Digital Loyalty Stamp Cards, Smart AI Google Reviews, AI Owner Auto-Reply, and Smart Digital Business Cards.",
     "offers": {
       "@type": "Offer",
-      "price": "4899",
+      "price": "4788",
       "priceCurrency": "INR",
       "priceValidUntil": "2027-12-31",
       "availability": "https://schema.org/InStock"

@@ -3,6 +3,27 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [09 Oct 2026] Feature: CustomerPilot Complete All-in-One Engine 1-Year Price Adjustment to ₹4,788 (MRP ₹9,576 · 50% OFF)
+- **Symptom**: User requested updating CustomerPilot Complete All-in-One Engine (1 Year / 12 Months Complete): set MRP to ₹9,576 and 50% discount price to ₹4,788 (previously MRP ₹9,798 and price ₹4,899).
+- **Root Cause**: The 1-Year Complete tier (`enterprise_365`) previously utilized ₹4,899 (~₹408/mo) with MRP ₹9,798. Adjusting to ₹4,788 provides a clean psychological price point of exactly ₹399/month (₹4,788 / 12 = ₹399/mo), ₹13.12/day, and saves ~11%/mo compared to the monthly plan.
+- **Resolution**:
+  1. **Canonical Master Plans & SQLite DB**:
+     - Updated `src/lib/master-plans.ts` (`enterprise_365`): `price: 4788`, `originalPrice: 9576`, description updated with `₹13.12/day, ~₹399/mo`.
+     - Updated SQLite database Plan table (`prisma/dev.db`): updated `enterprise_365` record with `price: 4788`, `originalPrice: 9576`.
+  2. **Pricing Studio UI (`src/components/pricing/pricing-studio.tsx`)**:
+     - Updated canonical fallback `completePrice1Yr = 4788`, `completeMrp1Yr = 9576`.
+     - Updated Section 2 Card 2 (12 Months Complete): price `₹4,788`, MRP `₹9,576`, breakdown `₹13.12/day (MRP ₹26.23/day) · ~₹399/mo · 365 days`, savings tag `50% OFF · Save ₹4,788 (~11% sasta/mo)`.
+     - Updated Section 2 monthly comparison callout to highlight `~11%/mo extra` savings.
+     - Updated Section 3 Master Comparison Table: CustomerPilot Complete 1-Year cell displays `₹4,788`, `MRP ₹9,576`, `₹13.12/day · ~₹399/mo (50% OFF)`, and `Complete ₹1,392 difference (Enterprise Multi-Tool Synergies)`.
+  3. **Global Marketing & SEO Synchronization**:
+     - Updated `src/app/page.tsx` ROI calculator baseline `planCostAnnual = 4788`.
+     - Updated `src/components/seo/json-ld.tsx` SoftwareApplication schema offer price to `"4788"`.
+  4. **Playwright & Ground-Truth Verification**:
+     - Updated and executed `scripts/verify_pricing_sheet.js`: verified 100% assertions for `₹4,788`, `₹9,576`, `₹399/mo`, and `₹1,392` difference.
+     - Captured and visually audited `verified_pricing_studio_v4_sheet.png`.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [09 Oct 2026] Feature: Clean Professional SaaS Redesign of Pricing Page: Removed Live Bundle Summary Box, Removed Lifetime Deal Card, Refined 1px SaaS Borders, and Added "CustomerPilot Complete Business Growth" Section
 - **Symptom**: User requested refinement of `http://localhost:3000/pricing`:
   1. Remove "Live Bundle Summary" basket box (with ₹3,396, 51% OFF, MRP ₹6,995, etc.).
