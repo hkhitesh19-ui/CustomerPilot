@@ -386,9 +386,11 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   ├── vs-page.tsx                # Reusable Competitor Comparison Layout
 │   │   ├── fastfood-loyalty-client.tsx# Fast Food & QSR Loyalty Client Component
 │   │   ├── car-wash-loyalty-client.tsx# Car Wash & Detailing Loyalty Client Component
+│   │   ├── pricing/                   # Pricing Studio v4 Architecture
+│   │   │   └── pricing-studio.tsx     # Pricing Studio v4 (Interactive Bundle Builder, Tenure Comparison & Admin Edit Mode)
 │   │   └── super-admin/               # SuperAdmin Management UI Panels
 │   │       ├── digital-cards-manager.tsx   # SuperAdmin On-Behalf Digital Card Generator & Fleet Manager
-│   │       ├── subscription-plans-manager.tsx # Master Subscription & Card Plans Pricing Editor
+│   │       ├── subscription-plans-manager.tsx # Master Subscription & Card Plans Pricing Editor with Pricing Studio v4
 │   │       ├── merchant-fleet-table.tsx   # Merchant Multi-Tenant Fleet Table & Impersonation
 │   │       └── super-admin-stats.tsx      # System Wide Metrics & Live Revenue Cards
 │   │
@@ -432,7 +434,7 @@ F:\CustomerPilot_ByGLM_July2026
 | **WhatsApp Messaging Engine** | `src/communication/services/CommunicationService.ts` | `src/communication/drivers/EvolutionDriver.ts` | Handles all outgoing & incoming WhatsApp messages (Welcome, OTP, Stamp Notifications, Reviews). |
 | **Digital Stamp Loyalty System** | `src/app/join/page.tsx`<br/>`src/app/dashboard/rewards/page.tsx` | `src/lib/stamp-engine.ts`<br/>`src/lib/vip-engine.ts` | Customer QR scan at billing counter, stamp collection, reward unlocks, and VIP tier progression. |
 | **Google Review Collection Flow** | `src/app/review/page.tsx` | `src/lib/google-reviews-service.ts` | Post-purchase review collector pre-filling 5-star AI drafts for Google Maps. |
-| **Pricing V3.0 & Founding Program** | `src/app/pricing/page.tsx`<br/>`src/app/page.tsx` | N/A | Displays V3.0 Customer Capacity Pricing, 100 Founding Merchant Scarcity Counter (Platinum/Gold/Silver), and Referral Rewards. |
+| **Pricing Studio v4 & Dynamic Bundle Architecture** | `src/app/pricing/page.tsx`<br/>`src/components/pricing-client.tsx`<br/>`src/components/pricing/pricing-studio.tsx`<br/>`src/app/dashboard/subscription/page.tsx` | `src/lib/master-plans.ts`<br/>`src/components/super-admin/subscription-plans-manager.tsx`<br/>`src/app/api/pricing/plans/route.ts` | Unified Pricing Studio v4 providing: 1) Interactive Dynamic Bundle Builder ("🧺 Your Bundle") with real-time volume savings, 2) Tenure Comparison ("Compare all tenures") across 6 Months, 1 Year Pro (50% OFF), and Lifetime Deal, 3) Standalone Services Table with 6 Months & 1 Year breakdown, row sums, and CustomerPilot Complete Suite savings callout, 4) Real-Time SuperAdmin inline edit mode with persistence to `/api/pricing/plans`. |
 | **SuperAdmin On-Behalf Card Generation & Master Pricing Suite** | `src/app/super-admin/page.tsx`<br/>`src/app/api/admin/digital-cards/route.ts` | `src/components/super-admin/digital-cards-manager.tsx`<br/>`src/components/super-admin/subscription-plans-manager.tsx`<br/>`src/lib/master-plans.ts`<br/>`scripts/verify_superadmin_digital_card_and_indian_english.js` | SuperAdmin can generate & manage live digital cards on behalf of any merchant without login credentials. Full real-time Master Pricing Plans manager allowing live edits of prices, MRPs, badges, and titles for all 12 platform plans including Smart Digital Business Cards (₹349, ₹499, ₹1,499). |
 
 ### **10.3 Obsolete Files Audit**

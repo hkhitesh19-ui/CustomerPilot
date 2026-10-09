@@ -28,6 +28,7 @@ import {
   Flame
 } from "lucide-react"
 import { TermsDialog } from "@/components/terms-dialog"
+import { PricingStudio } from "@/components/pricing/pricing-studio"
 
 export interface PlanItem {
   id: string
@@ -52,13 +53,14 @@ export default function SubscriptionPage() {
   const [selectedPlan, setSelectedPlan] = useState<PlanItem | null>(null)
   const [categoryTab, setCategoryTab] = useState<"complete" | "standalone">("complete")
   const [billingCycle, setBillingCycle] = useState<"6mo" | "1year">("1year")
+  const [viewMode, setViewMode] = useState<"studio" | "grid">("studio")
 
   // Filter plans according to selected tab and billing cycle (Exclude 30-day plans)
   const displayedPlans = plans.filter((p) => {
     // Strictly exclude 30-day plans
     if (p.days === 30) return false
 
-    const isStandalone = p.planKey?.startsWith("loyalty_") || p.planKey?.startsWith("reviews_") || p.planKey?.startsWith("autoreply_")
+    const isStandalone = p.planKey?.startsWith("loyalty_") || p.planKey?.startsWith("reviews_") || p.planKey?.startsWith("autoreply_") || p.planKey?.startsWith("card_")
     
     if (categoryTab === "complete") {
       // Show all Complete bundle capacity plans (6 Months & 1 Year)
@@ -393,8 +395,66 @@ export default function SubscriptionPage() {
           </div>
 
 
-          {/* 1. Plans Cards Grid */}
-          <div className="space-y-6">
+          {/* Plan Selection Experience Switcher */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/90 p-3 rounded-2xl border border-slate-800 shadow-md">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-bold text-slate-400">Plan Selector Mode:</span>
+              <div className="inline-flex items-center p-1 rounded-xl bg-slate-950 border border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("studio")}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                    viewMode === "studio"
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Pricing Studio v4</span>
+                  <Badge variant="outline" className="text-[9px] bg-emerald-500/20 text-emerald-300 border-none font-bold">Interactive</Badge>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("grid")}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                    viewMode === "grid"
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Crown className="w-3.5 h-3.5" />
+                  <span>Classic Cards</span>
+                </button>
+              </div>
+            </div>
+
+            {selectedPlan && (
+              <div className="text-xs text-emerald-400 font-bold flex items-center gap-1.5 bg-emerald-950/40 border border-emerald-500/30 px-3 py-1.5 rounded-xl">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>Selected: {selectedPlan.name} (₹{selectedPlan.price})</span>
+              </div>
+            )}
+          </div>
+
+          {viewMode === "studio" ? (
+            <div className="bg-slate-900/90 border border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
+              <PricingStudio
+                mode="merchant"
+                theme="dark"
+                initialPlans={plans}
+                selectedPlanId={selectedPlan?.id}
+                onSelectPlan={(plan) => {
+                  setSelectedPlan(plan)
+                  if (appliedCoupon) setAppliedCoupon(null)
+                  toast({
+                    title: "Plan Selected ✓",
+                    description: `${plan.name} (₹${plan.price}) selected. Proceed to review below.`
+                  })
+                }}
+              />
+            </div>
+          ) : (
+            <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -563,6 +623,7 @@ export default function SubscriptionPage() {
               })}
             </div>
           </div>
+          )}
 
           {/* 2. Coupon & Promo Code Section */}
           <Card className="bg-slate-900/60 border-slate-800 shadow-md">

@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import { PricingClient } from "@/components/pricing-client"
 
 export const metadata: Metadata = {
-  title: "Simple, Predictable Pricing — CustomerPilot",
-  description: "Transparent SaaS pricing for local merchants. 3-Day full-featured free trial. Pro plan at ₹2,999/month for unlimited WhatsApp loyalty stamps and AI Google review automation.",
+  title: "CustomerPilot Pricing Studio v4 — Pick Products, Compare Tenures & Build Bundles",
+  description: "CustomerPilot Pricing Studio v4: Pick a product, compare tenures (6 Months, 1 Year Pro, Lifetime Deal), build your bundle with live pricing and volume discounts.",
   keywords: [
     "CustomerPilot Pricing",
     "WhatsApp Loyalty Cost",

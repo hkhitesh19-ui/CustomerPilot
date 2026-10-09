@@ -28,6 +28,8 @@ import {
   Star
 } from "lucide-react"
 
+import { PricingStudio } from "@/components/pricing/pricing-studio"
+
 export function SubscriptionPlansManager() {
   const { toast } = useToast()
 
@@ -36,6 +38,7 @@ export function SubscriptionPlansManager() {
   const [loadingPlans, setLoadingPlans] = useState(true)
   const [savingPlans, setSavingPlans] = useState(false)
   const [planCategoryFilter, setPlanCategoryFilter] = useState("ALL")
+  const [pricingViewMode, setPricingViewMode] = useState<"studio" | "grid">("studio")
 
   // Coupons state
   const [coupons, setCoupons] = useState<any[]>([])
@@ -226,7 +229,64 @@ export function SubscriptionPlansManager() {
 
         {/* 1. PRICING PLANS TAB */}
         <TabsContent value="pricing" className="mt-4 space-y-4">
-          <Card className="bg-slate-900/80 border-slate-800/80 shadow-xl backdrop-blur-xl">
+          {/* View Mode Switcher */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/90 p-3 rounded-2xl border border-slate-800">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-bold text-slate-400">View Experience:</span>
+              <div className="inline-flex items-center p-1 rounded-xl bg-slate-950 border border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setPricingViewMode("studio")}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                    pricingViewMode === "studio"
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Pricing Studio v4</span>
+                  <Badge variant="outline" className="text-[9px] bg-emerald-500/20 text-emerald-300 border-none font-bold">Interactive</Badge>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPricingViewMode("grid")}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                    pricingViewMode === "grid"
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <CreditCard className="w-3.5 h-3.5" />
+                  <span>Raw Plans Matrix ({plans.length})</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={fetchPlans}
+                disabled={loadingPlans}
+                className="text-xs h-8 rounded-xl border-slate-800 text-slate-300 hover:bg-slate-800"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 mr-1 ${loadingPlans ? "animate-spin" : ""}`} />
+                Reload
+              </Button>
+            </div>
+          </div>
+
+          {pricingViewMode === "studio" ? (
+            <div className="bg-slate-900/90 border border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
+              <PricingStudio
+                mode="superadmin"
+                theme="dark"
+                showAdminToggle={true}
+                initialPlans={plans}
+              />
+            </div>
+          ) : (
+            <Card className="bg-slate-900/80 border-slate-800/80 shadow-xl backdrop-blur-xl">
             <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800/60">
               <div>
                 <CardTitle className="text-base font-bold text-white flex items-center gap-2">
@@ -410,6 +470,7 @@ export function SubscriptionPlansManager() {
               )}
             </CardContent>
           </Card>
+          )}
         </TabsContent>
 
         {/* 2. COUPONS TAB */}

@@ -3,6 +3,45 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [09 Oct 2026] Feature: CustomerPilot Pricing Studio v4 — Unified 3-Surface Configurator, Dynamic Bundle Builder & Inline Live SuperAdmin Editor
+- **Symptom**: User requested implementing the unified "CustomerPilot Pricing Studio v4" structure across 3 critical surfaces:
+  1. Main Website (`/pricing`)
+  2. SuperAdmin Panel (`/super-admin?tab=subscriptions`)
+  3. Merchant Panel (`/dashboard/subscription`)
+  Key specifications required:
+  - Header: `# CustomerPilot Pricing Studio v4`
+  - Subtitle: `Pick a product, compare tenures, build your bundle — all prices live`
+  - Inline Admin Mode: `[ ] Admin edit mode`
+  - Configurator: `### 🧺 Your Bundle` with dynamic multi-selection, volume discounts, dynamic daily pricing
+  - Comparison: `## Compare all tenures` (6 Months vs 1 Year Pro 50% OFF vs Lifetime Deal)
+  - Standalone Breakdown: `## Standalone services — 6 Months & 1 Year (with total)` with standalone sums (₹1,996 / ₹2,896) vs Complete Suite (₹1,749 / ₹2,249) and direct customer savings.
+- **Root Cause**: The application previously had disjointed pricing tables across surfaces, lacked an interactive bundle builder where merchants could choose individual modules with dynamic bundle discounts, and lacked an inline editor for SuperAdmin to adjust pricing in real-time.
+- **Resolution**:
+  1. **Built Unified Component (`src/components/pricing/pricing-studio.tsx`)**:
+     - Mode prop support: `'public'`, `'superadmin'`, `'merchant'`.
+     - 4 core products: Smart Digital Business Card, Digital Loyalty Stamps & VIP Club, Smart Ai Google Reviews, and Ai Drafted 1-Click AutoReply.
+     - Interactive `🧺 Your Bundle` with reactive checkboxes, quick presets ("All 4 Tools", "Complete Trio", "Google Reputation", "Card + Loyalty"), live tenure selector, volume bundle discounts, daily cost (~₹6.2/day), and context-aware CTAs.
+     - `Compare all tenures` comparison cards (6 Months vs 1 Year Pro 50% OFF vs Lifetime Deal).
+     - `Standalone services — 6 Months & 1 Year (with total)` comparison table calculating live standalone sums vs Complete Suite and total rupee savings.
+     - SuperAdmin `[ ] Admin edit mode` with inline price/MRP editing and one-click persistence to `/api/pricing/plans`.
+  2. **Main Website Surface (`src/components/pricing-client.tsx` & `src/app/pricing/page.tsx`)**:
+     - Embedded `<PricingStudio mode="public" theme="light" />` as the primary hero configurator with SEO metadata updated.
+  3. **SuperAdmin Panel Surface (`src/components/super-admin/subscription-plans-manager.tsx`)**:
+     - Added view switcher (`⚡ Pricing Studio v4` vs `📋 Raw Plans Matrix`).
+     - Rendered `<PricingStudio mode="superadmin" theme="dark" showAdminToggle={true} initialPlans={plans} />`.
+  4. **Merchant Panel Surface (`src/app/dashboard/subscription/page.tsx`)**:
+     - Added view switcher (`⚡ Pricing Studio v4` vs `👑 Classic Cards`).
+     - Rendered `<PricingStudio mode="merchant" theme="dark" initialPlans={plans} onSelectPlan={...} />`.
+     - Direct two-way selection binding with Razorpay checkout pipeline, coupon codes, and terms agreement.
+  5. **Architecture Documentation (`InstructionFlow.md`)**:
+     - Updated Section 10 with new file paths and component responsibilities.
+  6. **Production Build & Playwright Ground-Truth Verification (`scripts/verify_pricing_studio_v4.js`)**:
+     - Clean compilation with 0 errors across all 189 routes (`npx next build`).
+     - Automated end-to-end verification passing 100% on all 3 surfaces with zero dummy placeholders.
+     - Captured and archived screenshots: `verified_pricing_studio_v4_mainwebsite.png`, `verified_pricing_studio_v4_superadmin.png`, `verified_pricing_studio_v4_merchant.png`.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [08 Oct 2026] Feature: Google Review "+2 Bonus Stamps for Product/Shop Photo" High-Conversion Highlight Card
 - **Symptom**: On the Smart AI Google Review page (`/review`), customers were not prominently incentivized to attach photos of their purchased product or the merchant's storefront. Google Maps heavily prioritizes reviews with photos (10x local SEO ranking multiplier), and merchants wanted a clear, eye-catching message showing "+2 Bonus Stamps (when you upload Product Photo or Shop Photo)".
 - **Root Cause**: The review screen previously only showed a small badge `+2 Bonus Stamps` in the top corner and generic post text, with no prominent visual card explaining that uploading photos unlocks extra bonus stamps.
