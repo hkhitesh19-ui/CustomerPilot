@@ -22,9 +22,9 @@ export async function GET(
     let foundPath = null;
 
     for (const dir of candidateDirs) {
-      const fullPath = path.join(dir, safeName);
+      const fullPath = path.join(/*turbopackIgnore: true*/ dir, safeName);
       if (fs.existsSync(fullPath)) {
-        fileBuffer = fs.readFileSync(fullPath);
+        fileBuffer = fs.readFileSync(/*turbopackIgnore: true*/ fullPath);
         foundPath = fullPath;
         break;
       }

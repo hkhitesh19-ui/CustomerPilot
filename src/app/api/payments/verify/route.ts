@@ -71,6 +71,9 @@ export async function POST(req: NextRequest) {
         enabledModules = planRecord.enabledModules;
       }
     }
+    if (body.enabledModules && typeof body.enabledModules === "string") {
+      enabledModules = body.enabledModules;
+    }
 
     const updatedMerchant = await db.merchant.update({
       where: { id: merchant.id },

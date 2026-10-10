@@ -3,6 +3,31 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [10 Oct 2026] Feature: Standalone Modules & Pricing Plans Razorpay Checkout with Instant Signup/Login Account Activation
+- **Symptom**: On `http://localhost:3000/pricing` under "Standalone modules Or choose exactly what you need Add any module for 6 Months or 1 Year. Highest price first.", clicking "Continue →" after selecting any service did nothing. The user required that whatever services the user selects, clicking "Continue →" must allow them to pay the selected amount through Razorpay Payment Gateway, and immediately after payment, open/activate their Signup or Login merchant account (`/dashboard`).
+- **Root Cause**: The standalone modules selection bar only updated local state and the "Continue →" button previously lacked an integrated checkout, account registration, and payment gateway trigger flow for public visitors who aren't yet registered merchants.
+- **Resolution**:
+  1. **Built `CheckoutActivationModal` Component (`src/components/pricing/checkout-activation-modal.tsx`)**:
+     - Modern Radix UI / Shadcn Dialog modal presenting selected module(s), price breakdown, MRP discount savings, and Razorpay trust badges.
+     - Automatically verifies current session state via `/api/auth/me`.
+     - **Quick Signup & Pay Tab**: For new merchants (Business Name, 10-digit WhatsApp phone, Email, Password). Dynamically creates account via `/api/auth/register`, orders via `/api/payments/create-order`, opens Razorpay checkout with prefilled contact info, verifies HMAC signature via `/api/payments/verify`, and redirects seamlessly into `/dashboard`.
+     - **Already Registered? Sign In Tab**: For existing merchants (Email + Password). Authenticates, creates Razorpay order for the selected services, launches Razorpay checkout, and redirects to `/dashboard`.
+     - **Direct Pay**: For already-authenticated users, directly triggers Razorpay payment for the selected bundle/standalone services.
+  2. **Integrated Sticky Bottom Bar & Card CTAs (`src/components/pricing/pricing-studio.tsx`)**:
+     - Connected "Continue →" button to compute selected module items and open `CheckoutActivationModal`.
+     - Connected CustomerPilot Complete "Get Started" buttons and Lifetime Deal ("Get Lifetime Deal →" for ₹1,499) to open the modal in public mode.
+     - Adjusted bottom bar z-index to `z-[60]` and right padding to `sm:pr-20` to prevent collision with the floating WhatsApp widget.
+  3. **Updated Payment Verification API (`src/app/api/payments/verify/route.ts`)**:
+     - Added support for updating merchant's `enabledModules` with selected standalone/bundle modules upon successful Razorpay payment verification.
+  4. **Added Session Inspection API (`src/app/api/auth/me/route.ts`)**:
+     - Fast endpoint to determine merchant authentication status without page redirects.
+  5. **Playwright & Ground-Truth Verification**:
+     - Created and executed test script `scripts/verify_pricing_checkout_modal.js`.
+     - Verified pricing page HTTP 200, sticky bar display of selected items and price (`1 selected · ₹1,499`), modal launch on "Continue →" click, price total assertion (`₹1,499`), and modal tab switching between "Quick Signup & Pay" and "Already Registered? Sign In".
+     - Visually audited snapshots `verified_pricing_checkout_modal_signup.png` and `verified_pricing_checkout_modal_login.png`.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [10 Oct 2026] Feature: Pricing Page High-Impact 50% OFF Banner & CTA Banner Rebranding with Brand Logo Gradient
 - **Symptom**: User requested 2 targeted enhancements on `http://localhost:3000/pricing`:
   1. Rename bottom CTA banner: "Ready to turn customers into regulars?" ➔ "Ready to turn Walk-in Customers into Repeat and Loyal ?" and replace the navy background with the brand logo cyan-sky-indigo gradient.

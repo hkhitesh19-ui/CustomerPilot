@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import { CheckoutActivationModal, SelectedCheckoutItem } from "./checkout-activation-modal"
 
 export interface PlanItem {
   id?: string
@@ -135,6 +136,12 @@ export function PricingStudio({
   // Standalone selected modules map: { [serviceId]: tenureDays (180 or 365) }
   const [selectedStandalone, setSelectedStandalone] = useState<Record<string, number>>({})
 
+  // Checkout & Account Activation Modal State
+  const [checkoutModalOpen, setCheckoutModalOpen] = useState(false)
+  const [checkoutModalItems, setCheckoutModalItems] = useState<SelectedCheckoutItem[]>([])
+  const [checkoutModalTotal, setCheckoutModalTotal] = useState(0)
+  const [checkoutModalOriginalTotal, setCheckoutModalOriginalTotal] = useState(0)
+
   // Fetch plans if not passed
   useEffect(() => {
     if (initialPlans.length > 0) {
@@ -219,6 +226,14 @@ export function PricingStudio({
     }, 0)
   }, [selectedList, selectedStandalone, plans])
 
+  const selectedOriginalSum = useMemo(() => {
+    return selectedList.reduce((sum, s) => {
+      const d = selectedStandalone[s.i]
+      const dbP = getPlanByKey(d === 180 ? s.planKey6Mo : s.planKey1Yr)
+      return sum + (dbP?.originalPrice || s.p[d][1])
+    }, 0)
+  }, [selectedList, selectedStandalone, plans])
+
   // Toggle selection
   const handleToggleStandalone = (serviceId: string, days: number) => {
     setSelectedStandalone((prev) => {
@@ -257,9 +272,69 @@ export function PricingStudio({
     if (onCheckout) onCheckout(p)
   }
 
+  // Handle Complete tier checkout in public mode
+  const handleSelectCompletePublic = (tierIndex: number) => {
+    const tier = COMPLETE_TIERS[tierIndex]
+    const dbP = getPlanByKey(tier.planKey)
+    const item: SelectedCheckoutItem = {
+      id: "complete_" + tier.d,
+      name: `CustomerPilot Complete (${tier.t})`,
+      tenureDays: tier.d,
+      price: dbP?.price || tier.s,
+      originalPrice: dbP?.originalPrice || tier.m,
+      planKey: tier.planKey,
+      iconBg: "bg-indigo-600",
+      moduleKey: "complete"
+    }
+    setCheckoutModalItems([item])
+    setCheckoutModalTotal(dbP?.price || tier.s)
+    setCheckoutModalOriginalTotal(dbP?.originalPrice || tier.m)
+    setCheckoutModalOpen(true)
+  }
+
+  // Handle Lifetime Deal checkout
+  const handleSelectLifetimeDeal = () => {
+    const dbP = getPlanByKey("card_lifetime")
+    const item: SelectedCheckoutItem = {
+      id: "card_lifetime",
+      name: "Smart Digital Business Card · Lifetime Deal",
+      tenureDays: 3650,
+      price: dbP?.price || 1499,
+      originalPrice: dbP?.originalPrice || 3999,
+      planKey: "card_lifetime",
+      iconBg: "bg-indigo-600",
+      moduleKey: "card"
+    }
+    setCheckoutModalItems([item])
+    setCheckoutModalTotal(dbP?.price || 1499)
+    setCheckoutModalOriginalTotal(dbP?.originalPrice || 3999)
+    setCheckoutModalOpen(true)
+  }
+
   // Handle Standalone checkout
   const handleCheckoutStandalone = () => {
     if (selectedList.length === 0) return
+
+    const items: SelectedCheckoutItem[] = selectedList.map((s) => {
+      const d = selectedStandalone[s.i]
+      const planKey = d === 180 ? s.planKey6Mo : s.planKey1Yr
+      const dbP = getPlanByKey(planKey)
+      return {
+        id: s.i,
+        name: `${s.n} (${d === 180 ? "6 Months" : "1 Year"})`,
+        tenureDays: d,
+        price: dbP?.price || s.p[d][0],
+        originalPrice: dbP?.originalPrice || s.p[d][1],
+        planKey,
+        iconBg: s.iconBg,
+        moduleKey: s.i
+      }
+    })
+
+    setCheckoutModalItems(items)
+    setCheckoutModalTotal(selectedTotalSum)
+    setCheckoutModalOriginalTotal(selectedOriginalSum)
+    setCheckoutModalOpen(true)
 
     if (onSelectPlan && selectedList.length === 1) {
       const s = selectedList[0]
@@ -476,15 +551,14 @@ export function PricingStudio({
             {/* Action Button */}
             <div className="pt-2 relative z-10">
               {mode === "public" ? (
-                <Link href={`/signup?plan=${activeCompleteTier.planKey}`}>
-                  <button
-                    type="button"
-                    className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <span>Choose {activeCompleteTier.t} plan</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </Link>
+                <button
+                  type="button"
+                  onClick={() => handleSelectCompletePublic(activeCompleteIndex)}
+                  className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>Choose {activeCompleteTier.t} plan</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               ) : mode === "merchant" ? (
                 <button
                   type="button"
@@ -775,21 +849,30 @@ export function PricingStudio({
               </p>
             </div>
           </div>
-          <div className="text-right w-full sm:w-auto flex sm:flex-col items-center sm:items-end justify-between sm:justify-center">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                {inr(1499)}
-              </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400">
-                (₹0.41/day)
-              </span>
+          <div className="text-right w-full sm:w-auto flex flex-col sm:flex-row items-center sm:items-center justify-between sm:justify-end gap-3.5">
+            <div className="flex sm:flex-col items-baseline sm:items-end justify-between w-full sm:w-auto gap-1 sm:gap-0">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                  {inr(1499)}
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">
+                  (₹0.41/day)
+                </span>
+              </div>
+              <div className="text-xs text-slate-400 flex items-center gap-1.5">
+                <s>{inr(3999)}</s>
+                <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                  62% OFF
+                </span>
+              </div>
             </div>
-            <div className="text-xs text-slate-400 flex items-center gap-1.5">
-              <s>{inr(3999)}</s>
-              <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
-                62% OFF
-              </span>
-            </div>
+            <button
+              type="button"
+              onClick={handleSelectLifetimeDeal}
+              className="w-full sm:w-auto text-xs font-extrabold px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition cursor-pointer shrink-0"
+            >
+              Get Lifetime Deal →
+            </button>
           </div>
         </div>
       </section>
@@ -838,9 +921,9 @@ export function PricingStudio({
             initial={{ y: 80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
-            className="fixed left-0 right-0 bottom-0 z-50 p-3 sm:p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 shadow-2xl"
+            className="fixed left-0 right-0 bottom-0 z-[60] p-3 sm:p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 shadow-2xl"
           >
-            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 px-2">
+            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:pr-20">
               <div className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
                 <span className="font-bold text-slate-900 dark:text-white">
                   {selectedList.length} selected
@@ -874,6 +957,15 @@ export function PricingStudio({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ─── Checkout & Instant Account Activation Modal ─── */}
+      <CheckoutActivationModal
+        isOpen={checkoutModalOpen}
+        onClose={() => setCheckoutModalOpen(false)}
+        selectedItems={checkoutModalItems}
+        totalAmount={checkoutModalTotal}
+        totalOriginalPrice={checkoutModalOriginalTotal}
+      />
     </div>
   )
 }
