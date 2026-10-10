@@ -3,6 +3,31 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [10 Oct 2026] Feature: Pricing Page Headline "Simple, Flexible Pricing", Brand Logo Cyan Gradient & Feature Grid Relocation to Homepage
+- **Symptom**: User requested 3 specific UI refinements:
+  1. Rename heading on `/pricing` from "Pricing that grows with your business" to "Simple, Flexible Pricing".
+  2. Change the CustomerPilot Complete background card from navy blue to brand logo style with a stylish cyan-sky-indigo gradient effect, plus interactive hover & click feedback when hovering cursor over Monthly, 6 Months, and 12 Months tenure tabs.
+  3. Relocate "How CustomerPilot Helps You Grow Your Business" feature grid section from the Pricing page to the Homepage right above the FAQ section.
+- **Root Cause**: The pricing page previously had a deep indigo/navy blue radial gradient on the Complete card and retained the long-form feature grid directly between Complete and Standalone sections, which lengthened the checkout funnel on `/pricing` and belonged more appropriately on the public marketing homepage (`/`).
+- **Resolution**:
+  1. **Pricing Page Headline Update (`src/components/pricing/pricing-studio.tsx`)**:
+     - Updated H1 title to: `Simple, Flexible <span className="bg-gradient-to-r from-cyan-600 via-sky-600 to-indigo-600 bg-clip-text text-transparent">Pricing</span>`.
+  2. **Brand Logo Cyan-Sky-Indigo Stylish Gradient & Interactive Tabs (`src/components/pricing/pricing-studio.tsx`)**:
+     - Replaced the dark navy card with a radiant brand gradient: `radial-gradient(600px 320px at 90% 10%, rgba(255,255,255,0.22), transparent 70%), linear-gradient(135deg, #0284c7 0%, #0369a1 25%, #1e40af 70%, #4338ca 100%)` with subtle blurred cyan and indigo ambient light layers.
+     - Added interactive hover & active scale transitions to the tenure tab buttons (`Monthly`, `6 Months`, `12 Months`): `hover:scale-[1.02]`, `active:scale-95`, smooth cursor pointer styling, and responsive pill badges.
+  3. **Relocated Feature Grid to Homepage (`src/components/business-growth-features.tsx` & `src/app/page.tsx`)**:
+     - Extracted feature grid into standalone component `BusinessGrowthFeaturesSection`.
+     - Placed it directly above `<FaqSection />` on the homepage (`src/app/page.tsx`).
+     - Removed feature grid section cleanly from `PricingStudio`.
+  4. **Playwright & Ground-Truth Verification**:
+     - Verified all ground-truth price points on `/pricing` (HTTP 200).
+     - Verified H1 contains "Simple, Flexible Pricing".
+     - Verified absence of feature grid on `/pricing`.
+     - Verified presence and position of "How CustomerPilot Helps You Grow Your Business" right above "Frequently Asked Questions" on the homepage (`/`).
+     - Visually audited both screenshots: `verified_pricing_extracted_html.png` and `verified_homepage_feature_grid_scroll.png`.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [10 Oct 2026] Feature: Extracted Pricing Architecture from CustomerPilot_Pricing.html & Vibrant Feature Icon Grid Implementation
 - **Symptom**: User requested:
   1. Extract and adopt the exact pricing numbers and pricing structure directly from `CustomerPilot — Pricing.html` (`CustomerPilot_Pricing.html`).

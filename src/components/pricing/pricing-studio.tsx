@@ -103,94 +103,6 @@ export const STANDALONE_SERVICES = [
   }
 ]
 
-// 12 High-Converting Feature Cards with vibrant square icon boxes
-export const FEATURE_GRID_ITEMS = [
-  {
-    title: "1-Tap Phonebook Sync (.vcf)",
-    desc: "Customers save your business phone, WhatsApp, location and brand in their mobile contacts with zero typing.",
-    icon: PhoneCall,
-    color: "bg-indigo-600",
-    tag: "Digital Card"
-  },
-  {
-    title: "Smart AI Google Review Modal",
-    desc: "Post-purchase QR triggers 3 AI-crafted psychological review drafts. 1-Click copy to live Google Maps.",
-    icon: Star,
-    color: "bg-amber-500",
-    tag: "Reviews Engine"
-  },
-  {
-    title: "WhatsApp Digital Stamp Cards",
-    desc: "Zero app download needed. Digital stamp card with cashier counter check-in to boost customer return rates.",
-    icon: Gift,
-    color: "bg-purple-600",
-    tag: "Loyalty Engine"
-  },
-  {
-    title: "1-Click AI AutoReply to Google Maps",
-    desc: "Official Google Business Profile sync. Context-aware AI responses published live to Google Maps instantly.",
-    icon: MessageSquare,
-    color: "bg-blue-600",
-    tag: "Google Sync"
-  },
-  {
-    title: "Automated Birthday & VIP Rewards",
-    desc: "Surprise loyal customers on birthdays & anniversaries with automated WhatsApp wishes and reward coupons.",
-    icon: Trophy,
-    color: "bg-rose-500",
-    tag: "Automation"
-  },
-  {
-    title: "30 / 60 / 90-Day Win-Back Alerts",
-    desc: "Automatically detect churned customers and send personalized WhatsApp incentives before they switch.",
-    icon: RefreshCw,
-    color: "bg-emerald-600",
-    tag: "Retention"
-  },
-  {
-    title: "Counter QR Code Display",
-    desc: "High-resolution printable vector counter display templates (PNG/SVG/PDF) for billing desks & tabletops.",
-    icon: QrCode,
-    color: "bg-sky-600",
-    tag: "Hardware-Free"
-  },
-  {
-    title: "Anti-AI Detection Filter",
-    desc: "Natural human local reviews with 10-category SEO entities. Clean authentic tone trusted by Google algorithms.",
-    icon: ShieldCheck,
-    color: "bg-teal-600",
-    tag: "Local SEO"
-  },
-  {
-    title: "VIP Customer CRM & CSV Export",
-    desc: "Full visibility of customer visit counts, lifetime spend, stamp progress, and one-click database export.",
-    icon: Database,
-    color: "bg-violet-600",
-    tag: "Customer CRM"
-  },
-  {
-    title: "Live Cashier Counter Queue",
-    desc: "Lightning fast phone number search or QR scan. Cashiers award stamps in less than 3 seconds per shopper.",
-    icon: Zap,
-    color: "bg-orange-500",
-    tag: "Speed POS"
-  },
-  {
-    title: "Turn-by-Turn Google Navigation",
-    desc: "Direct navigation deep-link brings local customers straight from WhatsApp or card to your retail doorstep.",
-    icon: MapPin,
-    color: "bg-cyan-600",
-    tag: "Footfall"
-  },
-  {
-    title: "Priority WhatsApp VIP Support",
-    desc: "Direct concierge line (+91 90333 04707) with dedicated onboarding support for smooth store rollout.",
-    icon: HeartHandshake,
-    color: "bg-pink-600",
-    tag: "Support"
-  }
-]
-
 // Formatting helpers
 export const inr = (n: number) => "₹" + Math.round(n).toLocaleString("en-IN")
 export const dy = (n: number, d: number) => `(₹${(n / d).toFixed(2)}/day)`
@@ -409,19 +321,19 @@ export function PricingStudio({
 
   return (
     <div className={`w-full transition-colors duration-200 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-      {/* ─── Hero Section (Extracted from CustomerPilot_Pricing.html) ─── */}
+      {/* ─── Hero Section ─── */}
       <section className="text-center py-8 sm:py-12 relative">
         <div className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-1.5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs mb-4">
-          <span className="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-bold text-[11px] px-2.5 py-0.5 rounded-full">
+          <span className="bg-gradient-to-r from-cyan-600 via-sky-600 to-indigo-600 text-white font-bold text-[11px] px-2.5 py-0.5 rounded-full">
             50% OFF
           </span>
           <span className="text-slate-600 dark:text-slate-300">Limited-period offer on every plan</span>
         </div>
 
         <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight max-w-3xl mx-auto">
-          Pricing that grows{" "}
-          <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
-            with your business
+          Simple, Flexible{" "}
+          <span className="bg-gradient-to-r from-cyan-600 via-sky-600 to-indigo-600 bg-clip-text text-transparent">
+            Pricing
           </span>
         </h1>
 
@@ -436,7 +348,7 @@ export function PricingStudio({
               onClick={() => setAdminEditMode(!adminEditMode)}
               className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700"
             >
-              <Edit3 className="w-3.5 h-3.5 text-indigo-500" />
+              <Edit3 className="w-3.5 h-3.5 text-cyan-600" />
               <span>Admin edit mode</span>
             </button>
             {adminEditMode && (
@@ -457,7 +369,7 @@ export function PricingStudio({
       {/* ─── SECTION 1: CustomerPilot Complete (All-in-One Engine) ─── */}
       <section className="space-y-4 mb-14">
         <div className="pb-2">
-          <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+          <span className="text-xs font-bold uppercase tracking-widest text-cyan-600 dark:text-cyan-400">
             All-in-one
           </span>
           <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white mt-1">
@@ -470,45 +382,67 @@ export function PricingStudio({
 
         {/* 2-Column Grid: Featured Gradient Card + Effective Monthly Cost Card */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          {/* Column 1: Featured Interactive Complete Card (7 cols) */}
-          <div className="lg:col-span-7 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden bg-radial from-white/10 via-transparent to-transparent bg-[#1b1470] shadow-lg flex flex-col justify-between"
-               style={{ background: "radial-gradient(500px 260px at 100% 0, rgba(255,255,255,.2), transparent), linear-gradient(145deg, #1b1470, #4f46e5 60%, #7c6cff)" }}>
-            <div>
-              {/* Interactive Tenure Tabs: Monthly | 6 Months | 12 Months */}
-              <div className="inline-flex bg-white/15 backdrop-blur-md rounded-xl p-1 mb-6">
-                {COMPLETE_TIERS.map((tier, idx) => (
-                  <button
-                    key={tier.t}
-                    type="button"
-                    onClick={() => setActiveCompleteIndex(idx)}
-                    className={`border-0 font-semibold text-xs sm:text-sm px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
-                      activeCompleteIndex === idx
-                        ? "bg-white text-indigo-900 font-bold shadow-xs"
-                        : "text-white/80 hover:text-white hover:bg-white/10"
-                    }`}
-                  >
-                    {tier.t}
-                  </button>
-                ))}
+          {/* Column 1: Featured Interactive Complete Card (7 cols) with Brand Logo Cyan-Sky-Indigo Gradient */}
+          <div
+            className="lg:col-span-7 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/10 border border-cyan-400/30"
+            style={{
+              background: "radial-gradient(600px 320px at 90% 10%, rgba(255,255,255,0.22), transparent 70%), linear-gradient(135deg, #0284c7 0%, #0369a1 25%, #1e40af 70%, #4338ca 100%)"
+            }}
+          >
+            {/* Subtle brand glow overlay */}
+            <div className="absolute -top-24 -right-24 w-72 h-72 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10">
+              {/* Interactive Tenure Tabs with sleek cursor hover & active animation */}
+              <div className="inline-flex bg-slate-950/30 backdrop-blur-md rounded-2xl p-1.5 mb-6 border border-white/15 shadow-inner">
+                {COMPLETE_TIERS.map((tier, idx) => {
+                  const isActive = activeCompleteIndex === idx
+                  return (
+                    <button
+                      key={tier.t}
+                      type="button"
+                      onClick={() => setActiveCompleteIndex(idx)}
+                      className={`relative font-bold text-xs sm:text-sm px-4 py-2 rounded-xl transition-all duration-200 cursor-pointer select-none group flex items-center gap-1.5 ${
+                        isActive
+                          ? "bg-white text-slate-950 shadow-md shadow-slate-950/20 scale-[1.02]"
+                          : "text-white/85 hover:text-white hover:bg-white/15 hover:scale-[1.02] active:scale-95"
+                      }`}
+                    >
+                      <span>{tier.t}</span>
+                      {tier.badge && (
+                        <span
+                          className={`text-[9px] font-black uppercase px-1.5 py-0.2 rounded tracking-wider ${
+                            isActive
+                              ? "bg-cyan-100 text-cyan-800"
+                              : "bg-white/20 text-white group-hover:bg-white/30"
+                          }`}
+                        >
+                          {tier.badge}
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
               </div>
 
               {/* Price & Daily Cost */}
-              <div className="flex items-baseline gap-2 flex-wrap">
-                <span className="text-4xl sm:text-6xl font-black tracking-tight">
+              <div className="flex items-baseline gap-2.5 flex-wrap">
+                <span className="text-4xl sm:text-6xl font-black tracking-tight drop-shadow-sm">
                   {inr(completePrice)}
                 </span>
-                <span className="text-sm sm:text-base font-medium opacity-85">
+                <span className="text-sm sm:text-base font-semibold text-cyan-100/90">
                   {dy(completePrice, completeDays)}
                 </span>
               </div>
 
               {/* MRP & Savings Strip */}
-              <div className="flex items-center gap-2.5 flex-wrap mt-2.5 text-xs sm:text-sm opacity-90">
-                <s className="opacity-75">{inr(completeMrp)} {dy(completeMrp, completeDays)}</s>
-                <span className="bg-white/20 font-bold text-xs rounded-full px-2.5 py-0.5">
+              <div className="flex items-center gap-2.5 flex-wrap mt-2.5 text-xs sm:text-sm">
+                <s className="text-white/70">{inr(completeMrp)} {dy(completeMrp, completeDays)}</s>
+                <span className="bg-emerald-400 text-slate-950 font-black text-xs rounded-full px-2.5 py-0.5 shadow-xs">
                   {off(completePrice, completeMrp)}% OFF
                 </span>
-                <span>You save {inr(completeMrp - completePrice)}</span>
+                <span className="text-white/95 font-medium">You save {inr(completeMrp - completePrice)}</span>
               </div>
 
               {/* Included Items 2x2 Grid */}
@@ -519,39 +453,41 @@ export function PricingStudio({
                   "AI AutoReply",
                   "Smart Digital Business Card"
                 ].map((item) => (
-                  <div key={item} className="flex items-center gap-2.5">
-                    <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                      <Check className="w-3 h-3 stroke-[3]" />
+                  <div key={item} className="flex items-center gap-2.5 bg-white/10 backdrop-blur-xs rounded-xl px-3 py-2 border border-white/10 hover:bg-white/15 transition-colors">
+                    <div className="w-5 h-5 rounded-full bg-cyan-400/30 text-white flex items-center justify-center shrink-0">
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </div>
-                    <span className="font-medium">{item}</span>
+                    <span className="font-semibold text-white/95">{item}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Action Button */}
-            <div className="pt-2">
+            <div className="pt-2 relative z-10">
               {mode === "public" ? (
                 <Link href={`/signup?plan=${activeCompleteTier.planKey}`}>
                   <button
                     type="button"
-                    className="w-full bg-white hover:bg-slate-100 text-indigo-900 font-bold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-md transition cursor-pointer"
+                    className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
                   >
-                    Choose {activeCompleteTier.t} plan →
+                    <span>Choose {activeCompleteTier.t} plan</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </Link>
               ) : mode === "merchant" ? (
                 <button
                   type="button"
                   onClick={() => handleSelectComplete(activeCompleteIndex)}
-                  className="w-full bg-white hover:bg-slate-100 text-indigo-900 font-bold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-md transition cursor-pointer"
+                  className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  Choose {activeCompleteTier.t} plan
+                  <span>Choose {activeCompleteTier.t} plan</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               ) : (
                 <button
                   type="button"
-                  className="w-full bg-white text-indigo-900 font-bold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-md"
+                  className="w-full bg-white text-slate-950 font-bold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-md"
                 >
                   Active Plan Preview
                 </button>
@@ -579,11 +515,11 @@ export function PricingStudio({
                   return (
                     <div
                       key={tier.t}
-                      className="cursor-pointer"
+                      className="cursor-pointer group p-2 rounded-xl transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/60"
                       onClick={() => setActiveCompleteIndex(idx)}
                     >
                       <div className="flex justify-between items-center text-xs sm:text-sm mb-1.5">
-                        <span className={`font-semibold ${isSelected ? "text-indigo-600 dark:text-indigo-400" : "text-slate-800 dark:text-slate-200"}`}>
+                        <span className={`font-semibold transition-colors ${isSelected ? "text-cyan-600 dark:text-cyan-400 font-bold" : "text-slate-800 dark:text-slate-200 group-hover:text-cyan-600"}`}>
                           {tier.t} {isSelected && "✓"}
                         </span>
                         <span className="font-bold text-slate-600 dark:text-slate-300">
@@ -592,7 +528,7 @@ export function PricingStudio({
                       </div>
                       <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-indigo-600 to-indigo-400 transition-all duration-500"
+                          className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 transition-all duration-500"
                           style={{ width: `${pct}%` }}
                         />
                       </div>
@@ -611,52 +547,6 @@ export function PricingStudio({
               per month than Monthly.
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ─── SECTION 2: Complete Feature Set (Vibrant Square Icons matching screenshots) ─── */}
-      <section className="space-y-6 mb-16">
-        <div className="pb-2">
-          <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-            Complete Feature Set
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white mt-1">
-            How CustomerPilot Helps You Grow Your Business
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Every feature engineered to turn one-time shoppers into repeat loyal regulars and 5-star Google promoters.
-          </p>
-        </div>
-
-        {/* 12 Feature Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          {FEATURE_GRID_ITEMS.map((item, idx) => {
-            const Icon = item.icon
-            return (
-              <div
-                key={idx}
-                className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-sm transition flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3.5">
-                    {/* Vibrant Square Icon Container */}
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-xs ${item.color}`}>
-                      <Icon className="w-5 h-5 stroke-[2.2]" />
-                    </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                      {item.tag}
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-snug">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-                    {item.desc}
-                  </p>
-                </div>
-              </div>
-            )
-          })}
         </div>
       </section>
 

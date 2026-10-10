@@ -16,21 +16,19 @@ async function main() {
   const subTitle = await page.locator("text=One platform or one tool at a time").first().textContent();
   console.log("Subtitle:", subTitle?.trim());
 
-  // 2. Check 3 sections:
+  // 2. Check sections on pricing:
   const section1 = await page.locator("text=CustomerPilot Complete").first().textContent();
   console.log("Complete section found:", section1?.trim());
-
-  const section2 = await page.locator("text=How CustomerPilot Helps You Grow Your Business").first().textContent();
-  console.log("Feature grid section found:", section2?.trim());
 
   const section3 = await page.locator("text=Or choose exactly what you need").first().textContent();
   console.log("Standalone section found:", section3?.trim());
 
-  // 3. Ground-Truth Data Assertions for CustomerPilot_Pricing.html:
+  // 3. Ground-Truth Data Assertions for Pricing:
   const content = await page.content();
 
   const assertions = [
-    { label: "H1 contains 'Pricing that grows with your business'", test: title.includes("Pricing that grows") },
+    { label: "H1 contains 'Simple, Flexible Pricing'", test: title.includes("Simple, Flexible") && title.includes("Pricing") },
+    { label: "No Feature grid on pricing page", test: !content.includes("How CustomerPilot Helps You Grow Your Business") },
     { label: "No 'Studio v4' on page", test: !content.includes("Studio v4") },
     { label: "No NFC on page", test: !content.toLowerCase().includes("nfc") },
     { label: "No Standee on page", test: !content.toLowerCase().includes("standee") },
@@ -65,10 +63,41 @@ async function main() {
     }
   }
 
-  // Take screenshot
+  // Take pricing screenshot
   const screenshotPath = "C:/Users/Admin/.gemini/antigravity/brain/4da7c8d9-dec1-4986-9146-1a399efc88a4/verified_pricing_extracted_html.png";
   await page.screenshot({ path: screenshotPath, fullPage: true });
-  console.log("\nFull page screenshot saved to:", screenshotPath);
+  console.log("\nFull pricing page screenshot saved to:", screenshotPath);
+
+  // 4. Verify Homepage has feature grid above FAQ
+  console.log("\nNavigating to http://localhost:3000/ to verify Feature Grid above FAQ...");
+  await page.goto("http://localhost:3000/", { waitUntil: "domcontentloaded", timeout: 20000 });
+  await page.waitForTimeout(3000);
+  const homeContent = await page.content();
+
+  const homeFeatureGrid = homeContent.includes("How CustomerPilot Helps You Grow Your Business");
+  const homeFaq = homeContent.includes("Frequently Asked Questions");
+  const featureIndex = homeContent.indexOf("How CustomerPilot Helps You Grow Your Business");
+  const faqIndex = homeContent.indexOf("Frequently Asked Questions");
+
+  const homeAssertions = [
+    { label: "Homepage contains 'How CustomerPilot Helps You Grow Your Business'", test: homeFeatureGrid },
+    { label: "Feature grid is positioned BEFORE FAQ on Homepage", test: featureIndex !== -1 && faqIndex !== -1 && featureIndex < faqIndex }
+  ];
+
+  console.log("\n--- Homepage Feature Grid Assertions ---");
+  for (const a of homeAssertions) {
+    if (a.test) {
+      console.log(`✅ PASS: ${a.label}`);
+    } else {
+      console.log(`❌ FAIL: ${a.label}`);
+      allPassed = false;
+    }
+  }
+
+  // Take homepage screenshot showing feature grid
+  const homeScreenshotPath = "C:/Users/Admin/.gemini/antigravity/brain/4da7c8d9-dec1-4986-9146-1a399efc88a4/verified_homepage_feature_grid.png";
+  await page.screenshot({ path: homeScreenshotPath, fullPage: false });
+  console.log("\nHomepage screenshot saved to:", homeScreenshotPath);
 
   await browser.close();
   if (!allPassed) {

@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BrandLogo } from "@/components/brand-logo"
 import { FaqSection } from "@/components/faq-section"
+import { BusinessGrowthFeaturesSection } from "@/components/business-growth-features"
 import { ScrollReveal, StaggerContainer, StaggerItem } from "@/components/scroll-reveal"
 import { CountUp } from "@/components/count-up"
 
@@ -1819,6 +1820,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ============ HOW CUSTOMERPILOT HELPS YOU GROW YOUR BUSINESS ============ */}
+      <BusinessGrowthFeaturesSection />
 
       {/* ============ FREQUENTLY ASKED QUESTIONS ============ */}
       <FaqSection />
