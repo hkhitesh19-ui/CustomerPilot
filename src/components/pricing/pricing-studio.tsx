@@ -322,22 +322,32 @@ export function PricingStudio({
   return (
     <div className={`w-full transition-colors duration-200 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
       {/* ─── Hero Section ─── */}
-      <section className="text-center py-8 sm:py-12 relative">
-        <div className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-1.5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs mb-4">
-          <span className="bg-gradient-to-r from-cyan-600 via-sky-600 to-indigo-600 text-white font-bold text-[11px] px-2.5 py-0.5 rounded-full">
-            50% OFF
+      <section className="text-center py-10 sm:py-16 relative">
+        {/* Prominent High-Impact 50% OFF Banner */}
+        <div className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3.5 px-5 sm:px-7 py-2.5 sm:py-3 rounded-2xl bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-indigo-500/15 border-2 border-amber-400/50 dark:border-amber-400/40 shadow-lg shadow-amber-500/10 mb-6 backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            <span className="bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600 text-white font-black text-sm sm:text-lg px-3.5 py-1 rounded-xl shadow-md uppercase tracking-wide flex items-center gap-1.5 animate-pulse">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-200" />
+              <span>50% OFF</span>
+            </span>
+            <span className="text-slate-900 dark:text-white font-extrabold text-sm sm:text-base tracking-tight">
+              Limited-Period Offer on Every Plan
+            </span>
+          </div>
+          <span className="hidden sm:inline text-slate-300 dark:text-slate-700 font-bold">•</span>
+          <span className="text-emerald-700 dark:text-emerald-400 font-bold text-xs sm:text-sm bg-emerald-100/80 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-lg">
+            Flat Half-Price Locked
           </span>
-          <span className="text-slate-600 dark:text-slate-300">Limited-period offer on every plan</span>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight max-w-3xl mx-auto">
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight leading-[1.08] max-w-4xl mx-auto">
           Simple, Flexible{" "}
           <span className="bg-gradient-to-r from-cyan-600 via-sky-600 to-indigo-600 bg-clip-text text-transparent">
             Pricing
           </span>
         </h1>
 
-        <p className="text-slate-500 dark:text-slate-400 text-base sm:text-lg max-w-xl mx-auto mt-3">
+        <p className="text-slate-500 dark:text-slate-400 text-base sm:text-xl max-w-2xl mx-auto mt-4 leading-relaxed font-medium">
           One platform or one tool at a time. Every price comes with its true daily cost, so you always know what you pay.
         </p>
 
@@ -784,23 +794,36 @@ export function PricingStudio({
         </div>
       </section>
 
-      {/* ─── CTA Banner ─── */}
-      <section className="rounded-3xl p-8 sm:p-12 text-center text-white bg-[#17105a] relative overflow-hidden my-12"
-               style={{ background: "radial-gradient(500px 220px at 80% -20%, rgba(255,255,255,.2), transparent), linear-gradient(135deg, #17105a, #4f46e5)" }}>
-        <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">
-          Ready to turn customers into regulars?
-        </h2>
-        <p className="text-white/80 text-sm sm:text-base max-w-lg mx-auto mb-6">
-          Start with one module, upgrade to Complete anytime.
-        </p>
-        <Link href="/signup">
-          <button
-            type="button"
-            className="bg-white hover:bg-slate-100 text-indigo-900 font-bold text-sm sm:text-base rounded-xl py-3 px-8 shadow-md transition cursor-pointer"
-          >
-            Get started today →
-          </button>
-        </Link>
+      {/* ─── CTA Banner with Brand Logo Cyan-Sky-Indigo Gradient ─── */}
+      <section
+        className="rounded-3xl p-8 sm:p-14 text-center text-white relative overflow-hidden my-14 shadow-xl border border-cyan-400/30"
+        style={{
+          background: "radial-gradient(600px 320px at 80% 20%, rgba(255,255,255,0.22), transparent 70%), linear-gradient(135deg, #0284c7 0%, #0369a1 25%, #1e40af 70%, #4338ca 100%)"
+        }}
+      >
+        {/* Subtle ambient light accents */}
+        <div className="absolute -top-24 -left-24 w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 max-w-3xl mx-auto space-y-4">
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
+            Ready to turn Walk-in Customers into Repeat and Loyal ?
+          </h2>
+          <p className="text-cyan-100/90 text-sm sm:text-lg max-w-xl mx-auto leading-relaxed font-medium">
+            Start with one module, upgrade to Complete anytime. Transparent ROI from Day 1.
+          </p>
+          <div className="pt-2">
+            <Link href="/signup">
+              <button
+                type="button"
+                className="bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-4 px-9 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer inline-flex items-center gap-2"
+              >
+                <span>Get started today</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* Footnote */}

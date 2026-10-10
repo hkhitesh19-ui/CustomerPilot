@@ -3,6 +3,29 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [10 Oct 2026] Feature: Pricing Page High-Impact 50% OFF Banner & CTA Banner Rebranding with Brand Logo Gradient
+- **Symptom**: User requested 2 targeted enhancements on `http://localhost:3000/pricing`:
+  1. Rename bottom CTA banner: "Ready to turn customers into regulars?" ➔ "Ready to turn Walk-in Customers into Repeat and Loyal ?" and replace the navy background with the brand logo cyan-sky-indigo gradient.
+  2. Make the "50% OFF Limited-period offer on every plan" banner in the hero section much bigger, bolder, and prominently highlighted.
+- **Root Cause**: The hero promo badge previously had small text (`text-[11px]`) and a plain white pill with minimal contrast against the page background. The bottom CTA banner still used the old generic copy and dark navy gradient `#17105a` instead of the signature CustomerPilot brand logo gradient (`#0284c7` to `#4338ca`).
+- **Resolution**:
+  1. **Prominently Highlighted 50% OFF Hero Banner (`src/components/pricing/pricing-studio.tsx`)**:
+     - Enlarged into a full responsive high-contrast banner with `from-amber-500/15 via-rose-500/15 to-indigo-500/15` gradient fill and `border-2 border-amber-400/50`.
+     - Embedded an animated pulsing badge with `Sparkles` icon and bold `50% OFF` in `text-sm sm:text-lg`.
+     - Added prominent copy: `Limited-Period Offer on Every Plan` + `Flat Half-Price Locked` emerald status badge.
+     - Scaled H1 typography up to `text-4xl sm:text-6xl md:text-7xl font-black` for enhanced visual authority.
+  2. **Rebranded Bottom CTA Banner (`src/components/pricing/pricing-studio.tsx`)**:
+     - Updated headline to: `Ready to turn Walk-in Customers into Repeat and Loyal ?`.
+     - Replaced navy background with the brand logo gradient: `radial-gradient(600px 320px at 80% 20%, rgba(255,255,255,0.22), transparent 70%), linear-gradient(135deg, #0284c7 0%, #0369a1 25%, #1e40af 70%, #4338ca 100%)`.
+     - Added subtle ambient light accents (`cyan-400/20` and `indigo-600/30` blurs) and clean white action CTA with `ArrowRight` icon.
+  3. **Playwright & Ground-Truth Verification**:
+     - Verified both assertions via `node scripts/verify_pricing_sheet.js`:
+       - `CTA Banner title is 'Ready to turn Walk-in Customers into Repeat and Loyal ?'`
+       - `50% OFF banner is prominently highlighted`
+     - Captured and visually audited full-page screenshot `verified_pricing_extracted_html.png`.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [10 Oct 2026] Feature: Pricing Page Headline "Simple, Flexible Pricing", Brand Logo Cyan Gradient & Feature Grid Relocation to Homepage
 - **Symptom**: User requested 3 specific UI refinements:
   1. Rename heading on `/pricing` from "Pricing that grows with your business" to "Simple, Flexible Pricing".

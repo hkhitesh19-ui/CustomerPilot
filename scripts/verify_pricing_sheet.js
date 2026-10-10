@@ -49,7 +49,9 @@ async function main() {
     { label: "AutoReply 1Y ₹799", test: content.includes("799") },
     { label: "Digital Card 6M ₹349", test: content.includes("349") },
     { label: "Digital Card 1Y ₹499", test: content.includes("499") },
-    { label: "Lifetime Deal ₹1,499", test: content.includes("1,499") && content.includes("0.41/day") }
+    { label: "Lifetime Deal ₹1,499", test: content.includes("1,499") && content.includes("0.41/day") },
+    { label: "CTA Banner title is 'Ready to turn Walk-in Customers into Repeat and Loyal ?'", test: content.includes("Ready to turn Walk-in Customers into Repeat and Loyal ?") },
+    { label: "50% OFF banner is prominently highlighted", test: content.includes("Flat Half-Price Locked") }
   ];
 
   console.log("\n--- Ground-Truth Price Assertions ---");
