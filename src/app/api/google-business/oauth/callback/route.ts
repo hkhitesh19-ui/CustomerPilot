@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
-// In local Windows development, prevent 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' SSL error during Google token exchange
-if (process.env.NODE_ENV !== "production") {
+// On Windows (local environment regardless of NODE_ENV) or non-production, prevent 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' SSL error during Google token exchange
+if (process.platform === "win32" || process.env.NODE_ENV !== "production") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 

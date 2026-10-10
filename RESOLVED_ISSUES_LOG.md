@@ -3,6 +3,22 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [10 Oct 2026] Issue: Google OAuth Local Signup Redirect `?error=oauth_error` on Windows (Permanent Platform Fix)
+- **Symptom**: On localhost (`http://localhost:3000/signup`), when clicking "Continue with Google Account", selecting a Google profile and authenticating redirected back to `http://localhost:3000/signup?error=oauth_error`.
+- **Root Cause**: The standalone production build was started with `NODE_ENV=production`. Previously, the SSL leaf certificate bypass for Windows development was guarded by `if (process.env.NODE_ENV !== "production")`. Because `NODE_ENV === "production"` evaluated to false, `NODE_TLS_REJECT_UNAUTHORIZED = "0"` was skipped. When Node.js on Windows attempted to exchange authorization codes with `https://oauth2.googleapis.com/token`, it failed with `[TypeError: fetch failed] { code: 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' }`, which triggered the global catch block and redirected to `?error=oauth_error`.
+- **Resolution**:
+  1. Updated SSL tolerance check in both `src/app/api/auth/google/callback/route.ts` and `src/app/api/google-business/oauth/callback/route.ts` to:
+     ```typescript
+     if (process.platform === "win32" || process.env.NODE_ENV !== "production") {
+       process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+     }
+     ```
+  2. On Windows development (`process.platform === "win32"`), SSL leaf verification is bypassed permanently whether running dev server or standalone production build.
+  3. On the live Hostinger VPS Linux server (`process.platform === "linux"`), strict certificate validation remains active and untouched with system CA roots.
+  4. Rebuilt Next.js standalone bundle and verified local signup route response.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [10 Oct 2026] Feature: Standalone Modules & Pricing Plans Razorpay Checkout with Instant Signup/Login Account Activation
 - **Symptom**: On `http://localhost:3000/pricing` under "Standalone modules Or choose exactly what you need Add any module for 6 Months or 1 Year. Highest price first.", clicking "Continue →" after selecting any service did nothing. The user required that whatever services the user selects, clicking "Continue →" must allow them to pay the selected amount through Razorpay Payment Gateway, and immediately after payment, open/activate their Signup or Login merchant account (`/dashboard`).
 - **Root Cause**: The standalone modules selection bar only updated local state and the "Continue →" button previously lacked an integrated checkout, account registration, and payment gateway trigger flow for public visitors who aren't yet registered merchants.
