@@ -63,33 +63,7 @@ export function PricingClient() {
       </header>
 
       {/* Main Container */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 md:py-14 space-y-14 flex-1 w-full">
-        {/* Sleek Hero Value Strip Banner */}
-        <div className="rounded-3xl bg-slate-950 text-white border border-slate-800 shadow-xl overflow-hidden relative">
-          <div className="absolute inset-0 bg-radial from-indigo-500/10 via-transparent to-transparent pointer-events-none" />
-          <div className="px-6 py-7 sm:px-8 sm:py-8 flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-            <div className="space-y-2 text-center md:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-semibold tracking-wide">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Transparent, ROI-Driven Retention Architecture</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
-                Flat 50% OFF on All 1-Year Pro Plans
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">
-                Complete WhatsApp loyalty, 5★ Google reviews &amp; 1-click replies at half price. Starting from ₹1.37/day for standalone tools, or ₹13.42/day for Complete.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
-              <Link href="/signup">
-                <Button className="bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs sm:text-sm px-5 py-3 rounded-xl shadow-sm cursor-pointer transition">
-                  Claim 50% Discount Now →
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 md:py-10 space-y-12 flex-1 w-full">
         {/* Pricing Studio Configurator, Comparison & Standalone Grid */}
         <PricingStudio mode="public" theme="light" />
 

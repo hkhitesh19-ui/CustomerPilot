@@ -3,6 +3,42 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [10 Oct 2026] Feature: Extracted Pricing Architecture from CustomerPilot_Pricing.html & Vibrant Feature Icon Grid Implementation
+- **Symptom**: User requested:
+  1. Extract and adopt the exact pricing numbers and pricing structure directly from `CustomerPilot — Pricing.html` (`CustomerPilot_Pricing.html`).
+  2. Implement vibrant square colored icon boxes (Sky, Rose, Emerald, Blue, Purple, Violet, Teal, Amber, Indigo, Cyan, Orange, Pink) for feature cards as referenced in the uploaded screenshots (`mysmartyd.com`).
+  3. Mirror the exact structure of `CustomerPilot — Pricing.html`:
+     - CustomerPilot Complete hero with interactive tenure tabs (Monthly ₹449, 6 Months ₹1,999, 12 Months ₹3,499) + Effective Monthly Cost progress bar card.
+     - Complete Feature Set grid with vibrant icon containers.
+     - Standalone modules interactive table sorted highest price first (Loyalty ₹899/₹1,499, Reviews ₹649/₹899, AutoReply ₹549/₹799, Card ₹349/₹499) with "Add / Added" toggles, live sum total row (₹2,446 / ₹3,696), Complete comparison row, and Lifetime Deal card (₹1,499).
+     - Sticky bottom selection bar for selected tools.
+- **Root Cause**: The pricing page previously had a different structure and numbers from earlier iterations, rather than mirroring the sleek, high-converting interactive architecture defined in `CustomerPilot_Pricing.html` and the vibrant square icon visual language from the provided screenshots.
+- **Resolution**:
+  1. **Canonical Master Plans & SQLite DB Sync**:
+     - Updated `src/lib/master-plans.ts` and SQLite database (`prisma/dev.db`):
+       - `complete_monthly`: ₹449 (MRP ₹898)
+       - `growth_180`: ₹1,999 (MRP ₹3,998)
+       - `enterprise_365`: ₹3,499 (MRP ₹6,998)
+       - `loyalty_6mo`: ₹899 (MRP ₹1,598), `loyalty_yearly`: ₹1,499 (MRP ₹2,598)
+       - `reviews_6mo`: ₹649 (MRP ₹1,099), `reviews_yearly`: ₹899 (MRP ₹1,599)
+       - `autoreply_6mo`: ₹549 (MRP ₹1,099), `autoreply_yearly`: ₹799 (MRP ₹1,599)
+       - `card_6mo`: ₹349 (MRP ₹699), `card_yearly`: ₹499 (MRP ₹1,199), `card_lifetime`: ₹1,499 (MRP ₹3,999)
+  2. **Component Architecture Overhaul (`src/components/pricing/pricing-studio.tsx`)**:
+     - Integrated exact hero: "Pricing that grows with your business" with "50% OFF Limited-period offer on every plan".
+     - Implemented CustomerPilot Complete interactive tenure switcher (`Monthly`, `6 Months`, `12 Months`) with real-time price & MRP calculation.
+     - Built Effective Monthly Cost progress bar card showing Monthly (₹449/mo), 6 Mo (₹333/mo), 12 Mo (₹288/mo) with "12 Months works out 36% cheaper per month than Monthly".
+     - Built "How CustomerPilot Helps You Grow Your Business" 12-item feature grid featuring vibrant square rounded-xl icon boxes in distinct bold colors matching the uploaded design reference.
+     - Built Standalone modules table sorted highest-price-first with Add / Added toggle buttons, total row (₹2,446 / ₹3,696), Complete row, and Lifetime Deal card (₹1,499).
+     - Added sticky floating bottom checkout bar (`{count} selected · ₹{total} (₹{perDay}/day) [Clear] [Continue]`).
+     - Maintained 0 occurrences of "NFC" (replaced with "Smart QR") and 0 occurrences of "Standee".
+  3. **Production Build & Verification**:
+     - Ran full Next.js production build (`npm run build`) compiling all 189 routes cleanly.
+     - Synced static and public assets to `.next/standalone`.
+     - Started daemon server on port 3000 and verified 100% assertions via Playwright (`scripts/verify_pricing_sheet.js`).
+     - Visually audited snapshot `verified_pricing_extracted_html.png`.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [09 Oct 2026] Feature: CustomerPilot Complete All-in-One Engine 1-Year Price Adjustment to ₹4,788 (MRP ₹9,576 · 50% OFF)
 - **Symptom**: User requested updating CustomerPilot Complete All-in-One Engine (1 Year / 12 Months Complete): set MRP to ₹9,576 and 50% discount price to ₹4,788 (previously MRP ₹9,798 and price ₹4,899).
 - **Root Cause**: The 1-Year Complete tier (`enterprise_365`) previously utilized ₹4,899 (~₹408/mo) with MRP ₹9,798. Adjusting to ₹4,788 provides a clean psychological price point of exactly ₹399/month (₹4,788 / 12 = ₹399/mo), ₹13.12/day, and saves ~11%/mo compared to the monthly plan.

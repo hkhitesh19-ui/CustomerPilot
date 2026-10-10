@@ -8,14 +8,15 @@ import {
   Database, HelpCircle, CheckCircle2, Lock, Award, HeartHandshake, Flame,
   ShieldCheck, RefreshCw, MessageSquare, Edit3, Save, CheckSquare, Square,
   Layers, ChevronRight, Tag, Sliders, Info, AlertCircle, ShoppingBag, Eye,
-  CreditCard, Calendar, QrCode
+  CreditCard, Calendar, QrCode, Smartphone, PhoneCall, MapPin, Share2,
+  TrendingUp, BarChart3, Bot, Compass, Store, Award as Trophy, ThumbsUp,
+  Percent, ArrowUpRight, Sparkle, X
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/hooks/use-toast"
 
 export interface PlanItem {
@@ -48,136 +49,152 @@ export interface PricingStudioProps {
   isExpired?: boolean
 }
 
-// Canonical product definitions with keys & outcome markers
-export interface ProductModule {
-  id: "card" | "loyalty" | "reviews" | "autoreply"
-  name: string
-  shortTitle: string
-  icon: string
-  badge: string
-  tagline: string
-  description: string
-  features: string[]
-  planKey6Mo: string
-  planKey1Yr: string
-  planKeyLifetime?: string
-  defaultPrice6Mo: number
-  defaultMrp6Mo: number
-  defaultPrice1Yr: number
-  defaultMrp1Yr: number
-  defaultPriceLifetime?: number
-  defaultMrpLifetime?: number
-}
+// ─── SOURCE OF TRUTH FROM CustomerPilot_Pricing.html ───
+// C: Complete plans (Monthly ₹449, 6 Months ₹1,999, 12 Months ₹3,499)
+export const COMPLETE_TIERS = [
+  { t: "Monthly", d: 30, s: 449, m: 898, planKey: "complete_monthly", badge: "Flexible" },
+  { t: "6 Months", d: 180, s: 1999, m: 3998, planKey: "growth_180", badge: "Popular" },
+  { t: "12 Months", d: 365, s: 3499, m: 6998, planKey: "enterprise_365", badge: "Best Value" }
+]
 
-export const PRODUCT_MODULES: ProductModule[] = [
+// S: Standalone Services sorted highest 1Y price first
+export const STANDALONE_SERVICES = [
   {
-    id: "card",
-    name: "Smart Digital Business Card",
-    shortTitle: "Smart Digital Card",
-    icon: "credit-card",
-    badge: "Instant 2-Min Setup",
-    tagline: "1-Tap Contact Save (.vcf) + Direct Google Reviews + Ordering Links",
-    description: "Interactive digital business card. 1-Tap save contact to mobile phonebook, instant 5-star Google review trigger, and online ordering catalog.",
-    features: [
-      "1-Tap Save Contact (vCard .vcf phonebook sync)",
-      "Direct 5-Star Google Reviews Submission Modal",
-      "WhatsApp Chat & Direct Calling Connect",
-      "Google Maps Turn-by-Turn Navigation",
-      "Online Ordering Links (Zomato / Swiggy / Catalog)",
-      "Printable High-Resolution QR Code"
-    ],
-    planKey6Mo: "card_6mo",
-    planKey1Yr: "card_yearly",
-    planKeyLifetime: "card_lifetime",
-    defaultPrice6Mo: 349,
-    defaultMrp6Mo: 699,
-    defaultPrice1Yr: 499,
-    defaultMrp1Yr: 1199,
-    defaultPriceLifetime: 1499,
-    defaultMrpLifetime: 3999
-  },
-  {
-    id: "reviews",
-    name: "Smart Ai (SEO Optimized) Google Reviews",
-    shortTitle: "Smart AI Google Reviews",
-    icon: "star",
-    badge: "Local SEO Growth",
-    tagline: "Automated WhatsApp Prompts & 3-Angle AI Drafts [upto 2500 Reviews]",
-    description: "Collect authentic 5-star Google Maps reviews via WhatsApp after purchase. Generates 3 AI psychological review angles with zero banned AI words.",
-    features: [
-      "Post-Purchase WhatsApp Review Request Engine",
-      "3-Angle Gemini AI Review Drafts (Quality, Vibes, 1-Liner)",
-      "+2 Bonus Stamps Photo Upload Reward Callout",
-      "Anti-AI Detection Filter (10-Category Local SEO Entities)",
-      "1-Click Copy & Direct Google Maps Post"
-    ],
-    planKey6Mo: "reviews_6mo",
-    planKey1Yr: "reviews_yearly",
-    defaultPrice6Mo: 549,
-    defaultMrp6Mo: 1099,
-    defaultPrice1Yr: 799,
-    defaultMrp1Yr: 1599
-  },
-  {
-    id: "autoreply",
-    name: "Ai Drafted (SEO Optimized) 1-Click AutoReply",
-    shortTitle: "1-Click AutoReply",
-    icon: "message-square",
-    badge: "Owner Assistant Mode",
-    tagline: "Google Business Profile Sync & 1-Click AI Owner Responses",
-    description: "Gemini AI crafts appreciative, contextual owner replies to Google Maps reviews. Store owners review and publish to Google Maps in 1-Click.",
-    features: [
-      "Official Google Business Profile (GBP) OAuth Sync",
-      "Context-Aware AI Appreciation & De-escalation Replies",
-      "1-Click Direct Publish to Live Google Maps Listing",
-      "Sentiment Adaptation & Bulk Response Studio",
-      "Automated 60-Second Reply Safety Queue"
-    ],
-    planKey6Mo: "autoreply_6mo",
-    planKey1Yr: "autoreply_yearly",
-    defaultPrice6Mo: 549,
-    defaultMrp6Mo: 1099,
-    defaultPrice1Yr: 799,
-    defaultMrp1Yr: 1599
-  },
-  {
-    id: "loyalty",
-    name: "Digital Loyalty Stamps & VIP Club",
-    shortTitle: "Loyalty Stamps & VIP",
-    icon: "gift",
-    badge: "Repeat Visit Engine",
-    tagline: "WhatsApp Digital Stamp Cards & Automated Birthday Rewards",
-    description: "Turn walk-in shoppers into loyal repeat customers with WhatsApp digital stamp cards, cashier counter queue, and automated win-back triggers.",
-    features: [
-      "Digital WhatsApp Stamp Card (No App Download)",
-      "Cashier 1-Tap Counter Check-In Mode",
-      "Automated Birthday & Anniversary Rewards Engine",
-      "14/30/60-Day Inactivity Win-Back WhatsApp Alerts",
-      "VIP Tier Upgrades & Customer Loyalty Analytics"
-    ],
+    i: "loyalty",
+    n: "Digital Loyalty Stamps & VIP Club",
+    t: "WhatsApp digital stamp card and VIP rewards automation.",
     planKey6Mo: "loyalty_6mo",
     planKey1Yr: "loyalty_yearly",
-    defaultPrice6Mo: 799,
-    defaultMrp6Mo: 1598,
-    defaultPrice1Yr: 1299,
-    defaultMrp1Yr: 2598
+    p: { 180: [899, 1598], 365: [1499, 2598] } as Record<number, [number, number]>,
+    iconBg: "bg-purple-600",
+    colorText: "text-purple-600 dark:text-purple-400"
+  },
+  {
+    i: "star",
+    n: "Smart AI Google Reviews",
+    t: "WhatsApp review collection with AI-drafted, SEO-optimized reviews. Up to 1,000 (6M) / 2,500 (1Y) reviews.",
+    planKey6Mo: "reviews_6mo",
+    planKey1Yr: "reviews_yearly",
+    p: { 180: [649, 1099], 365: [899, 1599] } as Record<number, [number, number]>,
+    iconBg: "bg-amber-500",
+    colorText: "text-amber-500 dark:text-amber-400"
+  },
+  {
+    i: "chat",
+    n: "AI AutoReply to Google Reviews",
+    t: "AI-drafted, SEO-optimized replies published in 1-click to Google Maps.",
+    planKey6Mo: "autoreply_6mo",
+    planKey1Yr: "autoreply_yearly",
+    p: { 180: [549, 1099], 365: [799, 1599] } as Record<number, [number, number]>,
+    iconBg: "bg-blue-600",
+    colorText: "text-blue-600 dark:text-blue-400"
+  },
+  {
+    i: "card",
+    n: "Smart Digital Business Card",
+    t: "Interactive Smart QR digital card with 1-tap contact saving.",
+    planKey6Mo: "card_6mo",
+    planKey1Yr: "card_yearly",
+    p: { 180: [349, 699], 365: [499, 1199] } as Record<number, [number, number]>,
+    lt: [1499, 3999] as [number, number],
+    planKeyLt: "card_lifetime",
+    iconBg: "bg-indigo-600",
+    colorText: "text-indigo-600 dark:text-indigo-400"
   }
 ]
 
-export function getModuleIcon(id: string, className = "w-5 h-5") {
-  switch (id) {
-    case "card":
-      return <CreditCard className={`${className} text-indigo-600 dark:text-indigo-400`} />
-    case "reviews":
-      return <Star className={`${className} text-amber-500 fill-amber-500/20`} />
-    case "autoreply":
-      return <MessageSquare className={`${className} text-blue-600 dark:text-blue-400`} />
-    case "loyalty":
-      return <Gift className={`${className} text-purple-600 dark:text-purple-400`} />
-    default:
-      return <Sparkles className={`${className} text-indigo-600`} />
+// 12 High-Converting Feature Cards with vibrant square icon boxes
+export const FEATURE_GRID_ITEMS = [
+  {
+    title: "1-Tap Phonebook Sync (.vcf)",
+    desc: "Customers save your business phone, WhatsApp, location and brand in their mobile contacts with zero typing.",
+    icon: PhoneCall,
+    color: "bg-indigo-600",
+    tag: "Digital Card"
+  },
+  {
+    title: "Smart AI Google Review Modal",
+    desc: "Post-purchase QR triggers 3 AI-crafted psychological review drafts. 1-Click copy to live Google Maps.",
+    icon: Star,
+    color: "bg-amber-500",
+    tag: "Reviews Engine"
+  },
+  {
+    title: "WhatsApp Digital Stamp Cards",
+    desc: "Zero app download needed. Digital stamp card with cashier counter check-in to boost customer return rates.",
+    icon: Gift,
+    color: "bg-purple-600",
+    tag: "Loyalty Engine"
+  },
+  {
+    title: "1-Click AI AutoReply to Google Maps",
+    desc: "Official Google Business Profile sync. Context-aware AI responses published live to Google Maps instantly.",
+    icon: MessageSquare,
+    color: "bg-blue-600",
+    tag: "Google Sync"
+  },
+  {
+    title: "Automated Birthday & VIP Rewards",
+    desc: "Surprise loyal customers on birthdays & anniversaries with automated WhatsApp wishes and reward coupons.",
+    icon: Trophy,
+    color: "bg-rose-500",
+    tag: "Automation"
+  },
+  {
+    title: "30 / 60 / 90-Day Win-Back Alerts",
+    desc: "Automatically detect churned customers and send personalized WhatsApp incentives before they switch.",
+    icon: RefreshCw,
+    color: "bg-emerald-600",
+    tag: "Retention"
+  },
+  {
+    title: "Counter QR Code Display",
+    desc: "High-resolution printable vector counter display templates (PNG/SVG/PDF) for billing desks & tabletops.",
+    icon: QrCode,
+    color: "bg-sky-600",
+    tag: "Hardware-Free"
+  },
+  {
+    title: "Anti-AI Detection Filter",
+    desc: "Natural human local reviews with 10-category SEO entities. Clean authentic tone trusted by Google algorithms.",
+    icon: ShieldCheck,
+    color: "bg-teal-600",
+    tag: "Local SEO"
+  },
+  {
+    title: "VIP Customer CRM & CSV Export",
+    desc: "Full visibility of customer visit counts, lifetime spend, stamp progress, and one-click database export.",
+    icon: Database,
+    color: "bg-violet-600",
+    tag: "Customer CRM"
+  },
+  {
+    title: "Live Cashier Counter Queue",
+    desc: "Lightning fast phone number search or QR scan. Cashiers award stamps in less than 3 seconds per shopper.",
+    icon: Zap,
+    color: "bg-orange-500",
+    tag: "Speed POS"
+  },
+  {
+    title: "Turn-by-Turn Google Navigation",
+    desc: "Direct navigation deep-link brings local customers straight from WhatsApp or card to your retail doorstep.",
+    icon: MapPin,
+    color: "bg-cyan-600",
+    tag: "Footfall"
+  },
+  {
+    title: "Priority WhatsApp VIP Support",
+    desc: "Direct concierge line (+91 90333 04707) with dedicated onboarding support for smooth store rollout.",
+    icon: HeartHandshake,
+    color: "bg-pink-600",
+    tag: "Support"
   }
-}
+]
+
+// Formatting helpers
+export const inr = (n: number) => "₹" + Math.round(n).toLocaleString("en-IN")
+export const dy = (n: number, d: number) => `(₹${(n / d).toFixed(2)}/day)`
+export const off = (s: number, m: number) => Math.round((1 - s / m) * 100)
 
 export function PricingStudio({
   mode = "public",
@@ -198,25 +215,15 @@ export function PricingStudio({
   const [plans, setPlans] = useState<PlanItem[]>(initialPlans)
   const [loading, setLoading] = useState(initialPlans.length === 0)
   const [savingPlans, setSavingPlans] = useState(false)
-
-  // Admin edit mode toggle
   const [adminEditMode, setAdminEditMode] = useState(false)
 
-  // Tenure selection: "6mo" | "1year" | "lifetime"
-  const [selectedTenure, setSelectedTenure] = useState<"6mo" | "1year" | "lifetime">("1year")
+  // Interactive tenure tab for CustomerPilot Complete: 0=Monthly, 1=6 Months, 2=12 Months
+  const [activeCompleteIndex, setActiveCompleteIndex] = useState<number>(2) // Default 12 Months (Best Value)
 
-  // Bundle builder selected products
-  const [selectedModules, setSelectedModules] = useState<Record<string, boolean>>({
-    card: true,
-    loyalty: true,
-    reviews: true,
-    autoreply: true
-  })
+  // Standalone selected modules map: { [serviceId]: tenureDays (180 or 365) }
+  const [selectedStandalone, setSelectedStandalone] = useState<Record<string, number>>({})
 
-  // Standalone active tab
-  const [standaloneTenureFilter, setStandaloneTenureFilter] = useState<"all" | "6mo" | "1year">("all")
-
-  // Fetch plans if not provided
+  // Fetch plans if not passed
   useEffect(() => {
     if (initialPlans.length > 0) {
       setPlans(initialPlans)
@@ -238,69 +245,159 @@ export function PricingStudio({
       .finally(() => setLoading(false))
   }, [initialPlans])
 
-  // Helper to get active plan record by planKey
+  // Helper to find DB plan by key
   const getPlanByKey = (key: string): PlanItem | undefined => {
     return plans.find((p) => p.planKey === key)
   }
 
-  // Get price for a specific product and tenure
-  const getProductPrice = (mod: ProductModule, tenure: "6mo" | "1year" | "lifetime") => {
-    if (tenure === "lifetime") {
-      if (mod.id === "card") {
-        const p = getPlanByKey(mod.planKeyLifetime || "card_lifetime")
-        return {
-          price: p ? p.price : (mod.defaultPriceLifetime || 1499),
-          mrp: p?.originalPrice ? p.originalPrice : (mod.defaultMrpLifetime || 3999),
-          plan: p
-        }
+  // Active complete tier
+  const activeCompleteTier = COMPLETE_TIERS[activeCompleteIndex]
+  const completeDbPlan = getPlanByKey(activeCompleteTier.planKey)
+  const completePrice = completeDbPlan?.price || activeCompleteTier.s
+  const completeMrp = completeDbPlan?.originalPrice || activeCompleteTier.m
+  const completeDays = activeCompleteTier.d
+
+  // Effective monthly costs calculation for progress bars
+  const effectiveMonthlyCosts = useMemo(() => {
+    return COMPLETE_TIERS.map((tier) => {
+      const dbP = getPlanByKey(tier.planKey)
+      const p = dbP?.price || tier.s
+      const perMonth = p / (tier.d / 30)
+      return perMonth
+    })
+  }, [plans])
+
+  const maxMonthlyCost = Math.max(...effectiveMonthlyCosts)
+  const yearlyCheaperPercent = Math.round(
+    (1 - effectiveMonthlyCosts[2] / effectiveMonthlyCosts[0]) * 100
+  )
+
+  // Standalone total calculations
+  const standaloneTot = (days: 180 | 365) =>
+    STANDALONE_SERVICES.reduce((sum, s) => {
+      const dbP = getPlanByKey(days === 180 ? s.planKey6Mo : s.planKey1Yr)
+      return sum + (dbP?.price || s.p[days][0])
+    }, 0)
+
+  const standaloneMrpTot = (days: 180 | 365) =>
+    STANDALONE_SERVICES.reduce((sum, s) => {
+      const dbP = getPlanByKey(days === 180 ? s.planKey6Mo : s.planKey1Yr)
+      return sum + (dbP?.originalPrice || s.p[days][1])
+    }, 0)
+
+  // Floating bottom bar calculations
+  const selectedList = useMemo(() => {
+    return STANDALONE_SERVICES.filter((s) => selectedStandalone[s.i])
+  }, [selectedStandalone])
+
+  const selectedTotalSum = useMemo(() => {
+    return selectedList.reduce((sum, s) => {
+      const d = selectedStandalone[s.i]
+      const dbP = getPlanByKey(d === 180 ? s.planKey6Mo : s.planKey1Yr)
+      return sum + (dbP?.price || s.p[d][0])
+    }, 0)
+  }, [selectedList, selectedStandalone, plans])
+
+  const selectedPerDaySum = useMemo(() => {
+    return selectedList.reduce((sum, s) => {
+      const d = selectedStandalone[s.i]
+      const dbP = getPlanByKey(d === 180 ? s.planKey6Mo : s.planKey1Yr)
+      const price = dbP?.price || s.p[d][0]
+      return sum + price / d
+    }, 0)
+  }, [selectedList, selectedStandalone, plans])
+
+  // Toggle selection
+  const handleToggleStandalone = (serviceId: string, days: number) => {
+    setSelectedStandalone((prev) => {
+      const next = { ...prev }
+      if (next[serviceId] === days) {
+        delete next[serviceId]
+      } else {
+        next[serviceId] = days
       }
-      // Other products don't have lifetime, fall back to 1 year
-      const p = getPlanByKey(mod.planKey1Yr)
-      return {
-        price: p ? p.price : mod.defaultPrice1Yr,
-        mrp: p?.originalPrice ? p.originalPrice : mod.defaultMrp1Yr,
-        plan: p
-      }
+      return next
+    })
+  }
+
+  const handleClearStandalone = () => {
+    setSelectedStandalone({})
+  }
+
+  // Handle plan purchase
+  const handleSelectComplete = (tierIndex: number) => {
+    const tier = COMPLETE_TIERS[tierIndex]
+    const p = getPlanByKey(tier.planKey) || {
+      planKey: tier.planKey,
+      name: `CustomerPilot Complete (${tier.t})`,
+      price: tier.s,
+      originalPrice: tier.m,
+      days: tier.d,
+      features: [
+        "Digital Loyalty Stamp Cards",
+        "Smart AI Google Reviews",
+        "1-Click AutoReply",
+        "Smart Digital Business Card"
+      ]
     }
 
-    if (tenure === "6mo") {
-      const p = getPlanByKey(mod.planKey6Mo)
-      return {
-        price: p ? p.price : mod.defaultPrice6Mo,
-        mrp: p?.originalPrice ? p.originalPrice : mod.defaultMrp6Mo,
-        plan: p
-      }
-    }
+    if (onSelectPlan) onSelectPlan(p)
+    if (onCheckout) onCheckout(p)
+  }
 
-    // 1year
-    const p = getPlanByKey(mod.planKey1Yr)
-    return {
-      price: p ? p.price : mod.defaultPrice1Yr,
-      mrp: p?.originalPrice ? p.originalPrice : mod.defaultMrp1Yr,
-      plan: p
+  // Handle Standalone checkout
+  const handleCheckoutStandalone = () => {
+    if (selectedList.length === 0) return
+
+    if (onSelectPlan && selectedList.length === 1) {
+      const s = selectedList[0]
+      const d = selectedStandalone[s.i]
+      const planKey = d === 180 ? s.planKey6Mo : s.planKey1Yr
+      const p = getPlanByKey(planKey) || {
+        planKey,
+        name: `${s.n} (${d === 180 ? "6 Months" : "1 Year"})`,
+        price: s.p[d][0],
+        originalPrice: s.p[d][1],
+        days: d,
+        features: [s.t]
+      }
+      onSelectPlan(p)
+      if (onCheckout) onCheckout(p)
+    } else if (onSelectPlan) {
+      // Multiple items selected
+      const p = {
+        name: `Custom Bundle (${selectedList.length} items)`,
+        price: selectedTotalSum,
+        days: 365,
+        features: selectedList.map((s) => s.n)
+      } as PlanItem
+      onSelectPlan(p, { selectedStandalone })
+      if (onCheckout) onCheckout(p)
     }
   }
 
-  // Save updated plans to backend
+  // Admin save changes
   const handleSaveAllPlans = async () => {
     setSavingPlans(true)
     try {
-      const res = await fetch("/api/pricing/plans", {
-        method: "PUT",
+      const res = await fetch("/api/pricing/plans/bulk-update", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plans })
       })
       const data = await res.json()
-      if (!res.ok || !data.ok) throw new Error(data.error || "Failed to update plans")
-
+      if (data.ok) {
+        toast({
+          title: "Pricing Updated Successfully",
+          description: "All prices and plans have been synchronized live."
+        })
+      } else {
+        throw new Error(data.error || "Update failed")
+      }
+    } catch (err: any) {
       toast({
-        title: "Pricing Saved Successfully",
-        description: "Updated pricing live across Main Website, SuperAdmin & Merchant Panels."
-      })
-    } catch (e: any) {
-      toast({
-        title: "Save Failed",
-        description: e.message || "Could not persist pricing",
+        title: "Update Error",
+        description: err.message,
         variant: "destructive"
       })
     } finally {
@@ -308,378 +405,254 @@ export function PricingStudio({
     }
   }
 
-  // Handle local plan field change
-  const handlePlanChange = (planKey: string, field: keyof PlanItem, value: any) => {
-    setPlans((prev) =>
-      prev.map((p) => {
-        if (p.planKey === planKey) {
-          return { ...p, [field]: value }
-        }
-        return p
-      })
-    )
-  }
-
-  // Toggle selection of a product in bundle builder
-  const toggleModule = (id: string) => {
-    setSelectedModules((prev) => ({
-      ...prev,
-      [id]: !prev[id]
-    }))
-  }
-
-  // Preset selectors for bundle
-  const selectPreset = (preset: "complete" | "all4" | "reviews_only" | "card_loyalty") => {
-    if (preset === "all4") {
-      setSelectedModules({ card: true, loyalty: true, reviews: true, autoreply: true })
-    } else if (preset === "complete") {
-      setSelectedModules({ card: false, loyalty: true, reviews: true, autoreply: true })
-    } else if (preset === "reviews_only") {
-      setSelectedModules({ card: false, loyalty: false, reviews: true, autoreply: true })
-    } else if (preset === "card_loyalty") {
-      setSelectedModules({ card: true, loyalty: true, reviews: false, autoreply: false })
-    }
-  }
-
-  // Complete bundle canonical plans
-  const complete6MoPlan = getPlanByKey("growth_180")
-  const complete1YrPlan = getPlanByKey("enterprise_365")
-  const enterprisePlan = getPlanByKey("enterprise_unlimited_365")
-
-  const completePrice6Mo = complete6MoPlan ? complete6MoPlan.price : 2499
-  const completeMrp6Mo = complete6MoPlan?.originalPrice || 4998
-  const completePrice1Yr = complete1YrPlan ? complete1YrPlan.price : 4788
-  const completeMrp1Yr = complete1YrPlan?.originalPrice || 9576
-
-  // Bundle calculations
-  const bundleCalculation = useMemo(() => {
-    const selectedCount = Object.values(selectedModules).filter(Boolean).length
-    const hasCard = selectedModules.card
-    const hasLoyalty = selectedModules.loyalty
-    const hasReviews = selectedModules.reviews
-    const hasAutoReply = selectedModules.autoreply
-    const hasCompleteTrio = hasLoyalty && hasReviews && hasAutoReply
-
-    let standaloneSumPrice = 0
-    let standaloneSumMrp = 0
-
-    PRODUCT_MODULES.forEach((mod) => {
-      if (selectedModules[mod.id]) {
-        const pricing = getProductPrice(mod, selectedTenure)
-        standaloneSumPrice += pricing.price
-        standaloneSumMrp += pricing.mrp
-      }
-    })
-
-    // Determine smart bundle price: live sum of selected tools
-    let bundleOfferPrice = standaloneSumPrice
-    let bundleTotalMrp = standaloneSumMrp
-    let appliedBundleBadge = ""
-    let matchedPlan: PlanItem | null = null
-
-    if (selectedCount === 4) {
-      appliedBundleBadge = "All 4 Tools Selected (Live Sum)"
-      if (selectedTenure === "6mo") matchedPlan = complete6MoPlan || null
-      else if (selectedTenure === "1year") matchedPlan = complete1YrPlan || null
-    } else if (hasCompleteTrio) {
-      appliedBundleBadge = "Complete 3-in-1 Trio Selected (Live Sum)"
-      if (selectedTenure === "6mo") matchedPlan = complete6MoPlan || null
-      else if (selectedTenure === "1year") matchedPlan = complete1YrPlan || null
-    } else if (selectedCount === 1) {
-      const singleMod = PRODUCT_MODULES.find((m) => selectedModules[m.id])
-      if (singleMod) {
-        if (selectedTenure === "6mo") {
-          matchedPlan = getPlanByKey(singleMod.planKey6Mo) || null
-        } else if (selectedTenure === "1year") {
-          matchedPlan = getPlanByKey(singleMod.planKey1Yr) || null
-        } else if (selectedTenure === "lifetime" && singleMod.id === "card") {
-          matchedPlan = getPlanByKey("card_lifetime") || null
-        }
-        appliedBundleBadge = `${singleMod.shortTitle} Plan`
-      }
-    } else if (selectedCount > 1) {
-      appliedBundleBadge = `Custom Bundle (${selectedCount} Tools Selected)`
-    }
-
-    const totalSavings = Math.max(0, bundleTotalMrp - bundleOfferPrice)
-    const savingsPercent = bundleTotalMrp > 0 ? Math.round((totalSavings / bundleTotalMrp) * 100) : 50
-
-    // Daily cost estimate
-    const days = selectedTenure === "6mo" ? 180 : selectedTenure === "1year" ? 365 : 3650
-    const dailyCost = (bundleOfferPrice / days).toFixed(1)
-    const monthlyCost = Math.round((bundleOfferPrice / (days / 30)))
-
-    return {
-      selectedCount,
-      hasCard,
-      hasLoyalty,
-      hasReviews,
-      hasAutoReply,
-      hasCompleteTrio,
-      standaloneSumPrice,
-      standaloneSumMrp,
-      bundleOfferPrice,
-      bundleTotalMrp,
-      totalSavings,
-      savingsPercent,
-      dailyCost,
-      monthlyCost,
-      appliedBundleBadge,
-      matchedPlan
-    }
-  }, [selectedModules, selectedTenure, plans, completePrice6Mo, completeMrp6Mo, completePrice1Yr, completeMrp1Yr])
-
-  // Primary action button handler
-  const handleBundleAction = () => {
-    if (mode === "superadmin") {
-      toast({
-        title: "SuperAdmin Preview",
-        description: `Active Bundle: ${bundleCalculation.appliedBundleBadge || "Custom Bundle"} at ₹${bundleCalculation.bundleOfferPrice}`
-      })
-      return
-    }
-
-    if (bundleCalculation.matchedPlan) {
-      if (onSelectPlan) {
-        onSelectPlan(bundleCalculation.matchedPlan, {
-          selectedModules,
-          tenure: selectedTenure,
-          price: bundleCalculation.bundleOfferPrice
-        })
-      }
-      if (onCheckout) {
-        onCheckout(bundleCalculation.matchedPlan)
-      }
-    }
-  }
-
-  // Dynamic theme wrapper classes
   const isDark = theme === "dark" || mode === "superadmin" || mode === "merchant"
 
   return (
     <div className={`w-full transition-colors duration-200 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-      {/* ─── Studio Header & Admin Edit Mode Control ─── */}
-      <div className="space-y-4 mb-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200/60 dark:border-slate-800/80">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-wider mb-2">
-              <Sparkles className="w-3.5 h-3.5 animate-pulse" /> CustomerPilot Pricing
-            </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
-              Pricing
-            </h1>
-            <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-1 max-w-3xl">
-              Pick a product, compare tenures, build your bundle — all prices live
-            </p>
-          </div>
+      {/* ─── Hero Section (Extracted from CustomerPilot_Pricing.html) ─── */}
+      <section className="text-center py-8 sm:py-12 relative">
+        <div className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-1.5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs mb-4">
+          <span className="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-bold text-[11px] px-2.5 py-0.5 rounded-full">
+            50% OFF
+          </span>
+          <span className="text-slate-600 dark:text-slate-300">Limited-period offer on every plan</span>
+        </div>
 
-          {/* Admin Edit Mode Control Checkbox / Toggle */}
-          {(showAdminToggle || mode === "superadmin") && (
-            <div className="flex items-center gap-4 bg-slate-100 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 p-3.5 rounded-2xl shadow-sm">
-              <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setAdminEditMode(!adminEditMode)}>
-                <div className={`w-5 h-5 rounded flex items-center justify-center border transition ${adminEditMode ? "bg-indigo-600 border-indigo-600 text-white" : "border-slate-400 dark:border-slate-600 bg-white dark:bg-slate-950"}`}>
-                  {adminEditMode && <Check className="w-3.5 h-3.5 font-black stroke-[3]" />}
-                </div>
-                <Label className="text-xs font-bold cursor-pointer select-none text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <Edit3 className="w-3.5 h-3.5 text-indigo-500" />
-                  Admin edit mode
-                </Label>
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight max-w-3xl mx-auto">
+          Pricing that grows{" "}
+          <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
+            with your business
+          </span>
+        </h1>
+
+        <p className="text-slate-500 dark:text-slate-400 text-base sm:text-lg max-w-xl mx-auto mt-3">
+          One platform or one tool at a time. Every price comes with its true daily cost, so you always know what you pay.
+        </p>
+
+        {/* Admin toggle if enabled */}
+        {(showAdminToggle || mode === "superadmin") && (
+          <div className="mt-4 flex items-center justify-center gap-4">
+            <button
+              onClick={() => setAdminEditMode(!adminEditMode)}
+              className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700"
+            >
+              <Edit3 className="w-3.5 h-3.5 text-indigo-500" />
+              <span>Admin edit mode</span>
+            </button>
+            {adminEditMode && (
+              <Button
+                size="sm"
+                onClick={handleSaveAllPlans}
+                disabled={savingPlans}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-8 px-3 rounded-xl"
+              >
+                {savingPlans ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                Save Changes
+              </Button>
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* ─── SECTION 1: CustomerPilot Complete (All-in-One Engine) ─── */}
+      <section className="space-y-4 mb-14">
+        <div className="pb-2">
+          <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+            All-in-one
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white mt-1">
+            CustomerPilot Complete
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Every module in a single subscription.
+          </p>
+        </div>
+
+        {/* 2-Column Grid: Featured Gradient Card + Effective Monthly Cost Card */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          {/* Column 1: Featured Interactive Complete Card (7 cols) */}
+          <div className="lg:col-span-7 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden bg-radial from-white/10 via-transparent to-transparent bg-[#1b1470] shadow-lg flex flex-col justify-between"
+               style={{ background: "radial-gradient(500px 260px at 100% 0, rgba(255,255,255,.2), transparent), linear-gradient(145deg, #1b1470, #4f46e5 60%, #7c6cff)" }}>
+            <div>
+              {/* Interactive Tenure Tabs: Monthly | 6 Months | 12 Months */}
+              <div className="inline-flex bg-white/15 backdrop-blur-md rounded-xl p-1 mb-6">
+                {COMPLETE_TIERS.map((tier, idx) => (
+                  <button
+                    key={tier.t}
+                    type="button"
+                    onClick={() => setActiveCompleteIndex(idx)}
+                    className={`border-0 font-semibold text-xs sm:text-sm px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+                      activeCompleteIndex === idx
+                        ? "bg-white text-indigo-900 font-bold shadow-xs"
+                        : "text-white/80 hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    {tier.t}
+                  </button>
+                ))}
               </div>
 
-              {adminEditMode && (
-                <Button
-                  size="sm"
-                  onClick={handleSaveAllPlans}
-                  disabled={savingPlans}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-8 px-3 rounded-xl shadow-md cursor-pointer ml-auto"
+              {/* Price & Daily Cost */}
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className="text-4xl sm:text-6xl font-black tracking-tight">
+                  {inr(completePrice)}
+                </span>
+                <span className="text-sm sm:text-base font-medium opacity-85">
+                  {dy(completePrice, completeDays)}
+                </span>
+              </div>
+
+              {/* MRP & Savings Strip */}
+              <div className="flex items-center gap-2.5 flex-wrap mt-2.5 text-xs sm:text-sm opacity-90">
+                <s className="opacity-75">{inr(completeMrp)} {dy(completeMrp, completeDays)}</s>
+                <span className="bg-white/20 font-bold text-xs rounded-full px-2.5 py-0.5">
+                  {off(completePrice, completeMrp)}% OFF
+                </span>
+                <span>You save {inr(completeMrp - completePrice)}</span>
+              </div>
+
+              {/* Included Items 2x2 Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-6 text-xs sm:text-sm">
+                {[
+                  "Loyalty & VIP Club",
+                  "Google Reviews",
+                  "AI AutoReply",
+                  "Smart Digital Business Card"
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2.5">
+                    <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                      <Check className="w-3 h-3 stroke-[3]" />
+                    </div>
+                    <span className="font-medium">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Action Button */}
+            <div className="pt-2">
+              {mode === "public" ? (
+                <Link href={`/signup?plan=${activeCompleteTier.planKey}`}>
+                  <button
+                    type="button"
+                    className="w-full bg-white hover:bg-slate-100 text-indigo-900 font-bold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-md transition cursor-pointer"
+                  >
+                    Choose {activeCompleteTier.t} plan →
+                  </button>
+                </Link>
+              ) : mode === "merchant" ? (
+                <button
+                  type="button"
+                  onClick={() => handleSelectComplete(activeCompleteIndex)}
+                  className="w-full bg-white hover:bg-slate-100 text-indigo-900 font-bold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-md transition cursor-pointer"
                 >
-                  {savingPlans ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                  Save Changes
-                </Button>
+                  Choose {activeCompleteTier.t} plan
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="w-full bg-white text-indigo-900 font-bold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-md"
+                >
+                  Active Plan Preview
+                </button>
               )}
             </div>
-          )}
-        </div>
+          </div>
 
-        {/* Admin Edit Mode Banner */}
-        {adminEditMode && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 text-amber-800 dark:text-amber-300 text-xs flex items-center justify-between gap-3 shadow-md"
-          >
-            <div className="flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-amber-500 shrink-0" />
-              <span>
-                <strong>Admin Edit Mode Active:</strong> You can edit prices, MRPs, badges, and discount tags directly on any plan card or standalone row. Click &quot;Save Changes&quot; to persist live to all users.
-              </span>
+          {/* Column 2: Effective Monthly Cost Card (5 cols) */}
+          <div className="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-xs flex flex-col justify-between">
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                Effective monthly cost
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 mb-5">
+                The longer the tenure, the lower your per-month price.
+              </p>
+
+              {/* Progress Bars */}
+              <div className="space-y-4">
+                {COMPLETE_TIERS.map((tier, idx) => {
+                  const monthlyVal = effectiveMonthlyCosts[idx]
+                  const pct = Math.round((monthlyVal / maxMonthlyCost) * 100)
+                  const isSelected = activeCompleteIndex === idx
+
+                  return (
+                    <div
+                      key={tier.t}
+                      className="cursor-pointer"
+                      onClick={() => setActiveCompleteIndex(idx)}
+                    >
+                      <div className="flex justify-between items-center text-xs sm:text-sm mb-1.5">
+                        <span className={`font-semibold ${isSelected ? "text-indigo-600 dark:text-indigo-400" : "text-slate-800 dark:text-slate-200"}`}>
+                          {tier.t} {isSelected && "✓"}
+                        </span>
+                        <span className="font-bold text-slate-600 dark:text-slate-300">
+                          {inr(monthlyVal)} / month
+                        </span>
+                      </div>
+                      <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-indigo-600 to-indigo-400 transition-all duration-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-            <Button
-              size="sm"
-              onClick={handleSaveAllPlans}
-              disabled={savingPlans}
-              className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shrink-0 rounded-xl"
-            >
-              {savingPlans ? "Saving..." : "Save Live Prices"}
-            </Button>
-          </motion.div>
-        )}
-      </div>
 
-      {/* ─── SECTION 1: Standalone Modules (Your Bundle) ─── */}
+            {/* Note Footnote */}
+            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
+              12 Months works out{" "}
+              <strong className="text-emerald-600 dark:text-emerald-400 font-bold">
+                {yearlyCheaperPercent}% cheaper
+              </strong>{" "}
+              per month than Monthly.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── SECTION 2: Complete Feature Set (Vibrant Square Icons matching screenshots) ─── */}
       <section className="space-y-6 mb-16">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
-          <div>
-            <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider mb-1">
-              <Sliders className="w-3.5 h-3.5" />
-              <span>Modular Growth Tools</span>
-            </div>
-            <h3 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-2.5 text-slate-900 dark:text-white">
-              <ShoppingBag className="w-6 h-6 text-indigo-600 dark:text-indigo-400 shrink-0" />
-              <span>Your Bundle &amp; Standalone Modules</span>
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Select any individual tool for your store, or upgrade to CustomerPilot Complete Business Growth below.
-            </p>
-          </div>
-
-          {/* Tenure Switcher */}
-          <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shrink-0">
-            <button
-              type="button"
-              onClick={() => setSelectedTenure("6mo")}
-              className={`py-2 px-4 rounded-lg text-xs font-bold transition cursor-pointer ${
-                selectedTenure === "6mo"
-                  ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
-            >
-              6 Months (Semi-Annual)
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedTenure("1year")}
-              className={`py-2 px-4 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                selectedTenure === "1year"
-                  ? "bg-slate-900 dark:bg-indigo-600 text-white shadow-xs"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
-            >
-              <span>1 Year</span>
-              <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-500 text-white">50% OFF</span>
-            </button>
-          </div>
+        <div className="pb-2">
+          <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+            Complete Feature Set
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white mt-1">
+            How CustomerPilot Helps You Grow Your Business
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Every feature engineered to turn one-time shoppers into repeat loyal regulars and 5-star Google promoters.
+          </p>
         </div>
 
-        {/* 4 Professional Standalone Product Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {PRODUCT_MODULES.map((mod) => {
-            const pricing = getProductPrice(mod, selectedTenure)
-            const planRecord = pricing.plan
-
+        {/* 12 Feature Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          {FEATURE_GRID_ITEMS.map((item, idx) => {
+            const Icon = item.icon
             return (
               <div
-                key={mod.id}
-                className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-sm transition-all flex flex-col justify-between"
+                key={idx}
+                className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-sm transition flex flex-col justify-between"
               >
-                <div className="space-y-3">
-                  {/* Header with Icon & Badge */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 shrink-0">
-                        {getModuleIcon(mod.id, "w-5 h-5")}
-                      </div>
-                      <div>
-                        <Badge variant="outline" className="text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-none">
-                          {mod.badge}
-                        </Badge>
-                        <h4 className="text-base font-bold leading-tight mt-1 text-slate-900 dark:text-white">
-                          {mod.shortTitle}
-                        </h4>
-                      </div>
+                <div>
+                  <div className="flex items-center justify-between mb-3.5">
+                    {/* Vibrant Square Icon Container */}
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-xs ${item.color}`}>
+                      <Icon className="w-5 h-5 stroke-[2.2]" />
                     </div>
-                  </div>
-
-                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
-                    {mod.tagline}
-                  </p>
-
-                  {/* Features list */}
-                  <ul className="space-y-1.5 pt-1 text-[11px] text-slate-600 dark:text-slate-300">
-                    {mod.features.slice(0, 4).map((feat, fidx) => (
-                      <li key={fidx} className="flex items-center gap-1.5">
-                        <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        <span className="truncate">{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Price Tag & CTA Button */}
-                <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800/80 space-y-3">
-                  <div>
-                    <div className="flex items-baseline gap-2">
-                      {adminEditMode && planRecord ? (
-                        <div className="flex items-center gap-1">
-                          <span className="text-xs font-bold">₹</span>
-                          <Input
-                            type="number"
-                            value={planRecord.price}
-                            onChange={(e) => handlePlanChange(planRecord.planKey!, "price", Number(e.target.value))}
-                            className="w-20 h-7 text-xs font-black bg-white dark:bg-slate-900 text-emerald-600"
-                          />
-                        </div>
-                      ) : (
-                        <span className="text-2xl font-black text-slate-900 dark:text-white">
-                          ₹{pricing.price.toLocaleString("en-IN")}
-                        </span>
-                      )}
-
-                      {pricing.mrp && (
-                        adminEditMode && planRecord ? (
-                          <div className="flex items-center gap-1">
-                            <span className="text-[10px] text-slate-400">MRP:</span>
-                            <Input
-                              type="number"
-                              value={planRecord.originalPrice}
-                              onChange={(e) => handlePlanChange(planRecord.planKey!, "originalPrice", Number(e.target.value))}
-                              className="w-16 h-7 text-[11px] text-slate-400 bg-white dark:bg-slate-900"
-                            />
-                          </div>
-                        ) : (
-                          <span className="text-xs font-semibold text-slate-400 line-through font-mono">
-                            ₹{pricing.mrp.toLocaleString("en-IN")}
-                          </span>
-                        )
-                      )}
-                    </div>
-                    <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
-                      {selectedTenure === "6mo" ? "for 6 months (180 days)" : "for 1 year (365 days · 50% OFF)"}
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                      {item.tag}
                     </span>
                   </div>
-
-                  {mode === "public" ? (
-                    <Link href={`/signup?module=${mod.id}&tenure=${selectedTenure}`}>
-                      <Button variant="outline" className="w-full border-slate-300 hover:border-slate-900 hover:bg-slate-900 hover:text-white text-slate-900 font-bold text-xs h-9 rounded-xl transition cursor-pointer">
-                        Select {mod.shortTitle} →
-                      </Button>
-                    </Link>
-                  ) : mode === "merchant" ? (
-                    <Button
-                      onClick={() => {
-                        const p = pricing.plan
-                        if (p && onSelectPlan) onSelectPlan(p)
-                      }}
-                      variant="outline"
-                      className="w-full border-slate-300 hover:bg-slate-900 hover:text-white font-bold text-xs h-9 rounded-xl transition cursor-pointer"
-                    >
-                      Choose Plan
-                    </Button>
-                  ) : (
-                    <Button variant="outline" className="w-full text-xs font-medium h-9 rounded-xl">
-                      Active Module ✓
-                    </Button>
-                  )}
+                  <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-snug">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                    {item.desc}
+                  </p>
                 </div>
               </div>
             )
@@ -687,471 +660,307 @@ export function PricingStudio({
         </div>
       </section>
 
-      {/* ─── SECTION 2: ## Compare all tenures ─── */}
-      <section className="space-y-6 mb-16 pt-6 border-t border-slate-200/80 dark:border-slate-800/80">
-        <div className="text-center max-w-3xl mx-auto space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
-            <Layers className="w-3.5 h-3.5" /> Long-Term Value Multiplier
-          </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
-            CustomerPilot Complete Business Growth
+      {/* ─── SECTION 3: Standalone Modules Table (Highest Price First) ─── */}
+      <section className="space-y-4 mb-16">
+        <div className="pb-2">
+          <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+            Standalone modules
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white mt-1">
+            Or choose exactly what you need
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Compare 6 Months Semi-Annual &amp; 12 Months Annual Pro Suite — all 4 customer retention tools unified.
+            Add any module for 6 Months or 1 Year. Highest price first.
           </p>
         </div>
 
-        {/* Monthly Option Callout */}
-        <div className="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs max-w-4xl mx-auto text-indigo-950 dark:text-indigo-200">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
-            <span>
-              <strong>Also Available — Complete Monthly:</strong> <strong>₹449/mo</strong> (₹14.97/day · MRP <span className="line-through">₹898</span> · 50% OFF · Save ₹449). 6-Months saves ~7%/mo extra and 12-Months saves ~11%/mo extra!
-            </span>
+        {/* Responsive Table Container */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left min-w-[700px] border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-800 text-[11.5px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold bg-slate-50/60 dark:bg-slate-950/40">
+                  <th className="py-4 px-6 w-[45%]">Service</th>
+                  <th className="py-4 px-6 w-[27.5%]">6 Months</th>
+                  <th className="py-4 px-6 w-[27.5%]">1 Year</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
+                {STANDALONE_SERVICES.map((s) => {
+                  const dbPlan6 = getPlanByKey(s.planKey6Mo)
+                  const dbPlan1 = getPlanByKey(s.planKey1Yr)
+
+                  const p180 = dbPlan6?.price || s.p[180][0]
+                  const m180 = dbPlan6?.originalPrice || s.p[180][1]
+
+                  const p365 = dbPlan1?.price || s.p[365][0]
+                  const m365 = dbPlan1?.originalPrice || s.p[365][1]
+
+                  const isAdded180 = selectedStandalone[s.i] === 180
+                  const isAdded365 = selectedStandalone[s.i] === 365
+
+                  return (
+                    <tr key={s.i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition">
+                      {/* Service Info */}
+                      <td className="py-5 px-6 align-top">
+                        <div className="flex items-start gap-3.5">
+                          {/* Vibrant Icon Box */}
+                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${s.iconBg}`}>
+                            {s.i === "loyalty" && <Gift className="w-5 h-5" />}
+                            {s.i === "star" && <Star className="w-5 h-5" />}
+                            {s.i === "chat" && <MessageSquare className="w-5 h-5" />}
+                            {s.i === "card" && <CreditCard className="w-5 h-5" />}
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-snug">
+                              {s.n}
+                            </h4>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                              {s.t}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* 6 Months Cell */}
+                      <td className="py-5 px-6 align-top">
+                        <div className="space-y-1">
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-xl font-extrabold text-slate-900 dark:text-white">
+                              {inr(p180)}
+                            </span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                              {dy(p180, 180)}
+                            </span>
+                          </div>
+                          <div className="text-xs text-slate-400 flex items-center gap-1.5">
+                            <s>{inr(m180)}</s>
+                            <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                              {off(p180, m180)}% OFF
+                            </span>
+                          </div>
+                          <div className="pt-2">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleStandalone(s.i, 180)}
+                              className={`text-xs font-semibold px-4 py-1.5 rounded-lg border transition cursor-pointer ${
+                                isAdded180
+                                  ? "bg-indigo-600 border-indigo-600 text-white shadow-xs"
+                                  : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600"
+                              }`}
+                            >
+                              {isAdded180 ? "✓ Added" : "Add"}
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* 1 Year Cell */}
+                      <td className="py-5 px-6 align-top">
+                        <div className="space-y-1">
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-xl font-extrabold text-slate-900 dark:text-white">
+                              {inr(p365)}
+                            </span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                              {dy(p365, 365)}
+                            </span>
+                          </div>
+                          <div className="text-xs text-slate-400 flex items-center gap-1.5">
+                            <s>{inr(m365)}</s>
+                            <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                              {off(p365, m365)}% OFF
+                            </span>
+                          </div>
+                          <div className="pt-2">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleStandalone(s.i, 365)}
+                              className={`text-xs font-semibold px-4 py-1.5 rounded-lg border transition cursor-pointer ${
+                                isAdded365
+                                  ? "bg-indigo-600 border-indigo-600 text-white shadow-xs"
+                                  : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600"
+                              }`}
+                            >
+                              {isAdded365 ? "✓ Added" : "Add"}
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+
+                {/* ─── ROW 5: TOTAL (4 Standalone Services) ─── */}
+                <tr className="bg-slate-50 dark:bg-slate-950/60 font-semibold border-t-2 border-slate-200 dark:border-slate-800">
+                  <td className="py-5 px-6">
+                    <div className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">
+                      Total · 4 standalone services
+                    </div>
+                  </td>
+                  <td className="py-5 px-6">
+                    <div className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
+                      {inr(standaloneTot(180))} <span className="text-xs font-normal text-slate-500">{dy(standaloneTot(180), 180)}</span>
+                    </div>
+                    <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
+                      <s>{inr(standaloneMrpTot(180))}</s>
+                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                        Save {inr(standaloneMrpTot(180) - standaloneTot(180))}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-5 px-6">
+                    <div className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
+                      {inr(standaloneTot(365))} <span className="text-xs font-normal text-slate-500">{dy(standaloneTot(365), 365)}</span>
+                    </div>
+                    <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
+                      <s>{inr(standaloneMrpTot(365))}</s>
+                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                        Save {inr(standaloneMrpTot(365) - standaloneTot(365))}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+
+                {/* ─── ROW 6: CustomerPilot Complete Comparison ─── */}
+                <tr className="bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-50/60">
+                  <td className="py-5 px-6">
+                    <div className="font-bold text-indigo-900 dark:text-indigo-300 text-sm sm:text-base">
+                      CustomerPilot Complete
+                    </div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      All-in-one platform
+                    </div>
+                  </td>
+                  <td className="py-5 px-6">
+                    <div className="text-lg sm:text-xl font-black text-indigo-700 dark:text-indigo-300">
+                      {inr(COMPLETE_TIERS[1].s)} <span className="text-xs font-normal text-slate-500">{dy(COMPLETE_TIERS[1].s, 180)}</span>
+                    </div>
+                    <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
+                      <s>{inr(COMPLETE_TIERS[1].m)}</s>
+                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                        {off(COMPLETE_TIERS[1].s, COMPLETE_TIERS[1].m)}% OFF
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-5 px-6">
+                    <div className="text-lg sm:text-xl font-black text-indigo-700 dark:text-indigo-300">
+                      {inr(COMPLETE_TIERS[2].s)} <span className="text-xs font-normal text-slate-500">{dy(COMPLETE_TIERS[2].s, 365)}</span>
+                    </div>
+                    <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
+                      <s>{inr(COMPLETE_TIERS[2].m)}</s>
+                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                        {off(COMPLETE_TIERS[2].s, COMPLETE_TIERS[2].m)}% OFF
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <Link href="/signup?tenure=monthly" className="shrink-0 font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
-            Choose Monthly →
-          </Link>
         </div>
 
-        {/* 2 Complete Plans Grid */}
-        <div className="grid md:grid-cols-2 max-w-4xl mx-auto gap-6 sm:gap-8 pt-4">
-          {/* Card 1: 6 Months Complete (₹2,499) */}
-          <Card className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 transition-all p-6 sm:p-7 flex flex-col justify-between shadow-xs">
-            <div className="space-y-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Badge variant="outline" className="text-[10px] font-bold border-indigo-200 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">
-                    Best Value
-                  </Badge>
-                  <h3 className="text-xl font-black mt-1 text-slate-900 dark:text-white">6 Months Complete</h3>
-                </div>
-                <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50">
-                  <Calendar className="w-5 h-5" />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">₹2,499</span>
-                  <span className="text-sm text-slate-400 line-through font-mono">₹4,998</span>
-                </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  ₹13.88/day (MRP ₹27.77/day) · ~₹417/mo · 180 days
-                </p>
-                <span className="inline-block mt-2 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  50% OFF · Save ₹2,499 (~7% sasta/mo)
-                </span>
-              </div>
-
-              <div className="space-y-2.5 pt-3 border-t border-slate-200/70 dark:border-slate-800/70 text-xs">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Complete Suite Inclusions:</p>
-                <ul className="space-y-2 text-slate-600 dark:text-slate-300">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span>Up to 1,000 VIP Customers</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span>180-Day WhatsApp Automations</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span>AI Google Reviews &amp; AutoReply</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span>WhatsApp Digital Loyalty Stamp Cards</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span>Printable Counter QR Code Display</span>
-                  </li>
-                </ul>
-              </div>
+        {/* ─── Lifetime Deal Card (Extracted from CustomerPilot_Pricing.html) ─── */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
+          <div className="flex items-center gap-3.5 text-left w-full sm:w-auto">
+            <div className="w-11 h-11 rounded-xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-xs">
+              <CreditCard className="w-5 h-5" />
             </div>
-
-            <div className="pt-6">
-              <Link href="/signup?plan=growth_180">
-                <Button
-                  variant="outline"
-                  className="w-full font-bold text-xs h-11 rounded-xl border-slate-300 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition cursor-pointer"
-                >
-                  Choose 6 Months
-                </Button>
-              </Link>
+            <div>
+              <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
+                Lifetime Deal · Smart Digital Business Card
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Pay once. Zero renewal fees forever.
+              </p>
             </div>
-          </Card>
-
-          {/* Card 2: 12 Months Complete (₹4,788) */}
-          <Card className="rounded-2xl border-2 border-indigo-600 dark:border-indigo-500 bg-white dark:bg-slate-900 shadow-md relative p-6 sm:p-7 flex flex-col justify-between">
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-              <span className="bg-indigo-600 text-white font-bold text-[10px] tracking-wider uppercase px-3.5 py-1 rounded-full shadow-sm flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3" />
-                <span>12 MONTHS · ANNUAL PRO SUITE</span>
+          </div>
+          <div className="text-right w-full sm:w-auto flex sm:flex-col items-center sm:items-end justify-between sm:justify-center">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                {inr(1499)}
+              </span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">
+                (₹0.41/day)
               </span>
             </div>
+            <div className="text-xs text-slate-400 flex items-center gap-1.5">
+              <s>{inr(3999)}</s>
+              <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                62% OFF
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="space-y-5">
-              <div className="flex items-center justify-between pt-1">
-                <div>
-                  <Badge className="bg-amber-500 text-white font-extrabold text-[10px]">
-                    Annual Scaling (365 Days)
-                  </Badge>
-                  <h3 className="text-xl font-black mt-1 text-slate-900 dark:text-white">12 Months Complete</h3>
-                </div>
-                <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/50">
-                  <Crown className="w-5 h-5" />
-                </div>
-              </div>
+      {/* ─── CTA Banner ─── */}
+      <section className="rounded-3xl p-8 sm:p-12 text-center text-white bg-[#17105a] relative overflow-hidden my-12"
+               style={{ background: "radial-gradient(500px 220px at 80% -20%, rgba(255,255,255,.2), transparent), linear-gradient(135deg, #17105a, #4f46e5)" }}>
+        <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">
+          Ready to turn customers into regulars?
+        </h2>
+        <p className="text-white/80 text-sm sm:text-base max-w-lg mx-auto mb-6">
+          Start with one module, upgrade to Complete anytime.
+        </p>
+        <Link href="/signup">
+          <button
+            type="button"
+            className="bg-white hover:bg-slate-100 text-indigo-900 font-bold text-sm sm:text-base rounded-xl py-3 px-8 shadow-md transition cursor-pointer"
+          >
+            Get started today →
+          </button>
+        </Link>
+      </section>
 
-              <div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-black text-indigo-600 dark:text-indigo-400">₹4,788</span>
-                  <span className="text-sm text-slate-400 line-through font-mono">₹9,576</span>
-                </div>
-                <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold mt-1">
-                  ₹13.12/day (MRP ₹26.23/day) · ~₹399/mo · 365 days
-                </p>
-                <span className="inline-block mt-2 text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  50% OFF · Save ₹4,788 (~11% sasta/mo)
+      {/* Footnote */}
+      <div className="text-center text-xs text-slate-400 pb-16">
+        All prices in INR. Per-day cost = price ÷ plan days (Lifetime: 3,650 days).
+      </div>
+
+      {/* ─── Sticky Floating Bottom Selection Bar ─── */}
+      <AnimatePresence>
+        {selectedList.length > 0 && (
+          <motion.div
+            initial={{ y: 80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 80, opacity: 0 }}
+            className="fixed left-0 right-0 bottom-0 z-50 p-3 sm:p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 shadow-2xl"
+          >
+            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 px-2">
+              <div className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                <span className="font-bold text-slate-900 dark:text-white">
+                  {selectedList.length} selected
+                </span>
+                <span>·</span>
+                <span className="text-lg sm:text-xl font-extrabold text-indigo-600 dark:text-indigo-400">
+                  {inr(selectedTotalSum)}
+                </span>
+                <span className="text-xs text-slate-500">
+                  (₹{selectedPerDaySum.toFixed(2)}/day)
                 </span>
               </div>
 
-              <div className="space-y-2.5 pt-3 border-t border-slate-200/70 dark:border-slate-800/70 text-xs">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Everything in 6 Mo, Plus:</p>
-                <ul className="space-y-2 text-slate-700 dark:text-slate-200">
-                  <li className="flex items-center gap-2 font-semibold">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                    <span>Up to 2,500 VIP Customers Capacity</span>
-                  </li>
-                  <li className="flex items-center gap-2 font-semibold">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                    <span>365-Day Continuous Automation (Zero Pauses)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                    <span>VIP Customer CRM &amp; CSV Export</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                    <span>Custom High-Resolution Counter QR Code</span>
-                  </li>
-                  <li className="flex items-center gap-2 font-semibold text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span>Priority WhatsApp VIP Line (+91 90333 04707)</span>
-                  </li>
-                </ul>
+              <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={handleClearStandalone}
+                  className="text-xs font-semibold px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCheckoutStandalone}
+                  className="bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition cursor-pointer"
+                >
+                  Continue →
+                </button>
               </div>
             </div>
-
-            <div className="pt-6">
-              <Link href="/signup?plan=enterprise_365">
-                <Button
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-11 rounded-xl shadow-sm transition cursor-pointer"
-                >
-                  Choose 12 Months (Save 50%)
-                </Button>
-              </Link>
-            </div>
-          </Card>
-        </div>
-      </section>
-
-      {/* ─── SECTION 3: ## Standalone services — 6 Months & 1 Year (with total) ─── */}
-      <section className="space-y-6 mb-16 pt-6 border-t border-slate-200/80 dark:border-slate-800/80">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold mb-2">
-              <CheckSquare className="w-3.5 h-3.5" /> Granular Transparency
-            </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight">
-              Standalone services — 6 Months &amp; 1 Year (with total)
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Need only one specific tool? Pick exactly what you need, or see how much you save with CustomerPilot Complete.
-            </p>
-          </div>
-
-          {/* Sub-filter for standalone cards */}
-          <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-            <button
-              type="button"
-              onClick={() => setStandaloneTenureFilter("all")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                standaloneTenureFilter === "all" ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs" : "text-slate-500"
-              }`}
-            >
-              Side-by-Side Comparison
-            </button>
-            <button
-              type="button"
-              onClick={() => setStandaloneTenureFilter("6mo")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                standaloneTenureFilter === "6mo" ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs" : "text-slate-500"
-              }`}
-            >
-              6 Months Only
-            </button>
-            <button
-              type="button"
-              onClick={() => setStandaloneTenureFilter("1year")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                standaloneTenureFilter === "1year" ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs" : "text-slate-500"
-              }`}
-            >
-              1 Year Only
-            </button>
-          </div>
-        </div>
-
-        {/* Master Comparison Table */}
-        <div className="overflow-x-auto rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl bg-white dark:bg-slate-950">
-          <table className="w-full text-left border-collapse min-w-[840px]">
-            <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90 text-slate-700 dark:text-slate-200">
-                <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider w-[36%]">Standalone Service &amp; Core Engine</th>
-                <th className="p-4 text-center text-xs font-bold uppercase tracking-wider w-[24%]">
-                  6 Months Plan
-                </th>
-                <th className="p-4 text-center text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 w-[24%]">
-                  1 Year Plan (50% OFF)
-                </th>
-                <th className="p-4 text-center text-xs font-bold uppercase tracking-wider w-[16%]">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs sm:text-sm">
-              {PRODUCT_MODULES.map((mod) => {
-                const plan6 = getPlanByKey(mod.planKey6Mo)
-                const plan1 = getPlanByKey(mod.planKey1Yr)
-
-                const price6 = plan6 ? plan6.price : mod.defaultPrice6Mo
-                const mrp6 = plan6?.originalPrice || mod.defaultMrp6Mo
-                const price1 = plan1 ? plan1.price : mod.defaultPrice1Yr
-                const mrp1 = plan1?.originalPrice || mod.defaultMrp1Yr
-
-                const daily6 = (price6 / 180).toFixed(1)
-                const daily1 = (price1 / 365).toFixed(1)
-
-                return (
-                  <tr key={mod.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-900/50 transition">
-                    <td className="p-4 sm:p-5">
-                      <div className="flex items-start gap-3">
-                        <div className="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 shrink-0">
-                          {getModuleIcon(mod.id, "w-5 h-5")}
-                        </div>
-                        <div>
-                          <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                            <span>{mod.name}</span>
-                            <Badge variant="outline" className="text-[10px] hidden sm:inline-block">
-                              {mod.badge}
-                            </Badge>
-                          </div>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                            {mod.tagline}
-                          </p>
-                          {mod.id === "card" && (
-                            <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold flex items-center gap-1 mt-1">
-                              <Zap className="w-3 h-3" />
-                              <span>Lifetime Deal also available: ₹1,499 one-time</span>
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* 6 Months Cell */}
-                    <td className="p-4 text-center">
-                      {adminEditMode && plan6 ? (
-                        <div className="space-y-1 max-w-[120px] mx-auto">
-                          <Input
-                            type="number"
-                            value={plan6.price}
-                            onChange={(e) => handlePlanChange(plan6.planKey!, "price", Number(e.target.value))}
-                            className="h-7 text-xs font-black text-center text-emerald-600 dark:text-emerald-400 bg-slate-50 dark:bg-slate-900"
-                          />
-                          <span className="text-[10px] text-slate-400">MRP: ₹{mrp6}</span>
-                        </div>
-                      ) : (
-                        <div>
-                          <div className="flex items-baseline justify-center gap-1.5">
-                            <span className="text-base font-black text-slate-900 dark:text-white">₹{price6}</span>
-                            <span className="text-xs text-slate-400 line-through font-mono">₹{mrp6}</span>
-                          </div>
-                          <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">
-                            ₹{daily6}/day · 180 days
-                          </span>
-                        </div>
-                      )}
-                    </td>
-
-                    {/* 1 Year Cell */}
-                    <td className="p-4 text-center bg-amber-50/30 dark:bg-amber-950/15">
-                      {adminEditMode && plan1 ? (
-                        <div className="space-y-1 max-w-[120px] mx-auto">
-                          <Input
-                            type="number"
-                            value={plan1.price}
-                            onChange={(e) => handlePlanChange(plan1.planKey!, "price", Number(e.target.value))}
-                            className="h-7 text-xs font-black text-center text-amber-600 dark:text-amber-400 bg-slate-50 dark:bg-slate-900"
-                          />
-                          <span className="text-[10px] text-slate-400">MRP: ₹{mrp1}</span>
-                        </div>
-                      ) : (
-                        <div>
-                          <div className="flex items-baseline justify-center gap-1.5">
-                            <span className="text-base font-black text-amber-700 dark:text-amber-400">₹{price1}</span>
-                            <span className="text-xs text-slate-400 line-through font-mono">₹{mrp1}</span>
-                          </div>
-                          <span className="text-[11px] font-bold text-amber-800 dark:text-amber-300 block mt-0.5">
-                            ₹{daily1}/day · 365 days
-                          </span>
-                          <span className="inline-block mt-1 text-[9px] font-black uppercase px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
-                            50% OFF Locked
-                          </span>
-                        </div>
-                      )}
-                    </td>
-
-                    {/* Action Button */}
-                    <td className="p-4 text-center">
-                      {mode === "public" ? (
-                        <Link href={`/signup?module=${mod.id}`}>
-                          <Button size="sm" variant="outline" className="text-xs font-bold rounded-xl h-8 px-3 cursor-pointer">
-                            Select →
-                          </Button>
-                        </Link>
-                      ) : mode === "merchant" ? (
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            const p = plan1 || plan6
-                            if (p && onSelectPlan) onSelectPlan(p)
-                          }}
-                          className="bg-slate-900 dark:bg-indigo-600 text-white font-bold text-xs rounded-xl h-8 px-3 cursor-pointer"
-                        >
-                          Select
-                        </Button>
-                      ) : (
-                        <Button size="sm" variant="ghost" className="text-xs font-semibold h-8 text-slate-400">
-                          Active ✓
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                )
-              })}
-
-              {/* ─── STANDALONE SERVICES ROW TOTAL ─── */}
-              <tr className="bg-slate-100/80 dark:bg-slate-900/90 font-black border-t-2 border-slate-300 dark:border-slate-700">
-                <td className="p-4 sm:p-5">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
-                      <Layers className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-slate-900 dark:text-white uppercase tracking-wider text-xs">
-                        TOTAL (4 Standalone Services)
-                      </div>
-                      <span className="text-[11px] text-slate-500 font-normal">
-                        Combined sum of all 4 standalone modules (Card + Reviews + AutoReply + Loyalty)
-                      </span>
-                    </div>
-                  </div>
-                </td>
-                <td className="p-4 text-center">
-                  <div className="text-base font-black text-slate-900 dark:text-white">
-                    ₹2,246
-                  </div>
-                  <span className="text-[11px] text-slate-400 line-through font-mono">MRP ₹4,495</span>
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block font-bold mt-0.5">
-                    ₹12.48/day · Save ₹2,249 (50%)
-                  </span>
-                </td>
-                <td className="p-4 text-center bg-amber-100/50 dark:bg-amber-950/30">
-                  <div className="text-base font-black text-amber-700 dark:text-amber-400">
-                    ₹3,396
-                  </div>
-                  <span className="text-[11px] text-slate-400 line-through font-mono">MRP ₹6,995</span>
-                  <span className="text-[10px] text-amber-700 dark:text-amber-300 block font-bold mt-0.5">
-                    ₹9.30/day · Save ₹3,599 (~51%)
-                  </span>
-                </td>
-                <td className="p-4 text-center text-xs text-slate-400 font-normal">
-                  Sum Total
-                </td>
-              </tr>
-
-              {/* ─── COMPLETE BUNDLE COMPARISON ROW ─── */}
-              <tr className="bg-gradient-to-r from-emerald-500/10 via-amber-500/10 to-indigo-500/10 dark:from-emerald-950/30 dark:via-amber-950/30 dark:to-indigo-950/30 border-2 border-indigo-500/50">
-                <td className="p-4 sm:p-5">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 shrink-0">
-                      <Sparkles className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="text-indigo-700 dark:text-indigo-400 font-black text-sm sm:text-base flex items-center gap-2">
-                        <span>CustomerPilot Complete All-in-One Engine</span>
-                        <Badge className="bg-indigo-600 text-white text-[10px]">ALL-IN-ONE ENGINE</Badge>
-                      </div>
-                      <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
-                        Unified Dashboard + Loyalty Stamps + AI Reviews + 1-Click AutoReply + VIP QR + Direct GBP Sync
-                      </span>
-                    </div>
-                  </div>
-                </td>
-                <td className="p-4 text-center">
-                  <div className="text-lg font-black text-indigo-700 dark:text-indigo-400">
-                    ₹2,499
-                  </div>
-                  <span className="text-[11px] text-slate-400 line-through font-mono">MRP ₹4,998</span>
-                  <span className="text-[10px] text-indigo-700 dark:text-indigo-300 font-bold block mt-0.5">
-                    ₹13.88/day · ~₹417/mo
-                  </span>
-                  <span className="text-[9px] text-slate-500 block font-semibold mt-1">
-                    Complete ₹253 difference (Premium Unified Engine)
-                  </span>
-                </td>
-                <td className="p-4 text-center bg-indigo-500/15 dark:bg-indigo-950/40">
-                  <div className="text-xl font-black text-indigo-700 dark:text-indigo-400">
-                    ₹4,788
-                  </div>
-                  <span className="text-[11px] text-slate-400 line-through font-mono">MRP ₹9,576</span>
-                  <span className="text-[10px] font-black text-indigo-700 dark:text-indigo-300 block mt-0.5">
-                    ₹13.12/day · ~₹399/mo (50% OFF)
-                  </span>
-                  <span className="text-[9px] text-slate-500 block font-semibold mt-1">
-                    Complete ₹1,392 difference (Enterprise Multi-Tool Synergies)
-                  </span>
-                </td>
-                <td className="p-4 text-center">
-                  {mode === "public" ? (
-                    <Link href="/signup">
-                      <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl h-9 px-4 shadow-md cursor-pointer">
-                        Get Suite →
-                      </Button>
-                    </Link>
-                  ) : mode === "merchant" ? (
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        if (complete1YrPlan && onSelectPlan) onSelectPlan(complete1YrPlan)
-                      }}
-                      className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl h-9 px-4 shadow-md cursor-pointer"
-                    >
-                      Choose Suite
-                    </Button>
-                  ) : (
-                    <Badge className="bg-indigo-600 text-white text-[10px]">
-                      Best Seller
-                    </Badge>
-                  )}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
