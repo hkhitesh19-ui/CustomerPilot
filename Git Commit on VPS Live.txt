@@ -8,18 +8,19 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 05768d4
-Full Commit Hash  : 05768d43a67f22c24e4544bfd4c9c3789883f78e
-Target Fix Commit : 05768d4 (05768d43a67f22c24e4544bfd4c9c3789883f78e)
+Active Git Commit : 2034ced
+Full Commit Hash  : 2034cedae75d6a638e7b7310611406f12fcbffe5
+Target Fix Commit : 2034ced (2034cedae75d6a638e7b7310611406f12fcbffe5)
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 11 Oct 2026, 10:38 AM IST
-Commit Title      : feat(pricing): prominently display Main Price (MRP) alongside 50% Offer Price across /pricing and /dashboard/subscription
+Deployment Date   : 11 Oct 2026, 04:06 PM IST
+Commit Title      : feat(seo): expand sitemap.xml (40 -> 47 URLs) and robots.txt with guides, register, and live digital cards
 Status            : Active & Running Live on VPS
 PM2 Services      : customerpilot-web (Online), customerpilot-cron (Online)
 ----------------------------------------------------------
 
 Deployment History Log:
 ----------------------------------------------------------
+• [11 Oct 2026, 04:06 PM IST] Commit 2034ced - Expanded sitemap.xml (40 -> 47 Public URLs) & robots.txt with 5-Minute Setup Guide, Operations Manual, /register, and 4 Official Smart Digital Business Cards (/c/[slug])
 • [11 Oct 2026, 10:38 AM IST] Commit 05768d4 (includes 3d42b29, 1d1a9f8, 8223cbc, b348bc7) - Prominently display Main Price (MRP) alongside 50% Offer Price, Big 50% OFF Banner, Standalone Razorpay Checkout & Windows OAuth SSL Fix
 • [08 Oct 2026, 10:50 AM IST] Commit 4d18f0d (includes 2f5f194, 460dd94) - Google Review +2 Photo Bonus Highlight Banner, 3-Angle AI Review Engine, 10-Category SEO Fallbacks, Native Contact Save & 5 SuperAdmin Ordering Channels
 • [07 Oct 2026, 11:58 PM IST] Commit 3d97049 - Smart AI Review Page 504 Timeout Resolution & Complete Merchant Digital Card Builder Form Integration
