@@ -499,7 +499,7 @@ export function PricingStudio({
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-xl leading-relaxed">
                     Complete WhatsApp Loyalty, Smart AI Google Reviews &amp; 1-Click AutoReply.{" "}
-                    Original MRP ₹4,499 ➔ <span className="text-emerald-700 dark:text-emerald-400 font-bold">Now ₹2,249/yr</span> (₹6.1/day). Standalone from <span className="text-amber-700 dark:text-amber-400 font-bold">₹799/yr</span> (₹2.1/day).
+                    <span className="font-extrabold text-slate-700 dark:text-slate-200">Main Price:</span> <span className="font-extrabold text-slate-500 dark:text-slate-400 line-through decoration-rose-500 decoration-2">₹6,998/yr</span> ➔ <span className="text-emerald-700 dark:text-emerald-400 font-extrabold">Offer Price: ₹3,499/yr</span> (₹9.59/day). Standalone <span className="font-extrabold text-slate-500 dark:text-slate-400 line-through decoration-rose-500 decoration-2">₹1,199/yr</span> ➔ <span className="text-amber-700 dark:text-amber-400 font-extrabold">₹499/yr</span> (₹1.37/day).
                   </p>
                 </div>
               </div>
@@ -614,23 +614,41 @@ export function PricingStudio({
                 })}
               </div>
 
-              {/* Price & Daily Cost */}
-              <div className="flex items-baseline gap-2.5 flex-wrap">
-                <span className="text-4xl sm:text-6xl font-black tracking-tight drop-shadow-sm">
-                  {inr(completePrice)}
-                </span>
-                <span className="text-sm sm:text-base font-semibold text-cyan-100/90">
-                  {dy(completePrice, completeDays)}
-                </span>
+              {/* Main Price (MRP) & 50% OFF Offer Price */}
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 bg-slate-950/35 border border-white/20 rounded-xl px-3.5 py-1.5 backdrop-blur-xs">
+                  <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-amber-300">
+                    Main Price:
+                  </span>
+                  <span className="text-lg sm:text-2xl font-extrabold text-white/90 line-through decoration-rose-400 decoration-2">
+                    {inr(completeMrp)}
+                  </span>
+                  <span className="text-xs font-semibold text-white/75">
+                    {dy(completeMrp, completeDays)}
+                  </span>
+                </div>
+
+                <div className="flex items-baseline gap-2.5 flex-wrap">
+                  <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-300 bg-emerald-950/50 border border-emerald-400/40 px-2.5 py-1 rounded-lg self-center">
+                    50% Offer Price:
+                  </span>
+                  <span className="text-4xl sm:text-6xl font-black tracking-tight drop-shadow-sm text-white">
+                    {inr(completePrice)}
+                  </span>
+                  <span className="text-sm sm:text-base font-semibold text-cyan-100/95">
+                    {dy(completePrice, completeDays)}
+                  </span>
+                </div>
               </div>
 
               {/* MRP & Savings Strip */}
               <div className="flex items-center gap-2.5 flex-wrap mt-2.5 text-xs sm:text-sm">
-                <s className="text-white/70">{inr(completeMrp)} {dy(completeMrp, completeDays)}</s>
-                <span className="bg-emerald-400 text-slate-950 font-black text-xs rounded-full px-2.5 py-0.5 shadow-xs">
-                  {off(completePrice, completeMrp)}% OFF
+                <span className="bg-emerald-400 text-slate-950 font-black text-xs rounded-full px-3 py-0.5 shadow-xs">
+                  FLAT {off(completePrice, completeMrp)}% OFF
                 </span>
-                <span className="text-white/95 font-medium">You save {inr(completeMrp - completePrice)}</span>
+                <span className="text-white font-bold bg-white/15 px-3 py-0.5 rounded-full">
+                  Instant Savings: {inr(completeMrp - completePrice)}
+                </span>
               </div>
 
               {/* Included Items 2x2 Grid */}
@@ -696,6 +714,8 @@ export function PricingStudio({
               <div className="space-y-4">
                 {COMPLETE_TIERS.map((tier, idx) => {
                   const monthlyVal = effectiveMonthlyCosts[idx]
+                  const dbP = getPlanByKey(tier.planKey)
+                  const mrpMonthlyVal = (dbP?.originalPrice || tier.m) / (tier.d / 30)
                   const pct = Math.round((monthlyVal / maxMonthlyCost) * 100)
                   const isSelected = activeCompleteIndex === idx
 
@@ -709,9 +729,14 @@ export function PricingStudio({
                         <span className={`font-semibold transition-colors ${isSelected ? "text-cyan-600 dark:text-cyan-400 font-bold" : "text-slate-800 dark:text-slate-200 group-hover:text-cyan-600"}`}>
                           {tier.t} {isSelected && "✓"}
                         </span>
-                        <span className="font-bold text-slate-600 dark:text-slate-300">
-                          {inr(monthlyVal)} / month
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-400 line-through decoration-rose-500 decoration-2">
+                            {inr(mrpMonthlyVal)}/mo
+                          </span>
+                          <span className="font-extrabold text-slate-900 dark:text-white">
+                            {inr(monthlyVal)} / month
+                          </span>
+                        </div>
                       </div>
                       <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div
@@ -757,9 +782,9 @@ export function PricingStudio({
             <table className="w-full text-left min-w-[700px] border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 text-[11.5px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold bg-slate-50/60 dark:bg-slate-950/40">
-                  <th className="py-4 px-6 w-[45%]">Service</th>
-                  <th className="py-4 px-6 w-[27.5%]">6 Months</th>
-                  <th className="py-4 px-6 w-[27.5%]">1 Year</th>
+                  <th className="py-4 px-6 w-[43%]">Service</th>
+                  <th className="py-4 px-6 w-[28.5%]">6 Months (Main vs Offer Price)</th>
+                  <th className="py-4 px-6 w-[28.5%]">1 Year (Main vs Offer Price)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
@@ -801,22 +826,30 @@ export function PricingStudio({
 
                       {/* 6 Months Cell */}
                       <td className="py-5 px-6 align-top">
-                        <div className="space-y-1">
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-xl font-extrabold text-slate-900 dark:text-white">
-                              {inr(p180)}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                              Main Price:
                             </span>
-                            <span className="text-xs text-slate-500 dark:text-slate-400">
-                              {dy(p180, 180)}
+                            <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
+                              {inr(m180)}
                             </span>
-                          </div>
-                          <div className="text-xs text-slate-400 flex items-center gap-1.5">
-                            <s>{inr(m180)}</s>
-                            <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                            <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
                               {off(p180, m180)}% OFF
                             </span>
                           </div>
-                          <div className="pt-2">
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                              Offer:
+                            </span>
+                            <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                              {inr(p180)}
+                            </span>
+                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                              {dy(p180, 180)}
+                            </span>
+                          </div>
+                          <div className="pt-1.5">
                             <button
                               type="button"
                               onClick={() => handleToggleStandalone(s.i, 180)}
@@ -834,22 +867,30 @@ export function PricingStudio({
 
                       {/* 1 Year Cell */}
                       <td className="py-5 px-6 align-top">
-                        <div className="space-y-1">
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-xl font-extrabold text-slate-900 dark:text-white">
-                              {inr(p365)}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                              Main Price:
                             </span>
-                            <span className="text-xs text-slate-500 dark:text-slate-400">
-                              {dy(p365, 365)}
+                            <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
+                              {inr(m365)}
                             </span>
-                          </div>
-                          <div className="text-xs text-slate-400 flex items-center gap-1.5">
-                            <s>{inr(m365)}</s>
-                            <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                            <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
                               {off(p365, m365)}% OFF
                             </span>
                           </div>
-                          <div className="pt-2">
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                              Offer:
+                            </span>
+                            <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                              {inr(p365)}
+                            </span>
+                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                              {dy(p365, 365)}
+                            </span>
+                          </div>
+                          <div className="pt-1.5">
                             <button
                               type="button"
                               onClick={() => handleToggleStandalone(s.i, 365)}
@@ -875,26 +916,32 @@ export function PricingStudio({
                       Total · 4 standalone services
                     </div>
                   </td>
-                  <td className="py-5 px-6">
-                    <div className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
-                      {inr(standaloneTot(180))} <span className="text-xs font-normal text-slate-500">{dy(standaloneTot(180), 180)}</span>
-                    </div>
-                    <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
-                      <s>{inr(standaloneMrpTot(180))}</s>
-                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                  <td className="py-5 px-6 space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[11px] font-bold uppercase text-slate-500">Main Total:</span>
+                      <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
+                        {inr(standaloneMrpTot(180))}
+                      </span>
+                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.5 rounded-full">
                         Save {inr(standaloneMrpTot(180) - standaloneTot(180))}
                       </span>
                     </div>
-                  </td>
-                  <td className="py-5 px-6">
                     <div className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
-                      {inr(standaloneTot(365))} <span className="text-xs font-normal text-slate-500">{dy(standaloneTot(365), 365)}</span>
+                      Offer: {inr(standaloneTot(180))} <span className="text-xs font-normal text-slate-500">{dy(standaloneTot(180), 180)}</span>
                     </div>
-                    <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
-                      <s>{inr(standaloneMrpTot(365))}</s>
-                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                  </td>
+                  <td className="py-5 px-6 space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[11px] font-bold uppercase text-slate-500">Main Total:</span>
+                      <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
+                        {inr(standaloneMrpTot(365))}
+                      </span>
+                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.5 rounded-full">
                         Save {inr(standaloneMrpTot(365) - standaloneTot(365))}
                       </span>
+                    </div>
+                    <div className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
+                      Offer: {inr(standaloneTot(365))} <span className="text-xs font-normal text-slate-500">{dy(standaloneTot(365), 365)}</span>
                     </div>
                   </td>
                 </tr>
@@ -909,26 +956,32 @@ export function PricingStudio({
                       All-in-one platform
                     </div>
                   </td>
-                  <td className="py-5 px-6">
-                    <div className="text-lg sm:text-xl font-black text-indigo-700 dark:text-indigo-300">
-                      {inr(COMPLETE_TIERS[1].s)} <span className="text-xs font-normal text-slate-500">{dy(COMPLETE_TIERS[1].s, 180)}</span>
-                    </div>
-                    <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
-                      <s>{inr(COMPLETE_TIERS[1].m)}</s>
-                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                  <td className="py-5 px-6 space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[11px] font-bold uppercase text-slate-500">Main Price:</span>
+                      <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
+                        {inr(COMPLETE_TIERS[1].m)}
+                      </span>
+                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.5 rounded-full">
                         {off(COMPLETE_TIERS[1].s, COMPLETE_TIERS[1].m)}% OFF
                       </span>
                     </div>
-                  </td>
-                  <td className="py-5 px-6">
                     <div className="text-lg sm:text-xl font-black text-indigo-700 dark:text-indigo-300">
-                      {inr(COMPLETE_TIERS[2].s)} <span className="text-xs font-normal text-slate-500">{dy(COMPLETE_TIERS[2].s, 365)}</span>
+                      Offer: {inr(COMPLETE_TIERS[1].s)} <span className="text-xs font-normal text-slate-500">{dy(COMPLETE_TIERS[1].s, 180)}</span>
                     </div>
-                    <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
-                      <s>{inr(COMPLETE_TIERS[2].m)}</s>
-                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
+                  </td>
+                  <td className="py-5 px-6 space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[11px] font-bold uppercase text-slate-500">Main Price:</span>
+                      <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
+                        {inr(COMPLETE_TIERS[2].m)}
+                      </span>
+                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.5 rounded-full">
                         {off(COMPLETE_TIERS[2].s, COMPLETE_TIERS[2].m)}% OFF
                       </span>
+                    </div>
+                    <div className="text-lg sm:text-xl font-black text-indigo-700 dark:text-indigo-300">
+                      Offer: {inr(COMPLETE_TIERS[2].s)} <span className="text-xs font-normal text-slate-500">{dy(COMPLETE_TIERS[2].s, 365)}</span>
                     </div>
                   </td>
                 </tr>
@@ -952,20 +1005,28 @@ export function PricingStudio({
               </p>
             </div>
           </div>
-          <div className="text-right w-full sm:w-auto flex flex-col sm:flex-row items-center sm:items-center justify-between sm:justify-end gap-3.5">
-            <div className="flex sm:flex-col items-baseline sm:items-end justify-between w-full sm:w-auto gap-1 sm:gap-0">
+          <div className="text-right w-full sm:w-auto flex flex-col sm:flex-row items-center sm:items-center justify-between sm:justify-end gap-4">
+            <div className="flex flex-col items-end justify-center w-full sm:w-auto space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Main Price:
+                </span>
+                <span className="text-base sm:text-lg font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
+                  {inr(3999)}
+                </span>
+                <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
+                  62% OFF
+                </span>
+              </div>
               <div className="flex items-baseline gap-1.5">
-                <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                  Offer Price:
+                </span>
+                <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                   {inr(1499)}
                 </span>
                 <span className="text-xs text-slate-500 dark:text-slate-400">
                   (₹0.41/day)
-                </span>
-              </div>
-              <div className="text-xs text-slate-400 flex items-center gap-1.5">
-                <s>{inr(3999)}</s>
-                <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.2 rounded-full">
-                  62% OFF
                 </span>
               </div>
             </div>
@@ -1029,16 +1090,28 @@ export function PricingStudio({
             className="fixed left-0 right-0 bottom-0 z-[60] p-3 sm:p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 shadow-2xl"
           >
             <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:pr-20">
-              <div className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+              <div className="flex items-center gap-2.5 flex-wrap text-sm text-slate-700 dark:text-slate-300">
                 <span className="font-bold text-slate-900 dark:text-white">
                   {selectedList.length} selected
                 </span>
                 <span>·</span>
+                <span className="text-xs font-bold uppercase text-slate-500">
+                  Main Price:
+                </span>
+                <span className="text-sm sm:text-base font-extrabold text-slate-500 dark:text-slate-400 line-through decoration-rose-500 decoration-2">
+                  {inr(selectedOriginalSum)}
+                </span>
+                <span className="text-xs font-bold uppercase text-emerald-700 dark:text-emerald-400">
+                  Offer:
+                </span>
                 <span className="text-lg sm:text-xl font-extrabold text-indigo-600 dark:text-indigo-400">
                   {inr(selectedTotalSum)}
                 </span>
                 <span className="text-xs text-slate-500">
                   (₹{selectedPerDaySum.toFixed(2)}/day)
+                </span>
+                <span className="text-[11px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 px-2 py-0.5 rounded-full">
+                  Save {inr(selectedOriginalSum - selectedTotalSum)}
                 </span>
               </div>
 

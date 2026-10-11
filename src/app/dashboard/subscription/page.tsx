@@ -365,8 +365,8 @@ export default function SubscriptionPage() {
                     All Plans Locked at Flat Half Price!
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl leading-relaxed">
-                    Complete WhatsApp Loyalty, Smart AI Google Reviews &amp; 1-Click AutoReply. 
-                    Original MRP ₹4,499 ➔ <span className="text-emerald-700 font-bold">Now ₹2,249/yr</span> (₹6.1/day). Standalone from <span className="text-amber-700 font-bold">₹799/yr</span> (₹2.1/day).
+                    Complete WhatsApp Loyalty, Smart AI Google Reviews &amp; 1-Click AutoReply.{" "}
+                    <span className="font-extrabold text-slate-700">Main Price:</span> <span className="font-extrabold text-slate-500 line-through decoration-rose-500 decoration-2">₹6,998/yr</span> ➔ <span className="text-emerald-700 font-extrabold">Offer Price: ₹3,499/yr</span> (₹9.59/day). Standalone <span className="font-extrabold text-slate-500 line-through decoration-rose-500 decoration-2">₹1,199/yr</span> ➔ <span className="text-amber-700 font-extrabold">₹499/yr</span> (₹1.37/day).
                   </p>
                 </div>
               </div>
@@ -418,9 +418,17 @@ export default function SubscriptionPage() {
             </div>
 
             {selectedPlan && (
-              <div className="text-xs text-emerald-800 font-bold flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
+              <div className="text-xs text-emerald-800 font-bold flex items-center gap-1.5 flex-wrap bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Selected: {selectedPlan.name} (₹{selectedPlan.price})</span>
+                <span>Selected: {selectedPlan.name}</span>
+                {selectedPlan.originalPrice && selectedPlan.originalPrice > selectedPlan.price && (
+                  <span className="text-slate-500 line-through decoration-rose-500 decoration-2 font-extrabold ml-1">
+                    Main Price: ₹{selectedPlan.originalPrice.toLocaleString("en-IN")}
+                  </span>
+                )}
+                <span className="text-emerald-900 font-black ml-1">
+                  Offer Price: ₹{selectedPlan.price.toLocaleString("en-IN")}
+                </span>
               </div>
             )}
           </div>
@@ -559,16 +567,24 @@ export default function SubscriptionPage() {
                       <p className="text-xs text-slate-500 mb-6 min-h-[36px] leading-relaxed">{plan.description}</p>
 
                       {/* Price Section */}
-                      <div className="mb-6 pb-6 border-b border-slate-200">
-                        <div className="flex items-baseline gap-2.5">
-                          <span className="text-4xl font-black text-slate-900 tracking-tight">
-                            ₹{effectivePrice.toLocaleString()}
-                          </span>
-                          {plan.originalPrice && plan.originalPrice > effectivePrice && (
-                            <span className="text-base text-slate-400 line-through">
-                              ₹{plan.originalPrice.toLocaleString()}
+                      <div className="mb-6 pb-6 border-b border-slate-200 space-y-1.5">
+                        {plan.originalPrice && plan.originalPrice > effectivePrice && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                              Main Price:
                             </span>
-                          )}
+                            <span className="text-base sm:text-lg font-extrabold text-slate-500 line-through decoration-rose-500 decoration-2">
+                              ₹{plan.originalPrice.toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-xs font-bold uppercase text-emerald-700">
+                            Offer Price:
+                          </span>
+                          <span className="text-4xl font-black text-slate-900 tracking-tight">
+                            ₹{effectivePrice.toLocaleString("en-IN")}
+                          </span>
                         </div>
 
                         <div className="flex items-center gap-2 mt-2">
@@ -710,14 +726,22 @@ export default function SubscriptionPage() {
                   </Badge>
                 )}
               </div>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-xs text-slate-500 font-medium">Total Payable:</span>
+              <div className="flex items-baseline gap-2.5 flex-wrap mt-1.5">
+                {selectedPlan?.originalPrice && selectedPlan.originalPrice > effectiveFinalPrice && (
+                  <div className="flex items-center gap-1.5 mr-1">
+                    <span className="text-xs text-slate-500 font-semibold">Main Price:</span>
+                    <span className="text-base sm:text-lg font-extrabold text-slate-500 line-through decoration-rose-500 decoration-2">
+                      ₹{selectedPlan.originalPrice.toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                )}
+                <span className="text-xs text-emerald-700 font-bold uppercase">Offer Payable:</span>
                 <span className="text-3xl font-black text-indigo-600">
-                  ₹{effectiveFinalPrice.toLocaleString()}
+                  ₹{effectiveFinalPrice.toLocaleString("en-IN")}
                 </span>
                 {appliedCoupon && (
                   <span className="text-xs text-slate-400 line-through">
-                    ₹{selectedPlan?.price.toLocaleString()}
+                    ₹{selectedPlan?.price.toLocaleString("en-IN")}
                   </span>
                 )}
               </div>

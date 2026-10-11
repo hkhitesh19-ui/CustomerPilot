@@ -3,6 +3,43 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [11 Oct 2026] Feature: Prominent Main Price (MRP) & 50% Offer Price Display on `/pricing` and `/dashboard/subscription`
+- **Symptom**: On both `http://localhost:3000/pricing` and `http://localhost:3000/dashboard/subscription`, the original Main Price (before the 50% discount) was previously rendered in a small, low-contrast `<s>` tag, making only the discounted price noticeable. The user requested that the Main Price also be clearly, boldly, and prominently displayed alongside the 50% discount price across all plans.
+- **Root Cause**: The original MRP values were styled with `text-xs text-slate-400` or `text-white/70` inside small `<s>` elements without explicit `"Main Price:"` vs `"Offer Price:"` visual hierarchy.
+- **Resolution**:
+  1. **CustomerPilot Complete Featured Card (`src/components/pricing/pricing-studio.tsx`)**:
+     - Added a dedicated glassmorphic badge row for `MAIN PRICE: ₹6,998 (₹19.17/day)` with bold typography (`text-lg sm:text-2xl font-extrabold`) and crimson strikethrough (`decoration-rose-400 decoration-2`), paired with `50% OFFER PRICE: ₹3,499` and `Instant Savings: ₹3,499`.
+     - Added original monthly Main Price (`₹898/mo`, `₹666/mo`, `₹575/mo`) next to each discounted monthly figure in the **Effective monthly cost** card.
+  2. **Standalone Modules Table & Total Rows (`src/components/pricing/pricing-studio.tsx`)**:
+     - Updated table column headers to `6 MONTHS (MAIN VS OFFER PRICE)` and `1 YEAR (MAIN VS OFFER PRICE)`.
+     - Displayed `MAIN PRICE: ₹1,598 [44% OFF]` in bold `text-sm sm:text-base font-extrabold` with crimson strikethrough directly above `Offer: ₹899 (₹4.99/day)` for every standalone module, total row, and comparison row.
+  3. **Lifetime Deal Card & Sticky Floating Selection Bar (`src/components/pricing/pricing-studio.tsx`)**:
+     - Highlighted `MAIN PRICE: ₹3,999 [62% OFF]` above `Offer Price: ₹1,499` on the Smart Digital Business Card Lifetime Deal.
+     - Updated the floating bottom selection bar to show `Main Price: ₹...` alongside `Offer: ₹...` and `Save ₹...`.
+  4. **Dashboard Subscription Page (`src/app/dashboard/subscription/page.tsx`)**:
+     - Updated the top 50% OFF banner, the `Selected:` status pill, Classic Cards view, and the sticky bottom checkout summary bar (`Main Price: ₹6,998` + `OFFER PAYABLE: ₹3,499`) to prominently display both prices.
+  5. **Playwright Visual Verification (`scripts/verify_main_price_display.js`)**:
+     - Verified 13 `"Main Price:"` labels on `/pricing` and 15 `"Main Price:"` labels on `/dashboard/subscription`, and inspected full-page screenshots `verified_pricing_main_and_offer_price.png` and `verified_subscription_main_and_offer_price.png`.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
+## [11 Oct 2026] Issue: Console TypeError `Failed to fetch` in `PricingStudio.useEffect` & Big 50% OFF Discount Card Banner on `/pricing`
+- **Symptom**:
+  1. In Next.js 16.3.6 (Turbopack), `PricingStudio.useEffect` triggered a red overlay `Console TypeError: Failed to fetch` at `src/components/pricing/pricing-studio.tsx:154`.
+  2. On `http://localhost:3000/pricing`, the user requested setting the same large, prominent 50% OFF discount card banner design ("All Plans Locked at Flat Half Price!" + huge "FLAT DISCOUNT 50% OFF ⚡ INSTANT SAVINGS LOCKED" box) as displayed on `/dashboard/subscription`.
+- **Root Cause**:
+  1. In `PricingStudio`, the default prop parameter `initialPlans = []` created a new array reference (`[]`) on every parent or internal re-render when `initialPlans` was omitted (such as on `/pricing`) or while empty. Because `initialPlans` was in the `useEffect` dependency array (`[initialPlans]`), every state update re-triggered `fetch("/api/pricing/plans")` in a loop, and any aborted/HMR request invoked `console.error("[PricingStudio] Failed to fetch plans:", err)`, which Next.js Turbopack intercepted as a Console TypeError overlay.
+  2. The `/pricing` page previously rendered a compact inline badge instead of the full-width 2-column 50% OFF promotional card banner.
+- **Resolution**:
+  1. **Eliminated Infinite Re-fetch & Console TypeError (`src/components/pricing/pricing-studio.tsx`)**:
+     - Replaced `initialPlans = []` with a stable module-level constant `const DEFAULT_INITIAL_PLANS: PlanItem[] = []`.
+     - Added a `hasFetchedRef` guard and `AbortController` inside `useEffect` so `/api/pricing/plans` is fetched only once when `initialPlans` is not provided, and removed the `console.error` call on transient network/HMR aborts.
+  2. **Added Big 50% OFF Discount Card Banner to `/pricing` (`src/components/pricing/pricing-studio.tsx`)**:
+     - Replaced the small hero pill with the full-width 2-column promotional card banner (`All Plans Locked at Flat Half Price!`, `Limited Time 50% Discount Offer`, and the right-hand `FLAT DISCOUNT 50% OFF ⚡ INSTANT SAVINGS LOCKED` showcase card).
+     - Scoped to `mode !== "merchant"` inside `PricingStudio` so `/dashboard/subscription` (which renders the banner at the top of the page) does not display it twice.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [11 Oct 2026] Issue: Dashboard Subscription Standalone Modules Razorpay Checkout & Light Theme Overhaul
 - **Symptom**: On `http://localhost:3000/dashboard/subscription`, selecting standalone module plans and clicking "Continue →" did not redirect or launch the Razorpay payment gateway, and the page had a heavy dark/black background (`bg-slate-900/90` / `bg-slate-950`) that clashed with the light merchant dashboard.
 - **Root Cause**:
