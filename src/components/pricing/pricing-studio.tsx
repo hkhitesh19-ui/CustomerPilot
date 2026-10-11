@@ -247,6 +247,47 @@ export function PricingStudio({
     })
   }
 
+  // Sync selected standalone modules to onSelectPlan whenever selection changes
+  useEffect(() => {
+    if (!onSelectPlan) return
+    if (selectedList.length === 1) {
+      const s = selectedList[0]
+      const d = selectedStandalone[s.i]
+      const planKey = d === 180 ? s.planKey6Mo : s.planKey1Yr
+      const dbP = getPlanByKey(planKey)
+      const p: PlanItem = dbP || {
+        id: planKey,
+        planKey,
+        name: `${s.n} (${d === 180 ? "6 Months" : "1 Year"})`,
+        price: s.p[d][0],
+        originalPrice: s.p[d][1],
+        days: d,
+        features: [s.t],
+        enabledModules: s.i === "loyalty" ? "LOYALTY" : s.i === "star" ? "REVIEWS" : s.i === "chat" ? "AUTOREPLY" : s.i === "card" ? "DIGITAL_CARD" : s.i
+      }
+      onSelectPlan(p)
+    } else if (selectedList.length > 1) {
+      const maxDays = Math.max(...selectedList.map((s) => selectedStandalone[s.i] || 365))
+      const p: PlanItem = {
+        id: "custom_bundle",
+        planKey: "custom_bundle",
+        name: `Custom Bundle (${selectedList.length} services)`,
+        price: selectedTotalSum,
+        originalPrice: selectedOriginalSum,
+        days: maxDays,
+        features: selectedList.map((s) => s.n),
+        enabledModules: selectedList.map((s) => {
+          if (s.i === "loyalty") return "LOYALTY"
+          if (s.i === "star") return "REVIEWS"
+          if (s.i === "chat") return "AUTOREPLY"
+          if (s.i === "card") return "DIGITAL_CARD"
+          return s.i
+        }).join(",")
+      }
+      onSelectPlan(p, { selectedStandalone })
+    }
+  }, [selectedStandalone, selectedTotalSum, selectedOriginalSum, selectedList, plans])
+
   const handleClearStandalone = () => {
     setSelectedStandalone({})
   }
@@ -254,7 +295,9 @@ export function PricingStudio({
   // Handle plan purchase
   const handleSelectComplete = (tierIndex: number) => {
     const tier = COMPLETE_TIERS[tierIndex]
-    const p = getPlanByKey(tier.planKey) || {
+    const dbP = getPlanByKey(tier.planKey)
+    const p: PlanItem = dbP || {
+      id: tier.planKey,
       planKey: tier.planKey,
       name: `CustomerPilot Complete (${tier.t})`,
       price: tier.s,
@@ -265,7 +308,8 @@ export function PricingStudio({
         "Smart AI Google Reviews",
         "1-Click AutoReply",
         "Smart Digital Business Card"
-      ]
+      ],
+      enabledModules: "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD"
     }
 
     if (onSelectPlan) onSelectPlan(p)
@@ -305,6 +349,23 @@ export function PricingStudio({
       iconBg: "bg-indigo-600",
       moduleKey: "card"
     }
+
+    if (mode === "merchant" && onCheckout) {
+      const p: PlanItem = dbP || {
+        id: "card_lifetime",
+        planKey: "card_lifetime",
+        name: "Smart Digital Business Card · Lifetime Deal",
+        price: 1499,
+        originalPrice: 3999,
+        days: 3650,
+        features: ["Permanent Cloud Hosting", "Digital Card & QR"],
+        enabledModules: "DIGITAL_CARD"
+      }
+      if (onSelectPlan) onSelectPlan(p)
+      onCheckout(p)
+      return
+    }
+
     setCheckoutModalItems([item])
     setCheckoutModalTotal(dbP?.price || 1499)
     setCheckoutModalOriginalTotal(dbP?.originalPrice || 3999)
@@ -331,36 +392,33 @@ export function PricingStudio({
       }
     })
 
+    if (mode === "merchant" && onCheckout) {
+      const maxDays = Math.max(...selectedList.map((s) => selectedStandalone[s.i] || 365))
+      const bundlePlan: PlanItem = {
+        id: selectedList.length === 1 ? (getPlanByKey(items[0].planKey)?.id || items[0].planKey) : "custom_bundle",
+        planKey: selectedList.length === 1 ? items[0].planKey : "custom_bundle",
+        name: selectedList.length === 1 ? items[0].name : `Custom Bundle (${selectedList.length} services)`,
+        price: selectedTotalSum,
+        originalPrice: selectedOriginalSum,
+        days: maxDays,
+        features: selectedList.map((s) => s.n),
+        enabledModules: selectedList.map((s) => {
+          if (s.i === "loyalty") return "LOYALTY"
+          if (s.i === "star") return "REVIEWS"
+          if (s.i === "chat") return "AUTOREPLY"
+          if (s.i === "card") return "DIGITAL_CARD"
+          return s.i
+        }).join(",")
+      }
+      if (onSelectPlan) onSelectPlan(bundlePlan)
+      onCheckout(bundlePlan)
+      return
+    }
+
     setCheckoutModalItems(items)
     setCheckoutModalTotal(selectedTotalSum)
     setCheckoutModalOriginalTotal(selectedOriginalSum)
     setCheckoutModalOpen(true)
-
-    if (onSelectPlan && selectedList.length === 1) {
-      const s = selectedList[0]
-      const d = selectedStandalone[s.i]
-      const planKey = d === 180 ? s.planKey6Mo : s.planKey1Yr
-      const p = getPlanByKey(planKey) || {
-        planKey,
-        name: `${s.n} (${d === 180 ? "6 Months" : "1 Year"})`,
-        price: s.p[d][0],
-        originalPrice: s.p[d][1],
-        days: d,
-        features: [s.t]
-      }
-      onSelectPlan(p)
-      if (onCheckout) onCheckout(p)
-    } else if (onSelectPlan) {
-      // Multiple items selected
-      const p = {
-        name: `Custom Bundle (${selectedList.length} items)`,
-        price: selectedTotalSum,
-        days: 365,
-        features: selectedList.map((s) => s.n)
-      } as PlanItem
-      onSelectPlan(p, { selectedStandalone })
-      if (onCheckout) onCheckout(p)
-    }
   }
 
   // Admin save changes
@@ -392,7 +450,7 @@ export function PricingStudio({
     }
   }
 
-  const isDark = theme === "dark" || mode === "superadmin" || mode === "merchant"
+  const isDark = theme === "dark" || mode === "superadmin"
 
   return (
     <div className={`w-full transition-colors duration-200 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
@@ -877,37 +935,39 @@ export function PricingStudio({
         </div>
       </section>
 
-      {/* ─── CTA Banner with Brand Logo Cyan-Sky-Indigo Gradient ─── */}
-      <section
-        className="rounded-3xl p-8 sm:p-14 text-center text-white relative overflow-hidden my-14 shadow-xl border border-cyan-400/30"
-        style={{
-          background: "radial-gradient(600px 320px at 80% 20%, rgba(255,255,255,0.22), transparent 70%), linear-gradient(135deg, #0284c7 0%, #0369a1 25%, #1e40af 70%, #4338ca 100%)"
-        }}
-      >
-        {/* Subtle ambient light accents */}
-        <div className="absolute -top-24 -left-24 w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none" />
+      {/* ─── CTA Banner with Brand Logo Cyan-Sky-Indigo Gradient (Public Only) ─── */}
+      {mode !== "merchant" && (
+        <section
+          className="rounded-3xl p-8 sm:p-14 text-center text-white relative overflow-hidden my-14 shadow-xl border border-cyan-400/30"
+          style={{
+            background: "radial-gradient(600px 320px at 80% 20%, rgba(255,255,255,0.22), transparent 70%), linear-gradient(135deg, #0284c7 0%, #0369a1 25%, #1e40af 70%, #4338ca 100%)"
+          }}
+        >
+          {/* Subtle ambient light accents */}
+          <div className="absolute -top-24 -left-24 w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-3xl mx-auto space-y-4">
-          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
-            Ready to turn Walk-in Customers into Repeat and Loyal ?
-          </h2>
-          <p className="text-cyan-100/90 text-sm sm:text-lg max-w-xl mx-auto leading-relaxed font-medium">
-            Start with one module, upgrade to Complete anytime. Transparent ROI from Day 1.
-          </p>
-          <div className="pt-2">
-            <Link href="/signup">
-              <button
-                type="button"
-                className="bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-4 px-9 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer inline-flex items-center gap-2"
-              >
-                <span>Get started today</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </Link>
+          <div className="relative z-10 max-w-3xl mx-auto space-y-4">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
+              Ready to turn Walk-in Customers into Repeat and Loyal ?
+            </h2>
+            <p className="text-cyan-100/90 text-sm sm:text-lg max-w-xl mx-auto leading-relaxed font-medium">
+              Start with one module, upgrade to Complete anytime. Transparent ROI from Day 1.
+            </p>
+            <div className="pt-2">
+              <Link href="/signup">
+                <button
+                  type="button"
+                  className="bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-4 px-9 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer inline-flex items-center gap-2"
+                >
+                  <span>Get started today</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Footnote */}
       <div className="text-center text-xs text-slate-400 pb-16">
@@ -948,9 +1008,9 @@ export function PricingStudio({
                 <button
                   type="button"
                   onClick={handleCheckoutStandalone}
-                  className="bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition cursor-pointer"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition cursor-pointer flex items-center gap-1.5"
                 >
-                  Continue →
+                  <span>Continue →</span>
                 </button>
               </div>
             </div>

@@ -155,15 +155,22 @@ export function CheckoutActivationModal({
       throw new Error("Unable to load Razorpay payment gateway. Please check your internet connection.")
     }
 
+    const effectiveMerchantId = merchantInfo?.id || loggedInMerchant?.id || ""
+    const enabledModules = resolveEnabledModules()
+
     // 1. Create order on server
     const orderRes = await fetch("/api/payments/create-order", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        ...(effectiveMerchantId ? { "x-merchant-id": effectiveMerchantId } : {})
+      },
       body: JSON.stringify({
         planId: primaryPlanKey,
         amount: totalAmount,
         durationDays: maxDays,
-        merchantId: merchantInfo?.id || loggedInMerchant?.id
+        merchantId: effectiveMerchantId,
+        enabledModules
       })
     })
 
@@ -171,8 +178,6 @@ export function CheckoutActivationModal({
     if (!orderRes.ok || !orderData.ok) {
       throw new Error(orderData.error || "Failed to initialize Razorpay order.")
     }
-
-    const enabledModules = resolveEnabledModules()
 
     // 2. Configure Razorpay checkout options
     const options = {
@@ -205,14 +210,18 @@ export function CheckoutActivationModal({
           // 3. Verify payment signature on server
           const verifyRes = await fetch("/api/payments/verify", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              ...(effectiveMerchantId ? { "x-merchant-id": effectiveMerchantId } : {})
+            },
             body: JSON.stringify({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
               planId: primaryPlanKey,
               durationDays: maxDays,
-              enabledModules
+              enabledModules,
+              merchantId: effectiveMerchantId
             })
           })
 

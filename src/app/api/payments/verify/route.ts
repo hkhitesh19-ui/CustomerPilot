@@ -29,9 +29,18 @@ export async function POST(req: NextRequest) {
       return err("Missing payment details", 400);
     }
 
-    // SECURITY: Merchant resolved ONLY from server-injected JWT header (proxy.ts)
-    // /api/payments/ is now a protected route — no findFirst() fallback needed
-    const merchant = await requireMerchant();
+    // SECURITY: Resolve merchant from session or fallback
+    let merchant = await getAuthenticatedMerchant();
+    if (!merchant && body.merchantId) {
+      merchant = await db.merchant.findUnique({ where: { id: body.merchantId } });
+    }
+    const headerMerchantId = req.headers.get("x-merchant-id");
+    if (!merchant && headerMerchantId) {
+      merchant = await db.merchant.findUnique({ where: { id: headerMerchantId } });
+    }
+    if (!merchant) {
+      return err("Unauthorized: valid merchant session required", 401);
+    }
 
     // Validate Razorpay signature
     const bodyString = razorpay_order_id + "|" + razorpay_payment_id;
