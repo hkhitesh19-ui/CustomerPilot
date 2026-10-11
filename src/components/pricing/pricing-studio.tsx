@@ -109,10 +109,12 @@ export const inr = (n: number) => "₹" + Math.round(n).toLocaleString("en-IN")
 export const dy = (n: number, d: number) => `(₹${(n / d).toFixed(2)}/day)`
 export const off = (s: number, m: number) => Math.round((1 - s / m) * 100)
 
+const DEFAULT_INITIAL_PLANS: PlanItem[] = []
+
 export function PricingStudio({
   mode = "public",
   theme = "light",
-  initialPlans = [],
+  initialPlans = DEFAULT_INITIAL_PLANS,
   showAdminToggle = false,
   selectedPlanId,
   onSelectPlan,
@@ -142,26 +144,49 @@ export function PricingStudio({
   const [checkoutModalTotal, setCheckoutModalTotal] = useState(0)
   const [checkoutModalOriginalTotal, setCheckoutModalOriginalTotal] = useState(0)
 
+  const hasFetchedRef = React.useRef(false)
+
   // Fetch plans if not passed
   useEffect(() => {
-    if (initialPlans.length > 0) {
+    if (initialPlans && initialPlans.length > 0) {
       setPlans(initialPlans)
       setLoading(false)
       return
     }
 
-    setLoading(true)
-    fetch("/api/pricing/plans")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.ok && Array.isArray(data.data?.plans)) {
+    if (hasFetchedRef.current) return
+    hasFetchedRef.current = true
+
+    const controller = new AbortController()
+    let isMounted = true
+
+    const loadPlans = async () => {
+      try {
+        setLoading(true)
+        const res = await fetch("/api/pricing/plans", {
+          signal: controller.signal,
+          cache: "no-store"
+        }).catch(() => null)
+
+        if (!res || !res.ok || !isMounted) return
+
+        const data = await res.json().catch(() => null)
+        if (isMounted && data?.ok && Array.isArray(data.data?.plans)) {
           setPlans(data.data.plans)
         }
-      })
-      .catch((err) => {
-        console.error("[PricingStudio] Failed to fetch plans:", err)
-      })
-      .finally(() => setLoading(false))
+      } catch {
+        // Silently fall back to built-in default tiers if network/HMR interrupts fetch
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+
+    loadPlans()
+
+    return () => {
+      isMounted = false
+      controller.abort()
+    }
   }, [initialPlans])
 
   // Helper to find DB plan by key
@@ -455,23 +480,43 @@ export function PricingStudio({
   return (
     <div className={`w-full transition-colors duration-200 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
       {/* ─── Hero Section ─── */}
-      <section className="text-center py-10 sm:py-16 relative">
-        {/* Prominent High-Impact 50% OFF Banner */}
-        <div className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3.5 px-5 sm:px-7 py-2.5 sm:py-3 rounded-2xl bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-indigo-500/15 border-2 border-amber-400/50 dark:border-amber-400/40 shadow-lg shadow-amber-500/10 mb-6 backdrop-blur-md">
-          <div className="flex items-center gap-2">
-            <span className="bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600 text-white font-black text-sm sm:text-lg px-3.5 py-1 rounded-xl shadow-md uppercase tracking-wide flex items-center gap-1.5 animate-pulse">
-              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-200" />
-              <span>50% OFF</span>
-            </span>
-            <span className="text-slate-900 dark:text-white font-extrabold text-sm sm:text-base tracking-tight">
-              Limited-Period Offer on Every Plan
-            </span>
+      <section className="text-center py-6 sm:py-10 relative">
+        {/* Big High-Impact 50% OFF Discount Banner Card (Matches Dashboard Subscription Screenshot) */}
+        {mode !== "merchant" && (
+          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-indigo-500/10 border-2 border-amber-400/60 p-5 sm:p-7 shadow-sm mb-8 sm:mb-10 text-left">
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+              {/* Left text & details */}
+              <div className="flex items-start sm:items-center gap-4 text-left flex-1">
+                <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-amber-100 border border-amber-300 items-center justify-center flex-shrink-0 text-amber-600 shadow-xs">
+                  <Flame className="w-8 h-8 text-amber-600 animate-pulse" />
+                </div>
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-xs font-black uppercase tracking-widest mb-2">
+                    <Flame className="w-3.5 h-3.5 text-amber-600 animate-pulse" /> Limited Time 50% Discount Offer
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
+                    All Plans Locked at Flat Half Price!
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-xl leading-relaxed">
+                    Complete WhatsApp Loyalty, Smart AI Google Reviews &amp; 1-Click AutoReply.{" "}
+                    Original MRP ₹4,499 ➔ <span className="text-emerald-700 dark:text-emerald-400 font-bold">Now ₹2,249/yr</span> (₹6.1/day). Standalone from <span className="text-amber-700 dark:text-amber-400 font-bold">₹799/yr</span> (₹2.1/day).
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Biggest Font Highlight */}
+              <div className="w-full md:w-auto flex-shrink-0 flex flex-col items-center justify-center px-8 py-5 rounded-2xl bg-white/95 dark:bg-slate-900/95 border-2 border-amber-400 shadow-md text-center">
+                <span className="text-xs font-black uppercase tracking-widest text-amber-700 dark:text-amber-400">FLAT DISCOUNT</span>
+                <div className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600 drop-shadow-xs">
+                  50% OFF
+                </div>
+                <div className="mt-1.5 inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-[10px] font-extrabold tracking-wide">
+                  ⚡ INSTANT SAVINGS LOCKED
+                </div>
+              </div>
+            </div>
           </div>
-          <span className="hidden sm:inline text-slate-300 dark:text-slate-700 font-bold">•</span>
-          <span className="text-emerald-700 dark:text-emerald-400 font-bold text-xs sm:text-sm bg-emerald-100/80 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-lg">
-            Flat Half-Price Locked
-          </span>
-        </div>
+        )}
 
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight leading-[1.08] max-w-4xl mx-auto">
           Simple, Flexible{" "}
