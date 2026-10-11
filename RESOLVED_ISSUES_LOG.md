@@ -3,6 +3,22 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [11 Oct 2026] Feature: Updated Website Sitemap (`/sitemap.xml`) & Robots (`/robots.txt`) Expansion for Google Search Console (40 ➔ 47 Public URLs)
+- **Symptom**: In Google Search Console (`sc-domain:customerpilot.in`), the submitted `https://customerpilot.in/sitemap.xml` only discovered 40 pages (from the older sitemap list) and omitted the newly added website pages (`/guide/5-minute-setup-guide`, `/guide/operations`, `/register`, and official public Smart Digital Business Cards `/c/[slug]`). Additionally, `src/app/robots.ts` was missing explicit `Allow:` directives for several newer product and guide routes.
+- **Root Cause**: `src/app/sitemap.ts` previously contained a static 40-route array and had not been updated with the new Setup/Operations Guides, Merchant Registration route, or public Smart Digital Business Card slugs (`/c/cake-connection`, `/c/gujarat-photo-goods`, `/c/tasty-vadapav`, `/c/tasty-vadapav-atladara`).
+- **Resolution**:
+  1. **Expanded `src/app/sitemap.ts` (40 ➔ 47 Public Routes)**:
+     - Added `/guide/5-minute-setup-guide` (`priority: 0.8`, `weekly`), `/guide/operations` (`priority: 0.8`, `weekly`), and `/register` (`priority: 0.7`, `weekly`).
+     - Added official live Smart Digital Business Card public URLs (`/c/cake-connection`, `/c/gujarat-photo-goods`, `/c/tasty-vadapav`, `/c/tasty-vadapav-atladara`) with `priority: 0.8` and `weekly` change frequency.
+     - Kept `src/app/sitemap.ts` zero-dependency so Next.js 16 metadata route compilation serves `/sitemap.xml` in `<20ms`.
+  2. **Expanded `src/app/robots.ts`**:
+     - Added explicit `Allow` rules for `/whatsapp-digital-loyalty-card`, `/smart-digital-business-card`, `/ai-google-review-qr-generator`, `/smart-ai-google-review`, `/free-ai-google-review-generator`, `/ai-google-review-autoreply`, `/customerpilot-complete`, `/customerpilot-vs-stamp-me`, `/industry/`, `/alternatives/`, `/guide/`, `/c/`, `/roi-calculator`, `/register`, and `/sitemap.xml` across both `*` (Googlebot) and AI crawler user agents.
+  3. **Database Cleanup & Ground-Truth Verification**:
+     - Removed 2 leftover `playwright-test-bakery-*` rows from local `DigitalBusinessCard` table.
+     - Verified `http://localhost:3000/sitemap.xml` (47 valid URLs, 0 dummy/test URLs) and `http://localhost:3000/robots.txt` via Playwright (`verified_updated_sitemap_xml.png`).
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [11 Oct 2026] Feature: Prominent Main Price (MRP) & 50% Offer Price Display on `/pricing` and `/dashboard/subscription`
 - **Symptom**: On both `http://localhost:3000/pricing` and `http://localhost:3000/dashboard/subscription`, the original Main Price (before the 50% discount) was previously rendered in a small, low-contrast `<s>` tag, making only the discounted price noticeable. The user requested that the Main Price also be clearly, boldly, and prominently displayed alongside the 50% discount price across all plans.
 - **Root Cause**: The original MRP values were styled with `text-xs text-slate-400` or `text-white/70` inside small `<s>` elements without explicit `"Main Price:"` vs `"Offer Price:"` visual hierarchy.

@@ -13,10 +13,23 @@ export default function robots(): MetadataRoute.Robots {
     "/salon-loyalty",
     "/fastfood-loyalty",
     "/car-wash-loyalty",
+    "/whatsapp-digital-loyalty-card",
+    "/smart-digital-business-card",
+    "/ai-google-review-qr-generator",
+    "/smart-ai-google-review",
+    "/free-ai-google-review-generator",
+    "/ai-google-review-autoreply",
+    "/customerpilot-complete",
+    "/customerpilot-vs-stamp-me",
     "/features/",
     "/compare/",
     "/vs/",
+    "/industry/",
+    "/alternatives/",
     "/case-studies/",
+    "/guide/",
+    "/c/",
+    "/roi-calculator",
     "/for-business",
     "/help",
     "/privacy",
@@ -24,8 +37,10 @@ export default function robots(): MetadataRoute.Robots {
     "/security",
     "/contact",
     "/signup",
+    "/register",
     "/login",
     "/llms.txt",
+    "/sitemap.xml",
   ]
 
   const privateDisallowedRoutes = [
@@ -53,3 +68,4 @@ export default function robots(): MetadataRoute.Robots {
     sitemap: `${baseUrl}/sitemap.xml`,
   }
 }
+

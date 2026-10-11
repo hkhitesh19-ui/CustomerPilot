@@ -1,7 +1,15 @@
 import { MetadataRoute } from "next"
 
+const DIGITAL_CARD_ROUTES = [
+  "/c/cake-connection",
+  "/c/gujarat-photo-goods",
+  "/c/tasty-vadapav",
+  "/c/tasty-vadapav-atladara",
+]
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.in"
+  const now = new Date()
 
   const routes = [
     "",
@@ -37,11 +45,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/industry/dental-clinic-loyalty-program",
     // Competitor alternatives pages
     "/alternatives/stamp-me",
-    // Tools
+    // Setup & Operations Guides
+    "/guide/5-minute-setup-guide",
+    "/guide/operations",
+    // Official Live Smart Digital Business Cards
+    ...DIGITAL_CARD_ROUTES,
+    // Tools & Business Pages
     "/roi-calculator",
     "/for-business",
     "/help",
     "/signup",
+    "/register",
     "/login",
     "/privacy",
     "/terms",
@@ -51,8 +65,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return routes.map((route) => ({
     url: `${baseUrl}${route}`,
-    lastModified: new Date(),
-    changeFrequency: route === "" || route === "/marketing" || route === "/pricing" ? "daily" : "weekly",
+    lastModified: now,
+    changeFrequency:
+      route === "" || route === "/marketing" || route === "/pricing"
+        ? "daily"
+        : "weekly",
     priority:
       route === ""
         ? 1.0
@@ -70,8 +87,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
           route.startsWith("/features") ||
           route.endsWith("-loyalty")
         ? 0.9
-        : route.startsWith("/industry/") || route.startsWith("/alternatives/") || route === "/customerpilot-vs-stamp-me"
+        : route.startsWith("/industry/") ||
+          route.startsWith("/alternatives/") ||
+          route.startsWith("/guide/") ||
+          route.startsWith("/c/") ||
+          route === "/customerpilot-vs-stamp-me"
         ? 0.8
         : 0.7,
   }))
 }
+
+
