@@ -8,18 +8,19 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 4d18f0d
-Full Commit Hash  : 4d18f0db13ed1508ee125e8be0d57ab5d50a1351
-Target Fix Commit : 4d18f0d (4d18f0db13ed1508ee125e8be0d57ab5d50a1351)
+Active Git Commit : 05768d4
+Full Commit Hash  : 05768d43a67f22c24e4544bfd4c9c3789883f78e
+Target Fix Commit : 05768d4 (05768d43a67f22c24e4544bfd4c9c3789883f78e)
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 08 Oct 2026, 10:50 AM IST
-Commit Title      : feat(review): add prominent Photo Bonus Stamp Highlight Banner to Google Review screen
+Deployment Date   : 11 Oct 2026, 10:38 AM IST
+Commit Title      : feat(pricing): prominently display Main Price (MRP) alongside 50% Offer Price across /pricing and /dashboard/subscription
 Status            : Active & Running Live on VPS
 PM2 Services      : customerpilot-web (Online), customerpilot-cron (Online)
 ----------------------------------------------------------
 
 Deployment History Log:
 ----------------------------------------------------------
+• [11 Oct 2026, 10:38 AM IST] Commit 05768d4 (includes 3d42b29, 1d1a9f8, 8223cbc, b348bc7) - Prominently display Main Price (MRP) alongside 50% Offer Price, Big 50% OFF Banner, Standalone Razorpay Checkout & Windows OAuth SSL Fix
 • [08 Oct 2026, 10:50 AM IST] Commit 4d18f0d (includes 2f5f194, 460dd94) - Google Review +2 Photo Bonus Highlight Banner, 3-Angle AI Review Engine, 10-Category SEO Fallbacks, Native Contact Save & 5 SuperAdmin Ordering Channels
 • [07 Oct 2026, 11:58 PM IST] Commit 3d97049 - Smart AI Review Page 504 Timeout Resolution & Complete Merchant Digital Card Builder Form Integration
 • [06 Oct 2026, 10:23 AM IST] Commit bd3654a (includes 232276a & d05e838) - Dedicated Live ROI Calculator with Homepage Theme, Top Cost vs Opportunity Section, and /register Suspense build compliance
