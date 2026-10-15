@@ -3854,3 +3854,40 @@ ode_modules and .next cache. Switched npm registry to mirror to bypass timeouts.
        - **Test 1**: Set card title, reward, stamp value (450), and stamp goal (9) in `/super-admin?tab=default-settings`, clicked "Save Global Defaults", reloaded page — asserted 100% of persisted values remained intact. Clicked "Apply to All Merchants" and verified active DB cards received the updated rules.
        - **Test 2**: Inspected `http://localhost:3000/review?m=cmtymavfx0002kx008lbfvp57` — asserted 0 occurrences of Photo Bonus card, 0 occurrences of "Hitesh Kumar", 0 occurrences of "Posting publicly across Google", 0 occurrences of "Exceptional", and 0 occurrences of sub-ratings. Verified textarea, Dual AI angle chips, and "Copy & Post on Google Maps" CTA button are 100% visible and functional.
 - **Status**: ✅ Resolved and Verified.
+
+---
+## [15 Oct 2026] Issue: Complete Zero-to-One Migration to Fresh Hostinger KVM 1 VPS (187.127.170.36)
+- **Symptom**: User accidentally cancelled the previous VPS (`200.97.170.53`). Hostinger support wanted ₹1,945 to reactivate with an outdated Oct 6 backup. A brand-new KVM 1 VPS with Ubuntu 22.04 LTS was provisioned at `187.127.170.36`. Both CustomerPilot (with 11 live merchants SQLite database) and CakeConnection (Next.js + PostgreSQL) needed full zero-to-one stack setup and deployment.
+- **Root Cause**: The new VPS was completely empty with only bare Ubuntu 22.04 LTS. All runtimes, reverse proxies, databases, PM2 process daemons, build dependencies, SSL certbot tools, and firewall rules had to be installed and configured from scratch.
+- **Resolution**:
+  1. **Base Infrastructure Provisioning**:
+     - Configured UFW firewall (allowed ports 22, 80, 443).
+     - Installed Node.js v22.23.3 LTS, npm, PM2 v7.0.4, Nginx 1.18.0, Certbot, and Python3.
+     - Installed and configured PostgreSQL 14, created `cakeconnection` database and `postgres` user.
+  2. **CakeConnection Deployment**:
+     - Cloned from repository into `/var/www/CakeConnection`.
+     - Executed `master_postgres_schema.sql` to initialize all 10 core tables (`products`, `orders`, `cake_categories`, etc.) with seed data.
+     - Built Next.js production app and started in PM2 on port 3001 (`cakeconnection`, PID 14612, status online).
+  3. **CustomerPilot Deployment & Platform Compatibility**:
+     - Removed Windows platform-locked native binaries (`@next/swc-win32-x64-msvc` and `lightningcss-win32-x64-msvc`) from `package.json` to enable cross-platform Linux installation.
+     - Installed dependencies with `--include=dev` and native Linux `sharp`.
+     - Generated Prisma Client v6.19.3 (`debian-openssl-3.0.x`).
+     - Added package exports compatibility for `tw-animate-css` for Next 16 Turbopack build.
+     - Executed Next.js production build (`npm run build`), generating standalone build in 11.5s with 0 errors.
+     - Synced `.next/static`, `public`, and SQLite `prisma/dev.db` containing all 11 live merchants into `.next/standalone`.
+     - Started `customerpilot-web` in PM2 on port 3000 (`PID 14079`, status online).
+     - Started `customerpilot-cron` in PM2 polling automations and reviews every 1 minute (`PID 13338`, status online).
+     - Configured PM2 systemd startup service (`pm2-root.service`) to ensure automatic reboot recovery.
+  4. **Nginx Reverse Proxy**:
+     - Configured `/etc/nginx/sites-available/customerpilot.in` ➔ `http://127.0.0.1:3000`.
+     - Configured `/etc/nginx/sites-available/cakeconnection.in` ➔ `http://127.0.0.1:3001`.
+     - Added 1-year immutable caching headers for `/_next/static/`.
+  5. **Verification & Testing**:
+     - CustomerPilot local curl `http://127.0.0.1:3000`: HTTP 200 OK.
+     - CustomerPilot Pricing Plans API `http://127.0.0.1:3000/api/pricing/plans`: HTTP 200 OK with live plans.
+     - CustomerPilot live internet curl via public IP `187.127.170.36`: HTTP 200 OK (152 KB).
+     - CakeConnection local curl `http://127.0.0.1:3001`: HTTP 200 OK.
+     - CakeConnection live internet curl via public IP `187.127.170.36`: HTTP 200 OK (208 KB).
+     - All 11 live merchants verified in SQLite `dev.db` on VPS.
+     - Updated `Git Commit on VPS Live.txt` with new VPS IP `187.127.170.36`.
+- **Status**: ✅ Resolved and Verified.
