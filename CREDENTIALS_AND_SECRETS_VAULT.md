@@ -124,3 +124,20 @@
 | `RAZORPAY_KEY_ID` | `rzp_live_TaCvfqvIMOML9j` | Razorpay Live API Key ID |
 | `RAZORPAY_KEY_SECRET` | `hzNqzfbb93IWPdYN1154yBzB` | Razorpay Live Secret Key |
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | `rzp_live_TaCvfqvIMOML9j` | Frontend checkout client key |
+
+---
+
+## 11. CakeConnection.in Application Credentials (`.env.cakeconnection.production`)
+
+| Parameter / Variable | Value | Purpose / Notes |
+| :--- | :--- | :--- |
+| **Site URL** | `https://cakeconnection.in` | Production canonical domain (Port 3001) |
+| **Admin Login URL** | `https://cakeconnection.in/admin` | Owner order & catalog manager |
+| `ADMIN_EMAIL` | `admin@cakeconnection.in` | Admin dashboard login email |
+| `ADMIN_PASSWORD` | `CakeAdmin@2026` | Admin dashboard login password |
+| `DATABASE_URL` | `postgresql://postgres:CakeConnectionStrongDbPassword2026!@127.0.0.1:5432/cakeconnection` | Local native PostgreSQL 14 |
+| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | `rzp_test_T65MlFfUSQY1Gp` | CakeConnection Razorpay key |
+| `RAZORPAY_KEY_SECRET` | `lXyBsTH1AoZ15vXKjaNQvpmD` | CakeConnection Razorpay secret |
+| `EMAIL_USER` | `Order.CakeConnection@gmail.com` | Notification sender Gmail account |
+| `EMAIL_PASS` | `ykgjziwnulhnsvag` | Gmail 16-character App Password |
+
