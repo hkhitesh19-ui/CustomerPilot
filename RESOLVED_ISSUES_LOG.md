@@ -3891,3 +3891,17 @@ ode_modules and .next cache. Switched npm registry to mirror to bypass timeouts.
      - All 11 live merchants verified in SQLite `dev.db` on VPS.
      - Updated `Git Commit on VPS Live.txt` with new VPS IP `187.127.170.36`.
 - **Status**: ✅ Resolved and Verified.
+
+---
+## [15 Oct 2026] Issue: CustomerPilot Unstyled HTML (Missing PostCSS Tailwind Compilation) on VPS
+- **Symptom**: Upon visiting `https://customerpilot.in`, the website appeared as plain, unstyled HTML with broken layouts, unstyled buttons, and raw text ("20 years pehle ki technology jaisa").
+- **Root Cause**: During the initial VPS zero-to-one deployment tar payload creation, `postcss.config.mjs` was omitted from `/var/www/CustomerPilot`. Without `postcss.config.mjs`, Next.js 16 (Turbopack) skipped the `@tailwindcss/postcss` plugin, resulting in only 21 KB of baseline animations being generated without any Tailwind CSS utility classes, design system gradients, or responsive styling.
+- **Resolution**:
+  1. Uploaded `postcss.config.mjs` containing the `@tailwindcss/postcss` plugin to `/var/www/CustomerPilot/postcss.config.mjs`.
+  2. Executed a clean production build (`npm run build`) on the VPS. Next.js 16 Turbopack successfully compiled all Tailwind CSS utilities without warnings in 37.5s.
+  3. Verified generated CSS bundle grew from 21 KB to **370 KB** (`.next/static/chunks/1eq3ijr_jxbql.css`).
+  4. Synced `.next/static` assets into `.next/standalone/.next/static` and reloaded PM2 service `customerpilot-web`.
+  5. Verified live HTTP 200 on `https://customerpilot.in/_next/static/chunks/1eq3ijr_jxbql.css` (Content-Length: 370564).
+  6. Captured visual verification snapshot with Playwright asserting the pristine modern SaaS aesthetic, 3D luxury phone chassis, gradient typography, and responsive navigation.
+- **Status**: ✅ Resolved and Verified.
+
