@@ -160,8 +160,9 @@ cp prisma/dev.db .next/standalone/prisma/dev.db
 mkdir -p .next/standalone/prisma/prisma
 cp prisma/dev.db .next/standalone/prisma/prisma/dev.db
 
-# Environment Secrets
-cp .env .next/standalone/.env
+# Environment Secrets (.env.production is the master credentials file)
+cp .env.production .env
+cp .env.production .next/standalone/.env
 ```
 
 ### 4.7. PM2 Services Configuration & Autostart

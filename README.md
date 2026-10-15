@@ -31,7 +31,7 @@ Both manuals are also browsable in-app: Founder Manual tab + Developer Manual ta
 
 ```bash
 bun install                  # or npm install
-echo 'DATABASE_URL=file:./db/custom.db' > .env
+cp .env.production .env      # or copy production secrets
 bun run db:push              # create SQLite schema
 bun run src/lib/seed.ts      # seed demo merchant + 6 customers + sample data
 bun run dev                  # start Next.js dev server on :3000

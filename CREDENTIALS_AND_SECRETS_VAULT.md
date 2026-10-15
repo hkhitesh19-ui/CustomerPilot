@@ -47,8 +47,7 @@
 | :--- | :--- | :--- |
 | **Engine** | SQLite 3 via Prisma ORM | Embedded high-performance DB |
 | **Live Database Path** | `/var/www/CustomerPilot/prisma/dev.db` | Contains 11 live merchants data |
-| **Standalone Path** | `/var/www/CustomerPilot/.next/standalone/prisma/dev.db` | Synchronized for Next.js runtime |
-| **Environment Variable** | `DATABASE_URL="file:./dev.db"` | Defined in `.env` and `.env.production` |
+| **Environment Variable** | `DATABASE_URL="file:./dev.db"` | Defined in `.env.production` |
 
 ### 4.2. CakeConnection Database (PostgreSQL 14)
 | Property | Value | Notes |

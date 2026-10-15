@@ -55,7 +55,7 @@ It powers:
    - `http://localhost:3000/api/google-business/oauth`
    - `https://your-production-domain.com/api/google-business/oauth`
 7. Click **Create**.
-8. Copy the generated **Client ID** and **Client Secret** into your `.env` file:
+8. Copy the generated **Client ID** and **Client Secret** into your `.env.production` file:
    ```env
    GOOGLE_CLIENT_ID="391546314644-o8ep4jj3v9icce1fd1h7reu6a55lsui5.apps.googleusercontent.com"
    GOOGLE_CLIENT_SECRET="GOCSPX-xxxxxxxxxxxxxxxxxxxxxxxx"

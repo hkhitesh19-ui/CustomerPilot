@@ -29,7 +29,7 @@
 ```mermaid
 graph TD
     A[Step 1: VPS Base Packages Node 22, Git, Nginx, PM2] --> B[Step 2: Git Clone feature/superanalytics branch]
-    B --> C[Step 3: npm install & Production .env Setup]
+    B --> C[Step 3: npm install & Production .env.production Setup]
     C --> D[Step 4: Prisma DB Sync & Prisma Client Generate]
     D --> E[Step 5: SuperAdmin Bcrypt Password Provisioning]
     E --> F[Step 6: Next.js Standalone Production Build]
@@ -44,7 +44,7 @@ graph TD
 2. **Codebase Deployment**:
    Cloned the latest verified codebase containing all 6 pre-launch security fixes and UI enhancements from branch `feature/superanalytics-customers-crm-20260810`.
 3. **Environment Configuration**:
-   Provisioned production `.env` with secure database paths, JWT secrets, NextAuth URL, AI keys, and internal Evolution API endpoints.
+   Provisioned production `.env.production` with secure database paths, JWT secrets, NextAuth URL, AI keys, and internal Evolution API endpoints.
 4. **Database Migration**:
    Executed `npx prisma db push` to generate `prisma/dev.db` with WAL mode and compiled the Prisma Client.
 5. **SuperAdmin Account Setup**:
@@ -243,7 +243,7 @@ pm2 status
 
 ## 6. Server & Infrastructure Credentials
 
-> ⚠️ **CONFIDENTIAL**: Strictly for server administration. Stored in local `.env` and `.env.local` (gitignored).
+> ⚠️ **CONFIDENTIAL**: Strictly for server administration. Stored in `.env.production` (gitignored).
 
 | Parameter | Value / Detail |
 | :--- | :--- |
