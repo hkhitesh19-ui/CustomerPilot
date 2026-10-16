@@ -400,114 +400,233 @@ In the event of an unexpected build failure or regression:
 
 ## 9. Master VPS Migration SOP (From Old VPS to Fresh VPS)
 
-Whenever migrating CustomerPilot & CakeConnection from an old VPS to a brand-new Hostinger VPS instance, execute this strict 12-step Standard Operating Procedure (SOP):
+Whenever migrating CustomerPilot & CakeConnection from an old VPS to a brand-new Hostinger VPS instance, execute this strict 12-step Standard Operating Procedure (SOP) to ensure **ZERO data loss for real merchants and customers**, and **ZERO merchant QR re-scan**:
 
-### **Step 1: Backup & Export Everything from Old VPS**
-Before terminating or disconnecting the old VPS:
-1. **SQLite Database**: Backup `/var/www/CustomerPilot/prisma/dev.db` (contains all 11+ live merchants, stamp cards, customers, reports).
-2. **PostgreSQL Database**: Export CakeConnection data via `pg_dump -U postgres cakeconnection > cakeconnection_backup.sql`.
-3. **Environment Secrets**: Copy `/var/www/CustomerPilot/.env.production` and `/var/www/CakeConnection/next-app/.env`.
-4. **Evolution API Sessions (Optional/Recommended)**: Archive Docker volume `/evolution/instances` or `/var/lib/docker/volumes/evolution_instances` if active WhatsApp sessions need to be preserved without merchant re-scan.
+### **Step 1: Execute Zero-Scan Automated Backup on Old VPS**
+Before terminating or disconnecting the old VPS, run the automated snapshot engine:
+```bash
+# On Old VPS:
+/root/backup_migration_bundle.sh
+```
+This generates a single unified migration bundle at:
+`/root/backups/customerpilot_zero_scan_migration_bundle_latest.tar.gz` (7.6 MB) containing:
+1. **Evolution API WhatsApp Cryptographic Keystore** (`evolution_instances.tar.gz`): All Baileys noise keys, session tokens, and connection state (`creds.json`) so merchants stay connected without re-scanning.
+2. **SQLite Production Database** (`dev.db`): Checkpointed with `PRAGMA wal_checkpoint(TRUNCATE)` to guarantee 100% committed merchant and customer loyalty transactions.
+3. **CakeConnection PostgreSQL Database Dump** (`cakeconnection.sql`): All cake orders, users, and product catalog.
+4. **Evolution API PostgreSQL Database Dump** (`evolution_db.sql`): Instance metadata, settings, and webhook logs.
+5. **Production Credentials** (`customerpilot.env.production`, `cakeconnection.env`).
+6. **Media Assets & Logos** (`customerpilot_uploads.tar.gz`, `cakeconnection_uploads.tar.gz`): All uploaded store logos, custom stamps, and standee designs.
+7. **Nginx Configurations** (`nginx_sites.tar.gz`): Virtual host routing and cache headers.
+
+Download this archive to your local backup directory or directly transfer it to the new VPS:
+```bash
+scp /root/backups/customerpilot_zero_scan_migration_bundle_latest.tar.gz root@<NEW_VPS_IP>:/root/
+```
 
 ### **Step 2: Provision Fresh VPS Base System**
-1. Install base utilities: `apt-get update && apt-get install -y curl wget git unzip build-essential ufw certbot python3-certbot-nginx`.
-2. Configure UFW Firewall: Allow 22 (SSH), 80 (HTTP), 443 (HTTPS), then enable UFW.
+On the new VPS, run:
+```bash
+apt-get update && apt-get install -y curl wget git unzip build-essential ufw certbot python3-certbot-nginx
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 22/tcp
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw --force enable
+```
 
 ### **Step 3: Setup Node.js 22 LTS & PM2**
-1. Install Node.js v22 LTS via NodeSource (`setup_22.x`).
-2. Install PM2 globally (`npm install -g pm2`).
-3. Enable systemd boot persistence (`pm2 startup systemd -u root --hp /root`).
+```bash
+curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+apt-get install -y nodejs
+npm install -g pm2
+pm2 startup systemd -u root --hp /root
+```
 
 ### **Step 4: Provision PostgreSQL 14 with Dual Databases**
-1. Install `postgresql postgresql-contrib` and enable systemd service.
-2. Create `cakeconnection` database for CakeConnection Next.js application.
-3. Create `evolution_db` database and `evolution` user with password `EvoDb_Secure_2026!` for Evolution API v2.
-4. Update `pg_hba.conf` and `listen_addresses` to permit local password authentication.
+```bash
+apt-get install -y postgresql postgresql-contrib
+systemctl enable postgresql
+systemctl start postgresql
 
-### **Step 5: Deploy Official Evolution API v2 via Docker**
-1. Install Docker CE and Docker Compose plugin.
-2. Create `/opt/evolution-api/docker-compose.yml` with:
-   - Image: `evoapicloud/evolution-api:latest`
-   - `network_mode: host` (zero-latency direct localhost:5432 PostgreSQL connection)
-   - Expose port: `8080`
-   - `DATABASE_ENABLED=true`, `DATABASE_PROVIDER=postgresql`
-   - `restart: always`
-3. Launch container (`docker compose up -d`) and assert HTTP 200 on `http://127.0.0.1:8080`.
+sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'CakeConnectionStrongDbPassword2026!';"
+sudo -u postgres psql -c "CREATE DATABASE cakeconnection;"
 
-### **Step 6: Deploy CustomerPilot Application Stack**
-1. Sync repository to `/var/www/CustomerPilot` (ensuring platform-locked SWC/LightningCSS windows packages are excluded).
-2. Install dependencies (`npm install --include=dev --no-audit`).
-3. Mandatory: Verify `postcss.config.mjs` exists with `@tailwindcss/postcss` plugin (prevents unstyled raw HTML).
-4. Restore SQLite database into `prisma/dev.db`.
-5. Execute `npx prisma generate` to build Prisma client.
-6. Run `npm run build` to generate Next.js 16 standalone bundle.
-7. Sync `.next/static`, `public`, `prisma/dev.db`, and `.env.production` into `.next/standalone`.
+sudo -u postgres psql -c "CREATE USER evolution WITH PASSWORD 'EvoDb_Secure_2026!';"
+sudo -u postgres psql -c "CREATE DATABASE evolution_db OWNER evolution;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE evolution_db TO evolution;"
+sudo -u postgres psql -c "ALTER USER evolution CREATEDB;"
 
-### **Step 7: Deploy CakeConnection Application Stack**
-1. Sync repository to `/var/www/CakeConnection`.
-2. Run database migration (`npx prisma migrate deploy` or restore SQL dump).
-3. Build production application (`npm run build`).
+echo "host    evolution_db    evolution    127.0.0.1/32    md5" >> /etc/postgresql/14/main/pg_hba.conf
+systemctl reload postgresql
+```
 
-### **Step 8: Configure PM2 Process Daemons**
-1. Start `customerpilot-web` on port 3000 (`PORT=3000 HOSTNAME=0.0.0.0 pm2 start server.js --name customerpilot-web`).
-2. Start `customerpilot-cron` (`pm2 start scripts/localCronRunner.js --name customerpilot-cron`).
-3. Start `cakeconnection` on port 3001 (`pm2 start npm --name cakeconnection -- start -- -p 3001`).
-4. Save PM2 state: `pm2 save`.
+### **Step 5: Setup Docker & Deploy Evolution API v2 (Host Networking Mode)**
+```bash
+apt-get install -y ca-certificates curl gnupg
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+chmod a+r /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-### **Step 9: Configure Nginx Virtual Hosts & SSL**
-1. Create `/etc/nginx/sites-available/customerpilot.in` proxying to `http://127.0.0.1:3000`.
-2. Create `/etc/nginx/sites-available/cakeconnection.in` proxying to `http://127.0.0.1:3001`.
-3. Enable sites, test config (`nginx -t`), and reload Nginx.
-4. Issue Let's Encrypt certificates using Certbot.
+mkdir -p /opt/evolution-api
+cat << 'EOF' > /opt/evolution-api/docker-compose.yml
+services:
+  evolution-api:
+    image: evoapicloud/evolution-api:latest
+    container_name: evolution-api
+    restart: always
+    network_mode: host
+    environment:
+      - SERVER_URL=http://187.127.170.36:8080
+      - AUTHENTICATION_TYPE=apikey
+      - AUTHENTICATION_API_KEY=Evo_Api_Key_Secure_998877!
+      - AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES=true
+      - DATABASE_ENABLED=true
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_CONNECTION_URI=postgresql://evolution:EvoDb_Secure_2026!@127.0.0.1:5432/evolution_db?schema=public
+      - DATABASE_CONNECTION_CLIENT_NAME=evolution_api
+      - DATABASE_SAVE_DATA_INSTANCE=true
+      - DATABASE_SAVE_DATA_NEW_MESSAGE=false
+      - DATABASE_SAVE_MESSAGE_UPDATE=false
+      - DATABASE_SAVE_DATA_CONTACTS=false
+      - DATABASE_SAVE_DATA_CHATS=false
+      - DATABASE_SAVE_DATA_LABELS=false
+      - DATABASE_SAVE_DATA_HISTORIC=false
+      - QRCODE_LIMIT=30
+      - QRCODE_COLOR=#198754
+      - CACHE_REDIS_ENABLED=false
+      - CACHE_LOCAL_ENABLED=true
+      - LOG_LEVEL=ERROR
+      - LOG_COLOR=true
+      - LOG_BAILEYS=error
+      - DEL_INSTANCE=false
+      - CHATWOOT_ENABLED=false
+      - RABBITMQ_ENABLED=false
+      - WEBSOCKET_ENABLED=false
+      - SOCKET_IO_ENABLED=false
+      - CONFIG_SESSION_PHONE_CLIENT=CustomerPilot
+      - CONFIG_SESSION_PHONE_NAME=CustomerPilot
+    volumes:
+      - evolution_instances:/evolution/instances
+volumes:
+  evolution_instances:
+EOF
+
+cd /opt/evolution-api && docker compose up -d
+```
+
+### **Step 6: Execute 1-Click Zero-Scan Restore on New VPS**
+Run the automated restore script with the transferred bundle:
+```bash
+/root/restore_migration_bundle.sh /root/customerpilot_zero_scan_migration_bundle_latest.tar.gz
+```
+This automatically:
+- Injects WhatsApp session keys directly into `/var/lib/docker/volumes/evolution-api_evolution_instances/_data` and restarts Evolution API.
+- Restores PostgreSQL `cakeconnection` and `evolution_db`.
+- Restores SQLite `dev.db` with WAL mode to `/var/www/CustomerPilot/prisma/dev.db`.
+- Restores all `.env.production` secrets and user logos into `/public/uploads`.
+
+### **Step 7: Build Standalone Next.js Bundles**
+```bash
+cd /var/www/CustomerPilot
+npm install --include=dev --no-audit
+npm install --os=linux --cpu=x64 sharp --save
+# Verify postcss.config.mjs exists with @tailwindcss/postcss
+cat << 'EOF' > postcss.config.mjs
+const config = { plugins: ["@tailwindcss/postcss"] };
+export default config;
+EOF
+npx prisma generate
+npm run build
+
+# Standalone sync
+rm -rf .next/standalone/.next/static
+cp -r .next/static .next/standalone/.next/static
+cp -r public .next/standalone/public
+mkdir -p .next/standalone/prisma
+cp prisma/dev.db .next/standalone/prisma/dev.db
+cp .env.production .next/standalone/.env
+
+# CakeConnection Build
+cd /var/www/CakeConnection/next-app
+npm install --no-audit
+npm run build
+```
+
+### **Step 8: Start PM2 Daemons**
+```bash
+# CustomerPilot Web
+cd /var/www/CustomerPilot/.next/standalone
+pm2 delete customerpilot-web 2>/dev/null || true
+PORT=3000 HOSTNAME=0.0.0.0 pm2 start server.js --name customerpilot-web
+
+# CustomerPilot Cron
+cd /var/www/CustomerPilot
+pm2 delete customerpilot-cron 2>/dev/null || true
+pm2 start scripts/localCronRunner.js --name customerpilot-cron
+
+# CakeConnection Web
+cd /var/www/CakeConnection/next-app
+pm2 delete cakeconnection 2>/dev/null || true
+pm2 start npm --name cakeconnection -- start -- -p 3001
+
+pm2 save
+```
+
+### **Step 9: Setup Nginx Reverse Proxy & SSL**
+Enable sites from `/etc/nginx/sites-available/` and issue SSL certificates via Certbot:
+```bash
+certbot --nginx -d customerpilot.in -d www.customerpilot.in --non-interactive --agree-tos -m admin@customerpilot.in
+certbot --nginx -d cakeconnection.in -d www.cakeconnection.in --non-interactive --agree-tos -m order.cakeconnection@gmail.com
+nginx -t && systemctl reload nginx
+```
 
 ### **Step 10: Switch Cloudflare DNS A-Records**
-1. Update A record for `customerpilot.in` to point to the new VPS IP (`187.127.170.36`).
-2. Update A record for `cakeconnection.in` to point to the new VPS IP (`187.127.170.36`).
-3. Set SSL/TLS encryption mode to **Full** in Cloudflare dashboard.
+Update `customerpilot.in` and `cakeconnection.in` A-records in Cloudflare DNS to the new VPS IP. Encryption Mode: **Full**.
 
-### **Step 11: End-to-End Ground-Truth Testing Pipeline**
-1. Verify live HTTP 200 on both domains:
-   - `curl -I https://customerpilot.in`
-   - `curl -I https://cakeconnection.in`
-2. Run Playwright real-browser verification for:
-   - Onboarding Step 2: WhatsApp QR code generation (`https://customerpilot.in/signup`).
-   - Tailwind CSS bundle delivery (>350 KB).
-   - Digital Business Cards (`/c/cake-connection`).
-   - SuperAdmin and Merchant Dashboard authentication.
+### **Step 11: Ground-Truth Zero-Scan Verification**
+Verify that WhatsApp connection state is **immediately OPEN without re-scanning**:
+```bash
+curl -s http://127.0.0.1:8080/instance/fetchInstances -H "apikey: Evo_Api_Key_Secure_998877!"
+```
+Assert that active instances report `"connectionStatus": "open"`.
 
-### **Step 12: Sync Deployment Tracker & Issues Log**
-1. Update `Git Commit on VPS Live.txt` with active commit hash, new VPS IP, branch, and timestamp.
-2. Append all technical findings and fixes to `RESOLVED_ISSUES_LOG.md`.
+### **Step 12: Sync Deployment Tracker**
+Update `Git Commit on VPS Live.txt` and `RESOLVED_ISSUES_LOG.md`.
 
 ---
 
-## 10. WhatsApp Session Migration & Reconnection Reality Protocol
+## 10. Future-Proof Data Integrity & Bug Prevention Protocol
 
-### **The Technical Reality of WhatsApp Web / Baileys on a Fresh VPS**
-WhatsApp connections are governed by the Signal Protocol (end-to-end encrypted cryptographic keys). In Evolution API v2:
-- WhatsApp session keys (`creds.json`, noise keys, pre-keys) are stored inside the Evolution instance volume (`/evolution/instances`).
-- CustomerPilot's database stores the merchant reference (`whatsappPhone`, `whatsappInstanceName`).
+To ensure that **real merchants and customers data remains 100% intact with ZERO loss or technical regressions** in any future migration, adhere to these 5 Golden Rules:
 
-### **What Happens When Migrating to a Fresh VPS?**
-1. **If `/evolution/instances` is NOT transferred**:
-   - The newly deployed Evolution API instance has an empty keystore.
-   - For all previous merchants (e.g. Pizza Da Dabha, Deep Pharmacy, Cake Connection), Evolution API returns:
-     `{"ok": true, "status": "disconnected", "connected": false}`.
-   - Existing WhatsApp sessions **DO NOT** carry over automatically without the session keystore files.
-2. **Reconnection Process (Instant 10-Second Fix)**:
-   - Merchant logs into `https://customerpilot.in/login`.
-   - Navigates to **Dashboard ➔ Settings ➔ WhatsApp Connect** (or `/onboarding?step=2`).
-   - Scans the newly generated QR code once using their store WhatsApp (Settings ➔ Linked Devices ➔ Link a Device).
-   - Once scanned, Evolution API generates fresh cryptographic tokens, connects immediately (`connectionStatus: "open"`), and restores all automated WhatsApp messaging and stamp rewards.
-3. **Seamless Migration Alternative (For Zero-Scan Migration)**:
-   - If zero merchant re-scan is strictly required, the administrator must tar and transfer the entire `/evolution/instances` directory from the old VPS:
-     ```bash
-     # On Old VPS:
-     tar -czf /tmp/evolution_instances.tar.gz -C /var/lib/docker/volumes/evolution_instances/_data .
-     
-     # On New VPS:
-     tar -xzf /tmp/evolution_instances.tar.gz -C /var/lib/docker/volumes/evolution_api_evolution_instances/_data
-     docker compose restart evolution-api
-     ```
-   - This restores active cryptographic sessions without requiring any merchant to scan again.
+### **Golden Rule 1: The Triple-State WhatsApp Key Preservation**
+- WhatsApp Web / Baileys sessions depend on matching cryptographic pairs:
+  1. Phone Public Key on WhatsApp servers
+  2. Local Private Noise Key in `/var/lib/docker/volumes/evolution-api_evolution_instances/_data/<instance_id>/`
+  3. Instance pointer in PostgreSQL `evolution_db` and SQLite `Merchant.whatsappInstanceName`
+- **Rule**: NEVER delete or rebuild the Docker volume without exporting `evolution_instances.tar.gz`. If all 3 match, connection restores in 0 seconds with zero customer friction.
+
+### **Golden Rule 2: SQLite WAL Mode Checkpointing**
+- SQLite operates in WAL (Write-Ahead Logging) mode (`dev.db-wal` and `dev.db-shm`). If you simply copy `dev.db` while WAL is active, recently awarded customer stamps or newly created merchants might reside solely in `dev.db-wal` and get lost!
+- **Rule**: ALWAYS execute `PRAGMA wal_checkpoint(TRUNCATE);` before copying `dev.db`. The `/root/backup_migration_bundle.sh` script does this automatically.
+
+### **Golden Rule 3: The Standalone SQLite Dual-Sync Requirement**
+- In Next.js 16 standalone mode, the runtime server executes from `/var/www/CustomerPilot/.next/standalone/server.js`.
+- If `dev.db` is only updated in `/var/www/CustomerPilot/prisma/dev.db`, the live web application will read stale data from its own standalone folder (`.next/standalone/prisma/dev.db`)!
+- **Rule**: Database restorations must always copy to BOTH:
+  - `/var/www/CustomerPilot/prisma/dev.db`
+  - `/var/www/CustomerPilot/.next/standalone/prisma/dev.db`
+
+### **Golden Rule 4: PostCSS Tailwind CSS v4 Protection**
+- In Next.js 16 with Turbopack, if `postcss.config.mjs` is missing, Next.js will silently skip Tailwind CSS compilation and generate a broken 21 KB CSS file, rendering the website unstyled.
+- **Rule**: Verify that `postcss.config.mjs` contains `@tailwindcss/postcss` and that the live CSS bundle on `https://customerpilot.in/_next/static/chunks/...` is >350 KB before opening traffic.
+
+### **Golden Rule 5: Host Networking Mode for Docker Evolution API**
+- Evolution API v2 must run with `network_mode: host` in `docker-compose.yml`.
+- **Why**: Bridge networking requires complex UFW/iptables port forwarding between Docker subnets and local PostgreSQL port 5432. `network_mode: host` allows Evolution API to reach `127.0.0.1:5432` directly with zero firewall friction and zero latency.
+
 

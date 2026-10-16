@@ -417,7 +417,9 @@ F:\CustomerPilot_ByGLM_July2026
 │   ├── verify_all_products_landing_pages.js # Playwright Dedicated Product Landing Pages Test Suite (6 Scenarios)
 │   ├── verify_faq_dual_language.js    # Playwright Dual-Language FAQ Switching Suite
 │   ├── verify_seo_aeo_geo_pages.js    # Playwright SEO/AEO/GEO Landing Pages Test Suite
-│   └── seed_tasty_vadapav_atladara.js # Ground-Truth Business Seed Script for Tasty Vadapav Atladara
+│   ├── seed_tasty_vadapav_atladara.js # Ground-Truth Business Seed Script for Tasty Vadapav Atladara
+│   ├── backup_migration_bundle.sh     # Automated Zero-Scan Master Migration Snapshot & Keystore Bundler
+│   └── restore_migration_bundle.sh    # Automated 1-Click Zero-Scan Master Migration Restorer
 ```
 
 ### **10.2 Feature & Module Mapping Table**
