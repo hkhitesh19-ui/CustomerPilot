@@ -8,21 +8,23 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : f09eeaa
-Full Commit Hash  : f09eeaacdecfb5f6396f4c5c2d334ecf97e26857
-Target Fix Commit : f09eeaa
+Active Git Commit : dd5cc56
+Full Commit Hash  : dd5cc56faa953da3d0c9e56975b5d9ab7b62d0fd
+Target Fix Commit : dd5cc56
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 15 Oct 2026, 10:48 AM IST
+Deployment Date   : 16 Oct 2026, 11:05 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : docs: update VPS live deployment tracker for commit 2034ced
+Commit Title      : feat(migration): implement automated zero-scan master backup/restore engine and future-proof data protection safeguards
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080, Online & Healthy)
+Backup Engine     : /root/backup_migration_bundle.sh & /root/restore_migration_bundle.sh (Active)
 Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in (:3001)
 ----------------------------------------------------------
 
 Deployment History Log:
 ----------------------------------------------------------
+• [16 Oct 2026, 11:05 PM IST] Zero-Scan Master Migration Engine Implementation - Automated backup/restore snapshot tool (`customerpilot_zero_scan_migration_bundle_latest.tar.gz`) archiving Evolution API WhatsApp cryptographic sessions, WAL-checkpointed SQLite dev.db, PostgreSQL databases, uploads, and secrets.
 • [16 Oct 2026, 03:32 PM IST] WhatsApp QR Code Resolution on New VPS (187.127.170.36) - Deployed Evolution API v2.3.7 container with dedicated PostgreSQL evolution_db backend and host networking mode on port 8080. Verified live QR code generation during merchant onboarding via Playwright.
 • [15 Oct 2026, 10:48 AM IST] Migration to Fresh KVM 1 VPS (187.127.170.36) - Complete zero-to-one stack rebuild: Node 22 LTS, PM2, Nginx, PostgreSQL (cakeconnection db with 10 tables), SQLite dev.db (11 live merchants verified), customerpilot-web (:3000), cakeconnection (:3001), UFW enabled.
 • [11 Oct 2026, 04:06 PM IST] Commit 2034ced - Expanded sitemap.xml (40 -> 47 Public URLs) & robots.txt with 5-Minute Setup Guide, Operations Manual, /register, and 4 Official Smart Digital Business Cards (/c/[slug])
