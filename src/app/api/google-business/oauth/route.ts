@@ -14,10 +14,11 @@ export async function GET(req: Request) {
     const clientId = process.env.GOOGLE_CLIENT_ID;
 
     const merchant = await db.merchant.findUnique({ where: { id: merchantId } });
-    const businessName = merchant?.name?.trim() || "Cake Connection";
-    const businessAddress = merchant?.address?.trim() || "Shop 4, Anand-Vidyanagar Road, Anand, Gujarat";
-    const placeId = "ChIJc7ija2zFXzkR8DbOxXEfaM4";
-    const googleReviewUrl = (merchant as any)?.googleReviewLink || "https://g.page/r/CfA2zsVxH2jOEBM/review";
+    const isCakeConnection = (merchant?.name || "").toLowerCase().includes("cake connection");
+    const businessName = merchant?.name?.trim() || "Store Location";
+    const businessAddress = merchant?.address?.trim() || "Store Address";
+    const placeId = isCakeConnection ? "ChIJc7ija2zFXzkR8DbOxXEfaM4" : (merchant?.googleReviewLink ? `loc_${merchantId}` : "");
+    const googleReviewUrl = (merchant as any)?.googleReviewLink || (isCakeConnection ? "https://g.page/r/CfA2zsVxH2jOEBM/review" : "");
 
     // If instant sandbox connect requested or no client id:
     if (mode === "instant" || !clientId) {

@@ -199,10 +199,10 @@ function OnboardingPageContent() {
               logoUploaded: !!m.logoUrl,
               logoDataUrl: m.logoUrl || prev.logoDataUrl,
               googleConnected: isGoogleConnected,
-              googleBusiness: gConn?.placeName || (m.name && !m.name.includes("'s Business") ? m.name : "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"),
-              googlePlaceId: gConn?.placeId || "ChIJc7ija2zFXzkR8DbOxXEfaM4",
-              googleAddress: gConn?.address || m.address || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011",
-              googleReviewUrl: gConn?.googleReviewUrl || m.googleReviewLink || "https://g.page/r/CfA2zsVxH2jOEBM/review",
+              googleBusiness: gConn?.placeName || m.name || prev.businessName || "Store Location",
+              googlePlaceId: gConn?.placeId || (m.googleReviewLink ? "custom_place" : ""),
+              googleAddress: gConn?.address || m.address || prev.businessAddress || "",
+              googleReviewUrl: gConn?.googleReviewUrl || m.googleReviewLink || "",
             }))
             // Load merchant's enabled modules for conditional step filtering
             if (m.enabledModules) {
@@ -873,12 +873,12 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
               setData((prev: any) => ({
                 ...prev,
                 googleConnected: true,
-                googleBusiness: conn?.placeName || (m?.name && !m?.name.includes("'s Business") ? m.name : "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"),
-                googlePlaceId: conn?.placeId || "ChIJc7ija2zFXzkR8DbOxXEfaM4",
-                googleCid: conn?.gbpAccountId?.replace("accounts/", "") || "14873172342901454576",
-                googleMapsUri: `https://maps.google.com/?cid=14873172342901454576`,
-                googleReviewUrl: conn?.googleReviewUrl || m?.googleReviewLink || "https://g.page/r/CfA2zsVxH2jOEBM/review",
-                googleAddress: conn?.address || m?.address || prev.businessAddress || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011"
+                googleBusiness: conn?.placeName || m?.name || prev.businessName || "Store Location",
+                googlePlaceId: conn?.placeId || (m?.googleReviewLink ? "custom_place" : ""),
+                googleCid: conn?.gbpAccountId?.replace("accounts/", "") || "",
+                googleMapsUri: conn?.googleReviewUrl || m?.googleReviewLink || "",
+                googleReviewUrl: conn?.googleReviewUrl || m?.googleReviewLink || "",
+                googleAddress: conn?.address || m?.address || prev.businessAddress || ""
               }))
             }
           })
@@ -973,14 +973,14 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
 
   let rawPlaceName = data.googleBusiness || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"
   if (rawPlaceName.includes("'s Business")) {
-    rawPlaceName = "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"
+    rawPlaceName = data.businessName || "Your Store"
   }
   const placeName = rawPlaceName.split(/[:;|]/)[0].trim()
-  const storeAddress = data.googleAddress || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011"
-  const placeId = data.googlePlaceId || "ChIJc7ija2zFXzkR8DbOxXEfaM4"
-  const mapsCid = data.googleCid || "14873172342901454576"
-  const mapsUri = data.googleMapsUri || `https://maps.google.com/?cid=${mapsCid}`
-  const reviewLink = data.googleReviewUrl || "https://g.page/r/CfA2zsVxH2jOEBM/review"
+  const storeAddress = data.googleAddress || data.businessAddress || "Store Address"
+  const placeId = data.googlePlaceId || ""
+  const mapsCid = data.googleCid || ""
+  const mapsUri = data.googleMapsUri || (data.googleReviewUrl ? data.googleReviewUrl : "")
+  const reviewLink = data.googleReviewUrl || ""
 
   return (
     <div className="p-6 sm:p-8">
