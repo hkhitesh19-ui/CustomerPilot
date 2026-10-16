@@ -160,27 +160,48 @@ export async function POST(req: NextRequest) {
 
         console.log(`[Webhook] 📥 Incoming from: +${customerPhone} (${pushName}) | Text: ${text.substring(0, 80)}`)
 
-        // ── Find merchant by instance name or phone ─────────────────────
+        // ── Find merchant by instance name or phone (Prioritized matching) ─────────
         const phoneMatch = webhookInstance.match(/CP_(\d+)/)
         const instancePhone = phoneMatch ? phoneMatch[1] : ""
         const mIdMatch = webhookInstance.match(/CP_\d+_([a-z0-9]+)/)
         const instanceMerchantPrefix = mIdMatch ? mIdMatch[1] : ""
+        const genericAdminNumber = (process.env.EVOLUTION_ADMIN_NUMBER || "919033304707").replace(/\D/g, "")
 
-        let merchant = await db.merchant.findFirst({
-          where: {
-            OR: [
-              { whatsappInstanceName: webhookInstance },
-              ...(instancePhone ? [{ whatsappPhone: instancePhone }] : []),
-              ...(instanceMerchantPrefix ? [{ id: { startsWith: instanceMerchantPrefix } }] : []),
-              { whatsappPhone: webhookInstance.replace("CP_M", "") }
-            ]
-          }
-        })
-        if (!merchant) {
-          merchant = await db.merchant.findFirst({ orderBy: { createdAt: "asc" } })
+        let merchant = null
+
+        // 1. Exact match on active whatsappInstanceName
+        if (webhookInstance) {
+          merchant = await db.merchant.findFirst({
+            where: { whatsappInstanceName: webhookInstance }
+          })
         }
+
+        // 2. Strict match by merchant ID prefix from instance string (e.g. CP_xxx_cmvaruyb_xxx)
+        if (!merchant && instanceMerchantPrefix && instanceMerchantPrefix !== "anon" && instanceMerchantPrefix.length >= 6) {
+          merchant = await db.merchant.findFirst({
+            where: { id: { startsWith: instanceMerchantPrefix } }
+          })
+        }
+
+        // 3. Match by instancePhone ONLY if it is not the shared generic admin number
+        if (!merchant && instancePhone && instancePhone !== genericAdminNumber) {
+          merchant = await db.merchant.findFirst({
+            where: { whatsappPhone: instancePhone }
+          })
+        }
+
+        // 4. Match legacy CP_M format if applicable
+        if (!merchant && webhookInstance.startsWith("CP_M")) {
+          const rawPhone = webhookInstance.replace("CP_M", "")
+          if (rawPhone && rawPhone !== genericAdminNumber) {
+            merchant = await db.merchant.findFirst({
+              where: { whatsappPhone: rawPhone }
+            })
+          }
+        }
+
         if (!merchant) {
-          console.warn("[Webhook] ⚠️ No merchant found in DB")
+          console.warn(`[Webhook] ⚠️ No merchant resolved for instance: "${webhookInstance}". Dropping message to prevent cross-merchant contamination.`)
           continue
         }
 

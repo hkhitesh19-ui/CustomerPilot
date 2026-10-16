@@ -23,9 +23,10 @@ function getLiveWebhookUrl(): string {
 
 function buildInstanceName(whatsappPhone?: string | null, merchantId?: string, isNewSession: boolean = false): string {
   const timestamp = Date.now().toString(36)
-  const phone = (whatsappPhone || process.env.EVOLUTION_ADMIN_NUMBER || "919033304707").replace(/\D/g, "")
+  const cleanPhone = whatsappPhone ? whatsappPhone.replace(/\D/g, "") : ""
   const mId = (merchantId || 'anon').slice(0, 8)
-  return isNewSession ? `CP_${phone}_${mId}_${timestamp}` : `CP_${phone}_${mId}`
+  const phonePart = cleanPhone && cleanPhone.length >= 10 ? cleanPhone : `M_${mId}`
+  return isNewSession ? `CP_${phonePart}_${mId}_${timestamp}` : `CP_${phonePart}_${mId}`
 }
 
 async function getAuthMerchant(req: Request) {

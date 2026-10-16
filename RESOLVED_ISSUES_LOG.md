@@ -3,6 +3,37 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [16 Oct 2026] Issue: Merchant Baseline Review Count & Rating Discrepancy (Zero Reviews in AdminPanel)
+- **Symptom**: Newly registered merchant "M/s Vinayak Fashion, Kanpur" showed 5.0 ⭐ (1 review) on live Google Maps, but CustomerPilot SuperAdmin Fleet table displayed `⭐ 0.0 (0 reviews)` with missing baseline analytics.
+- **Root Cause**:
+  1. During Google OAuth authorization in Onboarding Step 3, CustomerPilot's Google Cloud project `391546314644` did not have `mybusiness.googleapis.com` (Google My Business API) enabled, returning HTTP 403 Forbidden.
+  2. The Google OAuth callback (`src/app/api/google-business/oauth/callback/route.ts`) and location selection route (`src/app/api/google-business/select-location/route.ts`) only persisted `address` and `googleReviewLink`, omitting `baselineReviewCount` and `baselineRating` synchronization.
+  3. Failure to fetch GBP reviews caused the catch block to fall back to hardcoded default values, leaving the database columns at `0` and `0.0`.
+- **Resolution**:
+  1. Integrated live Google Places API Details fetch in both `src/app/api/google-business/select-location/route.ts` and `src/app/api/google-business/oauth/callback/route.ts` using `GOOGLE_PLACES_API_KEY` to automatically query `rating` and `user_ratings_total` directly by `placeId` whenever a location is selected or authenticated.
+  2. Updated database records for Vinayak Fashion with verified baseline values (`baselineRating = 5.0`, `baselineReviewCount = 1`, `baselineCapturedAt = CURRENT_TIMESTAMP`).
+  3. Verified via Playwright automated browser test (`scripts/verify_superadmin_vinayak.js`) that SuperAdmin Merchants Fleet table accurately renders `Vinayak Fashion` with `⭐ 5 (1 reviews)` and active customer count.
+- **Status**: ✅ Resolved and Verified.
+
+---
+## [16 Oct 2026] Issue: Cross-Merchant WhatsApp Welcome Message & 404 Error on VIP Wallet Card
+- **Symptom**: When a customer (Ishanvi) scanned the QR code of newly registered merchant M/s Vinayak Fashion, she received a WhatsApp welcome message stating "Your FREE VIP Membership is now active at Sharma Sweets & Cafe Vadodara" with VIP Card URL `https://customerpilot.in/q/wallet/cmvavfgdj0pekkvtmrdtlioc4`, which returned a "404 - This page could not be found." error.
+- **Root Cause**:
+  1. **Webhook Cross-Merchant Resolution Collision**: When Vinayak Fashion created an instance in Step 2 without an explicit phone number, `buildInstanceName` defaulted to admin number `919033304707`, naming the instance `CP_919033304707_cmvaruyb_mvaslx00`. In `src/app/api/webhook/evolution/route.ts`, incoming webhook matched merchants using an un-prioritized `OR` condition containing `{ whatsappPhone: instancePhone }` (`919033304707`). Because older merchant "Sharma Sweets & Cafe Vadodara" had `whatsappPhone = 919033304707`, SQLite resolved Sharma Sweets instead of Vinayak Fashion, creating customer Ishanvi under Sharma Sweets and dispatching the Sharma Sweets welcome template.
+  2. **Fragile Wallet Route (404 Error)**: In `src/app/q/wallet/[customerId]/page.tsx`, if the resolved merchant did not have an active `StampCard` rule configured, line 47 returned `notFound()`, crashing the customer's wallet pass with a 404 page.
+- **Resolution**:
+  1. **Prioritized Merchant Resolution in Webhook**: Refactored `src/app/api/webhook/evolution/route.ts` to strictly prioritize:
+     - Priority 1: Exact `whatsappInstanceName` match.
+     - Priority 2: Merchant ID prefix extracted directly from instance string (`CP_xxx_<prefix>_xxx` where `id: { startsWith: prefix }`).
+     - Priority 3: Phone match ONLY IF phone is not the shared fallback admin number (`919033304707`).
+     - Removed unsafe fallback that assigned unmatched messages to the oldest merchant in the database.
+  2. **Refined Instance Naming (`src/app/api/whatsapp/connect/route.ts`)**: Prevented admin number injection into merchant instance names by using merchant-specific prefix `M_<merchantId>` when phone is not yet provided.
+  3. **Self-Healing Wallet Architecture (`src/app/q/wallet/[customerId]/page.tsx`)**: Replaced `notFound()` crash with self-healing fallback that automatically provisions a default VIP StampCard rule and initializes `CustomerStampCard` with joining bonus stamps if missing.
+  4. **Data Restoration & Ground-Truth Verification**: Restored Vinayak Fashion (`cmvaruybf0n9akvtmbog4k7u7`), its StampCard (`cmvasoy030nq7kvtmkrta4ely`), Customer Ishanvi (`cmvavfgdj0pekkvtmrdtlioc4`), and CustomerStampCard (2 joining stamps) across both SQLite database paths (`/var/www/CustomerPilot/prisma/dev.db` and `/var/www/CustomerPilot/.next/standalone/prisma/dev.db`).
+  5. **Playwright Visual Verification**: Executed automated browser inspection (`scripts/screenshot_ishanvi_wallet.js`), verifying HTTP 200 OK and capturing mobile pass rendering (`scratch/verified_ishanvi_vinayak_wallet.png`): "Hi, Ishanvi ❤️", "Official VIP Member at Vinayak Fashion", "Your Stamp Collection: 2 / 8", "₹200 Shopping Voucher", with 0 dummy text and 0 visual clipping.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [16 Oct 2026] Issue: WhatsApp QR Code Not Generating During Merchant Signup/Onboarding on Live Website
 - **Symptom**: During new merchant onboarding on `https://customerpilot.in/onboarding` (Step 2: "Connect Store WhatsApp"), the QR code failed to load. The screen was indefinitely stuck displaying `"Initializing QR Code..."` with a non-functional `"Generate QR Code"` button, blocking merchants from linking their WhatsApp Business account.
 - **Root Cause**:

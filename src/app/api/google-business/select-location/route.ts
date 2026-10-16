@@ -52,12 +52,33 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // Update merchant record address & review link
+    // Fetch live Google Maps rating and review count if Google Places API key is present
+    let fetchedRating: number | null = null;
+    let fetchedReviewCount: number | null = null;
+    const placesApiKey = process.env.GOOGLE_PLACES_API_KEY;
+    if (placeId && placesApiKey) {
+      try {
+        const placeRes = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(placeId)}&fields=rating,user_ratings_total&key=${placesApiKey}`);
+        if (placeRes.ok) {
+          const placeData = await placeRes.json();
+          if (placeData.result) {
+            if (typeof placeData.result.rating === "number") fetchedRating = placeData.result.rating;
+            if (typeof placeData.result.user_ratings_total === "number") fetchedReviewCount = placeData.result.user_ratings_total;
+          }
+        }
+      } catch (e) {
+        console.warn("[Google Select Location] Places API fetch error:", e);
+      }
+    }
+
+    // Update merchant record address, review link, and baseline reviews
     await (db.merchant as any).update({
       where: { id: merchantId },
       data: {
-        address: address,
-        googleReviewLink: finalReviewUrl
+        ...(address ? { address } : {}),
+        googleReviewLink: finalReviewUrl,
+        ...(fetchedRating !== null ? { baselineRating: fetchedRating } : {}),
+        ...(fetchedReviewCount !== null ? { baselineReviewCount: fetchedReviewCount, baselineCapturedAt: new Date() } : {})
       }
     }).catch(() => {});
 

@@ -39,25 +39,68 @@ export default async function WalletPage({
 
   if (!customer) return notFound()
 
-  // Find the active stamp card rule for this merchant
-  const activeStampCardRule = await db.stampCard.findFirst({
+  // Find the active stamp card rule for this merchant, or fallback to any existing rule
+  let activeStampCardRule = await db.stampCard.findFirst({
     where: { merchantId: customer.merchantId, active: true }
   })
 
-  if (!activeStampCardRule) return notFound()
+  if (!activeStampCardRule) {
+    activeStampCardRule = await db.stampCard.findFirst({
+      where: { merchantId: customer.merchantId }
+    })
+  }
+
+  // Self-healing: if merchant has no stamp card at all, auto-create default VIP card
+  if (!activeStampCardRule) {
+    try {
+      activeStampCardRule = await db.stampCard.create({
+        data: {
+          merchantId: customer.merchantId,
+          name: `${customer.merchant?.name || "VIP"} Club Card`,
+          stampsRequired: 10,
+          rewardName: "Special VIP Reward",
+          joiningBonusEnabled: true,
+          joiningBonusStamps: 2,
+          color: "#6366f1",
+          active: true,
+        }
+      })
+    } catch (e) {
+      console.error("[Wallet Page] Failed to auto-create fallback stamp card:", e)
+    }
+  }
 
   // Find active uncompleted card
-  const activeCard = customer.stampCards.find(
-    c => c.stampCardId === activeStampCardRule.id && !c.completed && !c.redeemed
+  let activeCard = customer.stampCards.find(
+    c => activeStampCardRule && c.stampCardId === activeStampCardRule.id && !c.completed && !c.redeemed
   )
 
   // Find completed unredeemed card
   const unredeemedRewardCard = customer.stampCards.find(
-    c => c.stampCardId === activeStampCardRule.id && c.completed && !c.redeemed
+    c => activeStampCardRule && c.stampCardId === activeStampCardRule.id && c.completed && !c.redeemed
   )
 
-  const stampsRequired = activeStampCardRule.stampsRequired || 10
-  const stampsCollected = activeCard ? activeCard.stampsCollected : (unredeemedRewardCard ? stampsRequired : 0)
+  // Self-healing: if customer has no active card, auto-create one with joining bonus
+  if (!activeCard && !unredeemedRewardCard && activeStampCardRule) {
+    try {
+      const initialStamps = activeStampCardRule.joiningBonusEnabled ? (activeStampCardRule.joiningBonusStamps ?? 2) : 1
+      activeCard = await db.customerStampCard.create({
+        data: {
+          customerId: customer.id,
+          merchantId: customer.merchantId,
+          stampCardId: activeStampCardRule.id,
+          stampsCollected: initialStamps,
+          completed: false,
+          redeemed: false,
+        }
+      }) as any
+    } catch (e) {
+      console.warn("[Wallet Page] Could not auto-create customer card:", e)
+    }
+  }
+
+  const stampsRequired = activeStampCardRule?.stampsRequired || 10
+  const stampsCollected = activeCard ? activeCard.stampsCollected : (unredeemedRewardCard ? stampsRequired : (activeStampCardRule?.joiningBonusEnabled ? (activeStampCardRule.joiningBonusStamps ?? 2) : 0))
 
   const latestReview = customer.reviews?.[0]
   const hasPostedReview = Boolean(latestReview)

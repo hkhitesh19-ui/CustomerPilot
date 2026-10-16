@@ -53,10 +53,10 @@ export async function GET(req: Request) {
     // 2. Fetch Google Business Profile Accounts
     let gbpAccountId = null;
     let gbpLocationId = null;
-    let placeName = merchant?.name?.trim() || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara";
-    let placeAddress = merchant?.address?.trim() || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011";
-    let placeId = "ChIJc7ija2zFXzkR8DbOxXEfaM4";
-    let googleReviewUrl = "https://g.page/r/CfA2zsVxH2jOEBM/review";
+    let placeName = merchant?.name?.trim() || "";
+    let placeAddress = merchant?.address?.trim() || "";
+    let placeId = "";
+    let googleReviewUrl = merchant?.googleReviewLink || "";
 
     try {
       const accountsRes = await fetch("https://mybusinessaccountmanagement.googleapis.com/v1/accounts", {
@@ -143,12 +143,33 @@ export async function GET(req: Request) {
       }
     });
 
-    // Also ensure merchant table has real address and review link
+    // Fetch live Google Maps rating and review count if Google Places API key is present
+    let fetchedRating: number | null = null;
+    let fetchedReviewCount: number | null = null;
+    const placesApiKey = process.env.GOOGLE_PLACES_API_KEY;
+    if (placeId && placesApiKey) {
+      try {
+        const placeRes = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(placeId)}&fields=rating,user_ratings_total&key=${placesApiKey}`);
+        if (placeRes.ok) {
+          const placeData = await placeRes.json();
+          if (placeData.result) {
+            if (typeof placeData.result.rating === "number") fetchedRating = placeData.result.rating;
+            if (typeof placeData.result.user_ratings_total === "number") fetchedReviewCount = placeData.result.user_ratings_total;
+          }
+        }
+      } catch (e) {
+        console.warn("[Google OAuth Callback] Places API fetch error:", e);
+      }
+    }
+
+    // Also ensure merchant table has real address, review link, and baseline reviews
     await db.merchant.update({
       where: { id: merchantId },
       data: { 
-        address: placeAddress,
-        googleReviewLink: googleReviewUrl,
+        ...(placeAddress ? { address: placeAddress } : {}),
+        ...(googleReviewUrl ? { googleReviewLink: googleReviewUrl } : {}),
+        ...(fetchedRating !== null ? { baselineRating: fetchedRating } : {}),
+        ...(fetchedReviewCount !== null ? { baselineReviewCount: fetchedReviewCount, baselineCapturedAt: new Date() } : {})
       }
     }).catch(() => {});
 
