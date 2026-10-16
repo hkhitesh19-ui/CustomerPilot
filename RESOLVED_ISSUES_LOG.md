@@ -3,6 +3,22 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [16 Oct 2026] Issue: WhatsApp QR Code Not Generating During Merchant Signup/Onboarding on Live Website
+- **Symptom**: During new merchant onboarding on `https://customerpilot.in/onboarding` (Step 2: "Connect Store WhatsApp"), the QR code failed to load. The screen was indefinitely stuck displaying `"Initializing QR Code..."` with a non-functional `"Generate QR Code"` button, blocking merchants from linking their WhatsApp Business account.
+- **Root Cause**:
+  1. During the VPS migration to the fresh Hostinger server (`187.127.170.36`), Evolution API (WhatsApp Baileys gateway) was omitted from the new VPS container deployment stack.
+  2. The application's `/api/whatsapp/connect` endpoint was throwing `500 Internal Server Error (fetch failed)` while attempting to connect to `http://187.127.170.36:8080/instance/create`.
+  3. Evolution API v2 (`evoapicloud/evolution-api:latest`) strictly requires a PostgreSQL relational database backend (`DATABASE_ENABLED=true`, `DATABASE_PROVIDER=postgresql`) even for session management; attempts to run it with `DATABASE_ENABLED=false` caused an immediate crash loop (`Error: Database provider invalid`).
+  4. Docker bridge networking (`172.17.0.0/16`) to host PostgreSQL port 5432 was initially blocked by UFW firewall rules.
+- **Resolution**:
+  1. **PostgreSQL Database Setup**: Created a dedicated `evolution_db` database and `evolution` user with secure credentials in the VPS PostgreSQL 14 instance. Configured `pg_hba.conf` and `listen_addresses` to accept local connections.
+  2. **Docker Compose with Host Networking**: Deployed official `evoapicloud/evolution-api:latest` using `network_mode: host` in `/opt/evolution-api/docker-compose.yml`, establishing direct bare-metal network connectivity to `127.0.0.1:5432` for PostgreSQL and exposing port `8080` without NAT or bridge overhead.
+  3. **Verified Evolution API Online**: Verified HTTP 200 health check response: `{"status":200,"message":"Welcome to the Evolution API, it is working!","version":"2.3.7"}`.
+  4. **Ground-Truth Playwright Verification**: Created and executed `scripts/verify_live_onboarding_qr.js` to simulate live merchant signup and onboarding. Verified that `/api/whatsapp/connect` successfully creates an instance, generates a high-resolution base64 QR code (`data:image/png;base64,...`, length 12,186 chars), and renders the scannable QR code on the live browser with a live 10:00 countdown timer.
+  5. **Snapshot Verification**: Captured visual proof `verified_whatsapp_qr_code_onboarding.png` confirming zero visual truncation, clear 3-step scanning instructions, and active QR code display.
+- **Status**: ✅ Resolved, Audited, Verified & Committed Locally.
+
+---
 ## [11 Oct 2026] Feature: Updated Website Sitemap (`/sitemap.xml`) & Robots (`/robots.txt`) Expansion for Google Search Console (40 ➔ 47 Public URLs)
 - **Symptom**: In Google Search Console (`sc-domain:customerpilot.in`), the submitted `https://customerpilot.in/sitemap.xml` only discovered 40 pages (from the older sitemap list) and omitted the newly added website pages (`/guide/5-minute-setup-guide`, `/guide/operations`, `/register`, and official public Smart Digital Business Cards `/c/[slug]`). Additionally, `src/app/robots.ts` was missing explicit `Allow:` directives for several newer product and guide routes.
 - **Root Cause**: `src/app/sitemap.ts` previously contained a static 40-route array and had not been updated with the new Setup/Operations Guides, Merchant Registration route, or public Smart Digital Business Card slugs (`/c/cake-connection`, `/c/gujarat-photo-goods`, `/c/tasty-vadapav`, `/c/tasty-vadapav-atladara`).
