@@ -1805,13 +1805,37 @@ function MerchantManagement() {
                     </select>
                   </div>
                   <div>
-                    <Label className="text-xs text-slate-400">Trial Ends At</Label>
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs text-slate-400">Trial Ends At</Label>
+                      <span className="text-[10px] text-indigo-400 font-semibold">Quick Extend:</span>
+                    </div>
                     <Input
                       type="date"
                       value={profileEditForm.trialEndsAt || ""}
                       onChange={(e) => setProfileEditForm({ ...profileEditForm, trialEndsAt: e.target.value })}
                       className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
                     />
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      {[3, 7, 14, 30].map((days) => (
+                        <button
+                          key={days}
+                          type="button"
+                          onClick={() => {
+                            const base = profileEditForm.trialEndsAt ? new Date(profileEditForm.trialEndsAt) : new Date()
+                            const currentMs = isNaN(base.getTime()) ? Date.now() : Math.max(Date.now(), base.getTime())
+                            const target = new Date(currentMs + days * 24 * 60 * 60 * 1000)
+                            setProfileEditForm({
+                              ...profileEditForm,
+                              trialEndsAt: target.toISOString().split("T")[0],
+                              status: "Active"
+                            })
+                          }}
+                          className="px-2 py-0.5 rounded bg-indigo-500/15 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold transition-colors cursor-pointer"
+                        >
+                          +{days}d
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div>
                     <Label className="text-xs text-slate-400">Onboarding Step (1-8)</Label>

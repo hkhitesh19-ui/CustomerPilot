@@ -81,6 +81,7 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
 
   let card = await db.digitalBusinessCard.findUnique({
     where: { slug: cleanSlug },
+    include: { merchant: true },
   })
 
   if (!card) {
@@ -91,11 +92,36 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
     })
     if (matchingMerchant) {
       card = await getOrCreateDigitalBusinessCard(matchingMerchant.id)
+      if (card) {
+        card = await db.digitalBusinessCard.findUnique({
+          where: { id: card.id },
+          include: { merchant: true },
+        })
+      }
     }
   }
 
   if (!card) {
     notFound()
+  }
+
+  // Ensure theme honors merchant's active plan and extended trialEndsAt from SuperAdmin
+  let effectiveTheme = card.theme
+  if (card.merchant) {
+    const isSubscribed = card.merchant.plan && card.merchant.plan !== "trial"
+    let themeObj: any = {}
+    try {
+      themeObj = typeof card.theme === "string" && card.theme.startsWith("{") ? JSON.parse(card.theme) : { baseTheme: card.theme }
+    } catch (_) {
+      themeObj = { baseTheme: card.theme }
+    }
+    if (isSubscribed) {
+      themeObj.subscribed = true
+    }
+    if (card.merchant.trialEndsAt) {
+      themeObj.trialEndsAt = card.merchant.trialEndsAt.toISOString()
+    }
+    effectiveTheme = JSON.stringify(themeObj)
   }
 
   const cardData: DigitalCardData = {
@@ -121,7 +147,7 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
     googleRating: card.googleRating,
     googleReviewsCnt: card.googleReviewsCnt,
     createdAt: card.createdAt,
-    theme: card.theme,
+    theme: effectiveTheme,
     googlePlaceId: card.googlePlaceId,
   }
 

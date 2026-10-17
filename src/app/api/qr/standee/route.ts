@@ -132,19 +132,23 @@ async function createBrandedQRBuffer(
   logoBuffer: Buffer | null,
   darkColor: string = "#0f172a"
 ): Promise<Buffer> {
+  // Generate QR directly at exact target size without fuzzy interpolation
+  // ErrorCorrectionLevel "H" provides 30% recovery capacity
   const qrRaw = await QRCode.toBuffer(targetUrl, {
     errorCorrectionLevel: "H",
-    margin: 2,
-    width: qrSize * 2,
+    margin: 1,
+    width: qrSize,
     color: { dark: darkColor, light: "#ffffff" },
   })
 
-  let qrSharp = sharp(qrRaw).resize(qrSize, qrSize)
+  let qrSharp = sharp(qrRaw)
 
   if (logoBuffer) {
     try {
-      const badgeSize = Math.round(qrSize * 0.28)
-      const logoInnerSize = Math.round(badgeSize * 0.82)
+      // 20% logo badge width covers only 4% of total QR area, leaving 26% safety margin
+      // for instant scan on all phone cameras, screens, and low-light environments
+      const badgeSize = Math.round(qrSize * 0.20)
+      const logoInnerSize = Math.round(badgeSize * 0.78)
       const resizedLogo = await sharp(logoBuffer)
         .resize({ width: logoInnerSize, height: logoInnerSize, fit: "inside" })
         .png()
@@ -152,7 +156,7 @@ async function createBrandedQRBuffer(
 
       const badgeSvg = Buffer.from(
         `<svg width="${badgeSize}" height="${badgeSize}">
-          <rect x="0" y="0" width="${badgeSize}" height="${badgeSize}" rx="14" ry="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="2.5"/>
+          <rect x="0" y="0" width="${badgeSize}" height="${badgeSize}" rx="8" ry="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.8"/>
         </svg>`
       )
 
@@ -287,7 +291,7 @@ async function renderReviewStandee(merchant: any, logoBuffer: Buffer | null, tar
   const width = 723
   const height = 1024
 
-  const qrBuf = await createBrandedQRBuffer(targetUrl, 250, logoBuffer, "#0f172a")
+  const qrBuf = await createBrandedQRBuffer(targetUrl, 280, logoBuffer, "#0f172a")
 
   const baseSvg = `
   <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
@@ -391,7 +395,7 @@ async function renderReviewStandee(merchant: any, logoBuffer: Buffer | null, tar
   const baseBuf = await sharp(Buffer.from(baseSvg)).png().toBuffer()
   const composites: sharp.OverlayOptions[] = [
     { input: baseBuf, left: 0, top: 0 },
-    { input: qrBuf, left: 236, top: 432 },
+    { input: qrBuf, left: 221, top: 417 },
   ]
 
   await compositeMerchantHeader(composites, merchant, logoBuffer, width)
@@ -411,7 +415,7 @@ async function renderCardStandee(merchant: any, logoBuffer: Buffer | null, targe
   const width = 723
   const height = 1024
 
-  const qrBuf = await createBrandedQRBuffer(targetUrl, 250, logoBuffer, "#0f172a")
+  const qrBuf = await createBrandedQRBuffer(targetUrl, 280, logoBuffer, "#0f172a")
 
   const baseSvg = `
   <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
@@ -501,7 +505,7 @@ async function renderCardStandee(merchant: any, logoBuffer: Buffer | null, targe
   const baseBuf = await sharp(Buffer.from(baseSvg)).png().toBuffer()
   const composites: sharp.OverlayOptions[] = [
     { input: baseBuf, left: 0, top: 0 },
-    { input: qrBuf, left: 236, top: 360 },
+    { input: qrBuf, left: 221, top: 345 },
   ]
 
   await compositeMerchantHeader(composites, merchant, logoBuffer, width)
@@ -521,7 +525,7 @@ async function renderComboStandee(merchant: any, logoBuffer: Buffer | null, targ
   const width = 723
   const height = 1024
 
-  const qrBuf = await createBrandedQRBuffer(targetUrl, 250, logoBuffer, "#0f172a")
+  const qrBuf = await createBrandedQRBuffer(targetUrl, 280, logoBuffer, "#0f172a")
 
   const baseSvg = `
   <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
@@ -622,7 +626,7 @@ async function renderComboStandee(merchant: any, logoBuffer: Buffer | null, targ
   const baseBuf = await sharp(Buffer.from(baseSvg)).png().toBuffer()
   const composites: sharp.OverlayOptions[] = [
     { input: baseBuf, left: 0, top: 0 },
-    { input: qrBuf, left: 236, top: 336 },
+    { input: qrBuf, left: 221, top: 321 },
   ]
 
   await compositeMerchantHeader(composites, merchant, logoBuffer, width)

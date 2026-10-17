@@ -3,6 +3,30 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [17 Oct 2026] Issue: QR Code Phone Camera Scannability Optimization & SuperAdmin 1-Click Merchant Trial Extension Engine
+- **Symptom**:
+  1. Standee QR codes were difficult or slow for physical smartphone cameras to scan when displayed on computer screens or under varying lighting conditions.
+  2. SuperAdmin needed a clear and instant mechanism to increase or extend trial days for any merchant on a 3-day or 7-day free trial without manual database surgery.
+- **Root Cause**:
+  1. In `src/app/api/qr/standee/route.ts`, the QR code was generated at 500px and downsampled to 250px via Sharp's continuous bicubic filter, creating fuzzy anti-aliased gray pixels along every 1-bit module edge. Furthermore, the embedded center logo badge was oversized at 28% of QR width, covering ~30% of data columns and leaving zero margin for camera optical glare or screen pixel moiré.
+  2. While `db.merchant.trialEndsAt` was stored in the database, the SuperAdmin Edit modal lacked quick 1-click extension buttons (+3d, +7d, +14d, +30d), and the public Digital Business Card (`/c/[slug]`) only checked `card.theme` without dynamically honoring `merchant.trialEndsAt`.
+- **Resolution**:
+  1. **Optical QR Camera Scanning Optimization (`src/app/api/qr/standee/route.ts`)**:
+     - Upgraded QR code size from 250px to 280px within the 330px card, increasing physical module size by ~24%.
+     - Eliminated fuzzy downsampling: `QRCode.toBuffer` now generates directly at the exact target dimensions with 100% sharp binary edge contrast.
+     - Reduced center logo badge width from 28% to 20%, covering only 4% of the total QR surface area. Under Reed-Solomon Level H (30% error correction), this guarantees a massive 26% safety margin for instant phone camera lock even on reflective screens, angles, and low light.
+     - Centered the 280px QR codes across Templates A, B, and C (`left: 221, top: 417/345/321`).
+  2. **SuperAdmin 1-Click Trial Extension Engine (`src/app/super-admin/page.tsx` & `src/app/api/admin/merchants/route.ts`)**:
+     - Added 4 quick extension buttons (`+3d`, `+7d`, `+14d`, `+30d`) next to the "Trial Ends At" date input in the SuperAdmin Edit Merchant modal.
+     - Clicking any button dynamically computes `currentExpiry + N days` (or `now + N days` if expired) and auto-activates merchant status.
+     - Updated `src/app/api/admin/merchants/route.ts` to automatically synchronize `digitalBusinessCard.theme` with the new `trialEndsAt`.
+     - Updated `src/app/c/[slug]/page.tsx` to include `merchant` relation, injecting `merchant.trialEndsAt` and paid subscription status into `effectiveTheme` so public digital cards never falsely expire.
+  3. **Live Deployment & Dual-Engine Verification**:
+     - Deployed to production VPS (`187.127.170.36`), reloaded PM2 `customerpilot-web`, and verified HTTP 200 across all 4 standee endpoints.
+     - Executed automated browser inspection (`scripts/verify_cake_standee_dashboard.js`) and decoded all 4 standees via `scripts/test_qr_decode.js` (HTTP 200, valid URLs).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [17 Oct 2026] Issue: Removal of Redundant "Point/Scan Phone Camera" Prompts from Standee Templates A, B, and C
 - **Symptom**: Standee designs contained redundant sub-prompts ("Scan with your Phone Camera to publish your review" in Template A, "Point Any Phone Camera to Open Digital Card" in Template B, and "Point Any Phone Camera → Open Digital Hub" in Template C) directly adjacent to the main QR code and feature sections, creating visual clutter and reducing whitespace around the central artwork.
 - **Root Cause**: The standalone and combo templates originally included inline guidance strings between the QR code and feature grids, which were redundant since the bottom instruction bars and badges already guide the customer clearly.

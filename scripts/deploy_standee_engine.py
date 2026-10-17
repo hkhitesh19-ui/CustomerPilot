@@ -18,6 +18,9 @@ def deploy():
         ('src/components/qr-generator.tsx', '/var/www/CustomerPilot/src/components/qr-generator.tsx'),
         ('src/app/dashboard/settings/page.tsx', '/var/www/CustomerPilot/src/app/dashboard/settings/page.tsx'),
         ('src/app/dashboard/digital-card/page.tsx', '/var/www/CustomerPilot/src/app/dashboard/digital-card/page.tsx'),
+        ('src/app/api/admin/merchants/route.ts', '/var/www/CustomerPilot/src/app/api/admin/merchants/route.ts'),
+        ('src/app/c/[slug]/page.tsx', '/var/www/CustomerPilot/src/app/c/[slug]/page.tsx'),
+        ('src/app/super-admin/page.tsx', '/var/www/CustomerPilot/src/app/super-admin/page.tsx'),
     ]
 
     for local_p, remote_p in files:

@@ -184,6 +184,33 @@ export async function POST(req: Request) {
         }
       });
 
+      // Synchronize digital business card theme with the new trial date if applicable
+      if (trialEndsAt !== undefined && updated.trialEndsAt) {
+        try {
+          const card = await db.digitalBusinessCard.findUnique({ where: { merchantId } });
+          if (card) {
+            let parsedTheme: any = {};
+            try {
+              parsedTheme = typeof card.theme === 'string' && card.theme.startsWith('{')
+                ? JSON.parse(card.theme)
+                : { baseTheme: card.theme || 'champagne_luxury' };
+            } catch (_) {
+              parsedTheme = { baseTheme: card.theme || 'champagne_luxury' };
+            }
+            parsedTheme.trialEndsAt = updated.trialEndsAt.toISOString();
+            if (updated.plan && updated.plan !== 'trial') {
+              parsedTheme.subscribed = true;
+            }
+            await db.digitalBusinessCard.update({
+              where: { id: card.id },
+              data: { theme: JSON.stringify(parsedTheme) }
+            });
+          }
+        } catch (cardSyncErr) {
+          console.warn('[Sync Card Trial Error]', cardSyncErr);
+        }
+      }
+
       return NextResponse.json({
         success: true,
         message: `Successfully updated profile for ${updated.name}`,
