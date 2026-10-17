@@ -8,18 +8,18 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 4d816ad
-Full Commit Hash  : 4d816add0c52e42d47b93d220e245d7b0099d905
-Target Fix Commit : 4d816ad
+Active Git Commit : 5cf8847
+Full Commit Hash  : 5cf88476a46ba92d4d51fa834b6a5b402f59fadb
+Target Fix Commit : 5cf8847
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 17 Oct 2026, 12:54 PM IST
+Deployment Date   : 17 Oct 2026, 01:36 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(standee): multi-template standee studio with dedicated Google Review, Digital Card, and Combo designs
+Commit Title      : fix(standee): replace emoji glyphs with vector SVG shapes and fix Template C headline wrap
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080, Online & Healthy)
 Merchant Status   : Vinayak Fashion & Cake Connection Live
-Standee Status    : Standee Studio Live with 4 Bespoke Templates (Template A: Google Review, Template B: Digital Card, Template C: Connect & Review, Template D: VIP Loyalty)
+Standee Status    : Standee Studio Live with 4 Bespoke Templates (Template A: Google Review, Template B: Digital Card, Template C: Connect & Review, Template D: VIP Loyalty) - 100% Crisp Vector SVG Rendering
 Trial Isolation   : Verified on VPS (Only selected 1 or 2 modules enabled; card auto-provisioned; direct dashboard redirect; 0 forced onboarding)
 Google Places API : Configured and verified with AIzaSyC1wp... (Active)
 Nginx Static Alias: Direct /_next/static/ disk alias active (HTTP 200 chunk delivery)
@@ -29,6 +29,7 @@ Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in 
 
 Deployment History Log:
 ----------------------------------------------------------
+• [17 Oct 2026, 01:36 PM IST] Commit 5cf8847 - fix(standee): replace emoji glyphs with vector SVG shapes and fix Template C headline wrap. Deployed to production VPS (187.127.170.36), reloaded PM2, and verified 100% crisp vector rendering across all 4 standee designs for Cake Connection.
 • [17 Oct 2026, 12:54 PM IST] Commit 4d816ad - feat(standee): multi-template standee studio with dedicated Google Review, Digital Card, and Combo designs. Deployed 4-template engine, Section 01 unlocked for all merchants, and verified live via Playwright for Cake Connection.
 • [17 Oct 2026, 11:45 AM IST] Commit fc995b9 - fix(trial): isolate 3-day free trial modules and support standalone/combo fast-track signups. Added DIGITAL_CARD to Module/ALL_MODULES, fixed registration override bug, updated all landing page CTAs, and verified live on VPS.
 • [17 Oct 2026, 11:13 AM IST] Commit fdc6379 - fix(standee): auto-provision digital business card so standee QR directly opens merchant digital card. Dynamic self-healing digital card creation for all new merchants.
