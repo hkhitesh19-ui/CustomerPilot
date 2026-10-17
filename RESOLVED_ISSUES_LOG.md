@@ -3,6 +3,24 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [17 Oct 2026] Issue: Residual "Cake Connection" Branding on Merchant Standee & Adaptive Universal Template
+- **Symptom**: In Vinayak Fashion's Merchant Dashboard Settings (`/dashboard/settings` Section 01: "Digital Loyalty Stamp QR Code"), the master standee preview displayed residual elements of "Cake Connection" ("onnection" text and colorful cake icon) poking out from under the merchant header pill, rather than showing a clean, bespoke standee for Vinayak Fashion.
+- **Root Cause**:
+  1. The base artwork image `public/standees/standee_master_authentic.jpg` (723x1024) had Cake Connection's branding permanently baked into the top dark navy arch (`x=160..565, y=6..157`).
+  2. In `src/app/api/qr/standee/route.ts`, the `headerPill` was configured at `{ left: 122, top: 16, width: 480, height: 104 }`. Because `top: 16` + `height: 104` = `120`, the bottom 38 pixels (`y=120..158`) containing "onnection" and divider lines remained exposed.
+  3. The route rendered a rigid, opaque white rectangular box (`fill="#ffffff"`) that awkwardly framed square or dark circular logos (like Vinayak Fashion's 1:1 circular damask emblem), causing empty white letterboxing.
+  4. The route had a hardcoded bypass `if (config.headerPill && !isCakeConnection)` that prevented Cake Connection from being dynamically composited, assuming it was forever part of the background.
+- **Resolution**:
+  1. **Cleaned Universal Base Template**: Seamlessly restored `public/standees/standee_master_authentic.jpg` using a mathematical vertical gradient matching the authentic luxury navy arch (`rgb(6, 25, 50)` to `rgb(2, 10, 24)`) and horizontal cosine edge fading, completely eliminating Cake Connection's hardcoded branding while preserving all gold outer borders and divider lines.
+  2. **Adaptive Luxury Branding Engine (`src/app/api/qr/standee/route.ts`)**:
+     - *Circular / Square Logos (Aspect 0.75 - 1.25, e.g. Vinayak Fashion)*: Automatically extracts and masks the logo into an authentic circular medallion with double metallic gold rims (`#d4af37` and `#fef08a`), accompanied by horizontal gold flourish wings with diamond tips on the dark navy arch.
+     - *Wide / Landscape Logos (Aspect > 1.25, e.g. Cake Connection)*: Dynamically composites into a luxury porcelain white plaque with double metallic gold borders, ensuring high contrast for dark text and custom branding.
+     - *Wordmark Fallback (Zero Logo)*: Renders store name in royal gold Times New Roman / Georgia serif typography with subtitle "OFFICIAL LOYALTY PARTNER".
+  3. **Deployed & Synchronized on Live VPS (`187.127.170.36`)**: Uploaded cleaned base templates to `/public/standees/` and standalone assets, rebuilt Next.js production build, reloaded PM2 `customerpilot-web`, and verified live HTTP 200 response.
+  4. **Playwright Visual Verification**: Executed automated browser inspection (`scripts/verify_vinayak_dashboard.js`), capturing full dashboard settings screenshot (`scratch/verified_vinayak_dashboard_settings.png`) and standalone element snapshot (`scratch/verified_vinayak_standee_element.png`), confirming that Vinayak Fashion renders its authentic circular emblem with zero Cake Connection artifacts. Also verified Cake Connection (`scratch/live_vps_cake_standee.jpg`) composites dynamically with its own branding.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [17 Oct 2026] Issue: ChunkLoadError 404 Crash on Merchant Onboarding Wizard ("This page couldn't load")
 - **Symptom**: When opening "Vinayak Fashion" from SuperAdmin Merchant Fleet (`/super-admin?tab=merchants`) via merchant link or `[Onboard]` button, the page navigated to `https://customerpilot.in/onboarding` and immediately crashed with Next.js error boundary: `"This page couldn't load. Reload to try again, or go back."`, while Cake Connection opened smoothly into its dashboard.
 - **Root Cause**:

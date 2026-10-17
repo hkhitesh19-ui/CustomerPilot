@@ -221,15 +221,15 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // 4. Composite Merchant Branding Header Pill if configured (Master Template for OTHER merchants)
-    // If merchant is Cake Connection, we keep the original 3D cake logo in the master arch untouched!
-    const isCakeConnection = merchant.name?.toLowerCase().includes("cake connection")
-    if (config.headerPill && !isCakeConnection) {
-      let headerContentBuf: Buffer | null = null
+    // 4. Composite Merchant Branding Header in top Arch (Universal for ALL merchants)
+    if (config.headerPill) {
+      const archCx = 361
+      const archCy = 84
+
+      let logoBuf: Buffer | null = null
 
       if (merchant.logoUrl && (merchant.logoUrl.startsWith("http") || merchant.logoUrl.startsWith("/") || merchant.logoUrl.startsWith("data:"))) {
         try {
-          let logoBuf: Buffer | null = null
           if (merchant.logoUrl.startsWith("data:")) {
             const base64Data = merchant.logoUrl.split(",")[1]
             if (base64Data) {
@@ -270,52 +270,134 @@ export async function GET(req: NextRequest) {
               logoBuf = fs.readFileSync(localPath)
             }
           }
-
-          if (logoBuf) {
-            const innerWidth = config.headerPill.width - 24
-            const innerHeight = config.headerPill.height - 18
-            const resizedLogo = await sharp(logoBuf)
-              .resize({ width: Math.round(innerWidth * 0.90), height: Math.round(innerHeight * 0.85), fit: "inside" })
-              .png()
-              .toBuffer()
-
-            const pillSvg = Buffer.from(`
-              <svg width="${config.headerPill.width}" height="${config.headerPill.height}" viewBox="0 0 ${config.headerPill.width} ${config.headerPill.height}">
-                <!-- Outer luxury dark navy container with gold border -->
-                <rect x="2" y="2" width="${config.headerPill.width - 4}" height="${config.headerPill.height - 4}" rx="22" fill="#081829" stroke="#d4af37" stroke-width="2.5"/>
-                <!-- Inner crisp white badge for 100% logo visibility (guarantees dark/black text logos pop) -->
-                <rect x="12" y="9" width="${innerWidth}" height="${innerHeight}" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
-              </svg>
-            `)
-            headerContentBuf = await sharp(pillSvg)
-              .composite([{ input: resizedLogo, gravity: "center" }])
-              .png()
-              .toBuffer()
-          }
         } catch (e) {
-          console.warn("Logo overlay fallback to wordmark:", e)
+          console.warn("Logo load error:", e)
         }
       }
 
-      // If no logo or logo overlay failed, render Times New Roman serif wordmark (Zero Truncation Rule)
-      if (!headerContentBuf) {
+      if (logoBuf) {
+        try {
+          const meta = await sharp(logoBuf).metadata()
+          const lw = meta.width || 100
+          const lh = meta.height || 100
+          const aspect = lw / lh
+
+          if (aspect >= 0.75 && aspect <= 1.25) {
+            // Circular / Square Medallion (e.g. Vinayak Fashion)
+            const diam = 126
+            const maskSvg = Buffer.from(`
+              <svg width="${diam}" height="${diam}">
+                <circle cx="${diam / 2}" cy="${diam / 2}" r="${diam / 2 - 2}" fill="#ffffff"/>
+              </svg>
+            `)
+
+            const resizedLogo = await sharp(logoBuf)
+              .resize(diam, diam, { fit: "cover" })
+              .png()
+              .toBuffer()
+
+            const circularLogo = await sharp(resizedLogo)
+              .composite([{ input: maskSvg, blend: "dest-in" }])
+              .png()
+              .toBuffer()
+
+            const frameSvg = Buffer.from(`
+              <svg width="${diam}" height="${diam}">
+                <circle cx="${diam / 2}" cy="${diam / 2}" r="${diam / 2 - 2}" fill="none" stroke="#d4af37" stroke-width="3"/>
+                <circle cx="${diam / 2}" cy="${diam / 2}" r="${diam / 2 - 4}" fill="none" stroke="#fef08a" stroke-width="1"/>
+              </svg>
+            `)
+
+            const medallionBuf = await sharp(circularLogo)
+              .composite([{ input: frameSvg }])
+              .png()
+              .toBuffer()
+
+            const medLeft = Math.round(archCx - diam / 2)
+            const medRight = Math.round(archCx + diam / 2)
+
+            const wingsSvg = Buffer.from(`
+              <svg width="723" height="170" xmlns="http://www.w3.org/2000/svg">
+                <!-- Left Wing -->
+                <line x1="${medLeft - 16}" y1="${archCy}" x2="${medLeft - 140}" y2="${archCy}" stroke="#d4af37" stroke-width="2.5"/>
+                <line x1="${medLeft - 16}" y1="${archCy - 1}" x2="${medLeft - 140}" y2="${archCy - 1}" stroke="#fef08a" stroke-width="1"/>
+                <polygon points="${medLeft - 16},${archCy} ${medLeft - 24},${archCy - 4} ${medLeft - 32},${archCy} ${medLeft - 24},${archCy + 4}" fill="#fef08a"/>
+                <circle cx="${medLeft - 142}" cy="${archCy}" r="3" fill="#d4af37"/>
+
+                <!-- Right Wing -->
+                <line x1="${medRight + 16}" y1="${archCy}" x2="${medRight + 140}" y2="${archCy}" stroke="#d4af37" stroke-width="2.5"/>
+                <line x1="${medRight + 16}" y1="${archCy - 1}" x2="${medRight + 140}" y2="${archCy - 1}" stroke="#fef08a" stroke-width="1"/>
+                <polygon points="${medRight + 16},${archCy} ${medRight + 24},${archCy - 4} ${medRight + 32},${archCy} ${medRight + 24},${archCy + 4}" fill="#fef08a"/>
+                <circle cx="${medRight + 142}" cy="${archCy}" r="3" fill="#d4af37"/>
+              </svg>
+            `)
+
+            composites.push({
+              input: wingsSvg,
+              left: 0,
+              top: 0,
+            })
+
+            composites.push({
+              input: medallionBuf,
+              left: medLeft,
+              top: Math.round(archCy - diam / 2),
+            })
+          } else {
+            // Wide / Landscape Logo (e.g. Cake Connection, Gujarat Photo Goods)
+            const pw = 440
+            const ph = 108
+            const maxLw = pw - 36
+            const maxLh = ph - 16
+
+            const plaqueSvg = Buffer.from(`
+              <svg width="${pw}" height="${ph}" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="${pw - 4}" height="${ph - 4}" rx="18" fill="#ffffff" stroke="#d4af37" stroke-width="3"/>
+                <rect x="5" y="5" width="${pw - 10}" height="${ph - 10}" rx="15" fill="none" stroke="#fef08a" stroke-width="1"/>
+              </svg>
+            `)
+
+            const resizedLogo = await sharp(logoBuf)
+              .resize({ width: maxLw, height: maxLh, fit: "inside" })
+              .png()
+              .toBuffer()
+
+            const plaqueBuf = await sharp(plaqueSvg)
+              .composite([{ input: resizedLogo, gravity: "center" }])
+              .png()
+              .toBuffer()
+
+            composites.push({
+              input: plaqueBuf,
+              left: Math.round(archCx - pw / 2),
+              top: Math.round(archCy - ph / 2),
+            })
+          }
+        } catch (e) {
+          console.warn("Logo overlay composite error:", e)
+        }
+      } else {
+        // Luxury Typography Wordmark (Store Name Fallback)
+        const pw = 440
+        const ph = 108
         const rawName = merchant.name || "CustomerPilot VIP"
         const fontSize = rawName.length > 28 ? 20 : rawName.length > 22 ? 24 : rawName.length > 16 ? 28 : 32
+        const safeName = rawName.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 
         const wordmarkSvg = Buffer.from(`
-          <svg width="${config.headerPill.width}" height="${config.headerPill.height}" viewBox="0 0 ${config.headerPill.width} ${config.headerPill.height}">
-            <rect x="2" y="2" width="${config.headerPill.width - 4}" height="${config.headerPill.height - 4}" rx="22" fill="#081829" stroke="#d4af37" stroke-width="2.5"/>
-            <text x="50%" y="58%" font-family="'Times New Roman', Georgia, serif" font-size="${fontSize}" font-weight="bold" fill="#fef08a" text-anchor="middle" letter-spacing="0.5">${rawName.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</text>
+          <svg width="${pw}" height="${ph}" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="${pw - 4}" height="${ph - 4}" rx="18" fill="#061a32" stroke="#d4af37" stroke-width="3"/>
+            <rect x="5" y="5" width="${pw - 10}" height="${ph - 10}" rx="15" fill="none" stroke="#fef08a" stroke-width="1"/>
+            <text x="${pw / 2}" y="44" font-family="'Times New Roman', Georgia, serif" font-size="${fontSize}" font-weight="bold" fill="#fef08a" text-anchor="middle" letter-spacing="0.5">${safeName}</text>
+            <text x="${pw / 2}" y="78" font-family="Arial, sans-serif" font-size="12" font-weight="600" fill="#93c5fd" text-anchor="middle" letter-spacing="2">OFFICIAL LOYALTY PARTNER</text>
           </svg>
         `)
-        headerContentBuf = await sharp(wordmarkSvg).png().toBuffer()
-      }
 
-      if (headerContentBuf) {
+        const wordmarkBuf = await sharp(wordmarkSvg).png().toBuffer()
         composites.push({
-          input: headerContentBuf,
-          left: config.headerPill.left,
-          top: config.headerPill.top,
+          input: wordmarkBuf,
+          left: Math.round(archCx - pw / 2),
+          top: Math.round(archCy - ph / 2),
         })
       }
     }
