@@ -69,6 +69,8 @@ export async function getOrCreateDigitalBusinessCard(merchantId: string) {
         locationState: merchant.state || "Uttar Pradesh",
         whatsappNumber: merchant.whatsappPhone || null,
         phoneNumber: merchant.phone || merchant.whatsappPhone || null,
+        instagramUrl: `https://www.instagram.com/${cleanSlug.replace(/-/g, "")}/`,
+        facebookUrl: `https://www.facebook.com/${cleanSlug.replace(/-/g, "")}/`,
         googleRating: merchant.baselineRating || 5.0,
         googleReviewsCnt: merchant.baselineReviewCount || 1,
         googlePlaceId: merchant.googlePlaceId || null,

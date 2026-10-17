@@ -370,6 +370,28 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
     ? `/review?m=${encodeURIComponent(card.merchantId)}`
     : (effectiveReviewUrl ? sanitizeUrl(effectiveReviewUrl) : "#")
 
+  // Smart Clean Social Handles fallback (Guarantees Instagram & Facebook are always active for all businesses)
+  const cleanSocialHandle = useMemo(() => {
+    return (card.slug || card.displayName || "store")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9_]/g, "")
+  }, [card.slug, card.displayName])
+
+  const effectiveInstagramUrl = useMemo(() => {
+    if (card.instagramUrl && card.instagramUrl.trim() !== "" && card.instagramUrl !== "https://instagram.com" && card.instagramUrl !== "https://www.instagram.com") {
+      return sanitizeUrl(card.instagramUrl.trim())
+    }
+    return `https://www.instagram.com/${cleanSocialHandle}/`
+  }, [card.instagramUrl, cleanSocialHandle])
+
+  const effectiveFacebookUrl = useMemo(() => {
+    if (card.facebookUrl && card.facebookUrl.trim() !== "" && card.facebookUrl !== "https://facebook.com" && card.facebookUrl !== "https://www.facebook.com") {
+      return sanitizeUrl(card.facebookUrl.trim())
+    }
+    return `https://www.facebook.com/${cleanSocialHandle}/`
+  }, [card.facebookUrl, cleanSocialHandle])
+
   const currentUrl = typeof window !== "undefined" ? window.location.href : `https://customerpilot.in/c/${card.slug}`
 
   // 📇 1-Tap Save Contact (Native Mobile Contacts Phonebook Integration)
@@ -409,8 +431,8 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
         cleanPhone ? `TEL;TYPE=WORK,VOICE:${cleanPhone}` : "",
         cleanWhatsapp ? `TEL;TYPE=WHATSAPP:${cleanWhatsapp}` : "",
         cleanWhatsapp ? `X-SOCIALPROFILE;TYPE=whatsapp:https://wa.me/${cleanWhatsapp.replace(/[^0-9]/g, "")}` : "",
-        card.instagramUrl ? `X-SOCIALPROFILE;TYPE=instagram:${card.instagramUrl}` : "",
-        card.facebookUrl ? `X-SOCIALPROFILE;TYPE=facebook:${card.facebookUrl}` : "",
+        effectiveInstagramUrl ? `X-SOCIALPROFILE;TYPE=instagram:${effectiveInstagramUrl}` : "",
+        effectiveFacebookUrl ? `X-SOCIALPROFILE;TYPE=facebook:${effectiveFacebookUrl}` : "",
         (safeLocationShort || safeLocationState) ? `ADR;TYPE=WORK,POSTAL,PARCEL;CHARSET=UTF-8:;;${safeLocationShort};${safeLocationState};;;India` : "",
         `URL;TYPE=WORK:${currentUrl}`,
         card.websiteUrl ? `URL;TYPE=WEBSITE:${card.websiteUrl}` : "",
@@ -716,47 +738,43 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
               </a>
             )}
 
-            {/* 3. Instagram Button */}
-            {Boolean(card.instagramUrl && card.instagramUrl.trim() !== "" && card.instagramUrl !== "https://instagram.com" && card.instagramUrl !== "https://www.instagram.com") && (
-              <a
-                href={sanitizeUrl(card.instagramUrl)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 sm:p-3.5 rounded-2xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98]"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center flex-shrink-0 shadow-xs">
-                    <Instagram className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="text-left min-w-0">
-                    <div className="font-bold text-xs sm:text-[13px] leading-tight text-slate-900">Instagram</div>
-                    <div className="text-[10px] text-slate-500 truncate">Follow for Updates</div>
-                  </div>
+            {/* 3. Instagram Button — Always Active for All Businesses */}
+            <a
+              href={effectiveInstagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3 sm:p-3.5 rounded-2xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98]"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center flex-shrink-0 shadow-xs">
+                  <Instagram className="w-4 h-4 text-white" />
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
-              </a>
-            )}
+                <div className="text-left min-w-0">
+                  <div className="font-bold text-xs sm:text-[13px] leading-tight text-slate-900">Instagram</div>
+                  <div className="text-[10px] text-slate-500 truncate">Follow for Updates</div>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+            </a>
 
-            {/* 4. Facebook Button */}
-            {Boolean(card.facebookUrl && card.facebookUrl.trim() !== "" && card.facebookUrl !== "https://facebook.com" && card.facebookUrl !== "https://www.facebook.com") && (
-              <a
-                href={sanitizeUrl(card.facebookUrl)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 sm:p-3.5 rounded-2xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98]"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-full bg-[#1877F2] flex items-center justify-center flex-shrink-0 shadow-xs">
-                    <Facebook className="w-4 h-4 text-white fill-white" />
-                  </div>
-                  <div className="text-left min-w-0">
-                    <div className="font-bold text-xs sm:text-[13px] leading-tight text-slate-900">Facebook</div>
-                    <div className="text-[10px] text-slate-500 truncate">Like Our Page</div>
-                  </div>
+            {/* 4. Facebook Button — Always Active for All Businesses */}
+            <a
+              href={effectiveFacebookUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3 sm:p-3.5 rounded-2xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98]"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-9 h-9 rounded-full bg-[#1877F2] flex items-center justify-center flex-shrink-0 shadow-xs">
+                  <Facebook className="w-4 h-4 text-white fill-white" />
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
-              </a>
-            )}
+                <div className="text-left min-w-0">
+                  <div className="font-bold text-xs sm:text-[13px] leading-tight text-slate-900">Facebook</div>
+                  <div className="text-[10px] text-slate-500 truncate">Like Our Page</div>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+            </a>
 
             {/* 5. YouTube Button */}
             {Boolean(card.youtubeUrl && card.youtubeUrl.trim() !== "" && card.youtubeUrl !== "https://youtube.com" && card.youtubeUrl !== "https://www.youtube.com") && (

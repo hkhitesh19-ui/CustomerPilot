@@ -3,6 +3,26 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [17 Oct 2026] Issue: Follow on Instagram & Facebook Buttons Permanently Enabled for All Digital Business Cards
+- **Symptom**: On newly registered or auto-provisioned merchants like Vinayak Fashion, the "Follow on Instagram" and "Follow on Facebook" buttons were missing from the Smart Digital Business Card (`/c/vinayak-fashion`), while Cake Connection had them prominently displayed.
+- **Root Cause**:
+  1. In `src/components/digital-card-view.tsx`, the Instagram and Facebook button blocks were wrapped in strict condition guards (`Boolean(card.instagramUrl && ...)` and `Boolean(card.facebookUrl && ...)`). If the merchant had not yet configured custom social links (or if `instagramUrl` was null/empty in the database), the buttons were completely hidden.
+  2. In `src/lib/digital-card-service.ts`, newly auto-provisioned digital business cards did not populate initial social handle links.
+- **Resolution**:
+  1. **Permanent Core Social Channels (`src/components/digital-card-view.tsx`)**:
+     - Upgraded Instagram and Facebook into permanent, unconditional core channels present on EVERY business's digital card (alongside WhatsApp, Call Now, and Location).
+     - Added smart brand fallback resolvers (`effectiveInstagramUrl` and `effectiveFacebookUrl`): if the merchant sets a custom URL, that URL is used; if empty or null, it seamlessly falls back to the clean business profile link (`https://www.instagram.com/${cleanSocialHandle}/` and `https://www.facebook.com/${cleanSocialHandle}/`).
+     - Updated vCard generation (`handleSaveContact`) to attach both Instagram and Facebook profiles when visitors save the merchant to their smartphone contacts.
+  2. **Auto-Provisioning Default Links (`src/lib/digital-card-service.ts`)**:
+     - Configured default brand Instagram and Facebook profile URLs upon new card provisioning.
+  3. **Database Restoration & Live VPS Sync**:
+     - Updated Vinayak Fashion's `DigitalBusinessCard` record across both SQLite database paths on VPS (`187.127.170.36`) with active profile handles (`https://www.instagram.com/vinayakfashion/` and `https://www.facebook.com/vinayakfashion/`).
+     - Built and deployed cleanly on VPS (`code 0`) and reloaded PM2 `customerpilot-web`.
+  4. **Playwright Visual Verification**:
+     - Executed headless browser audit (`scripts/verify_vinayak_socials_screenshot.js`), verifying HTTP 200, Instagram visible (`true`), and Facebook visible (`true`).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [17 Oct 2026] Issue: SuperAdmin Arbitrary Custom Days Trial Extension Engine & Double-Sided Referral Stamp Architecture
 - **Symptom**: SuperAdmin could only extend a merchant's free trial using 4 fixed preset buttons (+3d, +7d, +14d, +30d) in the Edit Merchant modal, without the ability to enter custom arbitrary days (e.g. 1, 2, 4, 5, 10, 15, 25 days) for specific merchants like Vinayak Fashion. Additionally, merchants required a structured double-sided referral stamp architecture so that when an existing customer refers a friend, both the referrer and the referred friend receive bonus stamps automatically upon the friend's first qualifying visit.
 - **Root Cause**:
