@@ -330,11 +330,9 @@ async function renderReviewStandee(merchant: any, logoBuffer: Buffer | null, tar
     </g>
 
     <!-- 5 Glowing Stars -->
-    <g transform="translate(${width / 2}, 340)" text-anchor="middle">
+    <g transform="translate(${width / 2}, 346)" text-anchor="middle">
       <text font-family="'Segoe UI', Arial, sans-serif" font-size="32" fill="#fbbf24" letter-spacing="6">&#9733;&#9733;&#9733;&#9733;&#9733;</text>
     </g>
-
-    <text x="${width / 2}" y="370" font-family="'Segoe UI', Arial, sans-serif" font-size="13.5" font-weight="700" fill="#475569" text-anchor="middle">Scan with your Phone Camera to publish your review</text>
 
     <!-- Center White QR Card Frame -->
     <rect x="196" y="392" width="330" height="330" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#cardShadow)"/>
@@ -453,12 +451,8 @@ async function renderCardStandee(merchant: any, logoBuffer: Buffer | null, targe
     <path d="M 216 594 L 216 626 Q 216 630 220 630 L 252 630" fill="none" stroke="#d4af37" stroke-width="6" stroke-linecap="round"/>
     <path d="M 470 630 L 502 630 Q 506 630 506 626 L 506 594" fill="none" stroke="#d4af37" stroke-width="6" stroke-linecap="round"/>
 
-    <text x="${width / 2}" y="694" font-family="'Segoe UI', Arial, sans-serif" font-size="15" font-weight="800" fill="#fef08a" text-anchor="middle" letter-spacing="0.5">
-      Point Any Phone Camera to Open Digital Card
-    </text>
-
     <!-- 3 Bottom Action Cards -->
-    <g transform="translate(62, 730)">
+    <g transform="translate(62, 716)">
       <g transform="translate(0, 0)">
         <rect width="180" height="110" rx="18" fill="#0f294a" stroke="#1e3a5f" stroke-width="1.5"/>
         <circle cx="90" cy="34" r="20" fill="#1e3a5f"/>
@@ -570,12 +564,8 @@ async function renderComboStandee(merchant: any, logoBuffer: Buffer | null, targ
     <path d="M 216 570 L 216 602 Q 216 606 220 606 L 252 606" fill="none" stroke="#34A853" stroke-width="6" stroke-linecap="round"/>
     <path d="M 470 606 L 502 606 Q 506 606 506 602 L 506 570" fill="none" stroke="#4285F4" stroke-width="6" stroke-linecap="round"/>
 
-    <text x="${width / 2}" y="664" font-family="'Segoe UI', Arial, sans-serif" font-size="14.5" font-weight="800" fill="#fef08a" text-anchor="middle" letter-spacing="0.5">
-      Point Any Phone Camera &#8594; Open Digital Hub
-    </text>
-
     <!-- Two Dual Power Blocks -->
-    <g transform="translate(48, 695)">
+    <g transform="translate(48, 680)">
       <!-- Left: Digital Card -->
       <g transform="translate(0, 0)">
         <rect width="298" height="155" rx="20" fill="#0f294a" stroke="#234567" stroke-width="1.5"/>

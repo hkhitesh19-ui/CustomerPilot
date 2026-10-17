@@ -3,6 +3,17 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [17 Oct 2026] Issue: Removal of Redundant "Point/Scan Phone Camera" Prompts from Standee Templates A, B, and C
+- **Symptom**: Standee designs contained redundant sub-prompts ("Scan with your Phone Camera to publish your review" in Template A, "Point Any Phone Camera to Open Digital Card" in Template B, and "Point Any Phone Camera → Open Digital Hub" in Template C) directly adjacent to the main QR code and feature sections, creating visual clutter and reducing whitespace around the central artwork.
+- **Root Cause**: The standalone and combo templates originally included inline guidance strings between the QR code and feature grids, which were redundant since the bottom instruction bars and badges already guide the customer clearly.
+- **Resolution**:
+  1. Removed `"Scan with your Phone Camera to publish your review"` from Template A (`src/app/api/qr/standee/route.ts`), centering the 5 Glowing Stars (`★★★★★`) gracefully above the QR frame.
+  2. Removed `"Point Any Phone Camera to Open Digital Card"` from Template B and adjusted the 3 bottom action cards (`translate(62, 716)`) for optimal vertical spacing between the QR frame and bottom action grid.
+  3. Removed `"Point Any Phone Camera → Open Digital Hub"` from Template C and shifted the dual power blocks (`translate(48, 680)`) to provide balanced breathing room between the central QR box and feature blocks.
+  4. Deployed to production VPS (`187.127.170.36`), reloaded PM2, and verified all 4 live rendered standees via automated Playwright visual testing.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [17 Oct 2026] Issue: Standee Route Missing Emoji Font Glyphs on Headless Linux & Template C Headline Clipping
 - **Symptom**: On the production Ubuntu Linux VPS (`187.127.170.36`), unicode emojis (`📲`, `✨`, `👤`, `🛍️`, `📍`, `📱`, `⭐`) in SVG text elements within `src/app/api/qr/standee/route.ts` rendered as missing glyph character boxes (`01F4F2`, `2728`, etc.) because headless Linux environments lack colored emoji font packages. Additionally, on Template C (Connect & Review Duo), the top gold headline `"CONNECT WITH US & RATE YOUR EXPERIENCE"` at `font-size: 28px` with `letter-spacing: 1px` was clipped at the right margin on the 723px width canvas.
 - **Root Cause**:
