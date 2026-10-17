@@ -130,16 +130,51 @@ export async function fetchGoogleReviews(merchantId: string, maxLimit: number = 
             submittedAt: r.createTime ? new Date(r.createTime) : new Date()
           }))
         }
-      } else {
         const errJson = await response.json().catch(() => ({}))
         console.warn(`[GBP API] Fetch failed with status ${response.status}:`, errJson?.error?.message || errJson);
       }
     } catch (err: any) {
       console.error(`[GBP API] Error fetching reviews for merchant ${merchantId}:`, err.message)
     }
+
+    // Modern Fallback: Google deprecated mybusiness.googleapis.com monolithic API.
+    // Fetch live real reviews from Google Places API via connection.placeId
+    if (connection.placeId && process.env.GOOGLE_PLACES_API_KEY) {
+      try {
+        const placesRes = await fetch(
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(connection.placeId)}&fields=reviews,rating,user_ratings_total&key=${process.env.GOOGLE_PLACES_API_KEY}`
+        )
+        if (placesRes.ok) {
+          const pData = await placesRes.json()
+          if (pData.result) {
+            // Also sync baseline review count & rating to Merchant if present
+            if (typeof pData.result.rating === "number" || typeof pData.result.user_ratings_total === "number") {
+              await db.merchant.update({
+                where: { id: merchantId },
+                data: {
+                  ...(typeof pData.result.rating === "number" ? { baselineRating: pData.result.rating } : {}),
+                  ...(typeof pData.result.user_ratings_total === "number" ? { baselineReviewCount: pData.result.user_ratings_total, baselineCapturedAt: new Date() } : {})
+                }
+              }).catch(() => {})
+            }
+
+            if (pData.result.reviews && Array.isArray(pData.result.reviews)) {
+              return pData.result.reviews.map((r: any, idx: number) => ({
+                gbpReviewId: `place_review_${connection.placeId}_${r.time || idx}`,
+                reviewerName: r.author_name || "Google User",
+                rating: typeof r.rating === "number" ? r.rating : 5,
+                comment: r.text || "",
+                submittedAt: r.time ? new Date(r.time * 1000) : new Date()
+              }))
+            }
+          }
+        }
+      } catch (pErr: any) {
+        console.warn(`[Google Places Reviews Fallback] Error:`, pErr.message)
+      }
+    }
     
-    // Crucial Bug Fix: If we attempted to use a real API token and it failed (or returned 0 reviews),
-    // we MUST return an empty array. Do NOT fall through to generating fake mock data in production.
+    // If no real API reviews found, return empty array (do NOT mock in production)
     return []
   }
 
