@@ -3,6 +3,20 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [17 Oct 2026] Issue: Removal of Restrictive "Scan with WhatsApp Camera" Label Under Standee QR Codes
+- **Symptom**: Printed counter QR standees (generated from Onboarding Step 5 `/onboarding?step=5`) and the homepage interactive preview displayed `"SCAN WITH WHATSAPP CAMERA"` directly below the QR code inside the white frame. This instruction was misleading to walk-in customers who use standard phone cameras, Google Lens, or iOS camera scanners to scan native URLs.
+- **Root Cause**:
+  1. In `src/app/onboarding/page.tsx`, the `handlePrintStandeePDF` HTML print template included `<p class="qr-sub">Scan with WhatsApp Camera</p>` inside `.qr-box`.
+  2. The on-screen Step 5 counter preview included `<p className="text-[11px] font-bold text-indigo-700 mt-2 uppercase tracking-wide">📲 Scan with WhatsApp Camera</p>`.
+  3. The homepage marketing interactive QR card in `src/app/page.tsx` included `<p className="text-[11px] font-bold text-indigo-700 mt-2 tracking-wide uppercase">📲 Scan with WhatsApp Camera</p>`.
+- **Resolution**:
+  1. Purged `<p class="qr-sub">Scan with WhatsApp Camera</p>` and its associated `.qr-sub` stylesheet from the print layout in `src/app/onboarding/page.tsx`.
+  2. Removed the on-screen scanning caption from both `src/app/onboarding/page.tsx` (Step 5) and `src/app/page.tsx` (homepage).
+  3. Deployed to production VPS (`187.127.170.36`), completed Next.js production build, synced static standalone chunks, and reloaded PM2 `customerpilot-web`.
+  4. Verified via Playwright headless rendering that both the print PDF template and on-screen cards display the pure, unobstructed QR code with 0 instances of the restricted camera caption.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [17 Oct 2026] Issue: Residual "Cake Connection" Branding on Merchant Standee & Adaptive Universal Template
 - **Symptom**: In Vinayak Fashion's Merchant Dashboard Settings (`/dashboard/settings` Section 01: "Digital Loyalty Stamp QR Code"), the master standee preview displayed residual elements of "Cake Connection" ("onnection" text and colorful cake icon) poking out from under the merchant header pill, rather than showing a clean, bespoke standee for Vinayak Fashion.
 - **Root Cause**:

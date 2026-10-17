@@ -2827,9 +2827,6 @@ function Step7PrintQR({ data, setData }: any) {
                 QR Code Loading...
               </div>
             )}
-            <p className="text-[11px] font-bold text-indigo-700 mt-2 tracking-wide uppercase">
-              📲 Scan with WhatsApp Camera
-            </p>
           </div>
 
           {/* Offer Banner */}

@@ -1677,14 +1677,6 @@ function OnboardStep7Print({ data, setData }: any) {
               display: block;
               margin: 0 auto;
             }
-            .qr-sub {
-              font-size: 11px;
-              font-weight: 800;
-              color: #0f172a !important;
-              margin: 8px 0 0 0;
-              text-transform: uppercase;
-              letter-spacing: 0.8px;
-            }
             .offer-box {
               margin-top: 14px;
               padding: 12px 14px;
@@ -1737,7 +1729,6 @@ function OnboardStep7Print({ data, setData }: any) {
             
             <div class="qr-box">
               <img src="${qrUrl}" class="qr-img" />
-              <p class="qr-sub">Scan with WhatsApp Camera</p>
             </div>
 
             <div class="offer-box">
@@ -1791,7 +1782,6 @@ function OnboardStep7Print({ data, setData }: any) {
             ) : (
               <div className="w-48 h-48 bg-slate-100 rounded-xl flex items-center justify-center text-xs text-slate-400">QR Loading...</div>
             )}
-            <p className="text-[11px] font-bold text-indigo-700 mt-2 uppercase tracking-wide">📲 Scan with WhatsApp Camera</p>
           </div>
           <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-100">
             <p className="text-xs text-indigo-700 font-bold uppercase">★ Exclusive Member Offer ★</p>
