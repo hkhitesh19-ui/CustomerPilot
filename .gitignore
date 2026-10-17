@@ -24,9 +24,15 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# local env files
+# local env & secrets files
 .env
+.env*
 .env*.local
+.env.production
+.env.cakeconnection.production
+CREDENTIALS_AND_SECRETS_VAULT*.md
+*.bundle
+*.tar.gz
 
 # vercel
 .vercel
