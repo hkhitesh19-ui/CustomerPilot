@@ -8,18 +8,19 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : fdc6379
-Full Commit Hash  : fdc6379d8e5db4cadc9c2dc3dc106b50fa09b9d2
-Target Fix Commit : fdc6379
+Active Git Commit : fc995b9
+Full Commit Hash  : fc995b9ec521881b639b76a9ff7bf7735c09c568
+Target Fix Commit : fc995b9
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 17 Oct 2026, 11:13 AM IST
+Deployment Date   : 17 Oct 2026, 11:45 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(standee): auto-provision digital business card so standee QR directly opens merchant digital card
+Commit Title      : fix(trial): isolate 3-day free trial modules and support standalone/combo fast-track signups
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080, Online & Healthy)
 Merchant Status   : Vinayak Fashion Live (onboardingCompleted: true, logoUrl: /uploads/1792145071422..., Standee: Verified Clean Royal Medallion)
 Standee Status    : Universal Master Base (0 residual Cake Connection branding; adaptive circular medallion & landscape plaque engine; 0 restrictive camera text)
+Trial Isolation   : Verified on VPS (Only selected 1 or 2 modules enabled; card auto-provisioned; direct dashboard redirect; 0 forced onboarding)
 Google Places API : Configured and verified with AIzaSyC1wp... (Active)
 Nginx Static Alias: Direct /_next/static/ disk alias active (HTTP 200 chunk delivery)
 Backup Engine     : /root/backup_migration_bundle.sh & /root/restore_migration_bundle.sh (Active)
@@ -28,6 +29,8 @@ Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in 
 
 Deployment History Log:
 ----------------------------------------------------------
+• [17 Oct 2026, 11:45 AM IST] Commit fc995b9 - fix(trial): isolate 3-day free trial modules and support standalone/combo fast-track signups. Added DIGITAL_CARD to Module/ALL_MODULES, fixed registration override bug, updated all landing page CTAs, and verified live on VPS.
+• [17 Oct 2026, 11:13 AM IST] Commit fdc6379 - fix(standee): auto-provision digital business card so standee QR directly opens merchant digital card. Dynamic self-healing digital card creation for all new merchants.
 • [17 Oct 2026, 08:55 AM IST] Commit a0b8601 (includes 555c6fe, b4233be, e873cc8) - Activated live Google Places API Details key (`AIzaSyC1wp...`) across VPS production environments (.env.production, .env, .next/standalone/.env). Deployed Google Places API fallback for review fetching when GBP v4 returns 403. Removed all hardcoded Cake Connection defaults across select-location, locations, oauth, join, and onboarding routes.
 • [16 Oct 2026, 11:05 PM IST] Zero-Scan Master Migration Engine Implementation - Automated backup/restore snapshot tool (`customerpilot_zero_scan_migration_bundle_latest.tar.gz`) archiving Evolution API WhatsApp cryptographic sessions, WAL-checkpointed SQLite dev.db, PostgreSQL databases, uploads, and secrets.
 • [16 Oct 2026, 03:32 PM IST] WhatsApp QR Code Resolution on New VPS (187.127.170.36) - Deployed Evolution API v2.3.7 container with dedicated PostgreSQL evolution_db backend and host networking mode on port 8080. Verified live QR code generation during merchant onboarding via Playwright.
