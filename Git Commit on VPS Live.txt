@@ -8,18 +8,18 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 0be1894
-Full Commit Hash  : 0be189472fdc32a46e215786c18a7b01777eaad3
-Target Fix Commit : 0be1894
+Active Git Commit : 7bec3f5
+Full Commit Hash  : 7bec3f53277860936578ff78919e71389445d65b
+Target Fix Commit : 7bec3f5
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 17 Oct 2026, 10:15 AM IST
+Deployment Date   : 17 Oct 2026, 10:35 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(standee): eliminate residual Cake Connection branding and implement adaptive universal luxury standee
+Commit Title      : fix(standee): remove restrictive 'Scan with WhatsApp Camera' caption from printed and preview QR cards
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080, Online & Healthy)
 Merchant Status   : Vinayak Fashion Live (onboardingCompleted: true, logoUrl: /uploads/1792145071422..., Standee: Verified Clean Royal Medallion)
-Standee Status    : Universal Master Base (0 residual Cake Connection branding; adaptive circular medallion & landscape plaque engine)
+Standee Status    : Universal Master Base (0 residual Cake Connection branding; adaptive circular medallion & landscape plaque engine; 0 restrictive camera text)
 Google Places API : Configured and verified with AIzaSyC1wp... (Active)
 Nginx Static Alias: Direct /_next/static/ disk alias active (HTTP 200 chunk delivery)
 Backup Engine     : /root/backup_migration_bundle.sh & /root/restore_migration_bundle.sh (Active)
