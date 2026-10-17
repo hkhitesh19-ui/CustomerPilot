@@ -3,6 +3,34 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [17 Oct 2026] Issue: Standee Route Missing Emoji Font Glyphs on Headless Linux & Template C Headline Clipping
+- **Symptom**: On the production Ubuntu Linux VPS (`187.127.170.36`), unicode emojis (`📲`, `✨`, `👤`, `🛍️`, `📍`, `📱`, `⭐`) in SVG text elements within `src/app/api/qr/standee/route.ts` rendered as missing glyph character boxes (`01F4F2`, `2728`, etc.) because headless Linux environments lack colored emoji font packages. Additionally, on Template C (Connect & Review Duo), the top gold headline `"CONNECT WITH US & RATE YOUR EXPERIENCE"` at `font-size: 28px` with `letter-spacing: 1px` was clipped at the right margin on the 723px width canvas.
+- **Root Cause**:
+  1. `Sharp` and underlying `librsvg` on Ubuntu 22.04 LTS look up system fonts for characters. Headless server images do not have color emoji glyphs installed by default, converting unicode emoji codepoints into empty bounding boxes with hex IDs.
+  2. The SVG text element on Template C exceeded the available 723px bounding width minus side margins, causing the last word ("EXPERIENCE") to collide with the inner golden border.
+- **Resolution**:
+  1. **Replaced All Emoji Characters with Zero-Font-Dependency Vector SVG Paths**:
+     - Template A Feature Badges:
+       - 10-SEC FAST: Amber background circle (`#fef3c7`) with crisp vector lightning polygon (`#d97706`).
+       - ZERO APP: Blue background circle (`#dbeafe`) with rounded vector smartphone stroke and home button (`#2563eb`).
+       - AI DRAFTED: Purple background circle (`#f3e8ff`) with 4-point magic sparkle vector path (`#9333ea`).
+     - Template B Action Cards:
+       - SAVE CONTACT: Sapphire circular backing with crisp gold user bust vector path (`<circle>`, `<path>`).
+       - CATALOG & MENU: Sapphire circular backing with crisp gold shopping bag vector outline (`<rect>`, `<path>`).
+       - MAPS & SOCIALS: Sapphire circular backing with crisp gold map pin vector shape (`<path>`, `<circle>`).
+     - Template C Dual Power Blocks:
+       - Digital Card Header: Vector phone icon in golden stroke.
+       - Google Reviews Header: Vector 5-point star polygon in gold.
+       - Bullet Points: Replaced unicode tick entities with clean circular badge checkmarks (`<circle fill="#10b981"/>` + `<path stroke="#ffffff"/>` for Card, `#3b82f6` for Reviews).
+     - Instruction & Banner Texts: Removed inline phone and sparkle emojis, using clean, professional typography.
+  2. **Template C Headline Typography Optimization**:
+     - Adjusted `font-size` from `28` to `22` and `letter-spacing` from `1` to `0.5`, ensuring ample breathing room and margins on both left and right sides.
+  3. **Live VPS Deployment & Playwright Visual Verification**:
+     - Deployed updated route to VPS (`187.127.170.36`), compiled Next.js standalone build, and reloaded PM2.
+     - Executed automated browser inspection (`scripts/verify_cake_standee_dashboard.js`), validating 100% vector sharpness with zero character boxes on all 4 templates.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [17 Oct 2026] Issue: Misleading Loyalty Rewards Messaging on Standees for Non-Loyalty Merchants & Bespoke Multi-Template Standee Engine
 - **Symptom**: When merchants opted only for "Smart AI Google Review" (Standalone Reviews), "Smart Digital Business Card" (Standalone Card), or "Card + Reviews" (Combo without Loyalty), the only counter standee available in the system was the historical Luxury VIP Rewards Standee (`SCAN TO EARN CONFIRM REWARDS`, `JOIN NOW & GET REWARDS`, `EXCLUSIVE OFFERS`, `LOYALTY REWARDS`, `MEMBERSHIP DISCOUNT`, `VIP MEMBER`). This conveyed a completely misleading message to walk-in customers who expected discounts and stamps when none were offered by the merchant. Furthermore, merchants with no loyalty module had Section 01 in Dashboard Settings completely hidden.
 - **Root Cause**:

@@ -349,21 +349,30 @@ async function renderReviewStandee(merchant: any, logoBuffer: Buffer | null, tar
     <g transform="translate(62, 746)">
       <g transform="translate(0, 0)">
         <rect width="180" height="96" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
-        <text x="90" y="32" font-family="'Segoe UI', Arial, sans-serif" font-size="24" text-anchor="middle">&#9889;</text>
-        <text x="90" y="58" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="800" fill="#0f172a" text-anchor="middle">10-SEC FAST</text>
-        <text x="90" y="76" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#64748b" text-anchor="middle">Zero Typing Needed</text>
+        <circle cx="90" cy="30" r="16" fill="#fef3c7"/>
+        <polygon points="89,19 81,30 90,30 87,41 99,28 90,28" fill="#d97706"/>
+        <text x="90" y="60" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="800" fill="#0f172a" text-anchor="middle">10-SEC FAST</text>
+        <text x="90" y="78" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#64748b" text-anchor="middle">Zero Typing Needed</text>
       </g>
       <g transform="translate(210, 0)">
         <rect width="180" height="96" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
-        <text x="90" y="32" font-family="'Segoe UI', Arial, sans-serif" font-size="24" text-anchor="middle">&#128242;</text>
-        <text x="90" y="58" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="800" fill="#0f172a" text-anchor="middle">ZERO APP</text>
-        <text x="90" y="76" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#64748b" text-anchor="middle">Use Any Phone Camera</text>
+        <circle cx="90" cy="30" r="16" fill="#dbeafe"/>
+        <g transform="translate(90, 30)">
+          <rect x="-6" y="-9" width="12" height="18" rx="2.5" fill="none" stroke="#2563eb" stroke-width="1.8"/>
+          <circle cx="0" cy="5" r="1.2" fill="#2563eb"/>
+        </g>
+        <text x="90" y="60" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="800" fill="#0f172a" text-anchor="middle">ZERO APP</text>
+        <text x="90" y="78" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#64748b" text-anchor="middle">Use Any Phone Camera</text>
       </g>
       <g transform="translate(420, 0)">
         <rect width="180" height="96" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
-        <text x="90" y="32" font-family="'Segoe UI', Arial, sans-serif" font-size="24" text-anchor="middle">&#10024;</text>
-        <text x="90" y="58" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="800" fill="#0f172a" text-anchor="middle">AI DRAFTED</text>
-        <text x="90" y="76" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#64748b" text-anchor="middle">1-Tap Maps Publish</text>
+        <circle cx="90" cy="30" r="16" fill="#f3e8ff"/>
+        <g transform="translate(90, 30)">
+          <path d="M 0 -8 Q 0 0 8 0 Q 0 0 0 8 Q 0 0 -8 0 Q 0 0 0 -8 Z" fill="#9333ea"/>
+          <circle cx="5" cy="-5" r="1.2" fill="#a855f7"/>
+        </g>
+        <text x="90" y="60" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="800" fill="#0f172a" text-anchor="middle">AI DRAFTED</text>
+        <text x="90" y="78" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#64748b" text-anchor="middle">1-Tap Maps Publish</text>
       </g>
     </g>
 
@@ -445,7 +454,7 @@ async function renderCardStandee(merchant: any, logoBuffer: Buffer | null, targe
     <path d="M 470 630 L 502 630 Q 506 630 506 626 L 506 594" fill="none" stroke="#d4af37" stroke-width="6" stroke-linecap="round"/>
 
     <text x="${width / 2}" y="694" font-family="'Segoe UI', Arial, sans-serif" font-size="15" font-weight="800" fill="#fef08a" text-anchor="middle" letter-spacing="0.5">
-      &#128242; Point Phone Camera to Open Digital Card
+      Point Any Phone Camera to Open Digital Card
     </text>
 
     <!-- 3 Bottom Action Cards -->
@@ -453,21 +462,30 @@ async function renderCardStandee(merchant: any, logoBuffer: Buffer | null, targe
       <g transform="translate(0, 0)">
         <rect width="180" height="110" rx="18" fill="#0f294a" stroke="#1e3a5f" stroke-width="1.5"/>
         <circle cx="90" cy="34" r="20" fill="#1e3a5f"/>
-        <text x="90" y="42" font-family="'Segoe UI', Arial, sans-serif" font-size="20" text-anchor="middle">&#128100;</text>
+        <g transform="translate(90, 34)">
+          <circle cx="0" cy="-4" r="5" fill="#fef08a"/>
+          <path d="M -8 9 C -8 3 -4 3 0 3 C 4 3 8 3 8 9 Z" fill="#fef08a"/>
+        </g>
         <text x="90" y="74" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="800" fill="#fef08a" text-anchor="middle">SAVE CONTACT</text>
         <text x="90" y="92" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#93c5fd" text-anchor="middle">Phone, Email &amp; WhatsApp</text>
       </g>
       <g transform="translate(210, 0)">
         <rect width="180" height="110" rx="18" fill="#0f294a" stroke="#1e3a5f" stroke-width="1.5"/>
         <circle cx="90" cy="34" r="20" fill="#1e3a5f"/>
-        <text x="90" y="42" font-family="'Segoe UI', Arial, sans-serif" font-size="20" text-anchor="middle">&#128717;</text>
+        <g transform="translate(90, 34)">
+          <rect x="-6" y="-3" width="12" height="12" rx="2" fill="none" stroke="#fef08a" stroke-width="1.8"/>
+          <path d="M -3 -3 Q -3 -7 0 -7 Q 3 -7 3 -3" fill="none" stroke="#fef08a" stroke-width="1.8"/>
+        </g>
         <text x="90" y="74" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="800" fill="#fef08a" text-anchor="middle">CATALOG &amp; MENU</text>
         <text x="90" y="92" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#93c5fd" text-anchor="middle">Products, Cakes &amp; Prices</text>
       </g>
       <g transform="translate(420, 0)">
         <rect width="180" height="110" rx="18" fill="#0f294a" stroke="#1e3a5f" stroke-width="1.5"/>
         <circle cx="90" cy="34" r="20" fill="#1e3a5f"/>
-        <text x="90" y="42" font-family="'Segoe UI', Arial, sans-serif" font-size="20" text-anchor="middle">&#128205;</text>
+        <g transform="translate(90, 34)">
+          <path d="M 0 -8 C -4 -8 -7 -4 -7 0 C -7 5 0 10 0 10 C 0 10 7 5 7 0 C 7 -4 4 -8 0 -8 Z" fill="#fef08a"/>
+          <circle cx="0" cy="-1" r="2.2" fill="#0f294a"/>
+        </g>
         <text x="90" y="74" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="800" fill="#fef08a" text-anchor="middle">MAPS &amp; SOCIALS</text>
         <text x="90" y="92" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#93c5fd" text-anchor="middle">Google Maps &amp; Instagram</text>
       </g>
@@ -476,7 +494,7 @@ async function renderCardStandee(merchant: any, logoBuffer: Buffer | null, targe
     <!-- Bottom Gold Highlight Banner -->
     <rect x="42" y="876" width="${width - 84}" height="54" rx="16" fill="#061932" stroke="url(#goldGrad)" stroke-width="1.5"/>
     <text x="${width / 2}" y="909" font-family="'Segoe UI', Arial, sans-serif" font-size="13.5" font-weight="800" fill="#fef08a" text-anchor="middle" letter-spacing="0.5">
-      &#10024; Tap "Save to Phone" to Add Store Card Directly to Contacts
+      Tap "Save to Phone" to Add Store Card Directly to Contacts
     </text>
 
     <!-- Footer Branding -->
@@ -536,8 +554,8 @@ async function renderComboStandee(merchant: any, logoBuffer: Buffer | null, targ
 
     <line x1="24" y1="170" x2="${width - 24}" y2="170" stroke="url(#goldGrad)" stroke-width="2.5"/>
 
-    <text x="${width / 2}" y="214" font-family="'Segoe UI', Arial, sans-serif" font-size="28" font-weight="900" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="1">CONNECT WITH US &amp; RATE YOUR EXPERIENCE</text>
-    <text x="${width / 2}" y="240" font-family="'Segoe UI', Arial, sans-serif" font-size="13.5" font-weight="700" fill="#93c5fd" text-anchor="middle" letter-spacing="1.5">SAVE CONTACT &#8226; VIEW CATALOG &#8226; 5-STAR GOOGLE REVIEW</text>
+    <text x="${width / 2}" y="214" font-family="'Segoe UI', Arial, sans-serif" font-size="22" font-weight="900" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="0.5">CONNECT WITH US &amp; RATE YOUR EXPERIENCE</text>
+    <text x="${width / 2}" y="240" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#93c5fd" text-anchor="middle" letter-spacing="1">SAVE CONTACT &#8226; VIEW CATALOG &#8226; 5-STAR GOOGLE REVIEW</text>
 
     <!-- Mini Stars -->
     <g transform="translate(${width / 2}, 268)" text-anchor="middle">
@@ -553,7 +571,7 @@ async function renderComboStandee(merchant: any, logoBuffer: Buffer | null, targ
     <path d="M 470 606 L 502 606 Q 506 606 506 602 L 506 570" fill="none" stroke="#4285F4" stroke-width="6" stroke-linecap="round"/>
 
     <text x="${width / 2}" y="664" font-family="'Segoe UI', Arial, sans-serif" font-size="14.5" font-weight="800" fill="#fef08a" text-anchor="middle" letter-spacing="0.5">
-      &#128242; Point Phone Camera &#8594; Open Digital Hub
+      Point Any Phone Camera &#8594; Open Digital Hub
     </text>
 
     <!-- Two Dual Power Blocks -->
@@ -562,22 +580,39 @@ async function renderComboStandee(merchant: any, logoBuffer: Buffer | null, targ
       <g transform="translate(0, 0)">
         <rect width="298" height="155" rx="20" fill="#0f294a" stroke="#234567" stroke-width="1.5"/>
         <rect x="14" y="14" width="36" height="36" rx="10" fill="#1e3a5f"/>
-        <text x="32" y="39" font-family="'Segoe UI', Arial, sans-serif" font-size="20" text-anchor="middle">&#128241;</text>
+        <g transform="translate(32, 32)">
+          <rect x="-5.5" y="-9" width="11" height="18" rx="2.5" fill="none" stroke="#fef08a" stroke-width="1.8"/>
+          <circle cx="0" cy="5.5" r="1.2" fill="#fef08a"/>
+        </g>
         <text x="60" y="38" font-family="'Segoe UI', Arial, sans-serif" font-size="15" font-weight="900" fill="#fef08a">DIGITAL CARD</text>
-        <text x="18" y="76" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#e2e8f0">&#10003; 1-Tap Save to Contacts</text>
-        <text x="18" y="100" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#e2e8f0">&#10003; WhatsApp Order &amp; Call</text>
-        <text x="18" y="124" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#e2e8f0">&#10003; Food Menu &amp; Catalog</text>
+        <circle cx="28" cy="73" r="6.5" fill="#10b981"/>
+        <path d="M 25 73 L 27 75 L 31 70" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="42" y="77" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#e2e8f0">1-Tap Save to Contacts</text>
+        <circle cx="28" cy="97" r="6.5" fill="#10b981"/>
+        <path d="M 25 97 L 27 99 L 31 94" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="42" y="101" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#e2e8f0">WhatsApp Order &amp; Call</text>
+        <circle cx="28" cy="121" r="6.5" fill="#10b981"/>
+        <path d="M 25 121 L 27 123 L 31 118" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="42" y="125" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#e2e8f0">Food Menu &amp; Catalog</text>
       </g>
 
       <!-- Right: Google Reviews -->
       <g transform="translate(328, 0)">
         <rect width="298" height="155" rx="20" fill="#0f294a" stroke="#234567" stroke-width="1.5"/>
         <rect x="14" y="14" width="36" height="36" rx="10" fill="#1e3a5f"/>
-        <text x="32" y="39" font-family="'Segoe UI', Arial, sans-serif" font-size="20" text-anchor="middle">&#11088;</text>
+        <g transform="translate(32, 32)">
+          <polygon points="0,-8 2.2,-2.5 8,-2 3.8,1.6 5.2,7.5 0,4.4 -5.2,7.5 -3.8,1.6 -8,-2 -2.2,-2.5" fill="#fef08a"/>
+        </g>
         <text x="60" y="38" font-family="'Segoe UI', Arial, sans-serif" font-size="15" font-weight="900" fill="#fef08a">GOOGLE REVIEWS</text>
-        <text x="18" y="76" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#e2e8f0">&#10003; 5-Star Instant Rating</text>
-        <text x="18" y="100" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#e2e8f0">&#10003; AI Pre-Drafted Reviews</text>
-        <text x="18" y="124" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#e2e8f0">&#10003; Direct Google Maps Link</text>
+        <circle cx="28" cy="73" r="6.5" fill="#3b82f6"/>
+        <path d="M 25 73 L 27 75 L 31 70" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="42" y="77" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#e2e8f0">5-Star Instant Rating</text>
+        <circle cx="28" cy="97" r="6.5" fill="#3b82f6"/>
+        <path d="M 25 97 L 27 99 L 31 94" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="42" y="101" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#e2e8f0">AI Pre-Drafted Reviews</text>
+        <circle cx="28" cy="121" r="6.5" fill="#3b82f6"/>
+        <path d="M 25 121 L 27 123 L 31 118" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="42" y="125" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#e2e8f0">Direct Google Maps Link</text>
       </g>
     </g>
 
