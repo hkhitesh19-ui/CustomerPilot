@@ -8,16 +8,17 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 9c657e9
-Full Commit Hash  : 9c657e98bf75ecff982f64fa4bb964096052f6f3
-Target Fix Commit : 9c657e9
+Active Git Commit : 66d1832
+Full Commit Hash  : 66d1832bc9bb4254a5c5315ff90333d4554b7327
+Target Fix Commit : 66d1832
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 17 Oct 2026, 09:10 AM IST
+Deployment Date   : 17 Oct 2026, 09:27 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : docs: append resolved issue report for ChunkLoadError 404 on onboarding page
+Commit Title      : fix(merchant): synchronize Vinayak Fashion completed onboarding and verified logoUrl
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080, Online & Healthy)
+Merchant Status   : Vinayak Fashion Live (onboardingCompleted: true, logoUrl: /uploads/1792145071422..., Standee: Live)
 Google Places API : Configured and verified with AIzaSyC1wp... (Active)
 Nginx Static Alias: Direct /_next/static/ disk alias active (HTTP 200 chunk delivery)
 Backup Engine     : /root/backup_migration_bundle.sh & /root/restore_migration_bundle.sh (Active)
