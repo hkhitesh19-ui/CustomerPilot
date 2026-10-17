@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 7bec3f5
-Full Commit Hash  : 7bec3f53277860936578ff78919e71389445d65b
-Target Fix Commit : 7bec3f5
+Active Git Commit : fdc6379
+Full Commit Hash  : fdc6379d8e5db4cadc9c2dc3dc106b50fa09b9d2
+Target Fix Commit : fdc6379
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 17 Oct 2026, 10:35 AM IST
+Deployment Date   : 17 Oct 2026, 11:13 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(standee): remove restrictive 'Scan with WhatsApp Camera' caption from printed and preview QR cards
+Commit Title      : fix(standee): auto-provision digital business card so standee QR directly opens merchant digital card
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080, Online & Healthy)
