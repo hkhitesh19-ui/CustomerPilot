@@ -8,17 +8,18 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : a0b8601
-Full Commit Hash  : a0b860161dc854fb5aca5d84255615341f49fd7c
-Target Fix Commit : a0b8601
+Active Git Commit : 9c657e9
+Full Commit Hash  : 9c657e98bf75ecff982f64fa4bb964096052f6f3
+Target Fix Commit : 9c657e9
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 17 Oct 2026, 08:55 AM IST
+Deployment Date   : 17 Oct 2026, 09:10 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(google-business): remove remaining hardcoded Cake Connection fallbacks from select-location, join, and onboarding
+Commit Title      : docs: append resolved issue report for ChunkLoadError 404 on onboarding page
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080, Online & Healthy)
 Google Places API : Configured and verified with AIzaSyC1wp... (Active)
+Nginx Static Alias: Direct /_next/static/ disk alias active (HTTP 200 chunk delivery)
 Backup Engine     : /root/backup_migration_bundle.sh & /root/restore_migration_bundle.sh (Active)
 Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in (:3001)
 ----------------------------------------------------------
