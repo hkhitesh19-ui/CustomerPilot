@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : a5ff6a8
-Full Commit Hash  : a5ff6a803d8a3baadbaff94c4a8beebf5ad56795
-Target Fix Commit : a5ff6a8
+Active Git Commit : abd2d19
+Full Commit Hash  : abd2d1940d8a4a955fbc7262b8d1fd94f618bd5e
+Target Fix Commit : abd2d19
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 17 Oct 2026, 02:37 PM IST
+Deployment Date   : 17 Oct 2026, 04:54 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(qr,superadmin): optimize QR phone camera scannability and add 1-click merchant trial extension engine
+Commit Title      : feat(superadmin): add arbitrary custom days trial extension engine and preset pills
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080, Online & Healthy)
