@@ -3,6 +3,25 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [17 Oct 2026] Issue: Master Standee QR Code Opening WhatsApp Instead of Smart Digital Business Card for Newly Onboarded Merchants
+- **Symptom**: When scanning the Master Counter QR Standee of newly onboarded merchant "Vinayak Fashion" (`cmvaruybf0n9akvtmbog4k7u7`), the phone opened a pre-filled WhatsApp chat (`wa.me/917355135613?text=Hi Vinayak Fashion! Checking in...`) instead of opening Vinayak Fashion's Smart Digital Business Card (`https://customerpilot.in/c/vinayak-fashion`). Furthermore, opening `https://customerpilot.in/c/vinayak-fashion` directly threw an HTTP 404 "This page could not be found." error.
+- **Root Cause**:
+  1. In `src/app/api/qr/standee/route.ts` and `src/app/api/qr/generate/route.ts`, the QR generator queries `db.digitalBusinessCard.findFirst({ where: { merchantId: merchant.id, isActive: true } })`.
+  2. The database (`prisma/dev.db`) only had 4 historical cards (`cake-connection`, `gujarat-photo-goods`, `tasty-vadapav`, `tasty-vadapav-atladara`). Newly onboarded merchants (including Vinayak Fashion) had no record created in the `DigitalBusinessCard` table during signup/onboarding.
+  3. Consequently, `digitalCard` evaluated to `null`, triggering the fallback branch that encoded the merchant's WhatsApp chat URL instead of their Smart Digital Business Card URL (`/c/[slug]`).
+  4. In `src/app/c/[slug]/page.tsx`, if a card slug was not found, the route called Next.js `notFound()` without self-healing or checking for an active merchant.
+- **Resolution**:
+  1. **Self-Healing Architecture (`src/lib/digital-card-service.ts`)**: Built `getOrCreateDigitalBusinessCard(merchantId)` which automatically checks for existing cards and dynamically provisions a complete, verified `DigitalBusinessCard` record from merchant metadata (Store Name, slug, business category, logoUrl, city, state, WhatsApp/phone, Google rating & reviews count) if missing.
+  2. **Standee & Counter QR Auto-Provisioning**: Updated `src/app/api/qr/standee/route.ts` and `src/app/api/qr/generate/route.ts` to call `getOrCreateDigitalBusinessCard` when generating master standees or counter QR cards.
+  3. **Self-Healing Public Route (`src/app/c/[slug]/page.tsx`)**: Enhanced both `generateMetadata` and `PublicDigitalCardPage` to resolve merchants by slug/ID and auto-provision their digital card if not yet present in the table, eliminating 404 errors.
+  4. **Database Provisioning on Live VPS (`187.127.170.36`)**: Auto-provisioned verified `DigitalBusinessCard` for Vinayak Fashion (`cmvbyw1nc000fkvpengmxbef3`, slug: `vinayak-fashion`, rating 5.0, 1 review, Kanpur) and all onboarded stores.
+  5. **Production Build & Verification**: Deployed changes, compiled Next.js production build (`Compiled successfully in 2.9s`), synced standalone chunks, and reloaded PM2 `customerpilot-web`.
+  6. **Playwright & QR Decoder Verification**:
+     - Verified live standee QR image (`GET /api/qr/standee?design=master&m=cmvaruybf0n9akvtmbog4k7u7`) with Playwright and jsQR, confirming it 100% encodes `https://customerpilot.in/c/vinayak-fashion`.
+     - Captured live mobile and desktop screenshots (`verified_vinayak_digital_card_mobile.png`, `verified_vinayak_digital_card_desktop.png`) verifying 100% authentic branding, 5.0★ rating, 1 review, Kanpur location, and working actions (Loyalty Stamps, AI Google Review, WhatsApp, Call, Location).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [17 Oct 2026] Issue: Removal of Restrictive "Scan with WhatsApp Camera" Label Under Standee QR Codes
 - **Symptom**: Printed counter QR standees (generated from Onboarding Step 5 `/onboarding?step=5`) and the homepage interactive preview displayed `"SCAN WITH WHATSAPP CAMERA"` directly below the QR code inside the white frame. This instruction was misleading to walk-in customers who use standard phone cameras, Google Lens, or iOS camera scanners to scan native URLs.
 - **Root Cause**:

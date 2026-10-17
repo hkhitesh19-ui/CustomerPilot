@@ -4,6 +4,7 @@ import { generateBrandedQRDataUrl } from "@/lib/branded-qr"
 import { db } from "@/lib/db"
 import { ok, err } from "@/lib/api"
 import { normalizePhone } from "@/lib/utils"
+import { getOrCreateDigitalBusinessCard } from "@/lib/digital-card-service"
 
 export async function GET(req: NextRequest) {
   try {
@@ -57,10 +58,15 @@ export async function GET(req: NextRequest) {
       const merchantPhone = normalizePhone(merchant.whatsappPhone)
       if (!merchantPhone) return err("Merchant WhatsApp number not configured. Please configure WhatsApp number first.", 400)
 
-      if (merchant.digitalBusinessCard && (type === "counter" || type === "card" || type === "complete")) {
+      let digitalCard = merchant.digitalBusinessCard
+      if (!digitalCard && (type === "counter" || type === "card" || type === "complete")) {
+        digitalCard = await getOrCreateDigitalBusinessCard(merchant.id)
+      }
+
+      if (digitalCard && (type === "counter" || type === "card" || type === "complete")) {
         const host = req.headers.get("host") || "localhost:3000"
         const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https"
-        targetUrl = `${protocol}://${host}/c/${merchant.digitalBusinessCard.slug}`
+        targetUrl = `${protocol}://${host}/c/${digitalCard.slug}`
       } else {
         const bizName = merchant.name || "our store"
         const joinText = `Hi ${bizName}! Checking in for my VIP Club stamps 🎁`

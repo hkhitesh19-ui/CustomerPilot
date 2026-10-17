@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { jwtVerify } from "jose"
+import { getOrCreateDigitalBusinessCard } from "@/lib/digital-card-service"
 
 const JWT_SECRET = process.env.JWT_SECRET || "cpilot_jwt_secret_change_this_in_production_2026!"
 
@@ -49,6 +50,9 @@ export async function GET(req: NextRequest) {
       card = await db.digitalBusinessCard.findUnique({
         where: { merchantId: targetMerchantId },
       })
+      if (!card) {
+        card = await getOrCreateDigitalBusinessCard(targetMerchantId)
+      }
     } else {
       // Default to first merchant's card
       card = await db.digitalBusinessCard.findFirst()

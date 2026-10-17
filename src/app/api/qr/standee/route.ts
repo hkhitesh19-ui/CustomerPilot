@@ -5,6 +5,7 @@ import sharp from "sharp"
 import { db } from "@/lib/db"
 import { normalizePhone } from "@/lib/utils"
 import { generateBrandedQRDataUrl } from "@/lib/branded-qr"
+import { getOrCreateDigitalBusinessCard } from "@/lib/digital-card-service"
 
 interface StandeeConfig {
   image: string
@@ -129,9 +130,13 @@ export async function GET(req: NextRequest) {
     // scanning the Master Standee opens their Smart Digital Business Card (/c/[slug]) where both
     // Digital Loyalty Stamp and Smart AI Google Review modules are available!
     let targetUrl = ""
-    const digitalCard = await db.digitalBusinessCard.findFirst({
+    let digitalCard = await db.digitalBusinessCard.findFirst({
       where: { merchantId: merchant.id, isActive: true },
     })
+
+    if (!digitalCard && (design === "master" || !design)) {
+      digitalCard = await getOrCreateDigitalBusinessCard(merchant.id)
+    }
 
     if (digitalCard && (design === "master" || !design)) {
       const host = req.headers.get("host") || "localhost:3000"
