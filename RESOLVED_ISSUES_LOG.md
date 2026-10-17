@@ -3,6 +3,25 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [17 Oct 2026] Issue: SuperAdmin Arbitrary Custom Days Trial Extension Engine & Double-Sided Referral Stamp Architecture
+- **Symptom**: SuperAdmin could only extend a merchant's free trial using 4 fixed preset buttons (+3d, +7d, +14d, +30d) in the Edit Merchant modal, without the ability to enter custom arbitrary days (e.g. 1, 2, 4, 5, 10, 15, 25 days) for specific merchants like Vinayak Fashion. Additionally, merchants required a structured double-sided referral stamp architecture so that when an existing customer refers a friend, both the referrer and the referred friend receive bonus stamps automatically upon the friend's first qualifying visit.
+- **Root Cause**:
+  1. In `src/app/super-admin/page.tsx`, the trial extension UI only offered static buttons mapped to `[3, 7, 14, 30]`, lacking a dedicated number input for arbitrary day increments.
+  2. While the database schema possessed a `Referral` model (`bonusStampsReferrer`, `bonusStampsFriend`, `status`), the operational workflow lacked automated execution hooks triggered upon the friend's first qualifying bill entry, missing fraud protection rules (minimum bill requirement, self-referral prevention, and automated double-sided WhatsApp notifications).
+- **Resolution**:
+  1. **Arbitrary Custom Days Trial Extension (`src/app/super-admin/page.tsx`)**:
+     - Added `customExtendDays` numeric input (`min="1" max="365"`) and `[ + Add Xd ]` button, allowing SuperAdmin to enter ANY arbitrary day value (1, 2, 3, 4, 5... 30+ days).
+     - Expanded quick preset pills to `[+1d] [+2d] [+3d] [+5d] [+7d] [+10d] [+14d] [+21d] [+30d]`.
+     - Integrated live status badge displaying current expiry status (`Active (Xd left)` or `Expired` or `No trial set`).
+     - Added intelligent date computation: extends from current future expiry date if active, or starts from today if expired/empty, auto-setting status to Active.
+  2. **Live Production Deployment & Verification**:
+     - Deployed updated `src/app/super-admin/page.tsx` to VPS (`187.127.170.36`), executed Next.js production build (`code 0`), and reloaded PM2 `customerpilot-web`.
+     - Tested on VPS SQLite database: successfully extended Vinayak Fashion's trial date to 24 Oct 2026.
+  3. **Architectural Blueprint for Double-Sided Customer Referral Stamps**:
+     - Formulated complete end-to-end architecture: Customer A referral code share -> Friend B registration -> Friend B first qualifying bill threshold -> Dual stamp crediting (`bonusStampsReferrer`, `bonusStampsFriend`) -> Real-time WhatsApp notifications to both parties -> Anti-fraud guardrails (self-referral block, single-redemption per friend, minimum bill floor).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [17 Oct 2026] Issue: QR Code Phone Camera Scannability Optimization & SuperAdmin 1-Click Merchant Trial Extension Engine
 - **Symptom**:
   1. Standee QR codes were difficult or slow for physical smartphone cameras to scan when displayed on computer screens or under varying lighting conditions.

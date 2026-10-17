@@ -8,7 +8,7 @@ import {
   Settings, Globe, Shield, Code, Zap, Crown, Store, Check, X, Search,
   MessageSquare, RefreshCw, RotateCcw, Activity, Server, Cpu, Sparkles,
   Layers, ArrowUpRight, Lock, CheckCircle2, ChevronRight, Trash2, AlertTriangle, Eye, UserX, LogOut,
-  MapPin, ExternalLink, Clock, Rocket, Loader2, Edit3, Smartphone, Gift
+  MapPin, ExternalLink, Clock, Rocket, Loader2, Edit3, Smartphone, Gift, Calendar, Plus
 } from "lucide-react"
 import { WhatsAppTemplateManager } from "@/components/whatsapp-template-manager"
 import { SubscriptionPlansManager } from "@/components/super-admin/subscription-plans-manager"
@@ -721,6 +721,7 @@ function MerchantManagement() {
   // Profile Edit Modal State
   const [profileModalMerchant, setProfileModalMerchant] = useState<any | null>(null)
   const [profileEditForm, setProfileEditForm] = useState<any>({})
+  const [customExtendDays, setCustomExtendDays] = useState<number | string>(7)
   const [savingProfile, setSavingProfile] = useState(false)
   const [profileSaveSuccess, setProfileSaveSuccess] = useState(false)
 
@@ -1804,10 +1805,24 @@ function MerchantManagement() {
                       <option value="Suspended">Suspended</option>
                     </select>
                   </div>
-                  <div>
+                  <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs text-slate-400">Trial Ends At</Label>
-                      <span className="text-[10px] text-indigo-400 font-semibold">Quick Extend:</span>
+                      <Label className="text-xs text-slate-400 font-semibold flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-indigo-400" /> Trial Ends At
+                      </Label>
+                      {profileEditForm.trialEndsAt ? (
+                        <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
+                          new Date(profileEditForm.trialEndsAt).getTime() >= Date.now()
+                            ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                            : "bg-rose-500/15 text-rose-400 border border-rose-500/30"
+                        }`}>
+                          {new Date(profileEditForm.trialEndsAt).getTime() >= Date.now()
+                            ? `Active (${Math.ceil((new Date(profileEditForm.trialEndsAt).getTime() - Date.now()) / 86400000)}d left)`
+                            : "Expired"}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-amber-400/80 font-mono">No trial set</span>
+                      )}
                     </div>
                     <Input
                       type="date"
@@ -1815,22 +1830,58 @@ function MerchantManagement() {
                       onChange={(e) => setProfileEditForm({ ...profileEditForm, trialEndsAt: e.target.value })}
                       className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
                     />
-                    <div className="flex items-center gap-1.5 mt-1.5">
-                      {[3, 7, 14, 30].map((days) => (
+
+                    {/* Arbitrary Custom Days Extension Input (1, 2, 3, 4, 5... 30+) */}
+                    <div className="flex items-center gap-1.5 mt-2 pt-1.5 border-t border-slate-800/60">
+                      <div className="relative flex-1">
+                        <Input
+                          type="number"
+                          min={1}
+                          max={365}
+                          value={customExtendDays}
+                          onChange={(e) => setCustomExtendDays(e.target.value)}
+                          placeholder="Days (e.g. 5)"
+                          className="bg-slate-950 border-slate-800 text-white text-xs h-7 px-2 font-mono"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => {
+                          const days = Math.max(1, parseInt(String(customExtendDays)) || 1);
+                          const base = profileEditForm.trialEndsAt ? new Date(profileEditForm.trialEndsAt) : new Date();
+                          const currentMs = isNaN(base.getTime()) ? Date.now() : Math.max(Date.now(), base.getTime());
+                          const target = new Date(currentMs + days * 24 * 60 * 60 * 1000);
+                          setProfileEditForm({
+                            ...profileEditForm,
+                            trialEndsAt: target.toISOString().split("T")[0],
+                            status: "Active"
+                          });
+                        }}
+                        className="h-7 px-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold rounded shadow-sm flex items-center gap-1 cursor-pointer shrink-0"
+                      >
+                        <Plus className="w-3 h-3" /> Add {customExtendDays || 1}d
+                      </Button>
+                    </div>
+
+                    {/* Quick Preset Buttons (1d to 30d) */}
+                    <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                      <span className="text-[10px] text-slate-500 mr-0.5">Quick:</span>
+                      {[1, 2, 3, 5, 7, 10, 14, 21, 30].map((days) => (
                         <button
                           key={days}
                           type="button"
                           onClick={() => {
-                            const base = profileEditForm.trialEndsAt ? new Date(profileEditForm.trialEndsAt) : new Date()
-                            const currentMs = isNaN(base.getTime()) ? Date.now() : Math.max(Date.now(), base.getTime())
-                            const target = new Date(currentMs + days * 24 * 60 * 60 * 1000)
+                            const base = profileEditForm.trialEndsAt ? new Date(profileEditForm.trialEndsAt) : new Date();
+                            const currentMs = isNaN(base.getTime()) ? Date.now() : Math.max(Date.now(), base.getTime());
+                            const target = new Date(currentMs + days * 24 * 60 * 60 * 1000);
                             setProfileEditForm({
                               ...profileEditForm,
                               trialEndsAt: target.toISOString().split("T")[0],
                               status: "Active"
-                            })
+                            });
                           }}
-                          className="px-2 py-0.5 rounded bg-indigo-500/15 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold transition-colors cursor-pointer"
+                          className="px-1.5 py-0.5 rounded bg-indigo-500/15 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold transition-colors cursor-pointer"
                         >
                           +{days}d
                         </button>
