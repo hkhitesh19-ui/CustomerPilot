@@ -3,6 +3,32 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [17 Oct 2026] Issue: Misleading Loyalty Rewards Messaging on Standees for Non-Loyalty Merchants & Bespoke Multi-Template Standee Engine
+- **Symptom**: When merchants opted only for "Smart AI Google Review" (Standalone Reviews), "Smart Digital Business Card" (Standalone Card), or "Card + Reviews" (Combo without Loyalty), the only counter standee available in the system was the historical Luxury VIP Rewards Standee (`SCAN TO EARN CONFIRM REWARDS`, `JOIN NOW & GET REWARDS`, `EXCLUSIVE OFFERS`, `LOYALTY REWARDS`, `MEMBERSHIP DISCOUNT`, `VIP MEMBER`). This conveyed a completely misleading message to walk-in customers who expected discounts and stamps when none were offered by the merchant. Furthermore, merchants with no loyalty module had Section 01 in Dashboard Settings completely hidden.
+- **Root Cause**:
+  1. In `src/app/api/qr/standee/route.ts`, all standee requests rendered onto `standee_master_authentic.jpg` (which permanently contained "SCAN TO EARN CONFIRM REWARDS" and 3 loyalty icons), regardless of the merchant's opted modules or plan.
+  2. In `src/app/dashboard/settings/page.tsx`, Section 01 ("Digital Loyalty Stamp QR") was hard-gated with `{isLoyaltyEnabled && (...) }`, preventing non-loyalty merchants from accessing their counter QR standee studio.
+  3. The standee generator and UI lacked dedicated standalone designs for Google Reviews, Digital Business Cards, and dual-action combos.
+- **Resolution**:
+  1. **Four Bespoke High-Resolution Standee Architectures (`src/app/api/qr/standee/route.ts`)**:
+     - **Template A (`design=review` / `google_review`)**: Clean porcelain white luxury theme with Official Google Wordmark (`G o o g l e` with explicit X coordinates), 5 Glowing Stars (`★★★★★`), Google 4-color brackets (Red, Yellow, Green, Blue), 3 feature badges (10-SEC FAST, ZERO APP, AI DRAFTED), and zero loyalty/reward text.
+     - **Template B (`design=card` / `digital_card`)**: Deep sapphire navy with double royal gold metallic borders (`#d4af37`, `#fef08a`), "SCAN TO CONNECT", 3 action badges (SAVE CONTACT, CATALOG & MENU, MAPS & SOCIALS), and zero loyalty text.
+     - **Template C (`design=combo` / `card_review`)**: Celestial midnight and royal navy gradient with "CONNECT WITH US & RATE YOUR EXPERIENCE", featuring dual power blocks: Left (Digital Card: Save Contact, WhatsApp, Menu) + Right (Google Reviews: 5-Star Rating, AI Pre-Drafted, Direct Maps).
+     - **Template D (`design=master` / `loyalty`)**: The authentic luxury VIP rewards standee retained for merchants with active `LOYALTY` modules.
+     - **Intelligent Auto-Resolution (`design=auto`)**: Automatically analyzes `merchant.enabledModules` to serve the exact matching standee.
+  2. **Interactive Standee Studio in Merchant Dashboard (`src/components/qr-generator.tsx` & `src/app/dashboard/settings/page.tsx`)**:
+     - Unlocked Section 01 for ALL merchants as "Counter QR Standee Studio".
+     - Added 4 interactive template switcher tabs (`Template A`, `Template B`, `Template C`, `Template D`) with live on-screen artwork preview, instant A4 PDF printing, and high-res JPG download.
+     - Auto-recommends and pre-selects the appropriate template based on active modules.
+  3. **Digital Card Dashboard Quick Action (`src/app/dashboard/digital-card/page.tsx`)**:
+     - Added quick "Counter Standee" action button allowing digital card merchants to jump directly to their bespoke standee studio.
+  4. **Deployment & Live Playwright Verification on Production VPS (`187.127.170.36`)**:
+     - Deployed all updated files and compiled Next.js production build (`Compiled successfully in 3.1s`).
+     - Verified HTTP 200 and valid image/jpeg headers for all 4 designs on VPS (`urllib.request`).
+     - Executed automated browser inspection via Playwright (`scripts/verify_cake_standee_dashboard.js`), capturing live screenshot proof of Cake Connection switching between Template A, B, C, and D in real-time with zero page reload.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [17 Oct 2026] Issue: Selective Service 3-Day Free Trial Module Isolation and Fast-Track Activation
 - **Symptom**: When a new merchant clicked "Start 3 Days Free Trial" on dedicated service pages (e.g., Smart AI Google Review, Smart Digital Business Card, AI Autoreply, or Custom Module Bundles), their trial account was activated with ALL 3 historical services (`LOYALTY,REVIEWS,AUTOREPLY`) enabled indiscriminately. Furthermore, merchants opting only for Digital Card or Reviews were forced into an 8-step WhatsApp Loyalty onboarding wizard rather than immediately accessing their chosen service.
 - **Root Cause**:

@@ -155,7 +155,7 @@ export default function SettingsPage() {
           className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/40 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
         >
           <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-1.5 py-0.2 rounded">01</span>
-          <span>Loyalty Stamp QR</span>
+          <span>Standee Studio</span>
         </a>
 
         {isReviewsEnabled && (
@@ -214,32 +214,30 @@ export default function SettingsPage() {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════ */}
-      {/* SECTION 1: WHATSAPP VIP LOYALTY & STAMP CHECK-IN QR CODE        */}
+      {/* SECTION 1: COUNTER QR STANDEE STUDIO                              */}
       {/* ══════════════════════════════════════════════════════════════════ */}
-      {isLoyaltyEnabled && (
-        <section id="sec-vip-qr" className="space-y-3 pt-2">
-          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-            <div className="flex items-center gap-2.5">
-              <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">
-                01
-              </span>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2.5 tracking-tight">
-                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
-                  <QrCode className="w-6 h-6" />
-                </div>
-                Digital Loyalty Stamp QR
-              </h2>
-            </div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
-              Counter QR Code, Table Tents &amp; Packaging QR Stickers
+      <section id="sec-vip-qr" className="space-y-3 pt-2">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">
+              01
             </span>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2.5 tracking-tight">
+              <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                <QrCode className="w-6 h-6" />
+              </div>
+              Counter QR Standee Studio
+            </h2>
           </div>
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
+            Bespoke Standees: Google Reviews, Digital Card &amp; VIP Loyalty
+          </span>
+        </div>
 
-          <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
-            <QRGenerator merchantId={merchant?.id || ""} />
-          </div>
-        </section>
-      )}
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
+          <QRGenerator merchantId={merchant?.id || ""} />
+        </div>
+      </section>
 
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 2: SMART AI GOOGLE REVIEWS                                */}

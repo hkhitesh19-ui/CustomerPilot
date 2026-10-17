@@ -378,6 +378,17 @@ export default function DigitalCardDashboardPage() {
               Open Live Card
             </a>
           </Button>
+
+          <Button
+            asChild
+            size="sm"
+            className="rounded-xl border border-amber-400/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold"
+          >
+            <a href="/dashboard/settings#sec-vip-qr">
+              <QrCode className="w-4 h-4 mr-1 text-amber-400" />
+              Counter Standee
+            </a>
+          </Button>
         </div>
       </div>
 
