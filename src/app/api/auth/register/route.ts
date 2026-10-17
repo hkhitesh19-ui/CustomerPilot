@@ -7,6 +7,7 @@ import { generateMerchantIdNumber } from '@/lib/merchant-id-generator';
 import { getIndustryLoyaltyRule } from '@/lib/industry-campaigns';
 import { getGlobalDefaultMerchantSettings } from '@/lib/default-merchant-settings';
 import { normalizePhone } from '@/lib/utils';
+import { getOrCreateDigitalBusinessCard } from '@/lib/digital-card-service';
 
 if (!process.env.JWT_SECRET) {
   throw new Error('FATAL: JWT_SECRET environment variable is not set');
@@ -39,14 +40,47 @@ export async function POST(req: Request) {
     // Normalize phone at entry point — ensures 91XXXXXXXXXX format in DB from day 1
     const cleanPhone = normalizePhone(whatsappPhone) || '';
 
-    // Determine if this is a fast-track module signup
-    const MODULE_MAP: Record<string, string> = {
+    // Determine opted module(s) (supports single: "reviews", "card", or combo: "card,reviews")
+    const MODULE_KEY_MAP: Record<string, string> = {
       reviews: "REVIEWS",
+      review: "REVIEWS",
       loyalty: "LOYALTY",
       autoreply: "AUTOREPLY",
+      card: "DIGITAL_CARD",
+      digital_card: "DIGITAL_CARD",
+      digitalcard: "DIGITAL_CARD",
     };
-    const isFastTrack = module && MODULE_MAP[module];
-    const enabledModules = isFastTrack ? MODULE_MAP[module] : "LOYALTY,REVIEWS,AUTOREPLY";
+
+    let resolvedModules = "";
+    let isOptedService = false;
+
+    if (module && typeof module === "string" && module.trim() !== "" && module.toLowerCase() !== "complete") {
+      const parts = module.split(",").map(p => p.trim().toLowerCase()).filter(Boolean);
+      const mappedParts = new Set<string>();
+      for (const p of parts) {
+        if (MODULE_KEY_MAP[p]) {
+          mappedParts.add(MODULE_KEY_MAP[p]);
+        }
+      }
+      if (mappedParts.size > 0) {
+        resolvedModules = Array.from(mappedParts).join(",");
+        isOptedService = true;
+      }
+    }
+
+    const globalDefaults = await getGlobalDefaultMerchantSettings();
+
+    if (!resolvedModules) {
+      resolvedModules = globalDefaults?.enabledModules || "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD";
+    }
+
+    const hasLoyalty = resolvedModules.split(",").includes("LOYALTY");
+    const hasReviews = resolvedModules.split(",").includes("REVIEWS");
+    const hasCard = resolvedModules.split(",").includes("DIGITAL_CARD");
+    const hasAutoReply = resolvedModules.split(",").includes("AUTOREPLY");
+
+    // Fast-track: skip loyalty onboarding if merchant only opted for standalone non-loyalty modules
+    const isFastTrack = isOptedService && !hasLoyalty;
 
     // Validation 2: Check if User already exists with email
     const existingUser = await db.user.findUnique({ where: { email: cleanEmail } });
@@ -86,8 +120,6 @@ export async function POST(req: Request) {
 
     const merchantIdNumber = await generateMerchantIdNumber(db);
 
-    const globalDefaults = await getGlobalDefaultMerchantSettings();
-
     const merchant = await db.merchant.create({
       data: {
         userId: user.id,
@@ -101,7 +133,7 @@ export async function POST(req: Request) {
         plan: 'trial',
         status: 'active',
         trialEndsAt,
-        enabledModules: globalDefaults?.enabledModules || enabledModules,
+        enabledModules: resolvedModules,
         googleReviewDelayMinutes: globalDefaults?.googleReviewDelayMinutes ?? 30,
         vipUpgradeBonusStamps: globalDefaults?.vipUpgradeBonusStamps ?? 1,
         loyaltyCategoryNames: JSON.stringify(globalDefaults?.loyaltyCategoryNames),
@@ -109,7 +141,7 @@ export async function POST(req: Request) {
         winbackDays2: globalDefaults?.winbackDays2 ?? 60,
         winbackDays3: globalDefaults?.winbackDays3 ?? 90,
         expiryWarningDays: globalDefaults?.expiryWarningDays ?? 7,
-        // Fast-track: skip onboarding for standalone module signups
+        // Fast-track: skip onboarding for standalone non-loyalty module signups
         onboardingCompleted: !!isFastTrack,
         currentStep: isFastTrack ? 99 : 1,
       },
@@ -137,7 +169,7 @@ export async function POST(req: Request) {
     });
 
     // Create default StampCard only if LOYALTY module is enabled
-    if (!isFastTrack || module === 'loyalty') {
+    if (hasLoyalty) {
       const rule = getIndustryLoyaltyRule(businessType, businessName);
       await db.stampCard.create({
         data: {
@@ -158,6 +190,15 @@ export async function POST(req: Request) {
       });
     }
 
+    // Auto-provision Digital Business Card if opted
+    if (hasCard) {
+      try {
+        await getOrCreateDigitalBusinessCard(merchant.id);
+      } catch (err) {
+        console.warn("Failed to auto-provision digital business card during register:", err);
+      }
+    }
+
     // Sign JWT with userId + merchantId + role
     const secret = new TextEncoder().encode(JWT_SECRET);
     const token = await new SignJWT({ 
@@ -171,12 +212,16 @@ export async function POST(req: Request) {
       .sign(secret);
 
     // Determine redirect based on module fast-track
-    const MODULE_REDIRECTS: Record<string, string> = {
-      reviews: '/dashboard/reviews',
-      autoreply: '/dashboard/reviews',
-      loyalty: '/dashboard',
-    };
-    const redirectTo = isFastTrack ? (MODULE_REDIRECTS[module] || '/dashboard') : '/dashboard';
+    let redirectTo = '/dashboard';
+    if (isFastTrack) {
+      if (hasCard && !hasReviews && !hasAutoReply) {
+        redirectTo = '/dashboard/digital-card';
+      } else if (hasReviews || hasAutoReply) {
+        redirectTo = '/dashboard/reviews';
+      } else {
+        redirectTo = '/dashboard';
+      }
+    }
 
     const response = NextResponse.json({ 
       success: true, 

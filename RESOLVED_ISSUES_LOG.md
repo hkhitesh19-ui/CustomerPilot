@@ -3,6 +3,45 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [17 Oct 2026] Issue: Selective Service 3-Day Free Trial Module Isolation and Fast-Track Activation
+- **Symptom**: When a new merchant clicked "Start 3 Days Free Trial" on dedicated service pages (e.g., Smart AI Google Review, Smart Digital Business Card, AI Autoreply, or Custom Module Bundles), their trial account was activated with ALL 3 historical services (`LOYALTY,REVIEWS,AUTOREPLY`) enabled indiscriminately. Furthermore, merchants opting only for Digital Card or Reviews were forced into an 8-step WhatsApp Loyalty onboarding wizard rather than immediately accessing their chosen service.
+- **Root Cause**:
+  1. In `src/app/api/auth/register/route.ts` (line 104), the registration route had `enabledModules: globalDefaults?.enabledModules || enabledModules`. Because `globalDefaults.enabledModules` in the database was `"LOYALTY,REVIEWS,AUTOREPLY"`, it completely overwrote any query parameter or payload module passed by the user.
+  2. The type system and module mapping in `src/lib/feature-gate.ts` only knew about `"LOYALTY"`, `"REVIEWS"`, and `"AUTOREPLY"`. `"DIGITAL_CARD"` was missing from `Module` and `ALL_MODULES`, and multi-module combo strings (e.g., `card,reviews`) were unsupported.
+  3. CTA buttons on individual landing pages (`/smart-ai-google-review`, `/smart-digital-business-card`, `/ai-google-review-autoreply`, `/whatsapp-digital-loyalty-card`, `/free-ai-google-review-generator`) linked to generic `/signup` without `?module=...`.
+  4. The registration handler always redirected newly created merchants to `/onboarding` (the 8-step loyalty program wizard), even if the merchant only opted for a Smart Digital Business Card or Google Reviews.
+- **Resolution**:
+  1. **Core Feature Gate & Module Architecture (`src/lib/feature-gate.ts`)**:
+     - Added `"DIGITAL_CARD"` to `Module` type definition and `ALL_MODULES` array.
+     - Added `card: ["DIGITAL_CARD"]` to `PLAN_MODULE_MAP`.
+     - Added multi-module combo support for `card,reviews` and custom selections.
+  2. **Fast-Track Registration Engine (`src/app/api/auth/register/route.ts`)**:
+     - Resolved `enabledModules` strictly from user choice when explicitly provided (`hasExplicitModule`), only falling back to defaults if no module was specified.
+     - Supported both single tokens (`reviews`, `card`, `autoreply`, `loyalty`) and combo tokens (`card,reviews`).
+     - Auto-provisions `DigitalBusinessCard` via `getOrCreateDigitalBusinessCard(merchant.id)` immediately upon registration when `hasCard` is opted.
+     - Bypasses the 8-step loyalty onboarding (`onboardingCompleted: true`, `currentStep: 99`) for non-loyalty standalone and combo accounts.
+     - Smart post-registration redirects:
+       - Standalone Card ➔ `/dashboard/digital-card`
+       - Standalone Reviews or Card+Reviews Combo ➔ `/dashboard/reviews`
+       - Standalone Autoreply ➔ `/dashboard/reviews`
+       - Complete / Loyalty Suite ➔ `/dashboard` (or onboarding)
+  3. **Tailored Signup Experience (`src/components/signup-client.tsx`)**:
+     - Added dynamic awareness of `card`, `reviews`, `card,reviews`, and other modules.
+     - Dynamically customizes trial badges, titles, and benefit bullets so merchants see exactly what they selected.
+  4. **Dynamic CTA Linking Across All Landing Pages**:
+     - Updated all landing page CTAs to include `?module=...` (`/signup?module=reviews`, `/signup?module=card`, `/signup?module=autoreply`, etc.).
+     - Updated `pricing-studio.tsx` bottom banner to dynamically link to `/signup?module=...` matching the user's interactive selection.
+     - Updated `checkout-activation-modal.tsx` to pass selected modules during registration.
+  5. **Production Deployment & Automated Live VPS Database Verification (`187.127.170.36`)**:
+     - Deployed all updated files to production VPS and completed Next.js build (`npm run build`).
+     - Executed automated API registration test directly against live VPS:
+       - Standalone Reviews (`module=reviews`) ➔ Activated ONLY `REVIEWS`, plan: `trial`, redirected to `/dashboard/reviews`.
+       - Standalone Card (`module=card`) ➔ Activated ONLY `DIGITAL_CARD`, plan: `trial`, auto-provisioned card, redirected to `/dashboard/digital-card`.
+       - Combo Card+Reviews (`module=card,reviews`) ➔ Activated ONLY `DIGITAL_CARD,REVIEWS`, plan: `trial`, redirected to `/dashboard/reviews`.
+     - Verified all test stores and cleaned them completely from production SQLite databases.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [17 Oct 2026] Issue: Master Standee QR Code Opening WhatsApp Instead of Smart Digital Business Card for Newly Onboarded Merchants
 - **Symptom**: When scanning the Master Counter QR Standee of newly onboarded merchant "Vinayak Fashion" (`cmvaruybf0n9akvtmbog4k7u7`), the phone opened a pre-filled WhatsApp chat (`wa.me/917355135613?text=Hi Vinayak Fashion! Checking in...`) instead of opening Vinayak Fashion's Smart Digital Business Card (`https://customerpilot.in/c/vinayak-fashion`). Furthermore, opening `https://customerpilot.in/c/vinayak-fashion` directly threw an HTTP 404 "This page could not be found." error.
 - **Root Cause**:

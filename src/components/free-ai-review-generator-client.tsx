@@ -206,7 +206,7 @@ export function FreeAiReviewGeneratorClient() {
               size="sm"
               className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-md transition-all"
             >
-              <Link href="/signup">Get Smart QR Free →</Link>
+              <Link href="/signup?module=reviews">Get Smart QR Free →</Link>
             </Button>
           </div>
         </div>
@@ -484,7 +484,7 @@ export function FreeAiReviewGeneratorClient() {
                     size="lg"
                     className="border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm px-6 py-4 rounded-xl w-full sm:w-auto shadow-xs"
                   >
-                    <Link href="/signup">Start 3-Day Free Trial</Link>
+                    <Link href="/signup?module=reviews">Start 3-Day Free Trial</Link>
                   </Button>
                   <Button
                     asChild

@@ -8,9 +8,9 @@
  * Default: All modules enabled (backward compatible with existing merchants).
  */
 
-export type Module = "LOYALTY" | "REVIEWS" | "AUTOREPLY";
+export type Module = "LOYALTY" | "REVIEWS" | "AUTOREPLY" | "DIGITAL_CARD";
 
-export const ALL_MODULES: Module[] = ["LOYALTY", "REVIEWS", "AUTOREPLY"];
+export const ALL_MODULES: Module[] = ["LOYALTY", "REVIEWS", "AUTOREPLY", "DIGITAL_CARD"];
 
 /**
  * Check if a merchant has a specific module enabled.
@@ -57,6 +57,8 @@ export const PLAN_MODULE_MAP: Record<string, Module[]> = {
   loyalty: ["LOYALTY"],
   reviews: ["REVIEWS"],
   autoreply: ["AUTOREPLY"],
+  card: ["DIGITAL_CARD"],
+  digital_card: ["DIGITAL_CARD"],
   // Combined plans (existing + new combos)
   starter: ALL_MODULES,
   growth: ALL_MODULES,

@@ -302,7 +302,8 @@ export function CheckoutActivationModal({
           email: email.trim().toLowerCase(),
           whatsappPhone: cleanPhone,
           password: password,
-          businessType: "retail"
+          businessType: "retail",
+          module: resolveEnabledModules()
         })
       })
 

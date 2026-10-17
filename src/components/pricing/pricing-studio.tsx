@@ -1061,7 +1061,7 @@ export function PricingStudio({
               Start with one module, upgrade to Complete anytime. Transparent ROI from Day 1.
             </p>
             <div className="pt-2">
-              <Link href="/signup">
+              <Link href={selectedList.length > 0 ? `/signup?module=${selectedList.map(s => s.i === "star" ? "reviews" : s.i === "chat" ? "autoreply" : s.i).join(",")}` : "/signup"}>
                 <button
                   type="button"
                   className="bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-4 px-9 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer inline-flex items-center gap-2"

@@ -13,11 +13,13 @@ function SignupForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const refCode = searchParams.get("ref") || ""
-  const moduleParam = searchParams.get("module") || "" // "reviews", "loyalty", "autoreply"
-  const isReviewsMode = moduleParam === "reviews"
+  const moduleParam = (searchParams.get("module") || "").toLowerCase().trim()
+  const isCardReviewsCombo = (moduleParam.includes("card") || moduleParam.includes("digital_card")) && (moduleParam.includes("review") || moduleParam.includes("reviews"))
+  const isCardMode = !isCardReviewsCombo && (moduleParam === "card" || moduleParam === "digital_card" || moduleParam === "digitalcard")
+  const isReviewsMode = !isCardReviewsCombo && (moduleParam === "reviews" || moduleParam === "review")
   const isLoyaltyMode = moduleParam === "loyalty"
   const isAutoReplyMode = moduleParam === "autoreply"
-  const isStandalone = isReviewsMode || isLoyaltyMode || isAutoReplyMode
+  const isStandalone = isCardReviewsCombo || isCardMode || isReviewsMode || isLoyaltyMode || isAutoReplyMode
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -112,7 +114,47 @@ function SignupForm() {
     "3-Day FREE trial, no credit card required",
   ]
 
-  if (isReviewsMode) {
+  if (isCardReviewsCombo) {
+    headerBadge = "3-Day FREE Trial • Smart Digital Business Card + Smart AI Google Reviews"
+    mainTitle = (
+      <>
+        Smart Digital Business Card + <br />
+        <span className="bg-gradient-to-r from-cyan-600 via-sky-600 to-amber-500 bg-clip-text text-transparent">
+          Smart AI Google Reviews.
+        </span>
+      </>
+    )
+    description = "Your 2-in-1 Power Suite: Interactive Smart QR digital visiting card with 1-tap contact saving, plus automated 5-star Google review collection on WhatsApp."
+    formTitle = "Start 3-Day Free Trial — Smart Digital Business Card + Smart AI Google Reviews"
+    formSubtitle = "Start your 3-day unrestricted trial in under 60 seconds — no credit card required"
+    submitBtnText = "Activate 3-Day Free Trial (Card + Reviews) →"
+    benefits = [
+      "Interactive Smart Digital Business Card with QR code",
+      "1-Tap Save Contact (.vcf phonebook sync)",
+      "Automated 5-Star Google Reviews Collection",
+      "Direct WhatsApp & Calling Links + Google Maps Location",
+    ]
+  } else if (isCardMode) {
+    headerBadge = "3-Day FREE Trial • Smart Digital Business Card"
+    mainTitle = (
+      <>
+        Smart Digital Business Card <br />
+        <span className="bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 bg-clip-text text-transparent">
+          with Smart QR &amp; 1-Tap Save Contact.
+        </span>
+      </>
+    )
+    description = "Give every customer an interactive digital card with 1-tap contact saving, online catalog menus, and direct review modal — zero app download required."
+    formTitle = "Start 3-Day Free Trial — Smart Digital Business Card"
+    formSubtitle = "Instant setup in 60 seconds — zero credit card required"
+    submitBtnText = "Activate 3-Day Free Trial (Digital Card) →"
+    benefits = [
+      "1-Tap Save Contact (.vcf phonebook sync)",
+      "Direct 5-Star Google Review modal",
+      "Online Ordering & Social Media Profile links",
+      "High-Resolution Printable Counter QR Code",
+    ]
+  } else if (isReviewsMode) {
     headerBadge = "3-Day FREE Trial • Ai Drafted SEO Optimized Google Reviews"
     mainTitle = (
       <>

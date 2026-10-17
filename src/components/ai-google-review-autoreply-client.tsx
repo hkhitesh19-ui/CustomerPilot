@@ -153,7 +153,7 @@ export function AiGoogleReviewAutoReplyClient() {
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
             </Link>
             <Button asChild size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-md transition-all">
-              <Link href="/signup">Start Free Trial →</Link>
+              <Link href="/signup?module=autoreply">Start Free Trial →</Link>
             </Button>
           </div>
         </div>
@@ -191,7 +191,7 @@ export function AiGoogleReviewAutoReplyClient() {
                 {/* Primary CTA Buttons */}
                 <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
                   <Link
-                    href="/signup"
+                    href="/signup?module=autoreply"
                     className="btn-grad py-3.5 sm:py-4 px-6 sm:px-8 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all w-full sm:w-auto"
                   >
                     <span>Connect Google Profile &amp; Try Free</span>
@@ -632,7 +632,7 @@ export function AiGoogleReviewAutoReplyClient() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button asChild size="lg" className="bg-indigo-600 hover:bg-indigo-700 text-white font-black text-base px-8 py-6 rounded-2xl shadow-xl shadow-indigo-600/20 hover:scale-105 transition-all">
-                <Link href="/signup">
+                <Link href="/signup?module=autoreply">
                   Launch 1-Click AI AutoReply Free <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>

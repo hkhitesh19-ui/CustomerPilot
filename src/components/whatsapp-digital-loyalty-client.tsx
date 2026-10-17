@@ -138,7 +138,7 @@ export function WhatsAppDigitalLoyaltyClient() {
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
             </Link>
             <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-md transition-transform hover:scale-105">
-              <Link href="/signup">Start Free Trial →</Link>
+              <Link href="/signup?module=loyalty">Start Free Trial →</Link>
             </Button>
           </div>
         </div>
@@ -176,7 +176,7 @@ export function WhatsAppDigitalLoyaltyClient() {
                 {/* Primary CTA Buttons */}
                 <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
                   <Link
-                    href="/signup"
+                    href="/signup?module=loyalty"
                     className="btn-grad py-3.5 sm:py-4 px-6 sm:px-8 text-sm sm:text-base font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all w-full sm:w-auto"
                   >
                     <span>Start 3-Day Free Trial</span>
@@ -673,7 +673,7 @@ export function WhatsAppDigitalLoyaltyClient() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button asChild size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base px-8 py-6 rounded-2xl shadow-xl hover:scale-105 transition-all">
-                <Link href="/signup">
+                <Link href="/signup?module=loyalty">
                   Get Your Counter QR Code Now <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>

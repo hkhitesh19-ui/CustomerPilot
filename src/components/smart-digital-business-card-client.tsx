@@ -1748,7 +1748,7 @@ export function SmartDigitalBusinessCardClient() {
                 </div>
 
                 <Button asChild size="lg" className="w-full py-5 rounded-2xl bg-white border-2 border-slate-300 hover:border-slate-400 text-slate-800 font-bold text-sm shadow-xs hover:bg-slate-50 transition">
-                  <Link href="/signup">
+                  <Link href="/signup?module=card">
                     Choose 6 Months (₹349) →
                   </Link>
                 </Button>
@@ -1811,7 +1811,7 @@ export function SmartDigitalBusinessCardClient() {
                 </div>
 
                 <Button asChild size="lg" className="w-full py-5 rounded-2xl btn-grad font-black text-sm shadow-lg hover:scale-[1.02] transition">
-                  <Link href="/signup">
+                  <Link href="/signup?module=card">
                     Get 1 Year Plan (₹499) →
                   </Link>
                 </Button>
@@ -1873,7 +1873,7 @@ export function SmartDigitalBusinessCardClient() {
                 </div>
 
                 <Button asChild size="lg" className="w-full py-5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-sm shadow-md hover:scale-[1.02] transition">
-                  <Link href="/signup">
+                  <Link href="/signup?module=card">
                     Claim Lifetime Deal (₹1499) →
                   </Link>
                 </Button>
@@ -1916,7 +1916,7 @@ export function SmartDigitalBusinessCardClient() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button asChild size="lg" className="bg-cyan-600 hover:bg-cyan-700 text-white font-black text-base px-8 py-6 rounded-2xl shadow-xl shadow-cyan-600/20 hover:scale-105 transition-all">
-                <Link href="/signup">
+                <Link href="/signup?module=card">
                   Create My Digital Card <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>
