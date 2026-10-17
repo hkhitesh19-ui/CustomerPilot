@@ -8,18 +8,18 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 2d39c10
-Full Commit Hash  : 2d39c10b35d01c587aa1e25834fbf071b6c7e4f7
-Target Fix Commit : 2d39c10
+Active Git Commit : a5ff6a8
+Full Commit Hash  : a5ff6a803d8a3baadbaff94c4a8beebf5ad56795
+Target Fix Commit : a5ff6a8
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 17 Oct 2026, 01:44 PM IST
+Deployment Date   : 17 Oct 2026, 02:37 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(standee): remove redundant phone camera instruction text from Templates A, B, and C
+Commit Title      : feat(qr,superadmin): optimize QR phone camera scannability and add 1-click merchant trial extension engine
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080, Online & Healthy)
 Merchant Status   : Vinayak Fashion & Cake Connection Live
-Standee Status    : Standee Studio Live with 4 Bespoke Templates (Template A: Google Review, Template B: Digital Card, Template C: Connect & Review, Template D: VIP Loyalty) - Clean Artwork without Redundant Camera Text
+Standee Status    : Standee Studio Live with 4 Bespoke Templates (280px QR, 20% Logo Badge, Instant Phone Camera Scannability)
 Trial Isolation   : Verified on VPS (Only selected 1 or 2 modules enabled; card auto-provisioned; direct dashboard redirect; 0 forced onboarding)
 Google Places API : Configured and verified with AIzaSyC1wp... (Active)
 Nginx Static Alias: Direct /_next/static/ disk alias active (HTTP 200 chunk delivery)
@@ -29,6 +29,7 @@ Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in 
 
 Deployment History Log:
 ----------------------------------------------------------
+• [17 Oct 2026, 02:37 PM IST] Commit a5ff6a8 - feat(qr,superadmin): optimize QR phone camera scannability and add 1-click merchant trial extension engine. Upgraded QR size to 280px, reduced center logo to 20%, added +3d/+7d/+14d/+30d quick trial extend in SuperAdmin, and synchronized digital card trial expiration.
 • [17 Oct 2026, 01:44 PM IST] Commit 2d39c10 - fix(standee): remove redundant phone camera instruction text from Templates A, B, and C. Deployed to production VPS (187.127.170.36), reloaded PM2, and verified clean typography and layout balance for Cake Connection.
 • [17 Oct 2026, 01:36 PM IST] Commit 5cf8847 - fix(standee): replace emoji glyphs with vector SVG shapes and fix Template C headline wrap. Deployed to production VPS (187.127.170.36), reloaded PM2, and verified 100% crisp vector rendering across all 4 standee designs for Cake Connection.
 • [17 Oct 2026, 12:54 PM IST] Commit 4d816ad - feat(standee): multi-template standee studio with dedicated Google Review, Digital Card, and Combo designs. Deployed 4-template engine, Section 01 unlocked for all merchants, and verified live via Playwright for Cake Connection.
