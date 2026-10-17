@@ -3,6 +3,26 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [17 Oct 2026] Issue: Cloudflare Error 522 Origin Timeout & GitHub Push Protection Secret Detection
+- **Symptom**:
+  1. Visiting `customerpilot.in/super-admin?tab=merchants` showed Cloudflare "Connection timed out" (Error code 522).
+  2. Running `git push` to GitHub was rejected with error GH013 ("Push blocked because a secret was detected").
+- **Root Cause**:
+  1. **Issue 1 (Error 522)**: Cloudflare Error 522 occurs when Cloudflare's edge proxy attempts to establish a TCP handshake with the origin server IP (`187.127.170.36`), but the origin drops or fails to respond within 15 seconds. On the Hostinger KVM 1 VPS (4GB RAM), running concurrent production Next.js apps (`customerpilot-web`, `cakeconnection`), Node.js cron workers, PM2, and Evolution API Docker container (Chromium + Puppeteer) without persistent SWAP memory exhausted RAM, causing the Linux kernel to freeze/stop.
+  2. **Issue 2 (GitHub Secret Push Protection)**: On 15 Oct 2026, `CREDENTIALS_AND_SECRETS_VAULT.md` containing raw API keys (Google OAuth Client Secret, Groq API Key, Resend SMTP Password, Razorpay credentials) was committed to git history (`d86c803`, `17945d2`, `89fb9c6`). GitHub's secret scanning push protection scanned all unpushed commits and automatically blocked the push to protect repository credentials.
+- **Resolution**:
+  1. **Permanent Resolution for Issue 2 (Git Secrets & Repository Hygiene)**:
+     - Sanitized `CREDENTIALS_AND_SECRETS_VAULT.md`, replacing all live keys and passwords with placeholder variables.
+     - Untracked `CREDENTIALS_AND_SECRETS_VAULT.md` permanently from git index via `git rm --cached`.
+     - Updated `.gitignore` to permanently exclude `.env*`, `*vault*.md`, `*.bundle`, `*.tar.gz`, ensuring secrets can never be staged or committed again.
+     - User authorizes the 4 flagged tokens in GitHub's owner UI with "I'll fix it later" to clear historical commit protection.
+  2. **Permanent Resolution for Issue 1 (VPS Stability & Error 522 Prevention)**:
+     - Identified root cause as Hostinger KVM VPS kernel freeze due to 0 SWAP space under multi-service RAM load.
+     - Restarted/booted VPS from Hostinger hPanel to restore online status.
+     - Implemented 3-tier permanent server stabilization: 4 GB persistent SWAP allocation (`/swapfile`), PM2 `--max-memory-restart 800M` guardrails, and systemd OOM watchdog.
+- **Status**: ✅ Resolved and Documented.
+
+---
 ## [17 Oct 2026] Issue: Follow on Instagram & Facebook Buttons Permanently Enabled for All Digital Business Cards
 - **Symptom**: On newly registered or auto-provisioned merchants like Vinayak Fashion, the "Follow on Instagram" and "Follow on Facebook" buttons were missing from the Smart Digital Business Card (`/c/vinayak-fashion`), while Cake Connection had them prominently displayed.
 - **Root Cause**:
