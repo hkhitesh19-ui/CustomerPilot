@@ -3,6 +3,20 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [17 Oct 2026] Issue: ChunkLoadError 404 Crash on Merchant Onboarding Wizard ("This page couldn't load")
+- **Symptom**: When opening "Vinayak Fashion" from SuperAdmin Merchant Fleet (`/super-admin?tab=merchants`) via merchant link or `[Onboard]` button, the page navigated to `https://customerpilot.in/onboarding` and immediately crashed with Next.js error boundary: `"This page couldn't load. Reload to try again, or go back."`, while Cake Connection opened smoothly into its dashboard.
+- **Root Cause**:
+  1. Cake Connection has `onboardingCompleted: true` in the database, so impersonation redirects it directly to `/dashboard`. Vinayak Fashion is a newly registered merchant with `onboardingCompleted: false` (`currentStep: 1`), which correctly redirects to `/onboarding?step=1`.
+  2. In Next.js standalone deployment mode, Webpack/Turbopack client JS chunks are compiled to `.next/static`. Next.js standalone server runs from `.next/standalone/server.js` and requires `.next/static` to exist in `.next/standalone/.next/static`. Because this directory was omitted after the recent Next.js rebuild, client chunk requests (e.g. `/_next/static/chunks/08c47f8jji35n.js`) returned HTTP 404 with MIME type `text/plain`.
+  3. The browser threw uncaught `PlaywrightError [ChunkLoadError]: Failed to load chunk /_next/static/chunks/...`, triggering Next.js's top-level error boundary.
+- **Resolution**:
+  1. Synchronized all static assets (`.next/static`) into `/var/www/CustomerPilot/.next/standalone/.next/static` on the VPS.
+  2. Optimized Nginx production server configuration (`/etc/nginx/sites-available/customerpilot.in`) with a direct static disk alias (`location /_next/static/ { alias /var/www/CustomerPilot/.next/static/; expires 365d; access_log off; }`), bypassing Node.js event loop latency and ensuring permanent chunk delivery even during background rebuilds.
+  3. Reloaded Nginx and restarted PM2 `customerpilot-web`.
+  4. Executed live Playwright verification (`scripts/debug_onboarding_crash.js`), confirming that clicking Vinayak Fashion in SuperAdmin impersonation successfully loads `/onboarding?step=1` with 0 errors, rendering the complete Step 1 "Business Information" form with verified merchant data (Vinayak Fashion, Hiren Srivastava, Kanpur).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [17 Oct 2026] Issue: Google Cloud Split APIs Deprecation & Direct Places API Key Integration for Review Sync
 - **Symptom**: Merchants connecting Google Business Profile or selecting locations could not fetch live Google reviews, ratings, or baseline review counts due to Google's deprecation of monolithic `mybusiness.googleapis.com` into split APIs (`mybusinessaccountmanagement`, `mybusinessbusinessinformation`, `mybusinessplaceactions`), coupled with residual "Cake Connection" hardcoded default fallbacks in `select-location`, `join`, and `onboarding`.
 - **Root Cause**:
