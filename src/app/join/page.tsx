@@ -17,8 +17,8 @@ function JoinContent() {
 
   const { toast } = useToast()
   const defaultCard = {
-    name: merchantId ? decodeURIComponent(merchantId) : "Cake Connection Live Cake",
-    rewardName: "FREE Special Treat / Pastry",
+    name: merchantId ? decodeURIComponent(merchantId) : "Store VIP Club",
+    rewardName: "FREE Special Welcome Treat",
     stampValue: 500,
     stampsRequired: 10,
     googleReviewBonus: 1,
@@ -153,7 +153,7 @@ function JoinContent() {
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 text-base shadow-md gap-2"
                 onClick={() => {
                   const phone = "919033304707"
-                  const bizName = stampCard?.name || "Cake Connection"
+                  const bizName = stampCard?.name || "Store Team"
                   const msg = `🎉 Hi ${bizName}! I want to join the VIP Club & collect my first loyalty stamp!`
                   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank")
                 }}

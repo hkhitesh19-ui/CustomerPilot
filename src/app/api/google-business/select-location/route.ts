@@ -24,6 +24,9 @@ export async function POST(req: NextRequest) {
       return err("Merchant not found", 404);
     }
 
+    const merchantRecord = await db.merchant.findUnique({ where: { id: merchantId } });
+    const fallbackStoreName = merchantRecord?.businessName || merchantRecord?.name || "Store Location";
+
     const finalReviewUrl = googleReviewUrl || `https://search.google.com/local/writereview?placeid=${placeId}`;
 
     // Update connection
@@ -31,8 +34,8 @@ export async function POST(req: NextRequest) {
       where: { merchantId },
       update: {
         placeId,
-        placeName: placeName || "Cake Connection",
-        address: address || "Store Location",
+        placeName: placeName || fallbackStoreName,
+        address: address || merchantRecord?.address || "Store Location",
         googleReviewUrl: finalReviewUrl,
         connectionType: "oauth",
         verified: true,
@@ -42,8 +45,8 @@ export async function POST(req: NextRequest) {
       create: {
         merchantId,
         placeId,
-        placeName: placeName || "Cake Connection",
-        address: address || "Store Location",
+        placeName: placeName || fallbackStoreName,
+        address: address || merchantRecord?.address || "Store Location",
         googleReviewUrl: finalReviewUrl,
         connectionType: "oauth",
         verified: true,
@@ -89,8 +92,8 @@ export async function POST(req: NextRequest) {
         placeName: updated.placeName,
         address: updated.address,
         googleReviewUrl: updated.googleReviewUrl,
-        cid: cid || "14873172342901454576",
-        mapsUri: mapsUri || `https://maps.google.com/?cid=14873172342901454576`
+        cid: cid || "",
+        mapsUri: mapsUri || finalReviewUrl
       }
     });
   } catch (error: any) {

@@ -971,7 +971,7 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
     }
   }
 
-  let rawPlaceName = data.googleBusiness || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"
+  let rawPlaceName = data.googleBusiness || data.businessName || "Your Store"
   if (rawPlaceName.includes("'s Business")) {
     rawPlaceName = data.businessName || "Your Store"
   }

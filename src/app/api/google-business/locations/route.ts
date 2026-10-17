@@ -59,8 +59,8 @@ export async function GET(req: NextRequest) {
 
                 liveLocations.push({
                   id: loc.name || placeId,
-                  name: loc.title || merchant?.name || "Cake Connection",
-                  businessTitle: loc.title || merchant?.name || "Cake Connection",
+                  name: loc.title || merchant?.name || "Store Location",
+                  businessTitle: loc.title || merchant?.name || "Store",
                   address: addr,
                   placeId: placeId,
                   cid: "14873172342901454576",

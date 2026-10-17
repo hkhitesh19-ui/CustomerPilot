@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     }
 
     // SCENARIO 1: Customer scans QR code (wa.me link text)
-    if (text.toLowerCase().includes('join cake connection vip club') || text.toLowerCase().includes('join')) {
+    if (text.toLowerCase().includes('vip club') || text.toLowerCase().includes('join')) {
       // 1. Find or create Customer
       let customer = await db.customer.findFirst({
         where: { merchantId, phone: fromPhone }
