@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 1cf8dc2
-Full Commit Hash  : 1cf8dc27d1784381e17b73ead7f43579b7520072
-Target Fix Commit : 1cf8dc2
+Active Git Commit : 42841a8
+Full Commit Hash  : 42841a8a25c3453b3bcfcefeeb4398e0965d496a
+Target Fix Commit : 42841a8
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 17 Oct 2026, 05:10 PM IST
+Deployment Date   : 17 Oct 2026, 09:55 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(digital-card): permanently enable Follow on Instagram and Facebook for all businesses
+Commit Title      : fix(security): untrack CREDENTIALS_AND_SECRETS_VAULT.md, sanitize secrets, and update .gitignore
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080, Online & Healthy)
