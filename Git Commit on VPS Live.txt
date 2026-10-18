@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 3e6bc16
-Full Commit Hash  : 3e6bc164b0d156a9c5e5523ec182363fdbeb04b6
-Target Fix Commit : 3e6bc164b0d156a9c5e5523ec182363fdbeb04b6
+Active Git Commit : 280f510
+Full Commit Hash  : 280f510c579c2a16bec4ce3c44c6420e4563d8dc
+Target Fix Commit : 280f510c579c2a16bec4ce3c44c6420e4563d8dc
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 18 Oct 2026, 10:36 PM IST
+Deployment Date   : 19 Oct 2026, 12:28 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(dashboard): unified executive business analytics, date filtering, and zero-code referral share
+Commit Title      : feat(settings): upgrade Instagram story reward with interactive radio cards and 2-line Hinglish guidance
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
