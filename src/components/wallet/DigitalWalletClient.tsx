@@ -11,6 +11,7 @@ interface WalletData {
     vipTier: string
     lifetimeStamps: number
     walletCredit: number
+    referralCode?: string
   }
   merchant: {
     id: string
@@ -259,7 +260,7 @@ export function DigitalWalletClient({ initialData }: { initialData: WalletData }
           {/* WhatsApp Invite Friend */}
           <a
             href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-              `Hi! Join me at ${data.merchant.name} VIP Club on CustomerPilot and get special welcome stamps! 🎁`
+              `Hi! Join me at ${data.merchant.name} VIP Club on CustomerPilot and get special welcome stamps! 🎁${data.customer.referralCode ? ` Show my invite code *${data.customer.referralCode}* on your first visit to get your bonus stamp!` : ''}`
             )}`}
             target="_blank"
             rel="noreferrer"
@@ -271,7 +272,7 @@ export function DigitalWalletClient({ initialData }: { initialData: WalletData }
                   <Sparkles className="w-4 h-4 text-emerald-400" />
                   <span className="font-bold text-sm text-slate-100">Refer a Friend</span>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
-                    +₹50 / Bonus
+                    +1 Bonus Stamp
                   </span>
                 </div>
                 <p className="text-xs text-slate-400">

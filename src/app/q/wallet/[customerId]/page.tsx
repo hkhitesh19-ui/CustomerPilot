@@ -112,7 +112,8 @@ export default async function WalletPage({
       phone: customer.phone,
       vipTier: customer.vipTier || "VIP",
       lifetimeStamps: customer.lifetimeStamps,
-      walletCredit: customer.walletCredit || 0
+      walletCredit: customer.walletCredit || 0,
+      referralCode: customer.referralCode || ""
     },
     merchant: {
       id: customer.merchant.id,

@@ -3,6 +3,29 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [18 Oct 2026] Issue: Referral System Single-Use Anti-Abuse Lock & Pure Loyalty Stamps Alignment
+- **Symptom**:
+  1. In the customer's live Digital Wallet (`/q/wallet/[customerId]`), the "Refer a Friend" card displayed an outdated `+₹50 / Bonus` badge instead of the pure loyalty stamp bonus (`+1 Bonus Stamp`), and the WhatsApp sharing link lacked the customer's unique referral code.
+  2. Referral submission API (`src/app/api/referrals/route.ts`) previously lacked explicit guards against self-referral, referral of existing customers, and cross-customer duplicate referrals of the same friend phone number.
+- **Root Cause**:
+  1. `DigitalWalletClient.tsx` contained static legacy placeholder text referencing ₹50 cash bonus.
+  2. The duplicate referral query only filtered by `referrerId`, allowing another customer to refer an already-referred friend or existing store customer.
+- **Resolution**:
+  1. **Enforced Strict One-Time-Only Referral Validity (`src/app/api/referrals/route.ts`)**:
+     - Blocked self-referrals (`referrer.phone === friendPhone`).
+     - Blocked referring existing store customers (`db.customer.findFirst({ where: { merchantId, phone: friendPhone } })`).
+     - Blocked duplicate referral invitations across the merchant store (`db.referral.findFirst({ where: { merchantId, friendPhone } })`).
+     - Preserved atomic `$transaction` lock on referral approval (`src/app/api/referrals/approve/route.ts`) preventing double approval.
+  2. **Aligned Digital Wallet to Pure Stamps Model (`src/components/wallet/DigitalWalletClient.tsx` & `src/app/q/wallet/[customerId]/page.tsx`)**:
+     - Replaced `+₹50 / Bonus` with `+1 Bonus Stamp`.
+     - Passed `referralCode` into the wallet customer state.
+     - Formatted WhatsApp invite link to include the customer's unique referral code.
+  3. **Verification**:
+     - Compiled Next.js 16 build locally (`npm run build`, exit code 0).
+     - Synced files to live VPS (`187.127.170.36`) and reloaded PM2 `customerpilot-web`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [18 Oct 2026] Issue: Removal of Referral Cash Reward (Pure Loyalty Stamps Referrals) & Cake Connection Stamp Rules Set as Global Default for All New Merchants
 - **Symptom**:
   1. In Section 04 ("Stamps Reward Card Rules Setup"), the Customer Referral Bonus Rules card included a "Referral Cash / Wallet Reward (₹)" input field, which introduced unnecessary confusion and mixed digital stamps with cash wallet credits.
