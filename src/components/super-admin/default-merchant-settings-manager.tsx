@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import {
-  Gift, Sparkles, RefreshCw, Award, Check, Layers,
+  Gift, Sparkles, RefreshCw, Award, Check, Layers, Users,
   Save, AlertTriangle, Store, Clock, Bell, Flame
 } from "lucide-react"
 import { FALLBACK_GLOBAL_DEFAULTS, DefaultMerchantSettingsData } from "@/lib/default-merchant-settings-types"
@@ -488,6 +488,77 @@ export function DefaultMerchantSettingsManager() {
                   onChange={e => setForm({ ...form, vipUpgradeBonusStamps: Math.max(0, Number(e.target.value)) })}
                   className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Customer Referral Bonus Rules */}
+          <div className="p-4 sm:p-5 bg-indigo-950/20 border border-indigo-500/30 rounded-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-indigo-400" />
+                <Label htmlFor="global-referral-switch" className="font-bold text-sm text-slate-100">
+                  Global Referral Bonus Rules (Customer A ➔ Friend B)
+                </Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${form.referralBonusEnabled ?? true ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40'}`}>
+                  {form.referralBonusEnabled ?? true ? `ACTIVE (+${form.referralBonusStamps ?? 1} / +${form.referralFriendBonusStamps ?? 1} Stamps)` : "DEACTIVATED"}
+                </span>
+                <Switch
+                  id="global-referral-switch"
+                  checked={form.referralBonusEnabled ?? true}
+                  onCheckedChange={(checked) => setForm({ ...form, referralBonusEnabled: checked })}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <Label htmlFor="global-referral-referrer" className="text-xs font-semibold text-slate-300">
+                  Referrer Bonus Stamps
+                </Label>
+                <Input
+                  id="global-referral-referrer"
+                  type="number"
+                  min="0"
+                  max="10"
+                  value={form.referralBonusStamps ?? 1}
+                  onChange={e => setForm({ ...form, referralBonusStamps: Math.max(0, Number(e.target.value)) })}
+                  className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm mt-1"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">Stamps to Customer A (Referrer)</p>
+              </div>
+
+              <div>
+                <Label htmlFor="global-referral-friend" className="text-xs font-semibold text-slate-300">
+                  Friend Welcome Stamps
+                </Label>
+                <Input
+                  id="global-referral-friend"
+                  type="number"
+                  min="0"
+                  max="10"
+                  value={form.referralFriendBonusStamps ?? 1}
+                  onChange={e => setForm({ ...form, referralFriendBonusStamps: Math.max(0, Number(e.target.value)) })}
+                  className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm mt-1"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">Stamps to Friend B on 1st visit</p>
+              </div>
+
+              <div>
+                <Label htmlFor="global-referral-cash" className="text-xs font-semibold text-slate-300">
+                  Referral Cash / Wallet Reward (₹)
+                </Label>
+                <Input
+                  id="global-referral-cash"
+                  type="number"
+                  min="0"
+                  value={form.referralRewardAmount ?? 50}
+                  onChange={e => setForm({ ...form, referralRewardAmount: Math.max(0, Number(e.target.value)) })}
+                  className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm mt-1"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">Instant wallet credit to Referrer</p>
               </div>
             </div>
           </div>

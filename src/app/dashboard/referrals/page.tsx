@@ -30,20 +30,20 @@ export default function ReferralsPage() {
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-100 flex items-center gap-2">
-          <Share2 className="h-8 w-8 text-indigo-400" />
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <Share2 className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
           Refer a Business
         </h1>
-        <p className="text-slate-400 mt-2">Earn credits by referring other business owners.</p>
+        <p className="text-slate-600 dark:text-slate-400 mt-2">Earn credits by referring other business owners.</p>
       </div>
 
-      <Card className="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 border-indigo-500/30 shadow-xl overflow-hidden">
+      <Card className="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-950/80 dark:to-purple-950/80 border-indigo-200 dark:border-indigo-500/30 shadow-xl overflow-hidden text-white">
         <CardContent className="p-8 md:p-12 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Grow Your Business Network</h2>
-          <div className="flex flex-col md:flex-row justify-center items-center gap-6 text-indigo-200 mb-8">
-            <div className="bg-indigo-950/50 px-4 py-2 rounded-xl">1. Refer a business owner</div>
-            <div className="bg-indigo-950/50 px-4 py-2 rounded-xl">2. Friend gets ₹100 benefit</div>
-            <div className="bg-indigo-950/50 px-4 py-2 rounded-xl font-bold text-white border border-indigo-400/50">3. You earn ₹100 credit</div>
+          <div className="flex flex-col md:flex-row justify-center items-center gap-6 text-indigo-100 mb-8">
+            <div className="bg-white/15 backdrop-blur-sm dark:bg-indigo-950/60 px-4 py-2 rounded-xl font-medium">1. Refer a business owner</div>
+            <div className="bg-white/15 backdrop-blur-sm dark:bg-indigo-950/60 px-4 py-2 rounded-xl font-medium">2. Friend gets ₹100 benefit</div>
+            <div className="bg-white/25 backdrop-blur-sm dark:bg-indigo-950/60 px-4 py-2 rounded-xl font-bold text-white border border-white/30 dark:border-indigo-400/50">3. You earn ₹100 credit</div>
           </div>
 
           {!referralCode ? (
@@ -52,9 +52,9 @@ export default function ReferralsPage() {
             </Button>
           ) : (
             <div className="flex flex-col items-center gap-4">
-              <div className="bg-slate-900 border border-slate-700 px-6 py-4 rounded-xl flex items-center gap-4 text-xl">
-                <span className="font-mono text-slate-300">customerpilot.in/r/{referralCode}</span>
-                <Button variant="ghost" size="icon" onClick={copyCode} className="text-slate-400 hover:text-white">
+              <div className="bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-6 py-4 rounded-xl flex items-center gap-4 text-xl">
+                <span className="font-mono text-slate-800 dark:text-slate-300">customerpilot.in/r/{referralCode}</span>
+                <Button variant="ghost" size="icon" onClick={copyCode} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
                   <Copy className="h-5 w-5" />
                 </Button>
               </div>
@@ -67,24 +67,24 @@ export default function ReferralsPage() {
       </Card>
 
       <div className="grid md:grid-cols-3 gap-6 mt-8">
-        <Card className="bg-slate-900/60 border-slate-800/60 md:col-span-2">
+        <Card className="bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800/60 shadow-sm md:col-span-2">
           <CardHeader>
-            <CardTitle className="text-slate-200">Referral History</CardTitle>
+            <CardTitle className="text-slate-900 dark:text-slate-200">Referral History</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-slate-400 text-center py-8">
+            <div className="text-slate-500 dark:text-slate-400 text-center py-8">
               No referrals yet.
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/60 border-slate-800/60">
+        <Card className="bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800/60 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-slate-200">Wallet Balance</CardTitle>
+            <CardTitle className="text-slate-900 dark:text-slate-200">Wallet Balance</CardTitle>
           </CardHeader>
           <CardContent className="text-center py-8">
-            <div className="text-5xl font-bold text-emerald-400 mb-2">₹0</div>
-            <div className="text-slate-400">Credit Earned</div>
+            <div className="text-5xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">₹0</div>
+            <div className="text-slate-500 dark:text-slate-400">Credit Earned</div>
           </CardContent>
         </Card>
       </div>

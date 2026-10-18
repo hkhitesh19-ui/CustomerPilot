@@ -10,6 +10,10 @@ export interface DefaultMerchantSettingsData {
   joiningBonusEnabled: boolean
   joiningBonusStamps: number
   vipUpgradeBonusStamps: number
+  referralBonusEnabled?: boolean
+  referralBonusStamps?: number
+  referralFriendBonusStamps?: number
+  referralRewardAmount?: number
   color: string
   tierRewardsEnabled: boolean
   rewardImageUrl?: string
@@ -37,6 +41,10 @@ export const FALLBACK_GLOBAL_DEFAULTS: DefaultMerchantSettingsData = {
   joiningBonusEnabled: true,
   joiningBonusStamps: 1,
   vipUpgradeBonusStamps: 1,
+  referralBonusEnabled: true,
+  referralBonusStamps: 1,
+  referralFriendBonusStamps: 1,
+  referralRewardAmount: 50,
   color: "#6366f1",
   tierRewardsEnabled: false,
   rewardImageUrl: "",

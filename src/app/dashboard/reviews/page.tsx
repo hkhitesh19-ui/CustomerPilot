@@ -263,22 +263,22 @@ export default function ReviewsManagementPage() {
       )}
 
       {/* Quota Mode Explanation Card */}
-      <Card className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border-indigo-500/30 shadow-xl">
+      <Card className="bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-900 border-indigo-200 dark:border-indigo-500/30 shadow-xs dark:shadow-xl">
         <CardContent className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-amber-400 font-bold text-xs">
+            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-xs">
               <Sparkles className="w-4 h-4" />
               <span>Mode: 1-Click AI Reply Assistant (Pre-Approval Phase)</span>
             </div>
-            <p className="text-xs text-slate-300">
-              AI automatically drafts personalized 5-star replies for every review. Click <strong className="text-emerald-400">"1-Click Copy & Post"</strong> to update on Google Maps in 10 seconds!
+            <p className="text-xs text-slate-700 dark:text-slate-300">
+              AI automatically drafts personalized 5-star replies for every review. Click <strong className="text-emerald-600 dark:text-emerald-400">"1-Click Copy & Post"</strong> to update on Google Maps in 10 seconds!
             </p>
           </div>
           <Button
             size="sm"
             onClick={fetchReviews}
             variant="outline"
-            className="border-indigo-400/40 text-indigo-200 hover:bg-indigo-900/50 text-xs gap-1.5 flex-shrink-0"
+            className="border-indigo-300 dark:border-indigo-400/40 text-indigo-700 dark:text-indigo-200 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-xs gap-1.5 flex-shrink-0"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh Reviews
           </Button>
@@ -286,7 +286,7 @@ export default function ReviewsManagementPage() {
       </Card>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-3 flex-wrap">
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 flex-wrap">
         {[
           { id: "all", label: `All Reviews (${reviews.length})` },
           { id: "pending", label: `Pending Reply (${reviews.filter(r => !r.isReplied).length})` },
@@ -298,7 +298,7 @@ export default function ReviewsManagementPage() {
             size="sm"
             variant={activeTab === tab.id ? "default" : "ghost"}
             onClick={() => setActiveTab(tab.id as any)}
-            className={activeTab === tab.id ? "bg-emerald-500 text-stone-950 font-bold text-xs" : "text-slate-400 text-xs"}
+            className={activeTab === tab.id ? "bg-emerald-600 dark:bg-emerald-500 text-white dark:text-stone-950 font-bold text-xs" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs"}
           >
             {tab.label}
           </Button>
@@ -309,35 +309,35 @@ export default function ReviewsManagementPage() {
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map(i => (
-            <Card key={i} className="animate-pulse bg-slate-900/40 h-40 border-slate-800" />
+            <Card key={i} className="animate-pulse bg-slate-100 dark:bg-slate-900/40 h-40 border-slate-200 dark:border-slate-800" />
           ))}
         </div>
       ) : filteredReviews.length === 0 ? (
-        <Card className="bg-slate-900/40 border-slate-800 p-12 text-center text-slate-500 text-xs">
+        <Card className="bg-white dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 p-12 text-center text-slate-500 text-xs shadow-sm">
           No reviews found in this category.
         </Card>
       ) : (
         <div className="space-y-4">
           {filteredReviews.map(item => (
-            <Card key={item.id} className="bg-slate-900 border-slate-800 relative overflow-hidden shadow-lg">
+            <Card key={item.id} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 relative overflow-hidden shadow-sm dark:shadow-lg">
               <CardContent className="p-6 space-y-4">
                 
                 {/* Top Row: Reviewer Name + Star Rating + Status */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800/80 pb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-emerald-400 text-sm">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center font-bold text-emerald-600 dark:text-emerald-400 text-sm">
                       {item.reviewerName.charAt(0)}
                     </div>
                     <div>
-                      <h4 className="font-bold text-sm text-slate-100">{item.reviewerName}</h4>
-                      <div className="flex items-center gap-1 text-amber-400 text-xs mt-0.5">
+                      <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">{item.reviewerName}</h4>
+                      <div className="flex items-center gap-1 text-amber-500 dark:text-amber-400 text-xs mt-0.5">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Star
                             key={i}
-                            className={`w-3.5 h-3.5 ${i < item.rating ? "fill-amber-400 text-amber-400" : "text-slate-700"}`}
+                            className={`w-3.5 h-3.5 ${i < item.rating ? "fill-amber-400 text-amber-400" : "text-slate-200 dark:text-slate-700"}`}
                           />
                         ))}
-                        <span className="text-slate-400 text-[11px] ml-1.5">
+                        <span className="text-slate-500 dark:text-slate-400 text-[11px] ml-1.5">
                           {new Date(item.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
                         </span>
                       </div>
@@ -347,15 +347,15 @@ export default function ReviewsManagementPage() {
                   {/* Status Badge */}
                   <div>
                     {item.isReplied ? (
-                      <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[11px] gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Replied on Google
+                      <Badge className="bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30 text-[11px] gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-500 dark:text-emerald-400" /> Replied on Google
                       </Badge>
                     ) : item.status === "quota_blocked" ? (
-                      <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 text-[11px] gap-1">
-                        <Clock className="w-3 h-3 text-amber-400" /> In Dead-Letter Queue
+                      <Badge className="bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/30 text-[11px] gap-1">
+                        <Clock className="w-3 h-3 text-amber-500 dark:text-amber-400" /> In Dead-Letter Queue
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-slate-400 border-slate-700 text-[11px]">
+                      <Badge variant="outline" className="text-slate-500 dark:text-slate-400 border-slate-300 dark:border-slate-700 text-[11px]">
                         Pending Auto-Reply
                       </Badge>
                     )}
@@ -364,7 +364,7 @@ export default function ReviewsManagementPage() {
 
                 {/* Review Text */}
                 {item.comment && (
-                  <p className="text-xs text-slate-300 bg-slate-950/60 p-3 rounded-xl border border-slate-800/60 italic">
+                  <p className="text-xs text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800/60 italic">
                     "{item.comment}"
                   </p>
                 )}
@@ -372,8 +372,8 @@ export default function ReviewsManagementPage() {
                 {/* AI Reply Draft Box */}
                 <div className="space-y-2 pt-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> AI Owner Reply Draft (SEO-Optimized & Editable):
+                    <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" /> AI Owner Reply Draft (SEO-Optimized & Editable):
                     </span>
                     <div className="flex items-center gap-1">
                       <Button
@@ -401,7 +401,7 @@ export default function ReviewsManagementPage() {
                   <textarea
                     value={draftReplies[item.id] || ""}
                     onChange={e => setDraftReplies(prev => ({ ...prev, [item.id]: e.target.value }))}
-                    className="w-full h-24 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 resize-none font-sans leading-relaxed"
+                    className="w-full h-24 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 resize-none font-sans leading-relaxed"
                     placeholder="AI generating response..."
                   />
                   <p className="text-[11px] text-slate-500 italic">
@@ -415,7 +415,7 @@ export default function ReviewsManagementPage() {
                     size="sm"
                     variant="outline"
                     onClick={() => setSharingReview(item)}
-                    className="border-indigo-500/30 text-indigo-300 hover:bg-indigo-950/40 text-xs gap-1.5"
+                    className="border-indigo-300 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-xs gap-1.5"
                   >
                     <Share2 className="w-3.5 h-3.5" /> Share Card
                   </Button>
@@ -424,7 +424,7 @@ export default function ReviewsManagementPage() {
                     size="sm"
                     variant="outline"
                     onClick={() => handleTestProgrammaticPush(item)}
-                    className="border-slate-700 text-slate-300 hover:bg-slate-800 text-xs"
+                    className="border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs"
                   >
                     ⚡ Test API Push
                   </Button>

@@ -34,8 +34,25 @@ export async function POST(req: NextRequest) {
   if (referral.status === "approved") return err("Already approved")
   if (referral.status === "fraud_flagged") return err("Cannot approve a fraud-flagged referral")
 
-  const BONUS_REFERRER = 1
-  const BONUS_FRIEND = 1
+  // Load dynamic merchant referral rules if configured
+  const referralRulesRecord = await db.systemContent.findUnique({
+    where: { key: `MERCHANT_REFERRAL_RULES_${merchant.id}` }
+  })
+  let referralRules = {
+    referralBonusEnabled: true,
+    referralBonusStamps: 1,
+    referralFriendBonusStamps: 1,
+    referralRewardAmount: referral.rewardAmount || 50,
+  }
+  if (referralRulesRecord?.value) {
+    try {
+      referralRules = { ...referralRules, ...JSON.parse(referralRulesRecord.value) }
+    } catch (e) {}
+  }
+
+  const BONUS_REFERRER = referralRules.referralBonusEnabled ? referralRules.referralBonusStamps : 0
+  const BONUS_FRIEND = referralRules.referralBonusEnabled ? referralRules.referralFriendBonusStamps : 0
+  const REWARD_AMOUNT = referralRules.referralBonusEnabled ? referralRules.referralRewardAmount : 0
 
   // Award bonus stamp to referrer
   const referrer = await db.customer.findUnique({ where: { id: referral.referrerId } })
@@ -52,27 +69,29 @@ export async function POST(req: NextRequest) {
         data: { customerId: referrer.id, stampCardId: template.id, merchantId: merchant.id, stampsCollected: 0 },
       })
     }
-    await db.stamp.create({
-      data: { customerId: referrer.id, stampCardId: template.id, customerStampCardId: card.id, merchantId: merchant.id, source: "referral_bonus" },
-    })
-    const newCount = Math.min(card.stampsCollected + 1, template.stampsRequired)
-    await db.customerStampCard.update({
-      where: { id: card.id },
-      data: { stampsCollected: newCount, completed: newCount >= template.stampsRequired },
-    })
+    if (BONUS_REFERRER > 0) {
+      await db.stamp.create({
+        data: { customerId: referrer.id, stampCardId: template.id, customerStampCardId: card.id, merchantId: merchant.id, source: "referral_bonus" },
+      })
+      const newCount = Math.min(card.stampsCollected + BONUS_REFERRER, template.stampsRequired)
+      await db.customerStampCard.update({
+        where: { id: card.id },
+        data: { stampsCollected: newCount, completed: newCount >= template.stampsRequired },
+      })
+    }
   }
   await db.customer.update({
     where: { id: referrer.id },
     data: { 
       lifetimeStamps: { increment: BONUS_REFERRER },
-      walletCredit: { increment: referral.rewardAmount || 50 }
+      walletCredit: { increment: REWARD_AMOUNT }
     },
   })
 
   // Award to friend if linked
   if (referral.friendCustomerId) {
     const friend = await db.customer.findUnique({ where: { id: referral.friendCustomerId } })
-    if (friend && template) {
+    if (friend && template && BONUS_FRIEND > 0) {
       let fcard = await db.customerStampCard.findFirst({
         where: { customerId: friend.id, stampCardId: template.id, completed: false, redeemed: false },
       })
@@ -84,7 +103,7 @@ export async function POST(req: NextRequest) {
       await db.stamp.create({
         data: { customerId: friend.id, stampCardId: template.id, customerStampCardId: fcard.id, merchantId: merchant.id, source: "referral_bonus" },
       })
-      const newCount = Math.min(fcard.stampsCollected + 1, template.stampsRequired)
+      const newCount = Math.min(fcard.stampsCollected + BONUS_FRIEND, template.stampsRequired)
       await db.customerStampCard.update({
         where: { id: fcard.id },
         data: { stampsCollected: newCount, completed: newCount >= template.stampsRequired },
@@ -95,7 +114,7 @@ export async function POST(req: NextRequest) {
         where: { id: friend.id },
         data: { 
           lifetimeStamps: { increment: BONUS_FRIEND },
-          walletCredit: { increment: referral.rewardAmount || 50 }
+          walletCredit: { increment: REWARD_AMOUNT }
         },
       })
       // WhatsApp

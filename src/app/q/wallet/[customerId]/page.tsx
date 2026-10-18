@@ -80,16 +80,15 @@ export default async function WalletPage({
     c => activeStampCardRule && c.stampCardId === activeStampCardRule.id && c.completed && !c.redeemed
   )
 
-  // Self-healing: if customer has no active card, auto-create one with joining bonus
+  // Self-healing: if customer has no active card, auto-create one starting at 0 stamps (no free wallet activation stamps)
   if (!activeCard && !unredeemedRewardCard && activeStampCardRule) {
     try {
-      const initialStamps = activeStampCardRule.joiningBonusEnabled ? (activeStampCardRule.joiningBonusStamps ?? 2) : 1
       activeCard = await db.customerStampCard.create({
         data: {
           customerId: customer.id,
           merchantId: customer.merchantId,
           stampCardId: activeStampCardRule.id,
-          stampsCollected: initialStamps,
+          stampsCollected: 0,
           completed: false,
           redeemed: false,
         }
@@ -100,7 +99,7 @@ export default async function WalletPage({
   }
 
   const stampsRequired = activeStampCardRule?.stampsRequired || 10
-  const stampsCollected = activeCard ? activeCard.stampsCollected : (unredeemedRewardCard ? stampsRequired : (activeStampCardRule?.joiningBonusEnabled ? (activeStampCardRule.joiningBonusStamps ?? 2) : 0))
+  const stampsCollected = activeCard ? activeCard.stampsCollected : (unredeemedRewardCard ? stampsRequired : 0)
 
   const latestReview = customer.reviews?.[0]
   const hasPostedReview = Boolean(latestReview)

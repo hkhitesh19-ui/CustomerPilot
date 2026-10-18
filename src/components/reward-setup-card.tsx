@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/hooks/use-toast"
-import { Gift, Sparkles, RefreshCw, Award, Image as ImageIcon, Check } from "lucide-react"
+import { Gift, Sparkles, RefreshCw, Award, Image as ImageIcon, Check, Users } from "lucide-react"
 
 import { useDashboardState } from "@/hooks/use-dashboard-state"
 
@@ -33,6 +33,10 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
     vipUpgradeBonusStamps: 1,
     joiningBonusEnabled: true,
     joiningBonusStamps: 1,
+    referralBonusEnabled: true,
+    referralBonusStamps: 1,
+    referralFriendBonusStamps: 1,
+    referralRewardAmount: 50,
     color: "#6366f1",
     tierRewardsEnabled: false,
     excludedCategories: "",
@@ -77,6 +81,10 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
             vipUpgradeBonusStamps: cardData.vipUpgradeBonusStamps ?? 1,
             joiningBonusEnabled: cardData.joiningBonusEnabled ?? true,
             joiningBonusStamps: cardData.joiningBonusStamps ?? 2,
+            referralBonusEnabled: cardData.referralBonusEnabled ?? true,
+            referralBonusStamps: cardData.referralBonusStamps ?? 1,
+            referralFriendBonusStamps: cardData.referralFriendBonusStamps ?? 1,
+            referralRewardAmount: cardData.referralRewardAmount ?? 50,
             color: cardData.color || "#6366f1",
             tierRewardsEnabled: Boolean(cardData.tierRewardsEnabled),
             excludedCategories: cardData.excludedCategories || "",
@@ -364,6 +372,88 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                     onChange={e => setForm({ ...form, vipUpgradeBonusStamps: Math.max(0, Number(e.target.value)) })}
                     className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl"
                   />
+                </div>
+              </div>
+            </div>
+
+            {/* ── Customer Referral Bonus Rules (Customer A ➔ Friend B) ── */}
+            <div className="col-span-1 md:col-span-2 p-4 sm:p-5 bg-indigo-50/60 dark:bg-slate-950/60 border border-indigo-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  <div>
+                    <Label htmlFor="referral-bonus-switch" className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                      Customer Referral Bonus Rules (Customer A ➔ Friend B)
+                    </Label>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                      Reward both the referring customer and their invited friend when the friend makes their first qualifying store visit.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${form.referralBonusEnabled ? 'bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-300 dark:border-indigo-500/20' : 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-500/20'}`}>
+                    {form.referralBonusEnabled ? `ACTIVE (+${form.referralBonusStamps ?? 1} / +${form.referralFriendBonusStamps ?? 1} Stamps)` : "DEACTIVATED"}
+                  </span>
+                  <Switch
+                    id="referral-bonus-switch"
+                    checked={form.referralBonusEnabled}
+                    onCheckedChange={(checked) => setForm({ ...form, referralBonusEnabled: checked })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                <div className="space-y-1.5">
+                  <Label htmlFor="referral-referrer-stamps" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    Referrer Bonus Stamps
+                  </Label>
+                  <Input
+                    id="referral-referrer-stamps"
+                    type="number"
+                    min="0"
+                    max="10"
+                    disabled={!form.referralBonusEnabled}
+                    value={form.referralBonusStamps ?? 1}
+                    onChange={e => setForm({ ...form, referralBonusStamps: Math.max(0, Number(e.target.value)) })}
+                    className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+                  />
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Bonus stamps awarded to Customer A (Referrer)</p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="referral-friend-stamps" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    Friend Welcome Stamps
+                  </Label>
+                  <Input
+                    id="referral-friend-stamps"
+                    type="number"
+                    min="0"
+                    max="10"
+                    disabled={!form.referralBonusEnabled}
+                    value={form.referralFriendBonusStamps ?? 1}
+                    onChange={e => setForm({ ...form, referralFriendBonusStamps: Math.max(0, Number(e.target.value)) })}
+                    className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+                  />
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Welcome stamps awarded to Friend B on 1st visit</p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="referral-reward-amount" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    Referral Cash / Wallet Reward (₹)
+                  </Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2.5 text-muted-foreground text-sm">₹</span>
+                    <Input
+                      id="referral-reward-amount"
+                      type="number"
+                      min="0"
+                      disabled={!form.referralBonusEnabled}
+                      value={form.referralRewardAmount ?? 50}
+                      onChange={e => setForm({ ...form, referralRewardAmount: Math.max(0, Number(e.target.value)) })}
+                      className="pl-7 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+                    />
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Instant wallet credit added to Referrer account</p>
                 </div>
               </div>
             </div>

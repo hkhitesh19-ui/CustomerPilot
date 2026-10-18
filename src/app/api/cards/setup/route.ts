@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
       return err("Unauthorized", 401)
     }
 
-    const [card, merchant, globalDefaults] = await Promise.all([
+    const [card, merchant, globalDefaults, referralRecord] = await Promise.all([
       db.stampCard.findFirst({
         where: { merchantId, active: true },
         orderBy: { updatedAt: "desc" }  // always get the most recently SAVED card
@@ -28,8 +28,24 @@ export async function GET(req: NextRequest) {
         where: { id: merchantId },
         select: { name: true, businessType: true, vipUpgradeBonusStamps: true }
       }),
-      getGlobalDefaultMerchantSettings()
+      getGlobalDefaultMerchantSettings(),
+      db.systemContent.findUnique({
+        where: { key: `MERCHANT_REFERRAL_RULES_${merchantId}` }
+      })
     ])
+
+    let referralRules = {
+      referralBonusEnabled: true,
+      referralBonusStamps: 1,
+      referralFriendBonusStamps: 1,
+      referralRewardAmount: 50,
+    }
+    if (referralRecord?.value) {
+      try {
+        const parsed = JSON.parse(referralRecord.value)
+        referralRules = { ...referralRules, ...parsed }
+      } catch (e) {}
+    }
 
     console.log(`[CardSetup GET] Card found for merchant ${merchantId}:`, card ? `id=${card.id} stamps=${card.stampsRequired} val=${card.stampValue}` : "NULL → will return GLOBAL DEFAULTS")
 
@@ -72,14 +88,14 @@ export async function GET(req: NextRequest) {
       }).catch(() => null)
 
       return ok({
-        card: createdCard ? { ...createdCard, vipUpgradeBonusStamps: defaultCardData.vipUpgradeBonusStamps } : defaultCardData,
+        card: createdCard ? { ...createdCard, ...referralRules, vipUpgradeBonusStamps: defaultCardData.vipUpgradeBonusStamps } : { ...defaultCardData, ...referralRules },
         isDefault: true
       }, {
         headers: { "Cache-Control": "no-store, private" }
       })
     }
 
-    return ok({ card: { ...card, vipUpgradeBonusStamps: merchant?.vipUpgradeBonusStamps ?? 1 }, isDefault: false }, {
+    return ok({ card: { ...card, ...referralRules, vipUpgradeBonusStamps: merchant?.vipUpgradeBonusStamps ?? 1 }, isDefault: false }, {
       headers: { "Cache-Control": "no-store, private" }
     })
   } catch (error: any) {
@@ -109,6 +125,10 @@ export async function POST(req: NextRequest) {
       vipUpgradeBonusStamps,
       joiningBonusEnabled,
       joiningBonusStamps,
+      referralBonusEnabled,
+      referralBonusStamps,
+      referralFriendBonusStamps,
+      referralRewardAmount,
       color,
       tierRewardsEnabled,
       excludedCategories,
@@ -117,6 +137,32 @@ export async function POST(req: NextRequest) {
 
     if (!name || !rewardName || !stampsRequired) {
       return err("Card name, reward name, and required stamps are mandatory", 400)
+    }
+
+    // Save referral rules to SystemContent if provided
+    if (referralBonusEnabled !== undefined || referralBonusStamps !== undefined || referralFriendBonusStamps !== undefined || referralRewardAmount !== undefined) {
+      await db.systemContent.upsert({
+        where: { key: `MERCHANT_REFERRAL_RULES_${merchantId}` },
+        create: {
+          key: `MERCHANT_REFERRAL_RULES_${merchantId}`,
+          section: "merchant_settings",
+          category: "referral_rules",
+          value: JSON.stringify({
+            referralBonusEnabled: Boolean(referralBonusEnabled ?? true),
+            referralBonusStamps: Math.max(0, Number(referralBonusStamps ?? 1)),
+            referralFriendBonusStamps: Math.max(0, Number(referralFriendBonusStamps ?? 1)),
+            referralRewardAmount: Math.max(0, Number(referralRewardAmount ?? 50)),
+          })
+        },
+        update: {
+          value: JSON.stringify({
+            referralBonusEnabled: Boolean(referralBonusEnabled ?? true),
+            referralBonusStamps: Math.max(0, Number(referralBonusStamps ?? 1)),
+            referralFriendBonusStamps: Math.max(0, Number(referralFriendBonusStamps ?? 1)),
+            referralRewardAmount: Math.max(0, Number(referralRewardAmount ?? 50)),
+          })
+        }
+      }).catch((e) => console.error("[CardSetup POST] Error saving referral rules:", e))
     }
 
     // Save vipUpgradeBonusStamps to Merchant record if provided

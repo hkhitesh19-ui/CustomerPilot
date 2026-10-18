@@ -3,6 +3,45 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [18 Oct 2026] Issue: Elimination of Wallet Activation Bonus (+1 Stamp on First Open), Complete Dashboard Light Mode Dual-Theme, and Section 04 Referral Bonus Rules Integration
+- **Symptom**:
+  1. **Phantom Stamp Awarded on Wallet Open**: When a new customer scanned Cake Connection's standee/card QR code and opened their digital loyalty wallet (`/q/wallet/[customerId]`), the system automatically pre-credited 1 stamp without any purchase or bill verification. For a customer making a ₹300 spend on their first visit, this caused 3 stamps to be credited instead of 2 (1 stamp from ₹300 spend + 1 stamp from First-Visit Joining Bonus + 1 unearned phantom stamp from wallet card creation).
+  2. **Light Mode Dual-Theme Inconsistencies on Live VPS**: Several merchant dashboard pages (`/dashboard/customers`, `/dashboard/reviews`, `/dashboard/referrals`, `/dashboard/growth/*`, `/dashboard/marketing/*`) displayed hardcoded dark backgrounds (`bg-slate-900`, `bg-slate-950`) and dark gradient banners when viewed in Light Mode on `customerpilot.in`.
+  3. **Missing Referral Bonus Rules in Section 04**: On `https://customerpilot.in/dashboard/settings`, Section 04 ("Stamps Reward Card Rules Setup") contained no UI fields or rules to configure customer-to-customer referral rewards (Customer A refers Friend B).
+- **Root Cause**:
+  1. In `src/app/q/wallet/[customerId]/page.tsx` (lines 83-104), the self-healing card creation routine hardcoded `stampsCollected: 1` as a default joining bonus on initial card generation, granting an extra phantom stamp upon merely viewing the wallet.
+  2. Tailwind v4 dark utility classes (`bg-slate-900`, `border-slate-800`, `text-slate-100`) were applied unconditionally on card and table components without `dark:` variant prefixes, causing dark mode styling to persist even when the browser or UI theme was set to light. Furthermore, previous local-only fixes had not been deployed to the live Hostinger VPS (`187.127.170.36`).
+  3. Referral reward rules were previously stored without an intuitive merchant-facing configuration UI within Section 04 of the merchant settings dashboard.
+- **Resolution**:
+  1. **Removed Wallet Activation Bonus (`src/app/q/wallet/[customerId]/page.tsx`)**: Replaced `stampsCollected: 1` with `stampsCollected: 0` in self-healing card creation and ensured fallback stamps default strictly to `0`. Merely opening the wallet now awards zero phantom stamps.
+  2. **Comprehensive Light Mode Dual-Theme Overhaul Across All Dashboard Pages**:
+     - Converted all remaining dashboard pages to dual-theme utility classes (`bg-white dark:bg-slate-900`, `border-slate-200 dark:border-slate-800`, `text-slate-900 dark:text-white`, `bg-slate-50 dark:bg-slate-800/50`):
+       - `src/app/dashboard/customers/page.tsx`
+       - `src/app/dashboard/reviews/page.tsx`
+       - `src/app/dashboard/referrals/page.tsx`
+       - `src/app/dashboard/growth/page.tsx`
+       - `src/app/dashboard/growth/case-study/page.tsx`
+       - `src/app/dashboard/growth/community/page.tsx`
+       - `src/app/dashboard/growth/report/page.tsx`
+       - `src/app/dashboard/marketing/review-cards/page.tsx`
+       - `src/app/dashboard/marketing/success-story/page.tsx`
+  3. **Integrated Customer Referral Bonus Rules in Section 04 (`src/components/reward-setup-card.tsx`)**:
+     - Added dedicated "Customer Referral Bonus Rules (Customer A ➔ Friend B)" configuration card directly within Section 04 with:
+       - Active/Deactivated toggle switch (`referralBonusEnabled`)
+       - Referrer Bonus Stamps input (`referralBonusStamps`, default: 1)
+       - Friend Welcome Stamps input (`referralFriendBonusStamps`, default: 1)
+       - Referral Cash / Wallet Reward (₹) input (`referralRewardAmount`, default: ₹50)
+     - Wired GET & POST API persistence in `src/app/api/cards/setup/route.ts` via atomic `SystemContent` key `MERCHANT_REFERRAL_RULES_${merchantId}`.
+     - Wired dynamic referral approval issuance in `src/app/api/referrals/approve/route.ts`.
+     - Synchronized global settings manager in SuperAdmin (`src/components/super-admin/default-merchant-settings-manager.tsx`).
+  4. **Live VPS Production Deployment & Playwright Visual Ground-Truth Verification**:
+     - Uploaded all modified files to the live Hostinger VPS (`187.127.170.36`), executed production Next.js 16 build (`npm run build`, exit code 0), and reloaded PM2 `customerpilot-web`.
+     - Executed headless Playwright browser tests against live `https://customerpilot.in` in light mode:
+       - Verified clean white background (`rgb(255, 255, 255)`) and dark typography across `/dashboard/customers`, `/dashboard/reviews`, and `/dashboard/referrals`.
+       - Verified Section 04 displays the new "Customer Referral Bonus Rules (Customer A ➔ Friend B)" card with live interactive controls and save button.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [18 Oct 2026] Issue: Light Mode Dual-Theme Overhaul for Merchant Dashboard Pages (/dashboard/customers, /dashboard/rewards, /dashboard/referrals)
 - **Symptom**: When navigating to `/dashboard/customers`, `/dashboard/rewards`, and `/dashboard/referrals/customer-referrals` in Light Mode, the UI rendered with hardcoded pitch-black backgrounds (`bg-slate-900`, `bg-slate-950`, dark borders, pure white text). This clashed with the light dashboard layout, causing an inconsistent experience and poor visual contrast.
 - **Root Cause**: Components in `src/app/dashboard/customers/page.tsx`, `src/app/dashboard/rewards/page.tsx`, and `src/app/dashboard/referrals/customer-referrals/page.tsx` directly used hardcoded dark utility classes (`bg-slate-900`, `bg-slate-950`, `border-slate-800`, `text-white`) without Tailwind v4's dual-theme `dark:` variant prefix (`dark:bg-slate-900`, `dark:border-slate-800`). Because the root `<html>` element does not contain the `.dark` class in Light Mode, these hardcoded slate-900 classes were applied unconditionally.
