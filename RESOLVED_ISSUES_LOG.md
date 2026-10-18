@@ -3,6 +3,25 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [19 Oct 2026] Feature & Architecture: Instagram Story Mention & Social Tag Bonus Rules in Stamps Reward Card Setup
+- **Symptom**: Merchants had no way to configure social loyalty triggers (specifically awarding bonus stamps when customers post photos of their orders on Instagram Stories tagging the merchant handle e.g. `@CakeConnection.in`) directly from their Settings page under "Stamps Reward Card Rules Setup".
+- **Root Cause**: The Card Setup API (`/api/cards/setup`) and frontend component (`src/components/reward-setup-card.tsx`) only supported standard purchase stamps, joining bonus, Google review bonus, photo bonus, and friend referrals, without customizable Instagram story reward rules and cadence frequencies.
+- **Resolution**:
+  1. **Backend Integration (`src/app/api/cards/setup/route.ts`)**:
+     - Added `MERCHANT_SOCIAL_REWARD_RULES_${merchantId}` retrieval via `db.systemContent.findUnique` in `GET`.
+     - Injected default fallback values: `instagramStoryBonusEnabled: true`, `instagramStoryBonusStamps: 1`, `instagramStoryFrequency: "ONCE_PER_CYCLE"`.
+     - Added robust `upsert` in `POST` handling `instagramStoryBonusEnabled`, `instagramStoryBonusStamps`, and `instagramStoryFrequency`.
+  2. **Merchant Settings UI (`src/components/reward-setup-card.tsx`)**:
+     - Added dedicated Instagram Story Mention block with Instagram gradient badge and toggle switch.
+     - Provided customizable number input for `Story Tag Bonus Stamps` (default: 1 stamp).
+     - Added Cadence/Frequency selector offering:
+       - `ONCE_PER_CYCLE` ("1 Stamp Cycle me 1 Baar - Recommended for Margin Safety")
+       - `EVERY_PURCHASE` ("Har Qualifying Purchase Bill par - Viral Reach")
+       - `COOLDOWN_30_DAYS` ("Har 30 Din me 1 Baar - Monthly Cooldown")
+  3. **Verification**: Compiled via `npm run build` (Turbopack, Next.js 16.3.6) with zero errors.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [18 Oct 2026] Issue: Unified Executive Business Analytics Dashboard & Zero-Code WhatsApp Referral Share Engine
 - **Symptom**:
   1. The merchant dashboard lacked a comprehensive executive overview with interactive date filtering (All Time, Today, 7d, 30d, This Month).

@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
       return err("Unauthorized", 401)
     }
 
-    const [card, merchant, globalDefaults, referralRecord] = await Promise.all([
+    const [card, merchant, globalDefaults, referralRecord, socialRewardRecord] = await Promise.all([
       db.stampCard.findFirst({
         where: { merchantId, active: true },
         orderBy: { updatedAt: "desc" }  // always get the most recently SAVED card
@@ -31,6 +31,9 @@ export async function GET(req: NextRequest) {
       getGlobalDefaultMerchantSettings(),
       db.systemContent.findUnique({
         where: { key: `MERCHANT_REFERRAL_RULES_${merchantId}` }
+      }),
+      db.systemContent.findUnique({
+        where: { key: `MERCHANT_SOCIAL_REWARD_RULES_${merchantId}` }
       })
     ])
 
@@ -44,6 +47,18 @@ export async function GET(req: NextRequest) {
       try {
         const parsed = JSON.parse(referralRecord.value)
         referralRules = { ...referralRules, ...parsed }
+      } catch (e) {}
+    }
+
+    let socialRewardRules = {
+      instagramStoryBonusEnabled: true,
+      instagramStoryBonusStamps: 1,
+      instagramStoryFrequency: "ONCE_PER_CYCLE",
+    }
+    if (socialRewardRecord?.value) {
+      try {
+        const parsed = JSON.parse(socialRewardRecord.value)
+        socialRewardRules = { ...socialRewardRules, ...parsed }
       } catch (e) {}
     }
 
@@ -88,14 +103,14 @@ export async function GET(req: NextRequest) {
       }).catch(() => null)
 
       return ok({
-        card: createdCard ? { ...createdCard, ...referralRules, vipUpgradeBonusStamps: defaultCardData.vipUpgradeBonusStamps } : { ...defaultCardData, ...referralRules },
+        card: createdCard ? { ...createdCard, ...referralRules, ...socialRewardRules, vipUpgradeBonusStamps: defaultCardData.vipUpgradeBonusStamps } : { ...defaultCardData, ...referralRules, ...socialRewardRules },
         isDefault: true
       }, {
         headers: { "Cache-Control": "no-store, private" }
       })
     }
 
-    return ok({ card: { ...card, ...referralRules, vipUpgradeBonusStamps: merchant?.vipUpgradeBonusStamps ?? 1 }, isDefault: false }, {
+    return ok({ card: { ...card, ...referralRules, ...socialRewardRules, vipUpgradeBonusStamps: merchant?.vipUpgradeBonusStamps ?? 1 }, isDefault: false }, {
       headers: { "Cache-Control": "no-store, private" }
     })
   } catch (error: any) {
@@ -129,6 +144,9 @@ export async function POST(req: NextRequest) {
       referralBonusStamps,
       referralFriendBonusStamps,
       referralRewardAmount,
+      instagramStoryBonusEnabled,
+      instagramStoryBonusStamps,
+      instagramStoryFrequency,
       color,
       tierRewardsEnabled,
       excludedCategories,
@@ -163,6 +181,30 @@ export async function POST(req: NextRequest) {
           })
         }
       }).catch((e) => console.error("[CardSetup POST] Error saving referral rules:", e))
+    }
+
+    // Save social reward rules (Instagram Story Bonus) to SystemContent if provided
+    if (instagramStoryBonusEnabled !== undefined || instagramStoryBonusStamps !== undefined || instagramStoryFrequency !== undefined) {
+      await db.systemContent.upsert({
+        where: { key: `MERCHANT_SOCIAL_REWARD_RULES_${merchantId}` },
+        create: {
+          key: `MERCHANT_SOCIAL_REWARD_RULES_${merchantId}`,
+          section: "merchant_settings",
+          category: "social_reward_rules",
+          value: JSON.stringify({
+            instagramStoryBonusEnabled: Boolean(instagramStoryBonusEnabled ?? true),
+            instagramStoryBonusStamps: Math.max(0, Number(instagramStoryBonusStamps ?? 1)),
+            instagramStoryFrequency: instagramStoryFrequency || "ONCE_PER_CYCLE",
+          })
+        },
+        update: {
+          value: JSON.stringify({
+            instagramStoryBonusEnabled: Boolean(instagramStoryBonusEnabled ?? true),
+            instagramStoryBonusStamps: Math.max(0, Number(instagramStoryBonusStamps ?? 1)),
+            instagramStoryFrequency: instagramStoryFrequency || "ONCE_PER_CYCLE",
+          })
+        }
+      }).catch((e) => console.error("[CardSetup POST] Error saving social reward rules:", e))
     }
 
     // Save vipUpgradeBonusStamps to Merchant record if provided
