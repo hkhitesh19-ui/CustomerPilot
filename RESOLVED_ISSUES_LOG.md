@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [18 Oct 2026] Issue: Light Mode Dual-Theme Overhaul for Merchant Dashboard Pages (/dashboard/customers, /dashboard/rewards, /dashboard/referrals)
+- **Symptom**: When navigating to `/dashboard/customers`, `/dashboard/rewards`, and `/dashboard/referrals/customer-referrals` in Light Mode, the UI rendered with hardcoded pitch-black backgrounds (`bg-slate-900`, `bg-slate-950`, dark borders, pure white text). This clashed with the light dashboard layout, causing an inconsistent experience and poor visual contrast.
+- **Root Cause**: Components in `src/app/dashboard/customers/page.tsx`, `src/app/dashboard/rewards/page.tsx`, and `src/app/dashboard/referrals/customer-referrals/page.tsx` directly used hardcoded dark utility classes (`bg-slate-900`, `bg-slate-950`, `border-slate-800`, `text-white`) without Tailwind v4's dual-theme `dark:` variant prefix (`dark:bg-slate-900`, `dark:border-slate-800`). Because the root `<html>` element does not contain the `.dark` class in Light Mode, these hardcoded slate-900 classes were applied unconditionally.
+- **Resolution**:
+  1. Refactored `src/app/dashboard/customers/page.tsx`: converted header banner, 4 KPI statistic cards, filter pill bar, search input, desktop table (header & body cells), and customer details modal to use dual-theme classes (`bg-white dark:bg-slate-900`, `border-slate-200 dark:border-slate-800`, `text-slate-900 dark:text-white`, `bg-slate-50 dark:bg-slate-800/50`).
+  2. Refactored `src/app/dashboard/rewards/page.tsx`: converted hero title, 3 metric cards, and redemption log card to dual-theme classes.
+  3. Refactored `src/app/dashboard/referrals/customer-referrals/page.tsx`: converted header, 4 metric cards, referral ledger card, and anti-abuse fraud card to dual-theme classes.
+  4. Executed Next.js 16 production Turbopack build (`npm run build`) locally with 0 errors (`exit code 0`).
+  5. Verified runtime rendering in a real headless browser via Playwright (`scripts/verify_dashboard_customers_light.js`), saving visual proof screenshots (`verified_dashboard_customers_light_mode.png`, `verified_dashboard_rewards_light_mode.png`, `verified_dashboard_referrals_light_mode.png`) confirming clean white theme styling and crisp contrast.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [18 Oct 2026] Issue: WhatsApp Auto-Reply Failure for Cake Connection VIP Club Stamps & UI False-Connected State
 - **Symptom**: When a customer scanned Cake Connection's standee/card QR code and clicked "Digital Loyalty Stamps" on the Smart Digital Business Card (`/c/cake-connection`), WhatsApp opened with the prefilled message `"Hi Cake Connection! Checking in for my VIP Club stamps 🎁"`. Upon sending this message to `+917203824012`, no automated reply was received from CustomerPilot. Meanwhile, the merchant dashboard (`/dashboard/settings` Section 05) deceptively showed "Connected / WhatsApp Linked & Operational", hiding the fact that WhatsApp was completely unlinked. Additionally, Evolution API on VPS (`187.127.170.36:8080`) was blocked by UFW firewall, preventing direct external browser access to Evolution Manager.
 - **Root Cause**:
