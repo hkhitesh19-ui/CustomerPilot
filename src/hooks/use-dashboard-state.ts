@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 
 export interface DashboardState {
   merchant: any
+  digitalBusinessCard?: any
   staff: any[]
   customers: any[]
   stampCards: any[]

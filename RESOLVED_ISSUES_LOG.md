@@ -3,6 +3,36 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [18 Oct 2026] Issue: Unified Executive Business Analytics Dashboard & Zero-Code WhatsApp Referral Share Engine
+- **Symptom**:
+  1. The merchant dashboard lacked a comprehensive executive overview with interactive date filtering (All Time, Today, 7d, 30d, This Month).
+  2. Merchants had no visibility into referral revenue attribution (how much ₹ was billed to referred friends), acquisition channel split (QR vs Referral vs Digital Card), and top referrer customer leaderboards.
+  3. Google Reviews impact had no baseline comparison showing pre-CustomerPilot reviews versus net-new AI-generated reviews.
+  4. In the customer digital wallet (`DigitalWalletClient.tsx`), the WhatsApp referral invite was static, lacked store-specific digital card links, and required manual counter codes.
+- **Root Cause**:
+  1. `/api/state` previously omitted `digitalBusinessCard` and did not include relational `referrer` and `friendCustomer` entities in `db.referral.findMany`.
+  2. `src/app/dashboard/page.tsx` was using basic static lifetime metrics without a multi-period date filter or referral revenue aggregations.
+- **Resolution**:
+  1. **Enhanced State API (`src/app/api/state/route.ts` & `src/hooks/use-dashboard-state.ts`)**:
+     - Added `digitalBusinessCard` to `Promise.all` and state payload for baseline reviews count and rating.
+     - Included relational `referrer` and `friendCustomer` models in `db.referral.findMany`.
+  2. **Executive Business Analytics Section (`src/app/dashboard/page.tsx`)**:
+     - Added interactive Date Range Filter (`All Time`, `Today`, `Last 7 Days`, `Last 30 Days`, `This Month`).
+     - Added 4 High-Impact Metric Cards:
+       - 💳 **Total CustomerPilot Revenue**: Total spend, with repeat vs new revenue breakdown.
+       - 👥 **Total Members & Acquisition**: Total customers, split by QR Scan, Referral, and Digital Card.
+       - 🤝 **Referral Sales Engine**: Total referral revenue and approved vs pending count.
+       - ⭐ **Google Reviews Impact**: Baseline reviews, new AI reviews added, and live rating.
+     - Added **Top Referrers Leaderboard Table** (ranked by friends brought in, sales generated, and bonus stamps).
+     - Added **Referral Sales Attribution Log** (friend name, referrer, join date, 1st bill amount, lifetime spend, status).
+  3. **Zero-Code WhatsApp Referral Sharing (`src/components/wallet/DigitalWalletClient.tsx`)**:
+     - Replaced legacy text with high-converting Friendly Hinglish zero-code template linking directly to `https://customerpilot.in/c/${merchantSlug}`.
+  4. **Playwright Visual Verification & VPS Deployment**:
+     - Deployed to Hostinger VPS (`187.127.170.36`), compiled Next.js build (`code 0`), reloaded PM2 `customerpilot-web`, and verified HTTP 200.
+     - Captured Playwright screenshots verifying live rendering of analytics cards and referral tables.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [18 Oct 2026] Issue: Automated Customer Referral Detection via Phone Number & Zero-Effort Merchant First-Bill Dual Stamp Engine
 - **Symptom**:
   1. When a new customer (Customer B) visits the merchant store for the first time after being referred by an existing customer (Customer A), there was no clear automated mechanism linking Customer B to Customer A without friction.

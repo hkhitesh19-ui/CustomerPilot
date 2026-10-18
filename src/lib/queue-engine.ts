@@ -43,6 +43,8 @@ export async function joinQueue(opts: {
       where: { merchantId, friendPhone: phone, status: "pending" }
     })
 
+    const customerReferralCode = `CP-${phone.slice(-4)}${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+
     customer = await db.customer.create({
       data: {
         merchantId,
@@ -51,7 +53,7 @@ export async function joinQueue(opts: {
         vipTier: initialCategory,
         acquisitionChan: pendingReferral ? "referral" : "qr_scan",
         referredById: pendingReferral ? pendingReferral.referrerId : null,
-        referralCode,
+        referralCode: customerReferralCode,
         whatsappOptIn: true,
         lastActiveAt: new Date(),
         botState: "AWAITING_NAME_CONFIRMATION",

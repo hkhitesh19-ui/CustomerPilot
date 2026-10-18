@@ -57,6 +57,7 @@ export async function GET(req: NextRequest) {
     ownerOverrideLogs,
     waitingCustomers,
     merchantGoogleConnections,
+    digitalBusinessCard,
   ] = await Promise.all([
     db.staff.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "asc" }, take: 100 }),
     db.customer.findMany({ where: { merchantId: merchant.id, deletedAt: null }, orderBy: { createdAt: "desc" }, take: 500 }),
@@ -65,7 +66,7 @@ export async function GET(req: NextRequest) {
     db.reward.findMany({ where: { merchantId: merchant.id, active: true, deletedAt: null }, orderBy: { createdAt: "asc" }, take: 100 }),
     db.bill.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 200 }),
     db.redemption.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 200 }),
-    db.referral.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 200 }),
+    db.referral.findMany({ where: { merchantId: merchant.id }, include: { referrer: true, friendCustomer: true }, orderBy: { createdAt: "desc" }, take: 200 }),
     db.auditLog.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 200 }),
     db.whatsAppMessage.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 100 }),
     db.subscription.findMany({ where: { merchantId: merchant.id } }),
@@ -90,10 +91,12 @@ export async function GET(req: NextRequest) {
     db.ownerOverrideLog.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 50 }).catch(() => []),
     db.waitingCustomer.findMany({ where: { merchantId: merchant.id, status: 'waiting' }, include: { customer: true }, orderBy: { scannedAt: "desc" }, take: 50 }).catch(() => []),
     db.merchantGoogleConnection.findMany({ where: { merchantId: merchant.id } }).catch(() => []),
+    db.digitalBusinessCard.findUnique({ where: { merchantId: merchant.id } }).catch(() => null),
   ])
 
   return ok({
     merchant,
+    digitalBusinessCard,
     staff,
     customers,
     stampCards,
