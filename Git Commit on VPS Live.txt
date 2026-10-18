@@ -8,16 +8,16 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 42841a8
-Full Commit Hash  : 42841a8a25c3453b3bcfcefeeb4398e0965d496a
-Target Fix Commit : 42841a8
+Active Git Commit : 9b34216
+Full Commit Hash  : 9b3421636200dc3442eff1c1a27b143c1513a65b
+Target Fix Commit : 9b34216
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 17 Oct 2026, 09:55 PM IST
+Deployment Date   : 18 Oct 2026, 10:20 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(security): untrack CREDENTIALS_AND_SECRETS_VAULT.md, sanitize secrets, and update .gitignore
+Commit Title      : fix(whatsapp): resolve Evolution API socket health check, port 8080 access, and UI false-connected state
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
-Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080, Online & Healthy)
+Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 Merchant Status   : Vinayak Fashion & Cake Connection Live
 Standee Status    : Standee Studio Live with 4 Bespoke Templates (280px QR, 20% Logo Badge, Instant Phone Camera Scannability)
 Trial Isolation   : Verified on VPS (Only selected 1 or 2 modules enabled; card auto-provisioned; direct dashboard redirect; 0 forced onboarding)
