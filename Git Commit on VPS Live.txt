@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : e404439
-Full Commit Hash  : e40443958054802b054a9a8f529b33d3feeef847
-Target Fix Commit : e40443958054802b054a9a8f529b33d3feeef847
+Active Git Commit : db1c5a0
+Full Commit Hash  : db1c5a09f2a41f6840e83bd8961a3222a8017c1c
+Target Fix Commit : db1c5a09f2a41f6840e83bd8961a3222a8017c1c
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 18 Oct 2026, 04:15 PM IST
+Deployment Date   : 18 Oct 2026, 05:18 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(referrals): enforce strict one-time validity guardrails and align wallet referral badge to pure loyalty stamps
+Commit Title      : feat(referrals): automatic phone matching on queue join and automated dual-stamp award on first bill
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
