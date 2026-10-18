@@ -28,11 +28,11 @@ export const ONBOARDING_STEPS: { key: OnboardingStepKey; label: string; required
 ]
 
 export const DEFAULT_CARD_BY_BUSINESS: Record<string, { name: string; stampsRequired: number; rewardName: string; color: string }> = {
-  cafe: { name: "Coffee Lover's Card", stampsRequired: 9, rewardName: "1 Free Specialty Coffee", color: "amber" },
-  bakery: { name: "Cake Lover's Card", stampsRequired: 9, rewardName: "1 Free Cupcake", color: "rose" },
-  salon: { name: "Beauty Pass", stampsRequired: 6, rewardName: "20% off next service", color: "purple" },
-  restaurant: { name: "Diner's Card", stampsRequired: 10, rewardName: "Free dessert", color: "emerald" },
-  retail: { name: "Shopper's Card", stampsRequired: 8, rewardName: "₹200 off next purchase", color: "blue" },
+  cafe: { name: "Coffee Lover's Card", stampsRequired: 10, rewardName: "1 Free Specialty Coffee", color: "#6366f1" },
+  bakery: { name: "Cake Lover's Card", stampsRequired: 10, rewardName: "1 Free Cupcake", color: "#6366f1" },
+  salon: { name: "Beauty Pass", stampsRequired: 10, rewardName: "20% off next service", color: "#6366f1" },
+  restaurant: { name: "Diner's Card", stampsRequired: 10, rewardName: "Free dessert", color: "#6366f1" },
+  retail: { name: "Shopper's Card", stampsRequired: 10, rewardName: "₹200 off next purchase", color: "#6366f1" },
 }
 
 /**
@@ -50,10 +50,16 @@ export async function fastStartOnboarding(merchantId: string, businessType: stri
       data: {
         merchantId,
         name: defaults.name,
-        stampsRequired: defaults.stampsRequired,
+        stampsRequired: 10,
         rewardName: defaults.rewardName,
+        stampValue: 300,
+        validityDays: 180,
+        googleReviewBonus: 1,
+        photoBonus: 1,
+        joiningBonusEnabled: true,
+        joiningBonusStamps: 1,
         stampsPerBill: "1",
-        color: defaults.color,
+        color: "#6366f1",
         active: true,
       },
     })

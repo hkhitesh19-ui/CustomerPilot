@@ -135,7 +135,7 @@ export async function POST(req: Request) {
         trialEndsAt,
         enabledModules: resolvedModules,
         googleReviewDelayMinutes: globalDefaults?.googleReviewDelayMinutes ?? 30,
-        vipUpgradeBonusStamps: globalDefaults?.vipUpgradeBonusStamps ?? 1,
+        vipUpgradeBonusStamps: globalDefaults?.vipUpgradeBonusStamps ?? 2,
         loyaltyCategoryNames: JSON.stringify(globalDefaults?.loyaltyCategoryNames),
         winbackDays1: globalDefaults?.winbackDays1 ?? 30,
         winbackDays2: globalDefaults?.winbackDays2 ?? 60,
@@ -174,9 +174,9 @@ export async function POST(req: Request) {
       await db.stampCard.create({
         data: {
           merchantId: merchant.id,
-          name: globalDefaults?.cardName || rule.getCardTitle(businessName),
+          name: rule.getCardTitle(businessName),
           stampsRequired: globalDefaults?.stampsRequired ?? rule.stampsRequired,
-          rewardName: globalDefaults?.rewardName || rule.rewardName,
+          rewardName: rule.rewardName,
           stampValue: globalDefaults?.stampValue ?? rule.stampValue,
           validityDays: globalDefaults?.validityDays ?? rule.validityDays,
           googleReviewBonus: globalDefaults?.googleReviewBonus ?? rule.googleReviewBonus,
@@ -188,6 +188,21 @@ export async function POST(req: Request) {
           active: true,
         },
       });
+
+      // Initialize default referral stamp rules for new merchant
+      await db.systemContent.create({
+        data: {
+          key: `MERCHANT_REFERRAL_RULES_${merchant.id}`,
+          section: "merchant_settings",
+          category: "referral_rules",
+          value: JSON.stringify({
+            referralBonusEnabled: true,
+            referralBonusStamps: 1,
+            referralFriendBonusStamps: 1,
+            referralRewardAmount: 0,
+          })
+        }
+      }).catch(() => {});
     }
 
     // Auto-provision Digital Business Card if opted

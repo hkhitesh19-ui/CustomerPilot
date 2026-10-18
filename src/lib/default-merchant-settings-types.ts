@@ -31,8 +31,8 @@ export interface DefaultMerchantSettingsData {
 }
 
 export const FALLBACK_GLOBAL_DEFAULTS: DefaultMerchantSettingsData = {
-  cardName: "Cake Connection VIP Club",
-  rewardName: "1 Free Cake",
+  cardName: "VIP Club",
+  rewardName: "1 Free Reward / Gift",
   stampsRequired: 10,
   stampValue: 300,
   validityDays: 180,
@@ -40,11 +40,11 @@ export const FALLBACK_GLOBAL_DEFAULTS: DefaultMerchantSettingsData = {
   photoBonus: 1,
   joiningBonusEnabled: true,
   joiningBonusStamps: 1,
-  vipUpgradeBonusStamps: 1,
+  vipUpgradeBonusStamps: 2,
   referralBonusEnabled: true,
   referralBonusStamps: 1,
   referralFriendBonusStamps: 1,
-  referralRewardAmount: 50,
+  referralRewardAmount: 0,
   color: "#6366f1",
   tierRewardsEnabled: false,
   rewardImageUrl: "",

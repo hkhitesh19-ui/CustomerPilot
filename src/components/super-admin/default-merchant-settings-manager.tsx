@@ -25,60 +25,60 @@ const PRESET_TEMPLATES: Record<string, Partial<DefaultMerchantSettingsData>> = {
     photoBonus: 1,
     joiningBonusEnabled: true,
     joiningBonusStamps: 1,
-    vipUpgradeBonusStamps: 1,
+    vipUpgradeBonusStamps: 2,
     color: "#6366f1"
   },
   restaurant: {
     cardName: "Gourmet Diner's VIP Club",
     rewardName: "Free Starter / Dessert",
     stampsRequired: 10,
-    stampValue: 400,
-    validityDays: 60,
-    googleReviewBonus: 2,
-    photoBonus: 2,
+    stampValue: 300,
+    validityDays: 180,
+    googleReviewBonus: 1,
+    photoBonus: 1,
     joiningBonusEnabled: true,
-    joiningBonusStamps: 2,
-    vipUpgradeBonusStamps: 1,
-    color: "#10b981"
+    joiningBonusStamps: 1,
+    vipUpgradeBonusStamps: 2,
+    color: "#6366f1"
   },
   cafe: {
     cardName: "Coffee Lover's VIP Club",
     rewardName: "1 Free Specialty Coffee",
-    stampsRequired: 8,
-    stampValue: 200,
-    validityDays: 45,
+    stampsRequired: 10,
+    stampValue: 300,
+    validityDays: 180,
     googleReviewBonus: 1,
-    photoBonus: 2,
+    photoBonus: 1,
     joiningBonusEnabled: true,
     joiningBonusStamps: 1,
-    vipUpgradeBonusStamps: 1,
-    color: "#f59e0b"
+    vipUpgradeBonusStamps: 2,
+    color: "#6366f1"
   },
   salon: {
     cardName: "Luxury Beauty VIP Pass",
     rewardName: "Free Hair Spa / Facial",
-    stampsRequired: 6,
-    stampValue: 800,
-    validityDays: 90,
-    googleReviewBonus: 2,
-    photoBonus: 2,
+    stampsRequired: 10,
+    stampValue: 300,
+    validityDays: 180,
+    googleReviewBonus: 1,
+    photoBonus: 1,
     joiningBonusEnabled: true,
     joiningBonusStamps: 1,
-    vipUpgradeBonusStamps: 1,
-    color: "#ec4899"
+    vipUpgradeBonusStamps: 2,
+    color: "#6366f1"
   },
   retail: {
     cardName: "Exclusive Shopper's Club",
     rewardName: "₹500 Shopping Voucher",
     stampsRequired: 10,
-    stampValue: 1000,
-    validityDays: 90,
-    googleReviewBonus: 2,
+    stampValue: 300,
+    validityDays: 180,
+    googleReviewBonus: 1,
     photoBonus: 1,
     joiningBonusEnabled: true,
-    joiningBonusStamps: 2,
+    joiningBonusStamps: 1,
     vipUpgradeBonusStamps: 2,
-    color: "#3b82f6"
+    color: "#6366f1"
   }
 }
 
@@ -513,7 +513,7 @@ export function DefaultMerchantSettingsManager() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="global-referral-referrer" className="text-xs font-semibold text-slate-300">
                   Referrer Bonus Stamps
@@ -544,21 +544,6 @@ export function DefaultMerchantSettingsManager() {
                   className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm mt-1"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">Stamps to Friend B on 1st visit</p>
-              </div>
-
-              <div>
-                <Label htmlFor="global-referral-cash" className="text-xs font-semibold text-slate-300">
-                  Referral Cash / Wallet Reward (₹)
-                </Label>
-                <Input
-                  id="global-referral-cash"
-                  type="number"
-                  min="0"
-                  value={form.referralRewardAmount ?? 50}
-                  onChange={e => setForm({ ...form, referralRewardAmount: Math.max(0, Number(e.target.value)) })}
-                  className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm mt-1"
-                />
-                <p className="text-[11px] text-slate-400 mt-1">Instant wallet credit to Referrer</p>
               </div>
             </div>
           </div>

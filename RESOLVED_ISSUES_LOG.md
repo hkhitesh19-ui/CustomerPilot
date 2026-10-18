@@ -3,6 +3,38 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [18 Oct 2026] Issue: Removal of Referral Cash Reward (Pure Loyalty Stamps Referrals) & Cake Connection Stamp Rules Set as Global Default for All New Merchants
+- **Symptom**:
+  1. In Section 04 ("Stamps Reward Card Rules Setup"), the Customer Referral Bonus Rules card included a "Referral Cash / Wallet Reward (₹)" input field, which introduced unnecessary confusion and mixed digital stamps with cash wallet credits.
+  2. Newly onboarded or registered merchants previously received disparate, inconsistent stamp card rules (e.g., 6, 8, 9, 12, or 15 stamps required, ₹150 or ₹500 or ₹800 spend thresholds, 60 or 90 days validity, 2 review bonus stamps) instead of the optimized, battle-tested Cake Connection digital loyalty stamp rules.
+- **Root Cause**:
+  1. The referral configuration card in `src/components/reward-setup-card.tsx` and SuperAdmin default settings manager had a third input column for `referralRewardAmount` (₹ cash/wallet balance credit).
+  2. Industry templates in `src/lib/industry-campaigns.ts`, `src/lib/onboarding-engine.ts`, and fallback defaults in `src/lib/default-merchant-settings-types.ts` had fragmented stamp parameters across categories.
+- **Resolution**:
+  1. **Removed Referral Cash / Wallet Reward (`src/components/reward-setup-card.tsx` & `src/components/super-admin/default-merchant-settings-manager.tsx`)**:
+     - Removed the cash/wallet reward input from Section 04 and SuperAdmin.
+     - Reconfigured the layout into a clean, balanced 2-column grid focusing purely on digital loyalty stamps:
+       - Column 1: Referrer Bonus Stamps (Customer A)
+       - Column 2: Friend Welcome Stamps (Friend B)
+     - Set default `referralRewardAmount: 0` in `src/lib/default-merchant-settings-types.ts` and `src/app/api/cards/setup/route.ts`.
+  2. **Set Cake Connection Stamp Rules as Universal Default for All New Merchants**:
+     - Standardized the digital stamp rules across `src/lib/industry-campaigns.ts`, `src/lib/default-merchant-settings-types.ts`, `src/lib/onboarding-engine.ts`, and `src/app/api/auth/register/route.ts`:
+       - **Stamps Required**: 10
+       - **Stamp Value**: ₹300 (Every ₹300 spend = 1 Stamp)
+       - **Validity**: 180 Days
+       - **Google Review Bonus Stamps**: 1
+       - **Photo Review Bonus Stamps**: 1
+       - **Joining Bonus (First Visit)**: Active (+1 Stamp)
+       - **Next Level Kickstart Bonus (Level Completion)**: Active (+2 Stamps)
+       - **Customer Referral Bonus**: Active (+1 / +1 Stamps)
+       - **Card Color**: `#6366f1`
+     - Preserved each industry's distinct reward names (e.g. Free Specialty Coffee, Free Haircut/Styling, Free Starter/Dessert) as explicitly requested: *(not Reward rules - only Stamps Rules)*.
+  3. **Live VPS Deployment & Playwright Visual Ground-Truth Verification**:
+     - Uploaded modified files to VPS (`187.127.170.36`), updated `GLOBAL_DEFAULT_MERCHANT_SETTINGS` in VPS SQLite `dev.db`, rebuilt Next.js 16 (`code 0`), and reloaded PM2.
+     - Verified with Playwright on live `https://customerpilot.in/dashboard/settings` that Section 04 displays the 2-column stamps referral card with zero cash/wallet reward text.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [18 Oct 2026] Issue: Elimination of Wallet Activation Bonus (+1 Stamp on First Open), Complete Dashboard Light Mode Dual-Theme, and Section 04 Referral Bonus Rules Integration
 - **Symptom**:
   1. **Phantom Stamp Awarded on Wallet Open**: When a new customer scanned Cake Connection's standee/card QR code and opened their digital loyalty wallet (`/q/wallet/[customerId]`), the system automatically pre-credited 1 stamp without any purchase or bill verification. For a customer making a ₹300 spend on their first visit, this caused 3 stamps to be credited instead of 2 (1 stamp from ₹300 spend + 1 stamp from First-Visit Joining Bonus + 1 unearned phantom stamp from wallet card creation).

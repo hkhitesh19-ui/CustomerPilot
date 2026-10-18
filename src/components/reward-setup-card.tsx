@@ -386,7 +386,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                       Customer Referral Bonus Rules (Customer A ➔ Friend B)
                     </Label>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                      Reward both the referring customer and their invited friend when the friend makes their first qualifying store visit.
+                      Reward both the referring customer and their invited friend with digital loyalty stamps when the friend makes their first qualifying store visit.
                     </p>
                   </div>
                 </div>
@@ -402,7 +402,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                 <div className="space-y-1.5">
                   <Label htmlFor="referral-referrer-stamps" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                     Referrer Bonus Stamps
@@ -435,25 +435,6 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                     className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
                   />
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">Welcome stamps awarded to Friend B on 1st visit</p>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="referral-reward-amount" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    Referral Cash / Wallet Reward (₹)
-                  </Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-2.5 text-muted-foreground text-sm">₹</span>
-                    <Input
-                      id="referral-reward-amount"
-                      type="number"
-                      min="0"
-                      disabled={!form.referralBonusEnabled}
-                      value={form.referralRewardAmount ?? 50}
-                      onChange={e => setForm({ ...form, referralRewardAmount: Math.max(0, Number(e.target.value)) })}
-                      className="pl-7 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
-                    />
-                  </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Instant wallet credit added to Referrer account</p>
                 </div>
               </div>
             </div>

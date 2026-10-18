@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
       referralBonusEnabled: true,
       referralBonusStamps: 1,
       referralFriendBonusStamps: 1,
-      referralRewardAmount: 50,
+      referralRewardAmount: 0,
     }
     if (referralRecord?.value) {
       try {
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
             referralBonusEnabled: Boolean(referralBonusEnabled ?? true),
             referralBonusStamps: Math.max(0, Number(referralBonusStamps ?? 1)),
             referralFriendBonusStamps: Math.max(0, Number(referralFriendBonusStamps ?? 1)),
-            referralRewardAmount: Math.max(0, Number(referralRewardAmount ?? 50)),
+            referralRewardAmount: Math.max(0, Number(referralRewardAmount ?? 0)),
           })
         },
         update: {
@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
             referralBonusEnabled: Boolean(referralBonusEnabled ?? true),
             referralBonusStamps: Math.max(0, Number(referralBonusStamps ?? 1)),
             referralFriendBonusStamps: Math.max(0, Number(referralFriendBonusStamps ?? 1)),
-            referralRewardAmount: Math.max(0, Number(referralRewardAmount ?? 50)),
+            referralRewardAmount: Math.max(0, Number(referralRewardAmount ?? 0)),
           })
         }
       }).catch((e) => console.error("[CardSetup POST] Error saving referral rules:", e))
