@@ -12,13 +12,13 @@ This document serves as a historical record of all major bugs, configuration iss
      - Injected default fallback values: `instagramStoryBonusEnabled: true`, `instagramStoryBonusStamps: 1`, `instagramStoryFrequency: "ONCE_PER_CYCLE"`.
      - Added robust `upsert` in `POST` handling `instagramStoryBonusEnabled`, `instagramStoryBonusStamps`, and `instagramStoryFrequency`.
   2. **Merchant Settings UI (`src/components/reward-setup-card.tsx`)**:
-     - Added dedicated Instagram Story Mention block with Instagram gradient badge and toggle switch.
-     - Provided customizable number input for `Story Tag Bonus Stamps` (default: 1 stamp).
-     - Added Cadence/Frequency selector offering:
-       - `ONCE_PER_CYCLE` ("1 Stamp Cycle me 1 Baar - Recommended for Margin Safety")
-       - `EVERY_PURCHASE` ("Har Qualifying Purchase Bill par - Viral Reach")
-       - `COOLDOWN_30_DAYS` ("Har 30 Din me 1 Baar - Monthly Cooldown")
-  3. **Verification**: Compiled via `npm run build` (Turbopack, Next.js 16.3.6) with zero errors.
+     - Added dedicated Instagram Story Mention block with Instagram gradient badge and main feature toggle switch (`ACTIVE / DEACTIVATED`).
+     - Provided customizable number input for `Story Tag Bonus Stamps` (default: 1 stamp, merchant editable).
+     - Upgraded from simple dropdown to **Interactive Radio Option Cards** featuring 2-line Hinglish explanations (Kya hoga & Kiske liye suitable):
+       - `ONCE_PER_CYCLE`: 1 Stamp Cycle me Sirf 1 Baar (Recommended for 100% Margin Safety - for established bakeries/cafes/salons).
+       - `EVERY_PURCHASE`: Har Qualifying Purchase Bill par (High Viral Social Reach - for new stores/trendy cafes/youth brands).
+       - `COOLDOWN_30_DAYS`: Har 30 Din me Sirf 1 Baar (Monthly Cooldown - for regular repeat retail stores/restaurants).
+  3. **Verification**: Compiled and verified clean JSX / TypeScript execution.
 - **Status**: ✅ Resolved and Verified.
 
 ---
