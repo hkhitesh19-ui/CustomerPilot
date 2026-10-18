@@ -67,7 +67,7 @@ export async function GET(req: Request) {
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      "apikey": EVOLUTION_API_KEY,
+      "apikey": EVOLUTION_API_KEY || "",
     }
 
     const stateRes = await fetch(
@@ -80,8 +80,10 @@ export async function GET(req: Request) {
     }
 
     const stateData = await stateRes.json().catch(() => null)
-    const instanceData = Array.isArray(stateData) ? stateData[0] : null
-    const state: string = instanceData?.connectionStatus || "disconnected"
+    const instanceData = Array.isArray(stateData)
+      ? (stateData.find((inst: any) => inst.name === instanceName) || stateData[0])
+      : (stateData?.instance || stateData)
+    const state: string = instanceData?.connectionStatus || instanceData?.state || "disconnected"
     const isConnected = state === "open"
     const ownerJid: string | null = instanceData?.ownerJid || null
 

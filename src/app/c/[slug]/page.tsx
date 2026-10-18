@@ -91,10 +91,10 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
       return s === cleanSlug || m.id === cleanSlug
     })
     if (matchingMerchant) {
-      card = await getOrCreateDigitalBusinessCard(matchingMerchant.id)
-      if (card) {
+      const createdCard = await getOrCreateDigitalBusinessCard(matchingMerchant.id)
+      if (createdCard) {
         card = await db.digitalBusinessCard.findUnique({
-          where: { id: card.id },
+          where: { id: createdCard.id },
           include: { merchant: true },
         })
       }
@@ -136,7 +136,7 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
     locationState: card.locationState,
     businessHours: card.businessHours,
     deliveryInfo: card.deliveryInfo,
-    whatsappNumber: card.whatsappNumber,
+    whatsappNumber: card.whatsappNumber || card.merchant?.whatsappPhone || card.phoneNumber || "",
     phoneNumber: card.phoneNumber,
     instagramUrl: card.instagramUrl,
     facebookUrl: card.facebookUrl,

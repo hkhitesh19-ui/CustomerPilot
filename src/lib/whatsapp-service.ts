@@ -40,7 +40,7 @@ export async function sendCentralWhatsAppMessage(params: {
 
     const res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
+      headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY || "" },
       body: JSON.stringify({
         number: params.toPhone,
         text: params.text

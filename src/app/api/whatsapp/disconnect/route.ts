@@ -38,12 +38,12 @@ export async function DELETE(req: Request) {
 
     const instanceName = merchant.whatsappInstanceName
 
-    if (instanceName) {
-      const headers = {
-        "Content-Type": "application/json",
-        "apikey": EVOLUTION_API_KEY,
-      }
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "apikey": EVOLUTION_API_KEY || "",
+    }
 
+    if (instanceName) {
       // 1. Logout the instance from WhatsApp
       console.log(`[WhatsApp Disconnect] Logging out instance: ${instanceName}`)
       await fetch(`${EVOLUTION_API_URL}/instance/logout/${instanceName}`, { 
@@ -61,6 +61,24 @@ export async function DELETE(req: Request) {
         headers 
       }).catch(e => console.warn("Delete error:", e.message))
     }
+
+    // Clean up any remaining instances belonging to this merchant
+    const merchantPrefix = merchant.id.slice(0, 8)
+    try {
+      const allRes = await fetch(`${EVOLUTION_API_URL}/instance/fetchInstances`, { headers }).catch(() => null)
+      if (allRes && allRes.ok) {
+        const allInstances = await allRes.json().catch(() => [])
+        if (Array.isArray(allInstances)) {
+          for (const inst of allInstances) {
+            if (inst?.name && (inst.name.includes(`_${merchantPrefix}_`) || inst.name.endsWith(`_${merchantPrefix}`))) {
+              console.log(`[WhatsApp Disconnect] Purging orphan instance "${inst.name}"`)
+              await fetch(`${EVOLUTION_API_URL}/instance/logout/${inst.name}`, { method: "DELETE", headers }).catch(() => null)
+              await fetch(`${EVOLUTION_API_URL}/instance/delete/${inst.name}`, { method: "DELETE", headers }).catch(() => null)
+            }
+          }
+        }
+      }
+    } catch {}
 
     // 3. Update the database to remove the connection
     await db.merchant.update({

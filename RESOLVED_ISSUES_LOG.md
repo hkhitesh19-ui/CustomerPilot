@@ -3,6 +3,27 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [18 Oct 2026] Issue: WhatsApp Auto-Reply Failure for Cake Connection VIP Club Stamps & UI False-Connected State
+- **Symptom**: When a customer scanned Cake Connection's standee/card QR code and clicked "Digital Loyalty Stamps" on the Smart Digital Business Card (`/c/cake-connection`), WhatsApp opened with the prefilled message `"Hi Cake Connection! Checking in for my VIP Club stamps 🎁"`. Upon sending this message to `+917203824012`, no automated reply was received from CustomerPilot. Meanwhile, the merchant dashboard (`/dashboard/settings` Section 05) deceptively showed "Connected / WhatsApp Linked & Operational", hiding the fact that WhatsApp was completely unlinked. Additionally, Evolution API on VPS (`187.127.170.36:8080`) was blocked by UFW firewall, preventing direct external browser access to Evolution Manager.
+- **Root Cause**:
+  1. **Disconnected Baileys WhatsApp Socket (401 Unauthorized)**: In Evolution API Docker container on VPS (`187.127.170.36`), Cake Connection's instance `CP_917203824012_cmtymavf_mvasn5eo` was in status `close` with disconnection code 401 (logged out / unlinked from WhatsApp mobile app since 16 Oct 2026). Because the Baileys socket was closed, Evolution API could not receive incoming WhatsApp messages or fire the webhook to CustomerPilot.
+  2. **Database Instance Name Desync**: In CustomerPilot's SQLite database (`dev.db`), Cake Connection's `whatsappInstanceName` was pointing to a non-existent historical instance (`CP_919033304707_cmtymavf_mulhiixb`), returning 404 in Evolution API lookups.
+  3. **UI False-Positive Bug in `whatsapp-verification.tsx`**: In `src/components/whatsapp-verification.tsx`, the component blindly set `setIsVerified(true)` on mount solely if `data?.merchant?.whatsappPhone` was present in the DB, without ever querying `/api/whatsapp/status` to check if the underlying Evolution API socket was actually alive.
+  4. **UFW Firewall Blocking Port 8080**: The Hostinger VPS UFW firewall only allowed ports 22, 80, and 443, dropping incoming traffic on port 8080 and making `http://187.127.170.36:8080/manager` unreachable from external browsers.
+  5. **Hardcoded Fallback Phone in Digital Card**: In `src/components/digital-card-view.tsx`, the VIP loyalty button link fell back to a hardcoded `"917203824012"` instead of dynamically resolving `card.phoneNumber || card.merchant?.whatsappPhone`.
+- **Resolution**:
+  1. **Firewall Unlocked**: Executed `ufw allow 8080/tcp` on the VPS, granting full public browser access to Evolution API Manager at `http://187.127.170.36:8080/manager/`.
+  2. **Live Socket Health Verification on Mount (`src/components/whatsapp-verification.tsx`)**: Upgraded component to query `/api/whatsapp/status` on initial load. If the socket is `close`/disconnected, it dynamically renders a warning banner (`"WhatsApp Disconnected: Your WhatsApp session for +{phone} is currently unlinked. Click below to generate a fresh QR code and scan to reconnect."`) and displays a 1-click `"Reconnect WhatsApp (+{phone})"` button.
+  3. **Stale/Zombie Instance Purging Engine (`src/app/api/whatsapp/connect/route.ts` & `src/app/api/whatsapp/disconnect/route.ts`)**: Added automatic purging of all stale or aborted instances matching the merchant prefix (`_${mId}_`) before creating new sessions, eliminating orphan Baileys instances.
+  4. **Webhook Disconnect Handler (`src/app/api/webhook/evolution/route.ts`)**: Added `state === "close"` handler to automatically clear disconnected instance references from the database upon socket termination.
+  5. **Dynamic WhatsApp Fallback (`src/components/digital-card-view.tsx` & `src/app/c/[slug]/page.tsx`)**: Replaced hardcoded fallback numbers with dynamic resolution from `card.whatsappNumber || card.merchant?.whatsappPhone || card.phoneNumber || "919033304707"`.
+  6. **Live VPS Deployment & Playwright Ground-Truth Verification**: Deployed all updated files to production VPS, rebuilt Next.js bundle (`code 0`), reloaded PM2 `customerpilot-web`, and visually verified via Playwright:
+     - Evolution API Manager loads with HTTP 200 at `http://187.127.170.36:8080/manager/`.
+     - Cake Connection settings correctly shows `[Not Connected]` with Reconnect banner.
+     - Clicking "Reconnect WhatsApp" generates and displays a fresh live high-res QR code with 10-minute session countdown.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [17 Oct 2026] Issue: Cloudflare Error 522 Origin Timeout & GitHub Push Protection Secret Detection
 - **Symptom**:
   1. Visiting `customerpilot.in/super-admin?tab=merchants` showed Cloudflare "Connection timed out" (Error code 522).

@@ -159,6 +159,26 @@ async function handleConnect(req: Request) {
       await fetch(`${EVOLUTION_API_URL}/instance/delete/${currentInstanceName}`, { method: "DELETE", headers }).catch(() => null)
     }
 
+    // Clean up any other orphan / dead instances for this merchant from Evolution API
+    const merchantPrefix = merchant.id.slice(0, 8)
+    try {
+      const allRes = await fetch(`${EVOLUTION_API_URL}/instance/fetchInstances`, { headers }).catch(() => null)
+      if (allRes && allRes.ok) {
+        const allInstances = await allRes.json().catch(() => [])
+        if (Array.isArray(allInstances)) {
+          for (const inst of allInstances) {
+            if (inst?.name && (inst.name.includes(`_${merchantPrefix}_`) || inst.name.endsWith(`_${merchantPrefix}`))) {
+              console.log(`[WhatsApp Connect] Purging stale/orphan instance "${inst.name}" for merchant ${merchantPrefix}`)
+              await fetch(`${EVOLUTION_API_URL}/instance/logout/${inst.name}`, { method: "DELETE", headers }).catch(() => null)
+              await fetch(`${EVOLUTION_API_URL}/instance/delete/${inst.name}`, { method: "DELETE", headers }).catch(() => null)
+            }
+          }
+        }
+      }
+    } catch (e: any) {
+      console.warn("[WhatsApp Connect] Orphan cleanup warning:", e.message)
+    }
+
     if (isPairing && !cleanPhone) {
       return NextResponse.json({ ok: false, error: "Please enter a valid 10-digit WhatsApp phone number to generate a pairing code." }, { status: 400 })
     }

@@ -645,7 +645,7 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
             <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
               {/* Button 1: Digital Loyalty Stamp (WhatsApp Emerald Theme) */}
               <a
-                href={`https://wa.me/${(card.whatsappNumber || "917203824012").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi ${card.displayName}! Checking in for my VIP Club stamps 🎁`)}`}
+                href={`https://wa.me/${(card.whatsappNumber || card.phoneNumber || "919033304707").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi ${card.displayName}! Checking in for my VIP Club stamps 🎁`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/40 hover:from-emerald-100 hover:to-white text-slate-900 border-2 border-emerald-300 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group active:scale-[0.98]"

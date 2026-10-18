@@ -527,6 +527,13 @@ export async function POST(req: NextRequest) {
           },
           data: { status: "active" }
         }).catch(() => {})
+      } else if (state === "close" && instanceName) {
+        console.warn(`[Webhook] ⚠️ WhatsApp connection closed for ${instanceName}`)
+        // Clean up disconnected instance reference so UI and APIs immediately reflect disconnected state
+        await db.merchant.updateMany({
+          where: { whatsappInstanceName: instanceName },
+          data: { whatsappInstanceName: null }
+        }).catch(() => {})
       }
     }
 
