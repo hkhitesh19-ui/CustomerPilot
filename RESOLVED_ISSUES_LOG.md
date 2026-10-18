@@ -3,6 +3,33 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [18 Oct 2026] Issue: Automated Customer Referral Detection via Phone Number & Zero-Effort Merchant First-Bill Dual Stamp Engine
+- **Symptom**:
+  1. When a new customer (Customer B) visits the merchant store for the first time after being referred by an existing customer (Customer A), there was no clear automated mechanism linking Customer B to Customer A without friction.
+  2. Merchants/cashiers did not know what they needed to do at the billing counter to verify and credit the referral bonus stamps to both parties.
+- **Root Cause**:
+  1. Previously, `joinQueue` in `src/lib/queue-engine.ts` only registered new customer profiles without checking `db.referral` for pending invites matching the incoming customer's phone number (`friendPhone`).
+  2. In `src/app/api/rewards/award/route.ts`, when a cashier awarded stamps for the customer's first bill, referral status was not automatically queried or processed within the atomic transaction.
+- **Resolution**:
+  1. **Automatic Phone Matching on Counter QR Scan (`src/lib/queue-engine.ts`)**:
+     - When Customer B scans the counter QR code, `joinQueue` automatically searches `db.referral` for `{ merchantId, friendPhone: phone, status: 'pending' }`.
+     - Automatically sets `customer.referredById = pendingReferral.referrerId`, `acquisitionChan = 'referral'`, and links `pendingReferral.friendCustomerId = customer.id`.
+  2. **Automated Dual-Stamp Award on First Bill (`src/app/api/rewards/award/route.ts`)**:
+     - Inside the cashier's bill award transaction, if `isFirstVisit` is true (`visitNumber === 1 || totalCustomerCards === 0`), the engine queries the pending referral by phone, customer ID, or optional cashier referral code.
+     - Atomically burns the referral (`status: 'approved'`), preventing duplicate awards.
+     - Automatically credits `+1 Welcome Bonus Stamp` to Customer B's active stamp card and `+1 Referral Bonus Stamp` to Customer A's active stamp card.
+     - Automatically fires WhatsApp celebration notifications:
+       - To Referrer (Customer A): *"🎉 Great news [Name]! Your friend [Friend] just completed their first purchase at [Merchant]! +1 Referral Bonus Stamp has been added to your VIP Card!"*
+       - To Friend (Customer B): Included in bill confirmation breakdown (`1 Purchase + 1 Referral Welcome 🎁`).
+  3. **Zero-Effort Merchant Flow with Optional Counter Code (`src/components/dashboard/RewardModal.tsx`)**:
+     - The merchant simply approves the bill in the Live Queue as usual—**zero extra work required**.
+     - An optional `Friend Referral Code` input field is provided in the cashier modal as a fallback if Customer B brings an invite code directly.
+  4. **Live VPS Production Deployment & Health Verification**:
+     - Deployed modified files to VPS (`187.127.170.36`), executed clean Next.js build, synced standalone assets, and reloaded PM2 `customerpilot-web`.
+     - Live curl health check returned HTTP 200.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [18 Oct 2026] Issue: Referral System Single-Use Anti-Abuse Lock & Pure Loyalty Stamps Alignment
 - **Symptom**:
   1. In the customer's live Digital Wallet (`/q/wallet/[customerId]`), the "Refer a Friend" card displayed an outdated `+₹50 / Bonus` badge instead of the pure loyalty stamp bonus (`+1 Bonus Stamp`), and the WhatsApp sharing link lacked the customer's unique referral code.

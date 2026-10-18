@@ -19,6 +19,7 @@ interface RewardModalProps {
 export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merchantId = "", stampValue }: RewardModalProps) {
   const [amount, setAmount] = useState('');
   const [productName, setProductName] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
   const [error, setError] = useState('');
@@ -34,6 +35,7 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
   const handleClose = () => {
     setAmount('');
     setProductName('');
+    setReferralCode('');
     setError('');
     setUpsellInfo(null);
     setResult(null);
@@ -68,6 +70,7 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
           waitingCustomerId: waitingCustomer.id,
           amount: finalAmount,
           productName: productName.trim() || undefined,
+          referralCode: referralCode.trim() || undefined,
           forceProceed
         }),
       });
@@ -253,6 +256,32 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
                   className="h-12 bg-slate-900 border border-slate-700 text-slate-100 text-lg font-semibold placeholder:text-slate-500 rounded-xl px-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
+
+              {/* Optional Friend Referral Code (First-Time Customers) */}
+              {!isReturningVIP && (
+                <div className="space-y-1.5 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="referralCode" className="text-slate-300 text-xs font-semibold flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                      Friend Referral Code <span className="text-[11px] text-slate-500 font-normal">(Optional)</span>
+                    </Label>
+                    <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                      +1 Stamp to Both
+                    </span>
+                  </div>
+                  <Input
+                    id="referralCode"
+                    type="text"
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                    placeholder="e.g. CP-A9X2 (if friend referred)"
+                    className="h-10 bg-slate-950 border border-slate-700 text-slate-100 placeholder:text-slate-500 rounded-lg px-3 text-xs uppercase font-mono tracking-wider focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  />
+                  <p className="text-[10px] text-slate-400">
+                    If customer was invited by phone, system awards stamps automatically!
+                  </p>
+                </div>
+              )}
 
               {/* Real-Time Smart Upsell Indicator while typing */}
               {realTimeShortfall > 0 && (
