@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : a27f54d
-Full Commit Hash  : a27f54d20a08199e74d50aa21bf1f46d79fce76e
-Target Fix Commit : a27f54d20a08199e74d50aa21bf1f46d79fce76e
+Active Git Commit : e2e2f7b
+Full Commit Hash  : e2e2f7b7032d983c2da02e1b30db4eedbc225ba4
+Target Fix Commit : e2e2f7b7032d983c2da02e1b30db4eedbc225ba4
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 19 Oct 2026, 09:44 AM IST
+Deployment Date   : 19 Oct 2026, 11:45 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(settings): bifurcate section cards, enlarge headlines with unified brand logo color #0284c7, and turn active switches green
+Commit Title      : feat(settings+queue): add branded squircle badges and live referral attribution alert
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -28,6 +28,7 @@ Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in 
 ----------------------------------------------------------
 
 Deployment History Log:
+- 19 Oct 2026, 11:45 AM IST: Commit e2e2f7b deployed to VPS 187.127.170.36 (Branded squircle icon badges across Settings & Setup cards, and real-time Referral Attribution Alert in Live Queue and RewardModal). Built and PM2 reloaded, verified live via Playwright.
 - 19 Oct 2026, 09:44 AM IST: Commit a27f54d deployed to VPS 187.127.170.36 (Settings page visual bifurcation into elevated cards, enlarged headlines in unified brand logo color #0284c7, and vibrant emerald green active switches & status pills). Live HTTP 200 verified.
 - 19 Oct 2026, 12:28 AM IST: Commit 280f510 deployed to VPS 187.127.170.36 (Instagram Story Mention reward with 3 interactive radio cards & 2-line Hinglish guidance). Live HTTP 200 verified.
 ----------------------------------------------------------
