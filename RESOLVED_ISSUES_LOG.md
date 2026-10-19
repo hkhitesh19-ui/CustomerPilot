@@ -3,6 +3,29 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [19 Oct 2026] Feature & Math Alignment: Live ROI Calculator Aligned with Audited Spec (Live ROI Calculator 2)
+- **Symptom**: The `/roi-calculator` page previously used default inputs (₹2,249 fee, 30 walk-ins, 5 stamps, no Instagram story tags calculation, aggressive repeat multipliers) that did not match the latest audited mathematical model, the new ₹3,499/year plan tier, and compliance guidelines regarding Google Reviews.
+- **Root Cause**: `src/components/roi-calculator-client.tsx` was built with earlier prototype defaults and was missing the Instagram Story Tags acquisition module, bonus stamp cost deductions, and audited disclaimer copy from `CustomerPilot — Live ROI Calculator2.md`.
+- **Resolution**:
+  1. **Audited Default Parameters Aligned**:
+     - Fee: ₹3,499/year
+     - Walk-ins: 35 customers/day (30 days/month = 1,050 walk-ins/month)
+     - Average Bill: ₹350
+     - Current Repeat Rate: 45% (Recovery rate: 20%)
+     - Stamps Needed: 15 Stamps (Reward menu MRP: ₹250, Food/inventory cost: 50%)
+     - Google Reviews: 1.2% (~12.6/month = 150/year)
+     - Referral Engine: 10% loyal customers refer 1 friend
+  2. **Instagram Story Tags Engine Added**:
+     - Added `storyTags` (15 tags/month default) and conversion modeling (`instaNewYear`, `instaSalesYear`).
+     - Added Instagram Story Tags interactive section with slider, outcome tiles, and toggle in the financial waterfall.
+     - Added bonus stamp cost deduction (`− Bonus stamp cost`) into the Waterfall model.
+  3. **Compliance & Realistic Copy Alignment**:
+     - Aligned all copy and disclaimers with `CustomerPilot — Live ROI Calculator2.md`: *"Please don't incentivise reviews with rewards"*, *"This is not net profit — rent, salaries, electricity, GST, payment charges and wastage are not included"*, and *"Illustrative projection — based on the numbers you entered. No sales are guaranteed"*.
+  4. **Build Verification**:
+     - Verified with `npm run build` Turbopack compilation passing with zero errors (Exit Code 0).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [19 Oct 2026] UI/UX & Rules Config: 15 Stamps Goal Default & Reordered Instagram Story Mention Above Next Level Kickstart Bonus
 - **Symptom**:
   1. Default stamp goal for loyalty reward cards needed to be set to 15 stamps instead of 10 stamps.

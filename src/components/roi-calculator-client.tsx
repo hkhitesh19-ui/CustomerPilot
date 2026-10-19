@@ -8,30 +8,44 @@ import { BrandLogo } from "@/components/brand-logo"
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 interface CalcValues {
-  cpd: number    // customers / day
-  days: number   // days / month
-  bill: number   // average bill ₹
-  cur: number    // current repeat %
-  rec: number    // % who return (recovery rate)
-  stamps: number // stamps needed
-  rew: number    // reward menu value ₹
-  food: number   // food cost %
-  fee: number    // CustomerPilot fee / year
-  g: number      // extra customers from Google %
-  ref: number    // % loyal customers who refer
-  per: number    // new customers each referrer brings
+  cpd: number    // customers / day (e.g. 35)
+  days: number   // days / month (e.g. 30)
+  bill: number   // average bill ₹ (e.g. 350)
+  cur: number    // current repeat % (e.g. 45)
+  rec: number    // % who return (recovery rate, e.g. 20)
+  stamps: number // stamps needed (e.g. 15)
+  rew: number    // reward menu value ₹ (e.g. 250)
+  food: number   // food cost % (e.g. 50)
+  fee: number    // CustomerPilot fee / year (e.g. 3499)
+  g: number      // extra customers from Google % (e.g. 1.25)
+  ref: number    // % loyal customers who refer (e.g. 10)
+  per: number    // new customers each referrer brings (e.g. 1)
+  storyTags: number // story tags / month (e.g. 15)
+  storyReach: number // followers who convert to customer per tag (e.g. 0.75)
 }
 
 interface CalcFlags {
   ref: boolean
   g: boolean
+  insta: boolean
 }
 
-// ─── Defaults (Matching Original Reference Specification) ───────────────────
+// ─── Defaults (Conservative & Realistic Spec from Live ROI Calculator 2) ─────
 const DEFAULTS: CalcValues = {
-  cpd: 30, days: 30, bill: 300, cur: 50, rec: 30,
-  stamps: 5, rew: 200, food: 50, fee: 2249,
-  g: 3.5, ref: 10, per: 4,
+  cpd: 35,
+  days: 30,
+  bill: 350,
+  cur: 45,
+  rec: 20,
+  stamps: 15,
+  rew: 250,
+  food: 50,
+  fee: 3499,
+  g: 1.2,          // ~12.6 customers/month (~150/year)
+  ref: 10,         // 10% loyal customers refer
+  per: 1,          // 1 new customer per referrer
+  storyTags: 15,   // 15 story tags / month
+  storyReach: 0.75 // ~11 new customers/month (~135/year)
 }
 
 // ─── Number Format Helpers ───────────────────────────────────────────────────
@@ -118,7 +132,7 @@ function Tile({ value, label, variant = "default" }: { value: string; label: str
 // ─── Waterfall Row ───────────────────────────────────────────────────────────
 function WaterfallRow({ label, value, barPct, color }: { label: string; value: string; barPct: number; color: string }) {
   return (
-    <div className="grid grid-cols-[115px_1fr_95px] gap-2 items-center my-2 text-xs sm:text-sm">
+    <div className="grid grid-cols-[135px_1fr_95px] gap-2 items-center my-2 text-xs sm:text-sm">
       <span className="text-slate-700 font-medium">{label}</span>
       <div className="bg-slate-100 rounded-lg h-5 sm:h-6 overflow-hidden border border-slate-200/60">
         <div
@@ -199,11 +213,11 @@ function DotGrid({ cur, rate }: { cur: number; rate: number }) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 export function RoiCalculatorClient() {
   const [V, setV] = useState<CalcValues>({ ...DEFAULTS })
-  const [F, setF] = useState<CalcFlags>({ ref: true, g: false })
+  const [F, setF] = useState<CalcFlags>({ ref: true, g: true, insta: false })
 
-  // Derived financial & customer retention modeling
+  // Derived financial & customer retention modeling exactly as per Live ROI Calculator 2 spec
   const calc = useCallback(() => {
-    const { cpd, days, bill, cur, rec, stamps, rew, food, fee, g } = V
+    const { cpd, days, bill, cur, rec, stamps, rew, food, fee, g, storyTags, storyReach } = V
     const st = Math.max(1, stamps)
     const month = cpd * days
     const rep = (month * cur) / 100
@@ -218,19 +232,36 @@ export function RoiCalculatorClient() {
     const ry = rm * 12
     const rf = ry * rew
     const rc = (rf * food) / 100
+
+    // Google Reviews Organic Influx
     const gm = (month * g) / 100
     const gy = gm * 12
     const gs = gy * bill
+
+    // Referral Engine (loyal regulars who refer)
     const lc = recd * 12
     const rr = (lc * V.ref) / 100
     const rn = rr * V.per
     const rs = rn * bill
+    // Referral bonus stamp cost (1 stamp referrer + 1 stamp friend = 2 stamps = (2/stamps) * rew * food%)
+    const refBonusCost = rn > 0 ? rn * ((2 / st) * rew * (food / 100)) : 0
+
+    // Instagram Story Tags Engine
+    const instaNewMonth = storyTags * storyReach
+    const instaNewYear = instaNewMonth * 12
+    const instaSalesYear = instaNewYear * bill
+    // Instagram bonus stamp cost (1 stamp per approved story tag = (1/stamps) * rew * food%)
+    const instaBonusCost = (storyTags * 12) * ((1 / st) * rew * (food / 100))
+
     const refS = F.ref ? rs : 0
     const gS = F.g ? gs : 0
-    const tot = sy + refS + gS
+    const instaS = F.insta ? instaSalesYear : 0
+
+    const tot = sy + refS + gS + instaS
     const fc = (tot * food) / 100
-    const left = tot - fc - rc - fee
-    const nv = vy + (F.ref ? rn : 0) + (F.g ? gy : 0)
+    const bonusCost = (F.ref ? refBonusCost : 0) + (F.insta ? instaBonusCost : 0)
+    const left = tot - fc - rc - bonusCost - fee
+    const nv = vy + (F.ref ? rn : 0) + (F.g ? gy : 0) + (F.insta ? instaNewYear : 0)
     const burden = bill > 0 ? (((rew * food) / 100) / (st * bill)) * 100 : 0
     const roiX = fee > 0 ? Math.max(0, left / fee) : 0
     const mg = bill * (1 - food / 100)
@@ -239,10 +270,12 @@ export function RoiCalculatorClient() {
     return {
       month, rep, non, recd, proj, rate, sm, sy, vy,
       rm, ry, rf, rc, gm, gy, gs, lc, rr, rn, rs,
-      refS, gS, tot, fc, left, nv, burden, roiX, mg, breakEven,
+      storyTags, instaNewYear, instaSalesYear, instaBonusCost, refBonusCost, bonusCost,
+      refS, gS, instaS, tot, fc, left, nv, burden, roiX, mg, breakEven,
       pctRepeat: sy > 0 && tot > 0 ? (sy / tot) * 100 : 0,
       pctRef: refS > 0 && tot > 0 ? (refS / tot) * 100 : 0,
       pctG: gS > 0 && tot > 0 ? (gS / tot) * 100 : 0,
+      pctInsta: instaS > 0 && tot > 0 ? (instaS / tot) * 100 : 0,
     }
   }, [V, F])
 
@@ -254,7 +287,7 @@ export function RoiCalculatorClient() {
 
   const handleReset = () => {
     setV({ ...DEFAULTS })
-    setF({ ref: true, g: false })
+    setF({ ref: true, g: true, insta: false })
   }
 
   const setReferralPreset = (ref: number, per: number) => {
@@ -265,8 +298,8 @@ export function RoiCalculatorClient() {
     {
       label: "🏪 Your Store Traffic & Spend",
       fields: [
-        { id: "cpd", label: "Customers / day", min: 1, max: 300, step: 1, unit: "" },
-        { id: "days", label: "Days / month", min: 1, max: 31, step: 1, unit: "" },
+        { id: "cpd", label: "Walk-in customers / day", min: 1, max: 300, step: 1, unit: "" },
+        { id: "days", label: "Days open / month", min: 1, max: 31, step: 1, unit: "" },
         { id: "bill", label: "Average bill amount", min: 10, max: 3000, step: 10, unit: "₹" },
         { id: "cur", label: "Current repeat customer %", min: 0, max: 100, step: 1, unit: "%" },
       ],
@@ -274,16 +307,17 @@ export function RoiCalculatorClient() {
     {
       label: "🎁 Loyalty Reward Settings",
       fields: [
-        { id: "stamps", label: "Stamps needed for reward", min: 1, max: 20, step: 1, unit: "" },
-        { id: "rew", label: "Reward menu value", min: 10, max: 1500, step: 10, unit: "₹" },
+        { id: "stamps", label: "Stamps needed for reward", min: 1, max: 25, step: 1, unit: "" },
+        { id: "rew", label: "Reward menu value (MRP)", min: 10, max: 1500, step: 10, unit: "₹" },
         { id: "food", label: "Food / inventory cost %", min: 0, max: 100, step: 1, unit: "%" },
       ],
     },
     {
-      label: "💳 CustomerPilot Subscription & Google",
+      label: "💳 Plan & Marketing Triggers",
       fields: [
-        { id: "fee", label: "CustomerPilot annual fee", min: 0, max: 20000, step: 50, unit: "₹" },
-        { id: "g", label: "Extra customers from Google %", min: 0, max: 15, step: 0.5, unit: "%" },
+        { id: "fee", label: "CustomerPilot annual plan fee", min: 0, max: 20000, step: 50, unit: "₹" },
+        { id: "g", label: "Google Reviews new customer %", min: 0, max: 10, step: 0.1, unit: "%" },
+        { id: "storyTags", label: "Instagram story tags / month", min: 0, max: 100, step: 1, unit: "" },
       ],
     },
   ]
@@ -297,7 +331,7 @@ export function RoiCalculatorClient() {
         <div className="absolute top-[800px] -left-20 w-[450px] h-[450px] bg-indigo-500/10 rounded-full blur-[140px]" />
       </div>
 
-      {/* ── Sticky Top Navigation (Matching Homepage Theme) ───────────────── */}
+      {/* ── Sticky Top Navigation ────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           <Link href="/" className="no-underline flex items-center">
@@ -325,8 +359,7 @@ export function RoiCalculatorClient() {
       <main className="w-full flex-1 relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-20">
 
         {/* ================================================================= */}
-        {/* [USER REQUIREMENT 1]: SECTION KO SAB SE UPAR TOP ME LELO          */}
-        {/* "your cost vs your opportunity" HERO COMPARISON BLOCK             */}
+        {/* HERO COMPARISON BLOCK: YOUR COST VS YOUR OPPORTUNITY               */}
         {/* ================================================================= */}
         <section className="mb-6">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-emerald-950 text-white p-6 sm:p-10 shadow-xl border border-slate-800">
@@ -379,7 +412,7 @@ export function RoiCalculatorClient() {
                 </div>
               </div>
 
-              {/* Dynamic Break-even Statement (as requested by user) */}
+              {/* Dynamic Break-even Statement (Audited & Realistic) */}
               <div id="roi-breakeven-banner" className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 my-5 text-xs sm:text-sm text-slate-200 leading-relaxed max-w-2xl mx-auto">
                 {V.fee > 0 && R.mg > 0 && R.breakEven > 0 ? (
                   <>
@@ -412,14 +445,14 @@ export function RoiCalculatorClient() {
                   Extra visits: <strong className="text-white">{n0(R.nv)} / year</strong>
                 </span>
                 <span className="bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 rounded-full px-3.5 py-1.5 font-bold backdrop-blur-xs">
-                  Net Profit Opportunity: ~{lk(R.left)} / year
+                  Extra Profit Opportunity: ~{lk(R.left)} / year
                 </span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ── Sticky Mini Summary Bar (Homepage theme) ─────────────────────── */}
+        {/* ── Sticky Mini Summary Bar ──────────────────────────────────────── */}
         <div className="sticky top-16 sm:top-20 z-40 grid grid-cols-3 gap-2 sm:gap-3 py-3 bg-slate-50/80 backdrop-blur-md">
           {[
             { label: "Repeat Rate", value: pc(R.rate), color: "text-indigo-600" },
@@ -441,7 +474,7 @@ export function RoiCalculatorClient() {
         {/* ── Two-Column Layout (Controls + Live Results) ──────────────────── */}
         <div className="lg:grid lg:grid-cols-[360px_1fr] lg:gap-6 lg:items-start mt-4 space-y-5 lg:space-y-0">
 
-          {/* ════ LEFT COLUMN: Controls & Sliders (Homepage Theme) ═══════════ */}
+          {/* ════ LEFT COLUMN: Controls & Sliders ════════════════════════════ */}
           <aside className="lg:sticky lg:top-36 space-y-4">
 
             {/* Target Recovery Win-back Hero Card */}
@@ -509,13 +542,13 @@ export function RoiCalculatorClient() {
               ))}
 
               <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
-                <span>Calculated monthly walk-ins:</span>
-                <span className="font-bold text-slate-900">{n0(R.month)} customers</span>
+                <span>Monthly customers:</span>
+                <span className="font-bold text-slate-900">{n0(R.month)}</span>
               </div>
             </div>
           </aside>
 
-          {/* ════ RIGHT COLUMN: Output Breakdown Cards (Homepage Theme) ═════ */}
+          {/* ════ RIGHT COLUMN: Output Breakdown Cards ═══════════════════════ */}
           <main className="space-y-5">
 
             {/* Section 1: Repeat Customers Visualizer */}
@@ -526,10 +559,10 @@ export function RoiCalculatorClient() {
                 </div>
                 <div>
                   <h2 className="text-base sm:text-lg font-black text-slate-900">
-                    Repeat Customers Growth
+                    Repeat Customers
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Earlier <strong>{pc(V.cur)}</strong> returned ➔ now <strong>{pc(R.rate)}</strong> will return
+                    Earlier returned <strong>{pc(V.cur)}</strong> → now will return <strong>{pc(R.rate)}</strong>
                   </p>
                 </div>
               </div>
@@ -577,7 +610,7 @@ export function RoiCalculatorClient() {
                     Extra Sales from Repeat Visits
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Recovered customers × your store&apos;s average bill (₹{V.bill})
+                    Recovered customers × your average bill (₹{V.bill})
                   </p>
                 </div>
               </div>
@@ -590,7 +623,7 @@ export function RoiCalculatorClient() {
               </div>
             </section>
 
-            {/* Section 3: Cost of Rewards (Real Food Cost, Not Menu Value) */}
+            {/* Section 3: Cost of Rewards */}
             <section className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs">
               <div className="flex items-center gap-2.5 mb-1">
                 <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
@@ -598,23 +631,23 @@ export function RoiCalculatorClient() {
                 </div>
                 <div>
                   <h2 className="text-base sm:text-lg font-black text-slate-900">
-                    Actual Cost of Loyalty Rewards
+                    Cost of Rewards
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Calculated on your actual cost price ({V.food}%), not MRP
+                    Not menu value — your actual food cost ({V.food}%)
                   </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-4">
-                <Tile value={n0(R.rm)} label="rewards claimed / month" />
-                <Tile value={n0(R.ry)} label="rewards claimed / year" />
+                <Tile value={n0(R.rm)} label="rewards / month" />
+                <Tile value={n0(R.ry)} label="rewards / year" />
                 <Tile value={lk(R.rf)} label="menu value / year" />
-                <Tile value={lk(R.rc)} label="actual cost to you / year" variant="warn" />
+                <Tile value={lk(R.rc)} label="actual food cost / year" variant="warn" />
               </div>
 
               <div className="mt-3.5 bg-amber-50/70 border border-amber-200/80 rounded-2xl p-3 text-xs text-amber-900 leading-relaxed">
-                <strong>Reward Burden: {pc(R.burden)}</strong> — Only this small percentage of purchase value is consumed by the reward across the customer cycle.
+                <strong>Reward burden: {pc(R.burden)}</strong> — this share of value goes to the reward on every purchase cycle.
               </div>
             </section>
 
@@ -626,15 +659,15 @@ export function RoiCalculatorClient() {
                 </div>
                 <div>
                   <h2 className="text-base sm:text-lg font-black text-slate-900">
-                    Total Sales &amp; Savings Waterfall
+                    Total Sales and Savings
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Full financial breakdown including referrals and reviews
+                    Detailed financial waterfall deducting costs &amp; rewards
                   </p>
                 </div>
               </div>
 
-              {/* Toggles */}
+              {/* Toggles (Matching Live ROI Calculator 2 spec) */}
               <div className="flex flex-wrap gap-4 text-xs font-semibold text-slate-700 my-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -643,7 +676,7 @@ export function RoiCalculatorClient() {
                     onChange={e => setF(p => ({ ...p, ref: e.target.checked }))}
                     className="accent-emerald-600 w-4 h-4 rounded-sm"
                   />
-                  Include referral revenue
+                  Include referral sales
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -652,7 +685,16 @@ export function RoiCalculatorClient() {
                     onChange={e => setF(p => ({ ...p, g: e.target.checked }))}
                     className="accent-emerald-600 w-4 h-4 rounded-sm"
                   />
-                  Include Google Reviews revenue
+                  Include Google sales
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={F.insta}
+                    onChange={e => setF(p => ({ ...p, insta: e.target.checked }))}
+                    className="accent-emerald-600 w-4 h-4 rounded-sm"
+                  />
+                  Include Instagram sales
                 </label>
               </div>
 
@@ -661,11 +703,13 @@ export function RoiCalculatorClient() {
                 <div className="h-full transition-all duration-300" style={{ width: `${R.pctRepeat}%`, background: "#4f46e5" }} />
                 <div className="h-full transition-all duration-300" style={{ width: `${R.pctRef}%`, background: "#10b981" }} />
                 <div className="h-full transition-all duration-300" style={{ width: `${R.pctG}%`, background: "#f59e0b" }} />
+                <div className="h-full transition-all duration-300" style={{ width: `${R.pctInsta}%`, background: "#ec4899" }} />
               </div>
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-4 font-medium">
                 <span><i className="inline-block w-2.5 h-2.5 rounded-xs bg-indigo-600 mr-1" />Repeat: <strong>{pc(R.pctRepeat)}</strong></span>
                 <span><i className="inline-block w-2.5 h-2.5 rounded-xs bg-emerald-500 mr-1" />Referral: <strong>{pc(R.pctRef)}</strong></span>
                 <span><i className="inline-block w-2.5 h-2.5 rounded-xs bg-amber-500 mr-1" />Google: <strong>{pc(R.pctG)}</strong></span>
+                <span><i className="inline-block w-2.5 h-2.5 rounded-xs bg-pink-500 mr-1" />Instagram: <strong>{pc(R.pctInsta)}</strong></span>
               </div>
 
               {/* Waterfall rows */}
@@ -673,18 +717,20 @@ export function RoiCalculatorClient() {
                 <WaterfallRow label="Repeat sales" value={lk(R.sy)} barPct={R.tot > 0 ? (R.sy / R.tot) * 100 : 0} color="#4f46e5" />
                 <WaterfallRow label="+ Referral sales" value={lk(R.refS)} barPct={R.tot > 0 ? (R.refS / R.tot) * 100 : 0} color="#10b981" />
                 <WaterfallRow label="+ Google sales" value={lk(R.gS)} barPct={R.tot > 0 ? (R.gS / R.tot) * 100 : 0} color="#f59e0b" />
+                <WaterfallRow label="+ Instagram sales" value={lk(R.instaS)} barPct={R.tot > 0 ? (R.instaS / R.tot) * 100 : 0} color="#ec4899" />
                 <div className="border-t border-dashed border-slate-300 pt-2 my-1">
                   <WaterfallRow label="= Total sales" value={lk(R.tot)} barPct={100} color="#0f766e" />
                 </div>
                 <WaterfallRow label="− Food cost" value={lk(R.fc)} barPct={R.tot > 0 ? (R.fc / R.tot) * 100 : 0} color="#ea580c" />
                 <WaterfallRow label="− Reward cost" value={lk(R.rc)} barPct={R.tot > 0 ? (R.rc / R.tot) * 100 : 0} color="#ca8a04" />
+                <WaterfallRow label="− Bonus stamp cost" value={lk(R.bonusCost)} barPct={R.tot > 0 ? (R.bonusCost / R.tot) * 100 : 0} color="#d97706" />
                 <WaterfallRow label="− CustomerPilot" value={inr(V.fee)} barPct={R.tot > 0 ? (V.fee / R.tot) * 100 : 0} color="#dc2626" />
               </div>
 
               {/* Extra Profit Opportunity Highlight */}
               <div className="mt-5 bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-500 rounded-2xl p-5 text-center shadow-xs">
                 <p className="text-xs sm:text-sm font-bold text-slate-700">
-                  = Extra Profit Opportunity using CustomerPilot ({inr(V.fee)}/year fee)
+                  = Extra Profit Opportunity using CustomerPilot /year
                 </p>
                 <div
                   className="text-3xl sm:text-4xl font-black my-2 transition-colors"
@@ -699,7 +745,7 @@ export function RoiCalculatorClient() {
                 )}
               </div>
               <p className="mt-2 text-[11px] text-slate-400 text-center">
-                *Note: Illustrative projection. Rent, staff salaries, electricity, GST and wastage are excluded.
+                This is not net profit — rent, salaries, electricity, GST, payment charges and wastage are not included.
               </p>
             </section>
 
@@ -714,7 +760,7 @@ export function RoiCalculatorClient() {
                     New Customers from Google Reviews
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Higher star rating on Google Maps = more organic walk-ins
+                    Better, more reviews = more visibility on Google
                   </p>
                 </div>
               </div>
@@ -726,7 +772,7 @@ export function RoiCalculatorClient() {
               </div>
 
               <div className="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600">
-                Repeat + Google total opportunity: <strong className="text-slate-900">{lk(R.sy + R.gs)}</strong> / year (may overlap).
+                Repeat + Google total opportunity: <strong className="text-slate-900">{lk(R.sy + R.gs)}</strong> / year (may overlap). Track referrals separately.
               </div>
             </section>
 
@@ -738,10 +784,10 @@ export function RoiCalculatorClient() {
                 </div>
                 <div>
                   <h2 className="text-base sm:text-lg font-black text-slate-900">
-                    Referrals: Loyal Customers ➔ New Friends
+                    Referrals: Loyal Customers → New Customers
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Recovered regulars × % who refer × friends each referrer brings
+                    Loyal customers recovered × % who refer × new customers each referrer brings
                   </p>
                 </div>
               </div>
@@ -766,7 +812,7 @@ export function RoiCalculatorClient() {
 
               <SliderRow
                 id="ref"
-                label="% of loyal customers who refer friends"
+                label="% of loyal customers who refer"
                 min={0}
                 max={100}
                 step={1}
@@ -776,7 +822,7 @@ export function RoiCalculatorClient() {
               />
               <SliderRow
                 id="per"
-                label="New customers each referrer brings (per 365 days)"
+                label="New customers each referrer brings"
                 min={0}
                 max={10}
                 step={0.5}
@@ -786,14 +832,63 @@ export function RoiCalculatorClient() {
               />
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3">
-                <Tile value={n0(R.lc)} label="loyal regulars / year" />
+                <Tile value={n0(R.lc)} label="loyal customers / year" />
                 <Tile value={n0(R.rr)} label="customers who refer" />
                 <Tile value={n0(R.rn)} label="new customers / year" variant="good" />
-                <Tile value={lk(R.rs)} label="referral revenue / year" variant="good" />
+                <Tile value={lk(R.rs)} label="potential sales / year (1 visit)" variant="good" />
+              </div>
+
+              <div className="mt-3.5 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 leading-relaxed">
+                On average, each loyal customer brings ~<strong className="text-slate-900 font-bold">{((R.rn / Math.max(1, R.lc))).toFixed(2)}</strong> new customer (over 365 days).
+                <br />
+                Referral bonus-stamp cost (actual food cost): <strong className="text-slate-900 font-bold">{inr(R.refBonusCost)}</strong> / year, deducted in Savings.
+                <br />
+                These referral sales are added into &ldquo;Total sales&rdquo; and &ldquo;Savings&rdquo; above (one new customer = one visit). Turn the toggle off above to avoid double-counting with Google. For real numbers, ask new customers &ldquo;Who referred you?&rdquo;
               </div>
             </section>
 
-            {/* Section 7: Beyond Sales — Intangible Software Benefits */}
+            {/* Section 7: Instagram Story Tags Engine (from Live ROI Calculator 2 spec) */}
+            <section className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="w-8 h-8 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center text-lg">
+                  📸
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-black text-slate-900">
+                    Instagram Story Tags: Customers → New Customers
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Customers who tag your story earn bonus stamps; their followers discover you
+                  </p>
+                </div>
+              </div>
+
+              <div className="my-3">
+                <SliderRow
+                  id="storyTags"
+                  label="Approved story tags / month"
+                  min={0}
+                  max={100}
+                  step={1}
+                  unit=""
+                  value={V.storyTags}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3">
+                <Tile value={n0(V.storyTags)} label="story tags / month" />
+                <Tile value={n0(R.instaNewYear)} label="new customers / year" variant="good" />
+                <Tile value={inr(R.instaBonusCost)} label="bonus stamp cost / year" variant="warn" />
+                <Tile value={lk(R.instaSalesYear)} label="potential sales / year (1 visit)" variant="good" />
+              </div>
+
+              <div className="mt-3.5 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 leading-relaxed">
+                Instagram reach is not tracked by CustomerPilot — treat this as an estimate. Default OFF; turn on the toggle above to include it in Total sales and Savings.
+              </div>
+            </section>
+
+            {/* Section 8: Beyond Sales — Intangible Software Benefits */}
             <section className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs">
               <div className="flex items-center gap-2.5 mb-1">
                 <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg">
@@ -801,22 +896,22 @@ export function RoiCalculatorClient() {
                 </div>
                 <div>
                   <h2 className="text-base sm:text-lg font-black text-slate-900">
-                    Extra Benefits — Beyond Just Direct Sales
+                    Extra Benefits — Beyond Just Sales
                   </h2>
                   <p className="text-xs text-slate-500">
-                    What CustomerPilot handles automatically every single day
+                    Things CustomerPilot does for you behind the scenes, every single day
                   </p>
                 </div>
               </div>
 
               <ul className="space-y-2.5 mt-4">
                 {[
-                  { icon: "🗂️", title: "Automated Customer Database", desc: "Every QR scan saves customer name, visits & spend history — zero manual registers or Excel." },
-                  { icon: "💬", title: "Automated WhatsApp Retention Nudges", desc: "Lapsed customers receive personalized WhatsApp prompts automatically — no staff follow-ups." },
-                  { icon: "⭐", title: "Google Reviews on Autopilot", desc: "Happy customers are prompted to post 5-star Google reviews right when they earn rewards." },
-                  { icon: "📊", title: "Live Real-Time Dashboard", desc: "Track repeat rate, top spenders, and claimed rewards from your mobile phone anytime." },
-                  { icon: "🔒", title: "100% Secure Cloud Backup", desc: "Never lose your customer contacts if a staff member leaves or a phone is lost." },
-                  { icon: "🕒", title: "Zero Billing Counter Delays", desc: "Quick 2-second QR scan — no paper punch card stamping or register lookups." },
+                  { icon: "🗂️", title: "Customer database, built automatically", desc: "Every scan saves name, visits & spend — no manual Excel or register needed." },
+                  { icon: "💬", title: "WhatsApp reminders, sent for you", desc: "Inactive customers get nudged automatically — no staff follow-up required." },
+                  { icon: "⭐", title: "Google reviews, requested on autopilot", desc: "Happy repeat customers are prompted for a review at the right moment." },
+                  { icon: "📊", title: "Live dashboard, always up to date", desc: "See repeat rate, top customers & rewards claimed anytime, on any device." },
+                  { icon: "🔒", title: "Your data, safely backed up", desc: "No risk of a lost register or a staff member's personal phone holding your customer list." },
+                  { icon: "🕒", title: "Time saved for staff", desc: "No manual stamping registers or counting — one scan does it all." },
                 ].map(item => (
                   <li key={item.title} className="flex gap-3 items-start bg-slate-50 border border-slate-100 rounded-2xl p-3.5">
                     <span className="text-xl flex-none">{item.icon}</span>
@@ -832,10 +927,23 @@ export function RoiCalculatorClient() {
             {/* Bottom Final Sign-Up Card */}
             <div className="rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white p-6 sm:p-8 text-center shadow-lg">
               <h3 className="text-xl sm:text-2xl font-black mb-2">
-                Ready to Turn Walk-ins into Regulars?
+                Your Cost vs Your Opportunity
               </h3>
+              <div className="flex justify-center items-center gap-6 my-4">
+                <div>
+                  <div className="text-xs uppercase tracking-wider text-emerald-200">CustomerPilot</div>
+                  <div className="text-2xl sm:text-3xl font-black">{inr(V.fee)}</div>
+                  <div className="text-[11px] text-emerald-200">/ year</div>
+                </div>
+                <div className="text-xl font-black text-emerald-300">vs</div>
+                <div>
+                  <div className="text-xs uppercase tracking-wider text-emerald-200">Potential Extra Sales</div>
+                  <div className="text-2xl sm:text-3xl font-black text-white">{lk(R.tot)}</div>
+                  <div className="text-[11px] text-emerald-200">/ year</div>
+                </div>
+              </div>
               <p className="text-xs sm:text-sm text-emerald-100 max-w-lg mx-auto mb-5 leading-relaxed">
-                Start your 3-day full access trial today. Setup takes under 5 minutes with zero special hardware.
+                Illustrative projection — based on the numbers you entered. No sales are guaranteed. Please don&apos;t incentivise reviews with rewards.
               </p>
               <Button
                 asChild
@@ -843,7 +951,7 @@ export function RoiCalculatorClient() {
                 className="bg-white text-emerald-800 hover:bg-emerald-50 font-black text-sm px-8 py-5 rounded-2xl shadow-md transition-transform hover:scale-105"
               >
                 <Link href="/signup">
-                  Get Started Free Now <ArrowRight className="w-4 h-4 ml-2" />
+                  Start 3-Day Free Trial <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </Button>
             </div>
@@ -852,7 +960,7 @@ export function RoiCalculatorClient() {
         </div>
       </main>
 
-      {/* ── Footer (Matching Master Homepage Theme) ──────────────────────── */}
+      {/* ── Footer ───────────────────────────────────────────────────────── */}
       <footer className="border-t border-slate-200 bg-white py-8 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} CustomerPilot. All rights reserved. Built for Indian Retail Merchants.</p>
