@@ -24,7 +24,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
   const defaultForm = {
     id: "",
     name: "Loyalty Stamp Card",
-    stampsRequired: 10,
+    stampsRequired: 15,
     rewardName: "1 Free Cake",
     stampValue: 300,
     validityDays: 180,
@@ -75,7 +75,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
           setForm({
             id: cardData.id || "",
             name: cardData.name || "Loyalty Stamp Card",
-            stampsRequired: cardData.stampsRequired ?? 10,
+            stampsRequired: cardData.stampsRequired ?? 15,
             rewardName: cardData.rewardName || "FREE 500gm Cake",
             stampValue: cardData.stampValue ?? 300,
             validityDays: cardData.validityDays ?? 180,
@@ -287,12 +287,12 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
               <Input
                 id="stamps-req"
                 type="number"
-                value={form.stampsRequired ?? 10}
+                value={form.stampsRequired ?? 15}
                 onChange={e => setForm({ ...form, stampsRequired: Number(e.target.value) })}
                 className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
                 required
               />
-              <p className="text-[11px] text-muted-foreground">{form.stampsRequired || 10} Stamps needed for 1 {form.rewardName || 'Reward'}</p>
+              <p className="text-[11px] text-muted-foreground">{form.stampsRequired || 15} Stamps needed for 1 {form.rewardName || 'Reward'}</p>
             </div>
 
             <div className="space-y-2">
@@ -347,117 +347,6 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                 className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
               />
               <p className="text-[11px] text-muted-foreground">Extra bonus stamps if they attach a photo with their review</p>
-            </div>
-
-            <div className="col-span-1 md:col-span-2 p-4 sm:p-5 bg-amber-50/50 dark:bg-slate-950/60 border border-amber-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-xs">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-xs shrink-0">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <Label htmlFor="vip-upgrade-bonus" className="font-bold text-sm text-slate-900 dark:text-slate-100">
-                      Next Level Kickstart Bonus Stamps (Level Completion Bonus)
-                    </Label>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Pre-credited stamps when advancing tiers</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${(form.vipUpgradeBonusStamps ?? 0) > 0 ? 'bg-amber-100 dark:bg-emerald-500/10 text-amber-800 dark:text-emerald-400 border-amber-300 dark:border-emerald-500/20' : 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-500/20'}`}>
-                    {(form.vipUpgradeBonusStamps ?? 0) > 0 ? `ACTIVE (+${form.vipUpgradeBonusStamps ?? 0} Stamp on Next Level)` : "DEACTIVATED (0 Stamps)"}
-                  </span>
-                  <Switch
-                    checked={(form.vipUpgradeBonusStamps ?? 0) > 0}
-                    onCheckedChange={(checked) => setForm({ ...form, vipUpgradeBonusStamps: checked ? 2 : 0 })}
-                    className="data-[state=checked]:!bg-emerald-600 dark:data-[state=checked]:!bg-emerald-500"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
-                <div className="sm:col-span-2">
-                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                    Advance bonus stamps pre-credited when a customer completes their previous level/card and unlocks the next loyalty level (e.g. Level 1 complete → Level 2 starts with pre-added bonus stamps).
-                  </p>
-                </div>
-                <div>
-                  <Input
-                    id="vip-upgrade-bonus"
-                    type="number"
-                    min="0"
-                    max="10"
-                    value={form.vipUpgradeBonusStamps ?? 0}
-                    onChange={e => setForm({ ...form, vipUpgradeBonusStamps: Math.max(0, Number(e.target.value)) })}
-                    className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* ── Customer Referral Bonus Rules (Customer A ➔ Friend B) ── */}
-            <div className="col-span-1 md:col-span-2 p-4 sm:p-5 bg-indigo-50/60 dark:bg-slate-950/60 border border-indigo-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-xs">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-xs shrink-0">
-                    <Users className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <Label htmlFor="referral-bonus-switch" className="font-bold text-sm text-slate-900 dark:text-slate-100">
-                      Customer Referral Bonus Rules (Customer A ➔ Friend B)
-                    </Label>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                      Reward both the referring customer and their invited friend with digital loyalty stamps when the friend makes their first qualifying store visit.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 self-start sm:self-auto">
-                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${form.referralBonusEnabled ? 'bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-300 dark:border-indigo-500/20' : 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-500/20'}`}>
-                    {form.referralBonusEnabled ? `ACTIVE (+${form.referralBonusStamps ?? 1} / +${form.referralFriendBonusStamps ?? 1} Stamps)` : "DEACTIVATED"}
-                  </span>
-                  <Switch
-                    id="referral-bonus-switch"
-                    checked={form.referralBonusEnabled}
-                    onCheckedChange={(checked) => setForm({ ...form, referralBonusEnabled: checked })}
-                    className="data-[state=checked]:!bg-emerald-600 dark:data-[state=checked]:!bg-emerald-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                <div className="space-y-1.5">
-                  <Label htmlFor="referral-referrer-stamps" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    Referrer Bonus Stamps
-                  </Label>
-                  <Input
-                    id="referral-referrer-stamps"
-                    type="number"
-                    min="0"
-                    max="10"
-                    disabled={!form.referralBonusEnabled}
-                    value={form.referralBonusStamps ?? 1}
-                    onChange={e => setForm({ ...form, referralBonusStamps: Math.max(0, Number(e.target.value)) })}
-                    className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
-                  />
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Bonus stamps awarded to Customer A (Referrer)</p>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="referral-friend-stamps" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    Friend Welcome Stamps
-                  </Label>
-                  <Input
-                    id="referral-friend-stamps"
-                    type="number"
-                    min="0"
-                    max="10"
-                    disabled={!form.referralBonusEnabled}
-                    value={form.referralFriendBonusStamps ?? 1}
-                    onChange={e => setForm({ ...form, referralFriendBonusStamps: Math.max(0, Number(e.target.value)) })}
-                    className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
-                  />
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Welcome stamps awarded to Friend B on 1st visit</p>
-                </div>
-              </div>
             </div>
 
             {/* ── Instagram Story Mention & Social Tag Reward (@MerchantHandle) ── */}
@@ -650,6 +539,118 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Next Level Kickstart Bonus Stamps (Level Completion Bonus) ── */}
+            <div className="col-span-1 md:col-span-2 p-4 sm:p-5 bg-amber-50/50 dark:bg-slate-950/60 border border-amber-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-xs">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-xs shrink-0">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <Label htmlFor="vip-upgrade-bonus" className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                      Next Level Kickstart Bonus Stamps (Level Completion Bonus)
+                    </Label>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Pre-credited stamps when advancing tiers</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${(form.vipUpgradeBonusStamps ?? 0) > 0 ? 'bg-amber-100 dark:bg-emerald-500/10 text-amber-800 dark:text-emerald-400 border-amber-300 dark:border-emerald-500/20' : 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-500/20'}`}>
+                    {(form.vipUpgradeBonusStamps ?? 0) > 0 ? `ACTIVE (+${form.vipUpgradeBonusStamps ?? 0} Stamp on Next Level)` : "DEACTIVATED (0 Stamps)"}
+                  </span>
+                  <Switch
+                    checked={(form.vipUpgradeBonusStamps ?? 0) > 0}
+                    onCheckedChange={(checked) => setForm({ ...form, vipUpgradeBonusStamps: checked ? 2 : 0 })}
+                    className="data-[state=checked]:!bg-emerald-600 dark:data-[state=checked]:!bg-emerald-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+                <div className="sm:col-span-2">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Advance bonus stamps pre-credited when a customer completes their previous level/card and unlocks the next loyalty level (e.g. Level 1 complete → Level 2 starts with pre-added bonus stamps).
+                  </p>
+                </div>
+                <div>
+                  <Input
+                    id="vip-upgrade-bonus"
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={form.vipUpgradeBonusStamps ?? 0}
+                    onChange={e => setForm({ ...form, vipUpgradeBonusStamps: Math.max(0, Number(e.target.value)) })}
+                    className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* ── Customer Referral Bonus Rules (Customer A ➔ Friend B) ── */}
+            <div className="col-span-1 md:col-span-2 p-4 sm:p-5 bg-indigo-50/60 dark:bg-slate-950/60 border border-indigo-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-xs shrink-0">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <Label htmlFor="referral-bonus-switch" className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                      Customer Referral Bonus Rules (Customer A ➔ Friend B)
+                    </Label>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                      Reward both the referring customer and their invited friend with digital loyalty stamps when the friend makes their first qualifying store visit.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${form.referralBonusEnabled ? 'bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-300 dark:border-indigo-500/20' : 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-500/20'}`}>
+                    {form.referralBonusEnabled ? `ACTIVE (+${form.referralBonusStamps ?? 1} / +${form.referralFriendBonusStamps ?? 1} Stamps)` : "DEACTIVATED"}
+                  </span>
+                  <Switch
+                    id="referral-bonus-switch"
+                    checked={form.referralBonusEnabled}
+                    onCheckedChange={(checked) => setForm({ ...form, referralBonusEnabled: checked })}
+                    className="data-[state=checked]:!bg-emerald-600 dark:data-[state=checked]:!bg-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div className="space-y-1.5">
+                  <Label htmlFor="referral-referrer-stamps" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    Referrer Bonus Stamps
+                  </Label>
+                  <Input
+                    id="referral-referrer-stamps"
+                    type="number"
+                    min="0"
+                    max="10"
+                    disabled={!form.referralBonusEnabled}
+                    value={form.referralBonusStamps ?? 1}
+                    onChange={e => setForm({ ...form, referralBonusStamps: Math.max(0, Number(e.target.value)) })}
+                    className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+                  />
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Bonus stamps awarded to Customer A (Referrer)</p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="referral-friend-stamps" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    Friend Welcome Stamps
+                  </Label>
+                  <Input
+                    id="referral-friend-stamps"
+                    type="number"
+                    min="0"
+                    max="10"
+                    disabled={!form.referralBonusEnabled}
+                    value={form.referralFriendBonusStamps ?? 1}
+                    onChange={e => setForm({ ...form, referralFriendBonusStamps: Math.max(0, Number(e.target.value)) })}
+                    className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+                  />
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Welcome stamps awarded to Friend B on 1st visit</p>
                 </div>
               </div>
             </div>

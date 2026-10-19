@@ -38,7 +38,7 @@ export interface DefaultMerchantSettingsData {
 export const FALLBACK_GLOBAL_DEFAULTS: DefaultMerchantSettingsData = {
   cardName: "VIP Club",
   rewardName: "1 Free Reward / Gift",
-  stampsRequired: 10,
+  stampsRequired: 15,
   stampValue: 300,
   validityDays: 180,
   googleReviewBonus: 1,

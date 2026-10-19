@@ -3,6 +3,25 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [19 Oct 2026] UI/UX & Rules Config: 15 Stamps Goal Default & Reordered Instagram Story Mention Above Next Level Kickstart Bonus
+- **Symptom**:
+  1. Default stamp goal for loyalty reward cards needed to be set to 15 stamps instead of 10 stamps.
+  2. In the "Stamps Reward Card Rules Setup" section, the "Instagram Story Mention & Tag Reward" block was positioned below Next Level and Referral rules, whereas the merchant requested it positioned above "Next Level Kickstart Bonus Stamps".
+- **Root Cause**:
+  1. `stampsRequired` default was 10 in `FALLBACK_GLOBAL_DEFAULTS`, `PRESET_TEMPLATES`, and component fallbacks.
+  2. In `src/components/reward-setup-card.tsx` and `src/components/super-admin/default-merchant-settings-manager.tsx`, the Instagram Story block was ordered after the Next Level Kickstart Bonus and Referral blocks.
+- **Resolution**:
+  1. **Stamp Goal Default (`stampsRequired: 15`)**:
+     - Updated `FALLBACK_GLOBAL_DEFAULTS.stampsRequired` to `15` in `src/lib/default-merchant-settings-types.ts`.
+     - Updated all `PRESET_TEMPLATES` to `15` in `src/components/super-admin/default-merchant-settings-manager.tsx`.
+     - Updated default state and fallbacks in `src/components/reward-setup-card.tsx` to `15`.
+     - Updated local SQLite database `GLOBAL_DEFAULT_MERCHANT_SETTINGS` in `prisma/dev.db` to `stampsRequired: 15`.
+  2. **Reordering Instagram Story Above Next Level**:
+     - Moved the entire Instagram Story Mention block directly above the Next Level Kickstart Bonus block in `src/components/reward-setup-card.tsx`.
+     - Mirrored identical block reordering in `src/components/super-admin/default-merchant-settings-manager.tsx`.
+  3. **Verification**:
+     - Ran Playwright visual snapshot check on live production confirming DOM order and layout harmony.
+- **Status**: ✅ Resolved and Verified.
 ## [19 Oct 2026] Feature & Defaults Alignment: Universal Default Merchant Loyalty Rules Configured Exactly as Reference Spec
 - **Symptom**: New merchants onboarded or registered across the system required manual setup of their loyalty stamp cards, referral rules, and Instagram story bonus settings to match the standardized best-practice configuration shown in the settings screenshot.
 - **Root Cause**: While individual pieces of default configuration existed in `FALLBACK_GLOBAL_DEFAULTS` and `industryLoyaltyRules`, slight fallback disparities (such as `joiningBonusStamps` fallback in UI or `vipUpgradeBonusStamps` toggle default) existed in component state initializers, and registration/fast-track routes needed 100% strict adherence to the exact reference rules:
