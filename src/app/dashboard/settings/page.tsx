@@ -138,50 +138,58 @@ export default function SettingsPage() {
   if (isLoading || !merchant) return <div className="p-8 animate-pulse text-muted-foreground">Loading settings...</div>
 
   return (
-    <div className="space-y-8 w-full max-w-5xl mx-auto relative pb-16">
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-500/5 via-transparent to-transparent dark:from-indigo-900/20 dark:via-slate-950 dark:to-slate-950 -z-10 pointer-events-none" />
+    <div className="space-y-10 sm:space-y-12 w-full max-w-5xl mx-auto relative pb-16">
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-sky-500/5 via-transparent to-transparent dark:from-sky-950/20 dark:via-slate-950 dark:to-slate-950 -z-10 pointer-events-none" />
       
       {/* ─── Header ───────────────────────────────────────────────────── */}
-      <div className="pb-1">
-        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+      <div className="space-y-1.5 border-b border-slate-200 dark:border-slate-800 pb-5">
+        <div className="flex items-center gap-2 text-xs font-bold text-[#0284c7] dark:text-[#38bdf8] uppercase tracking-wider">
+          <span>Merchant Control Center</span>
+          <span>•</span>
+          <span>All-In-One Store Settings</span>
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 dark:text-slate-100">
           Settings &amp; Configuration
         </h1>
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+          Manage your counter standees, Google review AI automations, business details, loyalty stamp rules, WhatsApp device linking, and timers.
+        </p>
       </div>
 
-      {/* ─── Mobile Quick-Jump Anchor Bar ───────────────────────────────── */}
+      {/* ─── Quick-Jump Anchor Bar ───────────────────────────────────────── */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-slate-200 dark:border-slate-800/80 -mx-1 px-1">
         <a 
           href="#sec-vip-qr" 
-          className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/40 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+          className="whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
         >
-          <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-1.5 py-0.2 rounded">01</span>
+          <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-1.5 py-0.5 rounded">01</span>
           <span>Standee Studio</span>
         </a>
 
         {isReviewsEnabled && (
           <a 
             href="#sec-google-reviews" 
-            className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-amber-500/40 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+            className="whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
           >
-            <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded">02</span>
+            <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-1.5 py-0.5 rounded">02</span>
             <span>Google Reviews</span>
           </a>
         )}
 
         <a 
           href="#sec-business" 
-          className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+          className="whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
         >
-          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded">03</span>
+          <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-1.5 py-0.5 rounded">03</span>
           <span>Business Info</span>
         </a>
 
         {isLoyaltyEnabled && (
           <a 
             href="#sec-reward-setup" 
-            className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/40 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+            className="whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
           >
-            <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-1.5 py-0.2 rounded">04</span>
+            <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-1.5 py-0.5 rounded">04</span>
             <span>Reward Setup</span>
           </a>
         )}
@@ -189,26 +197,26 @@ export default function SettingsPage() {
         {isLoyaltyEnabled && (
           <a 
             href="#sec-whatsapp-conn" 
-            className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+            className="whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
           >
-            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded">05</span>
+            <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-1.5 py-0.5 rounded">05</span>
             <span>WhatsApp Connection</span>
           </a>
         )}
 
         <a 
           href="#sec-automations" 
-          className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-violet-500/40 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+          className="whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
         >
-          <span className="text-[10px] font-bold text-violet-600 dark:text-violet-400 bg-violet-500/10 px-1.5 py-0.2 rounded">06</span>
+          <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-1.5 py-0.5 rounded">06</span>
           <span>Timers &amp; Templates</span>
         </a>
 
         <a 
           href="#sec-guides" 
-          className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-600 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+          className="whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
         >
-          <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.2 rounded">07</span>
+          <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-1.5 py-0.5 rounded">07</span>
           <span>Operations Manual</span>
         </a>
       </div>
@@ -216,25 +224,35 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 1: COUNTER QR STANDEE STUDIO                              */}
       {/* ══════════════════════════════════════════════════════════════════ */}
-      <section id="sec-vip-qr" className="space-y-3 pt-2">
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-          <div className="flex items-center gap-2.5">
-            <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">
-              01
-            </span>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2.5 tracking-tight">
-              <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
-                <QrCode className="w-6 h-6" />
+      <section 
+        id="sec-vip-qr" 
+        className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-5">
+          <div className="flex items-center gap-3.5">
+            <div className="p-3 rounded-2xl bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30 shadow-xs shrink-0">
+              <QrCode className="w-7 h-7 sm:w-8 sm:h-8" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black px-2.5 py-0.5 rounded-lg bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30">
+                  SECTION 01
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  Bespoke Standee Studio
+                </span>
               </div>
-              Counter QR Standee Studio
-            </h2>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#0284c7] dark:text-[#38bdf8] tracking-tight mt-1">
+                Counter QR Standee Studio
+              </h2>
+            </div>
           </div>
-          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden md:inline max-w-xs text-right">
             Bespoke Standees: Google Reviews, Digital Card &amp; VIP Loyalty
           </span>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
+        <div className="pt-1">
           <QRGenerator merchantId={merchant?.id || ""} />
         </div>
       </section>
@@ -243,31 +261,41 @@ export default function SettingsPage() {
       {/* SECTION 2: SMART AI GOOGLE REVIEWS                                */}
       {/* ══════════════════════════════════════════════════════════════════ */}
       {isReviewsEnabled && (
-        <section id="sec-google-reviews" className="space-y-4 pt-4">
-          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-            <div className="flex items-center gap-2.5">
-              <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
-                02
-              </span>
-              <h2 className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 flex items-center gap-2.5 tracking-tight">
-                <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                  <Star className="w-6 h-6 fill-amber-500" />
+        <section 
+          id="sec-google-reviews" 
+          className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-5">
+            <div className="flex items-center gap-3.5">
+              <div className="p-3 rounded-2xl bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30 shadow-xs shrink-0">
+                <Star className="w-7 h-7 sm:w-8 sm:h-8 fill-[#0284c7]/20" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black px-2.5 py-0.5 rounded-lg bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30">
+                    SECTION 02
+                  </span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    Google Business &amp; Review QR
+                  </span>
                 </div>
-                Smart Ai Google Reviews
-              </h2>
+                <h2 className="text-2xl sm:text-3xl font-black text-[#0284c7] dark:text-[#38bdf8] tracking-tight mt-1">
+                  Smart AI Google Reviews
+                </h2>
+              </div>
             </div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden md:inline max-w-xs text-right">
               Google Business Profile &amp; Review QR Codes
             </span>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-6 pt-1">
             {/* 2A: Smart AI Reviews QR Code & Posters */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 p-4 sm:p-5 shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-xs font-black text-amber-600 dark:text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-md">STEP A</span>
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Smart Ai Google Reviews</h3>
+                  <span className="text-xs font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-2.5 py-0.5 rounded-md border border-[#0284c7]/20">STEP A</span>
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Smart AI Review QR Code &amp; Posters</h3>
                 </div>
               </div>
               <GoogleReviewQRGenerator 
@@ -278,10 +306,10 @@ export default function SettingsPage() {
             </div>
 
             {/* 2B: Google Business Profile 1-Click Connect (with Merged Review Prompt Timers) */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 p-4 sm:p-5 shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-xs font-black text-amber-600 dark:text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-md">STEP B</span>
+                  <span className="text-xs font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-2.5 py-0.5 rounded-md border border-[#0284c7]/20">STEP B</span>
                   <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Google Business Profile Integration</h3>
                 </div>
               </div>
@@ -294,141 +322,149 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 3: BUSINESS PROFILE & STORE DETAILS                        */}
       {/* ══════════════════════════════════════════════════════════════════ */}
-      <section id="sec-business" className="space-y-3 pt-4">
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-          <div className="flex items-center gap-2.5">
-            <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-              03
-            </span>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2.5 tracking-tight">
-              <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                <Store className="w-6 h-6" />
+      <section 
+        id="sec-business" 
+        className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-5">
+          <div className="flex items-center gap-3.5">
+            <div className="p-3 rounded-2xl bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30 shadow-xs shrink-0">
+              <Store className="w-7 h-7 sm:w-8 sm:h-8" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black px-2.5 py-0.5 rounded-lg bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30">
+                  SECTION 03
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  Store Profile &amp; Category
+                </span>
               </div>
-              Business Information
-            </h2>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#0284c7] dark:text-[#38bdf8] tracking-tight mt-1">
+                Business Information
+              </h2>
+            </div>
           </div>
-          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
-            Store Name, Owner &amp; Business Category
-          </span>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {saveStatus === "saved" && (
+              <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <CheckCircle2 className="w-4 h-4"/> Saved
+              </span>
+            )}
+            <Button 
+              onClick={handleSave} 
+              disabled={isSaving} 
+              className="bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs"
+            >
+              {isSaving ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
         </div>
 
-        <Card className="bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800/80 backdrop-blur-xl shadow-sm dark:shadow-xl rounded-2xl overflow-hidden">
-          <CardHeader className="bg-slate-50/80 dark:bg-slate-900/40 border-b border-slate-200 dark:border-slate-800/60 pb-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <CardTitle className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Business Information</CardTitle>
-                <CardDescription className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                  Your store name, owner details, and business category printed on QR Codes.
-                </CardDescription>
-              </div>
-              <div className="flex items-center gap-2">
-                {saveStatus === "saved" && (
-                  <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4"/> Saved
-                  </span>
-                )}
-                <Button 
-                  onClick={handleSave} 
-                  disabled={isSaving} 
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm"
-                >
-                  {isSaving ? "Saving..." : "Save Changes"}
-                </Button>
-              </div>
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 p-4 sm:p-5 shadow-xs space-y-4">
+          <p className="text-xs text-slate-600 dark:text-slate-400">
+            Your store name, owner details, and business category printed on QR Codes and customer digital cards.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <Store className="w-3.5 h-3.5 text-[#0284c7] dark:text-[#38bdf8]"/> Business Name <span className="text-rose-500 font-bold">*</span>
+              </Label>
+              <Input 
+                value={formData.name} 
+                onChange={(e) => handleChange("name", e.target.value)}
+                placeholder="E.g., Cake Connection"
+                required
+                className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+              />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4 pt-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  <Store className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400"/> Business Name <span className="text-rose-500 font-bold">*</span>
-                </Label>
-                <Input 
-                  value={formData.name} 
-                  onChange={(e) => handleChange("name", e.target.value)}
-                  placeholder="E.g., Cake Connection"
-                  required
-                  className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
-                />
-              </div>
-              
-              <div className="space-y-1.5">
-                <Label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  <User className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400"/> Owner Name
-                </Label>
-                <Input 
-                  value={formData.ownerName} 
-                  onChange={(e) => handleChange("ownerName", e.target.value)}
-                  placeholder="E.g., Kiyaaan"
-                  className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  <Tag className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400"/> Business Type <span className="text-rose-500 font-bold">*</span>
-                </Label>
-                <Select value={formData.businessType?.toUpperCase() || ""} onValueChange={(v) => handleChange("businessType", v)}>
-                  <SelectTrigger className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm">
-                    <SelectValue placeholder="Select business type" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100">
-                    <SelectItem value="BAKERY">Bakery 🥐</SelectItem>
-                    <SelectItem value="RESTAURANT">Restaurant / Cafe ☕</SelectItem>
-                    <SelectItem value="RETAIL">Retail Store 🛍️</SelectItem>
-                    <SelectItem value="SALON">Salon / Spa 💇</SelectItem>
-                    <SelectItem value="GYM">Gym / Fitness 💪</SelectItem>
-                    <SelectItem value="CLINIC">Clinic 🏥</SelectItem>
-                    <SelectItem value="OTHER">Other Local Retail 📦</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  <Globe className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400"/> Category / Cuisine <span className="text-rose-500 font-bold">*</span>
-                </Label>
-                <Input 
-                  value={formData.category} 
-                  onChange={(e) => handleChange("category", e.target.value)}
-                  placeholder="E.g., Fresh Cakes, Italian Cuisine, Barber Shop"
-                  required
-                  className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
-                />
-              </div>
+            
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <User className="w-3.5 h-3.5 text-[#0284c7] dark:text-[#38bdf8]"/> Owner Name
+              </Label>
+              <Input 
+                value={formData.ownerName} 
+                onChange={(e) => handleChange("ownerName", e.target.value)}
+                placeholder="E.g., Kiyaaan"
+                className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+              />
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <Tag className="w-3.5 h-3.5 text-[#0284c7] dark:text-[#38bdf8]"/> Business Type <span className="text-rose-500 font-bold">*</span>
+              </Label>
+              <Select value={formData.businessType?.toUpperCase() || ""} onValueChange={(v) => handleChange("businessType", v)}>
+                <SelectTrigger className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm">
+                  <SelectValue placeholder="Select business type" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100">
+                  <SelectItem value="BAKERY">Bakery 🥐</SelectItem>
+                  <SelectItem value="RESTAURANT">Restaurant / Cafe ☕</SelectItem>
+                  <SelectItem value="RETAIL">Retail Store 🛍️</SelectItem>
+                  <SelectItem value="SALON">Salon / Spa 💇</SelectItem>
+                  <SelectItem value="GYM">Gym / Fitness 💪</SelectItem>
+                  <SelectItem value="CLINIC">Clinic 🏥</SelectItem>
+                  <SelectItem value="OTHER">Other Local Retail 📦</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <Globe className="w-3.5 h-3.5 text-[#0284c7] dark:text-[#38bdf8]"/> Category / Cuisine <span className="text-rose-500 font-bold">*</span>
+              </Label>
+              <Input 
+                value={formData.category} 
+                onChange={(e) => handleChange("category", e.target.value)}
+                placeholder="E.g., Fresh Cakes, Italian Cuisine, Barber Shop"
+                required
+                className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
+              />
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 4: REWARD CARD SETUP & LOYALTY LEVELS                      */}
       {/* ══════════════════════════════════════════════════════════════════ */}
       {isLoyaltyEnabled && (
-        <section id="sec-reward-setup" className="space-y-4 pt-4">
-          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-            <div className="flex items-center gap-2.5">
-              <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">
-                04
-              </span>
-              <h2 className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 flex items-center gap-2.5 tracking-tight">
-                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
-                  <Gift className="w-6 h-6" />
+        <section 
+          id="sec-reward-setup" 
+          className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-5">
+            <div className="flex items-center gap-3.5">
+              <div className="p-3 rounded-2xl bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30 shadow-xs shrink-0">
+                <Gift className="w-7 h-7 sm:w-8 sm:h-8" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black px-2.5 py-0.5 rounded-lg bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30">
+                    SECTION 04
+                  </span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    Stamps, Bonuses &amp; Tiers
+                  </span>
                 </div>
-                Stamps Reward Card Rules Setup
-              </h2>
+                <h2 className="text-2xl sm:text-3xl font-black text-[#0284c7] dark:text-[#38bdf8] tracking-tight mt-1">
+                  Stamps Reward Card Rules Setup
+                </h2>
+              </div>
             </div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
-              Digital Stamp Rules, Joining Bonus &amp; 10 Loyalty Levels
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden md:inline max-w-xs text-right">
+              Digital Stamp Rules, Joining Bonus, Referrals &amp; 10 Loyalty Levels
             </span>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-6 pt-1">
             {/* 4A: Stamps Reward Card Rules Setup */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 p-4 sm:p-5 shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-xs font-black text-indigo-600 dark:text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded-md">STEP A</span>
+                  <span className="text-xs font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-2.5 py-0.5 rounded-md border border-[#0284c7]/20">STEP A</span>
                   <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Stamps Reward Card Rules Setup</h3>
                 </div>
               </div>
@@ -436,10 +472,10 @@ export default function SettingsPage() {
             </div>
 
             {/* 4B: Loyalty Cycle Categories (10 Levels) */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 p-4 sm:p-5 shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-xs font-black text-indigo-600 dark:text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded-md">STEP B</span>
+                  <span className="text-xs font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-2.5 py-0.5 rounded-md border border-[#0284c7]/20">STEP B</span>
                   <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Loyalty Cycle Categories (10 Levels)</h3>
                 </div>
               </div>
@@ -453,32 +489,42 @@ export default function SettingsPage() {
       {/* SECTION 5: YOUR BUSINESS WHATSAPP CONNECTION                       */}
       {/* ══════════════════════════════════════════════════════════════════ */}
       {isLoyaltyEnabled && (
-        <section id="sec-whatsapp-conn" className="space-y-4 pt-4">
-          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-            <div className="flex items-center gap-2.5">
-              <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                05
-              </span>
-              <h2 className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2.5 tracking-tight">
-                <div className="p-2 rounded-xl bg-emerald-500/10 text-[#25D366] border border-emerald-500/20">
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    viewBox="0 0 24 24" 
-                    className="w-6 h-6 text-[#25D366]"
-                    fill="currentColor"
-                  >
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                  </svg>
+        <section 
+          id="sec-whatsapp-conn" 
+          className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-5">
+            <div className="flex items-center gap-3.5">
+              <div className="p-3 rounded-2xl bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30 shadow-xs shrink-0">
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24" 
+                  className="w-7 h-7 sm:w-8 sm:h-8"
+                  fill="currentColor"
+                >
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black px-2.5 py-0.5 rounded-lg bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30">
+                    SECTION 05
+                  </span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    Store WhatsApp Device
+                  </span>
                 </div>
-                Your Business WhatsApp Connection
-              </h2>
+                <h2 className="text-2xl sm:text-3xl font-black text-[#0284c7] dark:text-[#38bdf8] tracking-tight mt-1">
+                  Your Business WhatsApp Connection
+                </h2>
+              </div>
             </div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
-              Store WhatsApp Device Linking &amp; Live Status
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden md:inline max-w-xs text-right">
+              Device QR Pairing, Instance Linking &amp; Live Server Status
             </span>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
+          <div className="pt-1">
             <WhatsAppVerification merchantId={merchant?.id || ""} />
           </div>
         </section>
@@ -487,30 +533,40 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 6: AUTOMATION TIMERS & MESSAGE TEMPLATES                   */}
       {/* ══════════════════════════════════════════════════════════════════ */}
-      <section id="sec-automations" className="space-y-4 pt-4">
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-          <div className="flex items-center gap-2.5">
-            <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-500/30">
-              06
-            </span>
-            <h2 className="text-xl sm:text-2xl font-black text-violet-600 dark:text-violet-400 flex items-center gap-2.5 tracking-tight">
-              <div className="p-2 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20">
-                <Clock className="w-6 h-6" />
+      <section 
+        id="sec-automations" 
+        className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-5">
+          <div className="flex items-center gap-3.5">
+            <div className="p-3 rounded-2xl bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30 shadow-xs shrink-0">
+              <Clock className="w-7 h-7 sm:w-8 sm:h-8" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black px-2.5 py-0.5 rounded-lg bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30">
+                  SECTION 06
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  Win-Back &amp; Message Journeys
+                </span>
               </div>
-              Custom Automation Timers &amp; Reminder Days
-            </h2>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#0284c7] dark:text-[#38bdf8] tracking-tight mt-1">
+                Custom Automation Timers &amp; Reminder Days
+              </h2>
+            </div>
           </div>
-          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
-            Day 30, 60, 90 Win-Backs &amp; Auto-Replies
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden md:inline max-w-xs text-right">
+            Day 30, 60, 90 Win-Backs &amp; Automated WhatsApp Journey Templates
           </span>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6 pt-1">
           {/* 6A: Win-Back & Retention Timers */}
-          <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 p-4 sm:p-5 shadow-xs space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
               <div className="flex items-center gap-2.5">
-                <span className="text-xs font-black text-violet-600 dark:text-violet-300 bg-violet-500/10 px-2 py-0.5 rounded-md">STEP A</span>
+                <span className="text-xs font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-2.5 py-0.5 rounded-md border border-[#0284c7]/20">STEP A</span>
                 <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Custom Automation Timers &amp; Reminder Days</h3>
               </div>
             </div>
@@ -518,10 +574,10 @@ export default function SettingsPage() {
           </div>
 
           {/* 6B: Message Templates */}
-          <div className="rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 p-4 sm:p-5 shadow-sm dark:shadow-lg space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/60 pb-2">
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 p-4 sm:p-5 shadow-xs space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
               <div className="flex items-center gap-2.5">
-                <span className="text-xs font-black text-violet-600 dark:text-violet-300 bg-violet-500/10 px-2 py-0.5 rounded-md">STEP B</span>
+                <span className="text-xs font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-2.5 py-0.5 rounded-md border border-[#0284c7]/20">STEP B</span>
                 <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Automated WhatsApp Journey Templates</h3>
               </div>
             </div>
@@ -533,40 +589,52 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 7: OPERATIONS MANUAL                                      */}
       {/* ══════════════════════════════════════════════════════════════════ */}
-      <section id="sec-guides" className="space-y-4 pt-4">
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
-          <div className="flex items-center gap-2.5">
-            <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-700/40 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
-              07
-            </span>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2.5 tracking-tight">
-              <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-                <BookOpen className="w-6 h-6" />
+      <section 
+        id="sec-guides" 
+        className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-5">
+          <div className="flex items-center gap-3.5">
+            <div className="p-3 rounded-2xl bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30 shadow-xs shrink-0">
+              <BookOpen className="w-7 h-7 sm:w-8 sm:h-8" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black px-2.5 py-0.5 rounded-lg bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#38bdf8] border border-[#0284c7]/30">
+                  SECTION 07
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  Staff Guides &amp; SOPs
+                </span>
               </div>
-              Staff &amp; Operations Manual
-            </h2>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#0284c7] dark:text-[#38bdf8] tracking-tight mt-1">
+                Staff &amp; Operations Manual
+              </h2>
+            </div>
           </div>
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden md:inline max-w-xs text-right">
+            Staff training, cashier SOPs, and daily check-in workflows
+          </span>
         </div>
 
-        <div className="max-w-xl">
-          {/* Operations Manual Card */}
+        <div className="max-w-xl pt-1">
           <Link 
             href="/guide/operations"
-            className="group block p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900 hover:border-indigo-500/40 transition-all duration-200 shadow-sm dark:shadow-lg relative overflow-hidden"
+            className="group block p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 hover:bg-white dark:hover:bg-slate-900 hover:border-[#0284c7]/50 transition-all duration-200 shadow-xs relative overflow-hidden"
           >
             <div className="flex items-start justify-between">
               <div className="space-y-1.5">
-                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-[#0284c7]/10 border border-[#0284c7]/20 text-[#0284c7] dark:text-[#38bdf8] flex items-center justify-center">
                   <BookOpen className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors pt-1">
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-[#0284c7] dark:group-hover:text-[#38bdf8] transition-colors pt-1">
                   Operations Manual
                 </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                   Complete staff cashier guide, daily check-in workflows, and step-by-step simulations.
                 </p>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-1 transition-all mt-1" />
+              <ArrowRight className="w-4 h-4 text-slate-400 dark:text-slate-500 group-hover:text-[#0284c7] dark:group-hover:text-[#38bdf8] group-hover:translate-x-1 transition-all mt-1" />
             </div>
           </Link>
         </div>

@@ -3,6 +3,31 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [19 Oct 2026] UI/UX Redesign: Settings Page Visual Bifurcation, Bigger Unified Brand Logo Color Headlines & Emerald Active Reward Switches
+- **Symptom**: 
+  1. The Instagram Story Mention switch and status badge in Settings were rendered in black and pink instead of vibrant green when active.
+  2. The 7 main configuration sections on `/dashboard/settings` lacked clear visual boundaries/bifurcation, feeling like a cramped continuous wall of form inputs.
+  3. The main section headlines were relatively small and rendered in inconsistent patchwork colors (indigo, amber, emerald, violet, slate) rather than the unified CustomerPilot logo brand color.
+- **Root Cause**:
+  1. In `src/components/reward-setup-card.tsx`, Radix/Shadcn `Switch` defaulted to standard `bg-primary` (dark slate/black) without an emerald state override, and the status badge was using pink classes.
+  2. In `src/app/dashboard/settings/page.tsx`, section containers lacked elevated card boundaries and unified spacing, and headings lacked consistent typography and brand color tokens.
+- **Resolution**:
+  1. **Green Active Switches & Badges (`src/components/reward-setup-card.tsx`)**:
+     - Added `data-[state=checked]:!bg-emerald-600 dark:data-[state=checked]:!bg-emerald-500` to the Instagram Story toggle and all loyalty reward switches.
+     - Updated the Instagram status badge to emerald green: `bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700`.
+  2. **High-Elevation Section Bifurcation (`src/app/dashboard/settings/page.tsx`)**:
+     - Wrapped each of the 7 sections (01 Standee Studio, 02 Google Reviews, 03 Business Info, 04 Reward Setup, 05 WhatsApp Connection, 06 Timers & Templates, 07 Operations Manual) into distinct elevated container cards with `rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md space-y-6`.
+     - Increased inter-section page breathing room to `space-y-10 sm:space-y-12`.
+  3. **Unified Logo Brand Color & Bigger Typography**:
+     - Scaled all 7 section headlines to `text-2xl sm:text-3xl font-black tracking-tight`.
+     - Standardized all 7 headlines and section badges to the CustomerPilot logo brand color `#0284c7` (`text-[#0284c7] dark:text-[#38bdf8]`, `bg-[#0284c7]/10 border-[#0284c7]/30`).
+     - Upgraded the mobile quick-jump anchor bar to match `#0284c7` brand pills.
+  4. **Playwright Visual Verification & VPS Deployment**:
+     - Deployed modified files to live Hostinger VPS (`187.127.170.36`), compiled standalone Next.js build (`exit code 0`), synced static assets, and reloaded PM2 `customerpilot-web`.
+     - Captured Playwright screenshots on live production (`customerpilot.in/dashboard/settings`) confirming the green switch and unified section bifurcation.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [19 Oct 2026] Feature & Architecture: Instagram Story Mention & Social Tag Bonus Rules in Stamps Reward Card Setup
 - **Symptom**: Merchants had no way to configure social loyalty triggers (specifically awarding bonus stamps when customers post photos of their orders on Instagram Stories tagging the merchant handle e.g. `@CakeConnection.in`) directly from their Settings page under "Stamps Reward Card Rules Setup".
 - **Root Cause**: The Card Setup API (`/api/cards/setup`) and frontend component (`src/components/reward-setup-card.tsx`) only supported standard purchase stamps, joining bonus, Google review bonus, photo bonus, and friend referrals, without customizable Instagram story reward rules and cadence frequencies.

@@ -211,6 +211,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                   <Switch
                     checked={form.joiningBonusEnabled}
                     onCheckedChange={(checked) => setForm({ ...form, joiningBonusEnabled: checked })}
+                    className="data-[state=checked]:!bg-emerald-600 dark:data-[state=checked]:!bg-emerald-500"
                   />
                 </div>
               </div>
@@ -358,6 +359,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                   <Switch
                     checked={(form.vipUpgradeBonusStamps ?? 0) > 0}
                     onCheckedChange={(checked) => setForm({ ...form, vipUpgradeBonusStamps: checked ? 1 : 0 })}
+                    className="data-[state=checked]:!bg-emerald-600 dark:data-[state=checked]:!bg-emerald-500"
                   />
                 </div>
               </div>
@@ -404,6 +406,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                     id="referral-bonus-switch"
                     checked={form.referralBonusEnabled}
                     onCheckedChange={(checked) => setForm({ ...form, referralBonusEnabled: checked })}
+                    className="data-[state=checked]:!bg-emerald-600 dark:data-[state=checked]:!bg-emerald-500"
                   />
                 </div>
               </div>
@@ -465,13 +468,14 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                   </div>
                 </div>
                 <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0">
-                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${form.instagramStoryBonusEnabled ? 'bg-pink-100 dark:bg-pink-500/10 text-pink-700 dark:text-pink-400 border-pink-300 dark:border-pink-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'}`}>
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full border transition-all ${form.instagramStoryBonusEnabled ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700 shadow-xs' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'}`}>
                     {form.instagramStoryBonusEnabled ? `ACTIVE (+${form.instagramStoryBonusStamps ?? 1} STAMPS)` : "DEACTIVATED"}
                   </span>
                   <Switch
                     id="insta-story-switch"
                     checked={form.instagramStoryBonusEnabled}
                     onCheckedChange={(checked) => setForm({ ...form, instagramStoryBonusEnabled: checked })}
+                    className="data-[state=checked]:!bg-emerald-600 dark:data-[state=checked]:!bg-emerald-500"
                   />
                 </div>
               </div>
