@@ -176,8 +176,8 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-xl sm:text-2xl font-black flex items-center gap-2.5 text-slate-900 dark:text-slate-100 tracking-tight">
-              <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
-                <Gift className="w-5 h-5 text-indigo-500" />
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-xs shrink-0">
+                <Gift className="w-5 h-5" />
               </div>
               Stamps Reward Card Rules Setup
             </CardTitle>
@@ -198,11 +198,16 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
             {/* ── Joining Bonus Stamps moved to TOP ── */}
             <div className="col-span-1 md:col-span-2 p-4 sm:p-5 bg-emerald-50/50 dark:bg-slate-950/60 border border-emerald-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-xs">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  <Label htmlFor="joining-bonus" className="font-bold text-sm text-slate-900 dark:text-slate-100">
-                    Joining Bonus Stamps (First Time Scan)
-                  </Label>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-xs shrink-0">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <Label htmlFor="joining-bonus" className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                      Joining Bonus Stamps (First Time Scan)
+                    </Label>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Welcome gift for new customers</p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${form.joiningBonusEnabled ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/20' : 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-500/20'}`}>
@@ -346,11 +351,16 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
 
             <div className="col-span-1 md:col-span-2 p-4 sm:p-5 bg-amber-50/50 dark:bg-slate-950/60 border border-amber-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-xs">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-500" />
-                  <Label htmlFor="vip-upgrade-bonus" className="font-bold text-sm text-slate-900 dark:text-slate-100">
-                    Next Level Kickstart Bonus Stamps (Level Completion Bonus)
-                  </Label>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-xs shrink-0">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <Label htmlFor="vip-upgrade-bonus" className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                      Next Level Kickstart Bonus Stamps (Level Completion Bonus)
+                    </Label>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Pre-credited stamps when advancing tiers</p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${(form.vipUpgradeBonusStamps ?? 0) > 0 ? 'bg-amber-100 dark:bg-emerald-500/10 text-amber-800 dark:text-emerald-400 border-amber-300 dark:border-emerald-500/20' : 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-500/20'}`}>
@@ -387,8 +397,10 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
             {/* ── Customer Referral Bonus Rules (Customer A ➔ Friend B) ── */}
             <div className="col-span-1 md:col-span-2 p-4 sm:p-5 bg-indigo-50/60 dark:bg-slate-950/60 border border-indigo-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-xs">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-xs shrink-0">
+                    <Users className="w-5 h-5" />
+                  </div>
                   <div>
                     <Label htmlFor="referral-bonus-switch" className="font-bold text-sm text-slate-900 dark:text-slate-100">
                       Customer Referral Bonus Rules (Customer A ➔ Friend B)

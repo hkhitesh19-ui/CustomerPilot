@@ -388,7 +388,18 @@ export async function getQueue(merchantId: string) {
   const waiting = await db.waitingCustomer.findMany({
     where: { merchantId, status: "waiting" },
     orderBy: { scannedAt: "desc" },
-    include: { customer: true },
+    include: { 
+      customer: {
+        include: {
+          referredBy: { select: { id: true, name: true, phone: true } },
+          referralsReceived: {
+            include: {
+              referrer: { select: { id: true, name: true, phone: true } }
+            }
+          }
+        }
+      } 
+    },
   })
 
   const now = new Date()
@@ -409,6 +420,8 @@ export async function getQueue(merchantId: string) {
       status: w.status,
       reservedBy: w.reservedById,
       reservationExpiresAt: w.reservationExpiresAt,
+      customer: w.customer,
+      referrer: (w.customer as any).referredBy || (w.customer as any).referralsReceived?.[0]?.referrer || null,
     }))
 }
 

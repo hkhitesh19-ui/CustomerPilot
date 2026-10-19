@@ -4447,3 +4447,38 @@ ode_modules and .next cache. Switched npm registry to mirror to bypass timeouts.
   6. Captured visual verification snapshot with Playwright asserting the pristine modern SaaS aesthetic, 3D luxury phone chassis, gradient typography, and responsive navigation.
 - **Status**: ✅ Resolved and Verified.
 
+
+
+---
+## [19 Oct 2026] Issue: Branded Squircle Badges across Settings and Live Queue Referral Attribution Alert
+- **Symptom**: 
+  1. Settings page and Reward Setup Card had generic outline icons across sections instead of vibrant branded squircle badges like the Instagram story card.
+  2. When a referred customer scanned the loyalty QR code into the Live Queue, the merchant had no visibility into who referred them, making it impossible to acknowledge the referral or ensure dual-stamp attribution.
+- **Root Cause**:
+  1. Header icons across Section 01 to 07 and cards in `src/app/dashboard/settings/page.tsx` and `src/components/reward-setup-card.tsx` were rendered as simple monochrome Lucide icons without branded squircle backgrounds or official brand SVGs (Google 4-color "G", WhatsApp green).
+  2. The waiting customer queue queries in `src/app/api/state/route.ts` and `src/lib/queue-engine.ts` only loaded basic customer profile details without eagerly fetching the `referredBy` relation or `referralsReceived` relations. Consequently, the merchant queue UI and billing modals lacked referral context.
+- **Resolution**:
+  1. **Branded Squircle Icon System**:
+     - Upgraded all 7 sections and top anchor bar navigation pills in `/dashboard/settings` with authentic gradient squircle badges:
+       - Section 01: Counter QR Standee Studio (Sky-to-Indigo gradient squircle badge + `QrCode` icon).
+       - Section 02: Smart AI Google Reviews (Official 4-color Google "G" SVG logo in white squircle badge + Step 2A/2B mini badges).
+       - Section 03: Business Info (Emerald-to-Teal gradient squircle badge + `Store` icon).
+       - Section 04: Stamps Reward Card Rules Setup (Indigo-Purple-Pink gradient squircle badge + `Gift` icon, plus gradient badges for Joining Bonus `Sparkles`, Next Level Kickstart `Sparkles`, Customer Referrals `Users`, and Instagram Story `Instagram`).
+       - Section 05: Your Business WhatsApp Connection (Official WhatsApp green gradient squircle badge + white WhatsApp SVG icon).
+       - Section 06: Custom Automation Timers (Violet-to-Fuchsia gradient squircle badge + `Clock` icon).
+       - Section 07: Staff & Operations Manual (Amber-to-Orange gradient squircle badge + `BookOpen` icon).
+       - Anchor Bar: Upgraded all 7 quick-jump navigation pills with matching mini squircle badges.
+  2. **Referral Attribution Alert in Live Queue & Reward Modal**:
+     - Enhanced `src/app/api/state/route.ts` and `src/lib/queue-engine.ts` to eagerly load `customer.referredBy` and `customer.referralsReceived.referrer`.
+     - Added prominent top referral alert pill `✨ Referral Alert: Referred Customer Waiting for Bill!` in `/dashboard/queue`.
+     - In both `/dashboard/queue` and the main dashboard Live Queue, styled referred customer cards with an amber glowing border, `🤝 REFERRED` badge next to `WAITING`, and a highlighted alert box: `🤝 REFERRED BY: [Referrer Name] | Referrer: +91 [Referrer Phone]`. Changed button to `🤝 Reward Dual Stamps →`.
+     - In `RewardModal.tsx`, added a prominent amber alert banner explaining that the customer was referred by [Referrer Name] and that awarding stamps will automatically grant the dual-stamp referral bonus, replacing the redundant friend referral code input with an active confirmation pill.
+  3. **Verification**:
+     - Deployed to live VPS (`187.127.170.36`), compiled standalone Next.js bundle with 0 errors, and reloaded PM2.
+     - Ran Playwright automated test assertions on live production capturing 5 verified screenshots:
+       - `verified_live_settings_branded_icons_overview.png`
+       - `verified_live_settings_reward_setup_squircle_badges.png`
+       - `verified_live_settings_whatsapp_conn_badge.png`
+       - `verified_live_queue_referral_alert.png`
+       - `verified_live_reward_modal_referral_alert.png`
+- **Status**: ✅ Resolved and Verified.

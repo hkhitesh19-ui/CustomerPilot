@@ -45,6 +45,8 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
   const parsedAmt = parseFloat(amount) || 0;
   const STAMP_THRESHOLD = stampValue && stampValue > 0 ? stampValue : 300; // Dynamic from merchant setting
   
+  const referrer = waitingCustomer.referrer || waitingCustomer.customer?.referredBy || waitingCustomer.customer?.referralsReceived?.[0]?.referrer || null;
+  
   // Compute shortfall to earn next stamp threshold
   const remainder = parsedAmt % STAMP_THRESHOLD;
   const realTimeShortfall = parsedAmt > 0 && remainder > 0 ? STAMP_THRESHOLD - remainder : (parsedAmt > 0 && parsedAmt < STAMP_THRESHOLD ? STAMP_THRESHOLD - parsedAmt : 0);
@@ -222,6 +224,32 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
                 Enter eligible purchase details for <strong className="text-slate-200">{waitingCustomer.customer?.name}</strong>.
               </DialogDescription>
             </DialogHeader>
+
+            {/* ── Referral Attribution Alert for Merchant ── */}
+            {referrer && (
+              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-orange-500/15 to-amber-500/20 border-2 border-amber-500/50 text-amber-200 flex items-start gap-3 shadow-md shadow-amber-950/40 mt-1">
+                <div className="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 font-bold text-base shadow-sm mt-0.5">
+                  🤝
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950 px-2 py-0.5 rounded font-mono">
+                      Referred Customer Alert
+                    </span>
+                    <span className="text-[11px] font-semibold text-amber-300">
+                      Dual Stamp Reward Active
+                    </span>
+                  </div>
+                  <p className="text-xs font-bold text-white mt-1">
+                    Referred by: <span className="text-amber-300 underline font-extrabold">{referrer.name || 'Friend'}</span>
+                    {referrer.phone ? <span className="text-slate-300 font-mono text-[11px] ml-1.5">({referrer.phone})</span> : null}
+                  </p>
+                  <p className="text-[10px] text-amber-200/80 mt-0.5 leading-relaxed">
+                    Iss customer ko reward stamp milte hi Referrer (<strong className="text-amber-300">{referrer.name}</strong>) ko bhi bonus stamp auto-credit hoga!
+                  </p>
+                </div>
+              </div>
+            )}
             
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Product Name (Optional per Requirements.txt Rules) */}
@@ -257,8 +285,18 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
                 />
               </div>
 
-              {/* Optional Friend Referral Code (First-Time Customers) */}
-              {!isReturningVIP && (
+              {/* Friend Referral Status / Input */}
+              {referrer ? (
+                <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 text-amber-300">
+                    <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span>Referral Linked: <strong className="text-amber-200">{referrer.name}</strong></span>
+                  </div>
+                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
+                    Auto Dual Stamp Ready
+                  </span>
+                </div>
+              ) : !isReturningVIP ? (
                 <div className="space-y-1.5 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="referralCode" className="text-slate-300 text-xs font-semibold flex items-center gap-1.5">
@@ -281,7 +319,7 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
                     If customer was invited by phone, system awards stamps automatically!
                   </p>
                 </div>
-              )}
+              ) : null}
 
               {/* Real-Time Smart Upsell Indicator while typing */}
               {realTimeShortfall > 0 && (

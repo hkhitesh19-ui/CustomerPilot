@@ -89,7 +89,23 @@ export async function GET(req: NextRequest) {
     db.cardRuleChangeLog.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 50 }).catch(() => []),
     db.campaignDeliveryLog.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 50 }).catch(() => []),
     db.ownerOverrideLog.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 50 }).catch(() => []),
-    db.waitingCustomer.findMany({ where: { merchantId: merchant.id, status: 'waiting' }, include: { customer: true }, orderBy: { scannedAt: "desc" }, take: 50 }).catch(() => []),
+    db.waitingCustomer.findMany({ 
+      where: { merchantId: merchant.id, status: 'waiting' }, 
+      include: { 
+        customer: {
+          include: {
+            referredBy: { select: { id: true, name: true, phone: true } },
+            referralsReceived: {
+              include: {
+                referrer: { select: { id: true, name: true, phone: true } }
+              }
+            }
+          }
+        } 
+      }, 
+      orderBy: { scannedAt: "desc" }, 
+      take: 50 
+    }).catch(() => []),
     db.merchantGoogleConnection.findMany({ where: { merchantId: merchant.id } }).catch(() => []),
     db.digitalBusinessCard.findUnique({ where: { merchantId: merchant.id } }).catch(() => null),
   ])
