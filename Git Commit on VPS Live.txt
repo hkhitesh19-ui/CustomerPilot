@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 280f510
-Full Commit Hash  : 280f510c579c2a16bec4ce3c44c6420e4563d8dc
-Target Fix Commit : 280f510c579c2a16bec4ce3c44c6420e4563d8dc
+Active Git Commit : a27f54d
+Full Commit Hash  : a27f54d20a08199e74d50aa21bf1f46d79fce76e
+Target Fix Commit : a27f54d20a08199e74d50aa21bf1f46d79fce76e
 Branch Name       : feature/superanalytics-customers-crm-20260810
-Deployment Date   : 19 Oct 2026, 12:28 AM IST
+Deployment Date   : 19 Oct 2026, 09:44 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(settings): upgrade Instagram story reward with interactive radio cards and 2-line Hinglish guidance
+Commit Title      : feat(settings): bifurcate section cards, enlarge headlines with unified brand logo color #0284c7, and turn active switches green
 Status            : Active & Running Live on New VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -28,6 +28,8 @@ Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in 
 ----------------------------------------------------------
 
 Deployment History Log:
+- 19 Oct 2026, 09:44 AM IST: Commit a27f54d deployed to VPS 187.127.170.36 (Settings page visual bifurcation into elevated cards, enlarged headlines in unified brand logo color #0284c7, and vibrant emerald green active switches & status pills). Live HTTP 200 verified.
+- 19 Oct 2026, 12:28 AM IST: Commit 280f510 deployed to VPS 187.127.170.36 (Instagram Story Mention reward with 3 interactive radio cards & 2-line Hinglish guidance). Live HTTP 200 verified.
 ----------------------------------------------------------
 • [18 Oct 2026, 03:32 PM IST] fix(referrals,defaults): remove referral cash reward and set Cake Connection stamp rules as universal default for new merchants. Deployed to production VPS (187.127.170.36), updated VPS SQLite dev.db, reloaded PM2, and verified live via Playwright.
 • [18 Oct 2026, 01:15 PM IST] Commit a20b108 - fix(wallet,theme,referrals): eliminate wallet activation stamp, dual-theme light mode across dashboard, and integrate customer referral bonus rules in Section 04. Deployed to production VPS (187.127.170.36), reloaded PM2 customerpilot-web, and verified live via Playwright.
