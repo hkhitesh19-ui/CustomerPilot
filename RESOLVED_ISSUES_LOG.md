@@ -3,6 +3,33 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [19 Oct 2026] Feature & Defaults Alignment: Universal Default Merchant Loyalty Rules Configured Exactly as Reference Spec
+- **Symptom**: New merchants onboarded or registered across the system required manual setup of their loyalty stamp cards, referral rules, and Instagram story bonus settings to match the standardized best-practice configuration shown in the settings screenshot.
+- **Root Cause**: While individual pieces of default configuration existed in `FALLBACK_GLOBAL_DEFAULTS` and `industryLoyaltyRules`, slight fallback disparities (such as `joiningBonusStamps` fallback in UI or `vipUpgradeBonusStamps` toggle default) existed in component state initializers, and registration/fast-track routes needed 100% strict adherence to the exact reference rules:
+  - Joining Bonus: Active (+1 Stamp on Join)
+  - Eligible Minimum Purchase: ₹300 (Every ₹300 spent = 1 Stamp)
+  - Stamp Goal: 10 Stamps needed for 1 Reward
+  - Validity: 180 Days
+  - Google Review Bonus: 1 Stamp
+  - Photo Review Bonus: 1 Stamp
+  - Next Level Kickstart Bonus: Active (+2 Stamps on Next Level)
+  - Customer Referral Bonus: Active (+1 Referrer / +1 Friend Welcome Stamp)
+  - Instagram Story Mention: Active (+1 Stamp, Option 1: 1 Stamp Cycle me Sirf 1 Baar / `ONCE_PER_CYCLE`)
+- **Resolution**:
+  1. **Global Types & Server Defaults (`src/lib/default-merchant-settings-types.ts` & `src/lib/onboarding-engine.ts`)**:
+     - Standardized `FALLBACK_GLOBAL_DEFAULTS` to ensure `joiningBonusStamps: 1`, `stampValue: 300`, `stampsRequired: 10`, `validityDays: 180`, `googleReviewBonus: 1`, `photoBonus: 1`, `vipUpgradeBonusStamps: 2`, `referralBonusEnabled: true`, `referralBonusStamps: 1`, `referralFriendBonusStamps: 1`, `instagramStoryBonusEnabled: true`, `instagramStoryBonusStamps: 1`, `instagramStoryFrequency: "ONCE_PER_CYCLE"`.
+     - In `src/lib/onboarding-engine.ts` (`fastStartOnboarding`), auto-provisioned matching `MERCHANT_REFERRAL_RULES_${merchantId}` and `MERCHANT_SOCIAL_REWARD_RULES_${merchantId}` alongside stamp card creation.
+  2. **Merchant Registration & Admin Sync (`src/app/api/auth/register/route.ts` & `src/app/api/admin/default-settings/route.ts`)**:
+     - Fixed `register/route.ts` to inherit `globalDefaults` for referral rules and Instagram story bonus rules during merchant signup.
+     - Updated `admin/default-settings/route.ts` so updates to global defaults propagate across all merchants' referral and Instagram social reward rules.
+  3. **Merchant Settings UI Fallbacks (`src/components/reward-setup-card.tsx` & `src/components/super-admin/default-merchant-settings-manager.tsx`)**:
+     - Aligned all input fallbacks (`joiningBonusStamps: 1`, `stampValue: 300`, `validityDays: 180`, `googleReviewBonus: 1`, `photoBonus: 1`, `vipUpgradeBonusStamps: 2`) so there are zero discrepancies between UI rendering and backend schema.
+  4. **Database Verification**:
+     - Updated SQLite `GLOBAL_DEFAULT_MERCHANT_SETTINGS` in `prisma/dev.db`.
+     - Executed Playwright browser verification snapshotting `/dashboard/settings` confirming identical layout and exact rule values.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [19 Oct 2026] UI/UX Redesign: Settings Page Visual Bifurcation, Bigger Unified Brand Logo Color Headlines & Emerald Active Reward Switches
 - **Symptom**: 
   1. The Instagram Story Mention switch and status badge in Settings were rendered in black and pink instead of vibrant green when active.

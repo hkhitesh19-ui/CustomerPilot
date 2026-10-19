@@ -63,6 +63,45 @@ export async function fastStartOnboarding(merchantId: string, businessType: stri
         active: true,
       },
     })
+
+    // Initialize merchant vipUpgradeBonusStamps to 2
+    await db.merchant.update({
+      where: { id: merchantId },
+      data: { vipUpgradeBonusStamps: 2 }
+    }).catch(() => {})
+
+    // Initialize default referral stamp rules
+    await db.systemContent.upsert({
+      where: { key: `MERCHANT_REFERRAL_RULES_${merchantId}` },
+      create: {
+        key: `MERCHANT_REFERRAL_RULES_${merchantId}`,
+        section: "merchant_settings",
+        category: "referral_rules",
+        value: JSON.stringify({
+          referralBonusEnabled: true,
+          referralBonusStamps: 1,
+          referralFriendBonusStamps: 1,
+          referralRewardAmount: 0,
+        })
+      },
+      update: {}
+    }).catch(() => {})
+
+    // Initialize default social reward rules (Instagram Story Bonus)
+    await db.systemContent.upsert({
+      where: { key: `MERCHANT_SOCIAL_REWARD_RULES_${merchantId}` },
+      create: {
+        key: `MERCHANT_SOCIAL_REWARD_RULES_${merchantId}`,
+        section: "merchant_settings",
+        category: "social_reward_rules",
+        value: JSON.stringify({
+          instagramStoryBonusEnabled: true,
+          instagramStoryBonusStamps: 1,
+          instagramStoryFrequency: "ONCE_PER_CYCLE",
+        })
+      },
+      update: {}
+    }).catch(() => {})
   }
 
   // Initialize checklist

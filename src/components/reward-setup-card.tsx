@@ -30,13 +30,13 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
     validityDays: 180,
     googleReviewBonus: 1,
     photoBonus: 1,
-    vipUpgradeBonusStamps: 1,
+    vipUpgradeBonusStamps: 2,
     joiningBonusEnabled: true,
     joiningBonusStamps: 1,
     referralBonusEnabled: true,
     referralBonusStamps: 1,
     referralFriendBonusStamps: 1,
-    referralRewardAmount: 50,
+    referralRewardAmount: 0,
     instagramStoryBonusEnabled: true,
     instagramStoryBonusStamps: 1,
     instagramStoryFrequency: "ONCE_PER_CYCLE",
@@ -77,17 +77,17 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
             name: cardData.name || "Loyalty Stamp Card",
             stampsRequired: cardData.stampsRequired ?? 10,
             rewardName: cardData.rewardName || "FREE 500gm Cake",
-            stampValue: cardData.stampValue ?? 500,
-            validityDays: cardData.validityDays ?? 90,
+            stampValue: cardData.stampValue ?? 300,
+            validityDays: cardData.validityDays ?? 180,
             googleReviewBonus: cardData.googleReviewBonus ?? 1,
             photoBonus: cardData.photoBonus ?? 1,
-            vipUpgradeBonusStamps: cardData.vipUpgradeBonusStamps ?? 1,
+            vipUpgradeBonusStamps: cardData.vipUpgradeBonusStamps ?? 2,
             joiningBonusEnabled: cardData.joiningBonusEnabled ?? true,
-            joiningBonusStamps: cardData.joiningBonusStamps ?? 2,
+            joiningBonusStamps: cardData.joiningBonusStamps ?? 1,
             referralBonusEnabled: cardData.referralBonusEnabled ?? true,
             referralBonusStamps: cardData.referralBonusStamps ?? 1,
             referralFriendBonusStamps: cardData.referralFriendBonusStamps ?? 1,
-            referralRewardAmount: cardData.referralRewardAmount ?? 50,
+            referralRewardAmount: cardData.referralRewardAmount ?? 0,
             instagramStoryBonusEnabled: cardData.instagramStoryBonusEnabled ?? true,
             instagramStoryBonusStamps: cardData.instagramStoryBonusStamps ?? 1,
             instagramStoryFrequency: cardData.instagramStoryFrequency || "ONCE_PER_CYCLE",
@@ -211,7 +211,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${form.joiningBonusEnabled ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/20' : 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-500/20'}`}>
-                    {form.joiningBonusEnabled ? `ACTIVE (+${form.joiningBonusStamps ?? 2} Stamps on Join)` : "DEACTIVATED"}
+                    {form.joiningBonusEnabled ? `ACTIVE (+${form.joiningBonusStamps ?? 1} Stamps on Join)` : "DEACTIVATED"}
                   </span>
                   <Switch
                     checked={form.joiningBonusEnabled}
@@ -234,7 +234,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                     min="1"
                     max="10"
                     disabled={!form.joiningBonusEnabled}
-                    value={form.joiningBonusStamps ?? 2}
+                    value={form.joiningBonusStamps ?? 1}
                     onChange={e => setForm({ ...form, joiningBonusStamps: Math.max(1, Number(e.target.value)) })}
                     className="bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl"
                   />
@@ -274,12 +274,12 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                   id="stamp-val"
                   type="number"
                   className="pl-7 bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
-                  value={form.stampValue ?? 500}
+                  value={form.stampValue ?? 300}
                   onChange={e => setForm({ ...form, stampValue: Number(e.target.value) })}
                   required
                 />
               </div>
-              <p className="text-[11px] text-muted-foreground">Every ₹{form.stampValue || 500} spent = 1 Stamp</p>
+              <p className="text-[11px] text-muted-foreground">Every ₹{form.stampValue || 300} spent = 1 Stamp</p>
             </div>
 
             <div className="space-y-2">
@@ -300,7 +300,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
               <Input
                 id="validity"
                 type="number"
-                value={form.validityDays ?? 90}
+                value={form.validityDays ?? 180}
                 onChange={e => setForm({ ...form, validityDays: Number(e.target.value) })}
                 className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
                 required
@@ -330,7 +330,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
               <Input
                 id="google-bonus"
                 type="number"
-                value={form.googleReviewBonus ?? 0}
+                value={form.googleReviewBonus ?? 1}
                 onChange={e => setForm({ ...form, googleReviewBonus: Number(e.target.value) })}
                 className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
               />
@@ -342,7 +342,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
               <Input
                 id="photo-bonus"
                 type="number"
-                value={form.photoBonus ?? 0}
+                value={form.photoBonus ?? 1}
                 onChange={e => setForm({ ...form, photoBonus: Number(e.target.value) })}
                 className="bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm"
               />
@@ -368,7 +368,7 @@ export function RewardSetupCard({ merchantId }: { merchantId: string }) {
                   </span>
                   <Switch
                     checked={(form.vipUpgradeBonusStamps ?? 0) > 0}
-                    onCheckedChange={(checked) => setForm({ ...form, vipUpgradeBonusStamps: checked ? 1 : 0 })}
+                    onCheckedChange={(checked) => setForm({ ...form, vipUpgradeBonusStamps: checked ? 2 : 0 })}
                     className="data-[state=checked]:!bg-emerald-600 dark:data-[state=checked]:!bg-emerald-500"
                   />
                 </div>

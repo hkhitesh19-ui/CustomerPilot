@@ -26,6 +26,13 @@ const PRESET_TEMPLATES: Record<string, Partial<DefaultMerchantSettingsData>> = {
     joiningBonusEnabled: true,
     joiningBonusStamps: 1,
     vipUpgradeBonusStamps: 2,
+    referralBonusEnabled: true,
+    referralBonusStamps: 1,
+    referralFriendBonusStamps: 1,
+    referralRewardAmount: 0,
+    instagramStoryBonusEnabled: true,
+    instagramStoryBonusStamps: 1,
+    instagramStoryFrequency: "ONCE_PER_CYCLE",
     color: "#6366f1"
   },
   restaurant: {
@@ -39,6 +46,13 @@ const PRESET_TEMPLATES: Record<string, Partial<DefaultMerchantSettingsData>> = {
     joiningBonusEnabled: true,
     joiningBonusStamps: 1,
     vipUpgradeBonusStamps: 2,
+    referralBonusEnabled: true,
+    referralBonusStamps: 1,
+    referralFriendBonusStamps: 1,
+    referralRewardAmount: 0,
+    instagramStoryBonusEnabled: true,
+    instagramStoryBonusStamps: 1,
+    instagramStoryFrequency: "ONCE_PER_CYCLE",
     color: "#6366f1"
   },
   cafe: {
@@ -52,6 +66,13 @@ const PRESET_TEMPLATES: Record<string, Partial<DefaultMerchantSettingsData>> = {
     joiningBonusEnabled: true,
     joiningBonusStamps: 1,
     vipUpgradeBonusStamps: 2,
+    referralBonusEnabled: true,
+    referralBonusStamps: 1,
+    referralFriendBonusStamps: 1,
+    referralRewardAmount: 0,
+    instagramStoryBonusEnabled: true,
+    instagramStoryBonusStamps: 1,
+    instagramStoryFrequency: "ONCE_PER_CYCLE",
     color: "#6366f1"
   },
   salon: {
@@ -65,6 +86,13 @@ const PRESET_TEMPLATES: Record<string, Partial<DefaultMerchantSettingsData>> = {
     joiningBonusEnabled: true,
     joiningBonusStamps: 1,
     vipUpgradeBonusStamps: 2,
+    referralBonusEnabled: true,
+    referralBonusStamps: 1,
+    referralFriendBonusStamps: 1,
+    referralRewardAmount: 0,
+    instagramStoryBonusEnabled: true,
+    instagramStoryBonusStamps: 1,
+    instagramStoryFrequency: "ONCE_PER_CYCLE",
     color: "#6366f1"
   },
   retail: {
@@ -78,6 +106,13 @@ const PRESET_TEMPLATES: Record<string, Partial<DefaultMerchantSettingsData>> = {
     joiningBonusEnabled: true,
     joiningBonusStamps: 1,
     vipUpgradeBonusStamps: 2,
+    referralBonusEnabled: true,
+    referralBonusStamps: 1,
+    referralFriendBonusStamps: 1,
+    referralRewardAmount: 0,
+    instagramStoryBonusEnabled: true,
+    instagramStoryBonusStamps: 1,
+    instagramStoryFrequency: "ONCE_PER_CYCLE",
     color: "#6366f1"
   }
 }
@@ -468,7 +503,7 @@ export function DefaultMerchantSettingsManager() {
                 </Label>
               </div>
               <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full border bg-indigo-500/20 text-indigo-300 border-indigo-500/40">
-                ACTIVE (+{form.vipUpgradeBonusStamps ?? 1} Stamp on Next Level)
+                ACTIVE (+{form.vipUpgradeBonusStamps ?? 2} Stamp on Next Level)
               </span>
             </div>
             
@@ -484,7 +519,7 @@ export function DefaultMerchantSettingsManager() {
                   type="number"
                   min="0"
                   max="5"
-                  value={form.vipUpgradeBonusStamps ?? 1}
+                  value={form.vipUpgradeBonusStamps ?? 2}
                   onChange={e => setForm({ ...form, vipUpgradeBonusStamps: Math.max(0, Number(e.target.value)) })}
                   className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
                 />
@@ -544,6 +579,134 @@ export function DefaultMerchantSettingsManager() {
                   className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm mt-1"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">Stamps to Friend B on 1st visit</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Instagram Story Mention & Tag Reward Feature */}
+          <div className="p-4 sm:p-5 bg-gradient-to-r from-pink-950/20 via-purple-950/20 to-indigo-950/20 border border-pink-500/30 rounded-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white shadow-xs">
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  </svg>
+                </div>
+                <div>
+                  <Label htmlFor="global-insta-switch" className="font-bold text-sm text-slate-100 flex items-center gap-2">
+                    Instagram Story Mention & Tag Reward Feature
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-pink-500/20 text-pink-300 border border-pink-500/30">VIRAL SOCIAL REWARD</span>
+                  </Label>
+                  <p className="text-[11px] text-slate-400">
+                    Kya aap apne store par customer ko photo story lagakar @tag karne par extra bonus loyalty stamp dena chahte hain?
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${form.instagramStoryBonusEnabled ?? true ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-slate-800 text-slate-400 border-slate-700'}`}>
+                  {form.instagramStoryBonusEnabled ?? true ? `ACTIVE (+${form.instagramStoryBonusStamps ?? 1} STAMPS)` : "DEACTIVATED"}
+                </span>
+                <Switch
+                  id="global-insta-switch"
+                  checked={form.instagramStoryBonusEnabled ?? true}
+                  onCheckedChange={(checked) => setForm({ ...form, instagramStoryBonusEnabled: checked })}
+                />
+              </div>
+            </div>
+
+            <div className={`space-y-4 pt-1 transition-opacity ${form.instagramStoryBonusEnabled ?? true ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
+              <div className="p-3 bg-slate-950/60 rounded-xl border border-pink-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <Label className="text-xs font-bold text-slate-200">
+                    Story Tag Bonus Stamps (Har valid story tag par kitne extra stamps milenge?)
+                  </Label>
+                  <p className="text-[11px] text-slate-400">Default: +1 extra stamp per valid Instagram story mention</p>
+                </div>
+                <Input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={form.instagramStoryBonusStamps ?? 1}
+                  onChange={e => setForm({ ...form, instagramStoryBonusStamps: Math.max(1, Number(e.target.value)) })}
+                  className="w-24 bg-slate-900 border-slate-700 text-white font-bold text-center"
+                />
+              </div>
+
+              {/* 3 Strategy Radios */}
+              <div className="space-y-2">
+                <Label className="text-xs font-bold text-slate-300">
+                  Award Cadence: Aap customer ko yeh Story Bonus Stamp kab kab dena chahte hain?
+                </Label>
+                <div className="grid grid-cols-1 gap-2.5">
+                  {/* Option 1: Once Per Cycle */}
+                  <label
+                    onClick={() => setForm({ ...form, instagramStoryFrequency: "ONCE_PER_CYCLE" })}
+                    className={`p-3 rounded-xl border cursor-pointer flex items-start gap-3 transition-all ${(form.instagramStoryFrequency || "ONCE_PER_CYCLE") === "ONCE_PER_CYCLE" ? 'bg-pink-950/30 border-pink-500 ring-1 ring-pink-500' : 'bg-slate-950/40 border-slate-800 hover:border-slate-700'}`}
+                  >
+                    <input
+                      type="radio"
+                      name="globalInstagramStoryFrequency"
+                      checked={(form.instagramStoryFrequency || "ONCE_PER_CYCLE") === "ONCE_PER_CYCLE"}
+                      onChange={() => setForm({ ...form, instagramStoryFrequency: "ONCE_PER_CYCLE" })}
+                      className="mt-1"
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-white">Option 1: 1 Stamp Cycle me Sirf 1 Baar</span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">RECOMMENDED FOR 100% SECURITY & ROI</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        👉 <strong>Kya hoga:</strong> Customer ko pure 10 stamps card cycle me sirf ek hi baar story bonus stamp milega, agla stamp naye card cycle me milega.
+                      </p>
+                    </div>
+                  </label>
+
+                  {/* Option 2: Every Purchase */}
+                  <label
+                    onClick={() => setForm({ ...form, instagramStoryFrequency: "EVERY_PURCHASE" })}
+                    className={`p-3 rounded-xl border cursor-pointer flex items-start gap-3 transition-all ${form.instagramStoryFrequency === "EVERY_PURCHASE" ? 'bg-pink-950/30 border-pink-500 ring-1 ring-pink-500' : 'bg-slate-950/40 border-slate-800 hover:border-slate-700'}`}
+                  >
+                    <input
+                      type="radio"
+                      name="globalInstagramStoryFrequency"
+                      checked={form.instagramStoryFrequency === "EVERY_PURCHASE"}
+                      onChange={() => setForm({ ...form, instagramStoryFrequency: "EVERY_PURCHASE" })}
+                      className="mt-1"
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-white">Option 2: Har Qualifying Purchase Bill par</span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">BONUS ALONG WITH BILLING STAMP</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        👉 <strong>Kya hoga:</strong> Customer jab bhi purchase karega aur minimum qualifying bill banwayega, har visit par story tag karne par bill stamp ke saath extra stamp milega.
+                      </p>
+                    </div>
+                  </label>
+
+                  {/* Option 3: Cooldown 30 Days */}
+                  <label
+                    onClick={() => setForm({ ...form, instagramStoryFrequency: "COOLDOWN_30_DAYS" })}
+                    className={`p-3 rounded-xl border cursor-pointer flex items-start gap-3 transition-all ${form.instagramStoryFrequency === "COOLDOWN_30_DAYS" ? 'bg-pink-950/30 border-pink-500 ring-1 ring-pink-500' : 'bg-slate-950/40 border-slate-800 hover:border-slate-700'}`}
+                  >
+                    <input
+                      type="radio"
+                      name="globalInstagramStoryFrequency"
+                      checked={form.instagramStoryFrequency === "COOLDOWN_30_DAYS"}
+                      onChange={() => setForm({ ...form, instagramStoryFrequency: "COOLDOWN_30_DAYS" })}
+                      className="mt-1"
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-white">Option 3: Har 30 Din me Sirf 1 Baar (Monthly CoolDown)</span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">STEADY MONTHLY TRAFFIC</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        👉 <strong>Kya hoga:</strong> Ek customer ko har 30 din / 1 mahine me maximum 1 baar story tag karne ka bonus stamp hi milega.
+                      </p>
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
           </div>

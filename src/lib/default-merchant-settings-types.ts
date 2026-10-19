@@ -18,6 +18,11 @@ export interface DefaultMerchantSettingsData {
   tierRewardsEnabled: boolean
   rewardImageUrl?: string
 
+  // Instagram Story Mention & Tag Reward
+  instagramStoryBonusEnabled?: boolean
+  instagramStoryBonusStamps?: number
+  instagramStoryFrequency?: "ONCE_PER_CYCLE" | "EVERY_PURCHASE" | "COOLDOWN_30_DAYS"
+
   // 10 Loyalty Cycle Categories (Step B)
   loyaltyCategoryNames: string[]
 
@@ -45,6 +50,9 @@ export const FALLBACK_GLOBAL_DEFAULTS: DefaultMerchantSettingsData = {
   referralBonusStamps: 1,
   referralFriendBonusStamps: 1,
   referralRewardAmount: 0,
+  instagramStoryBonusEnabled: true,
+  instagramStoryBonusStamps: 1,
+  instagramStoryFrequency: "ONCE_PER_CYCLE",
   color: "#6366f1",
   tierRewardsEnabled: false,
   rewardImageUrl: "",

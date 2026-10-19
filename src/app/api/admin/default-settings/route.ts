@@ -79,6 +79,58 @@ export async function POST(req: NextRequest) {
         }
       })
       affectedCardsCount = cardUpdateResult.count
+
+      // 3. Batch update referral and social reward rules for all merchants
+      const allMerchants = await db.merchant.findMany({ select: { id: true } })
+      for (const m of allMerchants) {
+        if (updated.referralBonusEnabled !== undefined) {
+          await db.systemContent.upsert({
+            where: { key: `MERCHANT_REFERRAL_RULES_${m.id}` },
+            create: {
+              key: `MERCHANT_REFERRAL_RULES_${m.id}`,
+              section: "merchant_settings",
+              category: "referral_rules",
+              value: JSON.stringify({
+                referralBonusEnabled: Boolean(updated.referralBonusEnabled ?? true),
+                referralBonusStamps: Math.max(0, Number(updated.referralBonusStamps ?? 1)),
+                referralFriendBonusStamps: Math.max(0, Number(updated.referralFriendBonusStamps ?? 1)),
+                referralRewardAmount: Math.max(0, Number(updated.referralRewardAmount ?? 0)),
+              })
+            },
+            update: {
+              value: JSON.stringify({
+                referralBonusEnabled: Boolean(updated.referralBonusEnabled ?? true),
+                referralBonusStamps: Math.max(0, Number(updated.referralBonusStamps ?? 1)),
+                referralFriendBonusStamps: Math.max(0, Number(updated.referralFriendBonusStamps ?? 1)),
+                referralRewardAmount: Math.max(0, Number(updated.referralRewardAmount ?? 0)),
+              })
+            }
+          }).catch(() => {})
+        }
+
+        if (updated.instagramStoryBonusEnabled !== undefined) {
+          await db.systemContent.upsert({
+            where: { key: `MERCHANT_SOCIAL_REWARD_RULES_${m.id}` },
+            create: {
+              key: `MERCHANT_SOCIAL_REWARD_RULES_${m.id}`,
+              section: "merchant_settings",
+              category: "social_reward_rules",
+              value: JSON.stringify({
+                instagramStoryBonusEnabled: Boolean(updated.instagramStoryBonusEnabled ?? true),
+                instagramStoryBonusStamps: Math.max(0, Number(updated.instagramStoryBonusStamps ?? 1)),
+                instagramStoryFrequency: updated.instagramStoryFrequency || "ONCE_PER_CYCLE",
+              })
+            },
+            update: {
+              value: JSON.stringify({
+                instagramStoryBonusEnabled: Boolean(updated.instagramStoryBonusEnabled ?? true),
+                instagramStoryBonusStamps: Math.max(0, Number(updated.instagramStoryBonusStamps ?? 1)),
+                instagramStoryFrequency: updated.instagramStoryFrequency || "ONCE_PER_CYCLE",
+              })
+            }
+          }).catch(() => {})
+        }
+      }
     }
 
     return ok({

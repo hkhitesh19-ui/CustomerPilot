@@ -196,10 +196,24 @@ export async function POST(req: Request) {
           section: "merchant_settings",
           category: "referral_rules",
           value: JSON.stringify({
-            referralBonusEnabled: true,
-            referralBonusStamps: 1,
-            referralFriendBonusStamps: 1,
-            referralRewardAmount: 0,
+            referralBonusEnabled: globalDefaults?.referralBonusEnabled ?? true,
+            referralBonusStamps: globalDefaults?.referralBonusStamps ?? 1,
+            referralFriendBonusStamps: globalDefaults?.referralFriendBonusStamps ?? 1,
+            referralRewardAmount: globalDefaults?.referralRewardAmount ?? 0,
+          })
+        }
+      }).catch(() => {});
+
+      // Initialize default Instagram story mention reward rules for new merchant
+      await db.systemContent.create({
+        data: {
+          key: `MERCHANT_SOCIAL_REWARD_RULES_${merchant.id}`,
+          section: "merchant_settings",
+          category: "social_reward_rules",
+          value: JSON.stringify({
+            instagramStoryBonusEnabled: globalDefaults?.instagramStoryBonusEnabled ?? true,
+            instagramStoryBonusStamps: globalDefaults?.instagramStoryBonusStamps ?? 1,
+            instagramStoryFrequency: globalDefaults?.instagramStoryFrequency || "ONCE_PER_CYCLE",
           })
         }
       }).catch(() => {});

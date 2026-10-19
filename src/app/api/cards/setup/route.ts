@@ -38,10 +38,10 @@ export async function GET(req: NextRequest) {
     ])
 
     let referralRules = {
-      referralBonusEnabled: true,
-      referralBonusStamps: 1,
-      referralFriendBonusStamps: 1,
-      referralRewardAmount: 0,
+      referralBonusEnabled: globalDefaults?.referralBonusEnabled ?? true,
+      referralBonusStamps: globalDefaults?.referralBonusStamps ?? 1,
+      referralFriendBonusStamps: globalDefaults?.referralFriendBonusStamps ?? 1,
+      referralRewardAmount: globalDefaults?.referralRewardAmount ?? 0,
     }
     if (referralRecord?.value) {
       try {
@@ -51,9 +51,9 @@ export async function GET(req: NextRequest) {
     }
 
     let socialRewardRules = {
-      instagramStoryBonusEnabled: true,
-      instagramStoryBonusStamps: 1,
-      instagramStoryFrequency: "ONCE_PER_CYCLE",
+      instagramStoryBonusEnabled: globalDefaults?.instagramStoryBonusEnabled ?? true,
+      instagramStoryBonusStamps: globalDefaults?.instagramStoryBonusStamps ?? 1,
+      instagramStoryFrequency: globalDefaults?.instagramStoryFrequency || "ONCE_PER_CYCLE",
     }
     if (socialRewardRecord?.value) {
       try {
@@ -110,7 +110,7 @@ export async function GET(req: NextRequest) {
       })
     }
 
-    return ok({ card: { ...card, ...referralRules, ...socialRewardRules, vipUpgradeBonusStamps: merchant?.vipUpgradeBonusStamps ?? 1 }, isDefault: false }, {
+    return ok({ card: { ...card, ...referralRules, ...socialRewardRules, vipUpgradeBonusStamps: merchant?.vipUpgradeBonusStamps ?? globalDefaults?.vipUpgradeBonusStamps ?? 2 }, isDefault: false }, {
       headers: { "Cache-Control": "no-store, private" }
     })
   } catch (error: any) {
