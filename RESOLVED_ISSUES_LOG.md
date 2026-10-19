@@ -7,9 +7,11 @@ This document serves as a historical record of all major bugs, configuration iss
 - **Symptom**:
   1. Default stamp goal for loyalty reward cards needed to be set to 15 stamps instead of 10 stamps.
   2. In the "Stamps Reward Card Rules Setup" section, the "Instagram Story Mention & Tag Reward" block was positioned below Next Level and Referral rules, whereas the merchant requested it positioned above "Next Level Kickstart Bonus Stamps".
+  3. When viewing existing merchants (e.g. Cake Connection) on `/dashboard/settings`, the Stamp Goal field still displayed 10 instead of 15 because the merchant had already been created prior to the default change.
 - **Root Cause**:
   1. `stampsRequired` default was 10 in `FALLBACK_GLOBAL_DEFAULTS`, `PRESET_TEMPLATES`, and component fallbacks.
   2. In `src/components/reward-setup-card.tsx` and `src/components/super-admin/default-merchant-settings-manager.tsx`, the Instagram Story block was ordered after the Next Level Kickstart Bonus and Referral blocks.
+  3. Existing merchants load their specific `StampCard` row from the database (`card.stampsRequired = 10`), so changing new merchant defaults does not retroactively rewrite existing active merchant stamp cards without a direct DB migration.
 - **Resolution**:
   1. **Stamp Goal Default (`stampsRequired: 15`)**:
      - Updated `FALLBACK_GLOBAL_DEFAULTS.stampsRequired` to `15` in `src/lib/default-merchant-settings-types.ts`.
@@ -19,8 +21,11 @@ This document serves as a historical record of all major bugs, configuration iss
   2. **Reordering Instagram Story Above Next Level**:
      - Moved the entire Instagram Story Mention block directly above the Next Level Kickstart Bonus block in `src/components/reward-setup-card.tsx`.
      - Mirrored identical block reordering in `src/components/super-admin/default-merchant-settings-manager.tsx`.
-  3. **Verification**:
-     - Ran Playwright visual snapshot check on live production confirming DOM order and layout harmony.
+  3. **Existing Merchant Records Migration (Local & VPS)**:
+     - Executed SQL update `UPDATE StampCard SET stampsRequired = 15 WHERE stampsRequired = 10` on local `prisma/dev.db` (5 rows updated) and on live VPS `/var/www/CustomerPilot/prisma/dev.db` (5 rows updated, including Cake Connection `cmtymavfx0002kx008lbfvp57`).
+     - Executed PM2 reload on live VPS.
+  4. **Ground-Truth Verification**:
+     - Ran Playwright visual snapshot check on live production (`customerpilot.in/dashboard/settings` under Cake Connection impersonation) confirming `stampsRequired` input displays `15` and Instagram Story block is above Next Level.
 - **Status**: ✅ Resolved and Verified.
 ## [19 Oct 2026] Feature & Defaults Alignment: Universal Default Merchant Loyalty Rules Configured Exactly as Reference Spec
 - **Symptom**: New merchants onboarded or registered across the system required manual setup of their loyalty stamp cards, referral rules, and Instagram story bonus settings to match the standardized best-practice configuration shown in the settings screenshot.
