@@ -8,17 +8,18 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 321d3ac
-Full Commit Hash  : 321d3ace63b392a2a70cb6daec513bc75df69145
-Target Fix Commit : 321d3ace63b392a2a70cb6daec513bc75df69145
-Branch Name       : feature/gbp-service-tracks-20261020
-Deployment Date   : 26 Oct 2026, 11:45 PM IST
+Active Git Commit : ba21103 (Local: d93fe81)
+Full Commit Hash  : ba21103bc670ba59140ec7f34519455ea6432766 (Local SHA: d93fe814ee7bd0de98cd0c0817baad15b9eddccd)
+Target Fix Commit : d93fe814ee7bd0de98cd0c0817baad15b9eddccd
+Branch Name       : deploy/whatsapp-alerts-20261029 (Feature: feature/whatsapp-disconnection-alert-system-20261029)
+Deployment Date   : 29 Oct 2026, 10:25 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(gbp): sanitize store name and scale font size on gbp post card
+Commit Title      : feat(whatsapp): build superadmin whatsapp disconnection diagnosis and targeted alerting system
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
-PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
+PM2 Services      : customerpilot-web (Online, pid 161094, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
-Merchant Status   : Vinayak Fashion & Cake Connection Live
+Merchant Status   : Vinayak Fashion & Cake Connection Live (Cake Connection WhatsApp Socket Open & Healthy)
+WhatsApp Fleet    : Intelligent 5-case diagnostic engine, 6-hr anti-spam cooldown, personalized Hinglish alerts from SuperAdmin (+91 9033304707) live on /api/cron/whatsapp-health & SuperAdmin UI
 GBP Rank-1 Agent  : CustomerPilot Autonomous GBP Rank-1 Optimization Engine Live on /api/gbp/agent (Deterministic local generator + Gemini AI cascade, Clean Locality 'Manjalpur' & Title 'Cake Connection')
 GBP Service Tracks: Track A (New Profile Sandbox) & Track B (Top 3 Rank Accelerator) Active with 16 Operational Checklist Tasks & Zero-Touch Weekly 3-Post Engine (Advance Approval & Instant Regenerate)
 GBP Post Cards    : Clean Brand Store Title & Scaled Font Size Live on /api/gbp/posts/card (1200x900 Branded SVG/PNG Graphic)
@@ -34,6 +35,7 @@ Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in 
 ----------------------------------------------------------
 
 Deployment History Log:
+- 29 Oct 2026, 10:25 PM: ba21103 (Local: d93fe81) - feat(whatsapp): build superadmin whatsapp disconnection diagnosis and targeted alerting system
 - 26 Oct 2026, 11:45 PM: 321d3ac - fix(gbp): sanitize store name and scale font size on gbp post card
 - 26 Oct 2026, 11:10 PM: 2ad818f - fix(gbp): refine locality and business name address parsing and allow cloudflare CSP
 - 26 Oct 2026, 07:35 PM: 88e1335 - feat(gbp): build autonomous GBP Rank-1 optimization engine and API route
