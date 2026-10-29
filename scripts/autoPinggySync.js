@@ -2,7 +2,8 @@ require('dotenv').config();
 const { spawn } = require('child_process');
 const http = require('http');
 
-const API_KEY = 'Evo_Api_Key_Secure_998877!';
+const API_KEY = process.env.EVOLUTION_API_KEY || '';
+const EVOLUTION_URL = new URL(process.env.EVOLUTION_API_URL || 'http://localhost:8080');
 const RENEWAL_INTERVAL = 55 * 60 * 1000; // 55 minutes
 
 let currentPinggyProcess = null;
@@ -10,8 +11,8 @@ let currentPinggyProcess = null;
 function fetchAllInstancesAndUpdate(url) {
     console.log(`[PinggySync] Updating instances with new URL: ${url}`);
     const options = {
-        hostname: '200.97.170.53',
-        port: 8080,
+        hostname: EVOLUTION_URL.hostname,
+        port: EVOLUTION_URL.port || 80,
         path: '/instance/fetchInstances',
         method: 'GET',
         headers: { 'apikey': API_KEY }
@@ -31,7 +32,7 @@ function fetchAllInstancesAndUpdate(url) {
 }
 
 async function updateAllInstances(instances, url) {
-    const webhookUrl = url + '/api/webhook/evolution?secret=' + process.env.EVOLUTION_WEBHOOK_SECRET;
+    const webhookUrl = url + '/api/webhook/evolution?secret=' + 'cpilot_webhook_secret_change_in_prod_2026';
     const data = JSON.stringify({
         webhook: {
             enabled: true,
@@ -50,8 +51,8 @@ async function updateAllInstances(instances, url) {
         if (!instance.name) continue;
         await new Promise((resolve) => {
             const req = http.request({
-                hostname: '200.97.170.53',
-                port: 8080,
+                hostname: EVOLUTION_URL.hostname,
+                port: EVOLUTION_URL.port || 80,
                 path: '/webhook/set/' + instance.name,
                 method: 'POST',
                 headers: {
@@ -77,16 +78,56 @@ async function updateAllInstances(instances, url) {
     }
 }
 
+function killProcess(proc) {
+    if (!proc) return;
+    proc.wasKilled = true;
+    try {
+        if (process.platform === 'win32' && proc.pid) {
+            const { execSync } = require('child_process');
+            execSync(`taskkill /F /T /PID ${proc.pid}`, { stdio: 'ignore' });
+        } else {
+            proc.kill('SIGKILL');
+        }
+    } catch (_) {}
+}
+
+let watchdogTimer = null;
+
 function startPinggy() {
+    if (watchdogTimer) {
+        clearTimeout(watchdogTimer);
+        watchdogTimer = null;
+    }
+
     if (currentPinggyProcess) {
         console.log('[PinggySync] Killing old Pinggy process...');
-        currentPinggyProcess.kill();
+        killProcess(currentPinggyProcess);
+        currentPinggyProcess = null;
     }
 
     console.log('[PinggySync] Starting new Pinggy tunnel...');
-    currentPinggyProcess = spawn('ssh', ['-p', '443', '-R0:localhost:3000', 'a.pinggy.io', '-o', 'StrictHostKeyChecking=no']);
+    const proc = spawn('ssh', [
+        '-p', '443',
+        '-R0:localhost:3000',
+        'a.pinggy.io',
+        '-o', 'StrictHostKeyChecking=no',
+        '-o', 'ServerAliveInterval=10',
+        '-o', 'ServerAliveCountMax=3',
+        '-o', 'ConnectTimeout=15',
+        '-T'
+    ]);
+    currentPinggyProcess = proc;
+    proc.wasKilled = false;
 
     let urlFound = false;
+
+    // Watchdog: If URL not discovered in 25 seconds, force-restart
+    watchdogTimer = setTimeout(() => {
+        if (!urlFound && !proc.wasKilled) {
+            console.log('[PinggySync] ⚠️ No URL received within 25s, restarting tunnel...');
+            startPinggy();
+        }
+    }, 25000);
 
     const handleOutput = (data) => {
         const output = data.toString();
@@ -95,17 +136,68 @@ function startPinggy() {
         
         if (match && match[0] && !urlFound) {
             urlFound = true;
+            if (watchdogTimer) {
+                clearTimeout(watchdogTimer);
+                watchdogTimer = null;
+            }
             const extractedUrl = match[0];
             console.log('[PinggySync] Found Pinggy URL:', extractedUrl);
+
+            // ── KEY FIX: Update NEXT_PUBLIC_APP_URL & NEXTAUTH_URL in .env.local & WHATSAPP_WEBHOOK_URL in .env ──
+            try {
+                const fs = require('fs');
+                const path = require('path');
+                const envPath = path.join(__dirname, '..', '.env.local');
+                if (fs.existsSync(envPath)) {
+                    let envContent = fs.readFileSync(envPath, 'utf8');
+
+                    // Update NEXT_PUBLIC_APP_URL
+                    if (envContent.includes('NEXT_PUBLIC_APP_URL=')) {
+                        envContent = envContent.replace(/NEXT_PUBLIC_APP_URL=.*/g, `NEXT_PUBLIC_APP_URL=${extractedUrl}`);
+                    } else {
+                        envContent += `\nNEXT_PUBLIC_APP_URL=${extractedUrl}`;
+                    }
+
+                    // ⭐ ALSO update NEXTAUTH_URL so Google OAuth callbacks work from tunnel
+                    if (envContent.includes('NEXTAUTH_URL=')) {
+                        envContent = envContent.replace(/NEXTAUTH_URL=.*/g, `NEXTAUTH_URL=${extractedUrl}`);
+                    } else {
+                        envContent += `\nNEXTAUTH_URL=${extractedUrl}`;
+                    }
+
+                    fs.writeFileSync(envPath, envContent, 'utf8');
+                    console.log(`[PinggySync] ✅ Updated NEXT_PUBLIC_APP_URL=${extractedUrl} in .env.local`);
+                    console.log(`[PinggySync] ✅ Updated NEXTAUTH_URL=${extractedUrl} in .env.local`);
+                }
+
+                const rootEnvPath = path.join(__dirname, '..', '.env');
+                if (fs.existsSync(rootEnvPath)) {
+                    let rootEnv = fs.readFileSync(rootEnvPath, 'utf8');
+                    rootEnv = rootEnv.replace(/WHATSAPP_WEBHOOK_URL=.*/g, `WHATSAPP_WEBHOOK_URL="${extractedUrl}/api/webhook/evolution"`);
+                    fs.writeFileSync(rootEnvPath, rootEnv, 'utf8');
+                    console.log(`[PinggySync] ✅ Updated WHATSAPP_WEBHOOK_URL=${extractedUrl}/api/webhook/evolution in .env`);
+                }
+            } catch (e) {
+                console.error('[PinggySync] Failed to update env files:', e.message);
+            }
+
             fetchAllInstancesAndUpdate(extractedUrl);
         }
     };
 
-    currentPinggyProcess.stdout.on('data', handleOutput);
-    currentPinggyProcess.stderr.on('data', handleOutput); // ssh often prints to stderr
+    proc.stdout.on('data', handleOutput);
+    proc.stderr.on('data', handleOutput); // ssh often prints to stderr
 
-    currentPinggyProcess.on('close', (code) => {
+    proc.on('close', (code) => {
         console.log(`[PinggySync] Pinggy process exited with code ${code}`);
+        if (!proc.wasKilled) {
+            console.log('[PinggySync] 🔄 Tunnel disconnected unexpectedly! Reconnecting in 5 seconds...');
+            setTimeout(startPinggy, 5000);
+        }
+    });
+
+    proc.on('error', (err) => {
+        console.error('[PinggySync] Tunnel error:', err.message);
     });
 }
 
@@ -113,6 +205,9 @@ function startPinggy() {
 startPinggy();
 
 // Renew every 55 minutes
-setInterval(startPinggy, RENEWAL_INTERVAL);
+setInterval(() => {
+    console.log('[PinggySync] ⏰ Scheduled 55-minute renewal triggered...');
+    startPinggy();
+}, RENEWAL_INTERVAL);
 
-console.log('[PinggySync] Daemon started. Will renew Pinggy every 55 minutes.');
+console.log('[PinggySync] Daemon started. Will auto-reconnect on disconnect and renew every 55 minutes.');

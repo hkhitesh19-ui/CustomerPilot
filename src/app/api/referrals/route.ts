@@ -25,11 +25,26 @@ export async function POST(req: NextRequest) {
     const referrer = await db.customer.findUnique({ where: { id: referrerCustomerId } })
     if (!referrer || referrer.merchantId !== merchant.id) return err("Referrer not found", 404)
 
-    // Duplicate prevention: same friend already referred?
-    const existing = await db.referral.findFirst({
-      where: { merchantId: merchant.id, referrerId: referrer.id, friendPhone },
+    // 1. Anti-abuse: Self-referral prevention
+    if (referrer.phone === friendPhone) {
+      return err("You cannot refer your own phone number", 400)
+    }
+
+    // 2. One-time validity: Is friend already an existing customer at this merchant?
+    const existingCustomer = await db.customer.findFirst({
+      where: { merchantId: merchant.id, phone: friendPhone, deletedAt: null },
     })
-    if (existing) return err("This friend has already been referred by this customer", 409)
+    if (existingCustomer) {
+      return err("This friend is already an existing customer at this store and cannot be referred as a new member", 409)
+    }
+
+    // 3. One-time validity: Has this friend already been referred to this merchant by anyone?
+    const existingReferral = await db.referral.findFirst({
+      where: { merchantId: merchant.id, friendPhone },
+    })
+    if (existingReferral) {
+      return err("This friend has already received a referral invitation for this store (Referral codes are strictly 1-time valid)", 409)
+    }
 
     const referral = await db.referral.create({
       data: {

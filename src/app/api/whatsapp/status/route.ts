@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { normalizePhone } from "@/lib/utils"
 import { cookies } from "next/headers"
 import { jwtVerify } from "jose"
+import { getJwtSecret } from "@/lib/jwt-secret";
 
-if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set');
-const JWT_SECRET = process.env.JWT_SECRET;
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 
 async function getAuthMerchant(req: Request) {
   const merchantHeader = req.headers.get("x-merchant-id")
@@ -15,11 +15,24 @@ async function getAuthMerchant(req: Request) {
     if (m) return m
   }
 
+  const url = new URL(req.url)
+  const queryMerchantId = url.searchParams.get("merchantId")
+  if (queryMerchantId) {
+    const m = await db.merchant.findUnique({ where: { id: queryMerchantId } })
+    if (m) return m
+  }
+
   try {
     const cookieStore = await cookies()
+    const merchantCookie = cookieStore.get("merchant_id")?.value
+    if (merchantCookie) {
+      const m = await db.merchant.findUnique({ where: { id: merchantCookie } })
+      if (m) return m
+    }
+
     const token = cookieStore.get("token")?.value
     if (token) {
-      const secret = new TextEncoder().encode(JWT_SECRET)
+      const secret = new TextEncoder().encode(getJwtSecret())
       const { payload } = await jwtVerify(token, secret)
       const merchantId = payload.merchantId as string
       if (merchantId) {
@@ -53,7 +66,7 @@ export async function GET(req: Request) {
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      "apikey": EVOLUTION_API_KEY,
+      "apikey": EVOLUTION_API_KEY || "",
     }
 
     const stateRes = await fetch(
@@ -66,19 +79,24 @@ export async function GET(req: Request) {
     }
 
     const stateData = await stateRes.json().catch(() => null)
-    const instanceData = Array.isArray(stateData) ? stateData[0] : null
-    const state: string = instanceData?.connectionStatus || "disconnected"
+    const instanceData = Array.isArray(stateData)
+      ? (stateData.find((inst: any) => inst.name === instanceName) || stateData[0])
+      : (stateData?.instance || stateData)
+    const state: string = instanceData?.connectionStatus || instanceData?.state || "disconnected"
     const isConnected = state === "open"
     const ownerJid: string | null = instanceData?.ownerJid || null
 
-    // If now connected, save ownerJid phone to merchant DB
-    if (isConnected && ownerJid && !merchant.whatsappPhone) {
-      const phone = ownerJid.replace("@s.whatsapp.net", "").replace(/\D/g, "")
-      if (phone.length >= 10) {
+    // Always sync & normalise phone from ownerJid when connected.
+    // This corrects any stale/wrongly-formatted number (e.g. 10-digit without country code)
+    // that was saved at registration time — regardless of whether DB already has a value.
+    if (isConnected && ownerJid) {
+      const normalised = normalizePhone(ownerJid)
+      if (normalised && normalised !== merchant.whatsappPhone) {
         await db.merchant.update({
           where: { id: merchant.id },
-          data: { whatsappPhone: phone }
-        })
+          data: { whatsappPhone: normalised }
+        }).catch(e => console.error("[WhatsApp Status] Failed to sync phone:", e))
+        console.log(`[WhatsApp Status] ✅ Phone auto-corrected: ${merchant.whatsappPhone} → ${normalised}`)
       }
     }
 

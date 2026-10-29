@@ -86,11 +86,14 @@ export async function runFullSystemSimulation(): Promise<SimulationResult> {
       name: "Bakery Loyalty Card",
       stampsRequired: 10,
       rewardName: "FREE 500gm Chocolate Cake",
-      stampValue: 500,
-      validityDays: 90,
-      googleReviewBonus: 2,
+      stampValue: 300,
+      validityDays: 180,
+      googleReviewBonus: 1,
       photoBonus: 1,
-      tierRewardsEnabled: true,
+      joiningBonusEnabled: true,
+      joiningBonusStamps: 1,
+      color: "#6366f1",
+      tierRewardsEnabled: false,
       active: true
     }
   })

@@ -55,7 +55,7 @@ It powers:
    - `http://localhost:3000/api/google-business/oauth`
    - `https://your-production-domain.com/api/google-business/oauth`
 7. Click **Create**.
-8. Copy the generated **Client ID** and **Client Secret** into your `.env` file:
+8. Copy the generated **Client ID** and **Client Secret** into your `.env.production` file:
    ```env
    GOOGLE_CLIENT_ID="391546314644-o8ep4jj3v9icce1fd1h7reu6a55lsui5.apps.googleusercontent.com"
    GOOGLE_CLIENT_SECRET="GOCSPX-xxxxxxxxxxxxxxxxxxxxxxxx"
@@ -232,8 +232,15 @@ The system gives the merchant exactly 7 days to test the magic of CustomerPilot.
 *   **Dashboard Gatekeeper**: `src/app/dashboard/layout.tsx` (Middleware).
     *   Checks `merchant.trialEndsAt` and `merchant.subscriptionStatus`.
     *   If expired, renders the Payment Gateway / Upgrade UI instead of the dashboard.
-*   **API Gatekeeper**: `src/app/api/webhook/evolution/route.ts` & `src/app/api/cron/automations/route.ts`
-    *   Before processing any WhatsApp message or sending review requests, it checks the merchant's active status. If expired, it silently drops the event.
+*   **API Gatekeeper**: `src/app/api/webhook/evolution/route.ts` & `src/lib/template-engine.ts`
+
+- **Purpose**: Runs daily via pinggy or Vercel cron to execute logic requiring delays (like Winbacks or morning reports).
+- **Dynamic Template Engine**: All WhatsApp messages (Welcome, Queue Duplicate, Name Confirmation, Reviews, Stamp Earned, Reward Unlocked, Winbacks, Morning Reports) now use a centralized Dynamic Template Engine (`getCompiledTemplate`).
+  - **Priority 1:** Merchant Custom Override (`MessageTemplate` where `merchantId` is set).
+  - **Priority 2:** System Default Override (`MessageTemplate` where `merchantId` is `null` — editable by SuperAdmin).
+  - **Priority 3:** Hardcoded `SYSTEM_DEFAULT_TEMPLATES` inside `src/lib/default-templates.ts`.
+- **Review Requests**:
+  - Sends AI-generated Google review links (`REVIEW_DRAFT`).
 
 ---
 
@@ -280,6 +287,7 @@ This section provides the complete, authoritative map of all directories, files,
 ### **10.1 Directory Tree Structure**
 ```
 F:\CustomerPilot_ByGLM_July2026
+├── Git Commit on VPS Live.txt         # Active Live Git Commit & Deployment History Tracker on Hostinger VPS
 ├── prisma/
 │   └── schema.prisma                  # Master Database Schema (Prisma ORM: Customer, Merchant, AuditLog, DeadLetterQueue, etc.)
 │
@@ -290,59 +298,219 @@ F:\CustomerPilot_ByGLM_July2026
 ├── public/
 │   ├── cplogo.png                     # Master Light-Mode Horizontal Brand Logo (Navbar & Header)
 │   ├── cplogo_dark_backup.png          # Backup of Original Dark-Mode Logo
-│   └── logo_variations/               # 5 Generated High-Res Brand Logo Variations (.jpg)
+│   ├── logo_variations/               # 5 Generated High-Res Brand Logo Variations (.jpg)
+│   ├── proofs/                        # Day-0 Google Business Profile Registration Proof Certificates (.svg)
+│   └── standees/                      # 3 Shortlisted Tabletop Standee Mockup Images (Bakery, Royal VIP, Sweet Celebration) (.jpg)
 │
 ├── src/
 │   ├── app/                           # Next.js App Router (Pages, Layouts & API Routes)
 │   │   ├── (auth)/                    # Authentication Route Group (login, register, forgot-password)
 │   │   ├── api/                       # Backend API Endpoint Routes (JSON Services)
+│   │   │   ├── admin/                     # SuperAdmin Management, Impersonate & Sync-VPS APIs
+│   │   │   │   ├── impersonate/route.ts   # Impersonation Token & Session Issuer
+│   │   │   │   ├── merchants/route.ts     # Merchant Fleet List & Profile Editor
+│   │   │   │   ├── digital-cards/route.ts # SuperAdmin On-Behalf Digital Card Management API
+│   │   │   │   ├── whatsapp-monitor/route.ts # SuperAdmin WhatsApp Disconnection & Targeted Alert Fleet API
+│   │   │   │   └── sync-vps/route.ts      # 1-Click Production Database Sync from Hostinger VPS
+│   │   │   ├── cron/                      # Scheduled Background Tasks & Health Runners
+│   │   │   │   ├── whatsapp-health/route.ts # Automated Fleet WhatsApp Disconnection & Targeted Alert Cron
+│   │   │   │   ├── automations/route.ts   # Winback & Marketing Automations Cron
+│   │   │   │   └── gbp-posts/route.ts     # Weekly 3-Post Content Generation Cron
+│   │   │   ├── merchant/              # Merchant Google Manager Access & Verification APIs
+│   │   │   │   └── gbp-manager-access/route.ts # 1-Click Agency Manager Invite & Access State API
+│   │   │   ├── demo/                  # Public Sandboxed Demo APIs (AI Review Reply)
+│   │   │   ├── digital-card/          # Standalone Digital Business Card APIs
+│   │   │   │   ├── route.ts           # Digital Card CRUD API (Get/Save)
+│   │   │   │   └── fetch-public-gbp/route.ts # Public Google Places Auto-Extractor (Zero OAuth)
 │   │   │   ├── reviews/               # 1-Click AI Auto-Reply & List APIs
+│   │   │   ├── qr/                    # Dynamic Standee & QR Generation APIs
+│   │   │   │   ├── generate/route.ts  # Branded QR Code Generator API
+│   │   │   │   └── standee/route.ts   # Dynamic High-Res Acrylic Standee Composite API (Sharp)
 │   │   │   ├── onboarding/            # 9-Step Onboarding Engine State APIs
 │   │   │   ├── webhook/               # Evolution API & WhatsApp Incoming Webhooks
+│   │   │   ├── queue/                 # Live Waitlist & Queue Management APIs
+│   │   │   ├── menu/                  # Online Ordering Menu & Item CRUD APIs
+│   │   │   │   ├── [merchantId]/route.ts # Public Category & Available Items Fetcher
+│   │   │   │   └── items/route.ts     # Merchant Menu Items CRUD Management API
+│   │   │   ├── orders/                # WhatsApp Orders Management & Lifecycle APIs
+│   │   │   │   ├── route.ts           # Orders List & Filter API
+│   │   │   │   ├── [id]/confirm/route.ts # Merchant 1-Click Order Confirm & WA Notification
+│   │   │   │   ├── [id]/cancel/route.ts  # Merchant Order Reject & WA Notification
+│   │   │   │   └── [id]/status/route.ts  # Order Lifecycle State Transition (PREPARING, READY, DELIVERED)
+│   │   │   ├── gbp/                   # Google Business Profile (GBP) Dual-Track Operations APIs
+│   │   │   │   ├── agent/route.ts             # Autonomous GBP Rank-1 Engine API (JSON Payloads & Tasks)
+│   │   │   │   ├── audit/route.ts             # Free 100-Point GBP Health Audit & Competitor Spam Purge API
+│   │   │   │   ├── assign-track/route.ts      # Assign Track A / Track B & Seed SOP Checklist
+│   │   │   │   ├── checklist/route.ts         # Executive GBP Checklist & Progress State
+│   │   │   │   ├── checklist/complete/route.ts # Checkbox Verification with Automated Side Effects
+│   │   │   │   ├── redressal-dossier/route.ts # Pre-Filled Google Business Redressal Complaint Dossier Generator API
+│   │   │   │   ├── posts/route.ts             # Weekly 3-Post Engine (Generate/List Tuesday, Thursday, Saturday Content)
+│   │   │   │   ├── posts/[id]/mark-posted/route.ts # Operator 1-Click Verification & Live Status Mark
+│   │   │   │   ├── posts/[id]/approve/route.ts # Merchant 1-Click Post Approval API
+│   │   │   │   ├── posts/[id]/edit/route.ts   # Merchant Title/Caption Edit & Customization API
+│   │   │   │   ├── posts/[id]/reject/route.ts # Merchant Reject & Fresh Alternative Regenerator API
+│   │   │   │   ├── posts/card/route.ts        # Dynamic 1200x900 SVG Card Banner Generator
+│   │   │   │   ├── map-traffic-broadcast/route.ts # Throttled Weekend Map Traffic Booster Broadcast
+│   │   │   │   └── monthly-report/route.ts    # 4-Metric Monthly Retention WhatsApp Report Dispatcher
 │   │   │   └── google-business/       # Google OAuth 2.0 Auth Callback & Sync APIs
+│   │   ├── google-business-profile-ranking/page.tsx # Dedicated Pillar Landing Page: GBP Top 3 Rank Accelerator & Free Audit Tool
+│   │   ├── gbp-audit/page.tsx                     # Alias Route Permanent Redirect to /google-business-profile-ranking
+│   │   ├── ai-google-review-qr-generator/page.tsx # Dedicated Pillar Landing Page: Smart AI Google Reviews & QR Generator
+│   │   ├── ai-google-review-autoreply/page.tsx    # Dedicated Pillar Landing Page: 1-Click AI AutoReply on Google Maps
+│   │   ├── customerpilot-complete/page.tsx        # Flagship Landing Page: CustomerPilot Complete All-in-One Retention Stack
+│   │   ├── smart-digital-business-card/page.tsx   # Dedicated Pillar Landing Page: Smart Digital Business Card
+│   │   ├── whatsapp-digital-loyalty-card/page.tsx # Dedicated Pillar Landing Page: WhatsApp Digital Loyalty Cards
 │   │   ├── bakery-loyalty/page.tsx    # Industry Landing Page: Bakery Loyalty
+│   │   ├── menu/                      # Zomato-Style Online Ordering Menu Pages
+│   │   │   └── [slug]/page.tsx        # Public Interactive Menu Page (Category Nav, Cart, WhatsApp Checkout)
+│   │   ├── c/                         # Public Digital Business Card Routes
+│   │   │   └── [slug]/page.tsx        # High-End Mobile Digital Business Card (Zero App Install)
 │   │   ├── cafe-loyalty/page.tsx      # Industry Landing Page: Cafe Loyalty
 │   │   ├── salon-loyalty/page.tsx     # Industry Landing Page: Salon Loyalty
 │   │   ├── restaurant-loyalty/page.tsx# Industry Landing Page: Restaurant Loyalty
+│   │   ├── fastfood-loyalty/page.tsx  # Industry Landing Page: Fast Food & QSR Loyalty
+│   │   ├── car-wash-loyalty/page.tsx  # Industry Landing Page: Car Wash & Auto Detailing Loyalty
+│   │   ├── case-studies/              # Hard-Numbered Verified Case Studies
+│   │   │   └── cake-connection/page.tsx # Cake Connection 90-Day Results (+895% reviews)
+│   │   ├── vs/                        # Competitor Attack / Comparison Pages
+│   │   │   ├── reelo/page.tsx         # Reelo vs CustomerPilot
+│   │   │   ├── bingage/page.tsx       # Bingage vs CustomerPilot
+│   │   │   ├── birdeye/page.tsx       # Birdeye vs CustomerPilot
+│   │   │   └── stamp-me/page.tsx      # Stamp Me vs CustomerPilot
+│   │   ├── customerpilot-vs-stamp-me/page.tsx # Competitor Interception Alias Route
 │   │   ├── dashboard/                 # Merchant Command Center Dashboard
-│   │   │   ├── reviews/page.tsx       # 1-Click Google Review AI Studio (NEW)
+│   │   │   ├── digital-card/page.tsx  # Digital Business Card Studio & Live Simulator (NEW)
+│   │   │   ├── orders/page.tsx        # Live WhatsApp Orders Dashboard (Zomato Partner Style)
+│   │   │   ├── menu/page.tsx          # Online Menu Management Studio (Stock, Prices, Categories)
+│   │   │   ├── gbp-status/page.tsx    # Google Maps Rank & Trust Score Transparency Dashboard (NEW)
+│   │   │   ├── reviews/page.tsx       # 1-Click Google Review AI Studio
 │   │   │   ├── customers/page.tsx     # VIP Customers CRM Table
 │   │   │   ├── queue/page.tsx         # Live Waitlist & Queue Engine
 │   │   │   ├── rewards/page.tsx       # Loyalty Reward Catalog & Stamp Rules
-│   │   │   └── settings/page.tsx      # Merchant Profile, WhatsApp QR & GBP Link
+│   │   ├── guide/                          # Step-by-Step Interactive Guides & Infographics
+│   │   │   ├── 5-minute-setup-guide/page.tsx # 5-Minute Complete Setup Guide (Fast-Track Onboarding Blueprint)
+│   │   │   ├── operations/page.tsx         # Live Counter Operations Manual (Merchant & Customer Daily Journeys, Stepper & Matrix)
+│   │   │   └── 3-day-trial/page.tsx        # Legacy URL Permanent Redirect to /guide/5-minute-setup-guide
 │   │   ├── join/page.tsx              # Customer QR Scan & Digital Stamp Card Page
 │   │   ├── onboarding/page.tsx        # 9-Step Interactive Onboarding Wizard
 │   │   ├── page.tsx                   # Master Homepage & Product Landing Page
 │   │   ├── pricing/page.tsx           # V3.0 Customer Capacity & Founding Merchant Pricing
+│   │   ├── free-ai-google-review-generator/page.tsx # Free Interactive AI Google Review Generator (Traffic & Backlink Flywheel)
+│   │   ├── smart-ai-google-review/page.tsx   # Core AI Search & LLM Domination Blueprint Page (SEO/AEO/GEO)
 │   │   ├── review/page.tsx            # Customer 5-Star WhatsApp Review Collector Page
 │   │   └── super-admin/page.tsx       # Platform SuperAdmin Master Control Panel
 │   │
 │   ├── components/                    # Reusable React UI Components
+│   │   ├── gbp-manager-access-card.tsx         # 1-Click Google Business Profile Agency Manager Access & Invite Hub (CustomerPilot1@gmail.com)
+│   │   ├── gbp-10day-sprint.tsx                # 10-Day Local Top 3 Acceleration Sprint Dashboard & 4-Lever Tactical Command Hub
+│   │   ├── gbp-ranking-audit-client.tsx        # Interactive Free 100-Point GBP & Competitor Audit Tool, Tracks Comparison & Dual-Lang FAQs
+│   │   ├── free-ai-review-generator-client.tsx # Free AI Review Generator Interactive Client Engine (3 Variations, Presets, Copy)
+│   │   ├── live-review-reply-animation.tsx     # ReviewPilot-Style 3-Step Live Review & AI Reply Real-Time Simulation Engine (Framer Motion)
+│   │   ├── ai-google-review-qr-client.tsx      # Smart AI Google Review QR Generator Client Component (SEO/GEO/AEO + Stage 4 GEO Table)
+│   │   ├── ai-google-review-autoreply-client.tsx # 1-Click AI AutoReply Client Component (SEO/GEO/AEO)
+│   │   ├── customerpilot-complete-client.tsx    # CustomerPilot Complete All-in-One Client Component (SEO/GEO/AEO)
+│   │   ├── smart-digital-business-card-client.tsx # Smart Digital Business Card Client Component (SEO/GEO/AEO)
+│   │   ├── whatsapp-digital-loyalty-client.tsx  # WhatsApp Digital Loyalty Client Component (SEO/GEO/AEO)
+│   │   ├── digital-card-view.tsx      # Luxury Mobile Digital Card View with VCF & Socials
+│   │   ├── menu-view.tsx              # Interactive Zomato-Style Customer Ordering Menu (Cart, Search, Veg filter, WA Checkout)
+│   │   ├── dual-lang-faq.tsx          # Reusable Dual-Language FAQ (English Default + Hinglish) with Accordion & Theme Support
+│   │   ├── impersonation-banner.tsx   # SuperAdmin Impersonation Sticky Banner & Return Action
 │   │   ├── splash-screen.tsx          # Full-Screen 1-Second Animated Splash Overlay
 │   │   ├── brand-logo.tsx             # Pure Vector Transparent SVG Logo Component
 │   │   ├── app-sidebar.tsx            # Merchant Navigation Sidebar with Founder Badge
-│   │   └── top-nav.tsx                # Merchant Top Header Navigation
+│   │   ├── top-nav.tsx                # Merchant Top Header Navigation
+│   │   ├── ai-review-standee-client.tsx # Hardware Acrylic QR Standee Landing Client
+│   │   ├── free-ai-review-generator-client.tsx # Interactive AI Review Generator & SEO Flywheel
+│   │   ├── live-review-reply-animation.tsx # 3-Step Live Animation Engine
+│   │   ├── faq-section.tsx            # 16-Question Interactive Searchable FAQ with English & Hinglish Modes
+│   │   ├── ai-reply-sandbox.tsx       # Gemini AI Review Reply Browser Sandbox
+│   │   ├── vs-page.tsx                # Reusable Competitor Comparison Layout
+│   │   ├── fastfood-loyalty-client.tsx# Fast Food & QSR Loyalty Client Component
+│   │   ├── car-wash-loyalty-client.tsx# Car Wash & Detailing Loyalty Client Component
+│   │   ├── pricing/                   # Pricing Studio v4 Architecture
+│   │   │   └── pricing-studio.tsx     # Pricing Studio v4 (Interactive Bundle Builder, Tenure Comparison & Admin Edit Mode)
+│   │   └── super-admin/               # SuperAdmin Management UI Panels
+│   │       ├── whatsapp-fleet-monitor.tsx # SuperAdmin WhatsApp Disconnection & Targeted Alert Fleet Dashboard
+│   │       ├── gbp-operations-dashboard.tsx # GBP Dual-Track Operations Command Center
+│   │       ├── merchant-gbp-post-queue.tsx # 1-Click Weekly Content Queue & Caption Copy Tool
+│   │       ├── digital-cards-manager.tsx   # SuperAdmin On-Behalf Digital Card Generator & Fleet Manager
+│   │       ├── subscription-plans-manager.tsx # Master Subscription & Card Plans Pricing Editor with Pricing Studio v4
+│   │       ├── merchant-fleet-table.tsx   # Merchant Multi-Tenant Fleet Table & Impersonation
+│   │       └── super-admin-stats.tsx      # System Wide Metrics & Live Revenue Cards
 │   │
 │   ├── communication/                 # Unified Messaging Infrastructure
 │   │   ├── drivers/                   # Evolution API WhatsApp Engine Driver
 │   │   └── services/                  # CommunicationService (Dispatch & Templates)
 │   │
 │   └── lib/                           # Core Backend Business Logic & Engines
+│       ├── gbp-rank1-agent.ts         # Autonomous GBP Rank-1 Optimization Engine (Decision Matrix & Gemini/Local Fallback)
+│       ├── gbp-checklist-seed.ts      # Track A & B Operational SOP Checklists & Guardrail Templates
+│       ├── gbp-post-generator.ts      # Weekly 3-Post Engine (Product Spotlight, Social Proof, Weekend Offer)
 │       ├── ai-review-reply.ts         # Gemini AI Review Reply Generator
 │       ├── google-places-api.ts       # Google GBP API, Places API & Quota Handler
+│       ├── master-plans.ts            # Canonical Master Plans, Coupons & Self-Healing Auto-Seeder
 │       ├── queue-engine.ts            # WaitingCustomer & State Machine Processing
+│       ├── order-bot.ts               # WhatsApp Online Ordering Engine (Parser, Lifecycle, WA Auto-replies, Confirmation)
+│       ├── whatsapp-monitor.ts        # Fleet WhatsApp Disconnection Diagnosis & Targeted Alert Engine (SuperAdmin +91 9033304707)
 │       └── stamp-engine.ts            # Bill-to-Stamp Award & Redemption Logic
+│
+├── .github/workflows/                 # CI/CD Automation Workflows
+│   └── qa.yml                         # Automated Hardened QA, Playwright Error Trap & CI Verification Gate
+│
+├── e2e/                               # End-to-End Autonomous Testing & Hardened QA Suites
+│   ├── fixtures/
+│   │   └── hardened-test.ts           # Hardened Playwright Test Fixture (Console, Page Crash, Request Drops & 4xx/5xx Trap, Origin Lock & Token Redaction)
+│   ├── mutations/
+│   │   └── trap-mutation.spec.ts      # Multi-Vector Injected Fault Tests (Console, 500, Near-Miss 401, Pageerror, Requestfailed, Foreign Origin)
+│   ├── gbp-ranking-audit.spec.ts      # Dedicated Interactive GBP Free 100-Point Audit & Redirect E2E Spec
+│   ├── merchant-journey.spec.ts       # Full Merchant User Journey, Auth & Marketing Pages E2E Spec
+│   └── allowlist-contract.spec.ts     # Dedicated Strict Allowlist Contract Tests (Proving Every Entry /api/auth/me, /api/auth/logout, /favicon.ico is Exercised & Permitted)
+│
+├── scripts/                           # Production Health, Seed & Playwright Verification Scripts
+│   ├── run_autonomous_qa.js           # Deterministic Autonomous QA & Self-Debug Runner with Error Traps
+│   ├── verify_trap_mutation.js        # Hardened Error Trap Mutation Proof & Failure Verification Script (6 Vectors)
+│   ├── test_gbp_rank1_agent.js        # Deterministic Test Suite for GBP Rank-1 Engine (Track A/B, Guardrails, API)
+│   ├── verify_spec_imports.js         # Architectural Spec Import Lint (Guarantees zero unhardened @playwright/test imports)
+│   ├── test_scoring_engine.js         # Table-Driven Boundary Unit Test Suite for GBP Audit Scoring Engine (12 cases)
+│   ├── test_token_redaction.js        # Multi-Vector Token & Secret Redaction Unit Test Suite (Bearer, JWT, Cookie, Query, JSON)
+│   ├── verify_empty_db_determinism.js # Empty Database (0 Merchants) Audit Engine Invariance & Determinism Verification
+│   ├── verify_gbp_landing_page.js         # Playwright GBP Landing Page & Free Interactive Audit Tool Verification Suite
+│   ├── verify_master_standee_generator.js # Playwright Universal Master QR Loyalty Standee Ground-Truth Verification
+│   ├── verify_superadmin_digital_card_and_indian_english.js # Playwright SuperAdmin On-Behalf Card Generation & Indian English Test Suite
+│   ├── verify_seo_master_strategy.js  # Playwright Full SEO / AEO / GEO Master Strategy Assertion Suite
+│   ├── verify_smart_ai_review_framework.js # Playwright AI Search & LLM Domination Framework (Stages 1, 2, 4, 5) Assertion Suite
+│   ├── verify_review_pilot_animation.js # Playwright ReviewPilot-Style 3-Step Live Review & Auto-Reply Flow Verification Suite
+│   ├── verify_landing_pages_enhanced.js # Playwright Enhanced Landing Pages Test Suite (5 Pages, Simulators, $100k Chassis, How It Works Infographics, Indian English)
+│   ├── capture_how_it_works.js        # Playwright How-It-Works Visual Infographics Screenshot Script
+│   ├── verify_light_mode.js           # Playwright Strict Light Mode & Theme Lock Assertion Suite (7 Routes)
+│   ├── verify_all_products_landing_pages.js # Playwright Dedicated Product Landing Pages Test Suite (6 Scenarios)
+│   ├── verify_faq_dual_language.js    # Playwright Dual-Language FAQ Switching Suite
+│   ├── verify_seo_aeo_geo_pages.js    # Playwright SEO/AEO/GEO Landing Pages Test Suite
+│   ├── seed_tasty_vadapav_atladara.js # Ground-Truth Business Seed Script for Tasty Vadapav Atladara
+│   ├── backup_migration_bundle.sh     # Automated Zero-Scan Master Migration Snapshot & Keystore Bundler
+│   └── restore_migration_bundle.sh    # Automated 1-Click Zero-Scan Master Migration Restorer
 ```
 
 ### **10.2 Feature & Module Mapping Table**
 | Module / Feature | Main Entry File(s) | Helper Services & Engines | Purpose / Description |
 | :--- | :--- | :--- | :--- |
+| **Autonomous QA & Self-Debug Testing Engine** | scripts/run_autonomous_qa.js<br/>e2e/gbp-ranking-audit.spec.ts | e2e/fixtures/hardened-test.ts<br/>playwright.config.ts | Deterministic end-to-end testing and runtime error trapping framework. Listens to browser console errors, page crashes, and unwhitelisted 4xx/5xx network responses during user interaction flows. Writes failure traces to scratch/qa_debug_trace.json to empower Antigravity to autonomously debug and fix UI bugs before presenting results to the Admin. |
+| **Google Business Profile (GBP) Dedicated SEO/AEO/GEO Landing Page & Free Audit Tool** | `src/app/google-business-profile-ranking/page.tsx`<br/>`src/app/gbp-audit/page.tsx` | `src/components/gbp-ranking-audit-client.tsx`<br/>`src/app/api/gbp/audit/route.ts`<br/>`scripts/verify_gbp_landing_page.js` | Dedicated high-converting public landing page and interactive diagnostic tool. Allows merchants to run a free 100-point self-audit on their GBP listing, assesses Google Sandbox ban risk, detects competitor keyword spam with physical signboard redressal opportunities, benchmarks against local top 3 competitors, and presents Track A ("New Business Launchpad") and Track B ("Top 3 Rank Accelerator") with the 5 zero-ban operational guardrails. |
+| **CustomerPilot Autonomous GBP Rank-1 Engine** | `src/app/api/gbp/agent/route.ts`<br/>`.agent/agents/gbp-optimization-agent.md` | `src/lib/gbp-rank1-agent.ts`<br/>`scripts/test_gbp_rank1_agent.js` | Elite deterministic Local SEO, AEO, and GEO optimization AI engine for Indian SMBs to move from Rank #10-#50 to Google Maps Local Top 3 in 30 days. Executes 7-Pillar Algorithmic Weightage Matrix (Category alignment, WhatsApp photo review velocity, legitimate DBA signboard verification, triple LocalBusiness+FAQPage+OfferCatalog schema, weekend CTR map booster, competitor redressal purge, and 15 AEO seed Q&As) while enforcing 4 strict Google Policy Red Lines with Gemini AI & 100% deterministic local fallback. |
+| **Google Business Profile (GBP) Dual-Track Operations Engine** | `src/app/dashboard/gbp-status/page.tsx`<br/>`src/components/super-admin/gbp-operations-dashboard.tsx` | `src/lib/gbp-checklist-seed.ts`<br/>`src/app/api/gbp/assign-track/route.ts`<br/>`src/app/api/gbp/checklist/complete/route.ts`<br/>`src/app/api/gbp/map-traffic-broadcast/route.ts`<br/>`src/app/api/gbp/monthly-report/route.ts` | Complete non-technical operations framework and software automation for Track A ("New Business Launchpad", 0 to Top 3 in 60 days, 30-day sandbox review velocity throttle) and Track B ("Top 3 Rank Accelerator", #10-#50 to Top 3, 90-min surgery checklist, WhatsApp honest photo review flywheel, and weekend map booster). Includes 5 operational guardrails: 1) Zero-Ban honest feedback without review gating, 2) ₹500 physical sub-board upgrade before name edits, 3) Redressal complaint spam purge form, 4) Outside-GBP GEO article mentions for ChatGPT/Gemini, and 5) Hidden attributes & WhatsApp order links. |
+| **Universal Master QR Loyalty Standee System & Print Engine** | `src/app/api/qr/standee/route.ts`<br/>`src/components/qr-generator.tsx` | `public/standees/standee_universal_base.jpg`<br/>`src/lib/branded-qr.ts`<br/>`scripts/verify_master_standee_generator.js` | Locks the Master Tabletop Standee template across CustomerPilot. Renders 3D "SCAN to EARN" headline, gold satin "CONFIRM REWARDS", 3 benefit pills (Exclusive Offers, Loyalty Rewards, Membership Discount), VIP Member footer bar, and CustomerPilot tagline ("Turns Every Walkins into LifeTime Customers"). Supports dynamic merchant logo with Times New Roman serif fallback, vector A4/A5 acrylic print engine, and instant high-res JPG poster downloads. |
+| **5-Stage AI Search & LLM Domination Framework (Google SGE + ChatGPT + Perplexity)** | `src/app/smart-ai-google-review/page.tsx`<br/>`src/app/ai-google-review-qr-generator/page.tsx`<br/>`src/app/free-ai-google-review-generator/page.tsx` | `src/components/free-ai-review-generator-client.tsx`<br/>`scripts/verify_smart_ai_review_framework.js`<br/>`src/components/dual-lang-faq.tsx` | **Stage 1 Blueprint**: Target URL `/smart-ai-google-review`, H1 Primary Entity (*Smart AI Google Review: Scan, Auto-Write & Boost 5-Star Reviews in 1 Click*), 45-word SGE Direct Answer Snippet.<br/>**Stage 2 Schema**: JSON-LD `@graph` with `SoftwareApplication` entity + voice-search FAQPage.<br/>**Stage 4 GEO Table**: Structured 4-column `<table>` comparing CustomerPilot against MagicReview, TapNConnect, and normal Google QR.<br/>**Stage 5 Free Utility Trap**: Standalone `/free-ai-google-review-generator` with instant 3 AI review variations, retail category presets, and standee upsell. |
+| **5-Stage AI Search & LLM Domination Framework (Google SGE + ChatGPT + Perplexity)** | `src/app/smart-ai-google-review/page.tsx`<br/>`src/app/ai-google-review-qr-generator/page.tsx`<br/>`src/app/free-ai-google-review-generator/page.tsx` | `src/components/free-ai-review-generator-client.tsx`<br/>`scripts/verify_smart_ai_review_framework.js`<br/>`src/components/dual-lang-faq.tsx` | **Stage 1 Blueprint**: Target URL `/smart-ai-google-review`, H1 Primary Entity (*Smart AI Google Review: Scan, Auto-Write & Boost 5-Star Reviews in 1 Click*), 45-word SGE Direct Answer Snippet.<br/>**Stage 2 Schema**: JSON-LD `@graph` with `SoftwareApplication` entity + voice-search FAQPage.<br/>**Stage 4 GEO Table**: Structured 4-column `<table>` comparing CustomerPilot against MagicReview, TapNConnect, and normal Google QR.<br/>**Stage 5 Free Utility Trap**: Standalone `/free-ai-google-review-generator` with instant 3 AI review variations, retail category presets, and standee upsell. |
+| **Dedicated Product Landing Pages & Luxury $100k Visual Simulators** | `src/app/smart-digital-business-card/page.tsx`<br/>`src/app/ai-google-review-qr-generator/page.tsx`<br/>`src/app/ai-google-review-autoreply/page.tsx`<br/>`src/app/whatsapp-digital-loyalty-card/page.tsx`<br/>`src/app/customerpilot-complete/page.tsx` | `scripts/verify_landing_pages_enhanced.js`<br/>`scripts/capture_how_it_works.js`<br/>`src/components/dual-lang-faq.tsx` | Master Homepage theme alignment, pure light mode, 100% Indian English copy. Default **Cake Connection** card on `/smart-digital-business-card`. Unobstructed, crystal-clear $100,000 SaaS luxury phone chassis (iPhone 16 Pro styling, Dynamic Island status bar 9:41, bottom home indicator, zero obstructive floating cards). Dedicated animated **"How It Works"** section on every product landing page featuring numbered gradient pills (01, 02, 03), connecting desktop energy lines, visual interactive infographic boxes, and micro-metric badges. |
+| **Pure Light Mode Architecture** | `src/components/providers.tsx`<br/>`src/components/top-nav.tsx`<br/>`src/app/layout.tsx` | `scripts/verify_light_mode.js` | Strictly enforces pure light theme across public pages, landing pages, and dashboard. `NextThemesProvider` locked with `forcedTheme="light"` and `enableSystem={false}`. `<ModeToggle />` removed from top nav. Viewport `themeColor` set to `#ffffff`. |
+| **Luxury Live Digital Business Card** | `src/app/c/[slug]/page.tsx`<br/>`src/app/dashboard/digital-card/page.tsx` | `src/components/digital-card-view.tsx`<br/>`src/app/api/digital-card/route.ts`<br/>`src/lib/google-places-api.ts` | Mobile-first micro-website with auto-fetched public GBP data, 6 branded social/call/WhatsApp buttons, online food ordering platforms, Google reviews, and 1-tap `.vcf` contact downloader. Zero disturbance to existing modules. |
 | **1-Click GoogleReview AutoReply** | `src/app/dashboard/reviews/page.tsx` | `src/lib/ai-review-reply.ts`<br/>`src/lib/google-places-api.ts` | Pre-drafts 5-star Gemini AI replies & provides 1-Click Copy & Post to Google Maps with Quota Safety Dead-Letter Queue (Pre-Approval Mode). |
 | **9-Step Onboarding Engine** | `src/app/onboarding/page.tsx` | `src/lib/onboarding-engine.ts` | Guides store owners through WhatsApp QR scan, GBP link, Stamp Rules, and first test scan. |
 | **WhatsApp Messaging Engine** | `src/communication/services/CommunicationService.ts` | `src/communication/drivers/EvolutionDriver.ts` | Handles all outgoing & incoming WhatsApp messages (Welcome, OTP, Stamp Notifications, Reviews). |
 | **Digital Stamp Loyalty System** | `src/app/join/page.tsx`<br/>`src/app/dashboard/rewards/page.tsx` | `src/lib/stamp-engine.ts`<br/>`src/lib/vip-engine.ts` | Customer QR scan at billing counter, stamp collection, reward unlocks, and VIP tier progression. |
 | **Google Review Collection Flow** | `src/app/review/page.tsx` | `src/lib/google-reviews-service.ts` | Post-purchase review collector pre-filling 5-star AI drafts for Google Maps. |
-| **Pricing V3.0 & Founding Program** | `src/app/pricing/page.tsx`<br/>`src/app/page.tsx` | N/A | Displays V3.0 Customer Capacity Pricing, 100 Founding Merchant Scarcity Counter (Platinum/Gold/Silver), and Referral Rewards. |
+| **Pricing Studio v4 & Dynamic Bundle Architecture** | `src/app/pricing/page.tsx`<br/>`src/components/pricing-client.tsx`<br/>`src/components/pricing/pricing-studio.tsx`<br/>`src/app/dashboard/subscription/page.tsx` | `src/lib/master-plans.ts`<br/>`src/components/super-admin/subscription-plans-manager.tsx`<br/>`src/app/api/pricing/plans/route.ts` | Unified Pricing Studio v4 providing: 1) Interactive Dynamic Bundle Builder ("🧺 Your Bundle") with real-time volume savings, 2) Tenure Comparison ("Compare all tenures") across 6 Months, 1 Year Pro (50% OFF), and Lifetime Deal, 3) Standalone Services Table with 6 Months & 1 Year breakdown, row sums, and CustomerPilot Complete Suite savings callout, 4) Real-Time SuperAdmin inline edit mode with persistence to `/api/pricing/plans`. |
+| **SuperAdmin On-Behalf Card Generation & Master Pricing Suite** | `src/app/super-admin/page.tsx`<br/>`src/app/api/admin/digital-cards/route.ts` | `src/components/super-admin/digital-cards-manager.tsx`<br/>`src/components/super-admin/subscription-plans-manager.tsx`<br/>`src/lib/master-plans.ts`<br/>`scripts/verify_superadmin_digital_card_and_indian_english.js` | SuperAdmin can generate & manage live digital cards on behalf of any merchant without login credentials. Full real-time Master Pricing Plans manager allowing live edits of prices, MRPs, badges, and titles for all 12 platform plans including Smart Digital Business Cards (₹349, ₹499, ₹1,499). |
 
 ### **10.3 Obsolete Files Audit**
 * `src/lib/run-sim.ts` — Obsolete CLI simulation runner from V13.

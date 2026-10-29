@@ -1,11 +1,19 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
+import { generateMerchantIdNumber } from "@/lib/merchant-id-generator"
 
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      authorization: {
+        params: {
+          prompt: "select_account",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET || "fallback_nextauth_secret_32_chars_long!!",
@@ -33,11 +41,13 @@ export const authOptions: NextAuthOptions = {
         }
         if (!merchant) {
           const trialEndsAt = new Date();
-          trialEndsAt.setDate(trialEndsAt.getDate() + 7);
+          trialEndsAt.setDate(trialEndsAt.getDate() + 3); // 3-day trial
+          const merchantIdNumber = await generateMerchantIdNumber(db);
           merchant = await db.merchant.create({
             data: {
               userId: dbUser.id,
-              name: user.name ? `${user.name}'s Business` : "My Business",
+              merchantIdNumber,
+              name: user.name || "My Business",
               ownerName: user.name || "",
               email: cleanEmail,
               businessType: "bakery",

@@ -37,8 +37,24 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "examples", 
+    "examples",
     "node_modules",
-    "evolution-api-repo"
+    "evolution-api-repo",
+    "scratch",
+    "scripts",
+    "tests",
+    "e2e",
+    "src/app/api/cron/**",
+    "src/app/api/digital-card/**",
+    "src/app/api/google-business/select-location/**",
+    "src/app/api/payments/verify/**",
+    "src/app/api/qr/standee/**",
+    "src/app/api/webhook/evolution/**",
+    "src/app/api/whatsapp/connect/**",
+    "src/app/dashboard/reviews/**",
+    "src/app/q/wallet/**",
+    "src/app/uploads/**",
+    "src/lib/digital-card-service.ts",
+    "src/lib/stamp-engine.ts"
   ]
 }

@@ -1,0 +1,79 @@
+export interface DefaultMerchantSettingsData {
+  // Reward Card Rules (Step A)
+  cardName: string
+  rewardName: string
+  stampsRequired: number
+  stampValue: number
+  validityDays: number
+  googleReviewBonus: number
+  photoBonus: number
+  joiningBonusEnabled: boolean
+  joiningBonusStamps: number
+  vipUpgradeBonusStamps: number
+  referralBonusEnabled?: boolean
+  referralBonusStamps?: number
+  referralFriendBonusStamps?: number
+  referralRewardAmount?: number
+  color: string
+  tierRewardsEnabled: boolean
+  rewardImageUrl?: string
+
+  // Instagram Story Mention & Tag Reward
+  instagramStoryBonusEnabled?: boolean
+  instagramStoryBonusStamps?: number
+  instagramStoryFrequency?: "ONCE_PER_CYCLE" | "EVERY_PURCHASE" | "COOLDOWN_30_DAYS"
+
+  // 10 Loyalty Cycle Categories (Step B)
+  loyaltyCategoryNames: string[]
+
+  // System Automation Rules (Step C)
+  googleReviewDelayMinutes: number
+  winbackDays1: number
+  winbackDays2: number
+  winbackDays3: number
+  expiryWarningDays: number
+  enabledModules: string
+}
+
+export const FALLBACK_GLOBAL_DEFAULTS: DefaultMerchantSettingsData = {
+  cardName: "VIP Club",
+  rewardName: "1 Free Reward / Gift",
+  stampsRequired: 15,
+  stampValue: 300,
+  validityDays: 180,
+  googleReviewBonus: 1,
+  photoBonus: 1,
+  joiningBonusEnabled: true,
+  joiningBonusStamps: 1,
+  vipUpgradeBonusStamps: 2,
+  referralBonusEnabled: true,
+  referralBonusStamps: 1,
+  referralFriendBonusStamps: 1,
+  referralRewardAmount: 0,
+  instagramStoryBonusEnabled: true,
+  instagramStoryBonusStamps: 1,
+  instagramStoryFrequency: "ONCE_PER_CYCLE",
+  color: "#6366f1",
+  tierRewardsEnabled: false,
+  rewardImageUrl: "",
+
+  loyaltyCategoryNames: [
+    "VIP",
+    "VIP Silver",
+    "VIP Gold",
+    "VIP Platinum",
+    "VIP Diamond",
+    "VIP Elite",
+    "VIP Master",
+    "VIP Champion",
+    "VIP Legend",
+    "VIP Imperial"
+  ],
+
+  googleReviewDelayMinutes: 30,
+  winbackDays1: 30,
+  winbackDays2: 60,
+  winbackDays3: 90,
+  expiryWarningDays: 7,
+  enabledModules: "LOYALTY,REVIEWS,AUTOREPLY"
+}

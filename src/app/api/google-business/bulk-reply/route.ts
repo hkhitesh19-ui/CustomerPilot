@@ -2,11 +2,16 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { postReviewReplyToGBP } from "@/lib/google-reviews-service"
 import { generateAIReviewReply } from "@/lib/ai-review-reply"
+import { applyBulkAiRateLimit } from "@/lib/rate-limiter"
 
 export async function POST(req: NextRequest) {
   try {
     const merchantId = req.headers.get("x-merchant-id")
     if (!merchantId) return NextResponse.json({ error: "Missing merchantId" }, { status: 400 })
+
+    // Rate limit: max 5 bulk AI operations per merchant per minute
+    const limited = await applyBulkAiRateLimit(merchantId)
+    if (limited) return limited
 
     const { jobId } = await req.json()
     if (!jobId) return NextResponse.json({ error: "Missing jobId" }, { status: 400 })
@@ -61,7 +66,7 @@ export async function POST(req: NextRequest) {
       const pending = await tx.googleBusinessReview.findMany({
         where: { merchantId, isReplied: false, status: "pending", comment: { not: null } },
         take: CHUNK_SIZE,
-        select: { id: true, gbpReviewId: true, comment: true }
+        select: { id: true, gbpReviewId: true, comment: true, rating: true }
       })
       
       if (pending.length === 0) return []
@@ -89,11 +94,14 @@ export async function POST(req: NextRequest) {
     // 5. PROCESS CHUNK SEQUENTIALLY
     for (const review of unrepliedReviews) {
       try {
+        const storeLocation = conn.merchant.city || conn.merchant.address || conn.address || "Vadodara"
+        const storeCategory = conn.merchant.businessType || conn.merchant.category || "fresh cakes and bakery products"
         const replyText = await generateAIReviewReply({
           merchantName: conn.merchant.name || "Our Store",
-          locationOrArea: conn.address || "Our Area",
-          category: conn.merchant.businessType || "local business",
-          customerReview: review.comment || ""
+          locationOrArea: storeLocation,
+          category: storeCategory,
+          customerReview: review.comment || `${review.rating || 5}-Star Rating and wonderful experience!`,
+          rating: review.rating || 5
         })
 
         const success = await postReviewReplyToGBP(merchantId, review.gbpReviewId, replyText)

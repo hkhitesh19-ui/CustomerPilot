@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { QrCode, Sparkles, CheckCircle2, RefreshCw, Award, MessageSquare, Clock, ShieldCheck } from "lucide-react"
+import { PoweredByCustomerPilot } from "@/components/powered-by-customerpilot"
 
 function JoinContent() {
   const searchParams = useSearchParams()
@@ -16,8 +17,8 @@ function JoinContent() {
 
   const { toast } = useToast()
   const defaultCard = {
-    name: merchantId ? decodeURIComponent(merchantId) : "Cake Connection Live Cake",
-    rewardName: "FREE Special Treat / Pastry",
+    name: merchantId ? decodeURIComponent(merchantId) : "Store VIP Club",
+    rewardName: "FREE Special Welcome Treat",
     stampValue: 500,
     stampsRequired: 10,
     googleReviewBonus: 1,
@@ -151,8 +152,8 @@ function JoinContent() {
                 type="button"
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 text-base shadow-md gap-2"
                 onClick={() => {
-                  const phone = "917203824012"
-                  const bizName = stampCard?.name || "Cake Connection"
+                  const phone = "919033304707"
+                  const bizName = stampCard?.name || "Store Team"
                   const msg = `🎉 Hi ${bizName}! I want to join the VIP Club & collect my first loyalty stamp!`
                   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank")
                 }}
@@ -224,6 +225,7 @@ function JoinContent() {
         )}
 
       </div>
+      <PoweredByCustomerPilot />
     </div>
   )
 }

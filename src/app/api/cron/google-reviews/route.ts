@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { fetchGoogleReviews, syncGoogleReviewsToDb, postReviewReplyToGBP } from "@/lib/google-reviews-service"
 import { generateAIReviewReply } from "@/lib/ai-review-reply"
+import { processPendingReviewPhotoVerifications } from "@/lib/review-photo-verifier"
 
 // Vercel cron configuration (runs every 5 minutes in production)
 export const maxDuration = 300 // 5 minutes limit
@@ -14,7 +15,15 @@ export async function GET(req: Request) {
 
     // 1. Fetch all active merchants who have Google Business Profiles connected
     const connections = await db.merchantGoogleConnection.findMany({
-      where: { syncStatus: "active" },
+      where: { 
+        syncStatus: "active",
+        merchant: {
+          OR: [
+            { trialEndsAt: null },
+            { trialEndsAt: { gt: new Date() } }
+          ]
+        }
+      },
       include: { merchant: true }
     })
 
@@ -47,13 +56,17 @@ export async function GET(req: Request) {
 
         // 4. Generate & Post Replies
         for (const review of unrepliedReviews) {
-          console.log(`[CRON] Generating reply for review ${review.gbpReviewId}...`)
+          console.log(`[CRON] Generating SEO Auto-Reply for review ${review.gbpReviewId} (${review.rating}⭐)...`)
           
+          const storeLocation = conn.merchant.city || conn.merchant.address || conn.address || "Vadodara"
+          const storeCategory = conn.merchant.businessType || conn.merchant.category || "fresh cakes and bakery products"
+
           const replyText = await generateAIReviewReply({
             merchantName: conn.merchant.name || "Our Store",
-            locationOrArea: conn.address || "Our Area",
-            category: conn.merchant.businessType || "local business",
-            customerReview: review.comment || ""
+            locationOrArea: storeLocation,
+            category: storeCategory,
+            customerReview: review.comment || `${review.rating}-Star Rating and wonderful experience!`,
+            rating: review.rating ?? 5
           })
 
           const success = await postReviewReplyToGBP(conn.merchantId, review.gbpReviewId, replyText)
@@ -69,7 +82,7 @@ export async function GET(req: Request) {
               }
             })
             totalRepliesSent++
-            console.log(`[CRON] Successfully replied to review ${review.gbpReviewId}`)
+            console.log(`[CRON] ✅ Successfully published SEO Auto-Reply for review ${review.gbpReviewId}`)
           }
         }
       } catch (err: any) {
@@ -77,10 +90,15 @@ export async function GET(req: Request) {
       }
     }
 
+    // 5. Process any pending review photo verifications
+    const verifiedPhotosCount = await processPendingReviewPhotoVerifications()
+    console.log(`[CRON] Processed ${verifiedPhotosCount} pending review photo verifications.`)
+
     return NextResponse.json({
       success: true,
       message: "Real-time Google Reviews Polling completed.",
-      repliesSent: totalRepliesSent
+      repliesSent: totalRepliesSent,
+      verifiedPhotosCount
     })
 
   } catch (error: any) {

@@ -53,14 +53,14 @@ export async function GET(req: NextRequest) {
                   ].filter(Boolean);
                   if (parts.length > 0) addr = parts.join(", ");
                 }
-                const placeId = loc.metadata?.placeId || loc.name || "ChIJc7ija2zFXzkR8DbOxXEfaM4";
+                const placeId = loc.metadata?.placeId || loc.name || "";
                 const reviewUrl = loc.metadata?.newReviewUri || `https://search.google.com/local/writereview?placeid=${placeId}`;
                 const mapsUri = loc.metadata?.mapsUri || `https://maps.google.com/?cid=14873172342901454576`;
 
                 liveLocations.push({
                   id: loc.name || placeId,
-                  name: loc.title || merchant?.name || "Cake Connection",
-                  businessTitle: loc.title || merchant?.name || "Cake Connection",
+                  name: loc.title || merchant?.name || "Store Location",
+                  businessTitle: loc.title || merchant?.name || "Store",
                   address: addr,
                   placeId: placeId,
                   cid: "14873172342901454576",
@@ -77,53 +77,69 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Default multi-branch list for Cake Connection / Merchant if Google API returned single or in sandbox/demo
-    const primaryName = conn?.placeName || merchant?.name || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara";
-    const primaryAddress = conn?.address || merchant?.address || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011";
-    const primaryPlaceId = conn?.placeId || "ChIJc7ija2zFXzkR8DbOxXEfaM4";
-    const primaryReviewUrl = conn?.googleReviewUrl || "https://g.page/r/CfA2zsVxH2jOEBM/review";
+    // Only use Cake Connection multi-branch list for Cake Connection merchant
+    const isCakeConnection = (merchant?.name || "").toLowerCase().includes("cake connection");
 
-    const defaultLocations = [
-      {
-        id: "loc_vadodara_manjalpur",
-        name: primaryName,
-        branch: "Manjalpur Branch (Main HQ)",
-        businessTitle: "Cake Connection",
-        address: primaryAddress,
-        placeId: primaryPlaceId,
-        cid: "14873172342901454576",
-        mapsUri: "https://maps.google.com/?cid=14873172342901454576",
-        reviewUrl: primaryReviewUrl,
-        isVerified: true,
-        isSelected: true
-      },
-      {
-        id: "loc_vadodara_alkapuri",
-        name: "Cake Connection - Fresh Bakes & Desserts",
-        branch: "Alkapuri Branch",
-        businessTitle: "Cake Connection",
-        address: "Shop 12, Express Tower, RC Dutt Road, Alkapuri, Vadodara, Gujarat - 390007",
-        placeId: "ChIJL6u2s_rFXzkR3gY-P3y5aF8",
-        cid: "12849172839182371928",
-        mapsUri: "https://maps.google.com/?cid=12849172839182371928",
-        reviewUrl: "https://search.google.com/local/writereview?placeid=ChIJL6u2s_rFXzkR3gY-P3y5aF8",
-        isVerified: true,
-        isSelected: false
-      },
-      {
-        id: "loc_anand_vidyanagar",
-        name: "Cake Connection - Anand Outlet",
-        branch: "Anand Vidyanagar Road",
-        businessTitle: "Cake Connection",
-        address: "Shop 4, Anand-Vidyanagar Road, Near Town Hall, Anand, Gujarat - 388001",
-        placeId: "ChIJ9198u3nFXzkRx2881a7ybc3",
-        cid: "9823719827391827391",
-        mapsUri: "https://maps.google.com/?cid=9823719827391827391",
-        reviewUrl: "https://search.google.com/local/writereview?placeid=ChIJ9198u3nFXzkRx2881a7ybc3",
-        isVerified: true,
-        isSelected: false
-      }
-    ];
+    let defaultLocations: any[] = [];
+    if (isCakeConnection) {
+      defaultLocations = [
+        {
+          id: "loc_vadodara_manjalpur",
+          name: conn?.placeName || merchant?.name || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara",
+          branch: "Manjalpur Branch (Main HQ)",
+          businessTitle: "Cake Connection",
+          address: conn?.address || merchant?.address || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011",
+          placeId: conn?.placeId || "ChIJc7ija2zFXzkR8DbOxXEfaM4",
+          cid: "14873172342901454576",
+          mapsUri: "https://maps.google.com/?cid=14873172342901454576",
+          reviewUrl: conn?.googleReviewUrl || "https://g.page/r/CfA2zsVxH2jOEBM/review",
+          isVerified: true,
+          isSelected: true
+        },
+        {
+          id: "loc_vadodara_alkapuri",
+          name: "Cake Connection - Fresh Bakes & Desserts",
+          branch: "Alkapuri Branch",
+          businessTitle: "Cake Connection",
+          address: "Shop 12, Express Tower, RC Dutt Road, Alkapuri, Vadodara, Gujarat - 390007",
+          placeId: "ChIJL6u2s_rFXzkR3gY-P3y5aF8",
+          cid: "12849172839182371928",
+          mapsUri: "https://maps.google.com/?cid=12849172839182371928",
+          reviewUrl: "https://search.google.com/local/writereview?placeid=ChIJL6u2s_rFXzkR3gY-P3y5aF8",
+          isVerified: true,
+          isSelected: false
+        },
+        {
+          id: "loc_anand_vidyanagar",
+          name: "Cake Connection - Anand Outlet",
+          branch: "Anand Vidyanagar Road",
+          businessTitle: "Cake Connection",
+          address: "Shop 4, Anand-Vidyanagar Road, Near Town Hall, Anand, Gujarat - 388001",
+          placeId: "ChIJ9198u3nFXzkRx2881a7ybc3",
+          cid: "9823719827391827391",
+          mapsUri: "https://maps.google.com/?cid=9823719827391827391",
+          reviewUrl: "https://search.google.com/local/writereview?placeid=ChIJ9198u3nFXzkRx2881a7ybc3",
+          isVerified: true,
+          isSelected: false
+        }
+      ];
+    } else {
+      defaultLocations = [
+        {
+          id: `loc_${merchant?.id || "main"}`,
+          name: conn?.placeName || merchant?.name || "Store Location",
+          branch: "Main Branch",
+          businessTitle: merchant?.name || "Store",
+          address: conn?.address || merchant?.address || "Store Address",
+          placeId: conn?.placeId || (merchant?.googleReviewLink ? "custom_place" : ""),
+          cid: conn?.gbpAccountId?.replace("accounts/", "") || "",
+          mapsUri: conn?.googleReviewUrl || merchant?.googleReviewLink || "",
+          reviewUrl: conn?.googleReviewUrl || merchant?.googleReviewLink || "",
+          isVerified: !!conn?.verified,
+          isSelected: true
+        }
+      ];
+    }
 
     const finalLocations = liveLocations.length > 0 ? liveLocations : defaultLocations;
 

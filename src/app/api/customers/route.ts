@@ -42,8 +42,8 @@ export async function POST(req: NextRequest) {
       return err(deniedMessage(staff.role as Role, "customers.create"), 403)
     }
 
-    // Duplicate prevention: phone must be unique per merchant
-    const existing = await db.customer.findFirst({ where: { merchantId: merchant.id, phone } })
+    // Duplicate prevention: phone must be unique per merchant (excluding soft-deleted)
+    const existing = await db.customer.findFirst({ where: { merchantId: merchant.id, phone, deletedAt: null } })
     if (existing) {
       return err(`Duplicate customer: phone ${phone} already registered as "${existing.name}"`, 409)
     }

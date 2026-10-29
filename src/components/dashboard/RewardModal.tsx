@@ -13,12 +13,15 @@ interface RewardModalProps {
   waitingCustomer: any | null;
   onSuccess: () => void;
   merchantId?: string;
+  stampValue?: number;
 }
 
-export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merchantId = "" }: RewardModalProps) {
+export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merchantId = "", stampValue }: RewardModalProps) {
   const [amount, setAmount] = useState('');
   const [productName, setProductName] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
   const [error, setError] = useState('');
   const [upsellInfo, setUpsellInfo] = useState<{
     shortfall: number;
@@ -32,6 +35,7 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
   const handleClose = () => {
     setAmount('');
     setProductName('');
+    setReferralCode('');
     setError('');
     setUpsellInfo(null);
     setResult(null);
@@ -39,8 +43,15 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
   };
 
   const parsedAmt = parseFloat(amount) || 0;
-  const STAMP_THRESHOLD = 500; // Default ₹500
-  const realTimeShortfall = parsedAmt > 0 && parsedAmt < STAMP_THRESHOLD ? STAMP_THRESHOLD - parsedAmt : 0;
+  const STAMP_THRESHOLD = stampValue && stampValue > 0 ? stampValue : 300; // Dynamic from merchant setting
+  
+  const referrer = waitingCustomer.referrer || waitingCustomer.customer?.referredBy || waitingCustomer.customer?.referralsReceived?.[0]?.referrer || null;
+  
+  // Compute shortfall to earn next stamp threshold
+  const remainder = parsedAmt % STAMP_THRESHOLD;
+  const realTimeShortfall = parsedAmt > 0 && remainder > 0 ? STAMP_THRESHOLD - remainder : (parsedAmt > 0 && parsedAmt < STAMP_THRESHOLD ? STAMP_THRESHOLD - parsedAmt : 0);
+  const nextTargetAmount = parsedAmt + realTimeShortfall;
+  const currentStampsCount = Math.floor(parsedAmt / STAMP_THRESHOLD);
 
   const isReturningVIP = (waitingCustomer.customer?.lifetimeStamps || 0) > 0 || (waitingCustomer.customer?.bills?.length || 0) > 0;
 
@@ -61,6 +72,7 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
           waitingCustomerId: waitingCustomer.id,
           amount: finalAmount,
           productName: productName.trim() || undefined,
+          referralCode: referralCode.trim() || undefined,
           forceProceed
         }),
       });
@@ -89,6 +101,37 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
     }
   };
 
+  const handleRemove = async () => {
+    if (!confirm('Are you sure you want to remove this customer from the queue?')) return;
+    setError('');
+    setIsRemoving(true);
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/queue/remove', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-merchant-id': merchantId,
+        },
+        body: JSON.stringify({
+          waitingCustomerId: waitingCustomer.id,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to remove from queue');
+
+      onSuccess();
+      handleClose();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsRemoving(false);
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const finalAmount = parseFloat(amount);
@@ -101,7 +144,7 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="sm:max-w-md bg-slate-950 border-slate-800 text-slate-100">
+      <DialogContent className="sm:max-w-md max-h-[92vh] overflow-y-auto bg-slate-950 border-slate-800 text-slate-100">
         {result ? (
           /* ── Success State ── */
           <div className="flex flex-col items-center py-6 gap-4 text-center">
@@ -181,24 +224,50 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
                 Enter eligible purchase details for <strong className="text-slate-200">{waitingCustomer.customer?.name}</strong>.
               </DialogDescription>
             </DialogHeader>
+
+            {/* ── Referral Attribution Alert for Merchant ── */}
+            {referrer && (
+              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-orange-500/15 to-amber-500/20 border-2 border-amber-500/50 text-amber-200 flex items-start gap-3 shadow-md shadow-amber-950/40 mt-1">
+                <div className="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 font-bold text-base shadow-sm mt-0.5">
+                  🤝
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950 px-2 py-0.5 rounded font-mono">
+                      Referred Customer Alert
+                    </span>
+                    <span className="text-[11px] font-semibold text-amber-300">
+                      Dual Stamp Reward Active
+                    </span>
+                  </div>
+                  <p className="text-xs font-bold text-white mt-1">
+                    Referred by: <span className="text-amber-300 underline font-extrabold">{referrer.name || 'Friend'}</span>
+                    {referrer.phone ? <span className="text-slate-300 font-mono text-[11px] ml-1.5">({referrer.phone})</span> : null}
+                  </p>
+                  <p className="text-[10px] text-amber-200/80 mt-0.5 leading-relaxed">
+                    Iss customer ko reward stamp milte hi Referrer (<strong className="text-amber-300">{referrer.name}</strong>) ko bhi bonus stamp auto-credit hoga!
+                  </p>
+                </div>
+              </div>
+            )}
             
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Product Name (Optional per Requirements.txt Rules) */}
               <div className="space-y-1.5">
-                <Label htmlFor="productName" className="text-slate-300 text-sm">Product Name <span className="text-xs text-slate-500">(Optional)</span></Label>
+                <Label htmlFor="productName" className="text-slate-300 text-sm font-medium">Product Name <span className="text-xs text-slate-500">(Optional)</span></Label>
                 <Input
                   id="productName"
                   type="text"
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
                   placeholder="e.g. Black Forest Cake"
-                  className="bg-slate-900 border-slate-800 text-slate-100 placeholder:text-slate-600 text-sm"
+                  className="h-11 bg-slate-900 border border-slate-700 text-slate-100 placeholder:text-slate-500 rounded-xl px-3 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
 
               {/* Bill Amount (Mandatory per Requirements.txt Rules) */}
               <div className="space-y-1.5">
-                <Label htmlFor="amount" className="text-slate-300 text-sm">Purchase Amount (₹) <span className="text-emerald-400">*</span></Label>
+                <Label htmlFor="amount" className="text-slate-300 text-sm font-medium">Purchase Amount (₹) <span className="text-emerald-400">*</span></Label>
                 <Input
                   id="amount"
                   type="number"
@@ -212,35 +281,80 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
                   placeholder="e.g. 550"
                   required
                   autoFocus
-                  className="bg-slate-900 border-slate-800 text-slate-100 text-lg font-semibold placeholder:text-slate-600"
+                  className="h-12 bg-slate-900 border border-slate-700 text-slate-100 text-lg font-semibold placeholder:text-slate-500 rounded-xl px-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
+
+              {/* Friend Referral Status / Input */}
+              {referrer ? (
+                <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 text-amber-300">
+                    <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span>Referral Linked: <strong className="text-amber-200">{referrer.name}</strong></span>
+                  </div>
+                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
+                    Auto Dual Stamp Ready
+                  </span>
+                </div>
+              ) : !isReturningVIP ? (
+                <div className="space-y-1.5 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="referralCode" className="text-slate-300 text-xs font-semibold flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                      Friend Referral Code <span className="text-[11px] text-slate-500 font-normal">(Optional)</span>
+                    </Label>
+                    <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                      +1 Stamp to Both
+                    </span>
+                  </div>
+                  <Input
+                    id="referralCode"
+                    type="text"
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                    placeholder="e.g. CP-A9X2 (if friend referred)"
+                    className="h-10 bg-slate-950 border border-slate-700 text-slate-100 placeholder:text-slate-500 rounded-lg px-3 text-xs uppercase font-mono tracking-wider focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  />
+                  <p className="text-[10px] text-slate-400">
+                    If customer was invited by phone, system awards stamps automatically!
+                  </p>
+                </div>
+              ) : null}
 
               {/* Real-Time Smart Upsell Indicator while typing */}
               {realTimeShortfall > 0 && (
                 <div className="p-3 rounded-lg bg-indigo-950/40 border border-indigo-500/30 flex items-center justify-between text-xs animate-fadeIn">
                   <div className="flex items-center gap-2 text-indigo-300">
-                    <Sparkles className="w-4 h-4 text-indigo-400" />
-                    <span>Only <strong>₹{realTimeShortfall}</strong> away from 1 Stamp!</span>
+                    <Sparkles className="w-4 h-4 text-indigo-400 shrink-0" />
+                    <span>
+                      {currentStampsCount > 0 ? (
+                        <>🎉 <strong>{currentStampsCount} Stamp{currentStampsCount > 1 ? 's' : ''}</strong> earned! Only <strong>₹{realTimeShortfall}</strong> away from Stamp #{currentStampsCount + 1}!</>
+                      ) : (
+                        <>Only <strong>₹{realTimeShortfall}</strong> away from 1 Stamp!</>
+                      )}
+                    </span>
                   </div>
                   <button
                     type="button"
-                    onClick={() => setAmount(STAMP_THRESHOLD.toString())}
-                    className="text-[11px] bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-2 py-1 rounded transition-colors"
+                    onClick={() => setAmount(nextTargetAmount.toString())}
+                    className="text-[11px] bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-2 py-1 rounded transition-colors whitespace-nowrap ml-2"
                   >
-                    Make ₹{STAMP_THRESHOLD}
+                    Make ₹{nextTargetAmount}
                   </button>
                 </div>
               )}
 
               {error && <p className="text-sm text-red-400 bg-red-950/50 p-2.5 rounded border border-red-900">{error}</p>}
 
-              <DialogFooter className="fixed bottom-0 left-0 w-full p-4 bg-slate-950 border-t border-slate-800 md:relative md:border-none md:p-0 md:bg-transparent md:flex md:justify-end gap-2 z-50">
-                <Button type="button" variant="outline" onClick={handleClose} disabled={loading} className="border-slate-800 text-slate-400 w-full md:w-auto">
+              <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4 border-t border-slate-800">
+                <Button type="button" variant="ghost" onClick={handleRemove} disabled={loading} className="text-red-400 hover:text-red-300 hover:bg-red-950/30 w-full sm:w-auto sm:mr-auto">
+                  {isRemoving ? 'Removing...' : 'Dismiss'}
+                </Button>
+                <Button type="button" variant="outline" onClick={handleClose} disabled={loading} className="border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-900 w-full sm:w-auto">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={loading || !amount} className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold w-full md:w-auto">
-                  {loading ? 'Processing...' : 'Give Reward'}
+                <Button type="submit" disabled={loading || !amount} className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold w-full sm:w-auto">
+                  {loading && !isRemoving ? 'Processing...' : 'Give Reward'}
                 </Button>
               </DialogFooter>
             </form>

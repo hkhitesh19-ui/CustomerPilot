@@ -17,6 +17,20 @@ const loginLimiter = new RateLimiterMemory({
   blockDuration: 300 // block for 5 minutes
 })
 
+// AI generation endpoints: max 20 calls per merchant per minute (cost control)
+const aiLimiter = new RateLimiterMemory({
+  points: 20,        // 20 AI calls
+  duration: 60,      // per 60 seconds
+  blockDuration: 60  // block for 60 seconds
+})
+
+// Bulk AI reply: stricter limit — max 5 bulk operations per merchant per minute
+const bulkAiLimiter = new RateLimiterMemory({
+  points: 5,         // 5 bulk AI calls
+  duration: 60,      // per 60 seconds
+  blockDuration: 120 // block for 2 minutes
+})
+
 function getClientIp(req: NextRequest): string {
   return (
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
@@ -60,6 +74,46 @@ export async function applyLoginRateLimit(req: NextRequest): Promise<NextRespons
       {
         status: 429,
         headers: { 'Retry-After': '300' }
+      }
+    )
+  }
+}
+
+/**
+ * Apply AI endpoint rate limiting — keyed by merchant ID, not IP.
+ * AI costs are per account, so we limit per merchant to control spend.
+ * Returns a 429 response if limit exceeded, else null.
+ * Usage: const limited = await applyAiRateLimit(merchantId); if (limited) return limited;
+ */
+export async function applyAiRateLimit(merchantId: string): Promise<NextResponse | null> {
+  try {
+    await aiLimiter.consume(merchantId)
+    return null
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: 'AI rate limit reached. Maximum 20 AI requests per minute per account. Please wait before retrying.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': '60' }
+      }
+    )
+  }
+}
+
+/**
+ * Apply bulk AI rate limiting — stricter, for bulk AI operations.
+ * Returns a 429 response if limit exceeded, else null.
+ */
+export async function applyBulkAiRateLimit(merchantId: string): Promise<NextResponse | null> {
+  try {
+    await bulkAiLimiter.consume(merchantId)
+    return null
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: 'Bulk AI rate limit reached. Maximum 5 bulk AI operations per minute. Please wait before retrying.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': '120' }
       }
     )
   }

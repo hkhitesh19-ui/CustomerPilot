@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Building2, User, Phone, Mail, Lock, ArrowRight, CheckCircle2, Sparkles, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -9,8 +9,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-export function SignupClient() {
+function SignupForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const refCode = searchParams.get("ref") || ""
+  const moduleParam = (searchParams.get("module") || "").toLowerCase().trim()
+  const isCardReviewsCombo = (moduleParam.includes("card") || moduleParam.includes("digital_card")) && (moduleParam.includes("review") || moduleParam.includes("reviews"))
+  const isCardMode = !isCardReviewsCombo && (moduleParam === "card" || moduleParam === "digital_card" || moduleParam === "digitalcard")
+  const isReviewsMode = !isCardReviewsCombo && (moduleParam === "reviews" || moduleParam === "review")
+  const isLoyaltyMode = moduleParam === "loyalty"
+  const isAutoReplyMode = moduleParam === "autoreply"
+  const isStandalone = isCardReviewsCombo || isCardMode || isReviewsMode || isLoyaltyMode || isAutoReplyMode
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -32,8 +42,12 @@ export function SignupClient() {
     e.preventDefault()
     setError("")
 
-    if (!form.businessName || !form.ownerName || !form.email || !form.password) {
+    if (!form.businessName || !form.email || !form.password) {
       setError("All required fields must be filled.")
+      return
+    }
+    if (!isReviewsMode && !isAutoReplyMode && !form.ownerName) {
+      setError("Owner Name is required.")
       return
     }
     if (form.password.length < 6) {
@@ -46,7 +60,7 @@ export function SignupClient() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, ...(moduleParam ? { module: moduleParam } : {}) }),
       })
       const data = await res.json()
 
@@ -55,8 +69,22 @@ export function SignupClient() {
         return
       }
 
-      // Success: JWT cookie is set, redirect to onboarding wizard
-      router.push("/onboarding")
+      // Track merchant referral if ref code present
+      if (refCode && data.merchantId) {
+        try {
+          await fetch("/api/merchant-referrals/track", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ referralCode: refCode, merchantId: data.merchantId }),
+          })
+        } catch (e) {
+          // Non-blocking: referral tracking failure should not block signup
+          console.warn("Referral tracking failed:", e)
+        }
+      }
+
+      // Success: JWT cookie is set, redirect based on module
+      router.push(data.redirectTo || "/onboarding")
     } catch (e) {
       setError("Network error. Please check your connection.")
     } finally {
@@ -64,12 +92,129 @@ export function SignupClient() {
     }
   }
 
-  const benefits = [
-    "WhatsApp-first loyalty system",
-    "Auto Google Review collection",
-    "AI-powered customer retention",
-    "14-day FREE trial, no credit card",
+  // Dynamic titles, copy & benefits per selected module
+  let headerBadge = "3-Day FREE Trial • CustomerPilot Complete"
+  let mainTitle = (
+    <>
+      CustomerPilot Complete : <br />
+      <span className="bg-gradient-to-r from-emerald-600 via-sky-600 to-indigo-600 bg-clip-text text-transparent">
+        Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply.
+      </span>
+    </>
+  )
+  let description = "India's #1 WhatsApp-first AI Customer Retention Platform. Bring your customers back with loyalty rewards, 5-star Google reviews, and automated AI owner replies."
+  let formTitle = "Start Free Trial - CustomerPilot Complete : Digital Loyalty + Smart AI GoogleReviews + 1-Click AutoReply"
+  let formSubtitle = "Start 3-Day Complete Free Trial in under 2 minutes — no credit card required"
+  let submitBtnText = "Start CustomerPilot Complete Free Trial →"
+
+  let benefits = [
+    "Digital Loyalty Stamps & VIP Club",
+    "Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast",
+    "Ai Drafted SEO Optimized 1-Click Reply to Google Reviews",
+    "3-Day FREE trial, no credit card required",
   ]
+
+  if (isCardReviewsCombo) {
+    headerBadge = "3-Day FREE Trial • Smart Digital Business Card + Smart AI Google Reviews"
+    mainTitle = (
+      <>
+        Smart Digital Business Card + <br />
+        <span className="bg-gradient-to-r from-cyan-600 via-sky-600 to-amber-500 bg-clip-text text-transparent">
+          Smart AI Google Reviews.
+        </span>
+      </>
+    )
+    description = "Your 2-in-1 Power Suite: Interactive Smart QR digital visiting card with 1-tap contact saving, plus automated 5-star Google review collection on WhatsApp."
+    formTitle = "Start 3-Day Free Trial — Smart Digital Business Card + Smart AI Google Reviews"
+    formSubtitle = "Start your 3-day unrestricted trial in under 60 seconds — no credit card required"
+    submitBtnText = "Activate 3-Day Free Trial (Card + Reviews) →"
+    benefits = [
+      "Interactive Smart Digital Business Card with QR code",
+      "1-Tap Save Contact (.vcf phonebook sync)",
+      "Automated 5-Star Google Reviews Collection",
+      "Direct WhatsApp & Calling Links + Google Maps Location",
+    ]
+  } else if (isCardMode) {
+    headerBadge = "3-Day FREE Trial • Smart Digital Business Card"
+    mainTitle = (
+      <>
+        Smart Digital Business Card <br />
+        <span className="bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 bg-clip-text text-transparent">
+          with Smart QR &amp; 1-Tap Save Contact.
+        </span>
+      </>
+    )
+    description = "Give every customer an interactive digital card with 1-tap contact saving, online catalog menus, and direct review modal — zero app download required."
+    formTitle = "Start 3-Day Free Trial — Smart Digital Business Card"
+    formSubtitle = "Instant setup in 60 seconds — zero credit card required"
+    submitBtnText = "Activate 3-Day Free Trial (Digital Card) →"
+    benefits = [
+      "1-Tap Save Contact (.vcf phonebook sync)",
+      "Direct 5-Star Google Review modal",
+      "Online Ordering & Social Media Profile links",
+      "High-Resolution Printable Counter QR Code",
+    ]
+  } else if (isReviewsMode) {
+    headerBadge = "3-Day FREE Trial • Ai Drafted SEO Optimized Google Reviews"
+    mainTitle = (
+      <>
+        Ai Drafted SEO Optimized <br />
+        <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 bg-clip-text text-transparent">
+          Google Reviews - Increase GoogleReviews Very Fast.
+        </span>
+      </>
+    )
+    description = "Automatically collect authentic 4 & 5-star Google reviews right after a customer purchase on WhatsApp. AI drafts ready-to-post customer reviews in 1-Click."
+    formTitle = "Start Free Trial - Ai Drafted SEO Optimized Google Reviews - Increase GoogleReviews Very Fast"
+    formSubtitle = "2 clicks to get started — instant setup!"
+    submitBtnText = "Start Free Trial - Ai Drafted SEO Optimized Google Reviews →"
+    benefits = [
+      "AI-powered Google Review customer drafts",
+      "Auto review collection via WhatsApp delay timer",
+      "5-star review boost & local neighborhood SEO",
+      "Setup in under 2 minutes, no card required",
+    ]
+  } else if (isLoyaltyMode) {
+    headerBadge = "3-Day FREE Trial • Digital Loyalty Stamps & VIP Club"
+    mainTitle = (
+      <>
+        Digital Loyalty Stamps &amp; <br />
+        <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+          VIP Club.
+        </span>
+      </>
+    )
+    description = "Convert single-time walk-ins into repeat regulars with WhatsApp digital stamp cards, VIP club tier upgrades, and automated birthday rewards."
+    formTitle = "Start Free Trial - Digital Loyalty Stamps & VIP Club"
+    formSubtitle = "Setup digital stamp cards & VIP rewards in 2 minutes"
+    submitBtnText = "Start Free Trial - Digital Loyalty Stamps & VIP Club →"
+    benefits = [
+      "Digital WhatsApp Stamp Cards (No app download)",
+      "VIP Club Engine & Tier Upgrades (Silver, Gold, Platinum)",
+      "Automated Inactivity Win-Backs (14-day & 30-day)",
+      "Cashier 1-Tap Counter Queue Terminal",
+    ]
+  } else if (isAutoReplyMode) {
+    headerBadge = "3-Day FREE Trial • Ai Drafted SEO Optimized 1-Click Reply to Google Reviews"
+    mainTitle = (
+      <>
+        Ai Drafted SEO Optimized <br />
+        <span className="bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          1-Click Reply to Google Reviews.
+        </span>
+      </>
+    )
+    description = "Never miss a Google review reply again. AI drafts appreciative, SEO-optimized owner responses ready to publish on Google Maps in 1-Click."
+    formTitle = "Start Free Trial - Ai Drafted SEO Optimized 1-Click Reply to Google Reviews"
+    formSubtitle = "Connect Google Business Profile in 1-Click"
+    submitBtnText = "Start Free Trial - Ai Drafted SEO Optimized 1-Click Reply →"
+    benefits = [
+      "AI Context-Aware Drafts in 1 Second",
+      "1-Click Direct Publish to Google Maps",
+      "Smart Sentiment & Local Keyword Adaptation",
+      "Zero Missed Reviews Guarantee",
+    ]
+  }
 
   return (
     <div className="min-h-screen bg-white text-stone-900 font-sans relative overflow-hidden flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950">
@@ -84,7 +229,7 @@ export function SignupClient() {
       <header className="relative z-10 border-b border-stone-200/80 bg-white/80 backdrop-blur-md py-2">
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/cplogo.png" alt="CustomerPilot" className="h-11 sm:h-14 w-auto object-contain transition-transform hover:scale-105 drop-shadow-sm" />
+            <img src="/cplogo_horizontal.png" alt="CustomerPilot" className="h-9 sm:h-11 w-auto object-contain transition-transform hover:scale-105" />
           </Link>
           <div className="flex items-center gap-3">
             <span className="text-xs text-stone-500 hidden sm:inline">Already registered?</span>
@@ -95,58 +240,18 @@ export function SignupClient() {
         </div>
       </header>
 
-      {/* Main Content Split Layout */}
-      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-10 flex-1 flex items-start justify-center w-full">
-        <div className="grid md:grid-cols-12 gap-8 lg:gap-12 items-start w-full">
-          {/* Left Hero Column */}
-          <div className="md:col-span-6 lg:col-span-5 space-y-6 text-left pt-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-xs font-bold text-emerald-800">14-Day FREE Trial • No Credit Card</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-stone-900 tracking-tight leading-tight">
-              Start Your Free <br />
-              <span className="bg-gradient-to-r from-emerald-600 via-sky-600 to-indigo-600 bg-clip-text text-transparent">
-                Merchant Trial.
-              </span>
-            </h1>
-
-            <p className="text-xs sm:text-sm md:text-base text-stone-600 leading-relaxed">
-              India&apos;s #1 WhatsApp-first AI Customer Retention Platform. Bring your customers back with loyalty rewards, 5-star Google reviews, and automated AI owner replies.
-            </p>
-
-            <div className="space-y-2.5 pt-1">
-              {benefits.map((b, i) => (
-                <div key={i} className="flex items-center gap-2.5">
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600" />
-                  </div>
-                  <span className="text-stone-700 text-xs sm:text-sm font-semibold">{b}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Social Proof Card */}
-            <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-lg space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-extrabold text-stone-900">🍰 Cake Connection, Vadodara</span>
-                <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full text-[10px]">Verified Merchant</span>
-              </div>
-              <p className="text-xs text-stone-500 pt-1">
-                &quot;Added ₹38,400 repeat revenue &amp; 19 Google 5-star reviews in just 7 days of onboarding.&quot;
-              </p>
-            </div>
-          </div>
-
-          {/* Right Form Column */}
-          <div className="md:col-span-6 lg:col-span-7 flex justify-center w-full">
-            <div className="w-full max-w-lg bg-white/90 border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-sky-500 to-indigo-600 rounded-t-3xl" />
+      {/* Main Content Form Card */}
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12 flex-1 flex items-center justify-center w-full">
+        <div className="w-full max-w-lg bg-white/95 border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-sky-500 to-indigo-600 rounded-t-3xl" />
 
               <div className="mb-6">
-                <h2 className="text-2xl font-black text-stone-900">Create Merchant Account</h2>
-                <p className="text-stone-500 text-xs mt-1">Start your 14-day free trial in under 2 minutes</p>
+                <h2 className="text-2xl font-black text-stone-900">
+                  {formTitle}
+                </h2>
+                <p className="text-stone-500 text-xs mt-1">
+                  {formSubtitle}
+                </p>
               </div>
 
               {error && (
@@ -171,7 +276,7 @@ export function SignupClient() {
 
               {/* Google One-Click Signup */}
               <a
-                href="/api/auth/google"
+                href={moduleParam ? `/api/auth/google?module=${moduleParam}` : "/api/auth/google"}
                 className="w-full h-11 bg-stone-50 hover:bg-stone-100 text-stone-900 font-bold text-xs rounded-xl flex items-center justify-center gap-3 transition-all shadow-sm border border-stone-200 mb-5 cursor-pointer"
               >
                 <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
@@ -190,7 +295,7 @@ export function SignupClient() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className={`grid grid-cols-1 ${isReviewsMode ? '' : 'md:grid-cols-2'} gap-3`}>
                   <div>
                     <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
                       <Building2 className="w-3.5 h-3.5 text-emerald-600" /> Business Name *
@@ -203,20 +308,23 @@ export function SignupClient() {
                       required
                     />
                   </div>
-                  <div>
-                    <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
-                      <User className="w-3.5 h-3.5 text-emerald-600" /> Owner Name *
-                    </Label>
-                    <Input
-                      placeholder="e.g. Hitesh"
-                      value={form.ownerName}
-                      onChange={e => update("ownerName", e.target.value)}
-                      className="mt-1 text-xs bg-stone-50 border-stone-200 focus:bg-white"
-                      required
-                    />
-                  </div>
+                  {!isReviewsMode && (
+                    <div>
+                      <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
+                        <User className="w-3.5 h-3.5 text-emerald-600" /> Owner Name *
+                      </Label>
+                      <Input
+                        placeholder="e.g. Hitesh"
+                        value={form.ownerName}
+                        onChange={e => update("ownerName", e.target.value)}
+                        className="mt-1 text-xs bg-stone-50 border-stone-200 focus:bg-white"
+                        required
+                      />
+                    </div>
+                  )}
                 </div>
 
+                {!isReviewsMode && !isAutoReplyMode && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
@@ -248,6 +356,7 @@ export function SignupClient() {
                     </Select>
                   </div>
                 </div>
+                )}
 
                 <div>
                   <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
@@ -291,12 +400,10 @@ export function SignupClient() {
                   disabled={loading}
                   className="w-full h-11 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow-lg transition-all"
                 >
-                  {loading ? "Setting up merchant account..." : "Start 14-Day Free Trial →"}
+                  {loading ? "Setting up merchant account..." : submitBtnText}
                 </Button>
               </form>
             </div>
-          </div>
-        </div>
       </main>
 
       {/* Footer */}
@@ -312,5 +419,13 @@ export function SignupClient() {
         </div>
       </footer>
     </div>
+  )
+}
+
+export function SignupClient() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center animate-pulse">Loading...</div>}>
+      <SignupForm />
+    </Suspense>
   )
 }

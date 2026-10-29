@@ -1,14 +1,30 @@
+// ════════════════════════════════════════════════════════════════════════════════
+// ⚠️ ARCHITECTURAL RULE — SINGLE SOURCE OF TRUTH FOR BONUS STAMPS:
+// Advance Bonus Stamps are ONLY awarded inside the `isCardFinished` block when a customer
+// completes their Previous Loyalty Level / Card (Next Level Kickstart Bonus).
+// DO NOT add spend-threshold bonus stamp logic or multipliers anywhere else in this file.
+// ════════════════════════════════════════════════════════════════════════════════
+
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { scheduleGoogleReviewRequest } from '@/lib/review-scheduler';
+import { hasModule } from '@/lib/feature-gate';
+import { getCompiledTemplate } from "@/lib/template-engine";
+import { resolveLoyaltyCategoryName } from "@/lib/loyalty-category-service";
+import { getVipTierForSpend, VIP_TIER_LABELS } from "@/lib/vip-engine";
 
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 
-async function sendWhatsAppNotification(merchantId: string, toPhone: string, text: string) {
+async function sendWhatsAppNotification(merchantId: string, toPhone: string, text: string, templateKey: string = "STAMP_AWARDED") {
   try {
+    if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
+      console.error("[Award API] EVOLUTION_API_URL or EVOLUTION_API_KEY not configured — skipping notification dispatch")
+      return { ok: false, error: "Evolution API credentials not configured" }
+    }
     const merchant = await db.merchant.findUnique({ where: { id: merchantId } })
     const defaultInstance = process.env.EVOLUTION_INSTANCE_NAME || "CustomerPilot_Main"
-    const instanceName = merchant?.whatsappInstanceName || (merchant?.whatsappPhone ? `CP_M${merchant.whatsappPhone.replace(/\\D/g, "")}` : defaultInstance)
+    const instanceName = merchant?.whatsappInstanceName || (merchant?.whatsappPhone ? `CP_M${merchant.whatsappPhone.replace(/\D/g, "")}` : defaultInstance)
     
     let res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
       method: "POST",
@@ -38,15 +54,16 @@ async function sendWhatsAppNotification(merchantId: string, toPhone: string, tex
       data: {
         merchantId,
         toPhone,
-        template: "STAMP_AWARDED",
+        template: templateKey,
         body: text.substring(0, 500),
         status: res.ok ? "sent" : "failed",
+        sentAt: res.ok ? new Date() : null,
         metaMessageId: data?.key?.id || `stamp_${Date.now()}`,
         errorMessage: errorMsg
       }
     }).catch(() => {})
     
-    console.log(`[Award API] ✉️ Stamp notification processed for +${toPhone}`)
+    console.log(`[Award API] ✉️ WhatsApp notification (${templateKey}) processed for +${toPhone}`)
   } catch (e: any) {
     console.error("[Award API] WhatsApp send error:", e.message)
   }
@@ -60,7 +77,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { waitingCustomerId, amount, productName, forceProceed } = body;
+    const { waitingCustomerId, amount, productName, forceProceed, referralCode } = body;
 
     if (!waitingCustomerId || amount === undefined) {
       return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 });
@@ -85,13 +102,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'Customer has already been processed' }, { status: 400 });
     }
 
-    // 2. Fetch active StampCard for merchant
+    // 2. Fetch active StampCard and Merchant for merchant
     const stampCard = await db.stampCard.findFirst({
       where: { merchantId, active: true }
     });
+    const merchant = await db.merchant.findUnique({ where: { id: merchantId } });
 
-    if (!stampCard) {
-      return NextResponse.json({ success: false, error: 'No active reward program found for this merchant' }, { status: 400 });
+    if (!stampCard || !merchant) {
+      return NextResponse.json({ success: false, error: 'No active reward program or merchant found' }, { status: 400 });
     }
 
     const stampValue = stampCard.stampValue || 500;
@@ -114,7 +132,7 @@ export async function POST(req: Request) {
     let visitNumber = 1;
 
     // 4. Perform database transaction
-    await db.$transaction(async (tx) => {
+    const transactionResult = await db.$transaction(async (tx) => {
       // Mark waiting customer as completed
       await tx.waitingCustomer.update({
         where: { id: waitingCustomerId },
@@ -164,8 +182,11 @@ export async function POST(req: Request) {
         }
       });
 
+      // Calculate Old VIP Tier before updating spend
+      const oldTier = getVipTierForSpend(waitingCustomer.customer.lifetimeSpend || 0);
+
       // Update Customer Lifetime Spend & Stamps
-      await tx.customer.update({
+      const updatedCustomer = await tx.customer.update({
         where: { id: waitingCustomer.customerId },
         data: {
           lifetimeSpend: { increment: parsedAmount },
@@ -173,10 +194,258 @@ export async function POST(req: Request) {
           lastActiveAt: new Date()
         }
       });
+      
+      // Calculate New VIP Tier after update
+      const newTier = getVipTierForSpend(updatedCustomer.lifetimeSpend);
+      let isUpgraded = false;
 
-      // Update Customer Stamp Wallet
-      if (stampsToAward > 0) {
-        let customerCard = await tx.customerStampCard.findFirst({
+      // Check if upgraded to a strictly higher tier (using minLifetimeSpend as rank)
+      if (newTier.minLifetimeSpend > oldTier.minLifetimeSpend) {
+        isUpgraded = true;
+        // Update VIP tier name in customer record
+        await tx.customer.update({
+          where: { id: waitingCustomer.customerId },
+          data: { vipTier: newTier.name }
+        });
+      }
+
+      // 4. Update Customer Stamp Wallet & Handle Loyalty Cycle Completion
+      let cycleCompletedInTx = false;
+      let cycleVipBonusAwarded = 0;
+
+      const configuredVipBonus = merchant.vipUpgradeBonusStamps || 0;
+
+      // 🌟 JOINING BONUS LOGIC:
+      // Award advance joining bonus stamps on customer's first visit/first card if enabled
+      let joiningBonusStamps = 0;
+      const totalCustomerCards = await tx.customerStampCard.count({
+        where: { merchantId, customerId: waitingCustomer.customerId }
+      });
+      const isFirstVisit = visitNumber === 1 || totalCustomerCards === 0;
+
+      if (isFirstVisit && stampCard.joiningBonusEnabled) {
+        joiningBonusStamps = stampCard.joiningBonusStamps ?? 2;
+        if (joiningBonusStamps > 0) {
+          let initCard = await tx.customerStampCard.findFirst({
+            where: { 
+              merchantId, 
+              customerId: waitingCustomer.customerId,
+              stampCardId: stampCard.id,
+              completed: false 
+            }
+          });
+
+          if (!initCard) {
+            initCard = await tx.customerStampCard.create({
+              data: {
+                merchantId,
+                customerId: waitingCustomer.customerId,
+                stampCardId: stampCard.id,
+                stampsCollected: 0
+              }
+            });
+          }
+
+          for (let j = 0; j < joiningBonusStamps; j++) {
+            await tx.stamp.create({
+              data: {
+                customerId: waitingCustomer.customerId,
+                merchantId,
+                stampCardId: stampCard.id,
+                customerStampCardId: initCard.id,
+                billId: bill.id,
+                source: 'JOINING_BONUS'
+              }
+            });
+          }
+
+          await tx.customerStampCard.update({
+            where: { id: initCard.id },
+            data: { stampsCollected: { increment: joiningBonusStamps } }
+          });
+
+          await tx.customer.update({
+            where: { id: waitingCustomer.customerId },
+            data: { lifetimeStamps: { increment: joiningBonusStamps } }
+          });
+        }
+      }
+
+      // 🌟 AUTOMATIC CUSTOMER REFERRAL DETECTION & DUAL BONUS (First Visit):
+      let referralBonusResult: {
+        referrerId: string;
+        referrerName: string;
+        referrerPhone: string;
+        referrerBonusStamps: number;
+        friendBonusStamps: number;
+      } | null = null;
+
+      if (isFirstVisit) {
+        // Load dynamic merchant referral rules
+        const referralRulesRecord = await tx.systemContent.findUnique({
+          where: { key: `MERCHANT_REFERRAL_RULES_${merchantId}` }
+        });
+        let refRules = {
+          referralBonusEnabled: true,
+          referralBonusStamps: 1,
+          referralFriendBonusStamps: 1
+        };
+        if (referralRulesRecord?.value) {
+          try {
+            refRules = { ...refRules, ...JSON.parse(referralRulesRecord.value) };
+          } catch (e) {}
+        }
+
+        if (refRules.referralBonusEnabled) {
+          const custPhone = waitingCustomer.customer.phone;
+          const trimmedRefCode = typeof referralCode === 'string' ? referralCode.trim().toUpperCase() : '';
+
+          // 1. Look for pending referral by Customer B's phone or customer ID
+          let pendingRef = await tx.referral.findFirst({
+            where: {
+              merchantId,
+              status: 'pending',
+              OR: [
+                { friendPhone: custPhone },
+                { friendCustomerId: waitingCustomer.customerId }
+              ]
+            },
+            include: { referrer: true }
+          });
+
+          // 2. If not pre-registered by phone, check if cashier/customer supplied a valid referralCode
+          if (!pendingRef && trimmedRefCode) {
+            const referrerByCode = await tx.customer.findFirst({
+              where: { merchantId, referralCode: trimmedRefCode, deletedAt: null }
+            });
+
+            if (referrerByCode && referrerByCode.id !== waitingCustomer.customerId && referrerByCode.phone !== custPhone) {
+              const alreadyReferred = await tx.referral.findFirst({
+                where: { merchantId, friendPhone: custPhone }
+              });
+              if (!alreadyReferred) {
+                pendingRef = await tx.referral.create({
+                  data: {
+                    merchantId,
+                    referrerId: referrerByCode.id,
+                    friendPhone: custPhone,
+                    friendCustomerId: waitingCustomer.customerId,
+                    status: 'pending'
+                  },
+                  include: { referrer: true }
+                });
+              }
+            }
+          }
+
+          // 3. If a valid pending referral is found, process dual bonus stamps atomically
+          if (pendingRef && pendingRef.referrer) {
+            const referrerBonus = refRules.referralBonusStamps || 1;
+            const friendBonus = refRules.referralFriendBonusStamps || 1;
+
+            // Mark referral as approved (1-time burn)
+            await tx.referral.update({
+              where: { id: pendingRef.id },
+              data: {
+                status: 'approved',
+                friendCustomerId: waitingCustomer.customerId,
+                bonusStampsReferrer: referrerBonus,
+                bonusStampsFriend: friendBonus
+              }
+            });
+
+            // Link customer's referredById if not set
+            await tx.customer.update({
+              where: { id: waitingCustomer.customerId },
+              data: {
+                referredById: pendingRef.referrerId,
+                acquisitionChan: 'referral'
+              }
+            });
+
+            // Award friend welcome bonus stamps
+            if (friendBonus > 0) {
+              let friendCard = await tx.customerStampCard.findFirst({
+                where: { merchantId, customerId: waitingCustomer.customerId, stampCardId: stampCard.id, completed: false }
+              });
+              if (!friendCard) {
+                friendCard = await tx.customerStampCard.create({
+                  data: { merchantId, customerId: waitingCustomer.customerId, stampCardId: stampCard.id, stampsCollected: 0 }
+                });
+              }
+              for (let f = 0; f < friendBonus; f++) {
+                await tx.stamp.create({
+                  data: {
+                    customerId: waitingCustomer.customerId,
+                    merchantId,
+                    stampCardId: stampCard.id,
+                    customerStampCardId: friendCard.id,
+                    billId: bill.id,
+                    source: 'referral_friend_bonus'
+                  }
+                });
+              }
+              await tx.customerStampCard.update({
+                where: { id: friendCard.id },
+                data: { stampsCollected: { increment: friendBonus } }
+              });
+              await tx.customer.update({
+                where: { id: waitingCustomer.customerId },
+                data: { lifetimeStamps: { increment: friendBonus } }
+              });
+            }
+
+            // Award referrer bonus stamps to Customer A
+            if (referrerBonus > 0) {
+              let refCard = await tx.customerStampCard.findFirst({
+                where: { merchantId, customerId: pendingRef.referrer.id, stampCardId: stampCard.id, completed: false }
+              });
+              if (!refCard) {
+                refCard = await tx.customerStampCard.create({
+                  data: { merchantId, customerId: pendingRef.referrer.id, stampCardId: stampCard.id, stampsCollected: 0 }
+                });
+              }
+              for (let r = 0; r < referrerBonus; r++) {
+                await tx.stamp.create({
+                  data: {
+                    customerId: pendingRef.referrer.id,
+                    merchantId,
+                    stampCardId: stampCard.id,
+                    customerStampCardId: refCard.id,
+                    billId: bill.id,
+                    source: 'referral_bonus'
+                  }
+                });
+              }
+              const newRefCount = refCard.stampsCollected + referrerBonus;
+              const refCardFinished = newRefCount >= stampCard.stampsRequired;
+              await tx.customerStampCard.update({
+                where: { id: refCard.id },
+                data: {
+                  stampsCollected: Math.min(newRefCount, stampCard.stampsRequired),
+                  completed: refCardFinished
+                }
+              });
+              await tx.customer.update({
+                where: { id: pendingRef.referrer.id },
+                data: { lifetimeStamps: { increment: referrerBonus } }
+              });
+            }
+
+            referralBonusResult = {
+              referrerId: pendingRef.referrer.id,
+              referrerName: pendingRef.referrer.name || 'Your friend',
+              referrerPhone: pendingRef.referrer.phone,
+              referrerBonusStamps: referrerBonus,
+              friendBonusStamps: friendBonus
+            };
+          }
+        }
+      }
+
+      for (let i = 0; i < stampsToAward; i++) {
+        // Find or create active (uncompleted) card for customer
+        let activeCard = await tx.customerStampCard.findFirst({
           where: { 
             merchantId, 
             customerId: waitingCustomer.customerId,
@@ -185,8 +454,8 @@ export async function POST(req: Request) {
           }
         });
 
-        if (!customerCard) {
-          customerCard = await tx.customerStampCard.create({
+        if (!activeCard) {
+          activeCard = await tx.customerStampCard.create({
             data: {
               merchantId,
               customerId: waitingCustomer.customerId,
@@ -196,56 +465,189 @@ export async function POST(req: Request) {
           });
         }
 
-        const totalStampsNow = customerCard.stampsCollected + stampsToAward;
-        const isCompleted = totalStampsNow >= stampCard.stampsRequired;
+        // Add 1 POS stamp
+        const newCount = activeCard.stampsCollected + 1;
+        const isCardFinished = newCount >= stampCard.stampsRequired;
 
         await tx.customerStampCard.update({
-          where: { id: customerCard.id },
+          where: { id: activeCard.id },
           data: {
-            stampsCollected: totalStampsNow,
-            completed: isCompleted
+            stampsCollected: newCount,
+            completed: isCardFinished
           }
         });
 
-        for (let i = 0; i < stampsToAward; i++) {
-          await tx.stamp.create({
-            data: {
-              customerId: waitingCustomer.customerId,
-              merchantId,
-              stampCardId: stampCard.id,
-              customerStampCardId: customerCard.id,
-              billId: bill.id,
-              source: 'POS'
-            }
+        await tx.stamp.create({
+          data: {
+            customerId: waitingCustomer.customerId,
+            merchantId,
+            stampCardId: stampCard.id,
+            customerStampCardId: activeCard.id,
+            billId: bill.id,
+            source: 'POS'
+          }
+        });
+
+        // 🌟 LOYALTY CYCLE FINISHED EVENT:
+        // When previous loyalty level/card completes (stamp goal reached),
+        // award configured Next Level Kickstart Bonus Stamps to pre-fund the next level!
+        if (isCardFinished) {
+          cycleCompletedInTx = true;
+
+          // Automatically upgrade Customer Loyalty Level Category (Level 1: VIP -> Level 2: Silver -> Level 3: Gold...)
+          const totalCompletedCards = await tx.customerStampCard.count({
+            where: { merchantId, customerId: waitingCustomer.customerId, completed: true }
           });
+          const nextCategoryName = resolveLoyaltyCategoryName(merchant.loyaltyCategoryNames, totalCompletedCards);
+          await tx.customer.update({
+            where: { id: waitingCustomer.customerId },
+            data: { vipTier: nextCategoryName }
+          });
+
+          if (configuredVipBonus > 0) {
+            // Create fresh new card for next level/cycle pre-funded with bonus stamps
+            const nextCycleCard = await tx.customerStampCard.create({
+              data: {
+                merchantId,
+                customerId: waitingCustomer.customerId,
+                stampCardId: stampCard.id,
+                stampsCollected: configuredVipBonus,
+                completed: configuredVipBonus >= stampCard.stampsRequired
+              }
+            });
+
+            for (let v = 0; v < configuredVipBonus; v++) {
+              await tx.stamp.create({
+                data: {
+                  customerId: waitingCustomer.customerId,
+                  merchantId,
+                  stampCardId: stampCard.id,
+                  customerStampCardId: nextCycleCard.id,
+                  billId: bill.id,
+                  source: 'LEVEL_UP_BONUS'
+                }
+              });
+            }
+
+            // Increment customer lifetime stamps for level completion bonus
+            await tx.customer.update({
+              where: { id: waitingCustomer.customerId },
+              data: { lifetimeStamps: { increment: configuredVipBonus } }
+            });
+
+            cycleVipBonusAwarded += configuredVipBonus;
+          }
         }
       }
+      
+      return { 
+        isUpgraded, 
+        vipBonusStamps: cycleVipBonusAwarded,
+        joiningBonusStamps,
+        referralBonusResult,
+        newTier, 
+        cycleCompletedInTx,
+        completedCardReward: stampCard.rewardName || "FREE Reward",
+        completedCardStampsRequired: stampCard.stampsRequired || 7
+      };
     });
 
     // 5. Send instant WhatsApp notification to customer (Day 1 / Day 4 Requirements.txt)
     if (waitingCustomer.customer?.phone) {
-      const merchant = await db.merchant.findUnique({ where: { id: merchantId } });
       const merchantName = merchant?.name || "our store";
-      const customerCard = await db.customerStampCard.findFirst({
-        where: { merchantId, customerId: waitingCustomer.customerId, stampCardId: stampCard.id }
-      });
-      const totalStamps = customerCard?.stampsCollected || stampsToAward;
-      const stampsRequired = stampCard.stampsRequired || 10;
-      const rewardName = stampCard.rewardName || "FREE 500gm Cake";
-      const remaining = Math.max(0, stampsRequired - totalStamps);
+      const { vipBonusStamps, joiningBonusStamps: resJoinBonus, newTier, cycleCompletedInTx, completedCardReward, completedCardStampsRequired, referralBonusResult } = transactionResult;
       const custName = waitingCustomer.customer.name || "there";
 
-      const notifyMsg = totalStamps >= stampsRequired
-        ? `🎉 *CONGRATULATIONS ${custName.toUpperCase()}!* ❤️\n\nWelcome to *${merchantName} VIP Club*.\n\nYou've collected all *${stampsRequired}/${stampsRequired} Stamps*! 🏆 (Visit #${visitNumber})\n\n🎁 *YOUR REWARD:* ${rewardName}\nShow this message at the counter to claim your FREE treat! 🌟`
-        : `⭐ *Congratulations ${custName}!* ❤️\n\nWelcome back to *${merchantName} VIP Club* (Visit #${visitNumber}).\n\n✅ *${stampsToAward} Stamp${stampsToAward > 1 ? "s" : ""} Added*\n📊 *Wallet:* ${totalStamps} / ${stampsRequired} Stamps\n🎁 *Next Reward:* ${rewardName} (${remaining} more stamp${remaining !== 1 ? "s" : ""} needed)\n\nThank you for visiting us! 🙏`;
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+      const walletUrl = `${appUrl}/q/wallet/${waitingCustomer.customerId}`;
 
-      // Non-blocking background dispatch
-      sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, notifyMsg);
+      if (cycleCompletedInTx) {
+        // EVENT 1: CARD COMPLETED -> Send REWARD_UNLOCKED WhatsApp Notification!
+        const rewardMsg = await getCompiledTemplate(merchantId, "REWARD_UNLOCKED", {
+          customerName: custName.toUpperCase(),
+          merchantName,
+          requiredStamp: completedCardStampsRequired,
+          visitNumber,
+          rewardName: completedCardReward,
+          couponCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
+          walletUrl
+        });
+        const finalRewardMsg = rewardMsg.includes(walletUrl) ? rewardMsg : `${rewardMsg}\n\n📱 *View Your Reward in Digital Wallet:*\n${walletUrl}`;
+        sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, finalRewardMsg, "REWARD_UNLOCKED");
+
+        // EVENT 2: NEXT LEVEL UNLOCKED -> If Next Level Kickstart Bonus was awarded, send LEVEL_COMPLETE WhatsApp Notification!
+        if (vipBonusStamps > 0) {
+          const levelMsg = await getCompiledTemplate(merchantId, "LEVEL_COMPLETE", {
+            customerName: custName,
+            merchantName,
+            nextLevelName: VIP_TIER_LABELS[newTier.name as any] || newTier.name.toUpperCase(),
+            kickstartStamps: vipBonusStamps.toString(),
+            walletUrl
+          });
+          const finalLevelMsg = levelMsg.includes(walletUrl) ? levelMsg : `${levelMsg}\n\n📱 *Check Your New Card:*\n${walletUrl}`;
+          sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, finalLevelMsg, "LEVEL_COMPLETE");
+        }
+      } else {
+        // STANDARD STAMP AWARDED (Card not completed yet)
+        const customerCard = await db.customerStampCard.findFirst({
+          where: { merchantId, customerId: waitingCustomer.customerId, stampCardId: stampCard.id, completed: false },
+          orderBy: { createdAt: 'desc' }
+        });
+
+        const resFriendBonus = referralBonusResult?.friendBonusStamps || 0;
+        const totalStamps = customerCard?.stampsCollected || (stampsToAward + resJoinBonus + resFriendBonus);
+        const stampsRequired = stampCard.stampsRequired || 7;
+        const remaining = Math.max(0, stampsRequired - totalStamps);
+        const totalAddedThisVisit = stampsToAward + resJoinBonus + resFriendBonus;
+
+        const bonusParts = [`${stampsToAward} Purchase`];
+        if (resJoinBonus > 0) bonusParts.push(`${resJoinBonus} Welcome Bonus 🎁`);
+        if (resFriendBonus > 0) bonusParts.push(`${resFriendBonus} Referral Welcome 🎁`);
+        const stampCountDisplay = bonusParts.length > 1
+          ? `${totalAddedThisVisit} (${bonusParts.join(' + ')})`
+          : `${totalAddedThisVisit}`;
+
+        const stampMsg = await getCompiledTemplate(merchantId, "STAMP_EARNED", {
+          customerName: custName,
+          merchantName,
+          visitNumber,
+          stampCount: stampCountDisplay,
+          totalStamps,
+          requiredStamp: stampsRequired,
+          rewardName: stampCard.rewardName || "FREE Reward",
+          remainingStamps: remaining,
+          walletUrl
+        });
+
+        const finalStampMsg = stampMsg.includes(walletUrl) ? stampMsg : `${stampMsg}\n\n📱 *View Your Live Digital Stamp Card:*\n${walletUrl}`;
+        sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, finalStampMsg, "STAMP_AWARDED");
+      }
+
+      // EVENT 3: REFERRAL BONUS -> Send instant notification to Referrer (Customer A)
+      if (transactionResult.referralBonusResult?.referrerPhone) {
+        const { referrerName, referrerPhone, referrerBonusStamps, referrerId } = transactionResult.referralBonusResult;
+        const refWalletUrl = `${appUrl}/q/wallet/${referrerId}`;
+        const friendDisplayName = waitingCustomer.customer?.name || "Your friend";
+
+        const refMsg = `🎉 *Great News, ${referrerName}!* ❤️\n\nYour friend *${friendDisplayName}* just completed their first purchase at *${merchantName}*!\n\n🎁 *+${referrerBonusStamps} Referral Bonus Stamp* has been credited to your VIP Card!\n\n📱 *View Your Updated Card:*\n${refWalletUrl}`;
+
+        sendWhatsAppNotification(merchantId, referrerPhone, refMsg, "REFERRAL_BONUS");
+      }
+
+      // Schedule Google Review request only if merchant has REVIEWS module enabled
+      if (hasModule(merchant, "REVIEWS")) {
+        scheduleGoogleReviewRequest({
+          merchantId,
+          customerId: waitingCustomer.customerId,
+        }).catch(e => console.error("[Award API] Review Scheduler Error:", e));
+      }
     }
+
+    const totalStampsAwarded = stampsToAward + transactionResult.joiningBonusStamps + (transactionResult.referralBonusResult?.friendBonusStamps || 0);
 
     return NextResponse.json({ 
       success: true, 
-      stampsAwarded: stampsToAward,
+      stampsAwarded: totalStampsAwarded,
       visitNumber,
       message: 'Reward processed successfully' 
     });

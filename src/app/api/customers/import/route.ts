@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       results.push({ row, status: "invalid" })
       continue
     }
-    const existing = await db.customer.findFirst({ where: { merchantId: merchant.id, phone: row.phone } })
+    const existing = await db.customer.findFirst({ where: { merchantId: merchant.id, phone: row.phone, deletedAt: null } })
     if (existing) {
       results.push({ row, status: "duplicate" })
       continue

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { Sparkles } from 'lucide-react';
 import Link from 'next/link';
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'CustomerPilot Merchant Login',
     description: 'Access your retail loyalty terminal, customer queue, and automated review management.',
-    url: 'https://customerpilot.ai/login',
+    url: 'https://customerpilot.in/login',
   },
 };
 
@@ -59,7 +60,9 @@ export default function LoginPage() {
             .auth-dark a { color: #34d399 !important; }
           `}</style>
           <div className="auth-dark">
-            <AuthForm mode="login" />
+            <Suspense fallback={<div className="text-white text-xs text-center py-4">Loading form...</div>}>
+              <AuthForm mode="login" />
+            </Suspense>
           </div>
         </div>
 

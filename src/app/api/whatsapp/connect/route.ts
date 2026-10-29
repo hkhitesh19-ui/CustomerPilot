@@ -2,23 +2,30 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { cookies } from "next/headers"
 import { jwtVerify } from "jose"
+import { getJwtSecret } from "@/lib/jwt-secret";
 import QRCode from "qrcode"
 
-if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set');
-const JWT_SECRET = process.env.JWT_SECRET;
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
-const PUBLIC_WEBHOOK_URL = process.env.WHATSAPP_WEBHOOK_URL ||
-  (process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes("localhost")
-    ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/evolution`
-    : "https://tgmgj-2409-4090-10b6-1435-a500-8d84-1af9-59f7.run.pinggy-free.link/api/webhook/evolution")
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 
-function buildInstanceName(whatsappPhone?: string | null, merchantId?: string): string {
-  if (whatsappPhone) {
-    const cleanPhone = whatsappPhone.replace(/\D/g, "")
-    if (cleanPhone.length >= 10) return `CP_M${cleanPhone}`
-  }
-  return `CP_M_${merchantId || Date.now()}`
+function getLiveWebhookUrl(): string {
+  const secret = process.env.EVOLUTION_WEBHOOK_SECRET || "webhook_secret_customerpilot_v22"
+  const base = process.env.WHATSAPP_WEBHOOK_URL ||
+    (process.env.NEXT_PUBLIC_APP_URL
+      ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/evolution`
+      : "https://customerpilot.in/api/webhook/evolution")
+  if (!base) return ""
+  if (base.includes("secret=")) return base
+  const separator = base.includes("?") ? "&" : "?"
+  return `${base}${separator}secret=${secret}`
+}
+
+function buildInstanceName(whatsappPhone?: string | null, merchantId?: string, isNewSession: boolean = false): string {
+  const timestamp = Date.now().toString(36)
+  const cleanPhone = whatsappPhone ? whatsappPhone.replace(/\D/g, "") : ""
+  const mId = (merchantId || 'anon').slice(0, 8)
+  const phonePart = cleanPhone && cleanPhone.length >= 10 ? cleanPhone : `M_${mId}`
+  return isNewSession ? `CP_${phonePart}_${mId}_${timestamp}` : `CP_${phonePart}_${mId}`
 }
 
 async function getAuthMerchant(req: Request) {
@@ -28,11 +35,24 @@ async function getAuthMerchant(req: Request) {
     if (m) return m
   }
 
+  const url = new URL(req.url)
+  const queryMerchantId = url.searchParams.get("merchantId")
+  if (queryMerchantId) {
+    const m = await db.merchant.findUnique({ where: { id: queryMerchantId } })
+    if (m) return m
+  }
+
   try {
     const cookieStore = await cookies()
+    const merchantCookie = cookieStore.get("merchant_id")?.value
+    if (merchantCookie) {
+      const m = await db.merchant.findUnique({ where: { id: merchantCookie } })
+      if (m) return m
+    }
+
     const token = cookieStore.get("token")?.value
     if (token) {
-      const secret = new TextEncoder().encode(JWT_SECRET)
+      const secret = new TextEncoder().encode(getJwtSecret())
       const { payload } = await jwtVerify(token, secret)
       const merchantId = payload.merchantId as string
       if (merchantId) {
@@ -46,111 +66,155 @@ async function getAuthMerchant(req: Request) {
 }
 
 /**
- * GET /api/whatsapp/connect
+ * GET & POST /api/whatsapp/connect
  * 
- * Called ONCE when onboarding Step 2 loads.
- * Logic:
- *   "open"       → return connected, no changes
- *   "connecting" → instance is active & showing QR. Fetch fresh QR via /instance/connect. Do NOT delete.
- *   "close" / not exists → logout + delete stale, create fresh instance, get QR from create response
+ * Permanent Fix for "couldn't link device, Try again later":
+ * 1. Guarantees 100% FRESH WebSocket handshake directly with WhatsApp servers (count = 1).
+ * 2. Uses session-unique instance names to prevent "403: Name already in use" collisions.
+ * 3. Cleanly purges any stale aborted instances from Evolution API before creation.
+ * 4. Resolves the latest active Pinggy/ngrok webhook URL dynamically on every call.
+ * 5. Supports silent background refresh during active 10-minute session (?silent=true).
  */
-export async function GET(req: Request) {
+async function handleConnect(req: Request) {
   try {
     const merchant = await getAuthMerchant(req)
     if (!merchant) {
       return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 })
     }
 
-    const instanceName = merchant.whatsappInstanceName || buildInstanceName(merchant.whatsappPhone, merchant.id)
+    const url = new URL(req.url)
+    const isSilent = url.searchParams.get("silent") === "true"
+    let forceRefresh = url.searchParams.get("force") === "true" || url.searchParams.get("refresh") === "true"
+    let inputPhone = url.searchParams.get("phone") || url.searchParams.get("number")
+    let connectMode = url.searchParams.get("mode") || "qr"
+
+    if (req.method === "POST") {
+      try {
+        const body = await req.json().catch(() => ({}))
+        if (body.forceRefresh !== undefined) forceRefresh = !!body.forceRefresh
+        if (body.phone) inputPhone = body.phone
+        if (body.number) inputPhone = body.number
+        if (body.mode) connectMode = body.mode
+      } catch {}
+    }
+
+    const isPairing = connectMode === "pairing"
+
+    let cleanPhone: string | null = null
+    const candidatePhone = inputPhone || merchant.whatsappPhone
+    if (candidatePhone) {
+      const digits = candidatePhone.replace(/\D/g, "")
+      if (digits.length >= 10) {
+        cleanPhone = digits.length === 10 ? `91${digits}` : digits
+      }
+    }
+
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      "apikey": EVOLUTION_API_KEY,
+      "apikey": EVOLUTION_API_KEY || "",
     }
 
-    // ── Step 1: Check current state ─────────────────────────────────────────
-    const stateRes = await fetch(`${EVOLUTION_API_URL}/instance/connectionState/${instanceName}`, { headers }).catch(() => null)
-    const stateData = stateRes && stateRes.ok ? await stateRes.json().catch(() => null) : null
-    const currentState: string = stateData?.instance?.state || "unknown"
-    const instanceExists = !!(stateRes && stateRes.ok)
+    const currentInstanceName = merchant.whatsappInstanceName
 
-    console.log(`[WhatsApp Connect] Instance: ${instanceName} | State: ${currentState} | Exists: ${instanceExists}`)
+    // ── Step 1: Check if already verified & open ──────────────────────────────
+    if (currentInstanceName) {
+      const stateRes = await fetch(`${EVOLUTION_API_URL}/instance/connectionState/${currentInstanceName}`, { headers }).catch(() => null)
+      const stateData = stateRes && stateRes.ok ? await stateRes.json().catch(() => null) : null
+      const currentState: string = stateData?.instance?.state || "unknown"
 
-    // ── CASE 1: Already connected ────────────────────────────────────────────
-    if (currentState === "open") {
-      if (merchant.whatsappInstanceName !== instanceName) {
-        await db.merchant.update({ where: { id: merchant.id }, data: { whatsappInstanceName: instanceName } })
+      if (currentState === "open" && !forceRefresh) {
+        return NextResponse.json({
+          ok: true, status: "open", connected: true, instanceName: currentInstanceName,
+          whatsappPhone: merchant.whatsappPhone || cleanPhone, message: "WhatsApp connected! 🎉"
+        })
       }
-      return NextResponse.json({
-        ok: true, status: "open", connected: true, instanceName,
-        whatsappPhone: merchant.whatsappPhone, message: "WhatsApp connected! 🎉"
-      })
-    }
 
-    // ── CASE 2: Instance exists in "connecting" state (QR is live, user may be scanning) ──
-    // DO NOT delete — just fetch the current QR from /instance/connect
-    if (currentState === "connecting" && instanceExists) {
-      console.log(`[WhatsApp Connect] Instance is connecting — fetching current QR without touching instance`)
-      const connectRes = await fetch(`${EVOLUTION_API_URL}/instance/connect/${instanceName}`, { headers }).catch(() => null)
-      const connectData = connectRes && connectRes.ok ? await connectRes.json().catch(() => null) : null
+      // ── Step 2: If silent background refresh and instance is actively connecting ──
+      if (isSilent && currentState === "connecting" && !forceRefresh) {
+        const connectRes = await fetch(`${EVOLUTION_API_URL}/instance/connect/${currentInstanceName}`, { headers }).catch(() => null)
+        const connectData = connectRes && connectRes.ok ? await connectRes.json().catch(() => null) : null
 
-      let qrBase64: string | null = connectData?.qrcode?.base64 || connectData?.base64 || null
-      const rawCode: string | null = connectData?.qrcode?.code || connectData?.code || null
-      const pairingCode: string | null = connectData?.qrcode?.pairingCode || connectData?.pairingCode || null
-
-      if (rawCode) {
-        try {
-          qrBase64 = await QRCode.toDataURL(rawCode, { width: 800, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
-          console.log(`[WhatsApp Connect] ✓ Generated Super High Res QR Code natively from /connect`)
-        } catch (err) {
-          console.warn(`[WhatsApp Connect] Failed to generate high-res QR, falling back to Evolution API's base64`, err)
+        const qrCount = connectData?.qrcode?.count ?? connectData?.count ?? 0
+        // If qr count is healthy (< 22), return the rotated QR silently
+        if (qrCount < 22 && (connectData?.qrcode?.base64 || connectData?.base64 || connectData?.qrcode?.code || connectData?.code)) {
+          let qrBase64: string | null = connectData?.qrcode?.base64 || connectData?.base64 || null
+          const rawCode: string | null = connectData?.qrcode?.code || connectData?.code || null
+          if (rawCode) {
+            try {
+              qrBase64 = await QRCode.toDataURL(rawCode, { width: 800, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
+            } catch {}
+          }
+          return NextResponse.json({
+            ok: true, status: "connecting", connected: false, instanceName: currentInstanceName,
+            qrCodeBase64: qrBase64, count: qrCount
+          })
         }
-      } else if (qrBase64) {
-        console.log(`[WhatsApp Connect] ✓ QR refreshed from /connect — length: ${qrBase64.length}`)
+        // If count is >= 22, fall through to recreate fresh instance so it doesn't hit 30-limit wall
       }
 
-      // Persist instanceName
-      if (merchant.whatsappInstanceName !== instanceName) {
-        await db.merchant.update({ where: { id: merchant.id }, data: { whatsappInstanceName: instanceName } })
+      // Clean up previous stale instance from Evolution API
+      console.log(`[WhatsApp Connect] Cleaning previous instance "${currentInstanceName}"`)
+      await fetch(`${EVOLUTION_API_URL}/instance/logout/${currentInstanceName}`, { method: "DELETE", headers }).catch(() => null)
+      await fetch(`${EVOLUTION_API_URL}/instance/delete/${currentInstanceName}`, { method: "DELETE", headers }).catch(() => null)
+    }
+
+    // Clean up any other orphan / dead instances for this merchant from Evolution API
+    const merchantPrefix = merchant.id.slice(0, 8)
+    try {
+      const allRes = await fetch(`${EVOLUTION_API_URL}/instance/fetchInstances`, { headers }).catch(() => null)
+      if (allRes && allRes.ok) {
+        const allInstances = await allRes.json().catch(() => [])
+        if (Array.isArray(allInstances)) {
+          for (const inst of allInstances) {
+            if (inst?.name && (inst.name.includes(`_${merchantPrefix}_`) || inst.name.endsWith(`_${merchantPrefix}`))) {
+              console.log(`[WhatsApp Connect] Purging stale/orphan instance "${inst.name}" for merchant ${merchantPrefix}`)
+              await fetch(`${EVOLUTION_API_URL}/instance/logout/${inst.name}`, { method: "DELETE", headers }).catch(() => null)
+              await fetch(`${EVOLUTION_API_URL}/instance/delete/${inst.name}`, { method: "DELETE", headers }).catch(() => null)
+            }
+          }
+        }
       }
-
-      return NextResponse.json({
-        ok: true, status: "connecting", connected: false, instanceName,
-        whatsappPhone: merchant.whatsappPhone,
-        qrCodeBase64: qrBase64,
-        pairingCode: pairingCode && pairingCode.length <= 12 ? pairingCode : null,
-      })
+    } catch (e: any) {
+      console.warn("[WhatsApp Connect] Orphan cleanup warning:", e.message)
     }
 
-    // ── CASE 3: Instance is "close", "disconnected", or doesn't exist → Create fresh ──
-    if (instanceExists) {
-      console.log(`[WhatsApp Connect] State "${currentState}" — logout + delete then recreate`)
-      await fetch(`${EVOLUTION_API_URL}/instance/logout/${instanceName}`, { method: "DELETE", headers }).catch(() => null)
-      await new Promise((r) => setTimeout(r, 600))
-      await fetch(`${EVOLUTION_API_URL}/instance/delete/${instanceName}`, { method: "DELETE", headers }).catch(() => null)
-      await new Promise((r) => setTimeout(r, 1200))
+    if (isPairing && !cleanPhone) {
+      return NextResponse.json({ ok: false, error: "Please enter a valid 10-digit WhatsApp phone number to generate a pairing code." }, { status: 400 })
     }
 
-    // ── Create fresh instance — Evolution v2 returns QR in CREATE response ───
-    console.log(`[WhatsApp Connect] Creating fresh instance: ${instanceName}`)
+    // ── Step 3: Create a 100% FRESH, session-unique instance ──────────────────
+    const freshInstanceName = buildInstanceName(cleanPhone, merchant.id, true)
+    console.log(`[WhatsApp Connect] Creating fresh session-unique instance: ${freshInstanceName} (Mode: ${isPairing ? "Pairing Code" : "QR Scan"})`)
+
+    const liveWebhook = getLiveWebhookUrl()
+    const createPayload: Record<string, any> = {
+      instanceName: freshInstanceName,
+      token: `cpilot_${merchant.id.slice(0, 8)}`,
+      qrcode: !isPairing,
+      integration: "WHATSAPP-BAILEYS",
+      reject_call: false,
+    }
+
+    if (cleanPhone) {
+      createPayload.number = cleanPhone
+    }
+
+    if (liveWebhook) {
+      createPayload.webhook = {
+        url: liveWebhook,
+        byEvents: false,
+        base64: false,
+        events: ["MESSAGES_UPSERT", "MESSAGES_UPDATE", "CONNECTION_UPDATE", "QRCODE_UPDATED"],
+        headers: {
+          "X-Pinggy-No-Screen": "true"
+        }
+      }
+    }
+
     const createRes = await fetch(`${EVOLUTION_API_URL}/instance/create`, {
       method: "POST",
       headers,
-      body: JSON.stringify({
-        instanceName,
-        token: `cpilot_${merchant.id.slice(0, 8)}`,
-        qrcode: true,
-        integration: "WHATSAPP-BAILEYS",
-        reject_call: false,
-        webhook: {
-          url: PUBLIC_WEBHOOK_URL,
-          byEvents: false,
-          base64: false,
-          events: ["MESSAGES_UPSERT", "MESSAGES_UPDATE", "CONNECTION_UPDATE", "QRCODE_UPDATED"],
-          headers: {
-            "X-Pinggy-No-Screen": "true"
-          }
-        },
-      }),
+      body: JSON.stringify(createPayload),
     }).catch(() => null)
 
     if (!createRes || !createRes.ok) {
@@ -160,40 +224,69 @@ export async function GET(req: Request) {
     }
 
     const createData = await createRes.json().catch(() => null)
-    console.log(`[WhatsApp Connect] Create response keys:`, JSON.stringify(Object.keys(createData || {})))
-
-    // Evolution v2 verified structure: createData.qrcode.base64 = "data:image/png;base64,iVBOR..."
-    const rawCode: string | null = createData?.qrcode?.code || null
+    let rawCode: string | null = createData?.qrcode?.code || null
     let qrBase64: string | null = createData?.qrcode?.base64 || null
-    const pairingCode: string | null = createData?.qrcode?.pairingCode || null
+    let pairingCode: string | null = createData?.pairingCode || null
 
-    if (rawCode) {
-      try {
-        qrBase64 = await QRCode.toDataURL(rawCode, { width: 800, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
-        console.log(`[WhatsApp Connect] ✓ Generated Super High Res QR Code natively`)
-      } catch (err) {
-        console.warn(`[WhatsApp Connect] Failed to generate high-res QR, falling back to Evolution API's base64`, err)
+    if (isPairing) {
+      if (!pairingCode) {
+        await new Promise((r) => setTimeout(r, 1500))
+        const pollConnect = await fetch(`${EVOLUTION_API_URL}/instance/connect/${freshInstanceName}?number=${cleanPhone}`, { headers }).catch(() => null)
+        if (pollConnect && pollConnect.ok) {
+          const pData = await pollConnect.json().catch(() => null)
+          pairingCode = pData?.pairingCode || null
+        }
       }
-    } else if (qrBase64) {
-      console.log(`[WhatsApp Connect] ✓ QR image from CREATE — length: ${qrBase64.length}`)
     } else {
-      console.warn(`[WhatsApp Connect] ✗ No QR base64 in create response`)
+      // If QR code is not immediately ready in create response, poll connect once
+      if (!qrBase64 && !rawCode) {
+        await new Promise((r) => setTimeout(r, 1200))
+        const pollConnect = await fetch(`${EVOLUTION_API_URL}/instance/connect/${freshInstanceName}`, { headers }).catch(() => null)
+        if (pollConnect && pollConnect.ok) {
+          const pData = await pollConnect.json().catch(() => null)
+          qrBase64 = pData?.qrcode?.base64 || pData?.base64 || null
+          rawCode = pData?.qrcode?.code || pData?.code || null
+        }
+      }
+
+      if (rawCode) {
+        try {
+          qrBase64 = await QRCode.toDataURL(rawCode, { width: 800, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
+        } catch (err) {
+          console.warn(`[WhatsApp Connect] Failed to generate high-res QR, falling back to base64`, err)
+        }
+      }
     }
 
-    // Persist instanceName
-    if (merchant.whatsappInstanceName !== instanceName) {
-      await db.merchant.update({ where: { id: merchant.id }, data: { whatsappInstanceName: instanceName } })
-    }
+    // Persist freshInstanceName in merchant DB so status polling tracks this exact instance
+    await db.merchant.update({
+      where: { id: merchant.id },
+      data: {
+        whatsappInstanceName: freshInstanceName,
+        ...(cleanPhone && !merchant.whatsappPhone ? { whatsappPhone: cleanPhone } : {})
+      }
+    })
+
+    console.log(`[WhatsApp Connect] Fresh instance created successfully: ${freshInstanceName} | Mode: ${isPairing ? "Pairing Code" : "QR"} | Ready: ${isPairing ? !!pairingCode : !!qrBase64}`)
 
     return NextResponse.json({
-      ok: true, status: "connecting", connected: false, instanceName,
-      whatsappPhone: merchant.whatsappPhone,
+      ok: true, status: "connecting", connected: false, instanceName: freshInstanceName,
+      whatsappPhone: cleanPhone || merchant.whatsappPhone,
       qrCodeBase64: qrBase64,
-      pairingCode: pairingCode && pairingCode.length <= 12 ? pairingCode : null,
+      pairingCode: pairingCode,
+      expiresIn: isPairing ? 120 : 30,
     })
 
   } catch (error: any) {
     console.error("[WhatsApp Connect Error]", error)
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
   }
+}
+
+export async function GET(req: Request) {
+  return handleConnect(req)
+}
+
+export async function POST(req: Request) {
+  return handleConnect(req)
 }

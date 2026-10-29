@@ -71,23 +71,27 @@ export function MarketingClient() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold text-stone-900 leading-tight tracking-tight"
+            className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-stone-900 leading-tight tracking-tight"
           >
             Turn Every Walk-in
             <br />
             Into a <span className="bg-gradient-to-r from-yellow-500 to-amber-600 bg-clip-text text-transparent">Lifetime Customer</span>
           </motion.h1>
 
-          {/* Subheadline */}
-          <motion.p
+          {/* Subheadline & Hook */}
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="mt-6 text-lg md:text-xl text-stone-600 max-w-2xl mx-auto"
+            className="mt-6 max-w-3xl mx-auto space-y-3"
           >
-            Customer scans QR. You tap. Reward delivered in 5 seconds.
-            No POS replacement. No GST software. Just pure customer love.
-          </motion.p>
+            <p className="text-lg md:text-xl font-bold text-stone-800 tracking-tight">
+              Bring Your Customers Back. Get More Google Reviews. Reply Automatically.
+            </p>
+            <p className="text-sm md:text-base text-stone-600 leading-relaxed">
+              CustomerPilot helps local businesses bring customers back with loyalty rewards, AI-powered Google Review assistance, and automated review replies — without requiring customers to download an app.
+            </p>
+          </motion.div>
 
           {/* CTAs */}
           <motion.div
@@ -98,7 +102,7 @@ export function MarketingClient() {
           >
             <Button size="lg" asChild className="bg-stone-900 text-white hover:bg-stone-800 px-8 h-14 text-base">
               <a href="/signup">
-                Start 14-Day Free Trial
+                Start 3 Days Free Trial Today
                 <ArrowRight className="w-4 h-4 ml-2" />
               </a>
             </Button>
@@ -258,7 +262,7 @@ export function MarketingClient() {
           <div className="pt-2">
             <Button asChild size="lg" className="bg-yellow-400 text-stone-900 hover:bg-yellow-300 font-extrabold text-base px-8 h-14 shadow-xl">
               <a href="/pricing">
-                View Full Pricing & 100 Founding Merchant Program ➔
+                View Full Pricing & Plans ➔
               </a>
             </Button>
           </div>
@@ -269,10 +273,10 @@ export function MarketingClient() {
       <section className="py-24 bg-stone-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">Ready to Turn Walk-ins into Regulars?</h2>
-          <p className="text-stone-400 mb-8">14 days free. No credit card. Setup in 2 minutes.</p>
+          <p className="text-stone-400 mb-8">3 days free. No credit card. Setup in 2 minutes.</p>
           <Button size="lg" asChild className="bg-yellow-400 text-stone-900 hover:bg-yellow-300 px-8 h-14 text-base">
             <a href="/signup">
-              Start Your Free Trial
+              Start 3 Days Free Trial Today
               <ArrowRight className="w-4 h-4 ml-2" />
             </a>
           </Button>

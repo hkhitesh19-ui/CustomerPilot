@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { SignJWT } from 'jose';
+import { getJwtSecret } from "@/lib/jwt-secret";
 import bcrypt from 'bcryptjs';
 import { applyAuthRateLimit } from '@/lib/rate-limiter';
+import { generateMerchantIdNumber } from '@/lib/merchant-id-generator';
+import { getIndustryLoyaltyRule } from '@/lib/industry-campaigns';
+import { getGlobalDefaultMerchantSettings } from '@/lib/default-merchant-settings';
+import { normalizePhone } from '@/lib/utils';
+import { getOrCreateDigitalBusinessCard } from '@/lib/digital-card-service';
 
-if (!process.env.JWT_SECRET) {
-  throw new Error('FATAL: JWT_SECRET environment variable is not set');
-}
-const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(req: Request) {
   // Rate limit: max 10 registration attempts per IP per minute
@@ -16,7 +18,8 @@ export async function POST(req: Request) {
   try {
     const { 
       businessName, ownerName, email, password, 
-      businessType, businessAddress, whatsappPhone 
+      businessType, businessAddress, whatsappPhone,
+      module // optional: "reviews", "loyalty", "autoreply" for fast-track onboarding
     } = await req.json();
 
     // Validation 1: Required fields
@@ -31,7 +34,50 @@ export async function POST(req: Request) {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const cleanPhone = whatsappPhone ? whatsappPhone.trim() : '';
+    // Normalize phone at entry point — ensures 91XXXXXXXXXX format in DB from day 1
+    const cleanPhone = normalizePhone(whatsappPhone) || '';
+
+    // Determine opted module(s) (supports single: "reviews", "card", or combo: "card,reviews")
+    const MODULE_KEY_MAP: Record<string, string> = {
+      reviews: "REVIEWS",
+      review: "REVIEWS",
+      loyalty: "LOYALTY",
+      autoreply: "AUTOREPLY",
+      card: "DIGITAL_CARD",
+      digital_card: "DIGITAL_CARD",
+      digitalcard: "DIGITAL_CARD",
+    };
+
+    let resolvedModules = "";
+    let isOptedService = false;
+
+    if (module && typeof module === "string" && module.trim() !== "" && module.toLowerCase() !== "complete") {
+      const parts = module.split(",").map(p => p.trim().toLowerCase()).filter(Boolean);
+      const mappedParts = new Set<string>();
+      for (const p of parts) {
+        if (MODULE_KEY_MAP[p]) {
+          mappedParts.add(MODULE_KEY_MAP[p]);
+        }
+      }
+      if (mappedParts.size > 0) {
+        resolvedModules = Array.from(mappedParts).join(",");
+        isOptedService = true;
+      }
+    }
+
+    const globalDefaults = await getGlobalDefaultMerchantSettings();
+
+    if (!resolvedModules) {
+      resolvedModules = globalDefaults?.enabledModules || "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD";
+    }
+
+    const hasLoyalty = resolvedModules.split(",").includes("LOYALTY");
+    const hasReviews = resolvedModules.split(",").includes("REVIEWS");
+    const hasCard = resolvedModules.split(",").includes("DIGITAL_CARD");
+    const hasAutoReply = resolvedModules.split(",").includes("AUTOREPLY");
+
+    // Fast-track: skip loyalty onboarding if merchant only opted for standalone non-loyalty modules
+    const isFastTrack = isOptedService && !hasLoyalty;
 
     // Validation 2: Check if User already exists with email
     const existingUser = await db.user.findUnique({ where: { email: cleanEmail } });
@@ -67,22 +113,34 @@ export async function POST(req: Request) {
 
     // Create Merchant linked to User
     const trialEndsAt = new Date();
-    trialEndsAt.setDate(trialEndsAt.getDate() + 7); // 7-day trial
+    trialEndsAt.setDate(trialEndsAt.getDate() + 3); // 3-day trial
+
+    const merchantIdNumber = await generateMerchantIdNumber(db);
 
     const merchant = await db.merchant.create({
       data: {
         userId: user.id,
+        merchantIdNumber,
         name: businessName,
         ownerName: ownerName || '',
         email: cleanEmail,
         businessType: businessType || 'bakery',
         address: businessAddress || '',
-        whatsappPhone: cleanPhone,
+        whatsappPhone: cleanPhone || undefined,
         plan: 'trial',
         status: 'active',
         trialEndsAt,
-        onboardingCompleted: false,
-        currentStep: 1,
+        enabledModules: resolvedModules,
+        googleReviewDelayMinutes: globalDefaults?.googleReviewDelayMinutes ?? 30,
+        vipUpgradeBonusStamps: globalDefaults?.vipUpgradeBonusStamps ?? 2,
+        loyaltyCategoryNames: JSON.stringify(globalDefaults?.loyaltyCategoryNames),
+        winbackDays1: globalDefaults?.winbackDays1 ?? 30,
+        winbackDays2: globalDefaults?.winbackDays2 ?? 60,
+        winbackDays3: globalDefaults?.winbackDays3 ?? 90,
+        expiryWarningDays: globalDefaults?.expiryWarningDays ?? 7,
+        // Fast-track: skip onboarding for standalone non-loyalty module signups
+        onboardingCompleted: !!isFastTrack,
+        currentStep: isFastTrack ? 99 : 1,
       },
     });
 
@@ -94,7 +152,7 @@ export async function POST(req: Request) {
       { stepKey: 'logo_upload', label: 'Logo Upload' },
       { stepKey: 'reward_setup', label: 'Reward Card Setup' },
       { stepKey: 'qr_code', label: 'QR Code Generation' },
-      { stepKey: 'print_standee', label: 'Print Standee' },
+      { stepKey: 'print_standee', label: 'Print QR Code' },
       { stepKey: 'system_test', label: 'Live System Test' },
     ];
 
@@ -103,26 +161,72 @@ export async function POST(req: Request) {
         merchantId: merchant.id,
         stepKey: s.stepKey,
         label: s.label,
-        completed: false,
+        completed: !!isFastTrack, // Mark all as completed for fast-track
       })),
     });
 
-    // Create default StampCard for merchant
-    await db.stampCard.create({
-      data: {
-        merchantId: merchant.id,
-        name: `${businessName} VIP Club`,
-        stampsRequired: 10,
-        rewardName: 'FREE Special Treat',
-        stampValue: 500,
-        googleReviewBonus: 1,
-        photoBonus: 2,
-        active: true,
-      },
-    });
+    // Create default StampCard only if LOYALTY module is enabled
+    if (hasLoyalty) {
+      const rule = getIndustryLoyaltyRule(businessType, businessName);
+      await db.stampCard.create({
+        data: {
+          merchantId: merchant.id,
+          name: rule.getCardTitle(businessName),
+          stampsRequired: globalDefaults?.stampsRequired ?? rule.stampsRequired,
+          rewardName: rule.rewardName,
+          stampValue: globalDefaults?.stampValue ?? rule.stampValue,
+          validityDays: globalDefaults?.validityDays ?? rule.validityDays,
+          googleReviewBonus: globalDefaults?.googleReviewBonus ?? rule.googleReviewBonus,
+          photoBonus: globalDefaults?.photoBonus ?? rule.photoBonus,
+          joiningBonusEnabled: globalDefaults?.joiningBonusEnabled ?? rule.joiningBonusEnabled,
+          joiningBonusStamps: globalDefaults?.joiningBonusStamps ?? rule.joiningBonusStamps,
+          color: globalDefaults?.color || rule.color,
+          tierRewardsEnabled: false,
+          active: true,
+        },
+      });
+
+      // Initialize default referral stamp rules for new merchant
+      await db.systemContent.create({
+        data: {
+          key: `MERCHANT_REFERRAL_RULES_${merchant.id}`,
+          section: "merchant_settings",
+          category: "referral_rules",
+          value: JSON.stringify({
+            referralBonusEnabled: globalDefaults?.referralBonusEnabled ?? true,
+            referralBonusStamps: globalDefaults?.referralBonusStamps ?? 1,
+            referralFriendBonusStamps: globalDefaults?.referralFriendBonusStamps ?? 1,
+            referralRewardAmount: globalDefaults?.referralRewardAmount ?? 0,
+          })
+        }
+      }).catch(() => {});
+
+      // Initialize default Instagram story mention reward rules for new merchant
+      await db.systemContent.create({
+        data: {
+          key: `MERCHANT_SOCIAL_REWARD_RULES_${merchant.id}`,
+          section: "merchant_settings",
+          category: "social_reward_rules",
+          value: JSON.stringify({
+            instagramStoryBonusEnabled: globalDefaults?.instagramStoryBonusEnabled ?? true,
+            instagramStoryBonusStamps: globalDefaults?.instagramStoryBonusStamps ?? 1,
+            instagramStoryFrequency: globalDefaults?.instagramStoryFrequency || "ONCE_PER_CYCLE",
+          })
+        }
+      }).catch(() => {});
+    }
+
+    // Auto-provision Digital Business Card if opted
+    if (hasCard) {
+      try {
+        await getOrCreateDigitalBusinessCard(merchant.id);
+      } catch (err) {
+        console.warn("Failed to auto-provision digital business card during register:", err);
+      }
+    }
 
     // Sign JWT with userId + merchantId + role
-    const secret = new TextEncoder().encode(JWT_SECRET);
+    const secret = new TextEncoder().encode(getJwtSecret());
     const token = await new SignJWT({ 
       userId: user.id, 
       merchantId: merchant.id,
@@ -133,10 +237,22 @@ export async function POST(req: Request) {
       .setExpirationTime('7d')
       .sign(secret);
 
+    // Determine redirect based on module fast-track
+    let redirectTo = '/dashboard';
+    if (isFastTrack) {
+      if (hasCard && !hasReviews && !hasAutoReply) {
+        redirectTo = '/dashboard/digital-card';
+      } else if (hasReviews || hasAutoReply) {
+        redirectTo = '/dashboard/reviews';
+      } else {
+        redirectTo = '/dashboard';
+      }
+    }
+
     const response = NextResponse.json({ 
       success: true, 
       merchantId: merchant.id,
-      redirectTo: '/dashboard',
+      redirectTo,
     });
     
     response.cookies.set('token', token, {

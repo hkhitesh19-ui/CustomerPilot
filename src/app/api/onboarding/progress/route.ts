@@ -2,9 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { jwtVerify } from 'jose';
+import { getJwtSecret } from "@/lib/jwt-secret";
 
-if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set');
-const JWT_SECRET = process.env.JWT_SECRET;
 
 async function getMerchantId(req: NextRequest): Promise<string | null> {
   // Try header first (injected by middleware)
@@ -15,7 +14,7 @@ async function getMerchantId(req: NextRequest): Promise<string | null> {
   const token = req.cookies.get('token')?.value;
   if (!token) return null;
   try {
-    const secret = new TextEncoder().encode(JWT_SECRET);
+    const secret = new TextEncoder().encode(getJwtSecret());
     const { payload } = await jwtVerify(token, secret);
     return payload.merchantId as string;
   } catch {

@@ -4,12 +4,14 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Star, MessageSquare, Copy, ExternalLink, Sparkles, RefreshCw,
-  CheckCircle2, Clock, ShieldAlert, AlertTriangle, Send, Filter, Check
+  CheckCircle2, Clock, ShieldAlert, AlertTriangle, Send, Filter, Check, Share2
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { ReviewShareCard } from "@/components/review-share-card"
+import { useDashboardState } from "@/hooks/use-dashboard-state"
 
 interface ReviewItem {
   id: string
@@ -25,11 +27,14 @@ interface ReviewItem {
 
 export default function ReviewsManagementPage() {
   const [reviews, setReviews] = useState<ReviewItem[]>([])
+  const { data: dashboardData } = useDashboardState()
+  const [sharingReview, setSharingReview] = useState<ReviewItem | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<"all" | "pending" | "5star" | "blocked">("all")
   const [generatingId, setGeneratingId] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [draftReplies, setDraftReplies] = useState<Record<string, string>>({})
+  const [savingId, setSavingId] = useState<string | null>(null)
 
   // Fetch Reviews
   useEffect(() => {
@@ -44,10 +49,13 @@ export default function ReviewsManagementPage() {
         const json = await res.json()
         if (json.reviews) {
           setReviews(json.reviews)
-          // Initialize draft replies
+          // Initialize draft replies with SEO optimization
           const drafts: Record<string, string> = {}
           json.reviews.forEach((r: ReviewItem) => {
-            drafts[r.id] = r.reviewReply || generateDefaultAiReply(r.reviewerName, r.rating, r.comment)
+            const isNonSeoFallback = !r.reviewReply || r.reviewReply === "Thank you for the amazing review! It means a lot to us."
+            drafts[r.id] = isNonSeoFallback 
+              ? generateDefaultAiReply(r.reviewerName, r.rating, r.comment)
+              : r.reviewReply
           })
           setDraftReplies(drafts)
         }
@@ -62,9 +70,9 @@ export default function ReviewsManagementPage() {
   const generateDefaultAiReply = (name: string, rating: number, comment?: string) => {
     const firstName = name ? name.split(" ")[0] : "VIP"
     if (rating >= 4) {
-      return `Hi ${firstName}! 🌟 Thank you so much for the 5-star review! We're thrilled you enjoyed your experience at Cake Connection. We can't wait to welcome you back soon! 🎂❤️`
+      return `Hi ${firstName}! 🌟 Thank you so much for your wonderful 5-star Google review of Cake Connection in Vadodara! We're thrilled you loved our fresh cakes and bakery delicacies. Looking forward to serving you again soon! 🎂❤️`
     } else {
-      return `Hi ${firstName}, thank you for sharing your feedback with us. We sincerely apologize for not meeting your expectations. Please contact us directly on WhatsApp so we can make this right for you!`
+      return `Hi ${firstName}, thank you for your review of Cake Connection Vadodara. We sincerely apologize for not meeting your expectations. Please contact us directly on WhatsApp so we can make this right for you!`
     }
   }
 
@@ -78,6 +86,7 @@ export default function ReviewsManagementPage() {
           reviewerName: item.reviewerName,
           rating: item.rating,
           comment: item.comment,
+          merchantId: item.merchantId
         }),
       })
       if (res.ok) {
@@ -90,6 +99,30 @@ export default function ReviewsManagementPage() {
       console.error("Failed to generate AI reply:", e)
     } finally {
       setGeneratingId(null)
+    }
+  }
+
+  const handleSaveModifiedReply = async (reviewId: string) => {
+    const replyText = draftReplies[reviewId] || ""
+    if (!replyText) return
+
+    setSavingId(reviewId)
+    try {
+      const res = await fetch("/api/reviews/update-reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviewId, reviewReply: replyText }),
+      })
+      if (res.ok) {
+        alert("✅ Modified AI Owner Reply saved to database!")
+        setReviews(prev =>
+          prev.map(r => (r.id === reviewId ? { ...r, reviewReply: replyText } : r))
+        )
+      }
+    } catch (e) {
+      console.error("Failed to save modified reply:", e)
+    } finally {
+      setSavingId(null)
     }
   }
 
@@ -170,7 +203,7 @@ export default function ReviewsManagementPage() {
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">1-Click GoogleReview AutoReply Studio</h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Manage 5-star Google reviews & post Gemini AI owner replies in 1-Click (Pre-Approval Phase).
+            Manage 5-star Google reviews & post AI owner replies in 1-Click (Pre-Approval Phase).
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -181,23 +214,71 @@ export default function ReviewsManagementPage() {
         </div>
       </div>
 
+      {/* Google Business Connect Banner */}
+      {!dashboardData?.isGoogleConnected && (
+        <Card className="bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-950 border-emerald-500/30 shadow-xl overflow-hidden relative">
+          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay"></div>
+          <CardContent className="p-6 md:p-8 relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold uppercase tracking-wider">
+                <AlertTriangle className="w-3.5 h-3.5" /> Action Required
+              </div>
+              <h2 className="text-xl md:text-2xl font-black text-white">Connect Your Google Business Profile</h2>
+              <p className="text-emerald-100/70 text-sm max-w-xl">
+                You must connect your Google Business Profile to start syncing reviews and enabling AI replies. This only takes 1 click!
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-3 w-full md:w-auto">
+              {/* Using native Google Business Integration component */}
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-xl">
+                <Button 
+                  onClick={() => window.location.href = `/api/google-business/oauth?merchantId=${dashboardData?.merchantId || 'admin_merchant'}&mode=instant`}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold mb-3"
+                >
+                  ⚡ Instant 1-Click Connect (Sandbox)
+                </Button>
+                <div className="relative flex items-center gap-3 mb-3">
+                  <div className="flex-1 border-t border-white/10" />
+                  <span className="text-[10px] text-emerald-200/50 font-bold uppercase">OR</span>
+                  <div className="flex-1 border-t border-white/10" />
+                </div>
+                <Button 
+                  onClick={() => window.location.href = `/api/google-business/oauth?merchantId=${dashboardData?.merchantId || 'admin_merchant'}`}
+                  variant="outline" 
+                  className="w-full bg-white text-slate-900 hover:bg-slate-100"
+                >
+                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z" />
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z" />
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z" />
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
+                  </svg>
+                  Sign in with Google
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Quota Mode Explanation Card */}
-      <Card className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border-indigo-500/30 shadow-xl">
+      <Card className="bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-900 border-indigo-200 dark:border-indigo-500/30 shadow-xs dark:shadow-xl">
         <CardContent className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-amber-400 font-bold text-xs">
+            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-xs">
               <Sparkles className="w-4 h-4" />
               <span>Mode: 1-Click AI Reply Assistant (Pre-Approval Phase)</span>
             </div>
-            <p className="text-xs text-slate-300">
-              Gemini AI automatically drafts personalized 5-star replies for every review. Click <strong className="text-emerald-400">"1-Click Copy & Post"</strong> to update on Google Maps in 10 seconds!
+            <p className="text-xs text-slate-700 dark:text-slate-300">
+              AI automatically drafts personalized 5-star replies for every review. Click <strong className="text-emerald-600 dark:text-emerald-400">"1-Click Copy & Post"</strong> to update on Google Maps in 10 seconds!
             </p>
           </div>
           <Button
             size="sm"
             onClick={fetchReviews}
             variant="outline"
-            className="border-indigo-400/40 text-indigo-200 hover:bg-indigo-900/50 text-xs gap-1.5 flex-shrink-0"
+            className="border-indigo-300 dark:border-indigo-400/40 text-indigo-700 dark:text-indigo-200 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-xs gap-1.5 flex-shrink-0"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh Reviews
           </Button>
@@ -205,7 +286,7 @@ export default function ReviewsManagementPage() {
       </Card>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-3 flex-wrap">
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 flex-wrap">
         {[
           { id: "all", label: `All Reviews (${reviews.length})` },
           { id: "pending", label: `Pending Reply (${reviews.filter(r => !r.isReplied).length})` },
@@ -217,7 +298,7 @@ export default function ReviewsManagementPage() {
             size="sm"
             variant={activeTab === tab.id ? "default" : "ghost"}
             onClick={() => setActiveTab(tab.id as any)}
-            className={activeTab === tab.id ? "bg-emerald-500 text-stone-950 font-bold text-xs" : "text-slate-400 text-xs"}
+            className={activeTab === tab.id ? "bg-emerald-600 dark:bg-emerald-500 text-white dark:text-stone-950 font-bold text-xs" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs"}
           >
             {tab.label}
           </Button>
@@ -228,35 +309,35 @@ export default function ReviewsManagementPage() {
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map(i => (
-            <Card key={i} className="animate-pulse bg-slate-900/40 h-40 border-slate-800" />
+            <Card key={i} className="animate-pulse bg-slate-100 dark:bg-slate-900/40 h-40 border-slate-200 dark:border-slate-800" />
           ))}
         </div>
       ) : filteredReviews.length === 0 ? (
-        <Card className="bg-slate-900/40 border-slate-800 p-12 text-center text-slate-500 text-xs">
+        <Card className="bg-white dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 p-12 text-center text-slate-500 text-xs shadow-sm">
           No reviews found in this category.
         </Card>
       ) : (
         <div className="space-y-4">
           {filteredReviews.map(item => (
-            <Card key={item.id} className="bg-slate-900 border-slate-800 relative overflow-hidden shadow-lg">
+            <Card key={item.id} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 relative overflow-hidden shadow-sm dark:shadow-lg">
               <CardContent className="p-6 space-y-4">
                 
                 {/* Top Row: Reviewer Name + Star Rating + Status */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800/80 pb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-emerald-400 text-sm">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center font-bold text-emerald-600 dark:text-emerald-400 text-sm">
                       {item.reviewerName.charAt(0)}
                     </div>
                     <div>
-                      <h4 className="font-bold text-sm text-slate-100">{item.reviewerName}</h4>
-                      <div className="flex items-center gap-1 text-amber-400 text-xs mt-0.5">
+                      <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">{item.reviewerName}</h4>
+                      <div className="flex items-center gap-1 text-amber-500 dark:text-amber-400 text-xs mt-0.5">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Star
                             key={i}
-                            className={`w-3.5 h-3.5 ${i < item.rating ? "fill-amber-400 text-amber-400" : "text-slate-700"}`}
+                            className={`w-3.5 h-3.5 ${i < item.rating ? "fill-amber-400 text-amber-400" : "text-slate-200 dark:text-slate-700"}`}
                           />
                         ))}
-                        <span className="text-slate-400 text-[11px] ml-1.5">
+                        <span className="text-slate-500 dark:text-slate-400 text-[11px] ml-1.5">
                           {new Date(item.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
                         </span>
                       </div>
@@ -266,15 +347,15 @@ export default function ReviewsManagementPage() {
                   {/* Status Badge */}
                   <div>
                     {item.isReplied ? (
-                      <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[11px] gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Replied on Google
+                      <Badge className="bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30 text-[11px] gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-500 dark:text-emerald-400" /> Replied on Google
                       </Badge>
                     ) : item.status === "quota_blocked" ? (
-                      <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 text-[11px] gap-1">
-                        <Clock className="w-3 h-3 text-amber-400" /> In Dead-Letter Queue
+                      <Badge className="bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/30 text-[11px] gap-1">
+                        <Clock className="w-3 h-3 text-amber-500 dark:text-amber-400" /> In Dead-Letter Queue
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-slate-400 border-slate-700 text-[11px]">
+                      <Badge variant="outline" className="text-slate-500 dark:text-slate-400 border-slate-300 dark:border-slate-700 text-[11px]">
                         Pending Auto-Reply
                       </Badge>
                     )}
@@ -283,35 +364,49 @@ export default function ReviewsManagementPage() {
 
                 {/* Review Text */}
                 {item.comment && (
-                  <p className="text-xs text-slate-300 bg-slate-950/60 p-3 rounded-xl border border-slate-800/60 italic">
+                  <p className="text-xs text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800/60 italic">
                     "{item.comment}"
                   </p>
                 )}
 
-                {/* Gemini AI Reply Draft Box */}
+                {/* AI Reply Draft Box */}
                 <div className="space-y-2 pt-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> Gemini AI Owner Reply Draft:
+                    <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" /> AI Owner Reply Draft (SEO-Optimized & Editable):
                     </span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleGenerateAiReply(item.id, item)}
-                      disabled={generatingId === item.id}
-                      className="text-[11px] text-slate-400 hover:text-emerald-300 h-6 px-2"
-                    >
-                      <RefreshCw className={`w-3 h-3 mr-1 ${generatingId === item.id ? "animate-spin" : ""}`} />
-                      Regenerate
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleSaveModifiedReply(item.id)}
+                        disabled={savingId === item.id}
+                        className="text-[11px] text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/40 h-6 px-2 font-medium"
+                      >
+                        💾 {savingId === item.id ? "Saving..." : "Save Edits"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleGenerateAiReply(item.id, item)}
+                        disabled={generatingId === item.id}
+                        className="text-[11px] text-slate-400 hover:text-emerald-300 h-6 px-2"
+                      >
+                        <RefreshCw className={`w-3 h-3 mr-1 ${generatingId === item.id ? "animate-spin" : ""}`} />
+                        Regenerate
+                      </Button>
+                    </div>
                   </div>
 
                   <textarea
                     value={draftReplies[item.id] || ""}
                     onChange={e => setDraftReplies(prev => ({ ...prev, [item.id]: e.target.value }))}
-                    className="w-full h-24 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 resize-none font-sans"
+                    className="w-full h-24 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 resize-none font-sans leading-relaxed"
                     placeholder="AI generating response..."
                   />
+                  <p className="text-[11px] text-slate-500 italic">
+                    ✏️ <strong>Owner Edit Mode:</strong> Type directly in the box to customize this reply. Click <strong>"Save Edits"</strong> to store in DB or <strong>"1-Click Copy & Post"</strong> to update on Google.
+                  </p>
                 </div>
 
                 {/* 1-Click Action Buttons */}
@@ -319,8 +414,17 @@ export default function ReviewsManagementPage() {
                   <Button
                     size="sm"
                     variant="outline"
+                    onClick={() => setSharingReview(item)}
+                    className="border-indigo-300 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-xs gap-1.5"
+                  >
+                    <Share2 className="w-3.5 h-3.5" /> Share Card
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant="outline"
                     onClick={() => handleTestProgrammaticPush(item)}
-                    className="border-slate-700 text-slate-300 hover:bg-slate-800 text-xs"
+                    className="border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs"
                   >
                     ⚡ Test API Push
                   </Button>
@@ -349,6 +453,22 @@ export default function ReviewsManagementPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* Share Card Modal */}
+      {sharingReview && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <ReviewShareCard
+            review={{
+              rating: sharingReview.rating,
+              comment: sharingReview.comment || "",
+              authorName: sharingReview.reviewerName,
+              createdAt: sharingReview.createdAt,
+            }}
+            merchantName={dashboardData?.merchant?.name || "Our Store"}
+            onClose={() => setSharingReview(null)}
+          />
         </div>
       )}
     </div>

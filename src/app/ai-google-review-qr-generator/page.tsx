@@ -1,0 +1,136 @@
+import type { Metadata } from "next"
+import { AiReviewStandeeClient } from "@/components/ai-review-standee-client"
+import { BreadcrumbJsonLd } from "@/components/seo/json-ld"
+
+export const metadata: Metadata = {
+  title: "Smart Ai Google Review QR | CustomerPilot",
+  description:
+    "Get India's best Smart Ai Google Review QR code system for your billing counter. Auto-generate 5-star Google reviews via WhatsApp in 1 tap. Perfect for retail, cafes and restaurants.",
+  keywords: [
+    "Smart Ai Google review QR",
+    "Smart Ai Google Review System",
+    "Google review QR for retail",
+    "AI review QR code for cafe",
+    "restaurant review QR India",
+    "counter review QR code",
+    "QR code for billing counter",
+    "automatic Google review system India",
+    "AI review QR display India",
+    "review QR code for shop counter"
+  ],
+  alternates: {
+    canonical: "https://customerpilot.in/ai-google-review-qr-generator"
+  },
+  openGraph: {
+    title: "Smart Ai Google Review QR | CustomerPilot",
+    description:
+      "Get India's best Smart Ai Google Review QR code system for your billing counter. Auto-generate 5-star Google reviews via WhatsApp in 1 tap. Perfect for retail, cafes and restaurants.",
+    url: "https://customerpilot.in/ai-google-review-qr-generator"
+  }
+}
+
+const SMART_AI_REVIEW_SCHEMA = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Product",
+      "name": "CustomerPilot Smart Ai Google Review System",
+      "category": "Point of Sale Display",
+      "description":
+        "Smart Ai Google Review QR system that auto-generates personalized 5-star Google review drafts via WhatsApp in 1 tap for retail stores and restaurants.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Smart AI Google Review by CustomerPilot?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text":
+              "It is an automated QR tool that writes personalized 5-star Google reviews for customers based on their positive experience, boosting local SEO ranking."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "QR code scan karke review likhne wala AI tool kaise kaam karta hai?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text":
+              "Customer QR code scan karta hai, AI unke liye review text draft karta hai, aur customer bina type kiye 1-click me Google Business Profile par submit kar deta hai."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the AI Google Review QR code generator work for local retail shops?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text":
+              "Place the CustomerPilot Smart Ai Google Review QR code on your billing counter. When customers scan it (or receive an automated post-visit WhatsApp message), our generative AI drafts an authentic, positive review highlighting their purchase. The customer taps once to open Google Maps directly to the review submission dialog with the text pre-filled."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does CustomerPilot filter or protect my business from negative reviews?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text":
+              "Yes! CustomerPilot features a Smart Sentiment Router. If a customer rates their experience 1 to 3 stars, they are routed to a private merchant feedback dialog where you can resolve their issue directly. Only 4 and 5-star satisfied ratings are directed to publish on Google Maps, safeguarding your public rating."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I reward customers with bonus stamps for giving a 5-star Google review?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text":
+              "Absolutely! You can configure CustomerPilot to automatically award +2 bonus loyalty stamps (or exclusive reward discounts) once a customer submits their verified Google Review. This creates a powerful incentive loop that triples monthly review volume."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does the customer need to download any app to post a Google review?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text":
+              "Zero app download required. The flow works 100% inside mobile web browsers and WhatsApp, connecting directly to the customer's native Google Maps app or browser account."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does getting more Google reviews boost my store's local Google Maps ranking?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text":
+              "Google's local search algorithm places heavy weight on review velocity, recency, average star rating, and keyword-rich text. CustomerPilot reviews naturally include product keywords and location context, accelerating your position into Google Map's top-3 Local Pack."
+          }
+        }
+      ]
+    }
+  ]
+}
+
+export default function AiGoogleReviewQrPage() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SMART_AI_REVIEW_SCHEMA) }}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "https://customerpilot.in" },
+          { name: "Products", url: "https://customerpilot.in/#products" },
+          { name: "Smart Ai Google Review QR", url: "https://customerpilot.in/ai-google-review-qr-generator" }
+        ]}
+      />
+      <AiReviewStandeeClient />
+    </>
+  )
+}
+

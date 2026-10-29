@@ -1,113 +1,249 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import {
   Layout, Palette, FileText, Users, CreditCard, Flag, Bell,
   Image as ImageIcon, Brain, BarChart3, Heart, Database, Download,
-  Settings, Globe, Shield, Code, Zap, Crown, Store, Check, X, Search, MessageSquare, RefreshCw, RotateCcw
+  Settings, Globe, Shield, Code, Zap, Crown, Store, Check, X, Search,
+  MessageSquare, RefreshCw, RotateCcw, Activity, Server, Cpu, Sparkles,
+  Layers, ArrowUpRight, Lock, CheckCircle2, ChevronRight, Trash2, AlertTriangle, Eye, UserX, LogOut,
+  MapPin, ExternalLink, Clock, Rocket, Loader2, Edit3, Smartphone, Gift, Calendar, Plus
 } from "lucide-react"
+import { WhatsAppTemplateManager } from "@/components/whatsapp-template-manager"
+import { SubscriptionPlansManager } from "@/components/super-admin/subscription-plans-manager"
+import { SuperAdminDigitalCardsManager } from "@/components/super-admin/digital-cards-manager"
+import { DefaultMerchantSettingsManager } from "@/components/super-admin/default-merchant-settings-manager"
+import { GbpOperationsDashboard } from "@/components/super-admin/gbp-operations-dashboard"
+import { WhatsAppFleetMonitor } from "@/components/super-admin/whatsapp-fleet-monitor"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 
 // ============================================================
-// CustomerPilot — Super Admin Command Center
-// Enterprise-grade no-code visual operating system
+// CustomerPilot V6.5 — Super Admin Command Center
+// Enterprise-Grade Dark Glassmorphism Command Operations System
 // ============================================================
 
 export default function SuperAdminPage() {
   const [activeSection, setActiveSection] = useState("dashboard")
 
-  const navItems = [
-    { id: "dashboard", label: "Command Center", icon: BarChart3 },
-    { id: "website", label: "Website Builder", icon: Layout },
-    { id: "theme", label: "Theme Builder", icon: Palette },
-    { id: "cms", label: "CMS / Content", icon: FileText },
-    { id: "merchants", label: "Merchants", icon: Store },
-    { id: "subscriptions", label: "Subscriptions", icon: CreditCard },
-    { id: "features", label: "Feature Flags", icon: Flag },
-    { id: "ai", label: "AI Content Studio", icon: Brain },
-    { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "templates", label: "WhatsApp Templates", icon: MessageSquare },
-    { id: "media", label: "Media Library", icon: ImageIcon },
-    { id: "analytics", label: "Global Analytics", icon: Globe },
-    { id: "permissions", label: "Permissions", icon: Shield },
-    { id: "audit", label: "Audit Log", icon: Database },
-    { id: "settings", label: "System Settings", icon: Settings },
-    { id: "docs", label: "Documentation", icon: FileText },
+  const navCategories = [
+    {
+      title: "CORE OPERATIONS",
+      items: [
+        { id: "dashboard", label: "Command Center", icon: BarChart3, badge: "LIVE" },
+        { id: "merchants", label: "Merchants Fleet", icon: Store },
+        { id: "default-settings", label: "Default Merchant Settings", icon: Gift, badge: "STAMPS" },
+        { id: "digital-cards", label: "Smart Digital Cards", icon: Smartphone, badge: "NEW" },
+        { id: "subscriptions", label: "Subscriptions & Pricing", icon: CreditCard },
+        { id: "analytics", label: "Global Intelligence", icon: Globe },
+        { id: "gbp-operations", label: "GBP Operations", icon: MapPin, badge: "NEW" },
+        { id: "whatsapp-fleet", label: "WhatsApp Fleet & Alerts", icon: Smartphone, badge: "DEFENSE" },
+      ]
+    },
+    {
+      title: "PLATFORM & CMS",
+      items: [
+        { id: "website", label: "Website Studio", icon: Layout },
+        { id: "theme", label: "Design System", icon: Palette },
+        { id: "cms", label: "Global Copy Studio", icon: FileText },
+        { id: "ai", label: "AI Generator Studio", icon: Brain },
+        { id: "media", label: "Media Asset Vault", icon: ImageIcon },
+      ]
+    },
+    {
+      title: "SYSTEM CONTROL",
+      items: [
+        { id: "features", label: "Feature Toggles", icon: Flag },
+        { id: "templates", label: "WhatsApp Engine", icon: MessageSquare },
+        { id: "notifications", label: "Notification Channels", icon: Bell },
+        { id: "permissions", label: "RBAC Matrix", icon: Shield },
+        { id: "audit", label: "Security Audit Log", icon: Database },
+        { id: "settings", label: "System Health & DR", icon: Settings },
+        { id: "docs", label: "Architecture Docs", icon: Code },
+      ]
+    }
   ]
 
+  const allItems = navCategories.flatMap(c => c.items)
+  const currentNav = allItems.find(item => item.id === activeSection)
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const tab = params.get("tab") || params.get("section")
+      const hash = window.location.hash.replace("#", "")
+      const target = (tab || hash || "").toLowerCase()
+      if (target) {
+        if (target === "pricing" || target === "plans" || target === "subscription" || target === "subscriptions") {
+          setActiveSection("subscriptions")
+        } else if (target === "default-settings" || target === "defaults" || target === "reward-setup" || target === "stamps") {
+          setActiveSection("default-settings")
+        } else {
+          const match = allItems.find(it => it.id.toLowerCase() === target)
+          if (match) setActiveSection(match.id)
+        }
+      }
+    }
+  }, [])
+
+  const handleNavSelect = (id: string) => {
+    setActiveSection(id)
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href)
+      url.searchParams.set("tab", id)
+      window.history.replaceState({}, "", url.toString())
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-stone-50 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-stone-900 text-white flex-shrink-0 hidden md:block">
-        <div className="p-6">
-          <div className="flex items-center gap-3 mb-8">
-            <img src="/cplogo.png" alt="CustomerPilot" className="h-10 w-auto object-contain rounded-lg shadow-sm" />
-            <div>
-              <div className="font-bold text-sm text-stone-100">Super Admin</div>
-              <div className="text-[11px] text-emerald-400 font-medium">Command Center</div>
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex font-sans selection:bg-indigo-500 selection:text-white">
+      {/* Sleek Dark Glassmorphism Sidebar */}
+      <aside className="w-72 bg-slate-900/80 border-r border-slate-800/80 backdrop-blur-2xl flex-shrink-0 hidden lg:flex flex-col justify-between sticky top-0 h-screen z-20">
+        <div>
+          {/* SuperAdmin Brand Header */}
+          <div className="p-6 border-b border-slate-800/80">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <img src="/cplogo.png" alt="CustomerPilot" className="h-10 w-auto object-contain rounded-xl shadow-lg border border-slate-700/50 p-1 bg-slate-900" />
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900 animate-pulse" />
+              </div>
+              <div>
+                <div className="font-extrabold text-sm tracking-tight text-white flex items-center gap-1.5">
+                  Super Admin
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                    V6.5
+                  </span>
+                </div>
+                <div className="text-[11px] text-emerald-400 font-semibold tracking-wide flex items-center gap-1 mt-0.5">
+                  <Crown className="w-3 h-3 text-amber-400 fill-amber-400" /> Executive Command
+                </div>
+              </div>
             </div>
           </div>
-          <nav className="space-y-1">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveSection(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                  activeSection === item.id ? "bg-white/10 text-white" : "text-stone-400 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <item.icon className="w-4 h-4" />
-                {item.label}
-              </button>
+
+          {/* Navigation Items Grouped */}
+          <div className="p-4 space-y-6 overflow-y-auto max-h-[calc(100vh-260px)] custom-scrollbar">
+            {navCategories.map((group, gIdx) => (
+              <div key={gIdx} className="space-y-1">
+                <div className="px-3 text-[10px] font-extrabold tracking-wider uppercase text-slate-500 mb-2">
+                  {group.title}
+                </div>
+                {group.items.map((item) => {
+                  const isActive = activeSection === item.id
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleNavSelect(item.id)}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                        isActive
+                          ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/20 border border-indigo-500/40"
+                          : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <item.icon className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-400"}`} />
+                        <span>{item.label}</span>
+                      </div>
+                      {item.badge && (
+                        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-md ${
+                          isActive ? "bg-white/20 text-white" : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                        }`}>
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
             ))}
-          </nav>
+          </div>
+        </div>
+
+        {/* Sidebar Footer Info */}
+        <div className="p-3 border-t border-slate-800/80 bg-slate-950/40 space-y-2 flex-shrink-0">
+          <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800/80">
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[10px] font-semibold text-slate-300">Cluster Node #1</span>
+            </div>
+            <span className="text-[9px] font-mono text-slate-500">42ms Latency</span>
+          </div>
+
+          <button
+            onClick={async () => {
+              await fetch('/api/auth/logout', { method: 'POST' });
+              const { signOut } = await import("next-auth/react");
+              await signOut({ redirect: false });
+              window.location.href = '/login';
+            }}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 transition-all duration-200 cursor-pointer"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        {/* Top Bar */}
-        <header className="bg-white border-b border-stone-200 px-6 h-16 flex items-center justify-between sticky top-0 z-10">
-          <div>
-            <h1 className="font-bold text-stone-900 text-lg capitalize">
-              {navItems.find((n) => n.id === activeSection)?.label}
+      {/* Main Content Workspace */}
+      <main className="flex-1 overflow-y-auto bg-gradient-to-b from-slate-950 via-slate-900/60 to-slate-950 min-h-screen">
+        {/* Top Floating Glass Header */}
+        <header className="bg-slate-900/80 border-b border-slate-800/80 px-6 h-16 flex items-center justify-between sticky top-0 z-10 backdrop-blur-xl shadow-xl">
+          <div className="flex items-center gap-3">
+            {currentNav && <currentNav.icon className="w-5 h-5 text-indigo-400" />}
+            <h1 className="font-extrabold text-white text-lg tracking-tight">
+              {currentNav?.label || "Command Center"}
             </h1>
           </div>
+
           <div className="flex items-center gap-3">
-            <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 mr-1 animate-pulse" />
-              System Healthy
-            </Badge>
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-              All Systems Operational
+            <div className="hidden sm:flex items-center gap-2 bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300">
+              <Activity className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+              <span>System Health: <strong className="text-emerald-400">100% Operational</strong></span>
+            </div>
+            <Badge className="bg-indigo-500/10 text-indigo-300 border-indigo-500/30 text-xs px-3 py-1 font-semibold flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+              V6.5 Enterprise Active
             </Badge>
           </div>
         </header>
 
-        <div className="p-6">
-          {activeSection === "dashboard" && <CommandCenterDashboard />}
-          {activeSection === "website" && <WebsiteBuilder />}
-          {activeSection === "theme" && <ThemeBuilder />}
-          {activeSection === "cms" && <CMSPanel />}
-          {activeSection === "merchants" && <MerchantManagement />}
-          {activeSection === "subscriptions" && <SubscriptionManagement />}
-          {activeSection === "features" && <FeatureFlags />}
-          {activeSection === "ai" && <AIContentStudio />}
-          {activeSection === "notifications" && <NotificationCenter />}
-          {activeSection === "templates" && <AdminTemplateManagement />}
-          {activeSection === "media" && <MediaLibrary />}
-          {activeSection === "analytics" && <GlobalAnalytics />}
-          {activeSection === "permissions" && <PermissionBuilder />}
-          {activeSection === "audit" && <AuditExplorer />}
-          {activeSection === "settings" && <SystemSettings />}
-          {activeSection === "docs" && <DocumentationPanel />}
+        {/* Content Body */}
+        <div className="p-6 max-w-[1600px] mx-auto space-y-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeSection}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2 }}
+            >
+              {activeSection === "dashboard" && <CommandCenterDashboard />}
+              {activeSection === "website" && <WebsiteBuilder />}
+              {activeSection === "theme" && <ThemeBuilder />}
+              {activeSection === "cms" && <CMSPanel />}
+              {activeSection === "merchants" && <MerchantManagement />}
+              {activeSection === "default-settings" && <DefaultMerchantSettingsManager />}
+              {activeSection === "digital-cards" && <SuperAdminDigitalCardsManager />}
+              {activeSection === "subscriptions" && <SubscriptionManagement />}
+              {activeSection === "gbp-operations" && <GbpOperationsDashboard />}
+              {activeSection === "whatsapp-fleet" && <WhatsAppFleetMonitor />}
+              {activeSection === "features" && <FeatureFlags />}
+              {activeSection === "ai" && <AIContentStudio />}
+              {activeSection === "notifications" && <NotificationCenter />}
+              {activeSection === "templates" && <AdminTemplateManagement />}
+              {activeSection === "media" && <MediaLibrary />}
+              {activeSection === "analytics" && <GlobalAnalytics />}
+              {activeSection === "permissions" && <PermissionBuilder />}
+              {activeSection === "audit" && <AuditExplorer />}
+              {activeSection === "settings" && <SystemSettings />}
+              {activeSection === "docs" && <DocumentationPanel />}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
     </div>
@@ -115,84 +251,93 @@ export default function SuperAdminPage() {
 }
 
 // ============================================================
-// Command Center Dashboard
+// Command Center Dashboard Component
 // ============================================================
 function CommandCenterDashboard() {
   const kpis = [
-    { label: "Total Merchants", value: "15,247", change: "+248", color: "text-emerald-600" },
-    { label: "Active Trials", value: "1,892", change: "+156", color: "text-blue-600" },
-    { label: "MRR", value: "₹2.4Cr", change: "+12%", color: "text-emerald-600" },
-    { label: "Queues Today", value: "847K", change: "+34%", color: "text-purple-600" },
-    { label: "Rewards Today", value: "192K", change: "+28%", color: "text-amber-600" },
-    { label: "Reviews Today", value: "12.4K", change: "+18%", color: "text-rose-600" },
+    { label: "Total Merchants Fleet", value: "15,247", change: "+248", color: "from-emerald-500 to-teal-600", textColor: "text-emerald-400" },
+    { label: "Active Free Trials", value: "1,892", change: "+156", color: "from-blue-500 to-indigo-600", textColor: "text-blue-400" },
+    { label: "Monthly Recurring Revenue", value: "₹2.4Cr", change: "+12%", color: "from-purple-500 to-indigo-600", textColor: "text-purple-400" },
+    { label: "Live Queues Today", value: "847K", change: "+34%", color: "from-amber-500 to-orange-600", textColor: "text-amber-400" },
+    { label: "Rewards Unlocked", value: "192K", change: "+28%", color: "from-rose-500 to-pink-600", textColor: "text-rose-400" },
+    { label: "Google Reviews Generated", value: "12.4K", change: "+18%", color: "from-cyan-500 to-blue-600", textColor: "text-cyan-400" },
   ]
 
   return (
     <div className="space-y-6">
+      {/* 6 High-Impact Glass KPI Metric Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {kpis.map((kpi, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-          >
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-xs text-stone-500">{kpi.label}</div>
-                <div className="text-2xl font-bold text-stone-900 mt-1">{kpi.value}</div>
-                <div className={`text-xs ${kpi.color} mt-1`}>{kpi.change} today</div>
-              </CardContent>
-            </Card>
-          </motion.div>
+          <Card key={i} className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl relative overflow-hidden group hover:border-slate-700 transition-all duration-300 shadow-xl">
+            <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${kpi.color}`} />
+            <CardContent className="p-4">
+              <div className="text-[11px] font-semibold text-slate-400 tracking-tight">{kpi.label}</div>
+              <div className="text-2xl font-black text-white mt-1.5 tracking-tight">{kpi.value}</div>
+              <div className={`text-xs font-bold ${kpi.textColor} mt-1 flex items-center gap-1`}>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+                {kpi.change} <span className="text-[10px] text-slate-500 font-normal">today</span>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Top Industries</CardTitle>
+        {/* Industry Market Share Chart */}
+        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl shadow-xl">
+          <CardHeader className="border-b border-slate-800/60 pb-4">
+            <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+              <Store className="w-4 h-4 text-indigo-400" /> Active Industry Share Distribution
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
+          <CardContent className="p-6">
+            <div className="space-y-4">
               {[
-                { name: "Bakery", count: 4892, pct: 32 },
-                { name: "Cafe", count: 3214, pct: 21 },
-                { name: "Restaurant", count: 2541, pct: 17 },
-                { name: "Salon", count: 1876, pct: 12 },
-                { name: "Retail", count: 1421, pct: 9 },
+                { name: "Bakery & Confectionery 🥐", count: 4892, pct: 32, gradient: "from-amber-500 to-orange-500" },
+                { name: "Cafes & Coffee Shops ☕", count: 3214, pct: 21, gradient: "from-indigo-500 to-purple-500" },
+                { name: "Restaurants & Dining 🍔", count: 2541, pct: 17, gradient: "from-emerald-500 to-teal-500" },
+                { name: "Salons & Wellness ✂️", count: 1876, pct: 12, gradient: "from-pink-500 to-rose-500" },
+                { name: "Retail & Fashion Outlets 🛍️", count: 1421, pct: 9, gradient: "from-blue-500 to-cyan-500" },
               ].map((ind, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="w-24 text-sm">{ind.name}</div>
-                  <div className="flex-1 h-2 bg-stone-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-yellow-400 to-amber-500" style={{ width: `${ind.pct}%` }} />
+                <div key={i} className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <span className="text-slate-200">{ind.name}</span>
+                    <span className="text-slate-400">{ind.count} Merchants ({ind.pct}%)</span>
                   </div>
-                  <div className="text-sm text-stone-500 w-12 text-right">{ind.count}</div>
+                  <div className="h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                    <div className={`h-full bg-gradient-to-r ${ind.gradient} rounded-full transition-all duration-500`} style={{ width: `${ind.pct}%` }} />
+                  </div>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">System Health</CardTitle>
+        {/* System Cluster Matrix */}
+        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl shadow-xl">
+          <CardHeader className="border-b border-slate-800/60 pb-4">
+            <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+              <Cpu className="w-4 h-4 text-emerald-400" /> Infrastructure Node Status
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
+          <CardContent className="p-6">
+            <div className="grid grid-cols-2 gap-3">
               {[
-                { label: "API Latency", value: "42ms", status: "ok" },
-                { label: "DB Connections", value: "18/100", status: "ok" },
-                { label: "Cron Jobs", value: "7/7 OK", status: "ok" },
-                { label: "DLQ Depth", value: "0", status: "ok" },
-                { label: "WhatsApp Queue", value: "23", status: "ok" },
-                { label: "Backup Status", value: "Last 3AM", status: "ok" },
+                { label: "API Latency", value: "42ms", status: "Healthy" },
+                { label: "DB Connection Pool", value: "18/100 Active", status: "Healthy" },
+                { label: "Cron Automation Runners", value: "7/7 Jobs OK", status: "Healthy" },
+                { label: "DLQ Error Depth", value: "0 Failed", status: "Healthy" },
+                { label: "WhatsApp Gateway Queue", value: "23 Pending", status: "Healthy" },
+                { label: "Automated DB Backup", value: "Passed (3:00 AM)", status: "Healthy" },
               ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-stone-50">
-                  <span className="text-xs text-stone-600">{item.label}</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-medium">{item.value}</span>
-                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                <div key={i} className="flex flex-col justify-between p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 space-y-2">
+                  <span className="text-xs font-semibold text-slate-400">{item.label}</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-extrabold text-white">{item.value}</span>
+                    <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      {item.status}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -205,63 +350,64 @@ function CommandCenterDashboard() {
 }
 
 // ============================================================
-// Website Builder
+// Website Builder Component
 // ============================================================
 function WebsiteBuilder() {
   const [heroHeadline, setHeroHeadline] = useState("Turn Every Walk-in Into a Lifetime Customer")
   const [ctaText, setCtaText] = useState("Start Free Trial")
-  const [accentColor, setAccentColor] = useState("#f59e0b")
+  const [accentColor, setAccentColor] = useState("#6366f1")
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Layout className="w-4 h-4" /> Visual Editor
+      <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl shadow-xl">
+        <CardHeader className="border-b border-slate-800/60">
+          <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+            <Layout className="w-4 h-4 text-indigo-400" /> Marketing Visual Copy Editor
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-6 space-y-4">
           <div>
-            <Label>Hero Headline</Label>
-            <Input value={heroHeadline} onChange={(e) => setHeroHeadline(e.target.value)} />
+            <Label className="text-xs text-slate-300 font-semibold mb-1.5 block">Hero Headline</Label>
+            <Input value={heroHeadline} onChange={(e) => setHeroHeadline(e.target.value)} className="bg-slate-950 border-slate-800 text-white text-xs" />
           </div>
           <div>
-            <Label>CTA Button Text</Label>
-            <Input value={ctaText} onChange={(e) => setCtaText(e.target.value)} />
+            <Label className="text-xs text-slate-300 font-semibold mb-1.5 block">CTA Button Text</Label>
+            <Input value={ctaText} onChange={(e) => setCtaText(e.target.value)} className="bg-slate-950 border-slate-800 text-white text-xs" />
           </div>
           <div>
-            <Label>Accent Color</Label>
-            <div className="flex gap-2 mt-2">
-              {["#f59e0b", "#3b82f6", "#8b5cf6", "#10b981", "#ef4444"].map((c) => (
+            <Label className="text-xs text-slate-300 font-semibold mb-1.5 block">Accent Theme Color</Label>
+            <div className="flex gap-2.5 mt-2">
+              {["#6366f1", "#3b82f6", "#8b5cf6", "#10b981", "#f59e0b"].map((c) => (
                 <button
                   key={c}
                   onClick={() => setAccentColor(c)}
-                  className={`w-8 h-8 rounded-lg ${accentColor === c ? "ring-2 ring-offset-2 ring-stone-900" : ""}`}
+                  className={`w-9 h-9 rounded-xl transition-all ${accentColor === c ? "ring-2 ring-offset-2 ring-indigo-500 scale-110" : "opacity-80 hover:opacity-100"}`}
                   style={{ backgroundColor: c }}
                 />
               ))}
             </div>
           </div>
-          <div className="flex gap-2 pt-4">
-            <Button className="bg-stone-900 text-white">
-              <Check className="w-4 h-4 mr-1" /> Publish
+          <div className="flex gap-3 pt-4 border-t border-slate-800/60">
+            <Button className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs">
+              <Check className="w-4 h-4 mr-1.5" /> Publish Live To Web
             </Button>
-            <Button variant="outline">Preview</Button>
-            <Button variant="ghost">Rollback</Button>
+            <Button variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800 text-xs">Preview</Button>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-stone-50">
-        <CardHeader>
-          <CardTitle className="text-base">Live Preview</CardTitle>
+      <Card className="bg-slate-950 border-slate-800/80 shadow-xl">
+        <CardHeader className="border-b border-slate-800/60">
+          <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+            <Globe className="w-4 h-4 text-emerald-400" /> Real-time Live Render Preview
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="bg-white rounded-xl p-8 border border-stone-200">
-            <div className="text-2xl font-bold text-stone-900 mb-2">{heroHeadline}</div>
-            <div className="text-sm text-stone-500 mb-4">Customer scans QR. You tap. Reward delivered.</div>
+        <CardContent className="p-6">
+          <div className="bg-gradient-to-br from-slate-900 to-slate-950 rounded-2xl p-8 border border-slate-800/80 space-y-4 shadow-2xl">
+            <div className="text-2xl font-black text-white tracking-tight leading-tight">{heroHeadline}</div>
+            <div className="text-xs text-slate-400 leading-relaxed">Customer scans QR. Staff awards stamp. Repeat visits automated via WhatsApp AI.</div>
             <button
-              className="px-6 py-2 rounded-lg text-white text-sm font-medium"
+              className="px-6 py-2.5 rounded-xl text-white text-xs font-bold shadow-lg transition-all"
               style={{ backgroundColor: accentColor }}
             >
               {ctaText}
@@ -274,31 +420,31 @@ function WebsiteBuilder() {
 }
 
 // ============================================================
-// Theme Builder
+// Theme Builder Component
 // ============================================================
 function ThemeBuilder() {
   return (
     <div className="grid md:grid-cols-3 gap-6">
       {[
         { name: "Primary Font", options: ["Inter", "Geist", "Poppins"], icon: FileText },
-        { name: "Heading Color", options: ["#1c1917", "#0f172a", "#1e293b"], icon: Palette },
+        { name: "Heading Theme", options: ["Slate Dark", "Obsidian Glass", "Indigo Night"], icon: Palette },
         { name: "Button Radius", options: ["8px", "12px", "16px", "24px"], icon: Zap },
-        { name: "Shadow Style", options: ["Subtle", "Medium", "Dramatic"], icon: Layout },
-        { name: "Card Padding", options: ["16px", "24px", "32px"], icon: Layout },
-        { name: "Icon Set", options: ["Lucide", "Heroicons", "Phosphor"], icon: Crown },
+        { name: "Shadow Style", options: ["Subtle Glow", "Medium Ambient", "Dramatic 3D"], icon: Layout },
+        { name: "Container Spacing", options: ["16px Compact", "24px Balanced", "32px Spacing"], icon: Layout },
+        { name: "Icon System", options: ["Lucide React", "Heroicons V2", "Phosphor Dark"], icon: Crown },
       ].map((control, i) => (
-        <Card key={i}>
-          <CardHeader>
-            <CardTitle className="text-sm flex items-center gap-2">
-              <control.icon className="w-4 h-4" /> {control.name}
+        <Card key={i} className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl shadow-xl">
+          <CardHeader className="border-b border-slate-800/60 pb-3">
+            <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+              <control.icon className="w-4 h-4 text-indigo-400" /> {control.name}
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             <div className="flex flex-wrap gap-2">
               {control.options.map((opt, j) => (
                 <button
                   key={j}
-                  className="px-3 py-1.5 text-xs rounded-lg border border-stone-200 hover:border-stone-900 hover:bg-stone-50"
+                  className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-950 border border-slate-800 text-slate-300 hover:border-indigo-500 hover:text-white transition-all"
                 >
                   {opt}
                 </button>
@@ -312,8 +458,7 @@ function ThemeBuilder() {
 }
 
 // ============================================================
-// CMS Panel — Modern Visual Copy Studio & Global Text Editor
-// Matches Merchant Dashboard Design System
+// CMS Panel Component
 // ============================================================
 function CMSPanel() {
   const [contentList, setContentList] = useState<any[]>([])
@@ -398,10 +543,10 @@ function CMSPanel() {
 
   if (loading) {
     return (
-      <Card className="bg-stone-900 text-white border-stone-800">
+      <Card className="bg-slate-900 border-slate-800 text-white">
         <CardContent className="p-12 text-center">
           <div className="animate-spin w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full mx-auto mb-3" />
-          <div className="text-sm font-medium text-stone-300">Loading Global Section Copy Studio...</div>
+          <div className="text-sm font-medium text-slate-300">Loading Global Section Copy Studio...</div>
         </CardContent>
       </Card>
     )
@@ -422,14 +567,14 @@ function CMSPanel() {
       )}
 
       {/* Header & Controls Bar */}
-      <div className="bg-stone-900 border border-stone-800 rounded-2xl p-6 shadow-xl backdrop-blur-xl space-y-4">
+      <div className="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-xl space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <span className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">📝</span>
+              <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">📝</span>
               Global Section Copy & Text Studio
             </h2>
-            <p className="text-xs text-stone-400 mt-1">
+            <p className="text-xs text-slate-400 mt-1">
               Edit, update, and manage text copy across Merchant Onboarding Forms, Review Pages, and Marketing Landing Pages in real time.
             </p>
           </div>
@@ -438,14 +583,14 @@ function CMSPanel() {
               placeholder="Search section text or key..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-stone-950 border-stone-800 text-stone-200 placeholder:text-stone-500 text-xs pl-9 focus:border-emerald-500"
+              className="bg-slate-950 border-slate-800 text-slate-200 placeholder:text-slate-500 text-xs pl-9 focus:border-emerald-500"
             />
-            <Search className="w-4 h-4 text-stone-500 absolute left-3 top-2.5" />
+            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
           </div>
         </div>
 
         {/* Category Pill Filters */}
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-stone-800">
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
           {[
             { id: "all", label: "All Sections", count: contentList.length },
             { id: "onboarding", label: "📝 Merchant Setup Forms (Steps 1-5)", count: contentList.filter(i => i.section === 'onboarding').length },
@@ -456,15 +601,15 @@ function CMSPanel() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
                 activeTab === tab.id
-                  ? "bg-emerald-500 text-stone-950 shadow-md shadow-emerald-500/20"
-                  : "bg-stone-950 text-stone-400 border border-stone-800 hover:text-stone-200 hover:bg-stone-800/50"
+                  ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
+                  : "bg-slate-950 text-slate-400 border border-slate-800 hover:text-slate-200 hover:bg-slate-800/50"
               }`}
             >
               <span>{tab.label}</span>
               <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${
-                activeTab === tab.id ? "bg-stone-900/20 text-stone-950" : "bg-stone-800 text-stone-400"
+                activeTab === tab.id ? "bg-slate-900/20 text-slate-950" : "bg-slate-800 text-slate-400"
               }`}>
                 {tab.count}
               </span>
@@ -476,23 +621,23 @@ function CMSPanel() {
       {/* Content Editor Cards Grid */}
       <div className="grid md:grid-cols-2 gap-4">
         {filteredItems.map((item) => (
-          <Card key={item.key} className="bg-stone-900 border-stone-800 shadow-xl flex flex-col justify-between transition-all hover:border-stone-700">
-            <CardHeader className="pb-3 border-b border-stone-800/60">
+          <Card key={item.key} className="bg-slate-900/80 border-slate-800/80 shadow-xl flex flex-col justify-between transition-all hover:border-slate-700">
+            <CardHeader className="pb-3 border-b border-slate-800/60">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     {item.section.replace('_', ' ')} • {item.category}
                   </div>
-                  <CardTitle className="text-sm font-bold text-stone-100">{item.label}</CardTitle>
-                  <div className="text-[11px] font-mono text-stone-500 mt-0.5">{item.key}</div>
+                  <CardTitle className="text-sm font-bold text-slate-100">{item.label}</CardTitle>
+                  <div className="text-[11px] font-mono text-slate-500 mt-0.5">{item.key}</div>
                 </div>
                 {item.isCustomized ? (
                   <Badge className="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] px-2 py-0.5">
                     Customized
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="text-stone-500 border-stone-800 text-[10px] px-2 py-0.5">
+                  <Badge variant="outline" className="text-slate-500 border-slate-800 text-[10px] px-2 py-0.5">
                     Default
                   </Badge>
                 )}
@@ -501,39 +646,39 @@ function CMSPanel() {
 
             <CardContent className="p-4 space-y-4 flex-1">
               <div>
-                <Label className="text-xs text-stone-400 mb-1.5 block font-medium">Editable Content Text</Label>
+                <Label className="text-xs text-slate-400 mb-1.5 block font-medium">Editable Content Text</Label>
                 {item.value.length > 50 ? (
                   <textarea
                     rows={3}
                     value={editedValues[item.key] ?? item.value}
                     onChange={(e) => setEditedValues({ ...editedValues, [item.key]: e.target.value })}
-                    className="w-full p-3 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-xs font-medium focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-all"
+                    className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-xs font-medium focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-all"
                   />
                 ) : (
                   <Input
                     value={editedValues[item.key] ?? item.value}
                     onChange={(e) => setEditedValues({ ...editedValues, [item.key]: e.target.value })}
-                    className="bg-stone-950 border-stone-800 text-stone-100 text-xs font-medium focus:border-emerald-500"
+                    className="bg-slate-950 border-slate-800 text-slate-100 text-xs font-medium focus:border-emerald-500"
                   />
                 )}
               </div>
 
               {/* Live Render Preview Box */}
-              <div className="bg-stone-950/80 border border-stone-800/80 rounded-xl p-3 space-y-1">
-                <div className="text-[10px] uppercase font-bold text-stone-500 tracking-wider">Live Visual Render Preview</div>
-                <div className="text-xs text-stone-200 font-sans italic bg-stone-900/60 p-2 rounded border border-stone-800/40">
+              <div className="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3 space-y-1">
+                <div className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Live Visual Render Preview</div>
+                <div className="text-xs text-slate-200 font-sans italic bg-slate-900/60 p-2 rounded-lg border border-slate-800/40">
                   "{editedValues[item.key] ?? item.value}"
                 </div>
               </div>
             </CardContent>
 
-            <div className="p-4 pt-0 border-t border-stone-800/40 flex items-center justify-between mt-auto">
+            <div className="p-4 pt-0 border-t border-slate-800/40 flex items-center justify-between mt-auto">
               <Button
                 size="sm"
                 variant="ghost"
                 disabled={!item.isCustomized || savingKey === item.key}
                 onClick={() => handleReset(item.key)}
-                className="text-xs text-stone-500 hover:text-rose-400 hover:bg-rose-500/10 px-3"
+                className="text-xs text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 px-3"
               >
                 Reset Default
               </Button>
@@ -541,7 +686,7 @@ function CMSPanel() {
                 size="sm"
                 disabled={savingKey === item.key || editedValues[item.key] === item.value}
                 onClick={() => handleSave(item.key)}
-                className="bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-bold text-xs px-4 shadow-lg shadow-emerald-500/20"
+                className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-4 shadow-lg shadow-emerald-500/20"
               >
                 {savingKey === item.key ? "Saving..." : "Save & Update Live"}
               </Button>
@@ -554,30 +699,399 @@ function CMSPanel() {
 }
 
 // ============================================================
-// Merchant Management (Live Database Integration)
+// Merchant Management Component
 // ============================================================
 function MerchantManagement() {
   const [merchants, setMerchants] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedMerchant, setSelectedMerchant] = useState<any | null>(null)
+  const [editForm, setEditForm] = useState<any>({})
+  const [saving, setSaving] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
 
-  useEffect(() => {
+  // Customer List & Deletion Modal State
+  const [customerModalMerchant, setCustomerModalMerchant] = useState<any | null>(null)
+  const [merchantCustomers, setMerchantCustomers] = useState<any[]>([])
+  const [loadingCustomers, setLoadingCustomers] = useState(false)
+  const [customerSearch, setCustomerSearch] = useState("")
+  const [deletingCustomerId, setDeletingCustomerId] = useState<string | null>(null)
+
+  // Deleting & Resetting Progress States
+  const [deletingMerchantId, setDeletingMerchantId] = useState<string | null>(null)
+  const [resettingMerchantId, setResettingMerchantId] = useState<string | null>(null)
+
+  // Impersonation state
+  const [impersonatingId, setImpersonatingId] = useState<string | null>(null)
+
+  // Profile Edit Modal State
+  const [profileModalMerchant, setProfileModalMerchant] = useState<any | null>(null)
+  const [profileEditForm, setProfileEditForm] = useState<any>({})
+  const [customExtendDays, setCustomExtendDays] = useState<number | string>(7)
+  const [savingProfile, setSavingProfile] = useState(false)
+  const [profileSaveSuccess, setProfileSaveSuccess] = useState(false)
+
+  // Screenshot Proof Modal State
+  const [screenshotModalMerchant, setScreenshotModalMerchant] = useState<any | null>(null)
+
+  // Live VPS DB Sync State
+  const [isSyncingVps, setIsSyncingVps] = useState(false)
+  const [syncVpsMessage, setSyncVpsMessage] = useState<string | null>(null)
+
+  const handleSyncVpsDb = async () => {
+    if (!confirm("Are you sure you want to sync the latest production database from Hostinger VPS (200.97.170.53)?")) return
+    setIsSyncingVps(true)
+    setSyncVpsMessage(null)
+    try {
+      const res = await fetch("/api/admin/sync-vps", { method: "POST" })
+      const data = await res.json()
+      if (data.success) {
+        setSyncVpsMessage("✅ Live VPS DB synced successfully!")
+        loadMerchants()
+        setTimeout(() => setSyncVpsMessage(null), 6000)
+      } else {
+        alert("Sync failed: " + (data.error || "Unknown error"))
+      }
+    } catch (e: any) {
+      alert("Sync error: " + e.message)
+    } finally {
+      setIsSyncingVps(false)
+    }
+  }
+
+  const handleImpersonate = async (m: any) => {
+    // Open new tab synchronously right here so Chrome/Edge popup blocker NEVER blocks it!
+    const newTab = typeof window !== "undefined" ? window.open("about:blank", "_blank") : null
+    try {
+      setImpersonatingId(m.id)
+      const res = await fetch("/api/admin/impersonate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ merchantId: m.id })
+      })
+      const data = await res.json()
+      if (data.success && data.redirectTo) {
+        if (newTab) {
+          newTab.location.href = data.redirectTo
+        } else {
+          window.open(data.redirectTo, "_blank")
+        }
+      } else {
+        if (newTab) newTab.close()
+        alert("Failed to access dashboard: " + (data.error || "Unknown error"))
+      }
+    } catch (e: any) {
+      if (newTab) newTab.close()
+      alert("Error logging in as merchant: " + e.message)
+    } finally {
+      setImpersonatingId(null)
+    }
+  }
+
+  const handleOpenProfileEdit = (m: any) => {
+    setProfileModalMerchant(m)
+    setProfileEditForm({
+      name: m.name || "",
+      ownerName: m.ownerName === "N/A" ? "" : (m.ownerName || ""),
+      whatsappPhone: m.whatsappPhone === "N/A" ? "" : (m.whatsappPhone || ""),
+      email: m.email === "N/A" ? "" : (m.email || ""),
+      city: m.city === "N/A" ? "" : (m.city || ""),
+      address: m.address === "N/A" ? "" : (m.address || ""),
+      category: m.category || "Retail",
+      plan: m.plan || "TRIAL",
+      status: m.status || "Active",
+      googleReviewLink: m.googleReviewLink || "",
+      baselineReviewCount: m.baselineReviewCount ?? 0,
+      baselineRating: m.baselineRating ?? 0.0,
+      baselineScreenshotUrl: m.baselineScreenshotUrl || "",
+      onboardingCompleted: m.onboardingCompleted ?? false,
+      currentStep: m.currentStep ?? 1,
+      trialEndsAt: m.trialEndsAt ? new Date(m.trialEndsAt).toISOString().split('T')[0] : "",
+      gbpServiceTrack: m.gbpServiceTrack || "NONE",
+      gbpProfileStatus: m.gbpProfileStatus || "UNVERIFIED",
+      gbpReviewVelocityCap: m.gbpReviewVelocityCap ?? 3
+    })
+    setProfileSaveSuccess(false)
+  }
+
+  const handleSaveProfile = async () => {
+    if (!profileModalMerchant) return
+    setSavingProfile(true)
+    setProfileSaveSuccess(false)
+    try {
+      const res = await fetch("/api/admin/merchants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_profile",
+          merchantId: profileModalMerchant.id,
+          ...profileEditForm
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setProfileSaveSuccess(true)
+        loadMerchants()
+        setTimeout(() => {
+          setProfileModalMerchant(null)
+          setProfileSaveSuccess(false)
+        }, 1200)
+      } else {
+        alert("Failed to update profile: " + (data.error || "Unknown error"))
+      }
+    } catch (e: any) {
+      alert("Error updating profile: " + e.message)
+    } finally {
+      setSavingProfile(false)
+    }
+  }
+
+  const loadMerchants = () => {
+    setError(null)
     fetch("/api/admin/merchants")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(res.status === 403 ? "Forbidden: Super Admin access required." : "Failed to load merchants.");
+        }
+        return res.json();
+      })
       .then((data) => {
         if (data.success) {
           setMerchants(data.merchants || [])
+        } else {
+          throw new Error(data.error || "Failed to load merchants");
         }
       })
-      .catch((err) => console.error("Error fetching admin merchants:", err))
+      .catch((err) => {
+        console.error("Error fetching admin merchants:", err);
+        setError(err.message || "Failed to load merchants.");
+      })
       .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    loadMerchants()
   }, [])
+
+  const handleOpenEdit = (m: any) => {
+    setSelectedMerchant(m)
+    let cats = ["VIP", "Silver", "Gold", "Platinum", "Diamond", "Royal", "Elite", "Prestige", "Ambassador", "Legend"]
+    if (m.loyaltyCategoryNames) {
+      try {
+        const parsed = JSON.parse(m.loyaltyCategoryNames)
+        if (Array.isArray(parsed) && parsed.length >= 10) cats = parsed
+      } catch {}
+    }
+    setEditForm({
+      vipUpgradeBonusStamps: m.vipUpgradeBonusStamps ?? 1,
+      googleReviewBonus: m.stampCard?.googleReviewBonus ?? 1,
+      photoBonus: m.stampCard?.photoBonus ?? 2,
+      stampValue: m.stampCard?.stampValue ?? 450,
+      stampsRequired: m.stampCard?.stampsRequired ?? 9,
+      validityDays: m.stampCard?.validityDays ?? 100,
+      rewardName: m.stampCard?.rewardName || "FREE 500gm Cake",
+      categories: cats
+    })
+  }
+
+  const handleSaveMerchantRules = async () => {
+    if (!selectedMerchant) return
+    setSaving(true)
+    setSaveSuccess(false)
+    try {
+      await fetch("/api/merchant/update", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-merchant-id": selectedMerchant.id
+        },
+        body: JSON.stringify({
+          vipUpgradeBonusStamps: Number(editForm.vipUpgradeBonusStamps),
+          loyaltyCategoryNames: JSON.stringify(editForm.categories)
+        })
+      })
+
+      await fetch("/api/cards/setup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-merchant-id": selectedMerchant.id
+        },
+        body: JSON.stringify({
+          id: selectedMerchant.stampCard?.id,
+          name: selectedMerchant.stampCard?.name || "Loyalty Stamp Card",
+          rewardName: editForm.rewardName,
+          stampsRequired: Number(editForm.stampsRequired),
+          stampValue: Number(editForm.stampValue),
+          validityDays: Number(editForm.validityDays),
+          googleReviewBonus: Number(editForm.googleReviewBonus),
+          photoBonus: Number(editForm.photoBonus)
+        })
+      })
+
+      setSaveSuccess(true)
+      loadMerchants()
+      setTimeout(() => {
+        setSaveSuccess(false)
+        setSelectedMerchant(null)
+      }, 1200)
+    } catch (e: any) {
+      alert("Error saving rules: " + (e?.message || e))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // 1. SuperAdmin: Permanently Delete Entire Merchant
+  const handleDeleteMerchant = async (merchantId: string, merchantName: string) => {
+    const confirmation = confirm(
+      `⚠️ PERMANENT MERCHANT DELETION (SUPERADMIN):\n\n` +
+      `Are you sure you want to PERMANENTLY DELETE merchant:\n"${merchantName}" (ID: ${merchantId})?\n\n` +
+      `This will completely wipe:\n` +
+      `• Merchant account and credentials\n` +
+      `• All customers, stamps, and visits\n` +
+      `• All bills, reviews, and WhatsApp messages\n` +
+      `• Stamp cards, reward configs, and QR stands\n\n` +
+      `This action CANNOT be undone!`
+    )
+    if (!confirmation) return
+
+    try {
+      setDeletingMerchantId(merchantId)
+      const res = await fetch(`/api/admin/merchants?id=${merchantId}`, {
+        method: "DELETE"
+      })
+      const result = await res.json()
+      if (result.success) {
+        alert(`✅ ${result.message}`)
+        loadMerchants()
+      } else {
+        alert(`❌ Error deleting merchant: ${result.error}`)
+      }
+    } catch (e: any) {
+      alert(`❌ Failed to delete merchant: ${e.message}`)
+    } finally {
+      setDeletingMerchantId(null)
+    }
+  }
+
+  // 2. SuperAdmin: Reset / Wipe Customer Data for a Merchant
+  const handleResetMerchantCustomers = async (merchantId: string, merchantName: string) => {
+    const confirmation = confirm(
+      `🧹 RESET MERCHANT CUSTOMERS (SUPERADMIN):\n\n` +
+      `Are you sure you want to WIPE ALL CUSTOMER DATA for:\n"${merchantName}"?\n\n` +
+      `This will reset:\n` +
+      `• All test customers, visits, and stamps back to 0\n` +
+      `• All customer bills, redemptions, and WhatsApp queues\n\n` +
+      `Merchant account, QR codes, and reward settings will REMAIN INTACT for fresh testing.`
+    )
+    if (!confirmation) return
+
+    try {
+      setResettingMerchantId(merchantId)
+      const res = await fetch("/api/admin/merchants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "reset_customers",
+          merchantId
+        })
+      })
+      const result = await res.json()
+      if (result.success) {
+        alert(`✅ ${result.message}`)
+        loadMerchants()
+        if (customerModalMerchant?.id === merchantId) {
+          setMerchantCustomers([])
+        }
+      } else {
+        alert(`❌ Error resetting customers: ${result.error}`)
+      }
+    } catch (e: any) {
+      alert(`❌ Failed to reset customers: ${e.message}`)
+    } finally {
+      setResettingMerchantId(null)
+    }
+  }
+
+  // 3. SuperAdmin: Open Customers Modal to View & Delete Individual Customers
+  const handleViewCustomers = async (merchant: any) => {
+    setCustomerModalMerchant(merchant)
+    setLoadingCustomers(true)
+    setCustomerSearch("")
+    try {
+      const res = await fetch(`/api/admin/merchants?action=customers&merchantId=${merchant.id}`)
+      const data = await res.json()
+      if (data.success) {
+        setMerchantCustomers(data.customers || [])
+      }
+    } catch (e: any) {
+      alert(`❌ Error loading customers: ${e.message}`)
+    } finally {
+      setLoadingCustomers(false)
+    }
+  }
+
+  // 4. SuperAdmin: Delete Single Individual Customer
+  const handleDeleteIndividualCustomer = async (customerId: string, customerName: string) => {
+    if (!confirm(`Are you sure you want to delete customer "${customerName}" from "${customerModalMerchant?.name}"?`)) {
+      return
+    }
+
+    try {
+      setDeletingCustomerId(customerId)
+      const res = await fetch("/api/admin/merchants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "delete_customer",
+          customerId
+        })
+      })
+      const result = await res.json()
+      if (result.success) {
+        setMerchantCustomers((prev) => prev.filter((c) => c.id !== customerId))
+        loadMerchants()
+      } else {
+        alert(`❌ Error deleting customer: ${result.error}`)
+      }
+    } catch (e: any) {
+      alert(`❌ Failed to delete customer: ${e.message}`)
+    } finally {
+      setDeletingCustomerId(null)
+    }
+  }
+
+  const filteredCustomers = merchantCustomers.filter((c) => {
+    if (!customerSearch.trim()) return true
+    const q = customerSearch.toLowerCase()
+    return (
+      c.name?.toLowerCase().includes(q) ||
+      c.phone?.toLowerCase().includes(q) ||
+      c.email?.toLowerCase().includes(q)
+    )
+  })
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className="p-8 text-center text-stone-500">
-          <div className="animate-spin w-6 h-6 border-2 border-stone-800 border-t-transparent rounded-full mx-auto mb-2" />
+      <Card className="bg-slate-900/80 border-slate-800 text-white">
+        <CardContent className="p-12 text-center text-slate-400">
+          <div className="animate-spin w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full mx-auto mb-2" />
           Loading real merchant database...
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (error) {
+    return (
+      <Card className="bg-slate-900/80 border-red-500/30 text-white">
+        <CardContent className="p-12 text-center text-red-400 flex flex-col items-center justify-center gap-2">
+          <AlertTriangle className="w-8 h-8 text-red-500" />
+          <div className="font-bold text-sm">{error}</div>
+          <p className="text-xs text-slate-500 max-w-sm mt-1">
+            Please log out and log back in using an official Super Admin account (e.g. admin@customerpilot.in).
+          </p>
         </CardContent>
       </Card>
     )
@@ -585,8 +1099,8 @@ function MerchantManagement() {
 
   if (merchants.length === 0) {
     return (
-      <Card>
-        <CardContent className="p-8 text-center text-stone-500">
+      <Card className="bg-slate-900/80 border-slate-800 text-white">
+        <CardContent className="p-12 text-center text-slate-400">
           No registered merchants found in database.
         </CardContent>
       </Card>
@@ -594,89 +1108,1051 @@ function MerchantManagement() {
   }
 
   return (
-    <Card>
-      <CardContent className="p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-stone-50 border-b border-stone-200">
-              <tr>
-                <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Merchant</th>
-                <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Owner & WhatsApp</th>
-                <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Plan</th>
-                <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Review Delay</th>
-                <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Status</th>
-                <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">Customers</th>
-                <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">Bills</th>
-                <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">MRR</th>
-                <th className="text-right p-4 text-xs font-medium text-stone-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-stone-100">
-              {merchants.map((m: any, i: number) => (
-                <tr key={m.id || i} className="hover:bg-stone-50">
-                  <td className="p-4 font-medium text-sm text-stone-900">
-                    {m.name}
-                    <div className="text-[11px] text-stone-400 font-normal">ID: {m.id}</div>
-                  </td>
-                  <td className="p-4 text-sm text-stone-600">
-                    <div>{m.ownerName}</div>
-                    <div className="text-xs text-stone-400">{m.whatsappPhone}</div>
-                  </td>
-                  <td className="p-4 text-sm font-semibold text-stone-700">{m.plan}</td>
-                  <td className="p-4 text-sm text-stone-600 font-mono">{m.googleReviewDelayMinutes ?? 30} mins</td>
-                  <td className="p-4">
-                    <Badge variant="outline" className={
-                      m.status === "Active" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                      m.status === "Trial" ? "bg-blue-50 text-blue-700 border-blue-200" :
-                      "bg-rose-50 text-rose-700 border-rose-200"
-                    }>{m.status}</Badge>
-                  </td>
-                  <td className="p-4 text-right text-sm font-medium">{m.customers}</td>
-                  <td className="p-4 text-right text-sm text-stone-600">{m.bills}</td>
-                  <td className="p-4 text-right text-sm font-medium text-emerald-600">₹{m.mrr.toLocaleString("en-IN")}</td>
-                  <td className="p-4 text-right">
-                    <Button size="sm" variant="outline" onClick={() => window.open(`/dashboard`, '_blank')}>Manage</Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="space-y-6">
+      {/* Fleet Header Summary */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-black text-white flex items-center gap-2">
+            <Store className="w-5 h-5 text-indigo-400" />
+            Registered Merchants Fleet ({merchants.length})
+          </h2>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Manage live merchants, edit loyalty rules, reset test customer data, or permanently delete merchant accounts.
+          </p>
         </div>
-      </CardContent>
-    </Card>
-  )
-}
+        <div className="flex items-center gap-3">
+          {syncVpsMessage && (
+            <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-xl">
+              {syncVpsMessage}
+            </span>
+          )}
+          <Button
+            size="sm"
+            onClick={handleSyncVpsDb}
+            disabled={isSyncingVps}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg gap-2 px-3.5 h-9 rounded-xl border border-indigo-400/30"
+            title="Download and sync the latest production database from Hostinger VPS (200.97.170.53)"
+          >
+            {isSyncingVps ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <span>Syncing Live VPS...</span>
+              </>
+            ) : (
+              <>
+                <RefreshCw className="w-3.5 h-3.5 text-indigo-200" />
+                <span>⚡ Sync Live VPS DB</span>
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
 
-// ============================================================
-// Subscription Management
-// ============================================================
-function SubscriptionManagement() {
-  return (
-    <div className="grid md:grid-cols-4 gap-4">
-      {[
-        { plan: "Starter", active: 8924, mrr: 891576 },
-        { plan: "Pro", active: 5214, mrr: 13020858 },
-        { plan: "Enterprise", active: 187, mrr: 1866813 },
-        { plan: "Trials", active: 1892, mrr: 0 },
-      ].map((s, i) => (
-        <Card key={i}>
-          <CardContent className="p-6 text-center">
-            <div className="text-sm text-stone-500">{s.plan}</div>
-            <div className="text-3xl font-bold text-stone-900 mt-2">{s.active.toLocaleString("en-IN")}</div>
-            <div className="text-xs text-stone-400 mt-1">active subscriptions</div>
-            <div className="mt-4 pt-4 border-t border-stone-100">
-              <div className="text-xs text-stone-500">MRR Contribution</div>
-              <div className="text-lg font-semibold text-emerald-600">₹{(s.mrr / 100000).toFixed(1)}L</div>
+      <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-2xl overflow-hidden">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-slate-950 border-b border-slate-800/80">
+                <tr>
+                  <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Merchant & Dashboard</th>
+                  <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">City & GBP Page</th>
+                  <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Owner & Contact</th>
+                  <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Registration & Baseline</th>
+                  <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Plan</th>
+                  <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Status</th>
+                  <th className="text-center p-4 text-xs font-bold text-slate-400 uppercase">Customers</th>
+                  <th className="text-right p-4 text-xs font-bold text-slate-400 uppercase">Bills</th>
+                  <th className="text-right p-4 text-xs font-bold text-slate-400 uppercase">MRR</th>
+                  <th className="text-right p-4 text-xs font-bold text-slate-400 uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60 text-sm">
+                {merchants.map((m: any, i: number) => {
+                  const isDeleting = deletingMerchantId === m.id
+                  const isResetting = resettingMerchantId === m.id
+                  const isImpersonating = impersonatingId === m.id
+
+                  return (
+                    <tr key={m.id || i} className="hover:bg-slate-800/40 transition-colors">
+                      {/* 1. Merchant Name & Impersonate Link */}
+                      <td className="p-4">
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() => handleImpersonate(m)}
+                            disabled={isImpersonating}
+                            className="text-left font-black text-white hover:text-indigo-400 transition-colors flex items-center gap-1.5 group cursor-pointer"
+                            title="Click to Open Live Dashboard or Complete Onboarding"
+                          >
+                            <span className="group-hover:underline text-sm">{m.name}</span>
+                            {isImpersonating ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-400" />
+                            ) : (
+                              <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 text-indigo-400" />
+                            )}
+                          </button>
+                          <div className="text-[10px] text-slate-500 font-mono flex items-center gap-2">
+                            <span>ID: {m.id}</span>
+                            {m.onboardingCompleted ? (
+                              <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">
+                                ✓ Live
+                              </span>
+                            ) : (
+                              <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold">
+                                Step {m.currentStep || 1} Pending
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* 2. City & Google Business Profile Link */}
+                      <td className="p-4">
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-1 text-xs font-semibold text-slate-200">
+                            <MapPin className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+                            <span>{m.city && m.city !== "N/A" ? m.city : (m.address && m.address !== "N/A" ? m.address.split(',').pop()?.trim() : "Vadodara")}</span>
+                          </div>
+                          {m.googleReviewLink ? (
+                            <a
+                              href={m.googleReviewLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-400 hover:text-blue-300 hover:underline"
+                              title="Open live Google Maps / Review page"
+                            >
+                              <Globe className="w-3 h-3 text-blue-400" />
+                              <span>View GBP</span>
+                              <ExternalLink className="w-2.5 h-2.5" />
+                            </a>
+                          ) : (
+                            <span className="text-[10px] text-slate-500 italic">No GBP linked</span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* 3. Owner & Contact */}
+                      <td className="p-4 text-slate-300">
+                        <div className="font-semibold text-xs text-slate-200">{m.ownerName}</div>
+                        <div className="text-xs text-slate-400 font-mono">{m.whatsappPhone}</div>
+                        {m.email && m.email !== "N/A" && (
+                          <div className="text-[10px] text-slate-500 truncate max-w-[130px]">{m.email}</div>
+                        )}
+                      </td>
+
+                      {/* 4. Registration Date & Baseline Google Reviews */}
+                      <td className="p-4">
+                        <div className="flex flex-col gap-1.5">
+                          <div className="text-xs text-slate-300 font-medium flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-slate-400" />
+                            <span>
+                              {m.createdAt ? new Date(m.createdAt).toLocaleDateString("en-IN", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric"
+                              }) : "N/A"}
+                            </span>
+                            <span className="text-[10px] text-slate-500">
+                              {m.createdAt ? new Date(m.createdAt).toLocaleTimeString("en-IN", {
+                                hour: "2-digit",
+                                minute: "2-digit"
+                              }) : ""}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-[10px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded flex items-center gap-1">
+                              <span>⭐ {m.baselineRating || "0.0"}</span>
+                              <span className="text-slate-400">({m.baselineReviewCount || 0} reviews)</span>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setScreenshotModalMerchant(m)}
+                              className="h-5 px-1.5 text-[9px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold flex items-center gap-0.5"
+                              title="View Registration Proof Screenshot"
+                            >
+                              <Eye className="w-2.5 h-2.5" /> Proof
+                            </Button>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* 5. Plan */}
+                      <td className="p-4 font-extrabold text-indigo-400 text-xs">{m.plan}</td>
+
+                      {/* 6. Status */}
+                      <td className="p-4">
+                        <Badge variant="outline" className={
+                          m.status === "Active" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" :
+                          m.status === "Trial" ? "bg-blue-500/10 text-blue-400 border-blue-500/30" :
+                          "bg-rose-500/10 text-rose-400 border-rose-500/30"
+                        }>{m.status}</Badge>
+                      </td>
+
+                      {/* 7. Customers */}
+                      <td className="p-4 text-center">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleViewCustomers(m)}
+                          className="h-7 px-2.5 rounded-lg bg-slate-800/80 hover:bg-indigo-600/30 text-slate-200 hover:text-indigo-300 border border-slate-700 text-xs font-bold gap-1"
+                          title="View & manage customers"
+                        >
+                          <Users className="w-3.5 h-3.5 text-indigo-400" />
+                          <span>{m.customers}</span>
+                        </Button>
+                      </td>
+
+                      {/* 8. Bills */}
+                      <td className="p-4 text-right text-slate-400">{m.bills}</td>
+
+                      {/* 9. MRR */}
+                      <td className="p-4 text-right font-extrabold text-emerald-400">₹{m.mrr.toLocaleString("en-IN")}</td>
+
+                      {/* 10. Actions */}
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5 flex-nowrap">
+                          {/* 0. Impersonate / Complete Onboarding */}
+                          <Button
+                            size="sm"
+                            onClick={() => handleImpersonate(m)}
+                            disabled={isImpersonating}
+                            className="h-8 px-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs gap-1"
+                            title="Open live dashboard or complete registration on behalf of merchant"
+                          >
+                            {isImpersonating ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Rocket className="w-3.5 h-3.5" />
+                            )}
+                            <span>{m.onboardingCompleted ? "Dashboard" : "Onboard"}</span>
+                          </Button>
+
+                          {/* 1. Edit Profile Details */}
+                          <Button
+                            size="sm"
+                            onClick={() => handleOpenProfileEdit(m)}
+                            className="h-8 px-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-xs"
+                            title="Edit merchant details (City, Address, GBP link, etc.)"
+                          >
+                            ✏️ Edit
+                          </Button>
+
+                          {/* 2. Edit Rules */}
+                          <Button
+                            size="sm"
+                            onClick={() => handleOpenEdit(m)}
+                            className="h-8 px-2.5 bg-indigo-600/80 hover:bg-indigo-600 text-white font-bold text-xs shadow-xs"
+                            title="Edit reward rules & cycle categories"
+                          >
+                            ⚙️ Rules
+                          </Button>
+
+                          {/* 3. Reset Customers / Wipe Data */}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleResetMerchantCustomers(m.id, m.name)}
+                            disabled={isResetting || isDeleting}
+                            className="h-8 px-2.5 border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold text-xs"
+                            title="Wipe test customers & stamps back to 0"
+                          >
+                            {isResetting ? (
+                              <RotateCcw className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                            ) : (
+                              <span>🧹 Reset</span>
+                            )}
+                          </Button>
+
+                          {/* 4. Delete Merchant */}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDeleteMerchant(m.id, m.name)}
+                            disabled={isDeleting || isResetting}
+                            className="h-8 px-2.5 border-rose-500/40 bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-400 font-bold text-xs transition-colors"
+                            title="Permanently delete merchant account & data"
+                          >
+                            {isDeleting ? (
+                              <Trash2 className="w-3.5 h-3.5 animate-spin text-rose-400" />
+                            ) : (
+                              <span className="flex items-center gap-1">
+                                <Trash2 className="w-3 h-3" /> Delete
+                              </span>
+                            )}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* SuperAdmin Rule Override Modal */}
+      {selectedMerchant && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                  👑 SuperAdmin Rule Override — {selectedMerchant.name}
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">Modify Reward Rules, Bonus Stamps, and 10-Level Loyalty Cycle Categories for this merchant.</p>
+              </div>
+              <Button size="sm" variant="ghost" onClick={() => setSelectedMerchant(null)} className="text-slate-400 hover:text-white">✕</Button>
             </div>
-          </CardContent>
-        </Card>
-      ))}
+
+            {saveSuccess && (
+              <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 p-3.5 rounded-xl text-xs font-bold flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-400" /> All merchant rules updated successfully in Database!
+              </div>
+            )}
+
+            {/* Reward Card Rules */}
+            <div className="space-y-4">
+              <h4 className="font-bold text-slate-200 text-sm border-b border-slate-800 pb-2">🎁 Reward Card & Bonus Rules</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-xs text-slate-400">Reward Description</Label>
+                  <Input
+                    value={editForm.rewardName}
+                    onChange={(e) => setEditForm({ ...editForm, rewardName: e.target.value })}
+                    className="bg-slate-950 border-slate-800 text-white text-xs"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-slate-400">Min Purchase / Stamp (₹)</Label>
+                  <Input
+                    type="number"
+                    value={editForm.stampValue}
+                    onChange={(e) => setEditForm({ ...editForm, stampValue: e.target.value })}
+                    className="bg-slate-950 border-slate-800 text-white text-xs"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-slate-400">Stamp Goal (Stamps)</Label>
+                  <Input
+                    type="number"
+                    value={editForm.stampsRequired}
+                    onChange={(e) => setEditForm({ ...editForm, stampsRequired: e.target.value })}
+                    className="bg-slate-950 border-slate-800 text-white text-xs"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-slate-400">Google Review Bonus Stamps</Label>
+                  <Input
+                    type="number"
+                    value={editForm.googleReviewBonus}
+                    onChange={(e) => setEditForm({ ...editForm, googleReviewBonus: e.target.value })}
+                    className="bg-slate-950 border-slate-800 text-white text-xs"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-slate-400">Photo Review Bonus Stamps</Label>
+                  <Input
+                    type="number"
+                    value={editForm.photoBonus}
+                    onChange={(e) => setEditForm({ ...editForm, photoBonus: e.target.value })}
+                    className="bg-slate-950 border-slate-800 text-white text-xs"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-slate-400">Next Level Kickstart Stamps</Label>
+                  <Input
+                    type="number"
+                    value={editForm.vipUpgradeBonusStamps}
+                    onChange={(e) => setEditForm({ ...editForm, vipUpgradeBonusStamps: e.target.value })}
+                    className="bg-slate-950 border-slate-800 text-white text-xs"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Loyalty Cycle Categories */}
+            <div className="space-y-4">
+              <h4 className="font-bold text-slate-200 text-sm border-b border-slate-800 pb-2">👑 10-Level Loyalty Cycle Category Titles</h4>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                {editForm.categories?.map((cat: string, idx: number) => (
+                  <div key={idx} className="space-y-1">
+                    <Label className="text-[11px] text-amber-400 font-extrabold">Level {idx + 1}</Label>
+                    <Input
+                      value={cat}
+                      onChange={(e) => {
+                        const copy = [...editForm.categories]
+                        copy[idx] = e.target.value
+                        setEditForm({ ...editForm, categories: copy })
+                      }}
+                      className="bg-slate-950 border-slate-800 text-white text-xs font-semibold"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
+              <Button variant="outline" onClick={() => setSelectedMerchant(null)} className="border-slate-700 text-slate-300">Cancel</Button>
+              <Button onClick={handleSaveMerchantRules} disabled={saving} className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg">
+                {saving ? "Saving to DB..." : "💾 Save Merchant Rules (SuperAdmin)"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SuperAdmin View & Delete Customers Modal */}
+      {customerModalMerchant && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                  <Users className="w-5 h-5 text-indigo-400" />
+                  Customers Fleet — {customerModalMerchant.name}
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  View and manage individual customers, stamps, visits, or delete specific test users.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleResetMerchantCustomers(customerModalMerchant.id, customerModalMerchant.name)}
+                  className="border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-bold gap-1"
+                >
+                  🧹 Wipe All Customers
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setCustomerModalMerchant(null)}
+                  className="text-slate-400 hover:text-white"
+                >
+                  ✕
+                </Button>
+              </div>
+            </div>
+
+            {/* Modal Search Bar */}
+            <div className="p-4 bg-slate-950/50 border-b border-slate-800/80 flex items-center justify-between gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Input
+                  placeholder="Search customer by name, phone, or email..."
+                  value={customerSearch}
+                  onChange={(e) => setCustomerSearch(e.target.value)}
+                  className="pl-9 bg-slate-900 border-slate-800 text-xs text-white"
+                />
+              </div>
+              <span className="text-xs text-slate-400 font-medium">
+                Showing {filteredCustomers.length} of {merchantCustomers.length} customers
+              </span>
+            </div>
+
+            {/* Modal Customers Table */}
+            <div className="flex-1 overflow-y-auto p-0 custom-scrollbar">
+              {loadingCustomers ? (
+                <div className="p-12 text-center text-slate-400">
+                  <div className="animate-spin w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full mx-auto mb-2" />
+                  Loading customers from database...
+                </div>
+              ) : filteredCustomers.length === 0 ? (
+                <div className="p-12 text-center text-slate-500 text-sm">
+                  {merchantCustomers.length === 0 ? "No customers registered for this merchant yet." : "No matching customers found."}
+                </div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-950 sticky top-0 border-b border-slate-800/80 text-xs text-slate-400 uppercase">
+                    <tr>
+                      <th className="text-left p-3.5">Customer</th>
+                      <th className="text-left p-3.5">Phone & Email</th>
+                      <th className="text-center p-3.5">Stamps</th>
+                      <th className="text-center p-3.5">Visits</th>
+                      <th className="text-right p-3.5">Spend (₹)</th>
+                      <th className="text-left p-3.5">Joined</th>
+                      <th className="text-right p-3.5">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/50">
+                    {filteredCustomers.map((c: any) => {
+                      const isDeletingCust = deletingCustomerId === c.id
+
+                      return (
+                        <tr key={c.id} className="hover:bg-slate-800/30 transition-colors">
+                          <td className="p-3.5 font-bold text-white">
+                            {c.name || "Customer"}
+                            <div className="text-[10px] text-slate-500 font-mono">ID: {c.id.substring(0, 10)}...</div>
+                          </td>
+                          <td className="p-3.5 text-slate-300 font-mono text-xs">
+                            <div>{c.phone}</div>
+                            {c.email && <div className="text-[11px] text-slate-500">{c.email}</div>}
+                          </td>
+                          <td className="p-3.5 text-center font-extrabold text-amber-400">{c.stamps}</td>
+                          <td className="p-3.5 text-center text-slate-300">{c.visits}</td>
+                          <td className="p-3.5 text-right font-bold text-emerald-400">₹{c.spend?.toLocaleString("en-IN") || 0}</td>
+                          <td className="p-3.5 text-slate-400 text-xs">
+                            {new Date(c.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                          </td>
+                          <td className="p-3.5 text-right">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDeleteIndividualCustomer(c.id, c.name || c.phone)}
+                              disabled={isDeletingCust}
+                              className="h-7 px-2 border-rose-500/40 bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-400 text-xs font-bold gap-1"
+                              title="Delete customer"
+                            >
+                              {isDeletingCust ? (
+                                <Trash2 className="w-3 h-3 animate-spin text-rose-400" />
+                              ) : (
+                                <>
+                                  <Trash2 className="w-3 h-3" />
+                                  <span>Delete</span>
+                                </>
+                              )}
+                            </Button>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-slate-800 bg-slate-950/60 flex justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setCustomerModalMerchant(null)}
+                className="border-slate-700 text-slate-300 text-xs"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SuperAdmin Edit Merchant Profile Details Modal */}
+      {profileModalMerchant && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                  ✏️ Edit Merchant Details — {profileModalMerchant.name}
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Modify business profile, city, Google Maps links, baseline reviews, and plan configuration.
+                </p>
+              </div>
+              <Button size="sm" variant="ghost" onClick={() => setProfileModalMerchant(null)} className="text-slate-400 hover:text-white">✕</Button>
+            </div>
+
+            {profileSaveSuccess && (
+              <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 p-3.5 rounded-xl text-xs font-bold flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-400" /> Merchant details successfully saved to Database!
+              </div>
+            )}
+
+            <div className="space-y-5">
+              {/* Section 1: Business Profile & Contact */}
+              <div className="space-y-3">
+                <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider text-indigo-400 border-b border-slate-800 pb-1 flex items-center gap-1.5">
+                  <Store className="w-3.5 h-3.5" /> Business Profile & Contact
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-xs text-slate-400">Business Name</Label>
+                    <Input
+                      value={profileEditForm.name}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, name: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Owner Name</Label>
+                    <Input
+                      value={profileEditForm.ownerName}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, ownerName: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">WhatsApp Phone (with Country Code)</Label>
+                    <Input
+                      value={profileEditForm.whatsappPhone}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, whatsappPhone: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Email Address</Label>
+                    <Input
+                      value={profileEditForm.email}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, email: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400 flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-rose-400" /> City / Location
+                    </Label>
+                    <Input
+                      placeholder="e.g. Vadodara, Surat, Ahmedabad"
+                      value={profileEditForm.city}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, city: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Category / Industry</Label>
+                    <Input
+                      placeholder="Bakery, Cafe, Salon, Restaurant, QSR"
+                      value={profileEditForm.category}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, category: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs text-slate-400">Full Business Address</Label>
+                  <Input
+                    placeholder="Shop No, Complex, Street, Area..."
+                    value={profileEditForm.address}
+                    onChange={(e) => setProfileEditForm({ ...profileEditForm, address: e.target.value })}
+                    className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                  />
+                </div>
+              </div>
+
+              {/* Section 2: Google Business Profile & Day-0 Baseline Reviews */}
+              <div className="space-y-3 pt-2">
+                <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider text-amber-400 border-b border-slate-800 pb-1 flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5" /> Google Business Profile & Day-0 Baseline
+                </h4>
+                <div>
+                  <Label className="text-xs text-slate-400 flex items-center gap-1">
+                    <Globe className="w-3 h-3 text-blue-400" /> Google Maps / Review Link (GBP URL)
+                  </Label>
+                  <Input
+                    placeholder="https://maps.google.com/?cid=... or https://g.page/r/..."
+                    value={profileEditForm.googleReviewLink}
+                    onChange={(e) => setProfileEditForm({ ...profileEditForm, googleReviewLink: e.target.value })}
+                    className="bg-slate-950 border-slate-800 text-white text-xs mt-1 font-mono"
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-xs text-slate-400">Day-0 Baseline Reviews</Label>
+                    <Input
+                      type="number"
+                      placeholder="e.g. 42"
+                      value={profileEditForm.baselineReviewCount}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, baselineReviewCount: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Day-0 Baseline Rating (Stars)</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      placeholder="e.g. 4.2"
+                      value={profileEditForm.baselineRating}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, baselineRating: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Proof Screenshot URL / Path</Label>
+                    <Input
+                      placeholder="/uploads/proof.png or https://..."
+                      value={profileEditForm.baselineScreenshotUrl}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, baselineScreenshotUrl: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2.5: GBP Service Track & Ranking Acceleration */}
+              <div className="space-y-3 pt-2">
+                <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider text-indigo-400 border-b border-slate-800 pb-1 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5" /> GBP Service Track & Ranking Acceleration
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-xs text-slate-400">GBP Service Track</Label>
+                    <select
+                      value={profileEditForm.gbpServiceTrack || "NONE"}
+                      onChange={async (e) => {
+                        const newTrack = e.target.value
+                        setProfileEditForm({ ...profileEditForm, gbpServiceTrack: newTrack, gbpReviewVelocityCap: newTrack === "TRACK_A_NEW" ? 3 : 10 })
+                        if (newTrack !== "NONE" && profileModalMerchant) {
+                          await fetch("/api/gbp/assign-track", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ merchantId: profileModalMerchant.id, track: newTrack })
+                          })
+                        }
+                      }}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-md px-3 py-2 text-white text-xs mt-1"
+                    >
+                      <option value="NONE">None / Standard Account</option>
+                      <option value="TRACK_A_NEW">Track A: New Business Launchpad (?5,999 + ?1,999/mo)</option>
+                      <option value="TRACK_B_EXISTING">Track B: Top 3 Rank Accelerator (?4,999 + ?1,999/mo)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">GBP Profile Status</Label>
+                    <select
+                      value={profileEditForm.gbpProfileStatus || "UNVERIFIED"}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, gbpProfileStatus: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-md px-3 py-2 text-white text-xs mt-1"
+                    >
+                      <option value="UNVERIFIED">UNVERIFIED (Pending Video Verification)</option>
+                      <option value="SANDBOX">SANDBOX (Safe 30-Day Warm-up, Max 3 reviews/wk)</option>
+                      <option value="VERIFIED">VERIFIED (Full Velocity Unlocked)</option>
+                      <option value="TOP3_LOCKED">TOP3_LOCKED (?? Locked in Top 3 Local Pack)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Weekly Review Cap (Velocity)</Label>
+                    <Input
+                      type="number"
+                      value={profileEditForm.gbpReviewVelocityCap ?? 3}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, gbpReviewVelocityCap: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Subscription Plan & Onboarding State */}
+              <div className="space-y-3 pt-2">
+                <h4 className="font-bold text-slate-200 text-xs uppercase tracking-wider text-emerald-400 border-b border-slate-800 pb-1 flex items-center gap-1.5">
+                  <CreditCard className="w-3.5 h-3.5" /> Plan & Onboarding Controls
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <Label className="text-xs text-slate-400">Subscription Plan</Label>
+                    <select
+                      value={profileEditForm.plan}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, plan: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-md px-3 py-2 text-white text-xs mt-1 focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
+                    >
+                      <option value="TRIAL">TRIAL (7 Days)</option>
+                      <option value="STARTER">STARTER</option>
+                      <option value="GROWTH">GROWTH</option>
+                      <option value="PRO">PRO (₹2,499/mo)</option>
+                      <option value="ENTERPRISE">ENTERPRISE (₹9,999/mo)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Account Status</Label>
+                    <select
+                      value={profileEditForm.status}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, status: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-md px-3 py-2 text-white text-xs mt-1 focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Trial">Trial</option>
+                      <option value="Inactive">Inactive</option>
+                      <option value="Suspended">Suspended</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs text-slate-400 font-semibold flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-indigo-400" /> Trial Ends At
+                      </Label>
+                      {profileEditForm.trialEndsAt ? (
+                        <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
+                          new Date(profileEditForm.trialEndsAt).getTime() >= Date.now()
+                            ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                            : "bg-rose-500/15 text-rose-400 border border-rose-500/30"
+                        }`}>
+                          {new Date(profileEditForm.trialEndsAt).getTime() >= Date.now()
+                            ? `Active (${Math.ceil((new Date(profileEditForm.trialEndsAt).getTime() - Date.now()) / 86400000)}d left)`
+                            : "Expired"}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-amber-400/80 font-mono">No trial set</span>
+                      )}
+                    </div>
+                    <Input
+                      type="date"
+                      value={profileEditForm.trialEndsAt || ""}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, trialEndsAt: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+
+                    {/* Arbitrary Custom Days Extension Input (1, 2, 3, 4, 5... 30+) */}
+                    <div className="flex items-center gap-1.5 mt-2 pt-1.5 border-t border-slate-800/60">
+                      <div className="relative flex-1">
+                        <Input
+                          type="number"
+                          min={1}
+                          max={365}
+                          value={customExtendDays}
+                          onChange={(e) => setCustomExtendDays(e.target.value)}
+                          placeholder="Days (e.g. 5)"
+                          className="bg-slate-950 border-slate-800 text-white text-xs h-7 px-2 font-mono"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => {
+                          const days = Math.max(1, parseInt(String(customExtendDays)) || 1);
+                          const base = profileEditForm.trialEndsAt ? new Date(profileEditForm.trialEndsAt) : new Date();
+                          const currentMs = isNaN(base.getTime()) ? Date.now() : Math.max(Date.now(), base.getTime());
+                          const target = new Date(currentMs + days * 24 * 60 * 60 * 1000);
+                          setProfileEditForm({
+                            ...profileEditForm,
+                            trialEndsAt: target.toISOString().split("T")[0],
+                            status: "Active"
+                          });
+                        }}
+                        className="h-7 px-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold rounded shadow-sm flex items-center gap-1 cursor-pointer shrink-0"
+                      >
+                        <Plus className="w-3 h-3" /> Add {customExtendDays || 1}d
+                      </Button>
+                    </div>
+
+                    {/* Quick Preset Buttons (1d to 30d) */}
+                    <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                      <span className="text-[10px] text-slate-500 mr-0.5">Quick:</span>
+                      {[1, 2, 3, 5, 7, 10, 14, 21, 30].map((days) => (
+                        <button
+                          key={days}
+                          type="button"
+                          onClick={() => {
+                            const base = profileEditForm.trialEndsAt ? new Date(profileEditForm.trialEndsAt) : new Date();
+                            const currentMs = isNaN(base.getTime()) ? Date.now() : Math.max(Date.now(), base.getTime());
+                            const target = new Date(currentMs + days * 24 * 60 * 60 * 1000);
+                            setProfileEditForm({
+                              ...profileEditForm,
+                              trialEndsAt: target.toISOString().split("T")[0],
+                              status: "Active"
+                            });
+                          }}
+                          className="px-1.5 py-0.5 rounded bg-indigo-500/15 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold transition-colors cursor-pointer"
+                        >
+                          +{days}d
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-slate-400">Onboarding Step (1-8)</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={8}
+                      value={profileEditForm.currentStep}
+                      onChange={(e) => setProfileEditForm({ ...profileEditForm, currentStep: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white text-xs mt-1"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 pt-2">
+                  <Switch
+                    checked={profileEditForm.onboardingCompleted}
+                    onCheckedChange={(checked) => setProfileEditForm({ ...profileEditForm, onboardingCompleted: checked })}
+                    id="onboarding-toggle"
+                  />
+                  <Label htmlFor="onboarding-toggle" className="text-xs font-semibold text-slate-300 cursor-pointer">
+                    Mark Onboarding as Completed (Bypass 8-Step Wizard directly to Dashboard)
+                  </Label>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-800">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleImpersonate(profileModalMerchant)}
+                className="border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 text-xs font-bold gap-1"
+              >
+                <Rocket className="w-3.5 h-3.5" />
+                Launch Dashboard on Behalf
+              </Button>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" onClick={() => setProfileModalMerchant(null)} className="border-slate-700 text-slate-300 text-xs">
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveProfile} disabled={savingProfile} className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg">
+                  {savingProfile ? "Saving to DB..." : "💾 Save Changes (SuperAdmin)"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SuperAdmin Google Maps Day-0 Proof & Screenshot Modal */}
+      {screenshotModalMerchant && (
+        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
+                  <Globe className="w-5 h-5 text-blue-400" />
+                  Google Business Day-0 Registration Proof
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Baseline review count, star rating, and visual snapshot for {screenshotModalMerchant.name}.
+                </p>
+              </div>
+              <Button size="sm" variant="ghost" onClick={() => setScreenshotModalMerchant(null)} className="text-slate-400 hover:text-white">✕</Button>
+            </div>
+
+            {/* Proof Details Card */}
+            <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/60 pb-4">
+                <div>
+                  <div className="text-lg font-black text-white">{screenshotModalMerchant.name}</div>
+                  <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
+                    <MapPin className="w-3.5 h-3.5 text-rose-400" />
+                    <span>{screenshotModalMerchant.city && screenshotModalMerchant.city !== "N/A" ? screenshotModalMerchant.city : "Vadodara"}</span>
+                    <span>•</span>
+                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Registered: {new Date(screenshotModalMerchant.createdAt).toLocaleString("en-IN")}</span>
+                  </div>
+                </div>
+                {screenshotModalMerchant.googleReviewLink && (
+                  <a
+                    href={screenshotModalMerchant.googleReviewLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 border border-blue-500/30 text-xs font-bold"
+                  >
+                    <Globe className="w-3.5 h-3.5" />
+                    <span>Live Google Maps</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+              </div>
+
+              {/* Baseline Metrics Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="bg-slate-900 border border-slate-800 p-3.5 rounded-xl">
+                  <div className="text-[10px] uppercase font-bold text-slate-400">Day-0 Baseline Rating</div>
+                  <div className="text-2xl font-black text-amber-400 mt-1 flex items-center gap-1">
+                    <span>⭐ {screenshotModalMerchant.baselineRating || "0.0"}</span>
+                  </div>
+                </div>
+                <div className="bg-slate-900 border border-slate-800 p-3.5 rounded-xl">
+                  <div className="text-[10px] uppercase font-bold text-slate-400">Day-0 Baseline Reviews</div>
+                  <div className="text-2xl font-black text-white mt-1">
+                    {screenshotModalMerchant.baselineReviewCount || 0}
+                  </div>
+                </div>
+                <div className="bg-slate-900 border border-slate-800 p-3.5 rounded-xl col-span-2 sm:col-span-1">
+                  <div className="text-[10px] uppercase font-bold text-slate-400">Total Tracked In CP</div>
+                  <div className="text-2xl font-black text-emerald-400 mt-1">
+                    {screenshotModalMerchant.reviews || 0} reviews
+                  </div>
+                </div>
+              </div>
+
+              {/* Visual Screenshot or Certificate */}
+              <div className="space-y-2 pt-2">
+                <Label className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                  Visual Registration Screenshot Proof:
+                </Label>
+                {screenshotModalMerchant.baselineScreenshotUrl ? (
+                  <div className="rounded-xl overflow-hidden border border-slate-700 bg-slate-900">
+                    <img
+                      src={screenshotModalMerchant.baselineScreenshotUrl}
+                      alt="Google Maps Baseline Proof"
+                      className="w-full max-h-80 object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="p-8 border-2 border-dashed border-slate-800 rounded-2xl bg-slate-900/50 flex flex-col items-center justify-center text-center space-y-3">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                      <Sparkles className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-slate-200">Verified Day-0 Registration Snapshot Certificate</div>
+                      <p className="text-xs text-slate-400 max-w-sm mt-1">
+                        Captured at registration: {new Date(screenshotModalMerchant.createdAt).toLocaleString("en-IN")}. Baseline Reviews: {screenshotModalMerchant.baselineReviewCount || 0}, Rating: ⭐ {screenshotModalMerchant.baselineRating || '0.0'}.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 pt-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          const url = prompt("Enter Screenshot Image URL for this merchant:", screenshotModalMerchant.baselineScreenshotUrl || "");
+                          if (url !== null) {
+                            fetch("/api/admin/merchants", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                action: "update_profile",
+                                merchantId: screenshotModalMerchant.id,
+                                baselineScreenshotUrl: url
+                              })
+                            }).then(() => {
+                              alert("Screenshot URL updated successfully!");
+                              loadMerchants();
+                              setScreenshotModalMerchant({ ...screenshotModalMerchant, baselineScreenshotUrl: url });
+                            });
+                          }
+                        }}
+                        className="text-xs border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/10 font-bold"
+                      >
+                        📷 Attach Screenshot URL
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 pt-2 border-t border-slate-800">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleImpersonate(screenshotModalMerchant)}
+                className="border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 text-xs font-bold gap-1"
+              >
+                <Rocket className="w-3.5 h-3.5" /> Open Dashboard
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setScreenshotModalMerchant(null)}
+                className="border-slate-700 text-slate-300 text-xs"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
 // ============================================================
-// Feature Flags
+// Subscription Management Component
+// ============================================================
+function SubscriptionManagement() {
+  return <SubscriptionPlansManager />
+}
+
+// ============================================================
+// Feature Flags Component
 // ============================================================
 function FeatureFlags() {
   const [flags, setFlags] = useState({
@@ -693,12 +2169,12 @@ function FeatureFlags() {
   return (
     <div className="grid md:grid-cols-2 gap-4">
       {Object.entries(flags).map(([key, value]) => (
-        <Card key={key}>
-          <CardContent className="p-4 flex items-center justify-between">
+        <Card key={key} className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-xl">
+          <CardContent className="p-5 flex items-center justify-between">
             <div>
-              <div className="font-medium text-sm capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</div>
-              <div className="text-xs text-stone-500">
-                {value ? "Enabled globally" : "Disabled globally"}
+              <div className="font-extrabold text-sm text-white capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</div>
+              <div className="text-xs text-slate-400 mt-0.5">
+                {value ? "Active & enabled for all merchants" : "Disabled globally in feature gates"}
               </div>
             </div>
             <Switch
@@ -713,48 +2189,50 @@ function FeatureFlags() {
 }
 
 // ============================================================
-// AI Content Studio
+// AI Content Studio Component
 // ============================================================
 function AIContentStudio() {
   return (
     <div className="grid md:grid-cols-2 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Brain className="w-4 h-4" /> AI Generation
+      <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-xl">
+        <CardHeader className="border-b border-slate-800/60">
+          <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+            <Brain className="w-4 h-4 text-purple-400" /> AI Content Generation Studio
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-6 space-y-3">
           {[
-            { type: "Marketing Emails", desc: "Generate campaign emails for merchants" },
-            { type: "WhatsApp Templates", desc: "Create new message templates" },
-            { type: "Blog Posts", desc: "SEO-optimized content generation" },
-            { type: "Landing Pages", desc: "Auto-generate from brief" },
-            { type: "Social Media Posts", desc: "Instagram, Facebook, Twitter" },
-            { type: "Ad Copy", desc: "Google Ads, Meta Ads" },
+            { type: "Marketing Email Campaigns", desc: "Generate campaign emails for merchants" },
+            { type: "WhatsApp Journey Templates", desc: "Create new engagement templates" },
+            { type: "SEO Blog Posts & Guides", desc: "SEO-optimized content generation" },
+            { type: "Landing Page Copy", desc: "Auto-generate from industry brief" },
+            { type: "Social Media Posts", desc: "Instagram, Facebook, Twitter copy" },
+            { type: "Performance Ad Copy", desc: "Google Ads, Meta Ads" },
           ].map((item, i) => (
-            <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-stone-50">
+            <div key={i} className="flex items-center justify-between p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80">
               <div>
-                <div className="font-medium text-sm">{item.type}</div>
-                <div className="text-xs text-stone-500">{item.desc}</div>
+                <div className="font-bold text-sm text-white">{item.type}</div>
+                <div className="text-xs text-slate-400 mt-0.5">{item.desc}</div>
               </div>
-              <Button size="sm" variant="outline">Generate</Button>
+              <Button size="sm" className="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs">Generate</Button>
             </div>
           ))}
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">AI Translation</CardTitle>
+      <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-xl">
+        <CardHeader className="border-b border-slate-800/60">
+          <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+            <Globe className="w-4 h-4 text-indigo-400" /> Multi-Language AI Translation Matrix
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <div className="space-y-3">
-            <p className="text-sm text-stone-500">1-click translate all content to:</p>
-            {["Hindi", "Gujarati", "Marathi", "Tamil", "Telugu", "Bengali", "English"].map((lang, i) => (
-              <div key={i} className="flex items-center justify-between p-2 rounded-lg border border-stone-200">
-                <span className="text-sm">{lang}</span>
-                <Button size="sm" variant="ghost">Translate</Button>
+            <p className="text-xs text-slate-400">1-click translate all customer-facing templates to regional languages:</p>
+            {["Hindi (हिंदी)", "Gujarati (ગુજરાતી)", "Marathi (मराठी)", "Tamil (தமிழ்)", "Telugu (తెలుగు)", "Bengali (বাংলা)", "English"].map((lang, i) => (
+              <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-slate-950/80 border border-slate-800/80">
+                <span className="text-xs font-bold text-slate-200">{lang}</span>
+                <Button size="sm" variant="ghost" className="text-indigo-400 hover:text-white hover:bg-indigo-600/20 text-xs font-semibold">Translate</Button>
               </div>
             ))}
           </div>
@@ -765,24 +2243,24 @@ function AIContentStudio() {
 }
 
 // ============================================================
-// Notification Center
+// Notification Center Component
 // ============================================================
 function NotificationCenter() {
   return (
     <div className="space-y-4">
       <div className="grid md:grid-cols-3 gap-4">
         {[
-          { channel: "Email", sent: 45230, delivered: 44980, rate: "99.4%" },
-          { channel: "WhatsApp", sent: 892140, delivered: 887230, rate: "99.4%" },
-          { channel: "Push", sent: 12450, delivered: 11890, rate: "95.5%" },
+          { channel: "Email Broadcasts", sent: 45230, delivered: 44980, rate: "99.4%" },
+          { channel: "WhatsApp Evolution Gateway", sent: 892140, delivered: 887230, rate: "99.4%" },
+          { channel: "Push Notifications", sent: 12450, delivered: 11890, rate: "95.5%" },
         ].map((ch, i) => (
-          <Card key={i}>
-            <CardContent className="p-4">
-              <div className="font-medium text-sm mb-2">{ch.channel}</div>
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between"><span className="text-stone-500">Sent</span><span>{ch.sent.toLocaleString("en-IN")}</span></div>
-                <div className="flex justify-between"><span className="text-stone-500">Delivered</span><span>{ch.delivered.toLocaleString("en-IN")}</span></div>
-                <div className="flex justify-between"><span className="text-stone-500">Rate</span><span className="text-emerald-600 font-medium">{ch.rate}</span></div>
+          <Card key={i} className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-xl">
+            <CardContent className="p-5">
+              <div className="font-extrabold text-sm text-white mb-3">{ch.channel}</div>
+              <div className="space-y-2 text-xs font-semibold">
+                <div className="flex justify-between"><span className="text-slate-400">Total Sent</span><span className="text-slate-200">{ch.sent.toLocaleString("en-IN")}</span></div>
+                <div className="flex justify-between"><span className="text-slate-400">Delivered</span><span className="text-slate-200">{ch.delivered.toLocaleString("en-IN")}</span></div>
+                <div className="flex justify-between"><span className="text-slate-400">Delivery Rate</span><span className="text-emerald-400 font-extrabold">{ch.rate}</span></div>
               </div>
             </CardContent>
           </Card>
@@ -793,50 +2271,50 @@ function NotificationCenter() {
 }
 
 // ============================================================
-// Media Library
+// Media Library Component
 // ============================================================
 function MediaLibrary() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-      {Array.from({ length: 12 }).map((_, i) => (
-        <div key={i} className="aspect-square rounded-xl bg-gradient-to-br from-stone-100 to-stone-200 flex items-center justify-center">
-          <ImageIcon className="w-8 h-8 text-stone-400" />
+      {Array.from({ length: 11 }).map((_, i) => (
+        <div key={i} className="aspect-square rounded-2xl bg-slate-900 border border-slate-800/80 flex items-center justify-center shadow-lg group hover:border-indigo-500/50 transition-all">
+          <ImageIcon className="w-8 h-8 text-slate-600 group-hover:text-indigo-400 transition-colors" />
         </div>
       ))}
-      <div className="aspect-square rounded-xl border-2 border-dashed border-stone-300 flex flex-col items-center justify-center cursor-pointer hover:border-stone-900">
-        <Download className="w-6 h-6 text-stone-400" />
-        <span className="text-xs text-stone-500 mt-1">Upload</span>
+      <div className="aspect-square rounded-2xl border-2 border-dashed border-slate-800 bg-slate-950/40 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 transition-all">
+        <Download className="w-6 h-6 text-indigo-400" />
+        <span className="text-xs font-bold text-slate-400 mt-2">Upload Asset</span>
       </div>
     </div>
   )
 }
 
 // ============================================================
-// Global Analytics
+// Global Analytics Component
 // ============================================================
 function GlobalAnalytics() {
   return (
     <div className="space-y-6">
       <div className="grid md:grid-cols-3 gap-4">
-        <Card>
+        <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-xl">
           <CardContent className="p-6">
-            <div className="text-sm text-stone-500">Top City</div>
-            <div className="text-2xl font-bold mt-1">Mumbai</div>
-            <div className="text-xs text-stone-400">3,247 merchants</div>
+            <div className="text-xs font-semibold text-slate-400">Top Performing City</div>
+            <div className="text-3xl font-black text-white mt-1">Mumbai</div>
+            <div className="text-xs text-indigo-400 mt-1 font-semibold">3,247 active merchants</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-xl">
           <CardContent className="p-6">
-            <div className="text-sm text-stone-500">Avg Claims/Merchant</div>
-            <div className="text-2xl font-bold mt-1">847/day</div>
-            <div className="text-xs text-emerald-600">+12% vs last week</div>
+            <div className="text-xs font-semibold text-slate-400">Avg Claims / Merchant</div>
+            <div className="text-3xl font-black text-white mt-1">847/day</div>
+            <div className="text-xs text-emerald-400 mt-1 font-semibold">+12% vs last week</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-xl">
           <CardContent className="p-6">
-            <div className="text-sm text-stone-500">Churn Rate</div>
-            <div className="text-2xl font-bold mt-1">2.1%</div>
-            <div className="text-xs text-emerald-600">-0.3% vs last month</div>
+            <div className="text-xs font-semibold text-slate-400">Platform Churn Rate</div>
+            <div className="text-3xl font-black text-white mt-1">2.1%</div>
+            <div className="text-xs text-emerald-400 mt-1 font-semibold">-0.3% vs last month</div>
           </CardContent>
         </Card>
       </div>
@@ -845,7 +2323,7 @@ function GlobalAnalytics() {
 }
 
 // ============================================================
-// Permission Builder
+// Permission Builder Component
 // ============================================================
 function PermissionBuilder() {
   const roles = ["Owner", "Manager", "Cashier", "Support Agent", "Super Admin"]
@@ -856,25 +2334,25 @@ function PermissionBuilder() {
   ]
 
   return (
-    <Card>
+    <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-2xl">
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-stone-50 border-b">
+            <thead className="bg-slate-950 border-b border-slate-800">
               <tr>
-                <th className="text-left p-4 text-xs font-medium text-stone-500 uppercase">Permission</th>
+                <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase">Permission Matrix</th>
                 {roles.map((r) => (
-                  <th key={r} className="text-center p-4 text-xs font-medium text-stone-500 uppercase">{r}</th>
+                  <th key={r} className="text-center p-4 text-xs font-bold text-slate-400 uppercase">{r}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-100">
+            <tbody className="divide-y divide-slate-800/60 text-sm">
               {permissions.map((p, i) => (
-                <tr key={i} className="hover:bg-stone-50">
-                  <td className="p-4 text-sm">{p}</td>
+                <tr key={i} className="hover:bg-slate-800/40 transition-colors">
+                  <td className="p-4 font-semibold text-slate-200">{p}</td>
                   {roles.map((r, j) => (
                     <td key={j} className="text-center p-4">
-                      <input type="checkbox" defaultChecked={j <= 2 || (j === 4 && i < 8)} className="w-4 h-4" />
+                      <input type="checkbox" defaultChecked={j <= 2 || (j === 4 && i < 8)} className="w-4 h-4 rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-indigo-500" />
                     </td>
                   ))}
                 </tr>
@@ -888,13 +2366,13 @@ function PermissionBuilder() {
 }
 
 // ============================================================
-// Audit Explorer
+// Audit Explorer Component
 // ============================================================
 function AuditExplorer() {
   return (
-    <Card>
+    <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-2xl">
       <CardContent className="p-6">
-        <div className="space-y-2">
+        <div className="space-y-3">
           {[
             { action: "WEBSITE_PUBLISHED", actor: "admin@customerpilot.io", time: "2 min ago" },
             { action: "FEATURE_FLAG_TOGGLED", actor: "admin@customerpilot.io", time: "15 min ago" },
@@ -902,12 +2380,12 @@ function AuditExplorer() {
             { action: "THEME_UPDATED", actor: "admin@customerpilot.io", time: "3 hours ago" },
             { action: "CMS_PAGE_PUBLISHED", actor: "content@customerpilot.io", time: "5 hours ago" },
           ].map((log, i) => (
-            <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-stone-50">
+            <div key={i} className="flex items-center justify-between p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80">
               <div className="flex items-center gap-3">
-                <Badge variant="outline" className="font-mono text-[10px]">{log.action}</Badge>
-                <span className="text-sm text-stone-600">{log.actor}</span>
+                <Badge variant="outline" className="font-mono text-[10px] bg-slate-900 text-indigo-300 border-indigo-500/30">{log.action}</Badge>
+                <span className="text-xs font-semibold text-slate-300">{log.actor}</span>
               </div>
-              <span className="text-xs text-stone-400">{log.time}</span>
+              <span className="text-xs text-slate-500 font-mono">{log.time}</span>
             </div>
           ))}
         </div>
@@ -917,33 +2395,33 @@ function AuditExplorer() {
 }
 
 // ============================================================
-// System Settings
+// System Settings Component
 // ============================================================
 function SystemSettings() {
   return (
     <div className="grid md:grid-cols-2 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Environment</CardTitle>
+      <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-xl">
+        <CardHeader className="border-b border-slate-800/60">
+          <CardTitle className="text-base font-bold text-white">Runtime Environment</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex justify-between"><span className="text-sm text-stone-500">Node Version</span><span className="text-sm font-medium">v24.11.0</span></div>
-          <div className="flex justify-between"><span className="text-sm text-stone-500">Database</span><span className="text-sm font-medium">PostgreSQL 16</span></div>
-          <div className="flex justify-between"><span className="text-sm text-stone-500">Redis Cache</span><span className="text-sm font-medium">v7.2</span></div>
-          <div className="flex justify-between"><span className="text-sm text-stone-500">CDN</span><span className="text-sm font-medium">Cloudflare</span></div>
+        <CardContent className="p-6 space-y-3">
+          <div className="flex justify-between text-xs font-semibold"><span className="text-slate-400">Node Engine</span><span className="text-slate-200 font-mono">v24.11.0</span></div>
+          <div className="flex justify-between text-xs font-semibold"><span className="text-slate-400">Database Engine</span><span className="text-slate-200 font-mono">SQLite / Prisma Client 6.11</span></div>
+          <div className="flex justify-between text-xs font-semibold"><span className="text-slate-400">API Gateway</span><span className="text-slate-200 font-mono">Next.js App Router Proxy</span></div>
+          <div className="flex justify-between text-xs font-semibold"><span className="text-slate-400">WhatsApp Gateway</span><span className="text-slate-200 font-mono">Evolution API v2</span></div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Backup & Recovery</CardTitle>
+      <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-xl">
+        <CardHeader className="border-b border-slate-800/60">
+          <CardTitle className="text-base font-bold text-white">Backup & Disaster Recovery</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex justify-between"><span className="text-sm text-stone-500">Last Backup</span><span className="text-sm font-medium">3:00 AM today</span></div>
-          <div className="flex justify-between"><span className="text-sm text-stone-500">Backup Size</span><span className="text-sm font-medium">2.4 GB</span></div>
-          <div className="flex justify-between"><span className="text-sm text-stone-500">RPO</span><span className="text-sm font-medium">24 hours</span></div>
-          <div className="flex justify-between"><span className="text-sm text-stone-500">RTO</span><span className="text-sm font-medium">4 hours</span></div>
-          <Button size="sm" variant="outline" className="mt-2">Trigger Manual Backup</Button>
+        <CardContent className="p-6 space-y-3">
+          <div className="flex justify-between text-xs font-semibold"><span className="text-slate-400">Automated Backup</span><span className="text-slate-200 font-mono">3:00 AM Today (Passed)</span></div>
+          <div className="flex justify-between text-xs font-semibold"><span className="text-slate-400">Snapshot Storage Size</span><span className="text-slate-200 font-mono">2.4 GB</span></div>
+          <div className="flex justify-between text-xs font-semibold"><span className="text-slate-400">RPO Threshold</span><span className="text-slate-200 font-mono">24 Hours</span></div>
+          <div className="flex justify-between text-xs font-semibold"><span className="text-slate-400">RTO Threshold</span><span className="text-slate-200 font-mono">4 Hours</span></div>
+          <Button size="sm" className="mt-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md">Trigger Instant Backup</Button>
         </CardContent>
       </Card>
     </div>
@@ -951,65 +2429,61 @@ function SystemSettings() {
 }
 
 // ============================================================
-// Documentation Panel (moved from Merchant Dashboard)
-// Contains: Developer Manual, Production Policies, Enterprise Hardening, V6.5 Roadmap
+// Documentation Panel Component
 // ============================================================
 function DocumentationPanel() {
   const docs = [
     {
-      title: "Developer Manual",
+      title: "Developer Technical Manual",
       desc: "17 chapters — API endpoints, DB models, state machines, cron jobs. For developers building integrations.",
       chapters: 17,
       icon: Code,
-      color: "bg-indigo-100 text-indigo-700",
+      color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
     },
     {
-      title: "Production Policies",
-      desc: "12 policies — Rule migration, VIP eligibility, review lifecycle, campaign priority, fraud detection, customer merge, ownership transfer, and more.",
+      title: "Production Operating Policies",
+      desc: "12 policies — Rule migration, VIP eligibility, review lifecycle, campaign priority, fraud detection, customer merge, ownership transfer.",
       chapters: 12,
       icon: Shield,
-      color: "bg-rose-100 text-rose-700",
+      color: "bg-rose-500/10 text-rose-400 border-rose-500/20",
     },
     {
-      title: "Enterprise Hardening",
-      desc: "12 points — Idempotency, distributed locking, cron DLQ, multi-device sessions, WhatsApp failure, backup/DR, API versioning, feature licensing.",
+      title: "Enterprise Infrastructure Hardening",
+      desc: "12 points — Idempotency, distributed locking, cron DLQ, multi-device sessions, WhatsApp failure, backup/DR, API versioning.",
       chapters: 12,
       icon: Shield,
-      color: "bg-amber-100 text-amber-700",
+      color: "bg-amber-500/10 text-amber-400 border-amber-500/20",
     },
     {
-      title: "V6.5 / V7 Roadmap",
-      desc: "15 items — Reservation heartbeat, customer cancel, queue capacity, scan spam protection, multi-branch, WebSocket sync, AI queue assistant, smart counter display.",
+      title: "V6.5 / V7 Platform Roadmap",
+      desc: "15 items — Reservation heartbeat, customer cancel, queue capacity, scan spam protection, multi-branch, WebSocket sync.",
       chapters: 15,
       icon: Flag,
-      color: "bg-purple-100 text-purple-700",
+      color: "bg-purple-500/10 text-purple-400 border-purple-500/20",
     },
   ]
 
   return (
     <div className="space-y-6">
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-        <p className="text-sm text-amber-800">
-          <strong>Internal Documentation.</strong> These documents are for the CustomerPilot team (developers, ops, QA).
-          They have been moved out of the Merchant Dashboard to keep it clean and business-focused.
-          Merchants only see the "Help & Guide" tab.
+      <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">
+        <p className="text-xs text-amber-300 font-semibold leading-relaxed">
+          🔒 <strong>Internal SuperAdmin Documentation Vault.</strong> These technical specifications and architectural blueprints are for platform administrators and core developers.
         </p>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
         {docs.map((doc, i) => (
-          <Card key={i}>
+          <Card key={i} className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-xl">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
-                <div className={`w-12 h-12 rounded-xl ${doc.color} flex items-center justify-center flex-shrink-0`}>
+                <div className={`w-12 h-12 rounded-2xl ${doc.color} border flex items-center justify-center flex-shrink-0`}>
                   <doc.icon className="w-6 h-6" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-stone-900 mb-1">{doc.title}</h3>
-                  <p className="text-sm text-stone-500 mb-3">{doc.desc}</p>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">{doc.chapters} chapters</Badge>
-                    <Button size="sm" variant="outline">View Document</Button>
-                    <Button size="sm" variant="ghost">Download PDF</Button>
+                <div className="flex-1 space-y-2">
+                  <h3 className="font-bold text-white text-sm">{doc.title}</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">{doc.desc}</p>
+                  <div className="flex items-center gap-2 pt-1">
+                    <Badge variant="outline" className="text-[10px] text-indigo-300 border-indigo-500/30">{doc.chapters} chapters</Badge>
+                    <Button size="sm" variant="outline" className="text-xs border-slate-700 text-slate-300 hover:bg-slate-800">View Manual</Button>
                   </div>
                 </div>
               </div>
@@ -1064,9 +2538,9 @@ function AdminTemplateManagement() {
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className="p-8 text-center text-stone-500">
-          <div className="animate-spin w-6 h-6 border-2 border-stone-800 border-t-transparent rounded-full mx-auto mb-2" />
+      <Card className="bg-slate-900/80 border-slate-800 text-white">
+        <CardContent className="p-12 text-center text-slate-400">
+          <div className="animate-spin w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full mx-auto mb-2" />
           Loading system default templates & merchant overrides...
         </CardContent>
       </Card>
@@ -1076,43 +2550,45 @@ function AdminTemplateManagement() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="bg-white border-stone-200">
+        <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-xl">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-stone-500">System Default Templates</CardTitle>
+            <CardTitle className="text-xs font-bold text-slate-400">System Default Base Templates</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-stone-900">{data?.systemDefaults?.length || 0} Journey Templates</div>
-            <p className="text-xs text-stone-500 mt-1">Immutable baseline defaults for all merchants</p>
+            <div className="text-2xl font-black text-white">{data?.systemDefaults?.length || 0} Base Templates</div>
+            <p className="text-xs text-slate-400 mt-1">Global baselines used if no custom override exists</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-stone-200">
+        <Card className="bg-slate-900/80 border-slate-800/80 backdrop-blur-xl shadow-xl">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-stone-500">Merchant Custom Overrides</CardTitle>
+            <CardTitle className="text-xs font-bold text-slate-400">Merchant Custom Overrides</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">{data?.overridesCount || 0} Overrides</div>
-            <p className="text-xs text-stone-500 mt-1">Active merchant personalized journey templates</p>
+            <div className="text-2xl font-black text-emerald-400">{data?.overridesCount || 0} Active Overrides</div>
+            <p className="text-xs text-slate-400 mt-1">Active merchant personalized journey templates</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-white border-stone-200">
+      <WhatsAppTemplateManager merchantId="system" />
+
+      <Card className="bg-slate-900/80 border-slate-800/80 shadow-2xl mt-8">
         <CardHeader>
-          <CardTitle className="text-lg font-bold text-stone-900 flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-emerald-600" />
+          <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-emerald-400" />
             Active Merchant Custom Overrides
           </CardTitle>
         </CardHeader>
         <CardContent>
           {!data?.merchantOverrides || data.merchantOverrides.length === 0 ? (
-            <div className="text-center p-6 text-stone-400 text-sm">
+            <div className="text-center p-6 text-slate-500 text-xs font-semibold">
               No merchant custom overrides saved yet. All merchants are using System Default journey templates.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-stone-50 border-b border-stone-200 text-left text-xs text-stone-500 uppercase font-medium">
+                <thead className="bg-slate-950 border-b border-slate-800 text-left text-xs text-slate-400 uppercase font-bold">
                   <tr>
                     <th className="p-3">Merchant</th>
                     <th className="p-3">Template Key</th>
@@ -1121,26 +2597,26 @@ function AdminTemplateManagement() {
                     <th className="p-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100 text-xs text-stone-700">
+                <tbody className="divide-y divide-slate-800 text-xs text-slate-300">
                   {data.merchantOverrides.map((ov: any) => (
-                    <tr key={ov.id} className="hover:bg-stone-50">
-                      <td className="p-3 font-semibold text-stone-900">
+                    <tr key={ov.id} className="hover:bg-slate-800/40">
+                      <td className="p-3 font-bold text-white">
                         {ov.merchant?.name || ov.merchantId}
-                        <div className="text-[10px] text-stone-400 font-normal">{ov.merchant?.ownerName}</div>
+                        <div className="text-[10px] text-slate-500 font-normal">{ov.merchant?.ownerName}</div>
                       </td>
-                      <td className="p-3 font-mono text-emerald-700">{ov.templateKey}</td>
+                      <td className="p-3 font-mono text-emerald-400 font-semibold">{ov.templateKey}</td>
                       <td className="p-3">
-                        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+                        <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px]">
                           v{ov.version}
                         </Badge>
                       </td>
-                      <td className="p-3 font-mono text-stone-600 max-w-md truncate">{ov.messageBody}</td>
+                      <td className="p-3 font-mono text-slate-400 max-w-md truncate">{ov.messageBody}</td>
                       <td className="p-3 text-right">
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => handleResetMerchant(ov.merchantId, ov.templateKey)}
-                          className="h-7 text-xs text-rose-600 border-rose-200 hover:bg-rose-50"
+                          className="h-7 text-xs text-rose-400 border-rose-500/30 hover:bg-rose-500/20"
                         >
                           <RotateCcw className="w-3 h-3 mr-1" /> Force Reset
                         </Button>
@@ -1156,4 +2632,3 @@ function AdminTemplateManagement() {
     </div>
   )
 }
-

@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { fetchGoogleReviews, syncGoogleReviewsToDb } from "@/lib/google-reviews-service"
+import { applyBulkAiRateLimit } from "@/lib/rate-limiter"
 
 export async function POST(req: NextRequest) {
   try {
     const merchantId = req.headers.get("x-merchant-id")
     if (!merchantId) return NextResponse.json({ error: "Missing merchantId" }, { status: 400 })
+
+    // Rate limit: max 5 bulk AI job starts per merchant per minute
+    const limited = await applyBulkAiRateLimit(merchantId)
+    if (limited) return limited
 
     // 1. TIER CHECK: Verify active Paid Subscription
     const subscription = await db.subscription.findFirst({

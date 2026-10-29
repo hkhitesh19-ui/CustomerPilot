@@ -1,95 +1,91 @@
-import type { Metadata } from "next"
-import Link from "next/link"
-import { FileText, ArrowLeft } from "lucide-react"
+"use client"
 
-export const metadata: Metadata = {
-  title: "Terms of Service — CustomerPilot",
-  description: "CustomerPilot merchant terms of service, subscription agreements, and loyalty platform guidelines.",
-  alternates: {
-    canonical: "/terms",
-  },
-}
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { BrandLogo } from "@/components/brand-logo"
+import { Button } from "@/components/ui/button"
+import { ShieldCheck, ArrowLeft, Loader2 } from "lucide-react"
 
 export default function TermsPage() {
+  const [content, setContent] = useState<string>("")
+  const [loading, setLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    fetch("/api/legal/terms")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.ok && data.data?.content) {
+          setContent(data.data.content)
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 py-12 px-6">
-      <div className="max-w-3xl mx-auto space-y-8">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-6">
-          <Link href="/">
-            <img src="/cplogo_horizontal.png" alt="CustomerPilot" className="h-10 w-auto object-contain" />
+    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-emerald-500 selection:text-white flex flex-col justify-between">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
+          <Link href="/" className="no-underline flex items-center">
+            <BrandLogo size="sm" />
           </Link>
-          <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors">
-            <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
-          </Link>
-        </div>
-
-        <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold">
-            <FileText className="w-3.5 h-3.5" /> Merchant Agreement
+          <div className="flex items-center gap-4">
+            <Link href="/" className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition">
+              <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
+            </Link>
+            <Link href="/signup">
+              <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl">
+                Start 3 Days Free Trial Today →
+              </Button>
+            </Link>
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
-            CustomerPilot Terms of Service
-          </h1>
-          <p className="text-slate-400 text-sm">Last updated: August 2026</p>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 md:py-16 space-y-8 flex-1 w-full">
+        <div className="flex items-center gap-4 pb-6 border-b border-slate-200">
+          <div className="p-3.5 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+            <ShieldCheck className="w-8 h-8" />
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-4xl font-black text-slate-900">Merchant Terms &amp; Conditions</h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">CustomerPilot SaaS Agreement, Loyalty Guidelines &amp; Fair Use Policy</p>
+          </div>
         </div>
 
-        <div className="space-y-6 text-sm text-slate-300 leading-relaxed border-t border-slate-800 pt-6">
-          <section className="space-y-2">
-            <h2 className="text-lg font-bold text-white">1. Acceptance of Terms</h2>
-            <p>
-              By accessing, registering, or using CustomerPilot&apos;s software, merchant dashboard, WhatsApp automation tools, or QR codes, you agree to be bound by these Terms of Service. If you do not agree to these terms, you may not access or use the service.
-            </p>
-          </section>
+        {loading ? (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+          </div>
+        ) : (
+          <div className="p-6 sm:p-8 rounded-3xl bg-slate-50/70 border border-slate-200 text-slate-700 text-sm leading-relaxed whitespace-pre-line shadow-xs">
+            {content || `1. Acceptance of Terms: By registering a merchant account on CustomerPilot, you agree to comply with all applicable local business and consumer protection regulations.
 
-          <section className="space-y-2">
-            <h2 className="text-lg font-bold text-white">2. Description of Service</h2>
-            <p>
-              CustomerPilot provides autonomous software-as-a-service (SaaS) tools for retail and hospitality merchants. Features include digital WhatsApp stamp cards, counter QR check-ins, cashier tap-to-claim terminals, Google Review AI draft generation, and merchant business analytics.
-            </p>
-          </section>
+2. WhatsApp Messaging Compliance: Messages sent through CustomerPilot must adhere strictly to opt-in transactional loyalty cards and review requests. Unsolicited marketing spam is strictly prohibited.
 
-          <section className="space-y-2">
-            <h2 className="text-lg font-bold text-white">3. Merchant Responsibilities</h2>
-            <ul className="list-disc pl-5 space-y-1 text-slate-300">
-              <li>Merchants agree to honor all valid reward stamps and free treats earned legitimately by their customers.</li>
-              <li>Merchants agree to safeguard cashier PINs and manager credentials from unauthorized access.</li>
-              <li>Merchants must ensure customer phone numbers collected at checkout are provided with the customer&apos;s knowledge for loyalty participation.</li>
-            </ul>
-          </section>
+3. Subscription & Billing: All plans come with an initial 3-Day Free Trial. Paid renewals are processed based on your chosen VIP member capacity plan. Cancel anytime from your merchant settings.
 
-          <section className="space-y-2">
-            <h2 className="text-lg font-bold text-white">4. Subscription Plans & Billing</h2>
-            <p>
-              CustomerPilot offers a 14-day free trial with no credit card required upfront. Following the trial, subscriptions are billed monthly (standard Pro plan at ₹2,999/month or custom Founding Merchant terms). Subscriptions can be canceled at any time from the merchant dashboard settings.
-            </p>
-          </section>
+4. Intellectual Property: CustomerPilot and all associated logos, software code, and loyalty engine algorithms remain the exclusive property of CustomerPilot Inc.
 
-          <section className="space-y-2">
-            <h2 className="text-lg font-bold text-white">5. Fair Usage & WhatsApp Compliance</h2>
-            <p>
-              Merchants agree not to use CustomerPilot for spam, unsolicited promotional broadcasts, or deceptive marketing. All WhatsApp messages must adhere to standard WhatsApp Business policies and local telecommunication guidelines.
-            </p>
-          </section>
+5. Support Desk: For merchant queries, contact support@customerpilot.in or WhatsApp +91 90333 04707.`}
+          </div>
+        )}
+      </main>
 
-          <section className="space-y-2">
-            <h2 className="text-lg font-bold text-white">6. Limitation of Liability</h2>
-            <p>
-              CustomerPilot provides the platform on an &quot;as is&quot; and &quot;as available&quot; basis. In no event shall CustomerPilot be liable for indirect, punitive, or consequential damages resulting from internet disruptions, WhatsApp platform outages, or Google API policy updates.
-            </p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-lg font-bold text-white">7. Support & Queries</h2>
-            <p>
-              For legal inquiries or terms clarification, contact <a href="mailto:legal@customerpilot.ai" className="text-blue-400 underline">legal@customerpilot.ai</a> or <a href="mailto:support@customerpilot.ai" className="text-blue-400 underline">support@customerpilot.ai</a>.
-            </p>
-          </section>
+      {/* Footer */}
+      <footer className="border-t border-slate-200 bg-slate-50 py-8 px-6">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+          <div>© {new Date().getFullYear()} CustomerPilot Inc. · Autonomous Merchant Retention SaaS · support@customerpilot.in</div>
+          <div className="flex items-center gap-6">
+            <Link href="/privacy" className="hover:text-slate-900 transition">Privacy Policy</Link>
+            <Link href="/security" className="hover:text-slate-900 transition">Security</Link>
+            <Link href="/contact" className="hover:text-slate-900 transition">Contact Support</Link>
+            <Link href="/pricing" className="hover:text-slate-900 transition">Pricing</Link>
+          </div>
         </div>
-
-        <div className="border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
-          © {new Date().getFullYear()} CustomerPilot Inc. · Autonomous Merchant Retention SaaS
-        </div>
-      </div>
+      </footer>
     </div>
   )
 }

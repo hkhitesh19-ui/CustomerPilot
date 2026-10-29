@@ -117,10 +117,16 @@ async function main() {
     data: {
       merchantId: merchant.id,
       name: "Cake Lover's Card",
-      stampsRequired: 9,
+      stampsRequired: 10,
       rewardName: "1 Free Cupcake",
+      stampValue: 300,
+      validityDays: 180,
+      googleReviewBonus: 1,
+      photoBonus: 1,
+      joiningBonusEnabled: true,
+      joiningBonusStamps: 1,
       stampsPerBill: "1",
-      color: "rose",
+      color: "#6366f1",
       active: true,
     },
   })

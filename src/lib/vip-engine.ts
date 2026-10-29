@@ -48,6 +48,11 @@ export function getVipTierForSpend(lifetimeSpend: number): VipTierConfig {
   return tiers.find((t) => lifetimeSpend >= t.minLifetimeSpend) ?? DEFAULT_VIP_TIERS[0]
 }
 
+/**
+ * @deprecated DO NOT use this function to calculate or award bonus stamps in award/route.ts.
+ * Bonus stamps are ONLY awarded inside award/route.ts on Loyalty Level/Card completion (isCardFinished).
+ * Spend thresholds ONLY control display category tier names, NOT stamp counts.
+ */
 export function applyVipBonusStamps(baseStamps: number, tier: VipTierConfig): number {
   // Round down — never inflate.
   return Math.floor(baseStamps * tier.bonusMultiplier)

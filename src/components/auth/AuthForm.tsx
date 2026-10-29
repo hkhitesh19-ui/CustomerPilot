@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +15,8 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || searchParams.get('redirect');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,8 +36,9 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
         throw new Error(data.error || 'Something went wrong');
       }
 
-      // Use redirectTo from API if provided (handles onboarding resume)
-      router.push(data.redirectTo || '/dashboard');
+      // If callbackUrl is provided, redirect to callbackUrl, otherwise use data.redirectTo or /dashboard
+      const destination = callbackUrl || data.redirectTo || '/dashboard';
+      router.push(destination);
     } catch (err: any) {
       setError(err.message);
     } finally {

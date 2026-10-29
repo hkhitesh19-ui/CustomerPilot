@@ -4,13 +4,16 @@ import { Toaster } from "@/components/ui/toaster";
 import { Providers } from "@/components/providers";
 import { SoftwareApplicationJsonLd, OrganizationJsonLd } from "@/components/seo/json-ld";
 
-const geistSans = { variable: "font-sans" };
-const geistMono = { variable: "font-mono" };
+// Inter font is loaded via globals.css @import to ensure offline build resilience
+const inter = {
+  variable: "--font-inter",
+  className: "font-sans",
+};
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.ai";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.in";
 
 export const viewport = {
-  themeColor: "#020617",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -88,7 +91,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { SplashScreen } from "@/components/splash-screen";
+import { WhatsAppFloatingWidget } from "@/components/whatsapp-widget";
 
 export default function RootLayout({
   children,
@@ -102,11 +105,11 @@ export default function RootLayout({
         <OrganizationJsonLd />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${inter.variable} ${inter.className} font-sans antialiased bg-background text-foreground`}
       >
         <Providers>
-          <SplashScreen />
           {children}
+          <WhatsAppFloatingWidget />
           <Toaster />
         </Providers>
       </body>

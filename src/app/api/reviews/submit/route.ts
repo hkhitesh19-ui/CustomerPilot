@@ -21,6 +21,34 @@ export async function POST(req: NextRequest) {
   if (!review || review.merchantId !== merchant.id) return err("Review not found", 404)
   if (review.status === "submitted") return err("Already submitted")
 
+  // --- GBP Review Velocity Guard Rail -----------------------------------------
+  // Track A merchants (New Business Launchpad) have a weekly cap to prevent
+  // Google Sandbox / Spam filter from triggering a profile suspension.
+  // Default cap: 3 reviews/week for first 30 days. Lifted to 10 after Week 5 unlock.
+  if (merchant.gbpServiceTrack && merchant.gbpServiceTrack !== "NONE") {
+    const weekStart = new Date()
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay()) // Start of current week (Sunday)
+    weekStart.setHours(0, 0, 0, 0)
+
+    const reviewsThisWeek = await db.review.count({
+      where: {
+        merchantId: merchant.id,
+        status: "submitted",
+        submittedAt: { gte: weekStart },
+      },
+    })
+
+    const cap = merchant.gbpReviewVelocityCap ?? 3
+    if (reviewsThisWeek >= cap) {
+      return err(
+        `GBP Review Velocity Cap reached (${reviewsThisWeek}/${cap} this week). ` +
+        `This safety limit prevents Google from flagging your profile as spam. ` +
+        `Try again next week or ask your CustomerPilot executive to raise the cap.`,
+        429
+      )
+    }
+  }
+  // -----------------------------------------------------------------------------
   const bonus = calculateReviewBonus({ rating: review.rating, hasPhoto: !!hasPhoto })
 
   const updated = await db.review.update({

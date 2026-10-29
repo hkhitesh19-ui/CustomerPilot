@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "100% App-Free WhatsApp Stamp Cards — CustomerPilot",
     description: "No apps to download. Customers scan your counter QR and collect digital loyalty stamps straight on WhatsApp.",
-    url: "https://customerpilot.ai/features/whatsapp-stamp-card",
+    url: "https://customerpilot.in/features/whatsapp-stamp-card",
   },
 }
 

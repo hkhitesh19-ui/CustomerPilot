@@ -25,7 +25,7 @@ export const DELAY_OPTIONS = [
   { label: "24 Hours", value: 1440 },
 ]
 
-export function GoogleReviewDelaySettings({ merchantId }: { merchantId: string }) {
+export function GoogleReviewDelaySettings({ merchantId, embedded = false }: { merchantId: string; embedded?: boolean }) {
   const { data, refetch } = useDashboardState()
   const { toast } = useToast()
 
@@ -78,22 +78,91 @@ export function GoogleReviewDelaySettings({ merchantId }: { merchantId: string }
     }
   }
 
+  if (embedded) {
+    return (
+      <div className="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400">
+              <Clock className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                Google Review Prompt Timers
+              </h4>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                Choose how long CustomerPilot should wait before automatically sending the Google Review request on WhatsApp.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3 bg-slate-50/70 dark:bg-slate-950/40 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800/80">
+          <Label className="text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+            When should the Google Review WhatsApp message be sent after purchase approval?
+          </Label>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <Select
+              value={String(delayMinutes)}
+              onValueChange={(val) => setDelayMinutes(Number(val))}
+              disabled={isSaving}
+            >
+              <SelectTrigger className="w-full sm:w-80 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 h-10 focus:ring-emerald-500/20 text-xs">
+                <SelectValue placeholder="Select review delay" />
+              </SelectTrigger>
+              <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 max-h-72">
+                {DELAY_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={String(opt.value)} className="focus:bg-slate-100 dark:focus:bg-slate-800 focus:text-slate-900 dark:focus:text-white cursor-pointer text-xs">
+                    {opt.label} {opt.value === 30 ? "(Recommended Default)" : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Button
+              onClick={handleSave}
+              disabled={isSaving}
+              size="sm"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-4 h-10"
+            >
+              {isSaving ? (
+                "Saving..."
+              ) : saveStatus === "saved" ? (
+                <span className="flex items-center gap-1.5 text-white">
+                  <CheckCircle2 className="w-4 h-4" /> Saved
+                </span>
+              ) : (
+                "Save Timer"
+              )}
+            </Button>
+          </div>
+
+          <div className="text-[11px] text-slate-500">
+            Internal storage: <span className="text-emerald-600 dark:text-emerald-400 font-mono font-semibold">{delayMinutes}</span> minutes delay
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <Card className="bg-slate-900/60 border-slate-800/60 backdrop-blur-xl shadow-2xl relative overflow-hidden">
+    <Card className="bg-white/80 dark:bg-slate-900/60 border-amber-500/20 dark:border-slate-800/60 backdrop-blur-xl shadow-2xl relative overflow-hidden">
       <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
         <Star className="w-24 h-24 text-amber-400" />
       </div>
 
-      <CardHeader className="bg-slate-900/40 border-b border-slate-800/60">
+      <CardHeader className="bg-amber-50/40 dark:bg-slate-900/40 border-b border-amber-100 dark:border-slate-800/60">
         <div className="flex items-center gap-2">
           <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-            <Clock className="w-5 h-5 text-amber-400" />
+            <Clock className="w-5 h-5 text-amber-500 dark:text-amber-400" />
           </div>
           <div>
-            <CardTitle className="text-xl font-bold text-slate-100 flex items-center gap-2">
-              Google Review Settings
+            <CardTitle className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              Google Review Prompt Timers
             </CardTitle>
-            <CardDescription className="text-slate-400 mt-0.5">
+            <CardDescription className="text-slate-600 dark:text-slate-400 mt-0.5">
               Choose how long CustomerPilot should wait before automatically sending the Google Review request.
             </CardDescription>
           </div>
@@ -102,11 +171,11 @@ export function GoogleReviewDelaySettings({ merchantId }: { merchantId: string }
 
       <CardContent className="p-6 space-y-6">
         <div className="space-y-3">
-          <Label className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
+          <Label className="text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
             When should the Google Review WhatsApp message be sent after purchase approval?
           </Label>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
             Every business type has a different ideal review request timing (e.g., Restaurants: 15–30 mins, Salons: 1–3 hrs, Spas/Clinics: 4–24 hrs).
           </p>
 
@@ -115,12 +184,12 @@ export function GoogleReviewDelaySettings({ merchantId }: { merchantId: string }
             onValueChange={(val) => setDelayMinutes(Number(val))}
             disabled={isSaving}
           >
-            <SelectTrigger className="w-full bg-slate-950/60 border-slate-800 text-slate-100 h-11 focus:ring-emerald-500/20">
+            <SelectTrigger className="w-full bg-white dark:bg-slate-950/60 border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 h-11 focus:ring-emerald-500/20">
               <SelectValue placeholder="Select review delay" />
             </SelectTrigger>
-            <SelectContent className="bg-slate-900 border-slate-800 text-slate-100 max-h-72">
+            <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 max-h-72">
               {DELAY_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={String(opt.value)} className="focus:bg-slate-800 focus:text-white cursor-pointer">
+                <SelectItem key={opt.value} value={String(opt.value)} className="focus:bg-slate-100 dark:focus:bg-slate-800 focus:text-slate-900 dark:focus:text-white cursor-pointer">
                   {opt.label} {opt.value === 30 ? "(Recommended Default)" : ""}
                 </SelectItem>
               ))}
@@ -128,9 +197,9 @@ export function GoogleReviewDelaySettings({ merchantId }: { merchantId: string }
           </Select>
         </div>
 
-        <div className="flex items-center justify-between pt-2 border-t border-slate-800/40">
+        <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800/40">
           <div className="text-xs text-slate-500">
-            Internal storage: <span className="text-emerald-400 font-mono font-semibold">{delayMinutes}</span> minutes
+            Internal storage: <span className="text-emerald-600 dark:text-emerald-400 font-mono font-semibold">{delayMinutes}</span> minutes
           </div>
           <Button
             onClick={handleSave}

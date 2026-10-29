@@ -1,7 +1,10 @@
 import { NextRequest } from "next/server"
 import QRCode from "qrcode"
+import { generateBrandedQRDataUrl } from "@/lib/branded-qr"
 import { db } from "@/lib/db"
 import { ok, err } from "@/lib/api"
+import { normalizePhone } from "@/lib/utils"
+import { getOrCreateDigitalBusinessCard } from "@/lib/digital-card-service"
 
 export async function GET(req: NextRequest) {
   try {
@@ -9,54 +12,99 @@ export async function GET(req: NextRequest) {
     if (!merchantId) return err("Unauthorized", 401)
 
     const urlParams = req.nextUrl.searchParams
-    const type = urlParams.get("type") || "counter" // counter, table, poster, sticker, cake_box
+    const mode = urlParams.get("mode") || (urlParams.get("type")?.startsWith("review_") ? "reviews" : "loyalty")
+    const type = urlParams.get("type") || (mode === "reviews" ? "review_counter" : "counter") 
 
     const merchant = await db.merchant.findUnique({
-      where: { id: merchantId }
+      where: { id: merchantId },
+      include: {
+        merchantGoogleConnections: true,
+        digitalBusinessCard: true,
+      }
     })
 
     if (!merchant) return err("Merchant not found", 404)
 
-    // Build WhatsApp deep link — Requirements.txt: "QR directly opens WhatsApp"
-    // Format: https://wa.me/{phone}?text=JOIN|{merchantId}|{type}
-    // When customer sends this message, our Evolution webhook processes it.
-    const merchantPhone = (merchant.whatsappPhone || "").replace(/[^0-9]/g, "")
-    if (!merchantPhone) return err("Merchant WhatsApp number not configured", 400)
+    let targetUrl = ""
+    let defaultTitle = "Store QR Code"
 
-    // Build the pre-filled WhatsApp message — friendly & natural for both new and returning customers
-    // Merchant is identified by their phone number on the webhook side
-    const bizName = merchant.name || "our store"
-    const joinText = `Hi ${bizName}! Checking in for my VIP Club stamps 🎁`
-    const targetUrl = `https://wa.me/${merchantPhone}?text=${encodeURIComponent(joinText)}`
+    if (mode === "reviews" || type.startsWith("review_")) {
+      // ─── Smart AI Google Reviews QR ─────────────────────────
+      const host = req.headers.get("host") || "localhost:3000"
+      const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https"
+      const appUrl = `${protocol}://${host}`
 
-    // Generate QR Code as Data URL
-    const qrDataUrl = await QRCode.toDataURL(targetUrl, {
-      errorCorrectionLevel: "H",
-      margin: 2,
-      width: 400,
-      color: {
-        dark: "#1e1b4b",
-        light: "#ffffff"
+      const gbpConn = merchant.merchantGoogleConnections
+      const directGoogleUrl = gbpConn?.googleReviewUrl || (merchant as any).googleReviewLink || null
+
+      if (type === "review_direct" && directGoogleUrl) {
+        targetUrl = directGoogleUrl
+      } else {
+        // Default: AI Smart Review Draft Assistant
+        targetUrl = `${appUrl}/review?m=${merchant.id}`
       }
-    })
 
-    const titleMap: Record<string, string> = {
-      counter: "Counter QR Stand",
-      table: "Table QR Standee",
-      poster: "Store Window Poster",
-      sticker: "Packaging Sticker QR",
-      cake_box: "Cake Box Seal QR"
+      const reviewTitleMap: Record<string, string> = {
+        review_counter: "Google Reviews Counter QR Code",
+        review_table: "Table Tent Google Review QR",
+        review_sticker: "Packaging / Bill Review Sticker QR",
+        review_poster: "Store Front 5-Star Review Poster",
+        review_direct: "Direct Google 5-Star Review QR"
+      }
+      defaultTitle = reviewTitleMap[type] || "Google Reviews QR Code"
+    } else {
+      // ─── Loyalty VIP WhatsApp Check-in QR ───────────────────
+      // normalizePhone: last-line-of-defense — always ensures 91XXXXXXXXXX format
+      const merchantPhone = normalizePhone(merchant.whatsappPhone)
+      if (!merchantPhone) return err("Merchant WhatsApp number not configured. Please configure WhatsApp number first.", 400)
+
+      let digitalCard = merchant.digitalBusinessCard
+      if (!digitalCard && (type === "counter" || type === "card" || type === "complete")) {
+        digitalCard = await getOrCreateDigitalBusinessCard(merchant.id)
+      }
+
+      if (digitalCard && (type === "counter" || type === "card" || type === "complete")) {
+        const host = req.headers.get("host") || "localhost:3000"
+        const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https"
+        targetUrl = `${protocol}://${host}/c/${digitalCard.slug}`
+      } else {
+        const bizName = merchant.name || "our store"
+        const joinText = `Hi ${bizName}! Checking in for my VIP Club stamps 🎁`
+        targetUrl = `https://wa.me/${merchantPhone}?text=${encodeURIComponent(joinText)}`
+      }
+
+      const loyaltyTitleMap: Record<string, string> = {
+        counter: "VIP Loyalty Counter QR Stand",
+        table: "Table VIP Stamp QR Code",
+        poster: "Store Window VIP Loyalty Poster",
+        sticker: "VIP Packaging Sticker QR",
+        cake_box: "Cake Box Seal VIP QR"
+      }
+      defaultTitle = loyaltyTitleMap[type] || "VIP Loyalty QR Code"
     }
 
+    // Generate QR Code with Merchant Business Logo in Center (or CustomerPilot fallback)
+    const qrDataUrl = await generateBrandedQRDataUrl(targetUrl, {
+      width: 600,
+      darkColor: mode === "reviews" || type.startsWith("review_") ? "#0f172a" : "#1e1b4b",
+      lightColor: "#ffffff",
+      merchantLogoUrl: merchant.logoUrl || null
+    })
+
     return ok({
+      mode: mode === "reviews" || type.startsWith("review_") ? "reviews" : "loyalty",
       type,
-      title: titleMap[type] || "Store QR Code",
+      title: defaultTitle,
       qrDataUrl,
       targetUrl,
       merchant: {
         name: merchant.name,
         logoUrl: merchant.logoUrl,
-        category: merchant.category
+        businessType: merchant.businessType,
+        category: merchant.category,
+        city: (merchant as any).city || null,
+        googleReviewUrl: merchant.merchantGoogleConnections?.googleReviewUrl || (merchant as any).googleReviewLink || null,
+        googlePlaceName: merchant.merchantGoogleConnections?.placeName || null,
       }
     })
   } catch (error: any) {

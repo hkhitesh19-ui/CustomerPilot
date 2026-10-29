@@ -24,9 +24,15 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# local env files
+# local env & secrets files
 .env
+.env*
 .env*.local
+.env.production
+.env.cakeconnection.production
+CREDENTIALS_AND_SECRETS_VAULT*.md
+*.bundle
+*.tar.gz
 
 # vercel
 .vercel
@@ -38,3 +44,24 @@ cloudflared.exe
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+prisma/prod_*.db*
+*.db-shm
+*.db-wal
+
+# local antigravity agent tools & extensions
+antigravity_extensions/
+.agent/
+scripts/*.png
+
+scratch/
+playwright-report/
+test-results/
+
+# SQLite Databases & Backups (NEVER commit live/dev databases or PII)
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+prisma/*.db*
+prisma/backups/*.db*
+prisma/db/*.db*

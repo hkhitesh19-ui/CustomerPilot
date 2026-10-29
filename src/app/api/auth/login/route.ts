@@ -3,11 +3,8 @@ import { db } from '@/lib/db';
 import { SignJWT } from 'jose';
 import bcrypt from 'bcryptjs';
 import { applyLoginRateLimit } from '@/lib/rate-limiter';
+import { getJwtSecret } from '@/lib/jwt-secret';
 
-if (!process.env.JWT_SECRET) {
-  throw new Error('FATAL: JWT_SECRET environment variable is not set');
-}
-const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(req: Request) {
   // Rate limit: max 5 login attempts per IP per 5 minutes
@@ -68,7 +65,7 @@ export async function POST(req: Request) {
     }
 
     // 4. Sign JWT
-    const secret = new TextEncoder().encode(JWT_SECRET);
+    const secret = new TextEncoder().encode(getJwtSecret());
     const token = await new SignJWT({ 
       userId: user.id, 
       merchantId: merchant?.id || 'admin_merchant',
@@ -79,10 +76,15 @@ export async function POST(req: Request) {
       .setExpirationTime('7d')
       .sign(secret);
 
-    // Determine redirect based on user role
-    const redirectTo = user.role === 'super_admin'
-      ? '/super-admin'
-      : (merchant?.onboardingCompleted ? '/dashboard' : `/onboarding?step=${merchant?.currentStep || 1}`);
+    // Determine redirect based on user role and module
+    let redirectTo = '/dashboard';
+    if (user.role === 'super_admin') {
+      redirectTo = '/super-admin';
+    } else if (!merchant?.onboardingCompleted) {
+      redirectTo = `/onboarding?step=${merchant?.currentStep || 1}`;
+    } else if (merchant?.enabledModules === 'REVIEWS' || merchant?.enabledModules === 'AUTOREPLY') {
+      redirectTo = '/dashboard/reviews';
+    }
 
     const response = NextResponse.json({ 
       success: true, 

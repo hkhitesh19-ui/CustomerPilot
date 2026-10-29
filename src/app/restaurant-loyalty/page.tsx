@@ -2,22 +2,24 @@ import type { Metadata } from "next"
 import { RestaurantLoyaltyClient } from "@/components/restaurant-loyalty-client"
 
 export const metadata: Metadata = {
-  title: "Restaurant Loyalty Program & Table Standee QR Retention — CustomerPilot",
-  description: "Convert dining guests into weekly repeat customers with table QR standees, visit-based VIP multiplier tiers, and 5-second cashier claim terminals.",
+  title: "Restaurant Loyalty Program WhatsApp & Google Review Automation — CustomerPilot",
+  description: "Eliminate 25% Zomato/Swiggy commissions, own 100% customer data, and convert dine-in guests into repeat buyers with table QR codes and automated 5-star Google reviews.",
   keywords: [
-    "Restaurant Loyalty Program",
-    "Table QR Standee Loyalty",
-    "Restaurant Customer Retention",
-    "Diner Rewards WhatsApp",
-    "Restaurant CRM India",
+    "google review automation for restaurant in india",
+    "whatsapp loyalty program for punjabi gujarati restaurant",
+    "how to increase repeat customers in restaurant without app",
+    "customer retention software for south indian kathiyawadi restaurant",
+    "restaurant customer retention software india",
+    "table qr code loyalty",
+    "diner rewards whatsapp"
   ],
   alternates: {
     canonical: "/restaurant-loyalty",
   },
   openGraph: {
-    title: "CustomerPilot for Restaurants — Table QR & VIP Tier Loyalty",
-    description: "Bring diners back weekly with table standee QRs, visit multipliers, and 5-second cashier claim terminals.",
-    url: "https://customerpilot.ai/restaurant-loyalty",
+    title: "Restaurant WhatsApp Loyalty & Google Review Automation — CustomerPilot",
+    description: "Convert walk-in diners into repeat customers with digital WhatsApp stamp cards and collect 5-star Google reviews post-dining.",
+    url: "https://customerpilot.in/restaurant-loyalty",
   },
 }
 

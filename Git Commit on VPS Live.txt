@@ -1,0 +1,51 @@
+# ==========================================================
+# CUSTOMERPILOT - VPS LIVE DEPLOYMENT TRACKER
+# ==========================================================
+# This file records the active Git commit currently running
+# live on the Hostinger Production VPS (187.127.170.36).
+# Rule: Update this file every time a VPS deployment is executed!
+# ==========================================================
+
+Current Live Commit Details:
+----------------------------------------------------------
+Active Git Commit : 321d3ac
+Full Commit Hash  : 321d3ace63b392a2a70cb6daec513bc75df69145
+Target Fix Commit : 321d3ace63b392a2a70cb6daec513bc75df69145
+Branch Name       : feature/gbp-service-tracks-20261020
+Deployment Date   : 26 Oct 2026, 11:45 PM IST
+Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
+Commit Title      : fix(gbp): sanitize store name and scale font size on gbp post card
+Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
+PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
+Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
+Merchant Status   : Vinayak Fashion & Cake Connection Live
+GBP Rank-1 Agent  : CustomerPilot Autonomous GBP Rank-1 Optimization Engine Live on /api/gbp/agent (Deterministic local generator + Gemini AI cascade, Clean Locality 'Manjalpur' & Title 'Cake Connection')
+GBP Service Tracks: Track A (New Profile Sandbox) & Track B (Top 3 Rank Accelerator) Active with 16 Operational Checklist Tasks & Zero-Touch Weekly 3-Post Engine (Advance Approval & Instant Regenerate)
+GBP Post Cards    : Clean Brand Store Title & Scaled Font Size Live on /api/gbp/posts/card (1200x900 Branded SVG/PNG Graphic)
+GBP 10-Day Sprint : Active on /dashboard/gbp-status with 4 Levers (Competitor Purge, Review Velocity, Directions CTR, Profile Saturation)
+GBP Agency Access : 1-Click Manager Access widget live on /dashboard/settings for CustomerPilot1@gmail.com
+GBP Live Post     : Cake Connection Friday 23 Oct 2026 Post Live on Maps (Belgian Chocolate Truffle, 100% Eggless, WhatsApp 1-Click Order)
+Standee Status    : Standee Studio Live with 4 Bespoke Templates (280px QR, 20% Logo Badge, Instant Phone Camera Scannability)
+Trial Isolation   : Verified on VPS (Only selected 1 or 2 modules enabled; card auto-provisioned; direct dashboard redirect; 0 forced onboarding)
+Google Places API : Configured and verified with AIzaSyC1wp... (Active Real-Time Query for Local Pack Competitors)
+Nginx Static Alias: Direct /_next/static/ disk alias active (HTTP 200 chunk delivery)
+Backup Engine     : /root/backup_migration_bundle.sh & /root/restore_migration_bundle.sh (Active)
+Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in (:3001)
+----------------------------------------------------------
+
+Deployment History Log:
+- 26 Oct 2026, 11:45 PM: 321d3ac - fix(gbp): sanitize store name and scale font size on gbp post card
+- 26 Oct 2026, 11:10 PM: 2ad818f - fix(gbp): refine locality and business name address parsing and allow cloudflare CSP
+- 26 Oct 2026, 07:35 PM: 88e1335 - feat(gbp): build autonomous GBP Rank-1 optimization engine and API route
+- 23 Oct 2026, 07:00 AM: 3d429a6 - fix(gbp): allow public access to /api/gbp/posts/card and hydrate authentic merchant details
+- 23 Oct 2026, 06:39 AM: 2532cf9 - feat(settings): streamline 1-click GBP manager access card and eliminate redundant reverse-request button
+- 22 Oct 2026, 04:52 PM: 035e1fe - feat(settings): add live status refresh, agency reverse-request option, and checklist sync to MANAGER_ACCESS
+- 22 Oct 2026, 04:15 PM: 320a875 - feat(settings): add 1-click Google Business Profile Manager access widget for agency CustomerPilot1@gmail.com
+- 22 Oct 2026, 03:30 PM: 00b11ce - feat(gbp): implement 10-day sprint hub, 4-lever ranking engine, and competitor redressal dossier
+- 22 Oct 2026, 11:26 AM: bc70c32 - fix(gbp): connect audit engine to live Google Places API for real competitors and eliminate simulated slop
+- 22 Oct 2026, 10:25 AM: 65953ba - fix(gbp): synchronize standalone db and harden dashboard response shape for live verification
+- 22 Oct 2026, 09:55 AM: cfb398a - feat(gbp): complete cake connection gbp optimization suite, auth-me schema fix and e2e tests
+- 19 Oct 2026, 03:38 PM: dc28d2e - feat(settings): set 15 stamps goal default and move Instagram story reward above next level kickstart bonus
+- 19 Oct 2026, 11:45 AM: e2e2f7b - feat(settings+queue): add branded squircle badges and live referral attribution alert
+- 19 Oct 2026, 09:44 AM: a27f54d - visual bifurcation of settings into elevated cards & emerald status switches
+- 19 Oct 2026, 12:28 AM: 280f510 - Instagram Story Mention reward with 3 interactive radio cards & 2-line Hinglish guidance

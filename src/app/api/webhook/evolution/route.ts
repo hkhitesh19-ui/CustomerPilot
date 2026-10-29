@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { joinQueue } from "@/lib/queue-engine"
+import { getCompiledTemplate } from "@/lib/template-engine"
+import { isOrderTriggerMessage, isOrderStatusInquiry, processIncomingWhatsAppOrder } from "@/lib/order-bot"
 
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 
 /**
  * GAP 1 FIX: sendEvolutionMessage now uses the merchant's DEDICATED instance (CP_M919033304707)
@@ -15,6 +17,10 @@ async function sendEvolutionMessage(
   instanceName: string
 ) {
   try {
+    if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
+      console.error("[Webhook] EVOLUTION_API_URL or EVOLUTION_API_KEY not configured — skipping outbound WhatsApp dispatch")
+      return { ok: false, data: null }
+    }
     const res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
@@ -78,6 +84,21 @@ function extractPersonName(pushName: string | null | undefined): string | null {
   return cleaned
 }
 
+/**
+ * SECURITY FIX: Sanitize inbound WhatsApp text before any DB write or LLM call.
+ * - Trims whitespace
+ * - Limits to 500 characters (prevents oversized payloads)
+ * - Strips dangerous characters that could cause XSS or prompt injection
+ */
+function sanitizeInboundText(raw: string): string {
+  if (!raw || typeof raw !== "string") return ""
+  return raw
+    .trim()
+    .slice(0, 500)
+    .replace(/[<>"'`]/g, "")  // Strip HTML/injection chars
+    .replace(/\0/g, "")        // Strip null bytes
+}
+
 export async function POST(req: NextRequest) {
   try {
     // SECURITY: Validate webhook secret on ALL environments — no dev bypass
@@ -126,38 +147,85 @@ export async function POST(req: NextRequest) {
 
         if (!customerPhone || customerPhone.length < 10) continue
 
-        // Extract message text
-        const text = (
+        // Extract and sanitize message text (SECURITY: sanitize before DB/LLM use)
+        const rawText = (
           msg.message?.conversation ||
           msg.message?.extendedTextMessage?.text ||
           msg.message?.buttonsResponseMessage?.selectedDisplayText ||
           ""
-        ).trim()
+        )
+        const text = sanitizeInboundText(rawText)
 
-        // Extract WhatsApp display name
-        const pushName: string = msg.pushName || msg.key?.pushName || ""
+        // Extract WhatsApp display name (sanitized)
+        const pushName: string = sanitizeInboundText(msg.pushName || msg.key?.pushName || "")
 
         console.log(`[Webhook] 📥 Incoming from: +${customerPhone} (${pushName}) | Text: ${text.substring(0, 80)}`)
 
-        // ── Find merchant by instance name ──────────────────────────────
-        let merchant = await db.merchant.findFirst({
-          where: {
-            OR: [
-              { whatsappInstanceName: webhookInstance },
-              { whatsappPhone: webhookInstance.replace("CP_M", "") }
-            ]
-          }
-        })
-        if (!merchant) {
-          merchant = await db.merchant.findFirst({ orderBy: { createdAt: "asc" } })
+        // ── Find merchant by instance name or phone (Prioritized matching) ─────────
+        const phoneMatch = webhookInstance.match(/CP_(\d+)/)
+        const instancePhone = phoneMatch ? phoneMatch[1] : ""
+        const mIdMatch = webhookInstance.match(/CP_\d+_([a-z0-9]+)/)
+        const instanceMerchantPrefix = mIdMatch ? mIdMatch[1] : ""
+        const genericAdminNumber = (process.env.EVOLUTION_ADMIN_NUMBER || "919033304707").replace(/\D/g, "")
+
+        let merchant: import("@prisma/client").Merchant | null = null
+
+        // 1. Exact match on active whatsappInstanceName
+        if (webhookInstance) {
+          merchant = await db.merchant.findFirst({
+            where: { whatsappInstanceName: webhookInstance }
+          })
         }
+
+        // 2. Strict match by merchant ID prefix from instance string (e.g. CP_xxx_cmvaruyb_xxx)
+        if (!merchant && instanceMerchantPrefix && instanceMerchantPrefix !== "anon" && instanceMerchantPrefix.length >= 6) {
+          merchant = await db.merchant.findFirst({
+            where: { id: { startsWith: instanceMerchantPrefix } }
+          })
+        }
+
+        // 3. Match by instancePhone ONLY if it is not the shared generic admin number
+        if (!merchant && instancePhone && instancePhone !== genericAdminNumber) {
+          merchant = await db.merchant.findFirst({
+            where: { whatsappPhone: instancePhone }
+          })
+        }
+
+        // 4. Match legacy CP_M format if applicable
+        if (!merchant && webhookInstance.startsWith("CP_M")) {
+          const rawPhone = webhookInstance.replace("CP_M", "")
+          if (rawPhone && rawPhone !== genericAdminNumber) {
+            merchant = await db.merchant.findFirst({
+              where: { whatsappPhone: rawPhone }
+            })
+          }
+        }
+
         if (!merchant) {
-          console.warn("[Webhook] ⚠️ No merchant found in DB")
+          console.warn(`[Webhook] ⚠️ No merchant resolved for instance: "${webhookInstance}". Dropping message to prevent cross-merchant contamination.`)
           continue
         }
 
-        // Use merchant's dedicated Evolution instance
-        const merchantInstance = merchant.whatsappInstanceName || webhookInstance
+        // Auto-sync instance name in merchant DB if different
+        if (webhookInstance && merchant.whatsappInstanceName !== webhookInstance) {
+          db.merchant.update({
+            where: { id: merchant.id },
+            data: { whatsappInstanceName: webhookInstance }
+          }).catch(() => {})
+        }
+
+        // ── Subscription Gatekeeper ───────────────────────────────────────
+        if (merchant.trialEndsAt && new Date(merchant.trialEndsAt) < new Date()) {
+          console.warn(`[Webhook] 🚫 Merchant ${merchant.id} subscription expired. Dropping message.`);
+          continue;
+        }
+
+        // Use incoming instance directly to ensure reply is dispatched from the exact connected socket
+        const merchantInstance = webhookInstance || merchant.whatsappInstanceName || ""
+        if (!merchantInstance) {
+          console.warn("[Webhook] ⚠️ No active WhatsApp instance configured. Skipping outbound response.");
+          continue;
+        }
 
         // ── Idempotency check ───────────────────────────────────────────
         const existing = await db.whatsAppMessage.findFirst({
@@ -185,52 +253,72 @@ export async function POST(req: NextRequest) {
         const existingCustomer = await db.customer.findFirst({
           where: {
             merchantId: merchant.id,
-            phone: { contains: last10Phone }
+            phone: { contains: last10Phone },
+            deletedAt: null  // Ignore soft-deleted customers
           }
         })
 
-        const isTriggerMsg = /vip\s*club|checking\s*in|stamps?|join|reward|counter/i.test(text)
+        // STRICT MATCH: Only trigger auto-onboarding if the text strictly matches the QR Code generated text
+        const isTriggerMsg = /Checking in for my VIP Club stamps/i.test(text)
 
-        // Determine public base URL from request headers (Pinggy / Tunnel support for mobile links)
+        // Determine public base URL — Priority: env NEXT_PUBLIC_APP_URL > x-forwarded-host
+        // autoPinggySync.js keeps NEXT_PUBLIC_APP_URL always in sync with current Pinggy session
         const requestHost = req.headers.get("x-forwarded-host") || req.headers.get("host")
         const requestProto = req.headers.get("x-forwarded-proto") || "https"
-        const publicBaseUrl = (requestHost && !requestHost.includes("localhost"))
-          ? `${requestProto}://${requestHost}`
-          : (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000")
+        const publicBaseUrl = process.env.NEXT_PUBLIC_APP_URL
+          || ((requestHost && !requestHost.includes("localhost"))
+            ? `${requestProto}://${requestHost}`
+            : "http://localhost:3000")
 
         // ── 1. CONTEXT AWARE REPLIES (Review & Name) ──────────────────────
         if (!isTriggerMsg && existingCustomer && text.length > 0 && text.length < 50) {
-          const lastSentMsg = await db.whatsAppMessage.findFirst({
-            where: {
-              merchantId: merchant.id,
-              toPhone: { contains: last10Phone },
-              status: { in: ["sent", "delivered", "read"] }
-            },
-            orderBy: { createdAt: "desc" }
-          })
+          let botState = existingCustomer.botState || "IDLE";
+          
+          // Handle 24-hour state expiration
+          if (existingCustomer.botStateUpdatedAt) {
+            const hoursSinceUpdate = (new Date().getTime() - new Date(existingCustomer.botStateUpdatedAt).getTime()) / (1000 * 60 * 60);
+            if (hoursSinceUpdate > 24 && botState !== "IDLE") {
+              botState = "IDLE";
+              // Non-blocking state reset
+              db.customer.update({ where: { id: existingCustomer.id }, data: { botState: "IDLE" } }).catch(()=>{});
+            }
+          }
 
-          if (lastSentMsg) {
+          if (botState !== "IDLE") {
             const cleanText = text.trim().toLowerCase()
-            const isAffirmative = ["yes", "y", "sure", "yeah", "ok", "yes please", "yes!"].includes(cleanText) || cleanText.includes("yes")
+            const isAffirmative = ["yes", "y", "sure", "yeah", "ok", "okay", "yep", "yes please", "yes!"].includes(cleanText) || cleanText.includes("yes")
 
             // A. Google Review Flow
-            if (lastSentMsg.template === "review_request" && isAffirmative) {
-               console.log(`[Webhook] Google Review AI Draft triggered for ${customerPhone}`)
-               const reviewUrl = `${publicBaseUrl}/review?c=${existingCustomer.id}&m=${merchant.id}`
-               const draftMsg = `Awesome! 🌟 Here is a draft review prepared by AI:\n\n*"The cake was fresh, beautiful, and absolutely delicious. Highly recommended!"*\n\nTap the link below to Edit or Post it on Google:\n${reviewUrl}`
+            if (botState === "AWAITING_REVIEW_CONSENT") {
+               // Reset state immediately
+               await db.customer.update({ where: { id: existingCustomer.id }, data: { botState: "IDLE" } })
                
-               const res = await sendEvolutionMessage(customerPhone, draftMsg, merchantInstance)
-               if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "REVIEW_DRAFT", draftMsg, res.data?.key?.id)
-               continue
+               if (isAffirmative) {
+                 console.log(`[Webhook] Google Review AI Draft triggered for ${customerPhone}`)
+                 const reviewUrl = `${publicBaseUrl}/review?c=${existingCustomer.id}&m=${merchant.id}`
+                 const draftMsg = await getCompiledTemplate(merchant.id, "REVIEW_DRAFT", { reviewUrl })
+                 
+                 const res = await sendEvolutionMessage(customerPhone, draftMsg, merchantInstance)
+                 if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "REVIEW_DRAFT", draftMsg, res.data?.key?.id)
+                 continue
+               }
             }
 
             // B. Name Confirmation Flow
-            if (lastSentMsg.template === "qr_welcome") {
+            if (botState === "AWAITING_NAME_CONFIRMATION") {
+               // Reset state immediately
+               await db.customer.update({ where: { id: existingCustomer.id }, data: { botState: "IDLE" } })
+
                let nameGuess = text
                if (isAffirmative) {
                   nameGuess = existingCustomer.name || extractPersonName(pushName) || "VIP Member"
                } else {
                   nameGuess = text.split(" ").slice(0, 2).join(" ")
+                  // Ignore common non-name conversational words
+                  const genericWords = ["hi", "hello", "hey", "thanks", "thank you", "no", "what", "how", "please", "sir", "madam", "okay", "ok", "yep"]
+                  if (genericWords.includes(nameGuess.toLowerCase())) {
+                     nameGuess = extractPersonName(pushName) || "VIP Member"
+                  }
                }
 
                await db.customer.update({
@@ -239,11 +327,97 @@ export async function POST(req: NextRequest) {
                })
                console.log(`[Webhook] ✏️ Name captured for ${customerPhone}: "${nameGuess}"`)
 
-               const nameConfirmMsg = `✅ *Got it! Welcome, ${nameGuess}!* 🎉\n\nYour FREE VIP Membership is now active at *${merchant.name}*.\n\nYou're in the queue. Our team will add your first stamp after billing. 🌟`
-               const res = await sendEvolutionMessage(customerPhone, nameConfirmMsg, merchantInstance)
-               if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "NAME_CONFIRMED", nameConfirmMsg, res.data?.key?.id)
-               continue
+                const walletUrl = `${publicBaseUrl}/q/wallet/${existingCustomer.id}`
+                const nameConfirmMsg = await getCompiledTemplate(merchant.id, "NAME_CONFIRMED", {
+                  customerName: nameGuess,
+                  merchantName: merchant.name || "our store",
+                  walletUrl
+                })
+                const finalNameConfirmMsg = nameConfirmMsg.includes(walletUrl) 
+                  ? nameConfirmMsg 
+                  : `${nameConfirmMsg}\n\n📱 *Your Digital VIP Card:*\n${walletUrl}`
+
+                const res = await sendEvolutionMessage(customerPhone, finalNameConfirmMsg, merchantInstance)
+                if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "NAME_CONFIRMED", finalNameConfirmMsg, res.data?.key?.id)
+                continue
             }
+          }
+        }
+
+        // ── 1.5 SMART INQUIRY: Wallet & Stamp Balance Keywords ────────────
+        const lowerText = text.trim().toLowerCase();
+        const isWalletInquiry = [
+          "wallet", "stamp", "stamps", "balance", "card", "points", "status", 
+          "my stamps", "check stamps", "rewards", "passbook", "score"
+        ].some(kw => lowerText === kw || lowerText.includes(kw));
+
+        if (!isTriggerMsg && existingCustomer && isWalletInquiry) {
+          const activeCard = await db.customerStampCard.findFirst({
+            where: { customerId: existingCustomer.id, completed: false, redeemed: false },
+            include: { stampCard: true },
+            orderBy: { createdAt: "desc" }
+          });
+          const rule = activeCard?.stampCard || await db.stampCard.findFirst({ where: { merchantId: merchant.id, active: true } });
+          const collected = activeCard?.stampsCollected ?? existingCustomer.lifetimeStamps ?? 0;
+          const required = rule?.stampsRequired || 10;
+          const remaining = Math.max(0, required - collected);
+          const walletUrl = `${publicBaseUrl}/q/wallet/${existingCustomer.id}`;
+
+          const walletReply = `⭐ *Hi ${existingCustomer.name || "VIP"}!* ❤️\n\n` +
+            `Here is your live VIP Stamp balance at *${merchant.name}*:\n\n` +
+            `📊 *Wallet:* ${collected} / ${required} Stamps\n` +
+            `🎁 *Goal:* ${rule?.rewardName || "FREE Reward"}${remaining === 0 ? " — 🏆 *REWARD READY!*" : ` (${remaining} more stamp(s) needed)`}\n\n` +
+            `📱 *View Your Real-Time Digital Stamp Card:*\n${walletUrl}`;
+
+          console.log(`[Webhook] 💳 Sent real-time wallet link to ${customerPhone}`);
+          const res = await sendEvolutionMessage(customerPhone, walletReply, merchantInstance);
+          if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "WALLET_INQUIRY", walletReply, res.data?.key?.id);
+          continue;
+        }
+
+                // ── 1.6 WHATSAPP ONLINE ORDERING FLOW ────────────────────────────
+        if (isOrderTriggerMessage(text)) {
+          console.log(`[Webhook] 🛒 New Order received from ${customerPhone}`);
+          try {
+            await processIncomingWhatsAppOrder({
+              merchantId: merchant.id,
+              phone: customerPhone,
+              text,
+              waMessageId: msg.key?.id,
+              pushName: extractPersonName(pushName) || undefined,
+            });
+          } catch (orderErr: any) {
+            console.error("[Webhook] ❌ Order processing failed:", orderErr.message);
+          }
+          continue;
+        }
+
+        if (isOrderStatusInquiry(text)) {
+          const latestOrder = await db.order.findFirst({
+            where: { merchantId: merchant.id, customerPhone: customerPhone },
+            orderBy: { createdAt: "desc" },
+            include: { items: { include: { menuItem: true } } },
+          });
+          if (latestOrder) {
+            const statusMap: Record<string, string> = {
+              PENDING: "⏳ PENDING (Store verify kar raha hai)",
+              CONFIRMED: "✅ CONFIRMED (Kitchen me accept ho gaya)",
+              PREPARING: "🍳 PREPARING (Ban raha hai)",
+              READY: "🎁 READY (Collect karne ke liye ready hai)",
+              DELIVERED: "🎉 DELIVERED (Complete ho gaya)",
+              CANCELLED: `❌ CANCELLED (${latestOrder.cancelReason || "Store dwara cancel"})`,
+            };
+            const itemsList = latestOrder.items.map(i => `• ${i.menuItem.name} × ${i.quantity}`).join("\n") || "Items";
+            const statusMsg =
+              `📦 *Order Status #${latestOrder.orderNo}*\n\n` +
+              `📊 *Status:* ${statusMap[latestOrder.status] || latestOrder.status}\n` +
+              `💰 *Total:* ₹${latestOrder.totalAmount}\n` +
+              `📦 *Type:* ${latestOrder.deliveryType === "delivery" ? "Home Delivery" : "Self Pickup"}\n\n` +
+              `📋 *Items:*\n${itemsList}\n\n` +
+              `Koi aur sawaal ho to batayein! ❤️`;
+            const res = await sendEvolutionMessage(customerPhone, statusMsg, merchantInstance);
+            if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "ORDER_STATUS", statusMsg, res.data?.key?.id);
+            continue;
           }
         }
 
@@ -265,7 +439,9 @@ export async function POST(req: NextRequest) {
 
         if (alreadyWaiting) {
           console.log(`[Webhook] Customer ${customerPhone} already in queue`)
-          const alreadyMsg = `👋 You're already in the queue at *${merchant.name}*!\n\nPlease wait — our team will serve you shortly. 🙏`
+          const alreadyMsg = await getCompiledTemplate(merchant.id, "QUEUE_DUPLICATE", {
+            merchantName: merchant.name || "our store"
+          })
           const res = await sendEvolutionMessage(customerPhone, alreadyMsg, merchantInstance)
           if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "QUEUE_DUPLICATE", alreadyMsg, res.data?.key?.id)
           continue
@@ -277,9 +453,13 @@ export async function POST(req: NextRequest) {
 
         // ── JOIN: Add customer to Live Queue (Only for QR Code Scans) ────
         try {
+          // GAP 5 FIX: Smart name detection from pushName
+          const detectedName = extractPersonName(pushName)
+
           const result = await joinQueue({
             merchantId: merchant.id,
             phone: customerPhone,
+            name: detectedName || undefined,
             scanSource: scanType
           })
 
@@ -293,22 +473,33 @@ export async function POST(req: NextRequest) {
           const stampsRequired = stampCard?.stampsRequired || 10
           const stampValue = stampCard?.stampValue || 500
 
-          // GAP 5 FIX: Smart name detection from pushName
-          const detectedName = extractPersonName(pushName)
-
           let welcomeMsg: string
 
           if (result.isNewCustomer) {
             if (detectedName) {
               // CASE A from Requirements.txt: Display name detected — confirm it
-              welcomeMsg = `🎉 *You're invited to join the ${bizName} VIP Club.*\n\nIt's completely FREE and takes less than 10 seconds. Thank you for visiting us! 🙏\n\n*How it works:*\n⭐ Every ₹${stampValue} purchase = 1 Stamp\n🎁 Collect ${stampsRequired} Stamps → Claim *${rewardName}*\n🌟 Leave a Google Review → Earn Bonus Stamps!\n\nIs your name *${detectedName}*?\n\nReply *YES* to confirm, or type your name below:`
+              welcomeMsg = await getCompiledTemplate(merchant.id, "QR_WELCOME_NEW_DETECTED", {
+                businessName: bizName,
+                rewardPoints: stampValue,
+                requiredStamp: stampsRequired,
+                rewardName,
+                detectedName
+              })
             } else {
               // CASE B from Requirements.txt: No usable name — ask for it
-              welcomeMsg = `🎉 *You're invited to join the ${bizName} VIP Club.*\n\nIt's completely FREE and takes less than 10 seconds. Thank you for visiting us! 🙏\n\n*How it works:*\n⭐ Every ₹${stampValue} purchase = 1 Stamp\n🎁 Collect ${stampsRequired} Stamps → Claim *${rewardName}*\n🌟 Leave a Google Review → Earn Bonus Stamps!\n\nBefore we activate your FREE VIP Membership, *please share your name.*\n\nReply with your name (e.g. Rahul):`
+              welcomeMsg = await getCompiledTemplate(merchant.id, "QR_WELCOME_NEW_UNKNOWN", {
+                businessName: bizName,
+                rewardPoints: stampValue,
+                requiredStamp: stampsRequired,
+                rewardName
+              })
             }
           } else {
             const customerName = existingCustomer?.name || "there"
-            welcomeMsg = `👋 Welcome back, *${customerName}*! ❤️\n\nYou're in the queue at *${bizName}*.\n\nOur team will add your stamps after billing. Thank you for being a loyal VIP member! 🌟`
+            welcomeMsg = await getCompiledTemplate(merchant.id, "QR_WELCOME_RETURNING", {
+              customerName,
+              businessName: bizName
+            })
           }
 
           // GAP 1 FIX: Send via MERCHANT'S dedicated instance (not hardcoded default)
@@ -386,6 +577,13 @@ export async function POST(req: NextRequest) {
             ]
           },
           data: { status: "active" }
+        }).catch(() => {})
+      } else if (state === "close" && instanceName) {
+        console.warn(`[Webhook] ⚠️ WhatsApp connection closed for ${instanceName}`)
+        // Clean up disconnected instance reference so UI and APIs immediately reflect disconnected state
+        await db.merchant.updateMany({
+          where: { whatsappInstanceName: instanceName },
+          data: { whatsappInstanceName: null }
         }).catch(() => {})
       }
     }

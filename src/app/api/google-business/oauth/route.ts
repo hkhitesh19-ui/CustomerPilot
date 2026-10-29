@@ -7,15 +7,18 @@ export async function GET(req: Request) {
     const merchantId = url.searchParams.get("merchantId") || "cms97ihsr0002w0ykccl3xvqy";
     const mode = url.searchParams.get("mode"); // "instant" or "oauth"
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const host = req.headers.get("host") || "localhost:3000";
+    const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https";
+    const appUrl = `${protocol}://${host}`;
     const redirectUri = `${appUrl}/api/google-business/oauth/callback`;
     const clientId = process.env.GOOGLE_CLIENT_ID;
 
     const merchant = await db.merchant.findUnique({ where: { id: merchantId } });
-    const businessName = merchant?.name?.trim() || "Cake Connection";
-    const businessAddress = merchant?.address?.trim() || "Shop 4, Anand-Vidyanagar Road, Anand, Gujarat";
-    const placeId = "ChIJc7ija2zFXzkR8DbOxXEfaM4";
-    const googleReviewUrl = (merchant as any)?.googleReviewLink || "https://g.page/r/CfA2zsVxH2jOEBM/review";
+    const isCakeConnection = (merchant?.name || "").toLowerCase().includes("cake connection");
+    const businessName = merchant?.name?.trim() || "Store Location";
+    const businessAddress = merchant?.address?.trim() || "Store Address";
+    const placeId = isCakeConnection ? "ChIJc7ija2zFXzkR8DbOxXEfaM4" : (merchant?.googleReviewLink ? `loc_${merchantId}` : "");
+    const googleReviewUrl = (merchant as any)?.googleReviewLink || (isCakeConnection ? "https://g.page/r/CfA2zsVxH2jOEBM/review" : "");
 
     // If instant sandbox connect requested or no client id:
     if (mode === "instant" || !clientId) {
@@ -58,30 +61,36 @@ export async function GET(req: Request) {
         data: { googleReviewLink: googleReviewUrl }
       }).catch(() => {});
 
-      return NextResponse.redirect(`${appUrl}/onboarding?step=3&google_connected=true`);
+      return NextResponse.redirect(`${appUrl}/dashboard/settings?google_connected=true`);
     }
 
     // Official Google OAuth Flow:
     const scopes = [
-      "https://www.googleapis.com/auth/business.manage",
-      "https://www.googleapis.com/auth/userinfo.profile",
-      "https://www.googleapis.com/auth/userinfo.email"
+      "openid",
+      "email",
+      "profile",
+      "https://www.googleapis.com/auth/business.manage"
     ].join(" ");
 
     const state = merchantId;
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `client_id=${encodeURIComponent(clientId)}&` +
-      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-      `response_type=code&` +
-      `scope=${encodeURIComponent(scopes)}&` +
-      `access_type=offline&` +
-      `prompt=consent&` +
-      `state=${encodeURIComponent(state)}`;
+
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: "code",
+      scope: scopes,
+      access_type: "offline",
+      prompt: "consent select_account",
+      state: state,
+    });
+
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 
     return NextResponse.redirect(authUrl);
   } catch (error: any) {
     console.error("[Google OAuth] Error:", error);
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    return NextResponse.redirect(`${appUrl}/onboarding?step=3&error=auth_error`);
+    const host = req.headers.get("host") || "localhost:3000";
+    const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https";
+    return NextResponse.redirect(`${protocol}://${host}/dashboard/settings?error=auth_error`);
   }
 }

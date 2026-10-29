@@ -6,15 +6,16 @@
 // Requires JWT cookie (set by /signup or /login)
 // ============================================================
 
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect, useRef, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import QRCode from "qrcode"
+import { createBrandedClientQR } from "@/lib/client-branded-qr"
 import {
   Store, MessageSquare, Search, Upload, Gift, QrCode as QrIcon, Zap,
   Check, ArrowRight, ArrowLeft, Loader2, UserCheck,
   Printer, AlertCircle, CircleDot, Star, Rocket, X, Shield, Sparkles,
-  CheckCircle2, ExternalLink, MapPin, Copy, Globe, Building2, RefreshCw,
+  CheckCircle2, ExternalLink, MapPin, Copy, Globe, Building2, RefreshCw, Clock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,6 +23,9 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { hasModule, type Module } from "@/lib/feature-gate"
+import { getRecommendedCampaign, getIndustryLoyaltyRule } from "@/lib/industry-campaigns"
+import { ImpersonationBanner } from "@/components/impersonation-banner"
 
 // ─── Types ────────────────────────────────────────────────────
 interface WizardData {
@@ -45,6 +49,7 @@ interface WizardData {
   cardName: string
   stampsRequired: number
   rewardName: string
+  stampValue?: number
   cardColor: string
   qrGenerated: boolean
   qrDataUrl: string
@@ -55,16 +60,24 @@ interface WizardData {
   testStampsAwarded: number
 }
 
-const stepKeys = [
-  "business_info",
-  "whatsapp_verify",
-  "google_business",
-  "logo_upload",
-  "reward_setup",
-  "qr_code",
-  "print_standee",
-  "system_test",
+const ALL_STEPS = [
+  { stepKey: "business_info",   requiredModules: [] as Module[] },
+  { stepKey: "whatsapp_verify", requiredModules: ["LOYALTY", "REVIEWS"] as Module[] },
+  { stepKey: "google_business", requiredModules: ["REVIEWS", "AUTOREPLY"] as Module[] },
+  { stepKey: "logo_upload",     requiredModules: ["LOYALTY"] as Module[] },
+  { stepKey: "reward_setup",    requiredModules: ["LOYALTY"] as Module[] },
+  { stepKey: "qr_code",         requiredModules: ["LOYALTY"] as Module[] },
+  { stepKey: "print_standee",   requiredModules: ["LOYALTY"] as Module[] },
+  { stepKey: "system_test",     requiredModules: ["LOYALTY"] as Module[] },
 ]
+
+function getFilteredStepKeys(enabledModules: string): string[] {
+  return ALL_STEPS
+    .filter(s => s.requiredModules.length === 0 || s.requiredModules.some(m => hasModule({ enabledModules }, m)))
+    .map(s => s.stepKey)
+}
+
+const stepKeys = ALL_STEPS.map(s => s.stepKey)
 
 // ─── Helper: save step to DB ──────────────────────────────────
 async function saveStepProgress(stepKey: string, currentStep: number) {
@@ -143,6 +156,7 @@ function OnboardingPageContent() {
     testCustomerClaimed: false,
     testStampsAwarded: 0,
   })
+  const [merchantModules, setMerchantModules] = useState("LOYALTY,REVIEWS,AUTOREPLY")
 
   // Load merchant data from API
   useEffect(() => {
@@ -167,6 +181,7 @@ function OnboardingPageContent() {
             const gConns = stateJson.data.merchantGoogleConnections || []
             const gConn = gConns[0]
             const isGoogleConnected = gConns.length > 0 || !!m.googleReviewLink
+            const recRule = getIndustryLoyaltyRule(m.businessType || "bakery", m.name)
 
             setData(prev => ({
               ...prev,
@@ -177,15 +192,22 @@ function OnboardingPageContent() {
               businessType: m.businessType || "bakery",
               businessAddress: m.address || "",
               whatsappNumber: m.whatsappPhone || "",
-              cardName: m.name ? `${m.name} VIP Club` : "VIP Club",
+              cardName: m.name ? `${m.name} VIP Club` : recRule.getCardTitle(m.name),
+              stampsRequired: recRule.stampsRequired || 10,
+              rewardName: recRule.rewardName || "500 Free Cake",
+              stampValue: recRule.stampValue || 300,
               logoUploaded: !!m.logoUrl,
               logoDataUrl: m.logoUrl || prev.logoDataUrl,
               googleConnected: isGoogleConnected,
-              googleBusiness: gConn?.placeName || (m.name && !m.name.includes("'s Business") ? m.name : "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"),
-              googlePlaceId: gConn?.placeId || "ChIJc7ija2zFXzkR8DbOxXEfaM4",
-              googleAddress: gConn?.address || m.address || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011",
-              googleReviewUrl: gConn?.googleReviewUrl || m.googleReviewLink || "https://g.page/r/CfA2zsVxH2jOEBM/review",
+              googleBusiness: gConn?.placeName || m.name || prev.businessName || "Store Location",
+              googlePlaceId: gConn?.placeId || (m.googleReviewLink ? "custom_place" : ""),
+              googleAddress: gConn?.address || m.address || prev.businessAddress || "",
+              googleReviewUrl: gConn?.googleReviewUrl || m.googleReviewLink || "",
             }))
+            // Load merchant's enabled modules for conditional step filtering
+            if (m.enabledModules) {
+              setMerchantModules(m.enabledModules)
+            }
           }
         }
       } catch (e) {
@@ -199,24 +221,85 @@ function OnboardingPageContent() {
 
   const activationScore = calculateActivationScore(data)
 
-  const steps = [
-    { num: 1, label: "Business", icon: Store, stepKey: "business_info" },
-    { num: 2, label: "WhatsApp", icon: MessageSquare, stepKey: "whatsapp_verify" },
-    { num: 3, label: "Google", icon: Search, stepKey: "google_business" },
-    { num: 4, label: "Logo", icon: Upload, stepKey: "logo_upload" },
-    { num: 5, label: "Rewards", icon: Gift, stepKey: "reward_setup" },
-    { num: 6, label: "QR Code", icon: QrIcon, stepKey: "qr_code" },
-    { num: 7, label: "Print", icon: Printer, stepKey: "print_standee" },
-    { num: 8, label: "Test", icon: UserCheck, stepKey: "system_test" },
+  // Filter steps based on merchant's enabled modules
+  const filteredStepKeys = getFilteredStepKeys(merchantModules)
+
+  const ALL_STEP_CONFIGS = [
+    { label: "Business", icon: Store, stepKey: "business_info" },
+    { label: "WhatsApp", icon: MessageSquare, stepKey: "whatsapp_verify" },
+    { label: "Google", icon: Search, stepKey: "google_business" },
+    { label: "Logo", icon: Upload, stepKey: "logo_upload" },
+    { label: "Rewards", icon: Gift, stepKey: "reward_setup" },
+    { label: "QR Code", icon: QrIcon, stepKey: "qr_code" },
+    { label: "Print", icon: Printer, stepKey: "print_standee" },
+    { label: "Test", icon: UserCheck, stepKey: "system_test" },
   ]
 
+  const steps = ALL_STEP_CONFIGS
+    .filter(s => filteredStepKeys.includes(s.stepKey))
+    .map((s, i) => ({ ...s, num: i + 1 }))
+
+  const totalSteps = steps.length
+  const currentStepConfig = steps[step - 1]
+  const currentStepKey = currentStepConfig?.stepKey || "business_info"
+
   const next = async () => {
-    if (step < 8) {
+    if (step < totalSteps) {
       // Save current step completion to DB
-      const currentKey = steps[step - 1]?.stepKey
-      if (currentKey) {
-        await saveStepProgress(currentKey, step + 1)
+      if (currentStepKey) {
+        await saveStepProgress(currentStepKey, step + 1)
       }
+
+      // Step-specific saves based on stepKey (not step number)
+      if (currentStepKey === "business_info" && data.merchantId) {
+        try {
+          await fetch("/api/merchant/update", {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "x-merchant-id": data.merchantId,
+            },
+            body: JSON.stringify({
+              name: data.businessName,
+              ownerName: data.ownerName,
+              businessType: data.businessType,
+              address: data.businessAddress,
+            }),
+          })
+        } catch (e) {
+          console.error("Failed to save business info:", e)
+        }
+      }
+
+      // If completing Rewards step, save card setup
+      if (currentStepKey === "reward_setup") {
+        try {
+          const rule = getIndustryLoyaltyRule(data.businessType, data.businessName)
+          await fetch("/api/cards/setup", {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+              "x-merchant-id": data.merchantId 
+            },
+            body: JSON.stringify({
+              name: data.cardName || rule.getCardTitle(data.businessName),
+              stampsRequired: Number(data.stampsRequired) || rule.stampsRequired,
+              rewardName: data.rewardName || rule.rewardName,
+              stampValue: data.stampValue ? Number(data.stampValue) : rule.stampValue,
+              validityDays: rule.validityDays,
+              googleReviewBonus: rule.googleReviewBonus,
+              photoBonus: rule.photoBonus,
+              joiningBonusEnabled: rule.joiningBonusEnabled,
+              joiningBonusStamps: rule.joiningBonusStamps,
+              vipUpgradeBonusStamps: rule.vipUpgradeBonusStamps,
+              color: rule.color,
+            })
+          })
+        } catch (e) {
+          console.error("Failed to save reward card setup:", e)
+        }
+      }
+
       setStep(step + 1)
       setError("")
     }
@@ -225,8 +308,9 @@ function OnboardingPageContent() {
   const back = () => { setStep(step - 1); setError("") }
 
   const handleLaunch = async () => {
-    // Save final step
-    await saveStepProgress("system_test", 8)
+    // Save final step (the last visible step for this merchant's plan)
+    const lastStepKey = steps[steps.length - 1]?.stepKey || "system_test"
+    await saveStepProgress(lastStepKey, totalSteps)
     router.push("/dashboard")
   }
 
@@ -243,6 +327,7 @@ function OnboardingPageContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950">
+      <ImpersonationBanner />
       {/* Top Bar */}
       <div className="sticky top-0 z-30 bg-slate-900/90 border-b border-white/10 backdrop-blur-xl px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -252,7 +337,7 @@ function OnboardingPageContent() {
             </div>
             <div>
               <p className="text-white font-bold text-sm leading-none">CustomerPilot Setup</p>
-              <p className="text-slate-400 text-[10px] mt-0.5">Step {step} of 8 • 7-Day Free Trial</p>
+              <p className="text-slate-400 text-[10px] mt-0.5">Step {step} of 8 • 3-Day Free Trial</p>
             </div>
           </div>
 
@@ -309,7 +394,7 @@ function OnboardingPageContent() {
 
       {/* Step Content */}
       <div className="max-w-4xl mx-auto px-4 pb-24">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-white text-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
@@ -318,14 +403,14 @@ function OnboardingPageContent() {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
             >
-              {step === 1 && <OnboardStep1Business data={data} setData={setData} />}
-              {step === 2 && <OnboardStep2WhatsApp data={data} setData={setData} error={error} setError={setError} />}
-              {step === 3 && <OnboardStep3Google data={data} setData={setData} error={error} setError={setError} nextStep={next} />}
-              {step === 4 && <OnboardStep4Logo data={data} setData={setData} />}
-              {step === 5 && <OnboardStep5Rewards data={data} setData={setData} />}
-              {step === 6 && <OnboardStep6QR data={data} setData={setData} />}
-              {step === 7 && <OnboardStep7Print data={data} setData={setData} />}
-              {step === 8 && <OnboardStep8Test data={data} setData={setData} error={error} setError={setError} />}
+              {currentStepKey === "business_info" && <OnboardStep1Business data={data} setData={setData} />}
+              {currentStepKey === "whatsapp_verify" && <OnboardStep2WhatsApp data={data} setData={setData} error={error} setError={setError} />}
+              {currentStepKey === "google_business" && <OnboardStep3Google data={data} setData={setData} error={error} setError={setError} nextStep={next} />}
+              {currentStepKey === "logo_upload" && <OnboardStep4Logo data={data} setData={setData} />}
+              {currentStepKey === "reward_setup" && <OnboardStep5Rewards data={data} setData={setData} />}
+              {currentStepKey === "qr_code" && <OnboardStep6QR data={data} setData={setData} />}
+              {currentStepKey === "print_standee" && <OnboardStep7Print data={data} setData={setData} />}
+              {currentStepKey === "system_test" && <OnboardStep8Test data={data} setData={setData} error={error} setError={setError} />}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -348,7 +433,7 @@ function OnboardingPageContent() {
               </span>
             )}
 
-            {step < 8 ? (
+            {step < totalSteps ? (
               <Button
                 onClick={next}
                 disabled={!canProceedToNext(step, data)}
@@ -385,30 +470,43 @@ function OnboardStep1Business({ data, setData }: any) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl">
         <div>
-          <Label className="text-xs font-semibold">Business Name *</Label>
+          <Label className="text-xs font-bold text-slate-800">Business Name *</Label>
           <Input
             value={data.businessName}
             onChange={e => setData({ ...data, businessName: e.target.value })}
             placeholder="e.g., Cake Connection"
-            className="mt-1 text-sm"
+            className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 font-medium shadow-xs"
           />
         </div>
         <div>
-          <Label className="text-xs font-semibold">Owner Name *</Label>
+          <Label className="text-xs font-bold text-slate-800">Owner Name *</Label>
           <Input
             value={data.ownerName}
             onChange={e => setData({ ...data, ownerName: e.target.value })}
             placeholder="e.g., Hitesh"
-            className="mt-1 text-sm"
+            className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 font-medium shadow-xs"
           />
         </div>
         <div>
-          <Label className="text-xs font-semibold">Business Type</Label>
-          <Select value={data.businessType} onValueChange={v => setData({ ...data, businessType: v })}>
-            <SelectTrigger className="mt-1 text-sm"><SelectValue /></SelectTrigger>
-            <SelectContent>
+          <Label className="text-xs font-bold text-slate-800">Business Type</Label>
+          <Select 
+            value={data.businessType} 
+            onValueChange={v => {
+              const rule = getIndustryLoyaltyRule(v, data.businessName)
+              setData({ 
+                ...data, 
+                businessType: v,
+                cardName: rule.getCardTitle(data.businessName),
+                stampsRequired: rule.stampsRequired,
+                rewardName: rule.rewardName,
+                stampValue: rule.stampValue,
+              })
+            }}
+          >
+            <SelectTrigger className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 font-medium focus:ring-emerald-500 shadow-xs"><SelectValue /></SelectTrigger>
+            <SelectContent className="bg-white text-slate-900 border-slate-200 shadow-xl">
               {[
                 { value: "bakery", label: "Bakery 🥐" },
                 { value: "cafe", label: "Cafe ☕" },
@@ -419,35 +517,35 @@ function OnboardStep1Business({ data, setData }: any) {
                 { value: "clinic", label: "Clinic 🏥" },
                 { value: "other", label: "Other 📦" },
               ].map(t => (
-                <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                <SelectItem key={t.value} value={t.value} className="text-slate-900 hover:bg-slate-100 font-medium">{t.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
         <div>
-          <Label className="text-xs font-semibold">Business Address / City</Label>
+          <Label className="text-xs font-bold text-slate-800">Business Address / City</Label>
           <Input
             value={data.businessAddress}
             onChange={e => setData({ ...data, businessAddress: e.target.value })}
             placeholder="e.g., Vadodara, Gujarat"
-            className="mt-1 text-sm"
+            className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 font-medium shadow-xs"
           />
         </div>
         <div>
-          <Label className="text-xs font-semibold">Business Timing</Label>
+          <Label className="text-xs font-bold text-slate-800">Store WhatsApp Number (for QR stamps & reviews)</Label>
           <Input
-            value={data.businessAddress}
-            onChange={e => setData({ ...data, businessAddress: e.target.value })}
-            placeholder="e.g., 9AM–9PM, Mon–Sat"
-            className="mt-1 text-sm"
+            value={data.whatsappNumber}
+            onChange={e => setData({ ...data, whatsappNumber: e.target.value })}
+            placeholder="e.g., 917203824012"
+            className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 font-medium shadow-xs"
           />
         </div>
         <div>
-          <Label className="text-xs font-semibold">Email (from signup)</Label>
+          <Label className="text-xs font-bold text-slate-800">Email (from signup)</Label>
           <Input
             value={data.email}
             readOnly
-            className="mt-1 text-sm bg-slate-50 text-slate-500"
+            className="mt-1.5 text-sm bg-slate-100 text-slate-700 border-slate-300 font-mono font-medium"
           />
         </div>
       </div>
@@ -464,25 +562,35 @@ function OnboardStep1Business({ data, setData }: any) {
 
 // ─── Step 2: Dynamic Multi-Tenant WhatsApp Pairing ─────────────────────
 function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
+  const TOTAL_SESSION_SECONDS = 600 // 10 minutes
+
   const [loadingQr, setLoadingQr] = useState(false)
   const [qrCodeBase64, setQrCodeBase64] = useState<string | null>(null)
-  const [pairingCode, setPairingCode] = useState<string | null>(null)
   const [connectionStatus, setConnectionStatus] = useState<"connecting" | "open" | "disconnected">("connecting")
   const [instanceName, setInstanceName] = useState<string>("")
-  const [connectMode, setConnectMode] = useState<"qr" | "otp">("qr")
+  const [sessionCountdown, setSessionCountdown] = useState(TOTAL_SESSION_SECONDS)
+  const sessionTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const silentRefreshRef = useRef<NodeJS.Timeout | null>(null)
 
-  // OTP Fallback state
-  const [otp, setOtp] = useState("")
-  const [sendingOtp, setSendingOtp] = useState(false)
-  const [verifying, setVerifying] = useState(false)
-  const [resendTimer, setResendTimer] = useState(0)
-  const [apiResponse, setApiResponse] = useState<any>(null)
+  // Format seconds into MM:SS format (e.g. 09:45)
+  const formatTime = (totalSeconds: number) => {
+    const mins = Math.floor(Math.max(0, totalSeconds) / 60)
+    const secs = Math.max(0, totalSeconds) % 60
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
+  }
 
-  // Fetch fresh QR code (creates new Evolution instance)
-  const fetchInstanceStatus = async () => {
+  // Fetch fresh QR code (creates/resets Evolution instance)
+  const fetchInstanceStatus = async (force: boolean = false) => {
     setLoadingQr(true)
     try {
-      const res = await fetch("/api/whatsapp/connect")
+      const params = new URLSearchParams()
+      if (force) params.append("force", "true")
+      if (data.whatsappNumber) params.append("phone", data.whatsappNumber)
+      if (data.merchantId) params.append("merchantId", data.merchantId)
+
+      const res = await fetch(`/api/whatsapp/connect?${params.toString()}`, {
+        headers: data.merchantId ? { "x-merchant-id": data.merchantId } : {},
+      })
       const json = await res.json()
       if (res.ok && json.ok) {
         setInstanceName(json.instanceName || "")
@@ -492,7 +600,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
         } else {
           setConnectionStatus("connecting")
           if (json.qrCodeBase64) setQrCodeBase64(json.qrCodeBase64)
-          if (json.pairingCode) setPairingCode(json.pairingCode)
+          setSessionCountdown(TOTAL_SESSION_SECONDS) // Reset 10-minute timer
         }
       }
     } catch (e) {
@@ -502,144 +610,149 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
     }
   }
 
-  // Check ONLY connection state (no QR refresh, no instance delete)
-  const checkConnectionState = async () => {
-    try {
-      const res = await fetch("/api/whatsapp/status")
-      const json = await res.json()
-      if (res.ok && json.ok && (json.status === "open" || json.connected)) {
-        setConnectionStatus("open")
-        setData((prev: any) => ({ ...prev, otpVerified: true, whatsappNumber: json.whatsappPhone || prev.whatsappNumber || "Connected" }))
-      }
-    } catch {}
-  }
-
-  // On mount: load QR once. Then poll ONLY connection state every 4s (never auto-refresh QR)
+  // On mount: load QR once. Then poll connection state every 3s
   useEffect(() => {
-    fetchInstanceStatus()
+    fetchInstanceStatus(false)
 
-    // Poll connection state every 4s to detect when user scans — but do NOT refresh QR
     const interval = setInterval(() => {
       if (connectionStatus !== "open") {
-        checkConnectionState()
+        // Simple polling for state if not yet connected
+        const mParam = data.merchantId ? `?merchantId=${encodeURIComponent(data.merchantId)}` : ""
+        fetch(`/api/whatsapp/status${mParam}`, {
+          headers: data.merchantId ? { "x-merchant-id": data.merchantId } : {},
+        })
+          .then(r => r.json())
+          .then(json => {
+             if (json.ok && (json.status === "open" || json.connected)) {
+               setConnectionStatus("open")
+               setData((prev: any) => ({ ...prev, otpVerified: true, whatsappNumber: json.whatsappPhone || prev.whatsappNumber || "Connected" }))
+             }
+          })
+          .catch(() => {})
       }
-    }, 4000)
+    }, 3000)
 
     return () => clearInterval(interval)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [data.merchantId])
 
-  // Once connected, stop polling
+  // 10-Minute Live Session Countdown Timer
   useEffect(() => {
-    // no-op — handled in interval check above
-  }, [connectionStatus])
-
-  // OTP handlers for fallback
-  const sendOtp = async () => {
-    if (!data.whatsappNumber || data.whatsappNumber.length < 10) {
-      setError("Please enter a valid phone number with country code")
+    if (connectionStatus === "open" || !qrCodeBase64) {
+      if (sessionTimerRef.current) clearInterval(sessionTimerRef.current)
       return
     }
-    setSendingOtp(true); setError("")
-    try {
-      const res = await fetch("/api/whatsapp/send-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: data.whatsappNumber }),
-      })
-      const json = await res.json()
-      if (res.ok && json.ok) {
-        setData({ ...data, otpSent: true, otpSessionId: json.data.sessionId, deliveryStatus: json.data.deliveryResult?.status })
-        setApiResponse(json.data)
-        setResendTimer(json.data.resendCooldownSeconds || 10)
-      } else {
-        setError(json.error || "Failed to send OTP")
-      }
-    } catch { setError("Network error.") }
-    finally { setSendingOtp(false) }
-  }
 
-  const verifyOtp = async () => {
-    if (otp.length !== 4) { setError("Please enter the 4-digit OTP"); return }
-    setVerifying(true); setError("")
-    try {
-      const res = await fetch("/api/whatsapp/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: data.otpSessionId, otp }),
+    sessionTimerRef.current = setInterval(() => {
+      setSessionCountdown((prev) => {
+        if (prev <= 1) {
+          if (sessionTimerRef.current) clearInterval(sessionTimerRef.current)
+          if (silentRefreshRef.current) clearInterval(silentRefreshRef.current)
+          return 0
+        }
+        return prev - 1
       })
-      const json = await res.json()
-      if (res.ok && json.ok && json.data.verified) {
-        setData({ ...data, otpVerified: true })
-        setConnectionStatus("open")
-      } else {
-        setError(json.error || json.data?.message || "Invalid OTP")
-      }
-    } catch { setError("Verification failed.") }
-    finally { setVerifying(false) }
-  }
+    }, 1000)
+
+    return () => {
+      if (sessionTimerRef.current) clearInterval(sessionTimerRef.current)
+    }
+  }, [connectionStatus, qrCodeBase64])
+
+  // Automatic Silent Background Refresh every 20 seconds
+  // Keeps Baileys QR code fresh on WhatsApp servers without disturbing the 10-minute timer
+  useEffect(() => {
+    if (connectionStatus === "open" || !qrCodeBase64 || sessionCountdown <= 0) {
+      if (silentRefreshRef.current) clearInterval(silentRefreshRef.current)
+      return
+    }
+
+    silentRefreshRef.current = setInterval(async () => {
+      try {
+        const phoneParam = data.whatsappNumber ? `&phone=${encodeURIComponent(data.whatsappNumber)}` : ""
+        const mParam = data.merchantId ? `&merchantId=${encodeURIComponent(data.merchantId)}` : ""
+        const res = await fetch(`/api/whatsapp/connect?silent=true${phoneParam}${mParam}`, {
+          headers: data.merchantId ? { "x-merchant-id": data.merchantId } : {},
+        })
+        if (res.ok) {
+          const json = await res.json()
+          if (json.status === "open" || json.connected) {
+            setConnectionStatus("open")
+            setData((prev: any) => ({ ...prev, otpVerified: true, whatsappNumber: json.whatsappPhone || prev.whatsappNumber || "Connected" }))
+          } else if (json.qrCodeBase64) {
+            // Silently update the image without reloading the UI
+            setQrCodeBase64(json.qrCodeBase64)
+          }
+        }
+      } catch (e) {}
+    }, 20000)
+
+    return () => {
+      if (silentRefreshRef.current) clearInterval(silentRefreshRef.current)
+    }
+  }, [connectionStatus, qrCodeBase64, sessionCountdown, setData, data.merchantId, data.whatsappNumber])
 
   return (
     <div className="p-6 sm:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
             <MessageSquare className="w-5 h-5 text-emerald-600" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-900">Connect Store WhatsApp</h2>
-            <p className="text-xs text-slate-500">Scan QR Code from your store's WhatsApp (Linked Devices)</p>
+            <p className="text-xs text-slate-500">Scan QR Code with your store's WhatsApp (Linked Devices)</p>
           </div>
         </div>
 
-        {/* Mode Switcher */}
-        <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
-          <button
-            onClick={() => setConnectMode("qr")}
-            className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${connectMode === "qr" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"}`}
-          >
-            📷 Instant QR Scan
-          </button>
-          <button
-            onClick={() => setConnectMode("otp")}
-            className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${connectMode === "otp" ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500"}`}
-          >
-            💬 SMS / OTP Code
-          </button>
-        </div>
       </div>
 
-      {connectMode === "qr" ? (
-        <div className="max-w-xl mx-auto space-y-6">
-          {connectionStatus === "open" || data.otpVerified ? (
-            /* Connected Celebration Card */
-            <div className="p-8 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border-2 border-emerald-300 text-center space-y-4 shadow-xl">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center mx-auto shadow-lg shadow-emerald-200 animate-bounce">
-                <Check className="w-8 h-8 stroke-[3]" />
+      {connectionStatus === "open" || data.otpVerified ? (
+        /* Connected Celebration Card */
+        <div className="max-w-xl mx-auto p-8 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border-2 border-emerald-300 text-center space-y-4 shadow-xl">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center mx-auto shadow-lg shadow-emerald-200 animate-bounce">
+            <Check className="w-8 h-8 stroke-[3]" />
+          </div>
+          <div>
+            <Badge className="bg-emerald-600 text-white px-3 py-1 text-xs mb-2">WhatsApp Connected ✓</Badge>
+            <h3 className="font-extrabold text-2xl text-slate-900">Store WhatsApp Linked!</h3>
+            <p className="text-sm text-slate-600 max-w-md mx-auto mt-1">
+              Your store phone is now linked to CustomerPilot. Automated stamp rewards will be sent directly from your WhatsApp number.
+            </p>
+          </div>
+          {instanceName && (
+            <p className="text-[11px] font-mono text-emerald-700 bg-emerald-100/60 inline-block px-3 py-1 rounded-full">
+              Instance ID: {instanceName}
+            </p>
+          )}
+        </div>
+      ) : (
+        /* QR Code Scan Pairing Interface */
+        <div className="max-w-xl mx-auto space-y-4">
+          {sessionCountdown <= 0 ? (
+            /* Expired view */
+            <div className="p-8 border-2 border-dashed border-slate-300 rounded-2xl text-center space-y-3 bg-slate-50">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
+                <Clock className="w-6 h-6" />
               </div>
-              <div>
-                <Badge className="bg-emerald-600 text-white px-3 py-1 text-xs mb-2">WhatsApp Connected ✓</Badge>
-                <h3 className="font-extrabold text-2xl text-slate-900">Store WhatsApp Linked!</h3>
-                <p className="text-sm text-slate-600 max-w-md mx-auto mt-1">
-                  Your store phone is now linked to CustomerPilot. Automated stamp rewards will be sent directly from your WhatsApp number.
-                </p>
-              </div>
-              {instanceName && (
-                <p className="text-[11px] font-mono text-emerald-700 bg-emerald-100/60 inline-block px-3 py-1 rounded-full">
-                  Instance ID: {instanceName}
-                </p>
-              )}
+              <h4 className="font-bold text-slate-900 text-lg">10-Minute Session Expired</h4>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                The 10-minute linking window expired. Click below to generate a fresh QR code session.
+              </p>
+              <Button onClick={() => fetchInstanceStatus(true)} className="bg-emerald-600 text-white font-bold text-xs">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Generate Fresh 10-Min QR Code
+              </Button>
             </div>
           ) : (
-            /* QR Code Scan Pairing Interface */
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-inner">
               {/* Left Column: QR Display */}
               <div className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border-2 border-emerald-400/60 shadow-lg relative min-h-[260px]">
                 {loadingQr && !qrCodeBase64 ? (
                   <div className="flex flex-col items-center gap-3">
                     <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
-                    <p className="text-xs text-slate-500 font-medium">Creating WhatsApp Instance...</p>
+                    <p className="text-xs text-slate-500 font-medium">Generating Live QR...</p>
                   </div>
                 ) : qrCodeBase64 ? (
                   <div className="text-center space-y-2">
@@ -648,16 +761,16 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
                       alt="WhatsApp Pair QR Code"
                       className="w-52 h-52 object-contain rounded-xl border border-slate-200 shadow-md p-1 bg-white"
                     />
-                    <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-emerald-700 mt-1">
+                    <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-slate-700 bg-emerald-50 py-1 px-2.5 rounded-full border border-emerald-200">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      Ready to scan from WhatsApp
+                      <span>Valid For: <strong className="text-emerald-700 font-mono">{formatTime(sessionCountdown)}</strong></span>
                     </div>
                   </div>
                 ) : (
                   <div className="text-center p-4">
-                    <p className="text-xs text-slate-500 mb-3">Initializing Instance...</p>
-                    <Button onClick={fetchInstanceStatus} size="sm" className="bg-emerald-600 text-white text-xs">
-                      Refresh QR Code ↺
+                    <p className="text-xs text-slate-500 mb-3">Initializing QR Code...</p>
+                    <Button onClick={() => fetchInstanceStatus(true)} size="sm" className="bg-emerald-600 text-white text-xs">
+                      Generate QR Code
                     </Button>
                   </div>
                 )}
@@ -666,8 +779,8 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
               {/* Right Column: 3 Simple Instructions */}
               <div className="space-y-4">
                 <div className="space-y-1">
-                  <h4 className="font-bold text-slate-900 text-base">How to Scan:</h4>
-                  <p className="text-xs text-slate-500">Link your store phone in 10 seconds</p>
+                  <h4 className="font-bold text-slate-900 text-base">How to Scan on Phone:</h4>
+                  <p className="text-xs text-slate-500">You have 10 full minutes to scan</p>
                 </div>
 
                 <div className="space-y-3">
@@ -685,78 +798,26 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
                   </div>
                 </div>
 
-                {pairingCode && pairingCode.length <= 15 && !pairingCode.startsWith("2@") && (
-                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
-                    <p className="text-[11px] text-amber-800 font-semibold mb-1">Pairing Code Option:</p>
-                    <p className="font-mono text-xl font-bold tracking-widest text-slate-900">{pairingCode}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        /* OTP Connect Mode (Fallback) */
-        <div className="space-y-6 max-w-lg mx-auto">
-          {!data.otpVerified ? (
-            <>
-              <div>
-                <Label>WhatsApp Business Number *</Label>
-                <div className="flex gap-2 mt-1">
-                  <Input
-                    value={data.whatsappNumber}
-                    onChange={e => setData({ ...data, whatsappNumber: e.target.value })}
-                    placeholder="e.g., 917203824012"
-                    disabled={data.otpSent}
-                  />
+                <div className="pt-2 border-t border-slate-200 flex items-center gap-2">
                   <Button
-                    onClick={sendOtp}
-                    disabled={data.otpSent || data.whatsappNumber.length < 10 || resendTimer > 0}
-                    className="bg-slate-900 text-white"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => fetchInstanceStatus(true)}
+                    disabled={loadingQr}
+                    className="text-xs text-emerald-700 border-emerald-300 hover:bg-emerald-50"
                   >
-                    {sendingOtp ? <Loader2 className="w-4 h-4 animate-spin" /> : data.otpSent ? "Sent ✓" : "Send OTP"}
+                    <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loadingQr ? "animate-spin" : ""}`} />
+                    Reset 10-Min Session
                   </Button>
                 </div>
               </div>
-
-              {data.otpSent && (
-                <div className="space-y-3">
-                  {apiResponse?.isSameNumber && (
-                    <div className="p-4 bg-amber-50 border border-amber-300 rounded-xl">
-                      <p className="text-sm font-bold text-amber-800 mb-2">⚠️ OTP Code:</p>
-                      <div className="bg-white border-2 border-amber-400 rounded-lg p-3 text-center">
-                        <p className="text-4xl font-mono font-black tracking-[0.5em] text-slate-900">{apiResponse.otp}</p>
-                      </div>
-                    </div>
-                  )}
-                  <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200 space-y-3">
-                    <Label className="text-xs">Enter 4-digit OTP</Label>
-                    <div className="flex gap-2 mt-1">
-                      <Input
-                        value={otp}
-                        onChange={e => setOtp(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                        placeholder="1234"
-                        maxLength={4}
-                        className="font-mono text-center tracking-widest text-lg font-bold"
-                      />
-                      <Button
-                        onClick={verifyOtp}
-                        disabled={verifying || otp.length !== 4}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                      >
-                        {verifying ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify"}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="p-6 bg-emerald-50 rounded-xl border border-emerald-200 text-center space-y-2">
-              <Check className="w-6 h-6 text-emerald-600 mx-auto" />
-              <h3 className="font-bold text-slate-900">WhatsApp Verified!</h3>
             </div>
           )}
+
+          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+            <span>Automatic silent refresh keeps the QR code fresh in the background, giving you 10 full minutes without timeout errors.</span>
+          </div>
         </div>
       )}
     </div>
@@ -765,12 +826,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
 
 // ─── Step 3: Google Business ─────────────────────────────────
 function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
-  const [activeTab, setActiveTab] = useState<"oauth" | "manual">("oauth")
   const [connectingOauth, setConnectingOauth] = useState(false)
-  const [searching, setSearching] = useState(false)
-  const [query, setQuery] = useState(data.businessName || "")
-  const [directUrl, setDirectUrl] = useState(data.googleReviewUrl || "")
-  const [connectingLink, setConnectingLink] = useState(false)
   const [disconnecting, setDisconnecting] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
   
@@ -817,12 +873,12 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
               setData((prev: any) => ({
                 ...prev,
                 googleConnected: true,
-                googleBusiness: conn?.placeName || (m?.name && !m?.name.includes("'s Business") ? m.name : "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"),
-                googlePlaceId: conn?.placeId || "ChIJc7ija2zFXzkR8DbOxXEfaM4",
-                googleCid: conn?.gbpAccountId?.replace("accounts/", "") || "14873172342901454576",
-                googleMapsUri: `https://maps.google.com/?cid=14873172342901454576`,
-                googleReviewUrl: conn?.googleReviewUrl || m?.googleReviewLink || "https://g.page/r/CfA2zsVxH2jOEBM/review",
-                googleAddress: conn?.address || m?.address || prev.businessAddress || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011"
+                googleBusiness: conn?.placeName || m?.name || prev.businessName || "Store Location",
+                googlePlaceId: conn?.placeId || (m?.googleReviewLink ? "custom_place" : ""),
+                googleCid: conn?.gbpAccountId?.replace("accounts/", "") || "",
+                googleMapsUri: conn?.googleReviewUrl || m?.googleReviewLink || "",
+                googleReviewUrl: conn?.googleReviewUrl || m?.googleReviewLink || "",
+                googleAddress: conn?.address || m?.address || prev.businessAddress || ""
               }))
             }
           })
@@ -877,76 +933,6 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
     }
   }
 
-  const handleDirectLink = async () => {
-    if (!directUrl.trim()) { setError("Please enter your Google Review or Google Maps link"); return }
-    let name = data.businessName || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"
-    let placeId = "ChIJc7ija2zFXzkR8DbOxXEfaM4"
-    if (directUrl.includes("ChIJ")) {
-      const match = directUrl.match(/ChIJ[A-Za-z0-9_-]{23}/)
-      if (match) placeId = match[0]
-    }
-    await selectPlace({ 
-      name, 
-      placeId, 
-      address: "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011", 
-      reviewUrl: directUrl.trim(),
-      cid: "14873172342901454576",
-      mapsUri: "https://maps.google.com/?cid=14873172342901454576"
-    })
-  }
-
-  const searchGooglePlaces = async () => {
-    if (!query) return
-    setSearching(true); setError("")
-    try {
-      const res = await fetch(`/api/google/places-search?q=${encodeURIComponent(query)}`)
-      const json = await res.json()
-      if (res.ok && json.ok) {
-        setData((prev: any) => ({ ...prev, googleSearchResults: json.data.results || [] }))
-      } else {
-        setError(json.error || "Search failed")
-      }
-    } catch { setError("Failed to search Google Places") }
-    finally { setSearching(false) }
-  }
-
-  const selectPlace = async (place: any) => {
-    setConnectingLink(true)
-    const reviewUrl = place.reviewUrl || (place.placeId?.startsWith('http') ? place.placeId : `https://search.google.com/local/writereview?placeid=${place.placeId}`)
-    
-    setData((prev: any) => ({
-      ...prev,
-      googleBusiness: place.name || prev.businessName || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara",
-      googlePlaceId: place.placeId || "ChIJc7ija2zFXzkR8DbOxXEfaM4",
-      googleCid: place.cid || "14873172342901454576",
-      googleMapsUri: place.mapsUri || `https://maps.google.com/?cid=14873172342901454576`,
-      googleReviewUrl: reviewUrl || "https://g.page/r/CfA2zsVxH2jOEBM/review",
-      googleAddress: place.address || place.formattedAddress || prev.address || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011",
-      googleConnected: true
-    }))
-
-    try {
-      const merchantId = data.merchantId || "cms97ihsr0002w0ykccl3xvqy"
-      await fetch("/api/google-business/connect", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-merchant-id": merchantId
-        },
-        body: JSON.stringify({
-          placeId: place.placeId || "ChIJc7ija2zFXzkR8DbOxXEfaM4",
-          placeName: place.name || data.businessName || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara",
-          address: place.address || place.formattedAddress || data.address || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011",
-          reviewUrl: reviewUrl
-        })
-      })
-    } catch (err) {
-      console.error("Failed to save Google Connection to DB:", err)
-    } finally {
-      setConnectingLink(false)
-    }
-  }
-
   const disconnectPlace = async () => {
     setDisconnecting(true)
     setError("")
@@ -968,9 +954,7 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
       googleAddress: "",
       googleCid: "",
       googleMapsUri: "",
-      googleSearchResults: []
     }))
-    setActiveTab("oauth")
     setIsPickingLocation(false)
 
     // 3. Delete from backend database
@@ -987,16 +971,16 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
     }
   }
 
-  let rawPlaceName = data.googleBusiness || "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"
+  let rawPlaceName = data.googleBusiness || data.businessName || "Your Store"
   if (rawPlaceName.includes("'s Business")) {
-    rawPlaceName = "Cake Connection-Live Cake : Online Cake Delivery in Vadodara"
+    rawPlaceName = data.businessName || "Your Store"
   }
   const placeName = rawPlaceName.split(/[:;|]/)[0].trim()
-  const storeAddress = data.googleAddress || "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Near EVA Mall Exit Gate, Manjalpur, Vadodara - 390011"
-  const placeId = data.googlePlaceId || "ChIJc7ija2zFXzkR8DbOxXEfaM4"
-  const mapsCid = data.googleCid || "14873172342901454576"
-  const mapsUri = data.googleMapsUri || `https://maps.google.com/?cid=${mapsCid}`
-  const reviewLink = data.googleReviewUrl || "https://g.page/r/CfA2zsVxH2jOEBM/review"
+  const storeAddress = data.googleAddress || data.businessAddress || "Store Address"
+  const placeId = data.googlePlaceId || ""
+  const mapsCid = data.googleCid || ""
+  const mapsUri = data.googleMapsUri || (data.googleReviewUrl ? data.googleReviewUrl : "")
+  const reviewLink = data.googleReviewUrl || ""
 
   return (
     <div className="p-6 sm:p-8">
@@ -1019,131 +1003,54 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
 
       <div className="space-y-6">
         {!data.googleConnected ? (
-          /* Selection Mode */
-          <div className="space-y-4">
-            <div className="flex gap-2 p-1 bg-slate-100 rounded-xl">
-              <Button
-                variant={activeTab === "oauth" ? "default" : "ghost"}
-                className={`flex-1 text-xs font-semibold py-2 rounded-lg ${activeTab === "oauth" ? "bg-white text-slate-800 shadow" : "text-slate-600"}`}
-                onClick={() => setActiveTab("oauth")}
-              >
-                🔐 Google OAuth 2.0 (Official)
-              </Button>
-              <Button
-                variant={activeTab === "manual" ? "default" : "ghost"}
-                className={`flex-1 text-xs font-semibold py-2 rounded-lg ${activeTab === "manual" ? "bg-white text-slate-800 shadow" : "text-slate-600"}`}
-                onClick={() => setActiveTab("manual")}
-              >
-                🔗 Direct Review Link / Maps Search
-              </Button>
+          /* Official Google OAuth 2.0 Connect View */
+          <div className="p-8 border-2 border-dashed border-blue-200 bg-blue-50/30 rounded-2xl text-center space-y-5">
+            <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center mx-auto shadow-md shadow-blue-100">
+              <Star className="w-7 h-7 fill-blue-600" />
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="font-extrabold text-lg text-slate-900">Official Google Business Profile (OAuth)</h3>
+              <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
+                Connect your verified Google Business Profile to auto-sync 5★ reviews, track customer ratings, and trigger instant WhatsApp stamps.
+              </p>
             </div>
 
-            {activeTab === "oauth" ? (
-              <div className="p-6 border-2 border-dashed border-blue-200 bg-blue-50/30 rounded-2xl text-center space-y-4">
-                <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mx-auto">
-                  <Star className="w-6 h-6 fill-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-base text-slate-800">Official Google Business Profile API</h3>
-                  <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
-                    Connect your verified Google Business Profile to auto-sync 5★ reviews, track customer ratings, and trigger instant WhatsApp stamps.
-                  </p>
-                </div>
-                <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                  <Button
-                    onClick={handleOAuthConnect}
-                    disabled={connectingOauth}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg shadow-blue-200 flex items-center gap-2"
-                  >
-                    {connectingOauth ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                    Sign In with Google (OAuth)
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      const merchantId = data.merchantId || "cms97ihsr0002w0ykccl3xvqy"
-                      window.location.href = `/api/google-business/oauth?merchantId=${merchantId}&mode=instant`
-                    }}
-                    className="border-emerald-500 text-emerald-700 hover:bg-emerald-50 text-xs font-semibold"
-                  >
-                    ⚡ Instant 1-Click Sandbox Connect
-                  </Button>
-                </div>
+            {/* Prominent Helper Description Notice */}
+            <div className="p-4 bg-amber-50 border border-amber-200/80 rounded-xl text-xs text-amber-900 flex items-start gap-3 max-w-lg mx-auto text-left shadow-xs">
+              <span className="text-base shrink-0 mt-0.5">⚠️</span>
+              <div>
+                <p className="font-bold text-amber-950">Important Login Requirement:</p>
+                <p className="text-[11px] text-amber-900 mt-0.5 leading-relaxed">
+                  Please click below and <strong>sign in with the exact Google / Gmail ID</strong> that is registered as Owner or Manager of your <strong>Google Business Profile</strong> on Google Maps.
+                </p>
               </div>
-            ) : (
-              <div className="p-6 border border-slate-200 bg-slate-50 rounded-2xl space-y-4">
-                <div>
-                  <Label className="text-xs font-bold text-slate-700">Paste your Google Maps / Review Link:</Label>
-                  <p className="text-[11px] text-slate-500 mb-2">e.g., https://g.page/r/CfA2zsVxH2jOEBM/review or Google Maps URL</p>
-                  <div className="flex gap-2">
-                    <Input
-                      value={directUrl}
-                      onChange={e => setDirectUrl(e.target.value)}
-                      placeholder="https://g.page/r/.../review"
-                      className="text-xs font-mono"
-                    />
-                    <Button onClick={handleDirectLink} disabled={connectingLink} className="bg-blue-600 hover:bg-blue-700 text-white font-bold min-w-[100px]">
-                      {connectingLink ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Link →"}
-                    </Button>
-                  </div>
-                </div>
+            </div>
 
-                <div className="relative flex items-center py-1">
-                  <div className="flex-grow border-t border-slate-200" />
-                  <span className="mx-3 text-xs text-slate-400 font-semibold uppercase">OR SEARCH ON MAPS</span>
-                  <div className="flex-grow border-t border-slate-200" />
-                </div>
-
-                <div>
-                  <Label className="text-xs text-slate-600">Search your business name on Google Maps:</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Input
-                      value={query}
-                      onChange={e => setQuery(e.target.value)}
-                      placeholder="e.g., Cake Connection Vadodara"
-                      onKeyDown={e => e.key === "Enter" && searchGooglePlaces()}
-                    />
-                    <Button onClick={searchGooglePlaces} disabled={searching} variant="outline" className="min-w-[90px]">
-                      {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : "Search"}
-                    </Button>
-                  </div>
-                </div>
-
-                {data.googleSearchResults && data.googleSearchResults.length > 0 && (
-                  <div className="space-y-3">
-                    <Label className="text-xs font-semibold">Select your profile from search results:</Label>
-                    {data.googleSearchResults.map((place: any) => (
-                      <div
-                        key={place.placeId}
-                        onClick={() => selectPlace(place)}
-                        className="p-4 border bg-white rounded-2xl hover:border-blue-500 hover:shadow-md cursor-pointer flex items-center justify-between"
-                      >
-                        <div>
-                          <p className="font-bold text-sm">{place.name}</p>
-                          <p className="text-xs text-slate-500">{place.address}</p>
-                        </div>
-                        <Button size="sm" className="bg-blue-600 text-white text-xs">Connect →</Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+            <div className="pt-2 flex justify-center">
+              <Button
+                onClick={handleOAuthConnect}
+                disabled={connectingOauth}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-blue-200 flex items-center gap-2 text-sm"
+              >
+                {connectingOauth ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                Sign In with Google (OAuth)
+              </Button>
+            </div>
           </div>
         ) : isPickingLocation && availableLocations.length > 0 ? (
-          /* Multi-Location Selection View (Choose 1 Location for 7-Day Free Trial) */
+          /* Multi-Location Selection View (Choose 1 Location for 3-Day Free Trial) */
           <div className="p-6 sm:p-8 bg-gradient-to-br from-indigo-50/70 via-slate-50 to-blue-50/60 rounded-3xl border-2 border-indigo-200 text-left space-y-6 shadow-xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full text-xs font-bold mb-2">
                   <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Free Trial: 1 Location Included (7 Days Free)</span>
+                  <span>Free Trial: 1 Location Included (3 Days Free)</span>
                 </div>
                 <h3 className="text-xl font-black text-slate-900">
-                  Select Business Location for 7-Day Trial
+                  Select Business Location for 3-Day Trial
                 </h3>
                 <p className="text-xs text-slate-600 mt-1 max-w-xl">
-                  Aapke Google Account me <strong>{availableLocations.length} locations / branches</strong> mili hain. 7-Day Free Trial ke liye wo specific branch select karein jisme aap live reviews aur AI auto-reply start karna chahte hain:
+                  Aapke Google Account me <strong>{availableLocations.length} locations / branches</strong> mili hain. 3-Day Free Trial ke liye wo specific branch select karein jisme aap live reviews aur AI auto-reply start karna chahte hain:
                 </p>
               </div>
             </div>
@@ -1247,7 +1154,7 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
                 <Check className="w-7 h-7 stroke-[3]" />
               </div>
               <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white px-3.5 py-1 text-xs font-bold shadow-sm">
-                Connected & Verified ✓ (7-Day Trial Active)
+                Connected & Verified ✓ (3-Day Trial Active)
               </Badge>
               <h3 className="font-black text-2xl text-slate-900 mt-1 max-w-xl mx-auto leading-tight">
                 {placeName}
@@ -1435,7 +1342,7 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
                 onClick={nextStep}
                 className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white font-bold py-6 text-sm sm:text-base rounded-2xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
               >
-                <span>Confirm & Continue to Next Step (Logo Setup)</span>
+                <span>Confirm & Continue</span>
                 <ArrowRight className="w-5 h-5 stroke-[2.5]" />
               </Button>
 
@@ -1480,42 +1387,57 @@ function OnboardStep3Google({ data, setData, error, setError, nextStep }: any) {
 // ─── Step 4: Logo ──────────────────────────────────────────────
 function OnboardStep4Logo({ data, setData }: any) {
   const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState("")
+  const [previewUrl, setPreviewUrl] = useState<string>(data.logoDataUrl || "")
 
   const handleLogoUpload = async (e: any) => {
     const file = e.target.files?.[0]
     if (!file) return
+    setUploadError("")
 
-    // Show local preview immediately
+    // 1. Show local preview immediately for instant visual feedback
     const reader = new FileReader()
-    reader.onloadend = () => setData((prev: any) => ({ ...prev, logoUploaded: true, logoDataUrl: reader.result as string }))
+    reader.onloadend = () => {
+      const base64 = reader.result as string
+      setPreviewUrl(base64)
+      setData((prev: any) => ({ ...prev, logoUploaded: true, logoDataUrl: base64 }))
+    }
     reader.readAsDataURL(file)
 
-    // Upload to server and save to Merchant record
+    // 2. Upload to server and save to Merchant record
     setUploading(true)
     try {
       const formData = new FormData()
       formData.append("file", file)
       formData.append("type", "logo")
 
-      const merchantId = data.merchantId || "cms97ihsr0002w0ykccl3xvqy"
+      const headers: Record<string, string> = {}
+      if (data.merchantId) {
+        headers["x-merchant-id"] = data.merchantId
+      }
+
       const res = await fetch("/api/merchant/upload-brand", {
         method: "POST",
-        headers: { "x-merchant-id": merchantId },
+        headers,
         body: formData,
       })
 
-      if (res.ok) {
-        const json = await res.json()
-        if (json.data?.url) {
-          setData((prev: any) => ({ ...prev, logoUploaded: true, logoDataUrl: json.data.url }))
-        }
+      const json = await res.json()
+      if (res.ok && json.data?.url) {
+        // Keep dataUrl synced with server URL while previewUrl maintains instant display
+        setData((prev: any) => ({ ...prev, logoUploaded: true, logoDataUrl: json.data.url }))
+      } else {
+        console.warn("Server upload warning:", json.error)
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Logo upload error:", err)
+      setUploadError("Saved locally. Will sync on next save.")
     } finally {
       setUploading(false)
     }
   }
+
+  const activeLogo = previewUrl || data.logoDataUrl
 
   return (
     <div className="p-6 sm:p-8 text-center space-y-6">
@@ -1523,22 +1445,34 @@ function OnboardStep4Logo({ data, setData }: any) {
         <h2 className="text-xl font-bold text-slate-900">Upload Business Logo</h2>
         <p className="text-xs text-slate-500">Your logo appears on customer digital reward cards and dashboard</p>
         <div className="p-8 border-2 border-dashed rounded-2xl flex flex-col items-center bg-slate-50 relative">
-          {data.logoUploaded && data.logoDataUrl ? (
+          {data.logoUploaded && activeLogo ? (
             <div className="space-y-2 flex flex-col items-center">
-              <img src={data.logoDataUrl} alt="Logo" className="w-24 h-24 object-contain rounded-xl shadow border bg-white p-1" />
-              <Badge className="bg-emerald-600 text-white text-[10px]">Logo Saved ✓</Badge>
+              <img
+                src={activeLogo}
+                alt="Logo Preview"
+                className="w-28 h-28 object-contain rounded-xl shadow-md border-2 border-emerald-200 bg-white p-1"
+                onError={(e: any) => {
+                  // Fallback to placeholder if url fails
+                  e.currentTarget.src = "/cplogo_horizontal.png"
+                }}
+              />
+              <Badge className="bg-emerald-600 text-white text-[10px] shadow-sm">Logo Saved ✓</Badge>
             </div>
           ) : (
-            <Upload className="w-10 h-10 text-slate-400 mb-2" />
+            <div className="flex flex-col items-center text-slate-400">
+              <Upload className="w-10 h-10 mb-2" />
+              <p className="text-xs text-slate-400">PNG, JPG, SVG up to 5MB</p>
+            </div>
           )}
           <label className="mt-4 cursor-pointer">
-            <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs rounded-lg font-bold transition-all">
+            <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs rounded-lg font-bold transition-all shadow">
               {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
               <span>{data.logoUploaded ? "Change Logo" : "Browse File"}</span>
             </span>
             <input type="file" accept="image/*" onChange={handleLogoUpload} disabled={uploading} className="hidden" />
           </label>
         </div>
+        {uploadError && <p className="text-xs text-amber-600 font-medium">{uploadError}</p>}
         <p className="text-xs text-slate-400">(Optional — you can skip this step)</p>
       </div>
     </div>
@@ -1562,32 +1496,32 @@ function OnboardStep5Rewards({ data, setData }: any) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div>
-            <Label>Reward Card Title</Label>
+            <Label className="text-xs font-bold text-slate-800">Reward Card Title</Label>
             <Input
               value={data.cardName}
               onChange={e => setData({ ...data, cardName: e.target.value })}
               placeholder="e.g., VIP Cake Loyalty Pass"
-              className="mt-1"
+              className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 font-medium shadow-xs"
             />
           </div>
           <div>
-            <Label>Stamps Required for Free Reward</Label>
-            <Select value={String(data.stampsRequired)} onValueChange={v => setData({ ...data, stampsRequired: Number(v) })}>
-              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {[3, 5, 8, 10].map(n => (
-                  <SelectItem key={n} value={String(n)}>{n} Stamps</SelectItem>
+            <Label className="text-xs font-bold text-slate-800">Stamps Required for Free Reward</Label>
+            <Select value={String(data.stampsRequired || 10)} onValueChange={v => setData({ ...data, stampsRequired: Number(v) })}>
+              <SelectTrigger className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 font-medium focus:ring-emerald-500 shadow-xs"><SelectValue /></SelectTrigger>
+              <SelectContent className="bg-white text-slate-900 border-slate-200 shadow-xl">
+                {[3, 5, 6, 8, 10, 11, 12, 15].map(n => (
+                  <SelectItem key={n} value={String(n)} className="text-slate-900 hover:bg-slate-100 font-medium">{n} Stamps</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label>Free Reward Description</Label>
+            <Label className="text-xs font-bold text-slate-800">Free Reward Description</Label>
             <Input
               value={data.rewardName}
               onChange={e => setData({ ...data, rewardName: e.target.value })}
               placeholder="e.g., 1 Free Pastry + Coffee"
-              className="mt-1"
+              className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 font-medium shadow-xs"
             />
           </div>
         </div>
@@ -1619,12 +1553,12 @@ function OnboardStep6QR({ data, setData }: any) {
         const text = `Hi ${businessName}! Checking in for my VIP Club stamps 🎁`
         const targetUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
         setWaLink(targetUrl)
-        const qr = await QRCode.toDataURL(targetUrl, { width: 350, margin: 2 })
-        setData({ ...data, qrGenerated: true, qrDataUrl: qr })
+        const qr = await createBrandedClientQR(targetUrl, { width: 500 })
+        setData((prev: any) => ({ ...prev, qrGenerated: true, qrDataUrl: qr }))
       } catch {}
     }
     generate()
-  }, [data.businessName, data.whatsappNumber])
+  }, [data.businessName, data.whatsappNumber, setData])
 
   return (
     <div className="p-6 sm:p-8 text-center space-y-6">
@@ -1634,21 +1568,24 @@ function OnboardStep6QR({ data, setData }: any) {
       </div>
       {data.qrDataUrl && (
         <div className="inline-block p-6 bg-white border-2 border-slate-900 rounded-3xl shadow-xl space-y-4 max-w-sm w-full">
-          <p className="font-extrabold text-slate-900 text-lg">{data.businessName || "Your Business"}</p>
+          {data.logoDataUrl && (
+            <div className="flex justify-center items-center">
+              <img
+                src={data.logoDataUrl}
+                alt={data.businessName || "Business Logo"}
+                className="max-h-16 max-w-[200px] w-auto h-auto object-contain rounded-xl p-1 bg-white border border-slate-200 shadow-sm"
+              />
+            </div>
+          )}
+          <p className="font-extrabold text-slate-900 text-lg tracking-tight">{data.businessName || "Your Business"}</p>
           <div className="p-3 bg-emerald-50/50 rounded-2xl border border-emerald-200">
             <img src={data.qrDataUrl} alt="WhatsApp QR Code" className="w-52 h-52 mx-auto" />
           </div>
-          <Badge className="bg-emerald-600 text-white py-1 px-3 text-xs font-bold">💬 Opens WhatsApp Directly ★</Badge>
-          <div className="text-left space-y-2 pt-2">
-            <p className="text-[11px] font-mono text-slate-600 break-all bg-slate-100 p-2 rounded border">{waLink}</p>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="w-full text-xs text-emerald-700 border-emerald-300" onClick={() => window.open(waLink, "_blank")}>
-                Open WhatsApp 💬
-              </Button>
-              <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => navigator.clipboard.writeText(waLink)}>
-                Copy Link 📋
-              </Button>
-            </div>
+
+          {/* CustomerPilot Branding with Logo */}
+          <div className="pt-3 mt-2 border-t border-slate-100 flex items-center justify-center gap-2">
+            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Powered by</span>
+            <img src="/cplogo_horizontal.png" alt="CustomerPilot" className="h-5 w-auto object-contain" />
           </div>
         </div>
       )}
@@ -1663,39 +1600,206 @@ function OnboardStep7Print({ data, setData }: any) {
   const rewardOffer = data.rewardName || "FREE Special Treat"
   const logoUrl = data.logoDataUrl || ""
 
+  const handlePrintStandeePDF = () => {
+    if (!qrUrl) {
+      alert("QR code is not generated yet. Please wait a moment.")
+      return
+    }
+
+    const logoHtml = logoUrl
+      ? `<div style="display:flex; justify-content:center; align-items:center; min-height:80px; margin:0 auto 16px auto;">
+           <img src="${logoUrl}" style="max-height:85px; max-width:240px; width:auto; height:auto; object-fit:contain; filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.12)); border-radius:12px; background:#ffffff; padding:6px; border:1px solid #e2e8f0;" />
+         </div>`
+      : `<div style="width:70px; height:70px; border-radius:50%; background:#6366f1; color:white; font-size:24px; font-weight:bold; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto;">CP</div>`
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Print Counter QR Code - ${businessName}</title>
+          <style>
+            @page { size: A4 portrait; margin: 0; }
+            * {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              box-sizing: border-box;
+            }
+            body {
+              font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+              background: #0f172a;
+              margin: 0;
+              padding: 40px 20px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+            }
+            .standee-card {
+              width: 380px;
+              background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%) !important;
+              color: #ffffff !important;
+              border-radius: 28px;
+              border: 4px solid #f59e0b !important;
+              padding: 30px 24px;
+              text-align: center;
+              box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            }
+            .badge {
+              display: inline-block;
+              padding: 5px 16px;
+              background: #f59e0b !important;
+              color: #020617 !important;
+              font-weight: 800;
+              font-size: 12px;
+              border-radius: 999px;
+              margin-bottom: 14px;
+              letter-spacing: 0.5px;
+            }
+            .store-name {
+              font-size: 22px;
+              font-weight: 900;
+              color: #ffffff !important;
+              margin: 2px 0 6px 0;
+              letter-spacing: -0.5px;
+            }
+            .qr-box {
+              background: #ffffff !important;
+              padding: 14px;
+              border-radius: 20px;
+              border: 3px solid #fcd34d !important;
+              display: inline-block;
+              margin: 8px auto;
+              box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            }
+            .qr-img {
+              width: 205px;
+              height: 205px;
+              display: block;
+              margin: 0 auto;
+            }
+            .offer-box {
+              margin-top: 14px;
+              padding: 12px 14px;
+              background: rgba(255,255,255,0.1) !important;
+              border-radius: 16px;
+              border: 1px solid rgba(255,255,255,0.2) !important;
+            }
+            .offer-tag {
+              font-size: 11px;
+              color: #fde68a !important;
+              font-weight: 800;
+              text-transform: uppercase;
+              letter-spacing: 0.8px;
+              margin: 0 0 3px 0;
+            }
+            .offer-main {
+              font-size: 14px;
+              font-weight: 900;
+              color: #ffffff !important;
+              margin: 0 0 3px 0;
+            }
+            .offer-sub {
+              font-size: 10px;
+              color: #cbd5e1 !important;
+              margin: 0;
+            }
+            .footer-brand {
+              margin-top: 14px;
+              padding-top: 10px;
+              border-top: 1px solid rgba(255,255,255,0.2);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 8px;
+            }
+            .powered-txt {
+              font-size: 10px;
+              color: #94a3b8 !important;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 1.2px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="standee-card">
+            ${logoUrl ? `<img src="${logoUrl}" style="max-height:50px; max-width:180px; object-fit:contain; background:rgba(255,255,255,0.12); border-radius:12px; padding:5px; margin:0 auto 8px auto; display:block;" />` : ''}
+            <div class="store-name">${businessName}</div>
+            <div class="badge">VIP Loyalty Club 👑</div>
+            
+            <div class="qr-box">
+              <img src="${qrUrl}" class="qr-img" />
+            </div>
+
+            <div class="offer-box">
+              <p class="offer-tag">★ Exclusive Member Offer ★</p>
+              <p class="offer-main">Earn Stamps & Get ${rewardOffer}!</p>
+              <p class="offer-sub">No App Required • 5 Seconds on WhatsApp</p>
+            </div>
+
+            <div class="footer-brand">
+              <span class="powered-txt">Powered by</span>
+              <img src="/cplogo_horizontal.png" style="height:20px; width:auto; object-fit:contain; background:rgba(255,255,255,0.15); border-radius:4px; padding:2px 6px;" alt="CustomerPilot" />
+            </div>
+          </div>
+          <script>
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+              }, 400);
+            };
+          </script>
+        </body>
+      </html>
+    `
+
+    const printWin = window.open("", "_blank", "width=600,height=850")
+    if (printWin) {
+      printWin.document.write(printContent)
+      printWin.document.close()
+    } else {
+      alert("Please allow pop-ups for this site to print/save PDF.")
+    }
+  }
+
   return (
     <div className="p-6 sm:p-8 space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-bold text-slate-900">Print Counter QR Standee</h2>
+        <h2 className="text-xl font-bold text-slate-900">Print Counter QR Code</h2>
         <p className="text-xs text-slate-500">Preview and print your physical QR display</p>
       </div>
 
       <div className="flex justify-center">
-        <div id="printable-standee" className="w-full max-w-sm bg-gradient-to-b from-slate-900 to-indigo-950 text-white p-6 rounded-3xl shadow-2xl border-4 border-amber-400 space-y-4 text-center">
+        <div id="printable-standee" className="w-full max-w-sm bg-white text-slate-900 p-6 rounded-3xl shadow-2xl border-4 border-indigo-500 space-y-4 text-center">
           <div className="flex flex-col items-center gap-2">
-            {logoUrl && <img src={logoUrl} alt={businessName} className="h-12 object-contain bg-white/10 rounded-xl p-1.5" />}
-            <h3 className="text-xl font-black">{businessName}</h3>
-            <div className="px-3 py-1 bg-amber-400 text-slate-950 font-bold text-xs rounded-full">VIP Loyalty Club 👑</div>
+            <div className="px-3 py-1 bg-indigo-600 text-white font-extrabold text-xs rounded-full uppercase tracking-wider shadow-xs">👑 VIP Loyalty Club</div>
+            {logoUrl && <img src={logoUrl} alt={businessName} className="h-14 max-w-[200px] object-contain p-1" />}
+            <h3 className="text-xl font-black text-slate-900 tracking-tight">{businessName}</h3>
           </div>
-          <div className="p-4 bg-white rounded-2xl inline-block mx-auto border-2 border-amber-300">
+          <div className="p-3 bg-slate-50 rounded-2xl inline-block mx-auto border-2 border-indigo-100 shadow-inner">
             {qrUrl ? (
-              <img src={qrUrl} alt="QR" className="w-48 h-48 mx-auto" />
+              <img src={qrUrl} alt="QR" className="w-48 h-48 mx-auto rounded-lg" />
             ) : (
               <div className="w-48 h-48 bg-slate-100 rounded-xl flex items-center justify-center text-xs text-slate-400">QR Loading...</div>
             )}
-            <p className="text-[11px] font-bold text-slate-900 mt-2 uppercase tracking-wide">Scan with WhatsApp Camera</p>
           </div>
-          <div className="p-3 bg-white/10 rounded-xl border border-white/20">
-            <p className="text-xs text-amber-300 font-bold uppercase">★ Exclusive Member Offer ★</p>
-            <p className="text-sm font-extrabold">Earn Stamps & Get {rewardOffer}!</p>
-            <p className="text-[10px] text-slate-300">No App Required • 5 Seconds on WhatsApp</p>
+          <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-100">
+            <p className="text-xs text-indigo-700 font-bold uppercase">★ Exclusive Member Offer ★</p>
+            <p className="text-sm font-extrabold text-indigo-950">Earn Stamps &amp; Get {rewardOffer}!</p>
+            <p className="text-[10px] text-slate-500 font-medium">No App Required • 5 Seconds on WhatsApp</p>
+          </div>
+
+          {/* CustomerPilot Branding with Logo on Clean White Background */}
+          <div className="pt-3 border-t border-slate-200 flex items-center justify-center gap-2">
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Powered by</span>
+            <img src="/cplogo_horizontal.png" alt="CustomerPilot" className="h-5 w-auto object-contain" />
           </div>
         </div>
       </div>
 
       <div className="flex justify-center gap-3">
-        <Button onClick={() => window.print()} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-5 px-6 gap-2">
-          <Printer className="w-5 h-5" /> Print Standee (PDF) 🖨️
+        <Button onClick={handlePrintStandeePDF} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-5 px-6 gap-2 shadow-lg">
+          <Printer className="w-5 h-5" /> Print QR Code (PDF) 🖨️
         </Button>
       </div>
 
@@ -1725,16 +1829,29 @@ function OnboardStep8Test({ data, setData, error, setError }: any) {
 
       const [waHealth, stateHealth, progressHealth] = checks
 
+      let qrReady = !!data.qrDataUrl || !!data.qrGenerated
+      if (!qrReady && (data.whatsappNumber || data.businessName)) {
+        try {
+          const phone = (data.whatsappNumber || "919033304707").replace(/\D/g, "")
+          const businessName = data.businessName || "our store"
+          const text = `Hi ${businessName}! Checking in for my VIP Club stamps 🎁`
+          const targetUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
+          const qr = await createBrandedClientQR(targetUrl, { width: 500 })
+          setData((prev: any) => ({ ...prev, qrGenerated: true, qrDataUrl: qr }))
+          qrReady = true
+        } catch {}
+      }
+
       const results = {
         whatsapp: waHealth.status === "fulfilled" && waHealth.value?.ok !== false,
         database: stateHealth.status === "fulfilled" && stateHealth.value?.ok !== false,
         merchant: progressHealth.status === "fulfilled",
-        qrCode: data.qrGenerated,
+        qrCode: qrReady,
         rewards: data.stampsRequired > 0,
       }
 
       setTestResults(results)
-      setData({ ...data, testCustomerScanned: Object.values(results).every(Boolean) })
+      setData((prev: any) => ({ ...prev, testCustomerScanned: Object.values(results).every(Boolean) }))
     } catch (e: any) {
       setError("System test encountered an error: " + e.message)
     } finally {

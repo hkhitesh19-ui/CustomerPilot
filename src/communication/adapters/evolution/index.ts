@@ -3,8 +3,8 @@ import { db } from "@/lib/db"
 
 /**
  * Real Evolution API Integration
- * Communicates with the actual Evolution API Docker container at 200.97.170.53:8080
- * Multi-Tenant Support: Naming convention CP_M + CountryCode + Number (e.g. CP_M917203824012)
+ * Communicates with the Evolution API Docker container via process.env.EVOLUTION_API_URL
+ * Multi-Tenant Support: Naming convention CP_M + CountryCode + Number (e.g. CP_M919033304707)
  */
 export class EvolutionService {
   private baseUrl: string
@@ -12,8 +12,8 @@ export class EvolutionService {
   private defaultInstanceName: string
 
   constructor() {
-    this.baseUrl = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
-    this.apiKey = process.env.EVOLUTION_API_KEY || process.env.EVOLUTION_GLOBAL_API_KEY || "429683C4C977415CAAFCCE10F7D57E11"
+    this.baseUrl = process.env.EVOLUTION_API_URL || ""
+    this.apiKey = process.env.EVOLUTION_API_KEY || process.env.EVOLUTION_GLOBAL_API_KEY || ""
     this.defaultInstanceName = process.env.EVOLUTION_INSTANCE_NAME || "CustomerPilot_Main"
   }
 
@@ -26,7 +26,7 @@ export class EvolutionService {
 
   /**
    * Resolves the dedicated instanceName for a merchant
-   * Format: CP_M917203824012 (CP_M + CountryCode + WhatsApp Phone Number)
+   * Format: CP_M919033304707 (CP_M + CountryCode + WhatsApp Phone Number)
    */
   async getMerchantInstanceName(merchantId?: string): Promise<string> {
     if (!merchantId) return this.defaultInstanceName
@@ -75,7 +75,7 @@ export class EvolutionService {
     const bizName = metadata.bizName || "our store"
     const stamps = variables.stamps || 1
     const totalStamps = variables.totalStamps || stamps
-    const stampsRequired = variables.stampsRequired || 10
+    const stampsRequired = variables.stampsRequired || variables.requiredStamp || 7
     const rewardName = variables.rewardName || "FREE special treat"
     const stampValue = variables.stampValue || 500
 
@@ -105,7 +105,7 @@ export class EvolutionService {
   }
 
   /**
-   * Sends a text message using the merchant's dedicated instance (CP_M917203824012)
+   * Sends a text message using the merchant's dedicated instance (CP_M919033304707)
    */
   async sendMessage(merchantId: string, payload: MessagePayload): Promise<DeliveryResult> {
     const instanceName = await this.getMerchantInstanceName(merchantId)

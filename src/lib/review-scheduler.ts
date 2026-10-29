@@ -24,17 +24,16 @@ export async function scheduleGoogleReviewRequest({
       return { scheduled: false, reason: "Review already submitted" }
     }
 
-    // 3. Deduplication: Skip if review_request is already queued or scheduled
-    const pendingMsg = await db.whatsAppMessage.findFirst({
+    // 3. Deduplication: Skip if review_request was EVER sent to this customer
+    const previousRequest = await db.whatsAppMessage.findFirst({
       where: {
         merchantId: merchant.id,
         toPhone: customer.phone,
-        template: "review_request",
-        status: { in: ["queued", "scheduled", "sending"] }
+        template: "review_request"
       }
     })
-    if (pendingMsg) {
-      return { scheduled: false, reason: "Review request already pending/queued" }
+    if (previousRequest) {
+      return { scheduled: false, reason: "Review request already sent previously" }
     }
 
     // 4. Calculate Delay based on merchant.googleReviewDelayMinutes configuration
@@ -45,7 +44,7 @@ export async function scheduleGoogleReviewRequest({
       : null
     const status = delayMinutes > 0 ? "scheduled" : "queued"
 
-    const reviewMsg = `Hi ${customer.name} ❤️\n\nHope you loved your recent purchase from *${merchant.name}*!\n\nWould you like AI to prepare your Google Review? Reply *YES* to see the draft and unlock a 🎁 *Bonus Stamp* on your VIP Card!`
+    const reviewMsg = `Hi ${customer.name} ❤️\n\nHope you loved your visit to *${merchant.name}*! 😊\n\nShare your honest Google review with a photo to unlock a 🎁 *Bonus Loyalty Stamp* on your VIP Card! Reply *YES* to get your 1-Click link.\n\nOrder me koi dikkat thi? Yahan *HELP* likh kar reply karein taaki maalik aapse seedha baat kar sakein.`
 
     const msg = await db.whatsAppMessage.create({
       data: {
@@ -58,6 +57,18 @@ export async function scheduleGoogleReviewRequest({
         scheduledFor,
       }
     })
+
+    // ✅ CRITICAL FIX: If message is sent immediately (queued/no delay),
+    // set botState right away. If delayed (scheduled), cron will set it on dispatch.
+    if (status === "queued" || !scheduledFor) {
+      await db.customer.update({
+        where: { id: customer.id },
+        data: {
+          botState: "AWAITING_REVIEW_CONSENT",
+          botStateUpdatedAt: new Date()
+        }
+      }).catch(() => {})
+    }
 
     return { scheduled: true, messageId: msg.id, status, scheduledFor, delayMinutes }
   } catch (error) {

@@ -2,11 +2,10 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { cookies } from "next/headers"
 import { jwtVerify } from "jose"
+import { getJwtSecret } from "@/lib/jwt-secret";
 
-if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set');
-const JWT_SECRET = process.env.JWT_SECRET;
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || "http://200.97.170.53:8080"
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || "Evo_Api_Key_Secure_998877!"
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 
 async function getAuthMerchant(req: Request) {
   const merchantHeader = req.headers.get("x-merchant-id")
@@ -20,7 +19,7 @@ async function getAuthMerchant(req: Request) {
   if (!token) return null
 
   try {
-    const secret = new TextEncoder().encode(JWT_SECRET)
+    const secret = new TextEncoder().encode(getJwtSecret())
     const { payload } = await jwtVerify(token, secret)
     const merchantId = payload.merchantId as string
     if (merchantId) return await db.merchant.findUnique({ where: { id: merchantId } })
@@ -38,12 +37,12 @@ export async function DELETE(req: Request) {
 
     const instanceName = merchant.whatsappInstanceName
 
-    if (instanceName) {
-      const headers = {
-        "Content-Type": "application/json",
-        "apikey": EVOLUTION_API_KEY,
-      }
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "apikey": EVOLUTION_API_KEY || "",
+    }
 
+    if (instanceName) {
       // 1. Logout the instance from WhatsApp
       console.log(`[WhatsApp Disconnect] Logging out instance: ${instanceName}`)
       await fetch(`${EVOLUTION_API_URL}/instance/logout/${instanceName}`, { 
@@ -61,6 +60,24 @@ export async function DELETE(req: Request) {
         headers 
       }).catch(e => console.warn("Delete error:", e.message))
     }
+
+    // Clean up any remaining instances belonging to this merchant
+    const merchantPrefix = merchant.id.slice(0, 8)
+    try {
+      const allRes = await fetch(`${EVOLUTION_API_URL}/instance/fetchInstances`, { headers }).catch(() => null)
+      if (allRes && allRes.ok) {
+        const allInstances = await allRes.json().catch(() => [])
+        if (Array.isArray(allInstances)) {
+          for (const inst of allInstances) {
+            if (inst?.name && (inst.name.includes(`_${merchantPrefix}_`) || inst.name.endsWith(`_${merchantPrefix}`))) {
+              console.log(`[WhatsApp Disconnect] Purging orphan instance "${inst.name}"`)
+              await fetch(`${EVOLUTION_API_URL}/instance/logout/${inst.name}`, { method: "DELETE", headers }).catch(() => null)
+              await fetch(`${EVOLUTION_API_URL}/instance/delete/${inst.name}`, { method: "DELETE", headers }).catch(() => null)
+            }
+          }
+        }
+      }
+    } catch {}
 
     // 3. Update the database to remove the connection
     await db.merchant.update({

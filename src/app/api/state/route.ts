@@ -6,14 +6,27 @@ import { ok, err } from "@/lib/api"
 export async function GET(req: NextRequest) {
   try {
     // merchantId is injected by middleware from JWT token
-    const merchantId = req.headers.get('x-merchant-id')
+    let merchantId = req.headers.get('x-merchant-id')
+    const userRole = req.headers.get('x-user-role')
+
+    if (!merchantId || merchantId === 'admin_merchant') {
+      if (userRole === 'super_admin') {
+        merchantId = 'cmtymavfx0002kx008lbfvp57' // Default to Cake Connection
+      }
+    }
 
     // SECURITY: Require authenticated merchantId — never expose other merchants' data
     if (!merchantId) {
       return err('Unauthorized', 401)
     }
 
-    const merchant = await db.merchant.findUnique({ where: { id: merchantId } })
+    let merchant = await db.merchant.findUnique({ where: { id: merchantId } })
+    if (!merchant && userRole === 'super_admin') {
+      merchant = await db.merchant.findFirst({
+        where: { status: 'active' },
+        orderBy: { createdAt: 'asc' }
+      })
+    }
     if (!merchant) return err("Merchant not found", 404)
 
   const [
@@ -44,15 +57,16 @@ export async function GET(req: NextRequest) {
     ownerOverrideLogs,
     waitingCustomers,
     merchantGoogleConnections,
+    digitalBusinessCard,
   ] = await Promise.all([
     db.staff.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "asc" }, take: 100 }),
-    db.customer.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 500 }),
-    db.stampCard.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "asc" }, take: 50 }),
+    db.customer.findMany({ where: { merchantId: merchant.id, deletedAt: null }, orderBy: { createdAt: "desc" }, take: 500 }),
+    db.stampCard.findMany({ where: { merchantId: merchant.id, active: true }, orderBy: { updatedAt: "desc" }, take: 10 }),
     db.customerStampCard.findMany({ where: { merchantId: merchant.id }, include: { stamps: true }, orderBy: { createdAt: "desc" }, take: 500 }),
-    db.reward.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "asc" }, take: 100 }),
+    db.reward.findMany({ where: { merchantId: merchant.id, active: true, deletedAt: null }, orderBy: { createdAt: "asc" }, take: 100 }),
     db.bill.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 200 }),
     db.redemption.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 200 }),
-    db.referral.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 200 }),
+    db.referral.findMany({ where: { merchantId: merchant.id }, include: { referrer: true, friendCustomer: true }, orderBy: { createdAt: "desc" }, take: 200 }),
     db.auditLog.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 200 }),
     db.whatsAppMessage.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 100 }),
     db.subscription.findMany({ where: { merchantId: merchant.id } }),
@@ -75,12 +89,30 @@ export async function GET(req: NextRequest) {
     db.cardRuleChangeLog.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 50 }).catch(() => []),
     db.campaignDeliveryLog.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 50 }).catch(() => []),
     db.ownerOverrideLog.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 50 }).catch(() => []),
-    db.waitingCustomer.findMany({ where: { merchantId: merchant.id, status: 'waiting' }, include: { customer: true }, orderBy: { scannedAt: "desc" }, take: 50 }).catch(() => []),
+    db.waitingCustomer.findMany({ 
+      where: { merchantId: merchant.id, status: 'waiting' }, 
+      include: { 
+        customer: {
+          include: {
+            referredBy: { select: { id: true, name: true, phone: true } },
+            referralsReceived: {
+              include: {
+                referrer: { select: { id: true, name: true, phone: true } }
+              }
+            }
+          }
+        } 
+      }, 
+      orderBy: { scannedAt: "desc" }, 
+      take: 50 
+    }).catch(() => []),
     db.merchantGoogleConnection.findMany({ where: { merchantId: merchant.id } }).catch(() => []),
+    db.digitalBusinessCard.findUnique({ where: { merchantId: merchant.id } }).catch(() => null),
   ])
 
   return ok({
     merchant,
+    digitalBusinessCard,
     staff,
     customers,
     stampCards,

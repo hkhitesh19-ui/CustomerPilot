@@ -64,13 +64,14 @@ export function WhatsAppTemplateManager({ merchantId }: { merchantId: string }) 
   const effectiveMerchantId = merchantId || data?.merchant?.id || ""
 
   const fetchTemplates = async () => {
+    if (!effectiveMerchantId) return
     setIsLoading(true)
     try {
       const res = await fetch("/api/templates", {
         headers: { "x-merchant-id": effectiveMerchantId },
       })
-      const result = await res.json()
-      if (result.ok) {
+      const result = await res.json().catch(() => null)
+      if (result?.ok) {
         setTemplates(result.data?.templates || [])
       }
     } catch (e) {
@@ -85,7 +86,9 @@ export function WhatsAppTemplateManager({ merchantId }: { merchantId: string }) 
   }
 
   useEffect(() => {
-    fetchTemplates()
+    if (effectiveMerchantId) {
+      fetchTemplates()
+    }
   }, [effectiveMerchantId])
 
   const handleOpenEdit = async (template: MessageTemplateItem) => {
@@ -98,8 +101,8 @@ export function WhatsAppTemplateManager({ merchantId }: { merchantId: string }) 
       const res = await fetch(`/api/templates/${template.templateKey}`, {
         headers: { "x-merchant-id": effectiveMerchantId },
       })
-      const result = await res.json()
-      if (result.ok && result.data?.history) {
+      const result = await res.json().catch(() => null)
+      if (result?.ok && result.data?.history) {
         setEditingTemplate((prev) => (prev ? { ...prev, history: result.data.history } : prev))
       }
     } catch (e) {}
@@ -143,9 +146,9 @@ export function WhatsAppTemplateManager({ merchantId }: { merchantId: string }) 
         body: JSON.stringify({ messageBody: editBody }),
       })
 
-      const result = await res.json()
-      if (!res.ok || !result.ok) {
-        throw new Error(result.error || "Failed to save template")
+      const result = await res.json().catch(() => null)
+      if (!res.ok || !result?.ok) {
+        throw new Error(result?.error || "Failed to save template")
       }
 
       toast({
@@ -172,8 +175,8 @@ export function WhatsAppTemplateManager({ merchantId }: { merchantId: string }) 
         method: "DELETE",
         headers: { "x-merchant-id": effectiveMerchantId },
       })
-      const result = await res.json()
-      if (!res.ok || !result.ok) throw new Error(result.error || "Failed to reset")
+      const result = await res.json().catch(() => null)
+      if (!res.ok || !result?.ok) throw new Error(result?.error || "Failed to reset")
 
       toast({
         title: "Template Reset to Default",
@@ -205,7 +208,7 @@ export function WhatsAppTemplateManager({ merchantId }: { merchantId: string }) 
     const matchesCategory =
       selectedCategory === "ALL" ||
       t.category.toUpperCase().includes(selectedCategory) ||
-      (selectedCategory === "ENGAGEMENT" && ["BIRTHDAY_WISH", "WINBACK_CAMPAIGN", "INACTIVE_CUSTOMER_REMINDER", "FESTIVAL_GREETING"].includes(t.templateKey)) ||
+      (selectedCategory === "ENGAGEMENT" && ["BIRTHDAY_WISH", "WINBACK_CAMPAIGN", "INACTIVE_CUSTOMER_REMINDER", "FESTIVAL_GREETING", "WINBACK_30_DAY", "WINBACK_60_DAY", "WINBACK_90_DAY", "ALMOST_THERE_REMINDER", "EXPIRY_WARNING_7_DAY"].includes(t.templateKey)) ||
       (selectedCategory === "REWARDS" && ["REWARD_UNLOCKED", "REWARD_REMINDER", "REWARD_EXPIRY_REMINDER", "SPECIAL_OFFER"].includes(t.templateKey)) ||
       (selectedCategory === "LOYALTY" && ["FIRST_STAMP_EARNED", "STAMP_EARNED", "WELCOME_MSG", "REGISTRATION_SUCCESS"].includes(t.templateKey)) ||
       (selectedCategory === "REVIEWS" && ["REVIEW_REQUEST", "REVIEW_THANK_YOU", "VIP_UPGRADE"].includes(t.templateKey)) ||

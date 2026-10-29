@@ -1,15 +1,25 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { SignJWT } from "jose";
+import { getJwtSecret } from "@/lib/jwt-secret";
+import { generateMerchantIdNumber } from "@/lib/merchant-id-generator";
 
-if (!process.env.JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set');
-const JWT_SECRET = process.env.JWT_SECRET;
+
+// On Windows (local environment regardless of NODE_ENV) or non-production, prevent 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' SSL error during Google token exchange
+if (process.platform === "win32" || process.env.NODE_ENV !== "production") {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
 
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const code = url.searchParams.get("code");
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const state = url.searchParams.get("state") || "";
+    const stateParts = state.split("_");
+    const moduleParam = stateParts[1] || "";
+    const host = req.headers.get("host") || "localhost:3000";
+    const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https";
+    const appUrl = `${protocol}://${host}`;
 
     if (!code) {
       return NextResponse.redirect(`${appUrl}/signup?error=no_code_provided`);
@@ -67,6 +77,15 @@ export async function GET(req: Request) {
       });
     }
 
+    // Resolve module from OAuth state — applies to both new AND existing merchants
+    const MODULE_MAP: Record<string, string> = {
+      reviews: "REVIEWS",
+      loyalty: "LOYALTY",
+      autoreply: "AUTOREPLY",
+    };
+    const isFastTrack = !!(moduleParam && MODULE_MAP[moduleParam]);
+    const fastTrackModule = isFastTrack ? MODULE_MAP[moduleParam] : "LOYALTY,REVIEWS,AUTOREPLY";
+
     // 4. Find or Create Merchant
     let merchant = await db.merchant.findUnique({ where: { userId: user.id } }).catch(() => null);
     if (!merchant) {
@@ -74,21 +93,26 @@ export async function GET(req: Request) {
     }
 
     if (!merchant) {
+      // ─── New Merchant: Create with fast-track settings ───
       const trialEndsAt = new Date();
-      trialEndsAt.setDate(trialEndsAt.getDate() + 7);
+      trialEndsAt.setDate(trialEndsAt.getDate() + 3); // 3-day trial
+
+      const merchantIdNumber = await generateMerchantIdNumber(db);
 
       merchant = await db.merchant.create({
         data: {
           userId: user.id,
-          name: name ? `${name}'s Business` : "My Business",
+          merchantIdNumber,
+          name: name || "My Business",
           ownerName: name,
           email,
           businessType: "bakery",
           plan: "trial",
           status: "active",
           trialEndsAt,
-          onboardingCompleted: false,
-          currentStep: 1,
+          enabledModules: fastTrackModule,
+          onboardingCompleted: isFastTrack,
+          currentStep: isFastTrack ? 99 : 1,
         },
       });
 
@@ -100,7 +124,7 @@ export async function GET(req: Request) {
         { stepKey: "logo_upload", label: "Logo Upload" },
         { stepKey: "reward_setup", label: "Reward Card Setup" },
         { stepKey: "qr_code", label: "QR Code Generation" },
-        { stepKey: "print_standee", label: "Print Standee" },
+        { stepKey: "print_standee", label: "Print QR Code" },
         { stepKey: "system_test", label: "Live System Test" },
       ];
 
@@ -109,10 +133,28 @@ export async function GET(req: Request) {
           merchantId: merchant!.id,
           stepKey: s.stepKey,
           label: s.label,
-          status: "pending",
+          completed: isFastTrack,
         })),
       }).catch(() => {});
+
+    } else if (isFastTrack && !merchant.onboardingCompleted) {
+      // ─── Existing Merchant stuck in onboarding: Fast-track bypass ───
+      // This handles merchants who registered before the fix or via manual form
+      merchant = await db.merchant.update({
+        where: { id: merchant.id },
+        data: {
+          onboardingCompleted: true,
+          currentStep: 99,
+          enabledModules: fastTrackModule,
+        },
+      });
+      await db.onboardingStep.updateMany({
+        where: { merchantId: merchant.id },
+        data: { completed: true },
+      });
+      console.log(`[Google Auth Callback] Fast-tracked existing merchant ${merchant.id} to module: ${moduleParam}`);
     }
+
 
     // 5. Check and auto-fetch Google Business Profile if available
     try {
@@ -187,7 +229,7 @@ export async function GET(req: Request) {
     }
 
     // 6. Sign JWT and Set Session Cookie
-    const secret = new TextEncoder().encode(JWT_SECRET);
+    const secret = new TextEncoder().encode(getJwtSecret());
     const token = await new SignJWT({
       userId: user.id,
       merchantId: merchant.id,
@@ -198,8 +240,13 @@ export async function GET(req: Request) {
       .setExpirationTime("7d")
       .sign(secret);
 
+    const MODULE_REDIRECTS: Record<string, string> = {
+      reviews: '/dashboard/reviews',
+      autoreply: '/dashboard/reviews',
+      loyalty: '/dashboard',
+    };
     const redirectPath = merchant.onboardingCompleted
-      ? "/dashboard"
+      ? (isFastTrack ? (MODULE_REDIRECTS[moduleParam] || '/dashboard') : '/dashboard')
       : `/onboarding?step=${merchant.currentStep || 1}`;
 
     const res = NextResponse.redirect(`${appUrl}${redirectPath}`);

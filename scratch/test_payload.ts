@@ -1,6 +1,6 @@
 async function testPayloads() {
-  const EVOLUTION_API_URL = 'http://200.97.170.53:8080';
-  const EVOLUTION_API_KEY = 'Evo_Api_Key_Secure_998877!';
+  const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
+  const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
   const instance = 'CP_M919033304707';
   const toPhone = '919033456106';
 
@@ -37,7 +37,10 @@ async function testPayloads() {
       console.log(`\nTesting ${p.name}...`);
       const res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instance}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': EVOLUTION_API_KEY },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(EVOLUTION_API_KEY ? { 'apikey': EVOLUTION_API_KEY } : {})
+        },
         body: JSON.stringify(p.body)
       });
       const text = await res.text();

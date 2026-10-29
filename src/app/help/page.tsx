@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CustomerPilot Merchant Help Center",
     description: "Launch your customer loyalty engine in minutes with our setup guides, cashier tutorials, and QR printing assets.",
-    url: "https://customerpilot.ai/help",
+    url: "https://customerpilot.in/help",
   },
 }
 

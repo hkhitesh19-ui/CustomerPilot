@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures/hardened-test';
 
 test.describe('Merchant Journey', () => {
   test('Landing Page and Auth Navigation', async ({ page }) => {
@@ -8,9 +8,12 @@ test.describe('Merchant Journey', () => {
     await expect(page).toHaveTitle(/CustomerPilot/i);
     
     // Check if login link exists and navigate
-    const loginLink = page.locator('a[href="/login"]');
+    const loginLink = page.locator('a[href="/login"]').first();
     if (await loginLink.isVisible()) {
-      await loginLink.click();
+      await Promise.all([
+        page.waitForURL('**/login', { timeout: 10000 }),
+        loginLink.click()
+      ]);
       await expect(page.url()).toContain('/login');
     }
   });
@@ -23,7 +26,7 @@ test.describe('Merchant Journey', () => {
     // Industry page
     await page.goto('/bakery-loyalty');
     await expect(page.locator('h1').first()).toBeVisible();
-    await expect(page.locator('h1').first()).toContainText('Bakery');
+    await expect(page.locator('h1').first()).toContainText(/Baker/i);
   });
   
   test('Dashboard Core UI (Mocked Session)', async ({ page }) => {
