@@ -51,11 +51,78 @@ export interface PricingStudioProps {
 }
 
 // ─── SOURCE OF TRUTH FROM CustomerPilot_Pricing.html ───
-// C: Complete plans (Monthly ₹449, 6 Months ₹1,999, 12 Months ₹3,499)
+// C: Complete plans (Postpaid Monthly 0.3%, 6 Months ₹1,999, 12 Months ₹3,499)
 export const COMPLETE_TIERS = [
-  { t: "Monthly", d: 30, s: 449, m: 898, planKey: "complete_monthly", badge: "Flexible" },
-  { t: "6 Months", d: 180, s: 1999, m: 3998, planKey: "growth_180", badge: "Popular" },
-  { t: "12 Months", d: 365, s: 3499, m: 6998, planKey: "enterprise_365", badge: "Best Value" }
+  { t: "Postpaid · Monthly", d: 30, s: 0, m: 0, planKey: "complete_postpaid", badge: "Zero Upfront", isPostpaid: true },
+  { t: "6 Months", d: 180, s: 1999, m: 3998, planKey: "growth_180", badge: "Popular", isPostpaid: false },
+  { t: "12 Months", d: 365, s: 3499, m: 6998, planKey: "enterprise_365", badge: "Best Value", isPostpaid: false }
+]
+
+// Postpaid Configuration (Placeholders kept for billing extensions)
+export const POSTPAID_CONFIG = {
+  salesPercent: 0.3,
+  salesRateMultiplier: 0.003,
+  upfrontFee: 0,
+  exampleSales: 500000,
+  exampleFee: 1500,
+  breakEvenSalesMonthly: 194000, // Monthly sales above which 12M prepaid (₹3,499 / 12 = ~₹583/mo) is more economical
+  // Hidden placeholder constants (not displayed in UI as per requirements)
+  MIN_FEE: 0,
+  GST_NOTE: "exclusive of GST",
+  CAP: null as number | null
+}
+
+// Gear Combos Configuration
+export interface GearComboDefinition {
+  gearKey: string
+  name: string
+  subtitle: string
+  badge: string
+  iconBg: string
+  modulesIncluded: string[] // keys matching standalone services
+  tenures: {
+    180: { offer: number; regular: number; planKey: string }
+    365: { offer: number; regular: number; planKey: string }
+  }
+}
+
+export const GEAR_COMBOS: GearComboDefinition[] = [
+  {
+    gearKey: "gear_2",
+    name: "Gear 2 · Smart Card + Smart AI Google Review System",
+    subtitle: "Interactive Digital Business Card + Smart AI Google Reviews Suite",
+    badge: "Gear 2 Combo",
+    iconBg: "bg-emerald-600",
+    modulesIncluded: ["card", "star"],
+    tenures: {
+      180: { offer: 799, regular: 1598, planKey: "gear2_6mo" },
+      365: { offer: 1149, regular: 2298, planKey: "gear2_yearly" }
+    }
+  },
+  {
+    gearKey: "gear_3",
+    name: "Gear 3 · Smart Card + WhatsApp Loyalty + Smart AI Google Reviews",
+    subtitle: "Digital Business Card + WhatsApp Loyalty Stamp System + Smart AI Google Reviews",
+    badge: "Gear 3 Growth Pack",
+    iconBg: "bg-amber-600",
+    modulesIncluded: ["card", "loyalty", "star"],
+    tenures: {
+      180: { offer: 1499, regular: 2998, planKey: "gear3_6mo" },
+      365: { offer: 2499, regular: 4998, planKey: "gear3_yearly" }
+    }
+  },
+  {
+    gearKey: "gear_4",
+    name: "Gear 4 · CustomerPilot Complete",
+    subtitle: "Full All-in-One Suite: Digital Card + WhatsApp Loyalty + AI Reviews + 1-Click AutoReply",
+    badge: "Complete Suite",
+    iconBg: "bg-indigo-600",
+    modulesIncluded: ["card", "loyalty", "star", "chat"],
+    tenures: {
+      180: { offer: 1999, regular: 3998, planKey: "growth_180" },
+      365: { offer: 3499, regular: 7000, planKey: "enterprise_365" }
+    }
+  }
 ]
 
 // S: Standalone Services sorted highest 1Y price first
@@ -315,6 +382,54 @@ export function PricingStudio({
 
   const handleClearStandalone = () => {
     setSelectedStandalone({})
+  }
+
+  // Handle Combo plan checkout (Gear 2, Gear 3, Gear 4)
+  const handleSelectGearCombo = (combo: GearComboDefinition, tenureDays: 180 | 365) => {
+    const tenureData = combo.tenures[tenureDays]
+    const dbP = getPlanByKey(tenureData.planKey)
+    const price = dbP?.price || tenureData.offer
+    const originalPrice = dbP?.originalPrice || tenureData.regular
+
+    const moduleMapping: Record<string, string> = {
+      card: "DIGITAL_CARD",
+      star: "REVIEWS",
+      loyalty: "LOYALTY",
+      chat: "AUTOREPLY"
+    }
+    const enabledModules = combo.modulesIncluded.map((m) => moduleMapping[m] || m).join(",")
+
+    if (mode === "merchant" && onCheckout) {
+      const p: PlanItem = dbP || {
+        id: tenureData.planKey,
+        planKey: tenureData.planKey,
+        name: `${combo.name} (${tenureDays === 180 ? "6 Months" : "1 Year"})`,
+        price,
+        originalPrice,
+        days: tenureDays,
+        features: [combo.subtitle],
+        enabledModules
+      }
+      if (onSelectPlan) onSelectPlan(p)
+      onCheckout(p)
+      return
+    }
+
+    const item: SelectedCheckoutItem = {
+      id: tenureData.planKey,
+      name: `${combo.name} (${tenureDays === 180 ? "6 Months" : "1 Year"})`,
+      tenureDays,
+      price,
+      originalPrice,
+      planKey: tenureData.planKey,
+      iconBg: combo.iconBg,
+      moduleKey: combo.gearKey
+    }
+
+    setCheckoutModalItems([item])
+    setCheckoutModalTotal(price)
+    setCheckoutModalOriginalTotal(originalPrice)
+    setCheckoutModalOpen(true)
   }
 
   // Handle plan purchase
@@ -614,42 +729,81 @@ export function PricingStudio({
                 })}
               </div>
 
-              {/* Main Price (MRP) & 50% OFF Offer Price */}
-              <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 bg-slate-950/35 border border-white/20 rounded-xl px-3.5 py-1.5 backdrop-blur-xs">
-                  <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-amber-300">
-                    Main Price:
-                  </span>
-                  <span className="text-lg sm:text-2xl font-extrabold text-white/90 line-through decoration-rose-400 decoration-2">
-                    {inr(completeMrp)}
-                  </span>
-                  <span className="text-xs font-semibold text-white/75">
-                    {dy(completeMrp, completeDays)}
-                  </span>
-                </div>
+              {/* Pricing Display: Postpaid Model vs Fixed Tenure Pricing */}
+              {activeCompleteTier.isPostpaid ? (
+                <div className="space-y-3">
+                  <div className="inline-flex items-center gap-2 bg-slate-950/35 border border-white/20 rounded-xl px-3.5 py-1.5 backdrop-blur-xs">
+                    <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-amber-300">
+                      Upfront Activation:
+                    </span>
+                    <span className="text-base sm:text-lg font-black text-emerald-300">
+                      ₹0 (Zero Upfront Fee)
+                    </span>
+                  </div>
 
-                <div className="flex items-baseline gap-2.5 flex-wrap">
-                  <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-300 bg-emerald-950/50 border border-emerald-400/40 px-2.5 py-1 rounded-lg self-center">
-                    50% Offer Price:
-                  </span>
-                  <span className="text-4xl sm:text-6xl font-black tracking-tight drop-shadow-sm text-white">
-                    {inr(completePrice)}
-                  </span>
-                  <span className="text-sm sm:text-base font-semibold text-cyan-100/95">
-                    {dy(completePrice, completeDays)}
-                  </span>
-                </div>
-              </div>
+                  <div className="flex items-baseline gap-2.5 flex-wrap">
+                    <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-300 bg-emerald-950/50 border border-emerald-400/40 px-2.5 py-1 rounded-lg self-center">
+                      Postpaid Monthly:
+                    </span>
+                    <span className="text-3xl sm:text-5xl font-black tracking-tight drop-shadow-sm text-white">
+                      0.3%
+                    </span>
+                    <span className="text-sm sm:text-base font-semibold text-cyan-100/95">
+                      of monthly store sales
+                    </span>
+                  </div>
 
-              {/* MRP & Savings Strip */}
-              <div className="flex items-center gap-2.5 flex-wrap mt-2.5 text-xs sm:text-sm">
-                <span className="bg-emerald-400 text-slate-950 font-black text-xs rounded-full px-3 py-0.5 shadow-xs">
-                  FLAT {off(completePrice, completeMrp)}% OFF
-                </span>
-                <span className="text-white font-bold bg-white/15 px-3 py-0.5 rounded-full">
-                  Instant Savings: {inr(completeMrp - completePrice)}
-                </span>
-              </div>
+                  <div className="p-3 rounded-2xl bg-slate-950/40 border border-white/15 space-y-1.5 text-xs">
+                    <div className="flex items-center gap-2 text-white font-bold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0" />
+                      <span>Example: ₹5,00,000 monthly sales = ₹1,500/month</span>
+                    </div>
+                    <div className="text-white/75 text-[11px] leading-relaxed">
+                      Billed at month-end based on verified sales entered in your merchant dashboard.
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-white/10 border border-white/15 text-[11px] text-white/90 leading-relaxed">
+                    <strong className="text-amber-300">Approx. Estimate:</strong> For monthly store sales above ₹1,94,000, our 12-Month plan (₹3,499/year ≈ ₹583/month) is more economical.
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-2 bg-slate-950/35 border border-white/20 rounded-xl px-3.5 py-1.5 backdrop-blur-xs">
+                    <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-amber-300">
+                      Main Price:
+                    </span>
+                    <span className="text-lg sm:text-2xl font-extrabold text-white/90 line-through decoration-rose-400 decoration-2">
+                      {inr(completeMrp)}
+                    </span>
+                    <span className="text-xs font-semibold text-white/75">
+                      {dy(completeMrp, completeDays)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-baseline gap-2.5 flex-wrap">
+                    <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-300 bg-emerald-950/50 border border-emerald-400/40 px-2.5 py-1 rounded-lg self-center">
+                      50% Offer Price:
+                    </span>
+                    <span className="text-4xl sm:text-6xl font-black tracking-tight drop-shadow-sm text-white">
+                      {inr(completePrice)}
+                    </span>
+                    <span className="text-sm sm:text-base font-semibold text-cyan-100/95">
+                      {dy(completePrice, completeDays)}
+                    </span>
+                  </div>
+
+                  {/* MRP & Savings Strip */}
+                  <div className="flex items-center gap-2.5 flex-wrap mt-2.5 text-xs sm:text-sm">
+                    <span className="bg-emerald-400 text-slate-950 font-black text-xs rounded-full px-3 py-0.5 shadow-xs">
+                      FLAT {off(completePrice, completeMrp)}% OFF
+                    </span>
+                    <span className="text-white font-bold bg-white/15 px-3 py-0.5 rounded-full">
+                      Instant Savings: {inr(completeMrp - completePrice)}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* Included Items 2x2 Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-6 text-xs sm:text-sm">
@@ -713,11 +867,39 @@ export function PricingStudio({
               {/* Progress Bars */}
               <div className="space-y-4">
                 {COMPLETE_TIERS.map((tier, idx) => {
+                  const isSelected = activeCompleteIndex === idx
+
+                  if (tier.isPostpaid) {
+                    return (
+                      <div
+                        key={tier.t}
+                        className="cursor-pointer group p-2 rounded-xl transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                        onClick={() => setActiveCompleteIndex(idx)}
+                      >
+                        <div className="flex justify-between items-center text-xs sm:text-sm mb-1.5">
+                          <span className={`font-semibold transition-colors ${isSelected ? "text-cyan-600 dark:text-cyan-400 font-bold" : "text-slate-800 dark:text-slate-200 group-hover:text-cyan-600"}`}>
+                            {tier.t} {isSelected && "✓"}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-extrabold text-slate-900 dark:text-white">
+                              Postpaid: 0.3% of sales
+                            </span>
+                          </div>
+                        </div>
+                        <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 transition-all duration-500"
+                            style={{ width: "100%" }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  }
+
                   const monthlyVal = effectiveMonthlyCosts[idx]
                   const dbP = getPlanByKey(tier.planKey)
                   const mrpMonthlyVal = (dbP?.originalPrice || tier.m) / (tier.d / 30)
                   const pct = Math.round((monthlyVal / maxMonthlyCost) * 100)
-                  const isSelected = activeCompleteIndex === idx
 
                   return (
                     <div
@@ -754,9 +936,9 @@ export function PricingStudio({
             <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
               12 Months works out{" "}
               <strong className="text-emerald-600 dark:text-emerald-400 font-bold">
-                {yearlyCheaperPercent}% cheaper
+                {yearlyCheaperPercent}% lower cost
               </strong>{" "}
-              per month than Monthly.
+              than 6 Months. Postpaid is ₹0 upfront, billed 0.3% of sales at month-end.
             </div>
           </div>
         </div>
@@ -946,14 +1128,144 @@ export function PricingStudio({
                   </td>
                 </tr>
 
-                {/* ─── ROW 6: CustomerPilot Complete Comparison ─── */}
+                {/* ─── DYNAMIC GEAR COMBOS: GEAR 2 & GEAR 3 ─── */}
+                {GEAR_COMBOS.filter((c) => c.gearKey !== "gear_4").map((combo) => {
+                  const dbPlan6 = getPlanByKey(combo.tenures[180].planKey)
+                  const dbPlan1 = getPlanByKey(combo.tenures[365].planKey)
+
+                  const p180 = dbPlan6?.price || combo.tenures[180].offer
+                  const m180 = dbPlan6?.originalPrice || combo.tenures[180].regular
+
+                  const p365 = dbPlan1?.price || combo.tenures[365].offer
+                  const m365 = dbPlan1?.originalPrice || combo.tenures[365].regular
+
+                  // Calculate standalone total for 1 Year for included modules
+                  const standalone1YrSum = combo.modulesIncluded.reduce((acc, modKey) => {
+                    const serv = STANDALONE_SERVICES.find((s) => s.i === modKey)
+                    if (!serv) return acc
+                    const sDbP = getPlanByKey(serv.planKey1Yr)
+                    return acc + (sDbP?.price || serv.p[365][0])
+                  }, 0)
+                  const savings1YrVsStandalone = Math.max(0, standalone1YrSum - p365)
+
+                  return (
+                    <tr key={combo.gearKey} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition">
+                      <td className="py-5 px-6 align-top">
+                        <div className="flex items-start gap-3.5">
+                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${combo.iconBg}`}>
+                            <Zap className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-snug">
+                                {combo.name}
+                              </h4>
+                              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300">
+                                {combo.badge}
+                              </span>
+                            </div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                              {combo.subtitle}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* 6 Months Cell */}
+                      <td className="py-5 px-6 align-top">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                              Main Price:
+                            </span>
+                            <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
+                              {inr(m180)}
+                            </span>
+                            <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
+                              {off(p180, m180)}% OFF
+                            </span>
+                          </div>
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                              Offer:
+                            </span>
+                            <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                              {inr(p180)}
+                            </span>
+                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                              {dy(p180, 180)}
+                            </span>
+                          </div>
+                          <div className="pt-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleSelectGearCombo(combo, 180)}
+                              className="text-xs font-semibold px-4 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600 transition cursor-pointer"
+                            >
+                              Choose 6M
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* 1 Year Cell */}
+                      <td className="py-5 px-6 align-top">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                              Main Price:
+                            </span>
+                            <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
+                              {inr(m365)}
+                            </span>
+                            <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
+                              {off(p365, m365)}% OFF
+                            </span>
+                            {savings1YrVsStandalone > 0 && (
+                              <span className="text-indigo-700 bg-indigo-100 dark:bg-indigo-950/60 dark:text-indigo-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
+                                Save {inr(savings1YrVsStandalone)} vs Standalone
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                              Offer:
+                            </span>
+                            <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                              {inr(p365)}
+                            </span>
+                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                              {dy(p365, 365)}
+                            </span>
+                          </div>
+                          <div className="pt-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleSelectGearCombo(combo, 365)}
+                              className="text-xs font-semibold px-4 py-1.5 rounded-lg border border-indigo-600 bg-indigo-600 text-white hover:bg-indigo-700 transition cursor-pointer shadow-xs"
+                            >
+                              Choose 1Y
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+
+                {/* ─── ROW 7: GEAR 4 · CustomerPilot Complete ─── */}
                 <tr className="bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-50/60">
                   <td className="py-5 px-6">
-                    <div className="font-bold text-indigo-900 dark:text-indigo-300 text-sm sm:text-base">
-                      CustomerPilot Complete
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="font-bold text-indigo-900 dark:text-indigo-300 text-sm sm:text-base">
+                        Gear 4 · CustomerPilot Complete
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-200 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
+                        Complete Suite
+                      </span>
                     </div>
                     <div className="text-xs text-slate-500 dark:text-slate-400">
-                      All-in-one platform
+                      All-in-one platform (All 4 engines included)
                     </div>
                   </td>
                   <td className="py-5 px-6 space-y-1">
@@ -974,10 +1286,13 @@ export function PricingStudio({
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-[11px] font-bold uppercase text-slate-500">Main Price:</span>
                       <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
-                        {inr(COMPLETE_TIERS[2].m)}
+                        {inr(7000)}
                       </span>
                       <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.5 rounded-full">
-                        {off(COMPLETE_TIERS[2].s, COMPLETE_TIERS[2].m)}% OFF
+                        {off(COMPLETE_TIERS[2].s, 7000)}% OFF
+                      </span>
+                      <span className="text-indigo-700 bg-indigo-100 dark:bg-indigo-950/60 dark:text-indigo-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
+                        Save {inr(standaloneTot(365) - COMPLETE_TIERS[2].s)} vs Standalone
                       </span>
                     </div>
                     <div className="text-lg sm:text-xl font-black text-indigo-700 dark:text-indigo-300">
