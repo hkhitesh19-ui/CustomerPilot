@@ -5104,3 +5104,10 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
 - **Root Cause**: Architecture only defined standalone items and complete prepaid packages. Postpaid billing requires zero upfront with 0.3% monthly sales computation and dynamic break-even estimation.
 - **Resolution**: Implemented \COMPLETE_TIERS\ with Postpaid Monthly option (0.3% sales, ₹0 upfront, dynamic break-even comparison above ₹1.94L/mo), added \GEAR_COMBOS\ configuration for Gear 2 and Gear 3, calculated dynamic daily pricing & 'Save vs Standalone' savings badges, and audited UI for 100% strict English terminology.
 - **Status**: ✅ Resolved, Tested, Pushed to GitHub (Commit 758f686 / Local 680ba7c), and Deployed to Hostinger VPS.
+
+---
+## [02 Nov 2026] Issue: Pricing Page 2 Redesign & Flagship Product Nomenclature Standardization
+- **Symptom**: Pricing page had dense presentation where Postpaid and Combos were visually buried, and product names varied across modules.
+- **Root Cause**: Architecture lacked a dedicated Gear Combos visual grid, and naming across cards/tables was inconsistent between legacy labels and formal offerings.
+- **Resolution**: Revamped the pricing page to a high-converting, professional SaaS layout featuring: (1) 'Gear 4 : CustomerPilot Complete' dual hero showcase with Prepaid (50% OFF) and Postpaid (0.3% sales, ₹0 upfront) side-by-side; (2) A dedicated 3-card grid for Pre-Configured Gear Combos (Gear 2, Gear 3, Gear 4); (3) Standardized all 4 products across all cards, tables, FAQs, and sidebar: 'Smart Digital Business Card', 'Smart AI Google Reviews', '1-Click AI AutoReply', and 'Whatsapp Digital Loyalty Stamps & VIP Club'.
+- **Status**: ✅ Resolved, Verified on Localhost:3000 with Screenshot Proof, and Committed Locally (Commit acd977a).
