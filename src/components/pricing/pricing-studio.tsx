@@ -199,8 +199,8 @@ export function PricingStudio({
   const [savingPlans, setSavingPlans] = useState(false)
   const [adminEditMode, setAdminEditMode] = useState(false)
 
-  // Interactive tenure tab for CustomerPilot Complete: 0=Monthly, 1=6 Months, 2=12 Months
-  const [activeCompleteIndex, setActiveCompleteIndex] = useState<number>(2) // Default 12 Months (Best Value)
+  // Interactive tenure tab for CustomerPilot Complete Prepaid: 1=6 Months, 2=12 Months (Default 12 Months)
+  const [activePrepaidIndex, setActivePrepaidIndex] = useState<number>(2)
 
   // Standalone selected modules map: { [serviceId]: tenureDays (180 or 365) }
   const [selectedStandalone, setSelectedStandalone] = useState<Record<string, number>>({})
@@ -261,26 +261,29 @@ export function PricingStudio({
     return plans.find((p) => p.planKey === key)
   }
 
-  // Active complete tier
-  const activeCompleteTier = COMPLETE_TIERS[activeCompleteIndex]
-  const completeDbPlan = getPlanByKey(activeCompleteTier.planKey)
-  const completePrice = completeDbPlan?.price || activeCompleteTier.s
-  const completeMrp = completeDbPlan?.originalPrice || activeCompleteTier.m
-  const completeDays = activeCompleteTier.d
+  // Active prepaid complete tier
+  const activePrepaidTier = COMPLETE_TIERS[activePrepaidIndex]
+  const prepaidDbPlan = getPlanByKey(activePrepaidTier.planKey)
+  const prepaidPrice = prepaidDbPlan?.price || activePrepaidTier.s
+  const prepaidMrp = prepaidDbPlan?.originalPrice || activePrepaidTier.m
+  const prepaidDays = activePrepaidTier.d
+
+  // Postpaid tier shortcut
+  const postpaidTier = COMPLETE_TIERS[0]
 
   // Effective monthly costs calculation for progress bars
   const effectiveMonthlyCosts = useMemo(() => {
     return COMPLETE_TIERS.map((tier) => {
       const dbP = getPlanByKey(tier.planKey)
       const p = dbP?.price || tier.s
-      const perMonth = p / (tier.d / 30)
+      const perMonth = tier.d > 0 ? p / (tier.d / 30) : 0
       return perMonth
     })
   }, [plans])
 
-  const maxMonthlyCost = Math.max(...effectiveMonthlyCosts)
+  const maxMonthlyCost = Math.max(effectiveMonthlyCosts[1] || 333, effectiveMonthlyCosts[2] || 292)
   const yearlyCheaperPercent = Math.round(
-    (1 - effectiveMonthlyCosts[2] / effectiveMonthlyCosts[0]) * 100
+    (1 - (effectiveMonthlyCosts[2] || 292) / (effectiveMonthlyCosts[1] || 333)) * 100
   )
 
   // Standalone total calculations
@@ -669,151 +672,117 @@ export function PricingStudio({
         )}
       </section>
 
-      {/* ─── SECTION 1: CustomerPilot Complete (All-in-One Engine) ─── */}
-      <section className="space-y-4 mb-14">
+      {/* ─── SECTION 1: CustomerPilot Complete (Prepaid & Postpaid Showcase) ─── */}
+      <section className="space-y-6 mb-14">
         <div className="pb-2">
           <span className="text-xs font-bold uppercase tracking-widest text-cyan-600 dark:text-cyan-400">
-            All-in-one
+            All-in-one Platform
           </span>
           <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white mt-1">
             CustomerPilot Complete
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Every module in a single subscription.
+            Every module in a single subscription — choose upfront prepaid discount or performance postpaid billing.
           </p>
         </div>
 
-        {/* 2-Column Grid: Featured Gradient Card + Effective Monthly Cost Card */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          {/* Column 1: Featured Interactive Complete Card (7 cols) with Brand Logo Cyan-Sky-Indigo Gradient */}
+        {/* 2 Dedicated Cards Side-by-Side: Prepaid Complete (6M / 12M) vs Dedicated Postpaid Complete */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          {/* ══════ CARD 1: COMPLETE PREPAID PLANS (6M & 12M) ══════ */}
           <div
-            className="lg:col-span-7 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/10 border border-cyan-400/30"
+            className="rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/10 border border-cyan-400/30"
             style={{
               background: "radial-gradient(600px 320px at 90% 10%, rgba(255,255,255,0.22), transparent 70%), linear-gradient(135deg, #0284c7 0%, #0369a1 25%, #1e40af 70%, #4338ca 100%)"
             }}
           >
-            {/* Subtle brand glow overlay */}
             <div className="absolute -top-24 -right-24 w-72 h-72 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10">
-              {/* Interactive Tenure Tabs with sleek cursor hover & active animation */}
-              <div className="inline-flex bg-slate-950/30 backdrop-blur-md rounded-2xl p-1.5 mb-6 border border-white/15 shadow-inner">
-                {COMPLETE_TIERS.map((tier, idx) => {
-                  const isActive = activeCompleteIndex === idx
-                  return (
-                    <button
-                      key={tier.t}
-                      type="button"
-                      onClick={() => setActiveCompleteIndex(idx)}
-                      className={`relative font-bold text-xs sm:text-sm px-4 py-2 rounded-xl transition-all duration-200 cursor-pointer select-none group flex items-center gap-1.5 ${
-                        isActive
-                          ? "bg-white text-slate-950 shadow-md shadow-slate-950/20 scale-[1.02]"
-                          : "text-white/85 hover:text-white hover:bg-white/15 hover:scale-[1.02] active:scale-95"
-                      }`}
-                    >
-                      <span>{tier.t}</span>
-                      {tier.badge && (
-                        <span
-                          className={`text-[9px] font-black uppercase px-1.5 py-0.2 rounded tracking-wider ${
-                            isActive
-                              ? "bg-cyan-100 text-cyan-800"
-                              : "bg-white/20 text-white group-hover:bg-white/30"
-                          }`}
-                        >
-                          {tier.badge}
-                        </span>
-                      )}
-                    </button>
-                  )
-                })}
+              {/* Prepaid Header & Tenure Selector */}
+              <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-white text-[11px] font-black uppercase tracking-wider">
+                  <Flame className="w-3.5 h-3.5 text-amber-300" /> Prepaid Plans (Flat 50% OFF)
+                </div>
+
+                {/* Tenure Switcher Tabs (6 Months vs 12 Months) */}
+                <div className="inline-flex bg-slate-950/30 backdrop-blur-md rounded-2xl p-1 border border-white/15 shadow-inner">
+                  {[COMPLETE_TIERS[1], COMPLETE_TIERS[2]].map((tier, localIdx) => {
+                    const globalIdx = localIdx + 1
+                    const isActive = activePrepaidIndex === globalIdx
+                    return (
+                      <button
+                        key={tier.t}
+                        type="button"
+                        onClick={() => setActivePrepaidIndex(globalIdx)}
+                        className={`font-bold text-xs px-3.5 py-1.5 rounded-xl transition-all duration-200 cursor-pointer select-none flex items-center gap-1.5 ${
+                          isActive
+                            ? "bg-white text-slate-950 shadow-md shadow-slate-950/20 scale-[1.02]"
+                            : "text-white/85 hover:text-white hover:bg-white/15"
+                        }`}
+                      >
+                        <span>{tier.t}</span>
+                        {tier.badge && (
+                          <span
+                            className={`text-[9px] font-black uppercase px-1.5 py-0.2 rounded tracking-wider ${
+                              isActive ? "bg-cyan-100 text-cyan-800" : "bg-white/20 text-white"
+                            }`}
+                          >
+                            {tier.badge}
+                          </span>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
 
-              {/* Pricing Display: Postpaid Model vs Fixed Tenure Pricing */}
-              {activeCompleteTier.isPostpaid ? (
-                <div className="space-y-3">
-                  <div className="inline-flex items-center gap-2 bg-slate-950/35 border border-white/20 rounded-xl px-3.5 py-1.5 backdrop-blur-xs">
-                    <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-amber-300">
-                      Upfront Activation:
-                    </span>
-                    <span className="text-base sm:text-lg font-black text-emerald-300">
-                      ₹0 (Zero Upfront Fee)
-                    </span>
-                  </div>
-
-                  <div className="flex items-baseline gap-2.5 flex-wrap">
-                    <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-300 bg-emerald-950/50 border border-emerald-400/40 px-2.5 py-1 rounded-lg self-center">
-                      Postpaid Monthly:
-                    </span>
-                    <span className="text-3xl sm:text-5xl font-black tracking-tight drop-shadow-sm text-white">
-                      0.3%
-                    </span>
-                    <span className="text-sm sm:text-base font-semibold text-cyan-100/95">
-                      of monthly store sales
-                    </span>
-                  </div>
-
-                  <div className="p-3 rounded-2xl bg-slate-950/40 border border-white/15 space-y-1.5 text-xs">
-                    <div className="flex items-center gap-2 text-white font-bold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0" />
-                      <span>Example: ₹5,00,000 monthly sales = ₹1,500/month</span>
-                    </div>
-                    <div className="text-white/75 text-[11px] leading-relaxed">
-                      Billed at month-end based on verified sales entered in your merchant dashboard.
-                    </div>
-                  </div>
-
-                  <div className="p-2.5 rounded-xl bg-white/10 border border-white/15 text-[11px] text-white/90 leading-relaxed">
-                    <strong className="text-amber-300">Approx. Estimate:</strong> For monthly store sales above ₹1,94,000, our 12-Month plan (₹3,499/year ≈ ₹583/month) is more economical.
-                  </div>
+              {/* Pricing Display */}
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 bg-slate-950/35 border border-white/20 rounded-xl px-3.5 py-1.5 backdrop-blur-xs">
+                  <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-amber-300">
+                    Main Price:
+                  </span>
+                  <span className="text-lg sm:text-xl font-extrabold text-white/90 line-through decoration-rose-400 decoration-2">
+                    {inr(prepaidMrp)}
+                  </span>
+                  <span className="text-xs font-semibold text-white/75">
+                    {dy(prepaidMrp, prepaidDays)}
+                  </span>
                 </div>
-              ) : (
-                <div className="space-y-2">
-                  <div className="inline-flex items-center gap-2 bg-slate-950/35 border border-white/20 rounded-xl px-3.5 py-1.5 backdrop-blur-xs">
-                    <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-amber-300">
-                      Main Price:
-                    </span>
-                    <span className="text-lg sm:text-2xl font-extrabold text-white/90 line-through decoration-rose-400 decoration-2">
-                      {inr(completeMrp)}
-                    </span>
-                    <span className="text-xs font-semibold text-white/75">
-                      {dy(completeMrp, completeDays)}
-                    </span>
-                  </div>
 
-                  <div className="flex items-baseline gap-2.5 flex-wrap">
-                    <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-300 bg-emerald-950/50 border border-emerald-400/40 px-2.5 py-1 rounded-lg self-center">
-                      50% Offer Price:
-                    </span>
-                    <span className="text-4xl sm:text-6xl font-black tracking-tight drop-shadow-sm text-white">
-                      {inr(completePrice)}
-                    </span>
-                    <span className="text-sm sm:text-base font-semibold text-cyan-100/95">
-                      {dy(completePrice, completeDays)}
-                    </span>
-                  </div>
-
-                  {/* MRP & Savings Strip */}
-                  <div className="flex items-center gap-2.5 flex-wrap mt-2.5 text-xs sm:text-sm">
-                    <span className="bg-emerald-400 text-slate-950 font-black text-xs rounded-full px-3 py-0.5 shadow-xs">
-                      FLAT {off(completePrice, completeMrp)}% OFF
-                    </span>
-                    <span className="text-white font-bold bg-white/15 px-3 py-0.5 rounded-full">
-                      Instant Savings: {inr(completeMrp - completePrice)}
-                    </span>
-                  </div>
+                <div className="flex items-baseline gap-2.5 flex-wrap">
+                  <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-300 bg-emerald-950/50 border border-emerald-400/40 px-2.5 py-1 rounded-lg self-center">
+                    Offer Price:
+                  </span>
+                  <span className="text-4xl sm:text-6xl font-black tracking-tight drop-shadow-sm text-white">
+                    {inr(prepaidPrice)}
+                  </span>
+                  <span className="text-sm sm:text-base font-semibold text-cyan-100/95">
+                    {dy(prepaidPrice, prepaidDays)}
+                  </span>
                 </div>
-              )}
+
+                {/* MRP & Savings Strip */}
+                <div className="flex items-center gap-2.5 flex-wrap mt-2.5 text-xs sm:text-sm">
+                  <span className="bg-emerald-400 text-slate-950 font-black text-xs rounded-full px-3 py-0.5 shadow-xs">
+                    FLAT {off(prepaidPrice, prepaidMrp)}% OFF
+                  </span>
+                  <span className="text-white font-bold bg-white/15 px-3 py-0.5 rounded-full">
+                    Instant Savings: {inr(prepaidMrp - prepaidPrice)}
+                  </span>
+                </div>
+              </div>
 
               {/* Included Items 2x2 Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-6 text-xs sm:text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 my-6 text-xs sm:text-sm">
                 {[
                   "Loyalty & VIP Club",
                   "Google Reviews",
                   "AI AutoReply",
                   "Smart Digital Business Card"
                 ].map((item) => (
-                  <div key={item} className="flex items-center gap-2.5 bg-white/10 backdrop-blur-xs rounded-xl px-3 py-2 border border-white/10 hover:bg-white/15 transition-colors">
+                  <div key={item} className="flex items-center gap-2 bg-white/10 backdrop-blur-xs rounded-xl px-3 py-2 border border-white/10">
                     <div className="w-5 h-5 rounded-full bg-cyan-400/30 text-white flex items-center justify-center shrink-0">
                       <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </div>
@@ -828,19 +797,19 @@ export function PricingStudio({
               {mode === "public" ? (
                 <button
                   type="button"
-                  onClick={() => handleSelectCompletePublic(activeCompleteIndex)}
+                  onClick={() => handleSelectCompletePublic(activePrepaidIndex)}
                   className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <span>Choose {activeCompleteTier.t} plan</span>
+                  <span>Choose {activePrepaidTier.t} Prepaid Plan</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               ) : mode === "merchant" ? (
                 <button
                   type="button"
-                  onClick={() => handleSelectComplete(activeCompleteIndex)}
+                  onClick={() => handleSelectComplete(activePrepaidIndex)}
                   className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <span>Choose {activeCompleteTier.t} plan</span>
+                  <span>Choose {activePrepaidTier.t} Prepaid Plan</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               ) : (
@@ -854,92 +823,213 @@ export function PricingStudio({
             </div>
           </div>
 
-          {/* Column 2: Effective Monthly Cost Card (5 cols) */}
-          <div className="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-xs flex flex-col justify-between">
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                Effective monthly cost
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 mb-5">
-                The longer the tenure, the lower your per-month price.
-              </p>
+          {/* ══════ CARD 2: DEDICATED POSTPAID MONTHLY CARD ══════ */}
+          <div
+            className="rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 border-2 border-emerald-400/60 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950"
+          >
+            <div className="absolute -top-24 -right-24 w-72 h-72 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
 
-              {/* Progress Bars */}
-              <div className="space-y-4">
-                {COMPLETE_TIERS.map((tier, idx) => {
-                  const isSelected = activeCompleteIndex === idx
+            <div className="relative z-10">
+              {/* Postpaid Header Badges */}
+              <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[11px] font-black uppercase tracking-wider">
+                  <Zap className="w-3.5 h-3.5 text-emerald-400" /> Performance Postpaid · Zero Upfront
+                </div>
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700">
+                  Billed at Month-End
+                </span>
+              </div>
 
-                  if (tier.isPostpaid) {
-                    return (
-                      <div
-                        key={tier.t}
-                        className="cursor-pointer group p-2 rounded-xl transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/60"
-                        onClick={() => setActiveCompleteIndex(idx)}
-                      >
-                        <div className="flex justify-between items-center text-xs sm:text-sm mb-1.5">
-                          <span className={`font-semibold transition-colors ${isSelected ? "text-cyan-600 dark:text-cyan-400 font-bold" : "text-slate-800 dark:text-slate-200 group-hover:text-cyan-600"}`}>
-                            {tier.t} {isSelected && "✓"}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <span className="font-extrabold text-slate-900 dark:text-white">
-                              Postpaid: 0.3% of sales
-                            </span>
-                          </div>
-                        </div>
-                        <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 transition-all duration-500"
-                            style={{ width: "100%" }}
-                          />
-                        </div>
-                      </div>
-                    )
-                  }
+              {/* Pricing Display */}
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2 bg-slate-950/60 border border-emerald-400/30 rounded-xl px-3.5 py-1.5 backdrop-blur-xs">
+                  <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-300">
+                    Upfront Activation:
+                  </span>
+                  <span className="text-base sm:text-lg font-black text-emerald-300">
+                    ₹0 (Zero Upfront Fee)
+                  </span>
+                </div>
 
-                  const monthlyVal = effectiveMonthlyCosts[idx]
-                  const dbP = getPlanByKey(tier.planKey)
-                  const mrpMonthlyVal = (dbP?.originalPrice || tier.m) / (tier.d / 30)
-                  const pct = Math.round((monthlyVal / maxMonthlyCost) * 100)
+                <div className="flex items-baseline gap-2.5 flex-wrap">
+                  <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-300 bg-emerald-950/80 border border-emerald-400/40 px-2.5 py-1 rounded-lg self-center">
+                    Postpaid Fee:
+                  </span>
+                  <span className="text-4xl sm:text-6xl font-black tracking-tight drop-shadow-sm text-white">
+                    0.3%
+                  </span>
+                  <span className="text-sm sm:text-base font-semibold text-emerald-200/90">
+                    of monthly store sales
+                  </span>
+                </div>
 
-                  return (
-                    <div
-                      key={tier.t}
-                      className="cursor-pointer group p-2 rounded-xl transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/60"
-                      onClick={() => setActiveCompleteIndex(idx)}
-                    >
-                      <div className="flex justify-between items-center text-xs sm:text-sm mb-1.5">
-                        <span className={`font-semibold transition-colors ${isSelected ? "text-cyan-600 dark:text-cyan-400 font-bold" : "text-slate-800 dark:text-slate-200 group-hover:text-cyan-600"}`}>
-                          {tier.t} {isSelected && "✓"}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-slate-400 line-through decoration-rose-500 decoration-2">
-                            {inr(mrpMonthlyVal)}/mo
-                          </span>
-                          <span className="font-extrabold text-slate-900 dark:text-white">
-                            {inr(monthlyVal)} / month
-                          </span>
-                        </div>
-                      </div>
-                      <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 transition-all duration-500"
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
+                {/* Example calculation box */}
+                <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-emerald-400/20 space-y-1.5 text-xs">
+                  <div className="flex items-center gap-2 text-white font-bold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                    <span>Example: ₹5,00,000 monthly sales = ₹1,500/month</span>
+                  </div>
+                  <div className="text-slate-300 text-[11px] leading-relaxed">
+                    Pay nothing upfront. Billed monthly based on store sales entered in your merchant dashboard.
+                  </div>
+                </div>
+
+                {/* Break-even note */}
+                <div className="p-2.5 rounded-xl bg-slate-800/60 border border-slate-700 text-[11px] text-slate-200 leading-relaxed">
+                  <strong className="text-amber-300">Approx. Estimate:</strong> For monthly store sales above ₹1,94,000, our 12-Month plan (₹3,499/year ≈ ₹583/month) is more economical.
+                </div>
+              </div>
+
+              {/* Included Items 2x2 Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 my-6 text-xs sm:text-sm">
+                {[
+                  "Loyalty & VIP Club",
+                  "Google Reviews",
+                  "AI AutoReply",
+                  "Smart Digital Business Card"
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2 bg-slate-800/40 backdrop-blur-xs rounded-xl px-3 py-2 border border-emerald-400/20">
+                    <div className="w-5 h-5 rounded-full bg-emerald-400/20 text-emerald-300 flex items-center justify-center shrink-0">
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </div>
-                  )
-                })}
+                    <span className="font-semibold text-white/95">{item}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Note Footnote */}
-            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
-              12 Months works out{" "}
-              <strong className="text-emerald-600 dark:text-emerald-400 font-bold">
-                {yearlyCheaperPercent}% lower cost
-              </strong>{" "}
-              than 6 Months. Postpaid is ₹0 upfront, billed 0.3% of sales at month-end.
+            {/* Action Button */}
+            <div className="pt-2 relative z-10">
+              {mode === "public" ? (
+                <button
+                  type="button"
+                  onClick={() => handleSelectCompletePublic(0)}
+                  className="w-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-emerald-950/30 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>Choose Postpaid Plan (0.3% of sales)</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              ) : mode === "merchant" ? (
+                <button
+                  type="button"
+                  onClick={() => handleSelectComplete(0)}
+                  className="w-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-emerald-950/30 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>Choose Postpaid Plan (0.3% of sales)</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="w-full bg-emerald-400 text-slate-950 font-bold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-md"
+                >
+                  Active Plan Preview
+                </button>
+              )}
             </div>
+          </div>
+        </div>
+
+        {/* ══════ EFFECTIVE MONTHLY COST & TENURE COMPARISON BAR ══════ */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-xs">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-5">
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                Effective Monthly Cost &amp; Billing Comparison
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                Compare per-month equivalent pricing across prepaid tenures and zero-upfront postpaid.
+              </p>
+            </div>
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 self-start md:self-center">
+              Complete Suite Breakdown
+            </span>
+          </div>
+
+          {/* Progress Bars */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* 12 Months */}
+            <div className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
+              <div className="flex justify-between items-center text-xs sm:text-sm">
+                <span className="font-bold text-slate-900 dark:text-white">
+                  12 Months (Prepaid)
+                </span>
+                <span className="text-xs font-bold text-slate-400 line-through decoration-rose-500">
+                  ₹583/mo
+                </span>
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xl font-black text-indigo-600 dark:text-indigo-400">
+                  ₹292
+                </span>
+                <span className="text-xs font-semibold text-slate-500">/ month</span>
+                <span className="ml-auto text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                  Best Value
+                </span>
+              </div>
+              <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div className="h-full rounded-full bg-indigo-600" style={{ width: "88%" }} />
+              </div>
+            </div>
+
+            {/* 6 Months */}
+            <div className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
+              <div className="flex justify-between items-center text-xs sm:text-sm">
+                <span className="font-bold text-slate-900 dark:text-white">
+                  6 Months (Prepaid)
+                </span>
+                <span className="text-xs font-bold text-slate-400 line-through decoration-rose-500">
+                  ₹666/mo
+                </span>
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xl font-black text-sky-600 dark:text-sky-400">
+                  ₹333
+                </span>
+                <span className="text-xs font-semibold text-slate-500">/ month</span>
+                <span className="ml-auto text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300">
+                  Popular
+                </span>
+              </div>
+              <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div className="h-full rounded-full bg-sky-500" style={{ width: "100%" }} />
+              </div>
+            </div>
+
+            {/* Postpaid */}
+            <div className="p-3.5 rounded-2xl border-2 border-emerald-500/40 bg-emerald-50/20 dark:bg-emerald-950/20 space-y-2">
+              <div className="flex justify-between items-center text-xs sm:text-sm">
+                <span className="font-bold text-emerald-900 dark:text-emerald-300">
+                  Postpaid · Monthly
+                </span>
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                  ₹0 Upfront
+                </span>
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">
+                  0.3%
+                </span>
+                <span className="text-xs font-semibold text-slate-500">of sales</span>
+                <span className="ml-auto text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200">
+                  Zero Upfront
+                </span>
+              </div>
+              <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div className="h-full rounded-full bg-emerald-500" style={{ width: "100%" }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Footnote */}
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex flex-col sm:flex-row justify-between gap-2">
+            <span>
+              12 Months works out <strong className="text-emerald-600 dark:text-emerald-400 font-bold">{yearlyCheaperPercent}% lower cost</strong> than 6 Months.
+            </span>
+            <span>
+              Postpaid fee is ₹0 upfront, billed 0.3% of sales at month-end.
+            </span>
           </div>
         </div>
       </section>
