@@ -25,10 +25,10 @@ export function PricingClient() {
     },
     {
       q: "Can I choose just one standalone module instead of the full suite?",
-      a: "Yes! Every single module — Smart Digital Business Card (from ₹1.37/day), Smart AI Google Reviews (from ₹2.19/day), AI 1-Click AutoReply (from ₹2.19/day), and WhatsApp Digital Loyalty Stamps (from ₹3.56/day) — can be subscribed to independently or bundled dynamically."
+      a: "Yes! Every single module — Smart Digital Business Card (from ₹1.37/day), Smart AI Google Reviews (from ₹2.19/day), 1-Click AI AutoReply (from ₹2.19/day), and Whatsapp Digital Loyalty Stamps & VIP Club (from ₹3.56/day) — can be subscribed to independently or bundled dynamically."
     },
     {
-      q: "How does the Smart AI AutoReply to Google Reviews connect to Google Maps?",
+      q: "How does the 1-Click AI AutoReply connect to Google Maps?",
       a: "CustomerPilot connects securely through official Google Business Profile (GBP) OAuth in 1-Click. Gemini AI generates appreciative, SEO-optimized owner responses that you review and publish live to Google Maps with one tap."
     },
     {
@@ -37,7 +37,7 @@ export function PricingClient() {
     },
     {
       q: "Can I upgrade or switch my plan later?",
-      a: "Yes. You can upgrade from a standalone service to CustomerPilot Complete at any time from your merchant dashboard. Your remaining balance is automatically prorated toward your new plan."
+      a: "Yes. You can upgrade from a standalone service to Gear 4 : CustomerPilot Complete at any time from your merchant dashboard. Your remaining balance is automatically prorated toward your new plan."
     }
   ]
 

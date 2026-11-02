@@ -89,8 +89,8 @@ export interface GearComboDefinition {
 export const GEAR_COMBOS: GearComboDefinition[] = [
   {
     gearKey: "gear_2",
-    name: "Gear 2 · Smart Card + Smart AI Google Review System",
-    subtitle: "Interactive Digital Business Card + Smart AI Google Reviews Suite",
+    name: "Gear 2 : Smart Digital Business Card + Smart AI Google Reviews",
+    subtitle: "Smart Digital Business Card + Smart AI Google Reviews",
     badge: "Gear 2 Combo",
     iconBg: "bg-emerald-600",
     modulesIncluded: ["card", "star"],
@@ -101,8 +101,8 @@ export const GEAR_COMBOS: GearComboDefinition[] = [
   },
   {
     gearKey: "gear_3",
-    name: "Gear 3 · Smart Card + WhatsApp Loyalty + Smart AI Google Reviews",
-    subtitle: "Digital Business Card + WhatsApp Loyalty Stamp System + Smart AI Google Reviews",
+    name: "Gear 3 : Smart Digital Business Card + Whatsapp Digital Loyalty Stamps & VIP Club + Smart AI Google Reviews",
+    subtitle: "Smart Digital Business Card + Whatsapp Digital Loyalty Stamps & VIP Club + Smart AI Google Reviews",
     badge: "Gear 3 Growth Pack",
     iconBg: "bg-amber-600",
     modulesIncluded: ["card", "loyalty", "star"],
@@ -113,9 +113,9 @@ export const GEAR_COMBOS: GearComboDefinition[] = [
   },
   {
     gearKey: "gear_4",
-    name: "Gear 4 · CustomerPilot Complete",
-    subtitle: "Full All-in-One Suite: Digital Card + WhatsApp Loyalty + AI Reviews + 1-Click AutoReply",
-    badge: "Complete Suite",
+    name: "Gear 4 : CustomerPilot Complete",
+    subtitle: "Smart Digital Business Card + Whatsapp Digital Loyalty Stamps & VIP Club + Smart AI Google Reviews + 1-Click AI AutoReply",
+    badge: "Gear 4 Complete Suite",
     iconBg: "bg-indigo-600",
     modulesIncluded: ["card", "loyalty", "star", "chat"],
     tenures: {
@@ -129,8 +129,8 @@ export const GEAR_COMBOS: GearComboDefinition[] = [
 export const STANDALONE_SERVICES = [
   {
     i: "loyalty",
-    n: "Digital Loyalty Stamps & VIP Club",
-    t: "WhatsApp digital stamp card and VIP rewards automation.",
+    n: "Whatsapp Digital Loyalty Stamps & VIP Club",
+    t: "Automated WhatsApp loyalty stamp cards, milestone rewards, and customer VIP tier progression.",
     planKey6Mo: "loyalty_6mo",
     planKey1Yr: "loyalty_yearly",
     p: { 180: [899, 1598], 365: [1499, 2598] } as Record<number, [number, number]>,
@@ -140,7 +140,7 @@ export const STANDALONE_SERVICES = [
   {
     i: "star",
     n: "Smart AI Google Reviews",
-    t: "WhatsApp review collection with AI-drafted, SEO-optimized reviews. Up to 1,000 (6M) / 2,500 (1Y) reviews.",
+    t: "Autonomous WhatsApp review collection with AI-drafted, SEO-optimized reviews. Up to 1,000 (6M) / 2,500 (1Y) reviews.",
     planKey6Mo: "reviews_6mo",
     planKey1Yr: "reviews_yearly",
     p: { 180: [649, 1099], 365: [899, 1599] } as Record<number, [number, number]>,
@@ -149,8 +149,8 @@ export const STANDALONE_SERVICES = [
   },
   {
     i: "chat",
-    n: "AI AutoReply to Google Reviews",
-    t: "AI-drafted, SEO-optimized replies published in 1-click to Google Maps.",
+    n: "1-Click AI AutoReply",
+    t: "AI-drafted, SEO-rich owner replies published in 1-click to Google Maps via official Google OAuth.",
     planKey6Mo: "autoreply_6mo",
     planKey1Yr: "autoreply_yearly",
     p: { 180: [549, 1099], 365: [799, 1599] } as Record<number, [number, number]>,
@@ -160,7 +160,7 @@ export const STANDALONE_SERVICES = [
   {
     i: "card",
     n: "Smart Digital Business Card",
-    t: "Interactive Smart QR digital card with 1-tap contact saving.",
+    t: "Interactive Smart QR digital card with 1-tap contact saving and instant review collection.",
     planKey6Mo: "card_6mo",
     planKey1Yr: "card_yearly",
     p: { 180: [349, 699], 365: [499, 1199] } as Record<number, [number, number]>,
@@ -442,15 +442,15 @@ export function PricingStudio({
     const p: PlanItem = dbP || {
       id: tier.planKey,
       planKey: tier.planKey,
-      name: `CustomerPilot Complete (${tier.t})`,
+      name: `Gear 4 : CustomerPilot Complete (${tier.t})`,
       price: tier.s,
       originalPrice: tier.m,
       days: tier.d,
       features: [
-        "Digital Loyalty Stamp Cards",
+        "Smart Digital Business Card",
         "Smart AI Google Reviews",
-        "1-Click AutoReply",
-        "Smart Digital Business Card"
+        "1-Click AI AutoReply",
+        "Whatsapp Digital Loyalty Stamps & VIP Club"
       ],
       enabledModules: "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD"
     }
@@ -465,7 +465,7 @@ export function PricingStudio({
     const dbP = getPlanByKey(tier.planKey)
     const item: SelectedCheckoutItem = {
       id: "complete_" + tier.d,
-      name: `CustomerPilot Complete (${tier.t})`,
+      name: `Gear 4 : CustomerPilot Complete (${tier.t})`,
       tenureDays: tier.d,
       price: dbP?.price || tier.s,
       originalPrice: dbP?.originalPrice || tier.m,
@@ -678,11 +678,11 @@ export function PricingStudio({
           <span className="text-xs font-bold uppercase tracking-widest text-cyan-600 dark:text-cyan-400">
             All-in-one Platform
           </span>
-          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white mt-1">
-            CustomerPilot Complete
+          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 dark:text-white mt-1">
+            Gear 4 : CustomerPilot Complete
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Every module in a single subscription — choose upfront prepaid discount or performance postpaid billing.
+            All 4 flagship engines in one unified subscription: Smart Digital Business Card, Smart AI Google Reviews, 1-Click AI AutoReply, and Whatsapp Digital Loyalty Stamps & VIP Club.
           </p>
         </div>
 
@@ -702,7 +702,7 @@ export function PricingStudio({
               {/* Prepaid Header & Tenure Selector */}
               <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-white text-[11px] font-black uppercase tracking-wider">
-                  <Flame className="w-3.5 h-3.5 text-amber-300" /> Prepaid Plans (Flat 50% OFF)
+                  <Flame className="w-3.5 h-3.5 text-amber-300" /> Gear 4 : Prepaid Plans (Flat 50% OFF)
                 </div>
 
                 {/* Tenure Switcher Tabs (6 Months vs 12 Months) */}
@@ -777,9 +777,9 @@ export function PricingStudio({
               {/* Included Items 2x2 Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 my-6 text-xs sm:text-sm">
                 {[
-                  "Loyalty & VIP Club",
-                  "Google Reviews",
-                  "AI AutoReply",
+                  "Whatsapp Digital Loyalty Stamps & VIP Club",
+                  "Smart AI Google Reviews",
+                  "1-Click AI AutoReply",
                   "Smart Digital Business Card"
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2 bg-white/10 backdrop-blur-xs rounded-xl px-3 py-2 border border-white/10">
@@ -800,7 +800,7 @@ export function PricingStudio({
                   onClick={() => handleSelectCompletePublic(activePrepaidIndex)}
                   className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <span>Choose {activePrepaidTier.t} Prepaid Plan</span>
+                  <span>Choose Gear 4 {activePrepaidTier.t} Prepaid Plan</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               ) : mode === "merchant" ? (
@@ -809,7 +809,7 @@ export function PricingStudio({
                   onClick={() => handleSelectComplete(activePrepaidIndex)}
                   className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <span>Choose {activePrepaidTier.t} Prepaid Plan</span>
+                  <span>Choose Gear 4 {activePrepaidTier.t} Prepaid Plan</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               ) : (
@@ -834,7 +834,7 @@ export function PricingStudio({
               {/* Postpaid Header Badges */}
               <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[11px] font-black uppercase tracking-wider">
-                  <Zap className="w-3.5 h-3.5 text-emerald-400" /> Performance Postpaid · Zero Upfront
+                  <Zap className="w-3.5 h-3.5 text-emerald-400" /> Gear 4 : Performance Postpaid · Zero Upfront
                 </div>
                 <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700">
                   Billed at Month-End
@@ -884,9 +884,9 @@ export function PricingStudio({
               {/* Included Items 2x2 Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 my-6 text-xs sm:text-sm">
                 {[
-                  "Loyalty & VIP Club",
-                  "Google Reviews",
-                  "AI AutoReply",
+                  "Whatsapp Digital Loyalty Stamps & VIP Club",
+                  "Smart AI Google Reviews",
+                  "1-Click AI AutoReply",
                   "Smart Digital Business Card"
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2 bg-slate-800/40 backdrop-blur-xs rounded-xl px-3 py-2 border border-emerald-400/20">
@@ -907,7 +907,7 @@ export function PricingStudio({
                   onClick={() => handleSelectCompletePublic(0)}
                   className="w-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-emerald-950/30 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <span>Choose Postpaid Plan (0.3% of sales)</span>
+                  <span>Choose Gear 4 Postpaid Plan (0.3% of sales)</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               ) : mode === "merchant" ? (
@@ -916,7 +916,7 @@ export function PricingStudio({
                   onClick={() => handleSelectComplete(0)}
                   className="w-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-emerald-950/30 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <span>Choose Postpaid Plan (0.3% of sales)</span>
+                  <span>Choose Gear 4 Postpaid Plan (0.3% of sales)</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               ) : (
@@ -1034,17 +1034,178 @@ export function PricingStudio({
         </div>
       </section>
 
-      {/* ─── SECTION 3: Standalone Modules Table (Highest Price First) ─── */}
-      <section className="space-y-4 mb-16">
+      {/* ─── SECTION 2: GEAR GROWTH COMBOS (Gear 2, Gear 3, Gear 4) ─── */}
+      <section className="space-y-6 mb-16">
         <div className="pb-2">
-          <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-            Standalone modules
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white mt-1">
-            Or choose exactly what you need
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-black uppercase tracking-wider mb-2">
+            <Zap className="w-3.5 h-3.5 text-indigo-600" /> Growth Packs &amp; Combos
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+            Pre-Configured Gear Combos
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Add any module for 6 Months or 1 Year. Highest price first.
+            Engineered combos designed for maximum retention velocity. Save up to 50% compared to standalone pricing.
+          </p>
+        </div>
+
+        {/* 3-Column Responsive Modern Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+          {GEAR_COMBOS.map((combo) => {
+            const dbPlan6 = getPlanByKey(combo.tenures[180].planKey)
+            const dbPlan1 = getPlanByKey(combo.tenures[365].planKey)
+
+            const p180 = dbPlan6?.price || combo.tenures[180].offer
+            const m180 = dbPlan6?.originalPrice || combo.tenures[180].regular
+
+            const p365 = dbPlan1?.price || combo.tenures[365].offer
+            const m365 = dbPlan1?.originalPrice || combo.tenures[365].regular
+
+            const isGear4 = combo.gearKey === "gear_4"
+            const isGear3 = combo.gearKey === "gear_3"
+
+            // Standalone total comparison
+            const standalone1YrSum = combo.modulesIncluded.reduce((acc, modKey) => {
+              const serv = STANDALONE_SERVICES.find((s) => s.i === modKey)
+              if (!serv) return acc
+              const sDbP = getPlanByKey(serv.planKey1Yr)
+              return acc + (sDbP?.price || serv.p[365][0])
+            }, 0)
+            const savings1YrVsStandalone = Math.max(0, standalone1YrSum - p365)
+
+            return (
+              <div
+                key={combo.gearKey}
+                className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 relative overflow-hidden border ${
+                  isGear4
+                    ? "bg-gradient-to-b from-indigo-50/70 via-white to-sky-50/50 dark:from-indigo-950/40 dark:via-slate-900 dark:to-slate-900 border-indigo-400 shadow-lg hover:shadow-xl hover:shadow-indigo-500/10"
+                    : isGear3
+                    ? "bg-white dark:bg-slate-900 border-amber-300 dark:border-amber-700/60 shadow-sm hover:shadow-md"
+                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-md"
+                }`}
+              >
+                {/* Glow accent for Gear 4 */}
+                {isGear4 && (
+                  <div className="absolute -top-16 -right-16 w-40 h-40 bg-indigo-500/15 rounded-full blur-2xl pointer-events-none" />
+                )}
+
+                <div>
+                  {/* Top Badge */}
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <span
+                      className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                        isGear4
+                          ? "bg-indigo-600 text-white"
+                          : isGear3
+                          ? "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 border border-amber-300 dark:border-amber-800"
+                          : "bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800"
+                      }`}
+                    >
+                      {combo.badge}
+                    </span>
+                    <span className="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400">
+                      50% OFF
+                    </span>
+                  </div>
+
+                  {/* Title & Subtitle */}
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white leading-snug">
+                    {combo.name}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-5 leading-relaxed">
+                    {combo.subtitle}
+                  </p>
+
+                  {/* Included Engines Checklist */}
+                  <div className="space-y-2 mb-6">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                      Included Modules:
+                    </span>
+                    {combo.modulesIncluded.map((modKey) => {
+                      const serv = STANDALONE_SERVICES.find((s) => s.i === modKey)
+                      return (
+                        <div key={modKey} className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
+                          <div className="w-4 h-4 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                            <Check className="w-3 h-3 stroke-[3]" />
+                          </div>
+                          <span>{serv?.n || modKey}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {/* Pricing Tiers Box */}
+                  <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    {/* 1 Year Option (Recommended) */}
+                    <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 flex items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-extrabold text-slate-900 dark:text-white">1 Year Plan</span>
+                          {savings1YrVsStandalone > 0 && (
+                            <span className="text-[10px] font-black text-indigo-700 bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 px-1.5 py-0.2 rounded">
+                              Save {inr(savings1YrVsStandalone)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-baseline gap-1.5 mt-0.5">
+                          <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                            {inr(p365)}
+                          </span>
+                          <span className="text-[11px] font-semibold text-slate-400 line-through decoration-rose-500">
+                            {inr(m365)}
+                          </span>
+                          <span className="text-[11px] text-slate-500 font-medium">({dy(p365, 365)})</span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectGearCombo(combo, 365)}
+                        className="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs cursor-pointer transition shrink-0"
+                      >
+                        Choose 1Y
+                      </button>
+                    </div>
+
+                    {/* 6 Months Option */}
+                    <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+                      <div>
+                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300">6 Months Plan</span>
+                        <div className="flex items-baseline gap-1.5 mt-0.5">
+                          <span className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">
+                            {inr(p180)}
+                          </span>
+                          <span className="text-[11px] font-semibold text-slate-400 line-through decoration-rose-500">
+                            {inr(m180)}
+                          </span>
+                          <span className="text-[11px] text-slate-500 font-medium">({dy(p180, 180)})</span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectGearCombo(combo, 180)}
+                        className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600 cursor-pointer transition shrink-0"
+                      >
+                        Choose 6M
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </section>
+
+      {/* ─── SECTION 3: MODULAR STANDALONE TOOLS & BUILD-YOUR-OWN BUNDLE ─── */}
+      <section className="space-y-4 mb-16">
+        <div className="pb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-black uppercase tracking-wider mb-2">
+            <CreditCard className="w-3.5 h-3.5 text-slate-600" /> Modular Retention Tools
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+            Or Choose Exactly What You Need
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Add any individual engine for 6 Months or 1 Year, or combine them to craft your bespoke retention stack.
           </p>
         </div>
 
@@ -1054,7 +1215,7 @@ export function PricingStudio({
             <table className="w-full text-left min-w-[700px] border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 text-[11.5px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold bg-slate-50/60 dark:bg-slate-950/40">
-                  <th className="py-4 px-6 w-[43%]">Service</th>
+                  <th className="py-4 px-6 w-[43%]">Standalone Engine</th>
                   <th className="py-4 px-6 w-[28.5%]">6 Months (Main vs Offer Price)</th>
                   <th className="py-4 px-6 w-[28.5%]">1 Year (Main vs Offer Price)</th>
                 </tr>
@@ -1185,7 +1346,7 @@ export function PricingStudio({
                 <tr className="bg-slate-50 dark:bg-slate-950/60 font-semibold border-t-2 border-slate-200 dark:border-slate-800">
                   <td className="py-5 px-6">
                     <div className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">
-                      Total · 4 standalone services
+                      Total · 4 Standalone Engines
                     </div>
                   </td>
                   <td className="py-5 px-6 space-y-1">
@@ -1217,196 +1378,26 @@ export function PricingStudio({
                     </div>
                   </td>
                 </tr>
-
-                {/* ─── DYNAMIC GEAR COMBOS: GEAR 2 & GEAR 3 ─── */}
-                {GEAR_COMBOS.filter((c) => c.gearKey !== "gear_4").map((combo) => {
-                  const dbPlan6 = getPlanByKey(combo.tenures[180].planKey)
-                  const dbPlan1 = getPlanByKey(combo.tenures[365].planKey)
-
-                  const p180 = dbPlan6?.price || combo.tenures[180].offer
-                  const m180 = dbPlan6?.originalPrice || combo.tenures[180].regular
-
-                  const p365 = dbPlan1?.price || combo.tenures[365].offer
-                  const m365 = dbPlan1?.originalPrice || combo.tenures[365].regular
-
-                  // Calculate standalone total for 1 Year for included modules
-                  const standalone1YrSum = combo.modulesIncluded.reduce((acc, modKey) => {
-                    const serv = STANDALONE_SERVICES.find((s) => s.i === modKey)
-                    if (!serv) return acc
-                    const sDbP = getPlanByKey(serv.planKey1Yr)
-                    return acc + (sDbP?.price || serv.p[365][0])
-                  }, 0)
-                  const savings1YrVsStandalone = Math.max(0, standalone1YrSum - p365)
-
-                  return (
-                    <tr key={combo.gearKey} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition">
-                      <td className="py-5 px-6 align-top">
-                        <div className="flex items-start gap-3.5">
-                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${combo.iconBg}`}>
-                            <Zap className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-snug">
-                                {combo.name}
-                              </h4>
-                              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300">
-                                {combo.badge}
-                              </span>
-                            </div>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-                              {combo.subtitle}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* 6 Months Cell */}
-                      <td className="py-5 px-6 align-top">
-                        <div className="space-y-1.5">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                              Main Price:
-                            </span>
-                            <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
-                              {inr(m180)}
-                            </span>
-                            <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
-                              {off(p180, m180)}% OFF
-                            </span>
-                          </div>
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                              Offer:
-                            </span>
-                            <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                              {inr(p180)}
-                            </span>
-                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                              {dy(p180, 180)}
-                            </span>
-                          </div>
-                          <div className="pt-1.5">
-                            <button
-                              type="button"
-                              onClick={() => handleSelectGearCombo(combo, 180)}
-                              className="text-xs font-semibold px-4 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600 transition cursor-pointer"
-                            >
-                              Choose 6M
-                            </button>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* 1 Year Cell */}
-                      <td className="py-5 px-6 align-top">
-                        <div className="space-y-1.5">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                              Main Price:
-                            </span>
-                            <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
-                              {inr(m365)}
-                            </span>
-                            <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
-                              {off(p365, m365)}% OFF
-                            </span>
-                            {savings1YrVsStandalone > 0 && (
-                              <span className="text-indigo-700 bg-indigo-100 dark:bg-indigo-950/60 dark:text-indigo-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
-                                Save {inr(savings1YrVsStandalone)} vs Standalone
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                              Offer:
-                            </span>
-                            <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                              {inr(p365)}
-                            </span>
-                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                              {dy(p365, 365)}
-                            </span>
-                          </div>
-                          <div className="pt-1.5">
-                            <button
-                              type="button"
-                              onClick={() => handleSelectGearCombo(combo, 365)}
-                              className="text-xs font-semibold px-4 py-1.5 rounded-lg border border-indigo-600 bg-indigo-600 text-white hover:bg-indigo-700 transition cursor-pointer shadow-xs"
-                            >
-                              Choose 1Y
-                            </button>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-
-                {/* ─── ROW 7: GEAR 4 · CustomerPilot Complete ─── */}
-                <tr className="bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-50/60">
-                  <td className="py-5 px-6">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <div className="font-bold text-indigo-900 dark:text-indigo-300 text-sm sm:text-base">
-                        Gear 4 · CustomerPilot Complete
-                      </div>
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-200 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
-                        Complete Suite
-                      </span>
-                    </div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400">
-                      All-in-one platform (All 4 engines included)
-                    </div>
-                  </td>
-                  <td className="py-5 px-6 space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[11px] font-bold uppercase text-slate-500">Main Price:</span>
-                      <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
-                        {inr(COMPLETE_TIERS[1].m)}
-                      </span>
-                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.5 rounded-full">
-                        {off(COMPLETE_TIERS[1].s, COMPLETE_TIERS[1].m)}% OFF
-                      </span>
-                    </div>
-                    <div className="text-lg sm:text-xl font-black text-indigo-700 dark:text-indigo-300">
-                      Offer: {inr(COMPLETE_TIERS[1].s)} <span className="text-xs font-normal text-slate-500">{dy(COMPLETE_TIERS[1].s, 180)}</span>
-                    </div>
-                  </td>
-                  <td className="py-5 px-6 space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[11px] font-bold uppercase text-slate-500">Main Price:</span>
-                      <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
-                        {inr(7000)}
-                      </span>
-                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.5 rounded-full">
-                        {off(COMPLETE_TIERS[2].s, 7000)}% OFF
-                      </span>
-                      <span className="text-indigo-700 bg-indigo-100 dark:bg-indigo-950/60 dark:text-indigo-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
-                        Save {inr(standaloneTot(365) - COMPLETE_TIERS[2].s)} vs Standalone
-                      </span>
-                    </div>
-                    <div className="text-lg sm:text-xl font-black text-indigo-700 dark:text-indigo-300">
-                      Offer: {inr(COMPLETE_TIERS[2].s)} <span className="text-xs font-normal text-slate-500">{dy(COMPLETE_TIERS[2].s, 365)}</span>
-                    </div>
-                  </td>
-                </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* ─── Lifetime Deal Card (Extracted from CustomerPilot_Pricing.html) ─── */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
+        {/* ─── Lifetime Deal Card (Smart Digital Business Card) ─── */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
           <div className="flex items-center gap-3.5 text-left w-full sm:w-auto">
-            <div className="w-11 h-11 rounded-xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-xs">
-              <CreditCard className="w-5 h-5" />
+            <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-xs">
+              <CreditCard className="w-6 h-6" />
             </div>
             <div>
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-[10px] font-black uppercase tracking-wider mb-1">
+                Permanent Cloud Ownership
+              </div>
               <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
-                Lifetime Deal · Smart Digital Business Card
+                Smart Digital Business Card · Lifetime Deal
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Pay once. Zero renewal fees forever.
+                Pay once. Zero renewal fees forever. Includes permanent cloud hosting and counter QR kit.
               </p>
             </div>
           </div>
@@ -1419,26 +1410,19 @@ export function PricingStudio({
                 <span className="text-base sm:text-lg font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
                   {inr(3999)}
                 </span>
-                <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
+                <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.5 rounded-full">
                   62% OFF
                 </span>
               </div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                  Offer Price:
-                </span>
-                <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
-                  {inr(1499)}
-                </span>
-                <span className="text-xs text-slate-500 dark:text-slate-400">
-                  (₹0.41/day)
-                </span>
+              <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                Offer: <span className="text-indigo-600 dark:text-indigo-400">{inr(1499)}</span>{" "}
+                <span className="text-xs font-normal text-slate-500 dark:text-slate-400">({dy(1499, 3650)})</span>
               </div>
             </div>
             <button
               type="button"
               onClick={handleSelectLifetimeDeal}
-              className="w-full sm:w-auto text-xs font-extrabold px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition cursor-pointer shrink-0"
+              className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm py-2.5 px-6 rounded-xl shadow-xs transition shrink-0 cursor-pointer"
             >
               Get Lifetime Deal →
             </button>
