@@ -5097,3 +5097,10 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   4. Created Antigravity subagent gbp-optimization-agent and updated InstructionFlow.md.
   5. Deployed to live production VPS (187.127.170.36), validated Next.js standalone production build exit code 0, and verified live HTTPS endpoint via curl returning 100% compliant JSON payload.
 - **Status**: ✅ Resolved and Verified.
+
+---
+## [02 Nov 2026] Issue: Pricing Page - Postpaid Monthly Billing & Gear 2, 3, 4 Combos Implementation
+- **Symptom**: Pricing page only supported fixed prepaid tiers without a zero-upfront performance-based option, and lacked structured Gear 2 and Gear 3 module combinations.
+- **Root Cause**: Architecture only defined standalone items and complete prepaid packages. Postpaid billing requires zero upfront with 0.3% monthly sales computation and dynamic break-even estimation.
+- **Resolution**: Implemented \COMPLETE_TIERS\ with Postpaid Monthly option (0.3% sales, ₹0 upfront, dynamic break-even comparison above ₹1.94L/mo), added \GEAR_COMBOS\ configuration for Gear 2 and Gear 3, calculated dynamic daily pricing & 'Save vs Standalone' savings badges, and audited UI for 100% strict English terminology.
+- **Status**: ✅ Resolved, Tested, Pushed to GitHub (Commit 758f686 / Local 680ba7c), and Deployed to Hostinger VPS.
