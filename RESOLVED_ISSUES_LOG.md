@@ -8,6 +8,18 @@ This document serves as a historical record of all major bugs, configuration iss
 ---
 ---
 ---
+---
+## [02 Nov 2026] Issue: Automatic Google Places Profile & Baseline Review Hydration (Zero Manual Intervention)
+- **Symptom**: When new merchants like 'Bliss Beauty Parlour' registered on CustomerPilot, their Google review count showed 0 and city defaulted to Vadodara in SuperAdmin. The admin was forced to wonder why reviews were missing and whether manual database fixes were needed for every newly registered merchant.
+- **Root Cause**: 
+  1. Historical architecture relied entirely on merchants reaching Step 3 (`google_business`) in `/onboarding` and completing Google OAuth before any Google review data or city was populated.
+  2. If a merchant stopped at Step 1 or Step 2 (e.g. WhatsApp verification pending), `googleReviewLink` remained null, `baselineReviewCount` was 0, and city defaulted to the fallback value.
+- **Resolution**:
+  1. **Live Fix for Bliss Beauty Parlour**: Immediately queried Google Places API, resolved authentic Place ID (`ChIJsUB-40e7wjsRS8hj_b95MwQ`), rating (4.6★), review count (81 reviews), and Pune address (`Sentosa Pearl Society, Tathawade, Pimpri-Chinchwad, Maharashtra 411033`), updating `db.merchant` and `db.merchantGoogleConnection` on production VPS.
+  2. **Automated Zero-Manual Registration Auto-Hydration (`src/app/api/auth/register/route.ts`)**: Built background Google Places API auto-detection at the moment of signup. CustomerPilot now automatically matches the store on Google Maps on Day 1, auto-populating baseline rating, review count, address, and review URL even if the merchant pauses onboarding at Step 1 or Step 2.
+  3. **SuperAdmin 1-Click Auto-Detect Engine (`/api/admin/merchants/sync-gbp` & `src/app/super-admin/page.tsx`)**: Added a 1-click 'Auto-Detect GBP' action in the SuperAdmin Merchants Fleet table for any merchant displaying 'No GBP linked'. Clicking it resolves Place ID, rating, reviews, and city in 1 second without database intervention.
+- **Status**: ✅ Resolved and Verified.
+
 ## [02 Nov 2026] UI/UX & Design Enhancement: Growth Packs & Combos Tiered Professional Palette
 - **Symptom**: In the newly structured Pricing Page, the 'Growth Packs & Combos' (Section 2) combo cards (Gear 2, Gear 3, Gear 4) lacked distinctive visual hierarchy, contrast, and high-converting modern SaaS styling. Pricing daily cost calculations had double parentheses `((₹3.15/day))`, and badge headers wrapped awkwardly across multiple lines.
 - **Root Cause**: All 3 combo cards shared nearly identical muted backgrounds and gray borders with insufficient color differentiation. Per-day cost helper function `dy()` already contained parentheses, leading to double-parenthesized daily rates when wrapped in additional JSX parentheses.

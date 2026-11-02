@@ -9,6 +9,7 @@ import { getIndustryLoyaltyRule } from '@/lib/industry-campaigns';
 import { getGlobalDefaultMerchantSettings } from '@/lib/default-merchant-settings';
 import { normalizePhone } from '@/lib/utils';
 import { getOrCreateDigitalBusinessCard } from '@/lib/digital-card-service';
+import { searchPlaces } from '@/lib/google-places-api';
 
 
 export async function POST(req: Request) {
@@ -214,6 +215,52 @@ export async function POST(req: Request) {
           })
         }
       }).catch(() => {});
+    }
+
+    // 🛡️ Automatic Google Places & Reviews Auto-Hydration on Registration:
+    // Pre-populate baselineRating, baselineReviewCount, placeId & reviewUrl from Google Places on Day 1
+    try {
+      const placesQuery = [businessName, businessAddress].filter(Boolean).join(" ");
+      const placesRes = await searchPlaces(placesQuery);
+      if (placesRes?.results && placesRes.results.length > 0) {
+        const topMatch = placesRes.results.find((p: any) => p.placeId && !p.placeId.startsWith("manual_")) || placesRes.results[0];
+        if (topMatch?.placeId && !topMatch.placeId.startsWith("manual_")) {
+          const reviewUrl = `https://search.google.com/local/writereview?placeid=${topMatch.placeId}`;
+          const parts = (topMatch.formattedAddress || "").split(",").map((p: string) => p.trim()).filter(Boolean);
+          const detectedCity = parts.length >= 2 ? parts[parts.length - 2].replace(/\b\d{5,6}\b/g, "").trim() : null;
+
+          await db.merchant.update({
+            where: { id: merchant.id },
+            data: {
+              googleReviewLink: reviewUrl,
+              baselineRating: topMatch.rating || 0,
+              baselineReviewCount: topMatch.userRatingCount || 0,
+              address: merchant.address || topMatch.formattedAddress,
+              city: merchant.city || detectedCity || undefined,
+            }
+          });
+
+          await db.merchantGoogleConnection.upsert({
+            where: { merchantId: merchant.id },
+            create: {
+              merchantId: merchant.id,
+              placeId: topMatch.placeId,
+              placeName: topMatch.displayName?.text || businessName,
+              address: topMatch.formattedAddress,
+              googleReviewUrl: reviewUrl,
+              verified: false
+            },
+            update: {
+              placeId: topMatch.placeId,
+              placeName: topMatch.displayName?.text || businessName,
+              address: topMatch.formattedAddress,
+              googleReviewUrl: reviewUrl
+            }
+          });
+        }
+      }
+    } catch (placesErr) {
+      console.warn("[Register] Background Places auto-hydration skipped:", placesErr);
     }
 
     // Auto-provision Digital Business Card if opted

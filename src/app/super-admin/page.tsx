@@ -734,6 +734,43 @@ function MerchantManagement() {
   // Screenshot Proof Modal State
   const [screenshotModalMerchant, setScreenshotModalMerchant] = useState<any | null>(null)
 
+  // Google Places Auto-Detection State
+  const [syncingGbpMerchantId, setSyncingGbpMerchantId] = useState<string | null>(null)
+
+  const handleAutoSyncGbp = async (merchantId: string, merchantName: string) => {
+    setSyncingGbpMerchantId(merchantId)
+    try {
+      const res = await fetch("/api/admin/merchants/sync-gbp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ merchantId })
+      })
+      const json = await res.json()
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || "Failed to auto-detect Google Business Profile")
+      }
+      alert(`✅ Google Business Profile Synced!\n\nMatched: "${json.data.matchedPlace.name}"\nCity: ${json.data.merchant.city}\nRating: ⭐ ${json.data.matchedPlace.rating} (${json.data.matchedPlace.reviewCount} reviews)`)
+      // Update local merchant state
+      setMerchants(prev => prev.map(m => {
+        if (m.id === merchantId) {
+          return {
+            ...m,
+            city: json.data.merchant.city,
+            address: json.data.merchant.address,
+            googleReviewLink: json.data.merchant.googleReviewLink,
+            baselineRating: json.data.merchant.baselineRating,
+            baselineReviewCount: json.data.merchant.baselineReviewCount
+          }
+        }
+        return m
+      }))
+    } catch (err: any) {
+      alert("❌ GBP Sync Failed: " + err.message)
+    } finally {
+      setSyncingGbpMerchantId(null)
+    }
+  }
+
   // Live VPS DB Sync State
   const [isSyncingVps, setIsSyncingVps] = useState(false)
   const [syncVpsMessage, setSyncVpsMessage] = useState<string | null>(null)
@@ -1225,7 +1262,20 @@ function MerchantManagement() {
                               <ExternalLink className="w-2.5 h-2.5" />
                             </a>
                           ) : (
-                            <span className="text-[10px] text-slate-500 italic">No GBP linked</span>
+                            <button
+                              type="button"
+                              onClick={() => handleAutoSyncGbp(m.id, m.name)}
+                              disabled={syncingGbpMerchantId === m.id}
+                              className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded cursor-pointer transition"
+                              title="1-Click Auto-Detect Google Maps reviews and link profile"
+                            >
+                              {syncingGbpMerchantId === m.id ? (
+                                <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                              ) : (
+                                <Zap className="w-2.5 h-2.5 text-amber-400" />
+                              )}
+                              <span>Auto-Detect GBP</span>
+                            </button>
                           )}
                         </div>
                       </td>
