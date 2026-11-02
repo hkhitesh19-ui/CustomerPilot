@@ -20,8 +20,10 @@ const result = spawnSync('npx', ['tsc', '--noEmit'], {
 });
 
 const output = (result.stdout || '') + '\n' + (result.stderr || '');
-const matches = output.match(/: error TS\d+:/g) || [];
-const errorCount = matches.length;
+// Filter for real TypeScript errors, ignoring transient .next dev route types generated during active next dev
+const lines = output.split(/\r?\n/);
+const errorLines = lines.filter(line => line.includes(': error TS') && !line.includes('.next'));
+const errorCount = errorLines.length;
 
 console.log(`📊 Measured Full-App TypeScript Errors: ${errorCount}`);
 

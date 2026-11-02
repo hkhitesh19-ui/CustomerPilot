@@ -7,6 +7,24 @@ This document serves as a historical record of all major bugs, configuration iss
 ---
 ---
 ---
+---
+## [02 Nov 2026] UI/UX & Design Enhancement: Growth Packs & Combos Tiered Professional Palette
+- **Symptom**: In the newly structured Pricing Page, the 'Growth Packs & Combos' (Section 2) combo cards (Gear 2, Gear 3, Gear 4) lacked distinctive visual hierarchy, contrast, and high-converting modern SaaS styling. Pricing daily cost calculations had double parentheses `((₹3.15/day))`, and badge headers wrapped awkwardly across multiple lines.
+- **Root Cause**: All 3 combo cards shared nearly identical muted backgrounds and gray borders with insufficient color differentiation. Per-day cost helper function `dy()` already contained parentheses, leading to double-parenthesized daily rates when wrapped in additional JSX parentheses.
+- **Resolution**:
+  1. **Tiered Thematic Visual Architecture**:
+     - **Gear 2 (Review Accelerator)**: Mint & Emerald palette with soft emerald gradients, `⭐ Gear 2 · Review Accelerator` badge, emerald-bordered 1Y container, and vibrant emerald action buttons.
+     - **Gear 3 (Growth Pack - Most Popular)**: Warm Sunset Amber & Honey Gold palette, elevated with subtle lift (`md:-translate-y-2 md:scale-[1.02]`), `🔥 Gear 3 · Most Popular Choice` header ribbon, warm amber highlight container, and prominent CTA.
+     - **Gear 4 : CustomerPilot Complete (All-in-One Flagship)**: Royal Midnight Dark Indigo & Electric Cyan Neon palette (`bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900`) with ambient cyan glow, `👑 Gear 4 · All-in-One Flagship` badge, frosted glass 1Y box, and high-contrast cyan/sky CTA button.
+  2. **Micro-Polish & Bug Fixes**:
+     - Stripped redundant outer parentheses around `{dy(p365, 365)}` and `{dy(p180, 180)}` to eliminate `((₹x.xx/day))` visual glitch.
+     - Added `whitespace-nowrap` to combo header badges to prevent awkward multi-line text wrapping on narrow cards.
+  3. **Verification**:
+     - Executed headless Playwright browser capture (`localhost_pricing_combos_recolored.png`).
+     - Verified zero TypeScript errors across all pricing files (`Pricing errors count: 0`).
+     - Confirmed 100% English wording compliance (0 Hindi / 0 Hinglish / 0 Devanagari characters).
+- **Status**: ✅ Resolved and Verified.
+
 ## [29 Oct 2026] Feature & Infrastructure: SuperAdmin Fleet WhatsApp Disconnection & Targeted Alert Monitoring System
 - **Symptom**: Merchants' WhatsApp instances occasionally disconnected due to Meta WhatsApp Web session logout (Code 401), phone battery saver/offline state, or pending QR scans. When a customer scanned the store QR code, incoming check-in messages did not trigger the webhook because the Baileys socket was closed. Merchants remained unaware that their WhatsApp was unlinked, and the platform lacked a targeted alerting mechanism to inform only the affected store without spamming healthy stores.
 - **Root Cause**:

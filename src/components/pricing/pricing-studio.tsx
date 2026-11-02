@@ -90,8 +90,8 @@ export const GEAR_COMBOS: GearComboDefinition[] = [
   {
     gearKey: "gear_2",
     name: "Gear 2 : Smart Digital Business Card + Smart AI Google Reviews",
-    subtitle: "Smart Digital Business Card + Smart AI Google Reviews",
-    badge: "Gear 2 Combo",
+    subtitle: "Instant digital card branding plus autonomous Google review acceleration for local stores.",
+    badge: "⭐ Gear 2 · Review Accelerator",
     iconBg: "bg-emerald-600",
     modulesIncluded: ["card", "star"],
     tenures: {
@@ -102,8 +102,8 @@ export const GEAR_COMBOS: GearComboDefinition[] = [
   {
     gearKey: "gear_3",
     name: "Gear 3 : Smart Digital Business Card + Whatsapp Digital Loyalty Stamps & VIP Club + Smart AI Google Reviews",
-    subtitle: "Smart Digital Business Card + Whatsapp Digital Loyalty Stamps & VIP Club + Smart AI Google Reviews",
-    badge: "Gear 3 Growth Pack",
+    subtitle: "Complete walk-in retention: WhatsApp loyalty stamps, VIP tiers, and Google review acceleration.",
+    badge: "🔥 Gear 3 · Most Popular Choice",
     iconBg: "bg-amber-600",
     modulesIncluded: ["card", "loyalty", "star"],
     tenures: {
@@ -114,8 +114,8 @@ export const GEAR_COMBOS: GearComboDefinition[] = [
   {
     gearKey: "gear_4",
     name: "Gear 4 : CustomerPilot Complete",
-    subtitle: "Smart Digital Business Card + Whatsapp Digital Loyalty Stamps & VIP Club + Smart AI Google Reviews + 1-Click AI AutoReply",
-    badge: "Gear 4 Complete Suite",
+    subtitle: "All 4 flagship engines: Smart Card, Loyalty Stamps, AI Google Reviews, and 1-Click AI AutoReply.",
+    badge: "👑 Gear 4 · All-in-One Flagship",
     iconBg: "bg-indigo-600",
     modulesIncluded: ["card", "loyalty", "star", "chat"],
     tenures: {
@@ -1036,20 +1036,20 @@ export function PricingStudio({
 
       {/* ─── SECTION 2: GEAR GROWTH COMBOS (Gear 2, Gear 3, Gear 4) ─── */}
       <section className="space-y-6 mb-16">
-        <div className="pb-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-black uppercase tracking-wider mb-2">
-            <Zap className="w-3.5 h-3.5 text-indigo-600" /> Growth Packs &amp; Combos
+        <div className="text-center max-w-2xl mx-auto space-y-2 pb-2">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-emerald-500/10 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-black uppercase tracking-wider">
+            <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> Growth Packs &amp; Combos
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
             Pre-Configured Gear Combos
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Engineered combos designed for maximum retention velocity. Save up to 50% compared to standalone pricing.
+            Engineered bundles designed for maximum retention velocity. Save up to 50% compared to standalone pricing.
           </p>
         </div>
 
         {/* 3-Column Responsive Modern Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch pt-2">
           {GEAR_COMBOS.map((combo) => {
             const dbPlan6 = getPlanByKey(combo.tenures[180].planKey)
             const dbPlan1 = getPlanByKey(combo.tenures[365].planKey)
@@ -1062,6 +1062,7 @@ export function PricingStudio({
 
             const isGear4 = combo.gearKey === "gear_4"
             const isGear3 = combo.gearKey === "gear_3"
+            const isGear2 = combo.gearKey === "gear_2"
 
             // Standalone total comparison
             const standalone1YrSum = combo.modulesIncluded.reduce((acc, modKey) => {
@@ -1072,59 +1073,70 @@ export function PricingStudio({
             }, 0)
             const savings1YrVsStandalone = Math.max(0, standalone1YrSum - p365)
 
+            // Card thematic design styles
+            const cardTheme = isGear4
+              ? "bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900 text-white border-2 border-cyan-400/90 shadow-2xl hover:shadow-cyan-500/20"
+              : isGear3
+              ? "bg-gradient-to-b from-amber-50/90 via-white to-orange-50/40 dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900 border-2 border-amber-400 dark:border-amber-500 shadow-xl hover:shadow-2xl hover:shadow-amber-500/20 md:-translate-y-2 md:scale-[1.02]"
+              : "bg-gradient-to-b from-emerald-50/70 via-white to-teal-50/30 dark:from-emerald-950/30 dark:via-slate-900 dark:to-slate-900 border-2 border-emerald-400/70 dark:border-emerald-700/60 shadow-md hover:shadow-xl hover:shadow-emerald-500/15"
+
+            const badgeTheme = isGear4
+              ? "bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 text-slate-950 font-black shadow-md"
+              : isGear3
+              ? "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-slate-950 font-black shadow-sm"
+              : "bg-emerald-600 text-white font-black shadow-xs"
+
+            const discountBadgeTheme = isGear4
+              ? "text-cyan-300 bg-cyan-950/90 border border-cyan-400/50 font-black"
+              : isGear3
+              ? "text-amber-950 bg-amber-200 border border-amber-300 font-black"
+              : "text-emerald-800 bg-emerald-100 border border-emerald-300 font-black"
+
             return (
               <div
                 key={combo.gearKey}
-                className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 relative overflow-hidden border ${
-                  isGear4
-                    ? "bg-gradient-to-b from-indigo-50/70 via-white to-sky-50/50 dark:from-indigo-950/40 dark:via-slate-900 dark:to-slate-900 border-indigo-400 shadow-lg hover:shadow-xl hover:shadow-indigo-500/10"
-                    : isGear3
-                    ? "bg-white dark:bg-slate-900 border-amber-300 dark:border-amber-700/60 shadow-sm hover:shadow-md"
-                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-md"
-                }`}
+                className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${cardTheme}`}
               >
                 {/* Glow accent for Gear 4 */}
                 {isGear4 && (
-                  <div className="absolute -top-16 -right-16 w-40 h-40 bg-indigo-500/15 rounded-full blur-2xl pointer-events-none" />
+                  <div className="absolute -top-20 -right-20 w-52 h-52 bg-gradient-to-br from-cyan-500/25 to-indigo-500/25 rounded-full blur-3xl pointer-events-none" />
                 )}
 
                 <div>
-                  {/* Top Badge */}
+                  {/* Top Badge & Discount */}
                   <div className="flex items-center justify-between gap-2 mb-4">
-                    <span
-                      className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
-                        isGear4
-                          ? "bg-indigo-600 text-white"
-                          : isGear3
-                          ? "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 border border-amber-300 dark:border-amber-800"
-                          : "bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800"
-                      }`}
-                    >
+                    <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full whitespace-nowrap ${badgeTheme}`}>
                       {combo.badge}
                     </span>
-                    <span className="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400">
+                    <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full ${discountBadgeTheme}`}>
                       50% OFF
                     </span>
                   </div>
 
                   {/* Title & Subtitle */}
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white leading-snug">
+                  <h3 className={`text-lg sm:text-xl font-black leading-snug ${isGear4 ? "text-white" : "text-slate-900 dark:text-white"}`}>
                     {combo.name}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-5 leading-relaxed">
+                  <p className={`text-xs mt-1.5 mb-5 leading-relaxed ${isGear4 ? "text-slate-300" : "text-slate-600 dark:text-slate-400"}`}>
                     {combo.subtitle}
                   </p>
 
                   {/* Included Engines Checklist */}
-                  <div className="space-y-2 mb-6">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  <div className="space-y-2.5 mb-6">
+                    <span className={`text-[11px] font-bold uppercase tracking-wider ${isGear4 ? "text-cyan-300" : isGear3 ? "text-amber-800 dark:text-amber-300" : "text-emerald-800 dark:text-emerald-300"}`}>
                       Included Modules:
                     </span>
                     {combo.modulesIncluded.map((modKey) => {
                       const serv = STANDALONE_SERVICES.find((s) => s.i === modKey)
                       return (
-                        <div key={modKey} className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
-                          <div className="w-4 h-4 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                        <div key={modKey} className={`flex items-center gap-2.5 text-xs font-semibold ${isGear4 ? "text-slate-100" : "text-slate-800 dark:text-slate-200"}`}>
+                          <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                            isGear4
+                              ? "bg-cyan-500/20 text-cyan-300 border border-cyan-400/40"
+                              : isGear3
+                              ? "bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300"
+                              : "bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300"
+                          }`}>
                             <Check className="w-3 h-3 stroke-[3]" />
                           </div>
                           <span>{serv?.n || modKey}</span>
@@ -1134,55 +1146,101 @@ export function PricingStudio({
                   </div>
 
                   {/* Pricing Tiers Box */}
-                  <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                  <div className={`space-y-3 pt-4 border-t ${isGear4 ? "border-slate-800" : isGear3 ? "border-amber-200/80 dark:border-slate-800" : "border-emerald-200/80 dark:border-slate-800"}`}>
                     {/* 1 Year Option (Recommended) */}
-                    <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 flex items-center justify-between gap-3">
+                    <div className={`p-4 rounded-2xl flex items-center justify-between gap-3 ${
+                      isGear4
+                        ? "bg-gradient-to-r from-indigo-950 to-slate-900/90 border-2 border-cyan-400 shadow-lg backdrop-blur-md"
+                        : isGear3
+                        ? "bg-gradient-to-r from-amber-100 to-orange-100/90 dark:from-amber-950/70 dark:to-orange-950/50 border-2 border-amber-400 shadow-sm"
+                        : "bg-gradient-to-r from-emerald-100/90 to-teal-100/70 dark:from-emerald-950/60 dark:to-teal-950/40 border-2 border-emerald-400 shadow-xs"
+                    }`}>
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-extrabold text-slate-900 dark:text-white">1 Year Plan</span>
-                          {savings1YrVsStandalone > 0 && (
-                            <span className="text-[10px] font-black text-indigo-700 bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 px-1.5 py-0.2 rounded">
+                          <span className={`text-xs font-black ${isGear4 ? "text-white" : "text-slate-950"}`}>
+                            1 Year Plan
+                          </span>
+                          {savings1YrVsStandalone > 0 ? (
+                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                              isGear4
+                                ? "bg-cyan-400 text-slate-950"
+                                : isGear3
+                                ? "bg-amber-800 text-white"
+                                : "bg-emerald-800 text-white"
+                            }`}>
                               Save {inr(savings1YrVsStandalone)}
+                            </span>
+                          ) : (
+                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                              isGear4
+                                ? "bg-cyan-400 text-slate-950"
+                                : "bg-slate-900 text-white"
+                            }`}>
+                              Best Value
                             </span>
                           )}
                         </div>
-                        <div className="flex items-baseline gap-1.5 mt-0.5">
-                          <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                        <div className="flex items-baseline gap-1.5 mt-1">
+                          <span className={`text-lg sm:text-xl font-black ${isGear4 ? "text-cyan-300" : "text-slate-950"}`}>
                             {inr(p365)}
                           </span>
-                          <span className="text-[11px] font-semibold text-slate-400 line-through decoration-rose-500">
+                          <span className={`text-[11px] font-semibold line-through decoration-rose-500 ${isGear4 ? "text-slate-400 decoration-rose-400" : "text-slate-500"}`}>
                             {inr(m365)}
                           </span>
-                          <span className="text-[11px] text-slate-500 font-medium">({dy(p365, 365)})</span>
+                          <span className={`text-[11px] font-bold ${isGear4 ? "text-cyan-200/90" : isGear3 ? "text-amber-950" : "text-emerald-950"}`}>
+                            {dy(p365, 365)}
+                          </span>
                         </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleSelectGearCombo(combo, 365)}
-                        className="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs cursor-pointer transition shrink-0"
+                        className={`text-xs font-black px-4 py-2 rounded-xl transition transform hover:scale-[1.02] cursor-pointer shrink-0 ${
+                          isGear4
+                            ? "bg-gradient-to-r from-cyan-400 to-sky-300 hover:from-cyan-300 hover:to-sky-200 text-slate-950 shadow-md"
+                            : isGear3
+                            ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 shadow-md"
+                            : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                        }`}
                       >
                         Choose 1Y
                       </button>
                     </div>
 
                     {/* 6 Months Option */}
-                    <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+                    <div className={`p-3.5 rounded-2xl flex items-center justify-between gap-3 ${
+                      isGear4
+                        ? "bg-white/5 border border-white/15"
+                        : isGear3
+                        ? "bg-white/95 dark:bg-slate-900 border border-amber-200 dark:border-amber-800/60"
+                        : "bg-white/95 dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/60"
+                    }`}>
                       <div>
-                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300">6 Months Plan</span>
+                        <span className={`text-xs font-bold ${isGear4 ? "text-slate-200" : "text-slate-700 dark:text-slate-300"}`}>
+                          6 Months Plan
+                        </span>
                         <div className="flex items-baseline gap-1.5 mt-0.5">
-                          <span className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">
+                          <span className={`text-sm sm:text-base font-extrabold ${isGear4 ? "text-white" : "text-slate-900 dark:text-white"}`}>
                             {inr(p180)}
                           </span>
-                          <span className="text-[11px] font-semibold text-slate-400 line-through decoration-rose-500">
+                          <span className={`text-[11px] font-semibold line-through decoration-rose-500 ${isGear4 ? "text-slate-400 decoration-rose-400" : "text-slate-400"}`}>
                             {inr(m180)}
                           </span>
-                          <span className="text-[11px] text-slate-500 font-medium">({dy(p180, 180)})</span>
+                          <span className={`text-[11px] font-medium ${isGear4 ? "text-slate-300" : "text-slate-500"}`}>
+                            {dy(p180, 180)}
+                          </span>
                         </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleSelectGearCombo(combo, 180)}
-                        className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600 cursor-pointer transition shrink-0"
+                        className={`text-xs font-bold px-3 py-1.5 rounded-xl transition cursor-pointer shrink-0 ${
+                          isGear4
+                            ? "border border-cyan-400/50 text-cyan-300 hover:bg-cyan-950/60"
+                            : isGear3
+                            ? "bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-300"
+                            : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-300"
+                        }`}
                       >
                         Choose 6M
                       </button>
