@@ -8,18 +8,18 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 6928cef
-Full Commit Hash  : 6928cefc71a6b365a53b156ada6a8620c282d942
-Target Fix Commit : 6928cefc71a6b365a53b156ada6a8620c282d942
+Active Git Commit : 5d37ecd
+Full Commit Hash  : 5d37ecd218e6ebdde283cda6b1187467aacc3f1a
+Target Fix Commit : 5d37ecd218e6ebdde283cda6b1187467aacc3f1a
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 03 Nov 2026, 09:45 PM IST
+Deployment Date   : 03 Nov 2026, 11:35 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(billing): direct upi configuration in digital card, auto-prefixing, and evolution api whatsapp pdf attachment dispatch
+Commit Title      : revert(billing): remove upi payment section and upi id fields across digital card and billing settings
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 Merchant Status   : Vinayak Fashion & Cake Connection Live (Cake Connection WhatsApp Socket Open & Healthy)
-Digital Card UPI  : Dedicated Section 6 in /dashboard/digital-card for UPI ID / VPA & Payee Name; 0% MDR 1-tap UPI deep-link & dynamic interactive UPI QR modal on /c/[slug]; auto-synced with billing settings; Cake Connection verified on 7203824012@paytm
+UPI Section Revert: Removed UPI Payment section from Digital Business Card (/c/[slug]) and dashboard settings (/dashboard/digital-card & /dashboard/settings) as requested by Admin
 Itemized Billing  : Free modular POS in LiveQueue with catalog item counters, categories, custom items, flat/% discounts, GST tax engine (5%, 12%, 18%, IGST), and zero loyalty stamp pollution on bills
 WhatsApp PDF Doc  : Direct attached binary PDF invoice dispatch via Evolution API sendMedia (/message/sendMedia/:instance) alongside structured text bill with instant live link https://customerpilot.in/invoice/[orderNo]
 PDF Engine        : Lightweight Pure-JS PDF 1.4 generator in src/lib/invoice-pdf-generator.ts with standalone public download route /api/billing/invoice-pdf/[orderNo]
@@ -38,14 +38,10 @@ Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in 
 ----------------------------------------------------------
 
 Deployment History Log:
+- 03 Nov 2026, 11:35 PM: 5d37ecd - revert(billing): remove upi payment section and upi id fields across digital card and billing settings
 - 03 Nov 2026, 09:45 PM: 6928cef - feat(billing): direct upi configuration in digital card, auto-prefixing, and evolution api whatsapp pdf attachment dispatch
 - 03 Nov 2026, 08:25 PM: 631ca01 - feat(billing): itemized whatsapp billing, gst pos invoice engine and upi payment on digital card
 - 03 Nov 2026, 07:15 PM: 01e8e71 - feat(reviews): upgrade Smart AI Google Reviews standee to Final v3 in dashboard/settings, add square zero-clipping CP badge in QR, and sync A4 print template
 - 03 Nov 2026, 05:40 PM: cbe86f4 - fix(whatsapp): preserve pairing query in connect poll, add phone match guidance, and auto-provision 3-day trial on GBP quick-qr
 - 03 Nov 2026, 04:50 PM: 6b9f5e5 - fix(pricing): redesign gear combo cards for high-contrast readability, full-width zero-clipping buttons, and pixel-perfect height alignment
 - 03 Nov 2026, 04:20 PM: a937ca2 - feat(pricing-whatsapp-gbp): gear 2-5 combo pricing, dual-mode 8-digit whatsapp pairing, 1-click gbp review qr, and dynamic business categories
-- 03 Nov 2026, 02:15 PM: 2119d39 - feat(reviews-whatsapp): dynamic anti-repetition review drafting engine across 10 categories and whatsapp qr pairing stability
-- 02 Nov 2026, 03:10 PM: 31bda9c - feat(gbp): automate google places detection on signup and add 1-click superadmin sync
-- 02 Nov 2026, 10:50 AM: 80d1538 - style(pricing): elevate growth packs & combos with vibrant tiered color themes
-- 02 Nov 2026, 08:25 AM: 758f686 (Local: 680ba7c) - feat(pricing): add postpaid monthly billing and gear 2, 3, 4 combo plans with English UI
-- 29 Oct 2026, 10:25 PM: ba21103 (Local: d93fe81) - feat(whatsapp): build superadmin whatsapp disconnection diagnosis and targeted alerting system
