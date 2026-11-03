@@ -89,6 +89,7 @@ export interface DigitalCardData {
   theme?: string | null
   googlePlaceId?: string | null
   upiId?: string | null
+  upiPayeeName?: string | null
 }
 
 export function DigitalCardView({ card }: { card: DigitalCardData }) {

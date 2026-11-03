@@ -5262,3 +5262,29 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
      - **Public Web & High-Definition PDF Printable Invoice (`src/app/invoice/[orderNo]/page.tsx` & `src/components/invoice/invoice-view.tsx`)**: Created thermal-printer and A4 print-ready tax invoice view with authorized signatory and UPI verification QR.
   3. **Verification**: Passed all 6 gates of the Master Adversarial Guard (`node scripts/run_adversarial_guard.js`) cleanly and executed deterministic unit tests with Exit Code 0.
 - **Status**: ✅ Resolved, Tested, and Verified Locally.
+
+---
+## [03 Nov 2026] Issue: Digital Business Card UPI Management & Attached WhatsApp PDF Invoice Document Dispatch
+- **Symptom**: 
+  1. Merchants had no dedicated input fields in `/dashboard/digital-card` to easily set up or update their UPI ID/VPA (e.g. `7203824012@paytm`) and Payee Name for the Smart Digital Business Card.
+  2. Invoices generated in WhatsApp only sent the text message with the web link, but did not attach the actual PDF document file directly into the WhatsApp chat.
+  3. Cake Connection invoice prefix required automatic initialization to `CC-` (e.g. `CC-19791626`).
+- **Root Cause**:
+  1. `/dashboard/digital-card` only had inputs for social and ordering URLs, missing a dedicated UPI payment card configuration section.
+  2. Evolution API dispatch in `create-invoice/route.ts` only called `sendText` without `sendMedia` document attachment for binary PDFs.
+  3. Invoice prefix defaulted to `INV-` instead of intelligently deriving the merchant's initials (e.g. `CC-` for Cake Connection).
+- **Resolution**:
+  1. **Dedicated UPI Payment Configuration in Dashboard (`/dashboard/digital-card`)**:
+     - Added Section 6: "Instant UPI Payment & QR Code" with fields for Merchant UPI ID / VPA and UPI Payee Business Name.
+     - Automatically synchronized `theme.upiId` with `MERCHANT_BILLING_SETTINGS_${merchantId}.upiId` so both the digital card and billing invoice share the exact same verified UPI ID.
+     - Configured Cake Connection's verified UPI ID to `7203824012@paytm`.
+  2. **Direct WhatsApp PDF Document Attachment (`src/app/api/billing/create-invoice/route.ts`)**:
+     - Built `src/lib/invoice-pdf-generator.ts`: Pure-JS PDF 1.4 generator that compiles structured tax invoices with clean headers, itemized tables, GST tax breakdown, and terms.
+     - Updated `sendWhatsAppInvoice` to dispatch the PDF binary document via Evolution API `/message/sendMedia/:instance` with `mediatype: "document"`, `mimetype: "application/pdf"`, `media: base64Pdf`, and `fileName: "Invoice-${orderNo}.pdf"`.
+     - Also dispatches the full formatted text bill with the live link `https://customerpilot.in/invoice/${orderNo}` via `/message/sendText/:instance`.
+     - Added public PDF download endpoint at `/api/billing/invoice-pdf/[orderNo]`.
+  3. **Auto-Derived Business Prefix**:
+     - In `create-invoice/route.ts`, if no custom prefix is set, dynamically derives the business initials (e.g. `Cake Connection` -> `CC-`), generating invoices like `CC-19791626`.
+  4. **Adversarial & TypeScript Verification**:
+     - Fixed `Order` query typing, added `upiPayeeName` to `DigitalCardData`, and passed all 6 gates of `node scripts/run_adversarial_guard.js` (TypeScript Ratchet: 36/36).
+- **Status**: ✅ Resolved, Fully Verified, and Committed Locally.

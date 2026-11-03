@@ -1,11 +1,28 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { ok, err, getAuthenticatedMerchant } from "@/lib/api"
+import { generateInvoicePdf, InvoicePdfData } from "@/lib/invoice-pdf-generator"
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 
-async function sendWhatsAppInvoice(merchantId: string, toPhone: string, text: string) {
+interface WhatsAppInvoicePayload {
+  merchantId: string
+  toPhone: string
+  text: string
+  pdfBase64?: string
+  orderNo: string
+  invoiceUrl: string
+}
+
+async function sendWhatsAppInvoice({
+  merchantId,
+  toPhone,
+  text,
+  pdfBase64,
+  orderNo,
+  invoiceUrl
+}: WhatsAppInvoicePayload) {
   try {
     if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
       console.log("[Invoice API] Evolution API credentials not configured, skipping WhatsApp dispatch")
@@ -15,11 +32,44 @@ async function sendWhatsAppInvoice(merchantId: string, toPhone: string, text: st
     const merchant = await db.merchant.findUnique({ where: { id: merchantId } })
     const defaultInstance = process.env.EVOLUTION_INSTANCE_NAME || "CustomerPilot_Main"
     const instanceName = merchant?.whatsappInstanceName || (merchant?.whatsappPhone ? `CP_M${merchant.whatsappPhone.replace(/\D/g, "")}` : defaultInstance)
+    const cleanNumber = toPhone.replace(/\D/g, "")
 
+    // 1. Dispatch Attached PDF Document via Evolution API sendMedia
+    if (pdfBase64) {
+      try {
+        const mediaPayload = {
+          number: cleanNumber,
+          mediatype: "document",
+          mimetype: "application/pdf",
+          caption: `🧾 Official Tax Invoice #${orderNo}\n🔗 View / Print Online: ${invoiceUrl}`,
+          media: `data:application/pdf;base64,${pdfBase64}`,
+          fileName: `Invoice-${orderNo}.pdf`
+        }
+
+        let mediaRes = await fetch(`${EVOLUTION_API_URL}/message/sendMedia/${instanceName}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
+          body: JSON.stringify(mediaPayload)
+        })
+
+        if (!mediaRes.ok && instanceName !== defaultInstance) {
+          console.log(`[Invoice API] sendMedia on ${instanceName} failed. Retrying fallback ${defaultInstance}`)
+          await fetch(`${EVOLUTION_API_URL}/message/sendMedia/${defaultInstance}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
+            body: JSON.stringify(mediaPayload)
+          })
+        }
+      } catch (mediaErr: any) {
+        console.warn("[Invoice API] sendMedia error (will deliver text bill):", mediaErr.message)
+      }
+    }
+
+    // 2. Dispatch Full Formatted Text Bill via sendText
     let res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
-      body: JSON.stringify({ number: toPhone, text })
+      body: JSON.stringify({ number: cleanNumber, text })
     })
 
     if (!res.ok && instanceName !== defaultInstance) {
@@ -27,7 +77,7 @@ async function sendWhatsAppInvoice(merchantId: string, toPhone: string, text: st
       res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${defaultInstance}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
-        body: JSON.stringify({ number: toPhone, text })
+        body: JSON.stringify({ number: cleanNumber, text })
       })
     }
 
@@ -35,7 +85,7 @@ async function sendWhatsAppInvoice(merchantId: string, toPhone: string, text: st
     await db.whatsAppMessage.create({
       data: {
         merchantId,
-        toPhone,
+        toPhone: cleanNumber,
         template: "TAX_INVOICE_PDF",
         body: text.substring(0, 500),
         status: res.ok ? "sent" : "failed",
@@ -102,7 +152,7 @@ export async function POST(req: NextRequest) {
       where: { key: `MERCHANT_BILLING_SETTINGS_${merchantId}` }
     })
     let billingSettings = {
-      invoicePrefix: "INV-",
+      invoicePrefix: "",
       gstin: "",
       terms: "Thank you for shopping with us! Goods once sold will not be returned.",
       upiId: ""
@@ -113,10 +163,22 @@ export async function POST(req: NextRequest) {
       } catch (_) {}
     }
 
+    // Automatically derive prefix if not configured (e.g. "Cake Connection" -> "CC-")
+    let prefix = billingSettings.invoicePrefix?.trim()
+    if (!prefix) {
+      const initials = (merchant.name || "INV")
+        .split(/\s+/)
+        .map(w => w[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 3)
+      prefix = `${initials || "INV"}-`
+    }
+
     // Generate unique sequential order / invoice number
     const randomDigits = Math.floor(1000 + Math.random() * 9000)
     const timestampDigits = Date.now().toString().slice(-4)
-    const orderNo = `${billingSettings.invoicePrefix || "INV-"}${timestampDigits}${randomDigits}`
+    const orderNo = `${prefix}${timestampDigits}${randomDigits}`
 
     const finalGrandTotal = Math.round(Number(grandTotal || taxableAmount || subtotal))
 
@@ -229,7 +291,7 @@ export async function POST(req: NextRequest) {
       return newOrder
     })
 
-    // 4. Construct Clean Official WhatsApp Invoice (Strictly ZERO Loyalty Stamp Text)
+    // 4. Construct Clean Official WhatsApp Invoice & Generate PDF Attachment
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.in"
     const invoiceUrl = `${appUrl}/invoice/${orderNo}`
 
@@ -281,13 +343,59 @@ export async function POST(req: NextRequest) {
       `${invoiceUrl}\n\n` +
       `🙏 *Thank you for shopping with us!*`
 
-    // Dispatch WhatsApp notification asynchronously from merchant instance
-    sendWhatsAppInvoice(merchantId, waitingCustomer.customer.phone, waBillMessage)
+    // Generate Binary PDF Buffer for direct WhatsApp document attachment
+    let pdfBase64: string | undefined
+    try {
+      const pdfData: InvoicePdfData = {
+        orderNo,
+        date: formattedDate,
+        merchantName: merchant.name,
+        merchantAddress: merchant.address || null,
+        merchantPhone: merchant.whatsappPhone || null,
+        gstin: billingSettings.gstin || null,
+        upiId: billingSettings.upiId || null,
+        customerName: customerDisplayName,
+        customerPhone: waitingCustomer.customer.phone,
+        paymentMethod,
+        items: items.map(i => ({
+          name: i.name,
+          quantity: Number(i.quantity || 1),
+          unitPrice: Number(i.unitPrice || 0),
+          totalPrice: Number(i.totalPrice || (i.unitPrice * i.quantity))
+        })),
+        subtotal: Number(subtotal),
+        discount: Number(discount),
+        discountType,
+        taxableAmount: Number(taxableAmount),
+        gstRate: Number(gstRate),
+        gstType,
+        cgst: Number(cgst),
+        sgst: Number(sgst),
+        igst: Number(igst),
+        grandTotal: finalGrandTotal,
+        terms: billingSettings.terms || null
+      }
+      const pdfBuffer = generateInvoicePdf(pdfData)
+      pdfBase64 = pdfBuffer.toString("base64")
+    } catch (pdfErr: any) {
+      console.warn("[Invoice API] PDF buffer generation error:", pdfErr.message)
+    }
+
+    // Dispatch WhatsApp notification (both attached PDF document and structured text bill)
+    sendWhatsAppInvoice({
+      merchantId,
+      toPhone: waitingCustomer.customer.phone,
+      text: waBillMessage,
+      pdfBase64,
+      orderNo,
+      invoiceUrl
+    })
 
     return ok({
       message: "Tax invoice generated and dispatched successfully",
       orderNo,
       invoiceUrl,
+      pdfDownloadUrl: `${appUrl}/api/billing/invoice-pdf/${orderNo}`,
       grandTotal: finalGrandTotal,
       orderId: transactionResult.id
     })

@@ -133,7 +133,17 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
     if (card.merchant.trialEndsAt) {
       themeObj.trialEndsAt = card.merchant.trialEndsAt.toISOString()
     }
+    if (!merchantUpiId && themeObj.upiId) {
+      merchantUpiId = String(themeObj.upiId).trim()
+    }
     effectiveTheme = JSON.stringify(themeObj)
+  }
+
+  if (!merchantUpiId) {
+    const cleanPhone = (card.whatsappNumber || card.phoneNumber || "").replace(/[^0-9]/g, "")
+    if (cleanPhone && cleanPhone.length >= 10) {
+      merchantUpiId = `${cleanPhone.slice(-10)}@paytm`
+    }
   }
 
   const cardData: DigitalCardData = {
