@@ -107,18 +107,6 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
 
   // Ensure theme honors merchant's active plan and extended trialEndsAt from SuperAdmin
   let effectiveTheme = card.theme
-  let merchantUpiId: string | null = null
-  if (card.merchantId) {
-    const billingSettingsRecord = await db.systemContent.findUnique({
-      where: { key: `MERCHANT_BILLING_SETTINGS_${card.merchantId}` },
-    })
-    if (billingSettingsRecord?.value) {
-      try {
-        const parsed = JSON.parse(billingSettingsRecord.value)
-        if (parsed.upiId) merchantUpiId = String(parsed.upiId).trim()
-      } catch (_) {}
-    }
-  }
   if (card.merchant) {
     const isSubscribed = card.merchant.plan && card.merchant.plan !== "trial"
     let themeObj: any = {}
@@ -133,17 +121,7 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
     if (card.merchant.trialEndsAt) {
       themeObj.trialEndsAt = card.merchant.trialEndsAt.toISOString()
     }
-    if (!merchantUpiId && themeObj.upiId) {
-      merchantUpiId = String(themeObj.upiId).trim()
-    }
     effectiveTheme = JSON.stringify(themeObj)
-  }
-
-  if (!merchantUpiId) {
-    const cleanPhone = (card.whatsappNumber || card.phoneNumber || "").replace(/[^0-9]/g, "")
-    if (cleanPhone && cleanPhone.length >= 10) {
-      merchantUpiId = `${cleanPhone.slice(-10)}@paytm`
-    }
   }
 
   const cardData: DigitalCardData = {
@@ -171,7 +149,6 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
     createdAt: card.createdAt,
     theme: effectiveTheme,
     googlePlaceId: card.googlePlaceId,
-    upiId: merchantUpiId,
   }
 
   return <DigitalCardView card={cardData} />

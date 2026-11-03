@@ -22,7 +22,7 @@ interface InvoiceViewProps {
       phone: string
       logoUrl: string | null
       gstin: string
-      upiId: string
+      upiId?: string | null
       terms: string
     }
     customer: {
@@ -104,9 +104,6 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
     hour12: true,
   })
 
-  const upiPayUrl = invoice.merchant.upiId
-    ? `upi://pay?pa=${encodeURIComponent(invoice.merchant.upiId)}&pn=${encodeURIComponent(invoice.merchant.name)}&am=${invoice.financials.grandTotal}&cu=INR`
-    : null
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 py-6 px-3 sm:px-6 font-sans print:p-0 print:bg-white print:m-0">
@@ -265,24 +262,7 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
                 </span>
               </div>
 
-              {upiPayUrl && (
-                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3 w-fit">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(upiPayUrl)}`}
-                    alt="UPI Verification QR"
-                    className="w-16 h-16 object-contain rounded-lg border border-slate-300"
-                  />
-                  <div>
-                    <div className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full w-fit">
-                      UPI Verified
-                    </div>
-                    <div className="text-[11px] font-mono font-bold text-slate-800 mt-1">
-                      {invoice.merchant.upiId}
-                    </div>
-                    <div className="text-[10px] text-slate-500">Scan to verify payment</div>
-                  </div>
-                </div>
-              )}
+
             </div>
 
             {/* Price Breakdown Table */}

@@ -141,41 +141,7 @@ export async function GET(req: NextRequest) {
       })
     }
 
-        // Hydrate verified UPI ID & Payee details for digital card
-    let upiId: string | null = null
-    let upiPayeeName: string | null = null
-    if (card.theme && typeof card.theme === "string" && card.theme.startsWith("{")) {
-      try {
-        const parsed = JSON.parse(card.theme)
-        if (parsed.upiId) upiId = String(parsed.upiId).trim()
-        if (parsed.upiPayeeName) upiPayeeName = String(parsed.upiPayeeName).trim()
-      } catch {}
-    }
-    if (!upiId && card.merchantId) {
-      const billingSettingsRecord = await db.systemContent.findUnique({
-        where: { key: `MERCHANT_BILLING_SETTINGS_${card.merchantId}` },
-      })
-      if (billingSettingsRecord?.value) {
-        try {
-          const parsed = JSON.parse(billingSettingsRecord.value)
-          if (parsed.upiId) upiId = String(parsed.upiId).trim()
-        } catch {}
-      }
-    }
-    if (!upiId) {
-      const cleanPhone = (card.whatsappNumber || card.phoneNumber || "").replace(/[^0-9]/g, "")
-      if (cleanPhone && cleanPhone.length >= 10) {
-        upiId = `${cleanPhone.slice(-10)}@paytm`
-      }
-    }
-
-    const cardWithUpi = {
-      ...card,
-      upiId,
-      upiPayeeName: upiPayeeName || card.displayName
-    }
-
-    return NextResponse.json({ success: true, card: cardWithUpi })
+    return NextResponse.json({ success: true, card })
   } catch (error: any) {
     console.error("[API_DIGITAL_CARD_GET]", error)
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })
@@ -386,31 +352,7 @@ export async function POST(req: NextRequest) {
       },
     })
 
-        if (upiId && targetMerchantId) {
-      try {
-        const billingRecord = await db.systemContent.findUnique({
-          where: { key: `MERCHANT_BILLING_SETTINGS_${targetMerchantId}` }
-        })
-        let currentBilling: any = {}
-        if (billingRecord?.value) {
-          try { currentBilling = JSON.parse(billingRecord.value) } catch {}
-        }
-        currentBilling.upiId = String(upiId).trim()
-        await db.systemContent.upsert({
-          where: { key: `MERCHANT_BILLING_SETTINGS_${targetMerchantId}` },
-          update: { value: JSON.stringify(currentBilling) },
-          create: { section: "billing_settings", key: `MERCHANT_BILLING_SETTINGS_${targetMerchantId}`, value: JSON.stringify(currentBilling) }
-        })
-      } catch {}
-    }
-
-    const updatedCardWithUpi = {
-      ...updatedCard,
-      upiId: parsedTheme.upiId || null,
-      upiPayeeName: parsedTheme.upiPayeeName || updatedCard.displayName
-    }
-
-    return NextResponse.json({ success: true, card: updatedCardWithUpi, slug: updatedCard.slug })
+        return NextResponse.json({ success: true, card: updatedCard, slug: updatedCard.slug })
   } catch (error: any) {
     console.error("[API_DIGITAL_CARD_POST]", error)
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })

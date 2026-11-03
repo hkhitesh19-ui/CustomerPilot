@@ -5288,3 +5288,17 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   4. **Adversarial & TypeScript Verification**:
      - Fixed `Order` query typing, added `upiPayeeName` to `DigitalCardData`, and passed all 6 gates of `node scripts/run_adversarial_guard.js` (TypeScript Ratchet: 36/36).
 - **Status**: ✅ Resolved, Fully Verified, and Committed Locally.
+
+---
+## [03 Nov 2026] Issue: Revert UPI Payment Section & UPI ID Fields across Digital Card & Billing
+- **Symptom**: UPI payment section on Digital Business Card (`/c/[slug]`), dashboard settings (`/dashboard/digital-card`), and Itemized Billing settings card (`/dashboard/settings`) needed to be removed as per admin request.
+- **Root Cause**: Admin requested immediate removal of the UPI ID and payment widget from the public digital business card and merchant configuration screens.
+- **Resolution**:
+  1. Removed Section 2.8 (`effectiveUpiId` green card, copy button, deep-link, and modal triggers) from `src/components/digital-card-view.tsx`.
+  2. Removed `merchantUpiId` resolution from `src/app/c/[slug]/page.tsx`.
+  3. Removed Section 6 ("Instant UPI Payment & QR Code") from `src/app/dashboard/digital-card/page.tsx`.
+  4. Removed "Merchant UPI ID (For QR)" input and adjusted grid to 3 columns in `src/components/itemized-billing-settings-card.tsx`.
+  5. Removed UPI QR payment preview from `src/components/invoice/invoice-view.tsx`.
+  6. Cleaned database records for Cake Connection in `dev.db` locally and on VPS.
+  7. Ran full Master Adversarial Guard (all 6 gates passed cleanly).
+- **Status**: ✅ Resolved, Fully Verified, and Deployed to Live VPS.

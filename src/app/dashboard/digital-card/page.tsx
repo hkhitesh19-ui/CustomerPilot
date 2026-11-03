@@ -82,8 +82,6 @@ export default function DigitalCardDashboardPage() {
     ]),
     googleRating: 4.6,
     googleReviewsCnt: 689,
-    upiId: "7203824012@paytm",
-    upiPayeeName: "Cake Connection",
   })
 
   // Synchronize orderingLinks into formData for live interactive phone simulator
@@ -737,67 +735,6 @@ export default function DigitalCardDashboardPage() {
                     placeholder="https://..."
                     className="mt-1 rounded-xl text-xs"
                   />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* 6. Instant UPI Payment & QR Code (Paytm / PhonePe / GPay) */}
-          <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-black flex items-center gap-2">
-                  <IndianRupee className="w-4 h-4 text-emerald-600" />
-                  Instant UPI Payment &amp; QR Code
-                </CardTitle>
-                <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-300">
-                  Paytm / PhonePe / GPay
-                </span>
-              </div>
-              <CardDescription className="text-xs">
-                Enter your business UPI ID (VPA). Customers can pay you in 1-tap via Paytm, PhonePe, Google Pay, or BHIM, or scan the interactive UPI QR code directly on your live card.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Merchant UPI ID / VPA */}
-                <div>
-                  <Label className="text-xs font-bold flex items-center gap-1.5">
-                    <CreditCard className="w-3.5 h-3.5 text-emerald-600" />
-                    Merchant UPI ID / VPA
-                  </Label>
-                  <Input
-                    value={formData.upiId || ""}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      setFormData({ ...formData, upiId: val })
-                    }}
-                    placeholder="e.g. 7203824012@paytm or cakeconnection@okhdfcbank"
-                    className="mt-1 rounded-xl text-xs font-mono"
-                  />
-                  <p className="text-[10px] text-muted-foreground mt-1">
-                    Accepts all UPI handles: Paytm (@paytm), PhonePe (@ybl), Google Pay (@okhdfcbank), BHIM (@upi), etc.
-                  </p>
-                </div>
-
-                {/* Payee Business Name */}
-                <div>
-                  <Label className="text-xs font-bold flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                    UPI Payee Business Name
-                  </Label>
-                  <Input
-                    value={formData.upiPayeeName || formData.displayName || ""}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      setFormData({ ...formData, upiPayeeName: val })
-                    }}
-                    placeholder="e.g. Cake Connection"
-                    className="mt-1 rounded-xl text-xs"
-                  />
-                  <p className="text-[10px] text-muted-foreground mt-1">
-                    Official business name shown inside customer's UPI app on payment screen.
-                  </p>
                 </div>
               </div>
             </CardContent>

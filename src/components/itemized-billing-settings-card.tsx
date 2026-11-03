@@ -15,7 +15,6 @@ interface BillingSettings {
   gstType: "CGST_SGST" | "IGST" | "EXEMPT"
   gstin: string
   invoicePrefix: string
-  upiId: string
   terms: string
 }
 
@@ -29,7 +28,6 @@ export function ItemizedBillingSettingsCard({ merchantId }: { merchantId: string
     gstType: "CGST_SGST",
     gstin: "",
     invoicePrefix: "INV-",
-    upiId: "",
     terms: "Thank you for shopping with us! Goods once sold will not be returned.",
   })
 
@@ -164,7 +162,7 @@ export function ItemizedBillingSettingsCard({ merchantId }: { merchantId: string
 
         {/* Configuration Fields (Visible when enabled or for setup) */}
         {settings.itemizedBillingEnabled && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in duration-200">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-in fade-in duration-200">
             {/* Default GST Rate */}
             <div className="space-y-1.5">
               <Label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
@@ -215,22 +213,8 @@ export function ItemizedBillingSettingsCard({ merchantId }: { merchantId: string
               />
             </div>
 
-            {/* Merchant UPI ID */}
-            <div className="space-y-1.5">
-              <Label htmlFor="upiIdInput" className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                <CreditCard className="w-3.5 h-3.5 text-amber-600" /> Merchant UPI ID <span className="text-[10px] text-slate-400 font-normal">(For QR)</span>
-              </Label>
-              <Input
-                id="upiIdInput"
-                placeholder="e.g. cakeconnection@okhdfcbank"
-                value={settings.upiId}
-                onChange={(e) => setSettings(prev => ({ ...prev, upiId: e.target.value.toLowerCase() }))}
-                className="h-10 text-xs font-mono bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
-              />
-            </div>
-
             {/* Invoice Terms & Conditions */}
-            <div className="sm:col-span-2 lg:col-span-4 space-y-1.5">
+            <div className="sm:col-span-3 space-y-1.5">
               <Label htmlFor="termsInput" className="text-xs font-bold text-slate-700 dark:text-slate-300">
                 Invoice Footer Terms &amp; Policy
               </Label>
