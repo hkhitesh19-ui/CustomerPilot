@@ -66,11 +66,13 @@ export default async function ReviewPage({
   }
 
   // Fetch authentic merchant menu items for dynamic spotlight rotation
-  const menuItems = await db.menuItem.findMany({
+  const menuItems = (db as any).menuItem?.findMany
+    ? await (db as any).menuItem.findMany({
     where: { merchantId: merchant.id, isAvailable: true },
     select: { name: true },
     take: 20
   }).catch(() => [])
+    : []
 
   const businessCategory = merchant.category?.trim() || merchant.businessType || "Retail Store"
   const menuItemNames = menuItems.map((m: { name: string }) => m.name)

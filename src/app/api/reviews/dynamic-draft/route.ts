@@ -24,11 +24,13 @@ export async function GET(req: NextRequest) {
     }
 
     // Try fetching authentic merchant menu items for spotlight rotation
-    const menuItems = await db.menuItem.findMany({
+    const menuItems = (db as any).menuItem?.findMany
+    ? await (db as any).menuItem.findMany({
       where: { merchantId: merchant.id, isAvailable: true },
       select: { name: true },
       take: 20
     }).catch(() => [])
+    : []
 
     let productName = productParam || ""
     if (!productName && customerId) {
