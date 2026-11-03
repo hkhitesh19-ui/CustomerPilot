@@ -18,7 +18,7 @@ interface FallbackReviewItem {
 // Category-specific rich pool of authentic Indian customer reviews
 const BAKERY_REVIEWS: FallbackReviewItem[] = [
   {
-    draft1: "Midnight delivery bilkul time pe aayi. Chocolate truffle cake soft aur super fresh tha.",
+    draft1: "Super fresh chocolate truffle cake with rich cocoa layers. Delivered right on time for our celebration.",
     draft2: "Eggless fresh fruit cake ka taste badiya tha. Sunday rush ke baad bhi safe packing mili.",
     draft3: "Super fresh cake and safe packing. Live counter hygiene properly maintained thi, loved it!"
   },
@@ -282,7 +282,8 @@ export function getDynamicFallbackReview(
   } else if (typeof seed === "string" && seed.length > 0) {
     let hash = 0
     for (let i = 0; i < seed.length; i++) hash = (hash << 5) - hash + seed.charCodeAt(i)
-    index = Math.abs(hash) % pool.length
+    const jitter = Math.floor(Math.random() * pool.length)
+    index = (Math.abs(hash) + jitter) % pool.length
   } else {
     index = Math.floor(Math.random() * pool.length)
   }

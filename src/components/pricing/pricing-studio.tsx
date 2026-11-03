@@ -55,7 +55,7 @@ export interface PricingStudioProps {
 export const COMPLETE_TIERS = [
   { t: "Postpaid · Monthly", d: 30, s: 0, m: 0, planKey: "complete_postpaid", badge: "Zero Upfront", isPostpaid: true },
   { t: "6 Months", d: 180, s: 1999, m: 3998, planKey: "growth_180", badge: "Popular", isPostpaid: false },
-  { t: "12 Months", d: 365, s: 3499, m: 6998, planKey: "enterprise_365", badge: "Best Value", isPostpaid: false }
+  { t: "12 Months", d: 365, s: 3499, m: 7000, planKey: "enterprise_365", badge: "Best Value", isPostpaid: false }
 ]
 
 // Postpaid Configuration (Placeholders kept for billing extensions)
@@ -89,7 +89,7 @@ export interface GearComboDefinition {
 export const GEAR_COMBOS: GearComboDefinition[] = [
   {
     gearKey: "gear_2",
-    name: "Gear 2 : Smart Digital Business Card + Smart AI Google Reviews",
+    name: "Gear 2 : Smart Digital Business Card + Smart AI Google Review System",
     subtitle: "Instant digital card branding plus autonomous Google review acceleration for local stores.",
     badge: "⭐ Gear 2 · Review Accelerator",
     iconBg: "bg-emerald-600",
@@ -101,21 +101,33 @@ export const GEAR_COMBOS: GearComboDefinition[] = [
   },
   {
     gearKey: "gear_3",
-    name: "Gear 3 : Smart Digital Business Card + Whatsapp Digital Loyalty Stamps & VIP Club + Smart AI Google Reviews",
-    subtitle: "Complete walk-in retention: WhatsApp loyalty stamps, VIP tiers, and Google review acceleration.",
-    badge: "🔥 Gear 3 · Most Popular Choice",
+    name: "Gear 3 : WhatsApp Digital Loyalty System + Smart AI Google Review System",
+    subtitle: "High-retention combo: WhatsApp automated loyalty stamps plus smart AI Google reviews.",
+    badge: "🔥 Gear 3 · Loyalty & Reviews",
     iconBg: "bg-amber-600",
-    modulesIncluded: ["card", "loyalty", "star"],
+    modulesIncluded: ["loyalty", "star"],
     tenures: {
-      180: { offer: 1499, regular: 2998, planKey: "gear3_6mo" },
-      365: { offer: 2499, regular: 4998, planKey: "gear3_yearly" }
+      180: { offer: 1249, regular: 2498, planKey: "gear3_6mo" },
+      365: { offer: 1899, regular: 3798, planKey: "gear3_yearly" }
     }
   },
   {
     gearKey: "gear_4",
-    name: "Gear 4 : CustomerPilot Complete",
-    subtitle: "All 4 flagship engines: Smart Card, Loyalty Stamps, AI Google Reviews, and 1-Click AI AutoReply.",
-    badge: "👑 Gear 4 · All-in-One Flagship",
+    name: "Gear 4 : Card + Loyalty + Smart AI Google Review System",
+    subtitle: "Trio retention suite: Digital NFC card, WhatsApp loyalty stamps, and smart AI Google reviews.",
+    badge: "🚀 Gear 4 · Power Trio",
+    iconBg: "bg-purple-600",
+    modulesIncluded: ["card", "loyalty", "star"],
+    tenures: {
+      180: { offer: 1499, regular: 2998, planKey: "gear4_6mo" },
+      365: { offer: 2499, regular: 4998, planKey: "gear4_yearly" }
+    }
+  },
+  {
+    gearKey: "gear_5",
+    name: "Gear 5 : CustomerPilot Complete",
+    subtitle: "All 4 flagship engines: Smart Card, Loyalty Stamps, Smart AI Reviews, and 1-Click AI AutoReply.",
+    badge: "👑 Gear 5 · CustomerPilot Complete",
     iconBg: "bg-indigo-600",
     modulesIncluded: ["card", "loyalty", "star", "chat"],
     tenures: {
@@ -124,6 +136,17 @@ export const GEAR_COMBOS: GearComboDefinition[] = [
     }
   }
 ]
+
+export const getGearSavings1Yr = (combo: GearComboDefinition, getPlanByKeyFn?: (key: string) => PlanItem | undefined) => {
+  const standalone1YrSum = combo.modulesIncluded.reduce((acc, modKey) => {
+    const serv = STANDALONE_SERVICES.find((s) => s.i === modKey)
+    if (!serv) return acc
+    const sDbP = getPlanByKeyFn ? getPlanByKeyFn(serv.planKey1Yr) : null
+    return acc + (sDbP?.price || serv.p[365][0])
+  }, 0)
+  return Math.max(0, standalone1YrSum - combo.tenures[365].offer)
+}
+
 
 // S: Standalone Services sorted highest 1Y price first
 export const STANDALONE_SERVICES = [
@@ -173,7 +196,7 @@ export const STANDALONE_SERVICES = [
 
 // Formatting helpers
 export const inr = (n: number) => "₹" + Math.round(n).toLocaleString("en-IN")
-export const dy = (n: number, d: number) => `(₹${(n / d).toFixed(2)}/day)`
+export const dy = (n: number, d: number) => `(₹${Math.round(n / d)}/day)`
 export const off = (s: number, m: number) => Math.round((1 - s / m) * 100)
 
 const DEFAULT_INITIAL_PLANS: PlanItem[] = []
@@ -442,7 +465,7 @@ export function PricingStudio({
     const p: PlanItem = dbP || {
       id: tier.planKey,
       planKey: tier.planKey,
-      name: `Gear 4 : CustomerPilot Complete (${tier.t})`,
+      name: `Gear 5 : CustomerPilot Complete (${tier.t})`,
       price: tier.s,
       originalPrice: tier.m,
       days: tier.d,
@@ -465,7 +488,7 @@ export function PricingStudio({
     const dbP = getPlanByKey(tier.planKey)
     const item: SelectedCheckoutItem = {
       id: "complete_" + tier.d,
-      name: `Gear 4 : CustomerPilot Complete (${tier.t})`,
+      name: `Gear 5 : CustomerPilot Complete (${tier.t})`,
       tenureDays: tier.d,
       price: dbP?.price || tier.s,
       originalPrice: dbP?.originalPrice || tier.m,
@@ -679,7 +702,7 @@ export function PricingStudio({
             All-in-one Platform
           </span>
           <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 dark:text-white mt-1">
-            Gear 4 : CustomerPilot Complete
+            Gear 5 : CustomerPilot Complete
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             All 4 flagship engines in one unified subscription: Smart Digital Business Card, Smart AI Google Reviews, 1-Click AI AutoReply, and Whatsapp Digital Loyalty Stamps & VIP Club.
@@ -702,7 +725,7 @@ export function PricingStudio({
               {/* Prepaid Header & Tenure Selector */}
               <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-white text-[11px] font-black uppercase tracking-wider">
-                  <Flame className="w-3.5 h-3.5 text-amber-300" /> Gear 4 : Prepaid Plans (Flat 50% OFF)
+                  <Flame className="w-3.5 h-3.5 text-amber-300" /> Gear 5 : Prepaid Plans (Flat 50% OFF)
                 </div>
 
                 {/* Tenure Switcher Tabs (6 Months vs 12 Months) */}
@@ -800,7 +823,7 @@ export function PricingStudio({
                   onClick={() => handleSelectCompletePublic(activePrepaidIndex)}
                   className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <span>Choose Gear 4 {activePrepaidTier.t} Prepaid Plan</span>
+                  <span>Choose Gear 5 {activePrepaidTier.t} Prepaid Plan</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               ) : mode === "merchant" ? (
@@ -809,7 +832,7 @@ export function PricingStudio({
                   onClick={() => handleSelectComplete(activePrepaidIndex)}
                   className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <span>Choose Gear 4 {activePrepaidTier.t} Prepaid Plan</span>
+                  <span>Choose Gear 5 {activePrepaidTier.t} Prepaid Plan</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               ) : (
@@ -834,7 +857,7 @@ export function PricingStudio({
               {/* Postpaid Header Badges */}
               <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[11px] font-black uppercase tracking-wider">
-                  <Zap className="w-3.5 h-3.5 text-emerald-400" /> Gear 4 : Performance Postpaid · Zero Upfront
+                  <Zap className="w-3.5 h-3.5 text-emerald-400" /> Gear 5 : Performance Postpaid · Zero Upfront
                 </div>
                 <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700">
                   Billed at Month-End
@@ -907,7 +930,7 @@ export function PricingStudio({
                   onClick={() => handleSelectCompletePublic(0)}
                   className="w-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-emerald-950/30 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <span>Choose Gear 4 Postpaid Plan (0.3% of sales)</span>
+                  <span>Choose Gear 5 Postpaid Plan (0.3% of sales)</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               ) : mode === "merchant" ? (
@@ -916,7 +939,7 @@ export function PricingStudio({
                   onClick={() => handleSelectComplete(0)}
                   className="w-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-emerald-950/30 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <span>Choose Gear 4 Postpaid Plan (0.3% of sales)</span>
+                  <span>Choose Gear 5 Postpaid Plan (0.3% of sales)</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               ) : (
@@ -1049,7 +1072,7 @@ export function PricingStudio({
         </div>
 
         {/* 3-Column Responsive Modern Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch pt-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch pt-2">
           {GEAR_COMBOS.map((combo) => {
             const dbPlan6 = getPlanByKey(combo.tenures[180].planKey)
             const dbPlan1 = getPlanByKey(combo.tenures[365].planKey)
@@ -1060,6 +1083,7 @@ export function PricingStudio({
             const p365 = dbPlan1?.price || combo.tenures[365].offer
             const m365 = dbPlan1?.originalPrice || combo.tenures[365].regular
 
+            const isGear5 = combo.gearKey === "gear_5"
             const isGear4 = combo.gearKey === "gear_4"
             const isGear3 = combo.gearKey === "gear_3"
             const isGear2 = combo.gearKey === "gear_2"
@@ -1074,20 +1098,26 @@ export function PricingStudio({
             const savings1YrVsStandalone = Math.max(0, standalone1YrSum - p365)
 
             // Card thematic design styles
-            const cardTheme = isGear4
+            const cardTheme = isGear5
               ? "bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900 text-white border-2 border-cyan-400/90 shadow-2xl hover:shadow-cyan-500/20"
+              : isGear4
+              ? "bg-gradient-to-b from-purple-50/80 via-white to-indigo-50/40 dark:from-purple-950/40 dark:via-slate-900 dark:to-slate-900 border-2 border-purple-400 dark:border-purple-600 shadow-lg hover:shadow-xl hover:shadow-purple-500/20"
               : isGear3
               ? "bg-gradient-to-b from-amber-50/90 via-white to-orange-50/40 dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900 border-2 border-amber-400 dark:border-amber-500 shadow-xl hover:shadow-2xl hover:shadow-amber-500/20 md:-translate-y-2 md:scale-[1.02]"
               : "bg-gradient-to-b from-emerald-50/70 via-white to-teal-50/30 dark:from-emerald-950/30 dark:via-slate-900 dark:to-slate-900 border-2 border-emerald-400/70 dark:border-emerald-700/60 shadow-md hover:shadow-xl hover:shadow-emerald-500/15"
 
-            const badgeTheme = isGear4
+            const badgeTheme = isGear5
               ? "bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 text-slate-950 font-black shadow-md"
+              : isGear4
+              ? "bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-black shadow-sm"
               : isGear3
               ? "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-slate-950 font-black shadow-sm"
               : "bg-emerald-600 text-white font-black shadow-xs"
 
-            const discountBadgeTheme = isGear4
+            const discountBadgeTheme = isGear5
               ? "text-cyan-300 bg-cyan-950/90 border border-cyan-400/50 font-black"
+              : isGear4
+              ? "text-purple-900 bg-purple-100 border border-purple-300 font-black"
               : isGear3
               ? "text-amber-950 bg-amber-200 border border-amber-300 font-black"
               : "text-emerald-800 bg-emerald-100 border border-emerald-300 font-black"
@@ -1097,8 +1127,8 @@ export function PricingStudio({
                 key={combo.gearKey}
                 className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${cardTheme}`}
               >
-                {/* Glow accent for Gear 4 */}
-                {isGear4 && (
+                {/* Glow accent for Gear 5 */}
+                {isGear5 && (
                   <div className="absolute -top-20 -right-20 w-52 h-52 bg-gradient-to-br from-cyan-500/25 to-indigo-500/25 rounded-full blur-3xl pointer-events-none" />
                 )}
 
@@ -1436,6 +1466,103 @@ export function PricingStudio({
                     </div>
                   </td>
                 </tr>
+
+                {/* ─── GEAR COMBOS ROWS (Gear 2, 3, 4, 5) ─── */}
+                {GEAR_COMBOS.map((combo) => {
+                  const dbPlan6 = getPlanByKey(combo.tenures[180].planKey)
+                  const dbPlan1 = getPlanByKey(combo.tenures[365].planKey)
+
+                  const p180 = dbPlan6?.price || combo.tenures[180].offer
+                  const m180 = dbPlan6?.originalPrice || combo.tenures[180].regular
+
+                  const p365 = dbPlan1?.price || combo.tenures[365].offer
+                  const m365 = dbPlan1?.originalPrice || combo.tenures[365].regular
+
+                  const savings1Yr = getGearSavings1Yr(combo, getPlanByKey)
+
+                  return (
+                    <tr key={combo.gearKey} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition border-t border-slate-200 dark:border-slate-800">
+                      <td className="py-5 px-6 align-top">
+                        <div className="flex items-start gap-3.5">
+                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${combo.iconBg}`}>
+                            <Zap className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                                {combo.badge}
+                              </span>
+                              <span className="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                                50% OFF
+                              </span>
+                            </div>
+                            <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-snug">
+                              {combo.name}
+                            </h4>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                              {combo.subtitle}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-5 px-6 align-top">
+                        <div className="space-y-1">
+                          <div className="flex items-baseline gap-1.5 flex-wrap">
+                            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                              {inr(p180)}
+                            </span>
+                            <span className="text-xs font-semibold text-slate-400 line-through decoration-rose-500 decoration-1.5">
+                              {inr(m180)}
+                            </span>
+                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                              {dy(p180, 180)}
+                            </span>
+                          </div>
+                          <div className="pt-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleSelectGearCombo(combo, 180)}
+                              className="text-xs font-semibold px-4 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600 transition cursor-pointer"
+                            >
+                              Choose 6M
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-5 px-6 align-top">
+                        <div className="space-y-1">
+                          <div className="flex items-baseline gap-1.5 flex-wrap">
+                            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                              {inr(p365)}
+                            </span>
+                            <span className="text-xs font-semibold text-slate-400 line-through decoration-rose-500 decoration-1.5">
+                              {inr(m365)}
+                            </span>
+                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                              {dy(p365, 365)}
+                            </span>
+                          </div>
+                          {savings1Yr > 0 && (
+                            <div>
+                              <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[10px] px-2 py-0.5 rounded-full inline-block">
+                                Save {inr(savings1Yr)} vs Standalone
+                              </span>
+                            </div>
+                          )}
+                          <div className="pt-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleSelectGearCombo(combo, 365)}
+                              className="text-xs font-semibold px-4 py-1.5 rounded-lg border border-indigo-600 bg-indigo-600 text-white hover:bg-indigo-700 shadow-xs transition cursor-pointer"
+                            >
+                              Choose 1Y
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

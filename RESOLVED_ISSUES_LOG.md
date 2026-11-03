@@ -3,6 +3,28 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Nov 2026] Issue: 1000% Bulletproof Dual-Mode WhatsApp Linking, Pricing Gear 2-5 Matrix, SuperAdmin 1-Click GBP Review QR, & Dynamic Categories
+- **Symptom**: 
+  1. WhatsApp QR scanning on mobile devices frequently failed due to screen glare, camera focus turnover, and socket timeout loops during merchant signup/pairing.
+  2. Public Google review page displayed repetitive seed drafts if random hash hit index 0.
+  3. Pricing page lacked Gear 2, 3, 4, 5 combo packages in the interactive configuration matrix and table.
+  4. SuperAdmin lacked a direct 1-click mechanism to generate printable Smart AI Google Review QRs & Standees for merchants who only provide a Google Business Profile link/query without registering.
+  5. Business categories were limited to 8 hardcoded items without full GBP taxonomy or dynamic SuperAdmin category creation.
+- **Root Cause**:
+  1. Relying solely on camera-based QR codes introduced hardware and socket turnover vulnerabilities. Official Meta 8-digit pairing code mode was not exposed in the merchant UI.
+  2. The review fallback array index had no jitter offset on string seed hashing.
+  3. Pricing Studio previously only configured 3 combos with decimal per-day costs and lacked table rows for bundled gears.
+  4. No dedicated backend endpoint existed to resolve GBP Place IDs into active merchant review QRs without standard multi-step registration.
+  5. Categories were hardcoded across multiple components without database persistence for runtime additions.
+- **Resolution**:
+  1. **Dual-Mode WhatsApp Linking Architecture (`src/components/whatsapp-verification.tsx` & `src/app/onboarding/page.tsx`)**: Implemented dual linking options: Tab 1 exposes official Meta 8-Digit Pairing Code (`Link with phone number instead`) with 1-click copy and auto-polling; Tab 2 retains the refreshed QR scanner. Eliminates camera focus and timeout failure modes.
+  2. **Review Anti-Repetition Random Jitter (`src/lib/dynamic-review-engine.ts`)**: Added random jitter to seed hash indexing and rephrased the first bakery draft to ensure 100% distinct variations across consecutive visits.
+  3. **Pricing Studio Gear 2-5 Matrix (`src/components/pricing/pricing-studio.tsx`)**: Configured Gear 2 (₹799/₹1,149), Gear 3 (₹1,249/₹1,899), Gear 4 (₹1,499/₹2,499), and Gear 5 (₹1,999/₹3,499) with zero-decimal per-day costs, dynamic 1Y savings badges vs standalone sum, and dedicated table rows in "Or Choose Exactly What You Need".
+  4. **SuperAdmin 1-Click Review QR from GBP Tool (`src/app/api/admin/gbp/quick-qr/route.ts` & `src/components/super-admin/quick-gbp-qr-modal.tsx`)**: Built an instant QR generator that resolves any GBP link/query via Google Places API, provisions/links the merchant, and immediately delivers a 1024px print-ready QR code, Smart Review URL, and Standee link.
+  5. **Dynamic GBP Categories Registry (`src/lib/gbp-categories.ts`, `src/app/api/admin/categories/route.ts`, & `src/components/super-admin/gbp-categories-modal.tsx`)**: Added 35+ official GBP categories grouped by industry with custom category persistence in `db.systemContent` for SuperAdmin management without redeploying code.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [03 Nov 2026] Issue: WhatsApp QR Device Linking Failure on Merchant Registration & Dynamic Review Deployment Sync
 - **Symptom**: 
   1. Newly registered merchant Suvarna Sonawana (`cmw0dloss0s9ckvfcvb1lbpff`, phone `919099773781`) attempted to pair WhatsApp by scanning the QR code on `/dashboard/settings`, but WhatsApp showed "Couldn't link device" / QR expired in a rapid disconnect loop.

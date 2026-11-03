@@ -15,6 +15,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { MerchantGbpPostQueue } from "./merchant-gbp-post-queue"
+import { QuickGbpQrModal } from "./quick-gbp-qr-modal"
+import { GbpCategoriesModal } from "./gbp-categories-modal"
 
 type ChecklistItem = {
   id: string
@@ -93,6 +95,8 @@ export function GbpOperationsDashboard() {
   const [dossierMerchantId, setDossierMerchantId] = useState<string | null>(null)
   const [dossiers, setDossiers] = useState<any[]>([])
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
+  const [quickQrOpen, setQuickQrOpen] = useState(false)
+  const [categoriesOpen, setCategoriesOpen] = useState(false)
 
   const loadDossiers = async (mId: string) => {
     if (dossierMerchantId === mId) {
@@ -238,6 +242,38 @@ export function GbpOperationsDashboard() {
           </div>
         </div>
       )}
+
+      {/* Rapid GBP Review QR & Categories Studio Banner */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-indigo-950/80 via-slate-900 to-emerald-950/80 border border-indigo-500/30 shadow-lg">
+        <div>
+          <h3 className="font-extrabold text-white text-base flex items-center gap-2">
+            <Zap className="w-4 h-4 text-amber-400" />
+            GBP Rapid Tools & Categories Studio
+          </h3>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Generate Smart AI Google Review QRs instantly from any GBP link, and manage business categories dynamically.
+          </p>
+        </div>
+        <div className="flex items-center gap-2.5">
+          <Button
+            size="sm"
+            onClick={() => setQuickQrOpen(true)}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20"
+          >
+            <Zap className="w-3.5 h-3.5 mr-1.5 text-amber-300" />
+            ⚡ Quick Review QR from GBP
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setCategoriesOpen(true)}
+            className="border-indigo-500/40 text-indigo-300 hover:bg-indigo-950/50 font-bold text-xs"
+          >
+            <Tag className="w-3.5 h-3.5 mr-1.5" />
+            🏷️ Business Categories Manager
+          </Button>
+        </div>
+      </div>
 
       {/* Exec Email + Filter Controls */}
       <div className="flex flex-col md:flex-row gap-3 items-start md:items-center justify-between">
@@ -537,6 +573,10 @@ export function GbpOperationsDashboard() {
           })}
         </div>
       )}
+
+      {/* SuperAdmin Modals */}
+      <QuickGbpQrModal open={quickQrOpen} onOpenChange={setQuickQrOpen} />
+      <GbpCategoriesModal open={categoriesOpen} onOpenChange={setCategoriesOpen} />
     </div>
   )
 }

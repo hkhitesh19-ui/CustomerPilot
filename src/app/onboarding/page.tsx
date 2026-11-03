@@ -15,7 +15,7 @@ import {
   Store, MessageSquare, Search, Upload, Gift, QrCode as QrIcon, Zap,
   Check, ArrowRight, ArrowLeft, Loader2, UserCheck,
   Printer, AlertCircle, CircleDot, Star, Rocket, X, Shield, Sparkles,
-  CheckCircle2, ExternalLink, MapPin, Copy, Globe, Building2, RefreshCw, Clock,
+  CheckCircle2, ExternalLink, MapPin, Copy, Globe, Building2, RefreshCw, Clock, Smartphone,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,6 +26,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { hasModule, type Module } from "@/lib/feature-gate"
 import { getRecommendedCampaign, getIndustryLoyaltyRule } from "@/lib/industry-campaigns"
 import { ImpersonationBanner } from "@/components/impersonation-banner"
+import { OFFICIAL_GBP_CATEGORIES } from "@/lib/gbp-categories"
 
 // ─── Types ────────────────────────────────────────────────────
 interface WizardData {
@@ -507,17 +508,12 @@ function OnboardStep1Business({ data, setData }: any) {
           >
             <SelectTrigger className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 font-medium focus:ring-emerald-500 shadow-xs"><SelectValue /></SelectTrigger>
             <SelectContent className="bg-white text-slate-900 border-slate-200 shadow-xl">
-              {[
-                { value: "bakery", label: "Bakery 🥐" },
-                { value: "cafe", label: "Cafe ☕" },
-                { value: "restaurant", label: "Restaurant 🍽️" },
-                { value: "salon", label: "Salon 💇" },
-                { value: "gym", label: "Gym 💪" },
-                { value: "retail", label: "Retail 🛍️" },
-                { value: "clinic", label: "Clinic 🏥" },
-                { value: "other", label: "Other 📦" },
-              ].map(t => (
-                <SelectItem key={t.value} value={t.value} className="text-slate-900 hover:bg-slate-100 font-medium">{t.label}</SelectItem>
+              {OFFICIAL_GBP_CATEGORIES.map(t => (
+                <SelectItem key={t.id} value={t.id} className="text-slate-900 hover:bg-slate-100 font-medium">
+                  <span className="mr-2">{t.icon}</span>
+                  <span>{t.label}</span>
+                  <span className="ml-2 text-[10px] text-slate-400 font-normal">({t.group})</span>
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -564,8 +560,11 @@ function OnboardStep1Business({ data, setData }: any) {
 function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
   const TOTAL_SESSION_SECONDS = 600 // 10 minutes
 
+  const [connectMode, setConnectMode] = useState<"pairing" | "qr">("pairing")
   const [loadingQr, setLoadingQr] = useState(false)
   const [qrCodeBase64, setQrCodeBase64] = useState<string | null>(null)
+  const [pairingCode, setPairingCode] = useState<string | null>(null)
+  const [copiedPairingCode, setCopiedPairingCode] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState<"connecting" | "open" | "disconnected">("connecting")
   const [instanceName, setInstanceName] = useState<string>("")
   const [sessionCountdown, setSessionCountdown] = useState(TOTAL_SESSION_SECONDS)
@@ -579,12 +578,14 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
   }
 
-  // Fetch fresh QR code (creates/resets Evolution instance)
-  const fetchInstanceStatus = async (force: boolean = false) => {
+  // Fetch fresh credentials (creates/resets Evolution instance)
+  const fetchInstanceStatus = async (force: boolean = false, targetMode?: "pairing" | "qr") => {
+    const activeMode = targetMode || connectMode
     setLoadingQr(true)
     try {
       const params = new URLSearchParams()
       if (force) params.append("force", "true")
+      params.append("mode", activeMode)
       if (data.whatsappNumber) params.append("phone", data.whatsappNumber)
       if (data.merchantId) params.append("merchantId", data.merchantId)
 
@@ -599,24 +600,26 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
           setData((prev: any) => ({ ...prev, otpVerified: true, whatsappNumber: json.whatsappPhone || prev.whatsappNumber || "Connected" }))
         } else {
           setConnectionStatus("connecting")
+          if (json.pairingCode) {
+            setPairingCode(json.pairingCode)
+          }
           if (json.qrCodeBase64) setQrCodeBase64(json.qrCodeBase64)
           setSessionCountdown(TOTAL_SESSION_SECONDS) // Reset 10-minute timer
         }
       }
     } catch (e) {
-      console.error("Failed to fetch instance QR:", e)
+      console.error("Failed to fetch instance WhatsApp connection:", e)
     } finally {
       setLoadingQr(false)
     }
   }
 
-  // On mount: load QR once. Then poll connection state every 3s
+  // On mount: load credentials once. Then poll connection state every 2.5s
   useEffect(() => {
-    fetchInstanceStatus(false)
+    fetchInstanceStatus(false, "pairing")
 
     const interval = setInterval(() => {
       if (connectionStatus !== "open") {
-        // Simple polling for state if not yet connected
         const mParam = data.merchantId ? `?merchantId=${encodeURIComponent(data.merchantId)}` : ""
         fetch(`/api/whatsapp/status${mParam}`, {
           headers: data.merchantId ? { "x-merchant-id": data.merchantId } : {},
@@ -630,7 +633,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
           })
           .catch(() => {})
       }
-    }, 3000)
+    }, 2500)
 
     return () => clearInterval(interval)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -638,7 +641,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
 
   // 10-Minute Live Session Countdown Timer
   useEffect(() => {
-    if (connectionStatus === "open" || !qrCodeBase64) {
+    if (connectionStatus === "open" || (!qrCodeBase64 && !pairingCode)) {
       if (sessionTimerRef.current) clearInterval(sessionTimerRef.current)
       return
     }
@@ -657,12 +660,11 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
     return () => {
       if (sessionTimerRef.current) clearInterval(sessionTimerRef.current)
     }
-  }, [connectionStatus, qrCodeBase64])
+  }, [connectionStatus, qrCodeBase64, pairingCode])
 
-  // Automatic Silent Background Refresh every 20 seconds
-  // Keeps Baileys QR code fresh on WhatsApp servers without disturbing the 10-minute timer
+  // Automatic Silent Background Refresh every 25 seconds for QR mode
   useEffect(() => {
-    if (connectionStatus === "open" || !qrCodeBase64 || sessionCountdown <= 0) {
+    if (connectMode !== "qr" || connectionStatus === "open" || !qrCodeBase64 || sessionCountdown <= 0) {
       if (silentRefreshRef.current) clearInterval(silentRefreshRef.current)
       return
     }
@@ -671,7 +673,7 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
       try {
         const phoneParam = data.whatsappNumber ? `&phone=${encodeURIComponent(data.whatsappNumber)}` : ""
         const mParam = data.merchantId ? `&merchantId=${encodeURIComponent(data.merchantId)}` : ""
-        const res = await fetch(`/api/whatsapp/connect?silent=true${phoneParam}${mParam}`, {
+        const res = await fetch(`/api/whatsapp/connect?silent=true${phoneParam}${mParam}&mode=qr`, {
           headers: data.merchantId ? { "x-merchant-id": data.merchantId } : {},
         })
         if (res.ok) {
@@ -680,17 +682,23 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
             setConnectionStatus("open")
             setData((prev: any) => ({ ...prev, otpVerified: true, whatsappNumber: json.whatsappPhone || prev.whatsappNumber || "Connected" }))
           } else if (json.qrCodeBase64) {
-            // Silently update the image without reloading the UI
             setQrCodeBase64(json.qrCodeBase64)
           }
         }
       } catch (e) {}
-    }, 20000)
+    }, 25000)
 
     return () => {
       if (silentRefreshRef.current) clearInterval(silentRefreshRef.current)
     }
-  }, [connectionStatus, qrCodeBase64, sessionCountdown, setData, data.merchantId, data.whatsappNumber])
+  }, [connectMode, connectionStatus, qrCodeBase64, sessionCountdown, setData, data.merchantId, data.whatsappNumber])
+
+  const copyCode = () => {
+    if (!pairingCode) return
+    navigator.clipboard.writeText(pairingCode)
+    setCopiedPairingCode(true)
+    setTimeout(() => setCopiedPairingCode(false), 2500)
+  }
 
   return (
     <div className="p-6 sm:p-8">
@@ -702,10 +710,9 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-900">Connect Store WhatsApp</h2>
-            <p className="text-xs text-slate-500">Scan QR Code with your store's WhatsApp (Linked Devices)</p>
+            <p className="text-xs text-slate-500">Official WhatsApp connection via 8-Digit Pairing Code or QR Code</p>
           </div>
         </div>
-
       </div>
 
       {connectionStatus === "open" || data.otpVerified ? (
@@ -728,95 +735,175 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
           )}
         </div>
       ) : (
-        /* QR Code Scan Pairing Interface */
-        <div className="max-w-xl mx-auto space-y-4">
-          {sessionCountdown <= 0 ? (
-            /* Expired view */
-            <div className="p-8 border-2 border-dashed border-slate-300 rounded-2xl text-center space-y-3 bg-slate-50">
-              <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
-                <Clock className="w-6 h-6" />
-              </div>
-              <h4 className="font-bold text-slate-900 text-lg">10-Minute Session Expired</h4>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                The 10-minute linking window expired. Click below to generate a fresh QR code session.
-              </p>
-              <Button onClick={() => fetchInstanceStatus(true)} className="bg-emerald-600 text-white font-bold text-xs">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Generate Fresh 10-Min QR Code
-              </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-inner">
-              {/* Left Column: QR Display */}
-              <div className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border-2 border-emerald-400/60 shadow-lg relative min-h-[260px]">
-                {loadingQr && !qrCodeBase64 ? (
-                  <div className="flex flex-col items-center gap-3">
-                    <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
-                    <p className="text-xs text-slate-500 font-medium">Generating Live QR...</p>
+        /* Dual-Mode Interface */
+        <div className="max-w-xl mx-auto space-y-5">
+          {/* Dual Linking Switcher */}
+          <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl border border-slate-200">
+            <button
+              type="button"
+              onClick={() => {
+                setConnectMode("pairing")
+                if (!pairingCode) fetchInstanceStatus(false, "pairing")
+              }}
+              className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                connectMode === "pairing"
+                  ? "bg-white text-emerald-700 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Smartphone className="w-4 h-4" />
+              <span>📱 8-Digit Code (Recommended · 100% Reliable)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setConnectMode("qr")
+                if (!qrCodeBase64) fetchInstanceStatus(false, "qr")
+              }}
+              className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                connectMode === "qr"
+                  ? "bg-white text-indigo-700 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <QrIcon className="w-4 h-4" />
+              <span>📷 Scan QR</span>
+            </button>
+          </div>
+
+          {/* TAB 1: 8-DIGIT PAIRING CODE (RECOMMENDED) */}
+          {connectMode === "pairing" && (
+            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 shadow-xs space-y-4 text-center">
+              {loadingQr && !pairingCode ? (
+                <div className="py-8 space-y-3">
+                  <Loader2 className="w-8 h-8 text-emerald-600 animate-spin mx-auto" />
+                  <p className="text-xs text-slate-500 font-bold">Requesting 8-Digit Pairing Code from WhatsApp...</p>
+                </div>
+              ) : pairingCode ? (
+                <div className="space-y-4">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black">
+                    <Clock className="w-3.5 h-3.5" />
+                    Active for {formatTime(sessionCountdown)} · Auto-linking enabled
                   </div>
-                ) : qrCodeBase64 ? (
-                  <div className="text-center space-y-2">
-                    <img
-                      src={qrCodeBase64.startsWith("data:") ? qrCodeBase64 : `data:image/png;base64,${qrCodeBase64}`}
-                      alt="WhatsApp Pair QR Code"
-                      className="w-52 h-52 object-contain rounded-xl border border-slate-200 shadow-md p-1 bg-white"
-                    />
-                    <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-slate-700 bg-emerald-50 py-1 px-2.5 rounded-full border border-emerald-200">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span>Valid For: <strong className="text-emerald-700 font-mono">{formatTime(sessionCountdown)}</strong></span>
+
+                  <div>
+                    <div className="text-xs text-slate-500 uppercase tracking-wider font-extrabold mb-1">
+                      Your Store Pairing Code
+                    </div>
+                    <div className="text-3xl sm:text-4xl font-mono font-black tracking-widest text-emerald-700 bg-white py-3 px-6 rounded-2xl border-2 border-dashed border-emerald-400 inline-block shadow-inner select-all">
+                      {pairingCode}
                     </div>
                   </div>
-                ) : (
-                  <div className="text-center p-4">
-                    <p className="text-xs text-slate-500 mb-3">Initializing QR Code...</p>
-                    <Button onClick={() => fetchInstanceStatus(true)} size="sm" className="bg-emerald-600 text-white text-xs">
-                      Generate QR Code
+
+                  <div className="flex items-center justify-center gap-3">
+                    <Button
+                      size="sm"
+                      onClick={copyCode}
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs"
+                    >
+                      {copiedPairingCode ? <Check className="w-4 h-4 mr-1.5" /> : <Copy className="w-4 h-4 mr-1.5" />}
+                      {copiedPairingCode ? "Copied!" : "Copy 8-Digit Code"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fetchInstanceStatus(true, "pairing")}
+                      disabled={loadingQr}
+                      className="text-xs font-semibold"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                      Get New Code
                     </Button>
                   </div>
-                )}
-              </div>
 
-              {/* Right Column: 3 Simple Instructions */}
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <h4 className="font-bold text-slate-900 text-base">How to Scan on Phone:</h4>
-                  <p className="text-xs text-slate-500">You have 10 full minutes to scan</p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</div>
-                    <p className="text-xs text-slate-700">Open <strong>WhatsApp</strong> on your store phone.</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</div>
-                    <p className="text-xs text-slate-700">Tap <strong>Settings / 3 Dots</strong> ➔ select <strong>Linked Devices</strong>.</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</div>
-                    <p className="text-xs text-slate-700">Tap <strong>Link a Device</strong> and point camera at the QR code on the left.</p>
+                  {/* 3 Step Instructions */}
+                  <div className="text-left bg-white p-4 rounded-xl border border-slate-200 space-y-2 text-xs">
+                    <div className="font-black text-slate-900 flex items-center gap-1.5">
+                      <Shield className="w-4 h-4 text-emerald-600" />
+                      3 Quick Steps on Your Phone (Zero Camera Required):
+                    </div>
+                    <ol className="list-decimal list-inside space-y-1 text-slate-600">
+                      <li>Open <strong>WhatsApp</strong> on your store phone.</li>
+                      <li>Go to <strong>Settings (or ⋮ menu) ➔ Linked Devices ➔ Link a Device</strong>.</li>
+                      <li>At the bottom of the screen, tap <strong>"Link with phone number instead"</strong> and enter <strong className="font-mono text-emerald-600">{pairingCode}</strong>.</li>
+                    </ol>
                   </div>
                 </div>
-
-                <div className="pt-2 border-t border-slate-200 flex items-center gap-2">
+              ) : (
+                <div className="py-6 space-y-3">
+                  <p className="text-xs text-slate-500">Pair your WhatsApp instantly without scanning camera QR.</p>
                   <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => fetchInstanceStatus(true)}
+                    onClick={() => fetchInstanceStatus(true, "pairing")}
                     disabled={loadingQr}
-                    className="text-xs text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                    className="bg-emerald-600 text-white font-bold text-xs"
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loadingQr ? "animate-spin" : ""}`} />
-                    Reset 10-Min Session
+                    Generate 8-Digit Pairing Code
                   </Button>
                 </div>
-              </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 2: CAMERA QR CODE SCAN */}
+          {connectMode === "qr" && (
+            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+              {sessionCountdown <= 0 ? (
+                <div className="p-8 border-2 border-dashed border-slate-300 rounded-2xl text-center space-y-3 bg-white">
+                  <Clock className="w-8 h-8 text-amber-600 mx-auto" />
+                  <h4 className="font-bold text-slate-900 text-lg">10-Minute Session Expired</h4>
+                  <Button onClick={() => fetchInstanceStatus(true, "qr")} className="bg-emerald-600 text-white font-bold text-xs">
+                    Generate Fresh QR Code
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                  <div className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border-2 border-emerald-400/60 shadow-lg min-h-[240px]">
+                    {loadingQr && !qrCodeBase64 ? (
+                      <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                    ) : qrCodeBase64 ? (
+                      <div className="text-center space-y-2">
+                        <img
+                          src={qrCodeBase64.startsWith("data:") ? qrCodeBase64 : `data:image/png;base64,${qrCodeBase64}`}
+                          alt="WhatsApp Pair QR Code"
+                          className="w-48 h-48 object-contain rounded-xl border border-slate-200 p-1 bg-white"
+                        />
+                        <div className="text-[11px] font-bold text-slate-700 bg-emerald-50 py-1 px-2.5 rounded-full border border-emerald-200">
+                          Expires in: <strong className="text-emerald-700 font-mono">{formatTime(sessionCountdown)}</strong>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button onClick={() => fetchInstanceStatus(true, "qr")} size="sm" className="bg-emerald-600 text-white text-xs">
+                        Generate QR Code
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    <h4 className="font-bold text-slate-900 text-sm">How to Scan on Phone:</h4>
+                    <ol className="list-decimal list-inside space-y-1.5 text-slate-700">
+                      <li>Open <strong>WhatsApp</strong> on your phone.</li>
+                      <li>Go to <strong>Settings / 3 Dots ➔ Linked Devices</strong>.</li>
+                      <li>Tap <strong>Link a Device</strong> and point camera at the QR code.</li>
+                    </ol>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => fetchInstanceStatus(true, "qr")}
+                      disabled={loadingQr}
+                      className="text-xs text-emerald-700 border-emerald-300"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                      Reload QR Code
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
           <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
-            <span>Automatic silent refresh keeps the QR code fresh in the background, giving you 10 full minutes without timeout errors.</span>
+            <span>CustomerPilot will automatically detect the moment you link your device on phone and advance to the next step.</span>
           </div>
         </div>
       )}
