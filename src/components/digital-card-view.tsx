@@ -57,7 +57,9 @@ import {
   Check,
   CheckCircle2,
   Copy,
-  X
+  X,
+  CreditCard,
+  IndianRupee
 } from "lucide-react"
 
 export interface DigitalCardData {
@@ -86,10 +88,13 @@ export interface DigitalCardData {
   createdAt?: string | Date | null
   theme?: string | null
   googlePlaceId?: string | null
+  upiId?: string | null
 }
 
 export function DigitalCardView({ card }: { card: DigitalCardData }) {
   const [qrModalOpen, setQrModalOpen] = useState(false)
+  const [upiModalOpen, setUpiModalOpen] = useState(false)
+  const [upiCopied, setUpiCopied] = useState(false)
   const [copied, setCopied] = useState(false)
   const [savingContact, setSavingContact] = useState(false)
   const [contactToast, setContactToast] = useState<{
@@ -384,6 +389,28 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
     }
     return `https://www.instagram.com/${cleanSocialHandle}/`
   }, [card.instagramUrl, cleanSocialHandle])
+
+  // Compute verified merchant UPI ID for on-card payments
+  const effectiveUpiId = useMemo(() => {
+    if (card.upiId && card.upiId.trim()) return card.upiId.trim()
+    if (card.theme && typeof card.theme === "string" && card.theme.startsWith("{")) {
+      try {
+        const parsed = JSON.parse(card.theme)
+        if (parsed.upiId && typeof parsed.upiId === "string" && parsed.upiId.trim()) {
+          return parsed.upiId.trim()
+        }
+      } catch (_) {}
+    }
+    const cleanPhone = (card.whatsappNumber || card.phoneNumber || "").replace(/[^0-9]/g, "")
+    if (cleanPhone && cleanPhone.length >= 10) {
+      return `${cleanPhone.slice(-10)}@upi`
+    }
+    return null
+  }, [card.upiId, card.theme, card.whatsappNumber, card.phoneNumber])
+
+  const upiIntentUrl = effectiveUpiId
+    ? `upi://pay?pa=${encodeURIComponent(effectiveUpiId)}&pn=${encodeURIComponent(card.displayName)}&cu=INR`
+    : "#"
 
   const effectiveFacebookUrl = useMemo(() => {
     if (card.facebookUrl && card.facebookUrl.trim() !== "" && card.facebookUrl !== "https://facebook.com" && card.facebookUrl !== "https://www.facebook.com") {
@@ -690,6 +717,71 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
               </a>
             </div>
           </div>
+
+          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* 2.8 INSTANT UPI PAYMENT & QR CODE (0% MDR DIRECT TO BANK)       */}
+          {/* ═══════════════════════════════════════════════════════════════ */}
+          {effectiveUpiId && (
+            <div className="p-4 rounded-3xl bg-gradient-to-br from-white via-emerald-50/30 to-amber-50/40 border-2 border-emerald-300/80 shadow-md space-y-3 font-sans">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center shadow-xs font-black text-base">
+                    ₹
+                  </div>
+                  <div>
+                    <div className="font-extrabold text-xs sm:text-[13px] text-slate-900 flex items-center gap-1.5">
+                      Pay via UPI (GPay • PhonePe • Paytm)
+                      <span className="text-[9px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                        0% Fee
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-medium">
+                      Direct settlement to {card.displayName} bank account
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* UPI ID Pill with 1-Click Copy */}
+              <div className="p-2.5 rounded-xl bg-slate-900 text-white flex items-center justify-between text-xs font-mono shadow-xs">
+                <div className="flex items-center gap-2 truncate min-w-0 mr-2">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-slate-800 px-1.5 py-0.5 rounded shrink-0">UPI ID</span>
+                  <span className="font-bold truncate text-[11px] text-slate-100">{effectiveUpiId}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(effectiveUpiId);
+                    setUpiCopied(true);
+                    setTimeout(() => setUpiCopied(false), 2000);
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-emerald-300 flex items-center gap-1 shrink-0 transition"
+                >
+                  {upiCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  {upiCopied ? "Copied!" : "Copy"}
+                </button>
+              </div>
+
+              {/* Dual Action Buttons */}
+              <div className="grid grid-cols-2 gap-2">
+                <a
+                  href={upiIntentUrl}
+                  className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition"
+                >
+                  <CreditCard className="w-3.5 h-3.5" />
+                  <span>Pay via UPI App</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setUpiModalOpen(true)}
+                  className="py-2.5 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-900 font-extrabold text-xs flex items-center justify-center gap-1.5 border border-slate-300 active:scale-95 shadow-xs transition"
+                >
+                  <QrCode className="w-3.5 h-3.5 text-slate-700" />
+                  <span>Scan UPI QR</span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* ═══════════════════════════════════════════════════════════════ */}
           {/* 3. PRIMARY ACTION BUTTONS (LIGHT CARDS + HIGHLIGHTED ICONS)     */}

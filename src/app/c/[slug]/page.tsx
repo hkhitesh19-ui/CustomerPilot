@@ -107,6 +107,18 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
 
   // Ensure theme honors merchant's active plan and extended trialEndsAt from SuperAdmin
   let effectiveTheme = card.theme
+  let merchantUpiId: string | null = null
+  if (card.merchantId) {
+    const billingSettingsRecord = await db.systemContent.findUnique({
+      where: { key: `MERCHANT_BILLING_SETTINGS_${card.merchantId}` },
+    })
+    if (billingSettingsRecord?.value) {
+      try {
+        const parsed = JSON.parse(billingSettingsRecord.value)
+        if (parsed.upiId) merchantUpiId = String(parsed.upiId).trim()
+      } catch (_) {}
+    }
+  }
   if (card.merchant) {
     const isSubscribed = card.merchant.plan && card.merchant.plan !== "trial"
     let themeObj: any = {}
@@ -149,6 +161,7 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
     createdAt: card.createdAt,
     theme: effectiveTheme,
     googlePlaceId: card.googlePlaceId,
+    upiId: merchantUpiId,
   }
 
   return <DigitalCardView card={cardData} />

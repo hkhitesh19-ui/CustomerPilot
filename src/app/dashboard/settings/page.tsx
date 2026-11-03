@@ -22,7 +22,8 @@ import {
   ArrowRight,
   Gift,
   Star,
-  QrCode
+  QrCode,
+  Receipt
 } from "lucide-react"
 import { WhatsAppVerification } from "@/components/whatsapp-verification"
 import { WhatsAppJourneyTemplates } from "@/components/whatsapp-journey-templates"
@@ -31,6 +32,7 @@ import { GbpManagerAccessCard } from "@/components/gbp-manager-access-card"
 import { GoogleReviewQRGenerator } from "@/components/google-review-qr-generator"
 import { RewardSetupCard } from "@/components/reward-setup-card"
 import { LoyaltyCategoryCard } from "@/components/loyalty-category-card"
+import { ItemizedBillingSettingsCard } from "@/components/itemized-billing-settings-card"
 import { QRGenerator } from "@/components/qr-generator"
 import { AutomationTimerSettings } from "@/components/automation-timer-settings"
 import { hasModule } from "@/lib/feature-gate"
@@ -532,6 +534,20 @@ export default function SettingsPage() {
                 </div>
               </div>
               <LoyaltyCategoryCard merchantId={merchant?.id || ""} initialCategoryJson={(merchant as any)?.loyaltyCategoryNames} />
+            </div>
+
+            {/* 4C: Itemized WhatsApp Billing & GST Invoice Engine (100% Free Module) */}
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 p-4 sm:p-5 shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-md border border-emerald-500/20">STEP C</span>
+                  <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <Receipt className="w-3.5 h-3.5" />
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Itemized WhatsApp Billing &amp; GST POS Setup</h3>
+                </div>
+              </div>
+              <ItemizedBillingSettingsCard merchantId={merchant?.id || ""} />
             </div>
           </div>
         </section>

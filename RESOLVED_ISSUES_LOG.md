@@ -5241,3 +5241,24 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
 - **Root Cause**: Architecture lacked a dedicated Gear Combos visual grid, and naming across cards/tables was inconsistent between legacy labels and formal offerings.
 - **Resolution**: Revamped the pricing page to a high-converting, professional SaaS layout featuring: (1) 'Gear 4 : CustomerPilot Complete' dual hero showcase with Prepaid (50% OFF) and Postpaid (0.3% sales, ₹0 upfront) side-by-side; (2) A dedicated 3-card grid for Pre-Configured Gear Combos (Gear 2, Gear 3, Gear 4); (3) Standardized all 4 products across all cards, tables, FAQs, and sidebar: 'Smart Digital Business Card', 'Smart AI Google Reviews', '1-Click AI AutoReply', and 'Whatsapp Digital Loyalty Stamps & VIP Club'.
 - **Status**: ✅ Resolved, Verified on Localhost:3000 with Screenshot Proof, and Committed Locally (Commit acd977a).
+
+---
+## [03 Nov 2026] Issue: Smart Digital Business Card UPI Payments & Itemized WhatsApp Billing with GST POS Engine
+- **Symptom**: 
+  1. Customers visiting the Smart Digital Business Card (`/c/[slug]`) had no seamless direct UPI payment option (GPay, PhonePe, Paytm, BHIM) with 0% MDR direct bank transfer.
+  2. Merchants using LiveQueue required an itemized catalog-driven POS billing mode with discount controls, GST tax calculation (CGST/SGST/IGST), and WhatsApp tax invoice dispatch, but strictly isolated from VIP loyalty stamp updates (no loyalty rewards or stamps in the invoice).
+- **Root Cause**: 
+  1. `DigitalCardView` lacked UPI payment intent deep links (`upi://pay`) and a dynamic on-card UPI QR modal.
+  2. LiveQueue (`RewardModal.tsx`) only offered a single monolithic Quick Amount input, with no feature switch to enable/disable itemized catalog billing, and lacked an official tax invoice generator and clean WhatsApp dispatch pipeline.
+- **Resolution**:
+  1. **Smart Digital Business Card UPI Integration**:
+     - Added `upiId` support in `DigitalCardData`, resolved dynamically from merchant billing settings or theme JSON.
+     - Added a high-visibility, luxury UPI Payment Card in `src/components/digital-card-view.tsx` featuring 0% MDR direct bank transfer badge, 1-click UPI ID copy, mobile deep-link (`upi://pay?pa=...`), and an interactive modal displaying the live UPI QR code for all UPI apps.
+  2. **Itemized WhatsApp Billing & GST POS Engine**:
+     - **Free Module Feature Switch**: Built `src/app/api/billing/settings/route.ts` and `src/components/itemized-billing-settings-card.tsx` in `src/app/dashboard/settings/page.tsx` (`STEP C`), allowing merchants to freely enable/disable Itemized Billing with default GST rates, GSTIN, invoice prefixes, and footer terms.
+     - **LiveQueue Dual-Mode POS (`src/components/dashboard/RewardModal.tsx`)**: When enabled, presents an Itemized POS tab with category pills, live product search, catalog item counters (`[-] [qty] [+]`), custom ad-hoc item entry, flat/percent discount controls, and GST tax selector (Non-GST / 5% / 12% / 18% / IGST).
+     - **Dedicated Invoice Creation API (`src/app/api/billing/create-invoice/route.ts`)**: Creates structured `Order`, `OrderItem`, and `Bill` records atomically, generates unique invoice numbers (`INV-XXXX`), and auto-dispatches an official Tax Invoice via merchant's Evolution API WhatsApp instance.
+     - **Strict Loyalty-Isolation Guarantee**: Guaranteed that generated bills and WhatsApp messages contain strictly ZERO VIP loyalty stamp updates or promotional reward text.
+     - **Public Web & High-Definition PDF Printable Invoice (`src/app/invoice/[orderNo]/page.tsx` & `src/components/invoice/invoice-view.tsx`)**: Created thermal-printer and A4 print-ready tax invoice view with authorized signatory and UPI verification QR.
+  3. **Verification**: Passed all 6 gates of the Master Adversarial Guard (`node scripts/run_adversarial_guard.js`) cleanly and executed deterministic unit tests with Exit Code 0.
+- **Status**: ✅ Resolved, Tested, and Verified Locally.
