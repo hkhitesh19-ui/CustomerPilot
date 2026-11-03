@@ -3,6 +3,22 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Nov 2026] Issue: WhatsApp 8-Digit Pairing Code Query Param Preservation, Device Phone Cryptographic Lock Guard, & SuperAdmin GBP 3-Day Trial Auto-Activation
+- **Symptom**:
+  1. On `/dashboard/settings` and `/onboarding`, entering an 8-digit pairing code (e.g. `GN9F75V1` for `917203824012`) into the WhatsApp mobile app failed with: *"Couldn't link device. Check the phone number is correct on your device, or get a new code"*, whereas QR code scanning on the same merchant setup connected successfully.
+  2. In the SuperAdmin 1-Click GBP Quick QR tool (`/api/admin/gbp/quick-qr`), newly provisioned merchants or existing merchants linked from GBP links/queries were not automatically assigned an active 3-Day Free Trial (`plan: 'trial'`, `trialEndsAt: +3 days`).
+- **Root Cause**:
+  1. **Dual-Layer Pairing Code Invalidation**:
+     a. **Client-Side Cryptographic Lock**: In Meta's official WhatsApp pairing protocol, Baileys signs the 8-digit code exclusively to the requested MSISDN phone number. When entered on a mobile device where the WhatsApp SIM/account number does not exactly match the requested number, WhatsApp's client-side validation aborts with *"Check the phone number is correct on your device"*. (QR scanning, by contrast, is phone-number-agnostic).
+     b. **Baileys Listener Reset during Polling**: In `src/app/api/whatsapp/connect/route.ts`, when polling active instance states without `forceRefresh`, the endpoint called `/instance/connect/${instance}` without the `?number=${phone}` query parameter. This caused Evolution API / Baileys to default to QR mode and terminate the active pairing-code listener on Meta's servers.
+  2. **Missing Trial Expiry in GBP Provisioning**: `src/app/api/admin/gbp/quick-qr/route.ts` created or updated merchants with Place IDs and review URLs, but omitted `trialEndsAt` and `plan`, requiring manual subscription activation in SuperAdmin.
+- **Resolution**:
+  1. **Pairing Code Query Parameter Preservation (`src/app/api/whatsapp/connect/route.ts`)**: Appended `?number=${cleanPhone}` to all existing instance connect queries when `isPairing && cleanPhone` is true, preventing Baileys from resetting the pairing listener during frontend polling.
+  2. **Device Phone Match Guidance Guard (`src/components/whatsapp-verification.tsx` & `src/app/onboarding/page.tsx`)**: Added clear amber alert callouts explaining that the 8-digit code is cryptographically locked to the specific phone number entered, instructing merchants to input it inside WhatsApp on the phone running that exact SIM/account.
+  3. **Automatic 3-Day Free Trial Provisioning (`src/app/api/admin/gbp/quick-qr/route.ts`)**: Configured automatic `plan: "trial"` and `trialEndsAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)` (+3 days) on all merchant creations and updates via the SuperAdmin 1-Click GBP tool.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [03 Nov 2026] Issue: Pre-Configured Gear Combos Visual Contrast Breakdown, Button Truncation & Misalignment
 - **Symptom**: On customerpilot.in/pricing, the 4 'Pre-Configured Gear Combos' cards had broken visual design:
   1. Gear 4 card had white text rendered on a white background, making the title, subtitle, checklist, and buttons invisible.

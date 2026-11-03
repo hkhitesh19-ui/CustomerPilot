@@ -61,7 +61,9 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // 3. If no existing merchant, check by name/city or auto-provision
+    // 3. If no existing merchant, check by name/city or auto-provision with 3 Days Free Trial
+    const trialEndsAtDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+
     if (!merchant) {
       merchant = await db.merchant.create({
         data: {
@@ -74,12 +76,18 @@ export async function POST(req: NextRequest) {
           googleReviewLink: reviewUrl,
           baselineRating: topMatch.rating || 0,
           baselineReviewCount: topMatch.userRatingCount || 0,
+          plan: "trial",
+          trialEndsAt: trialEndsAtDate,
           onboardingCompleted: true,
           status: "active"
         }
       })
     } else {
-      // Update Google review link & baseline
+      // Update Google review link & baseline and guarantee active 3 days free trial
+      const activeTrialExpiry = merchant.trialEndsAt && new Date(merchant.trialEndsAt) > new Date()
+        ? merchant.trialEndsAt
+        : trialEndsAtDate
+
       merchant = await db.merchant.update({
         where: { id: merchant.id },
         data: {
@@ -87,7 +95,9 @@ export async function POST(req: NextRequest) {
           baselineRating: topMatch.rating || merchant.baselineRating,
           baselineReviewCount: topMatch.userRatingCount || merchant.baselineReviewCount,
           address: merchant.address || address,
-          city: merchant.city || city
+          city: merchant.city || city,
+          trialEndsAt: activeTrialExpiry,
+          plan: merchant.plan || "trial"
         }
       })
     }

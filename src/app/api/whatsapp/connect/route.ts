@@ -131,7 +131,8 @@ async function handleConnect(req: Request) {
 
       // ── Step 2: Check if existing instance has an active QR code / pairing code ──
       if (!forceRefresh) {
-        const connectRes = await fetch(`${EVOLUTION_API_URL}/instance/connect/${currentInstanceName}`, { headers }).catch(() => null)
+        const queryParams = isPairing && cleanPhone ? `?number=${cleanPhone}` : ""
+        const connectRes = await fetch(`${EVOLUTION_API_URL}/instance/connect/${currentInstanceName}${queryParams}`, { headers }).catch(() => null)
         const connectData = connectRes && connectRes.ok ? await connectRes.json().catch(() => null) : null
 
         const qrCount = connectData?.qrcode?.count ?? connectData?.count ?? 0

@@ -827,6 +827,9 @@ function OnboardStep2WhatsApp({ data, setData, error, setError }: any) {
                       <li>Go to <strong>Settings (or ⋮ menu) ➔ Linked Devices ➔ Link a Device</strong>.</li>
                       <li>At the bottom of the screen, tap <strong>"Link with phone number instead"</strong> and enter <strong className="font-mono text-emerald-600">{pairingCode}</strong>.</li>
                     </ol>
+                    <div className="mt-2.5 p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-[11px] text-amber-900 leading-relaxed">
+                      ⚠️ <strong>Phone Number Match Rule:</strong> This code is cryptographically locked to your registered store WhatsApp phone number. You must enter it inside WhatsApp on the phone running that exact SIM/account. If you enter it on a different number, WhatsApp will reject it with <em>"Check the phone number is correct on your device"</em>.
+                    </div>
                   </div>
                 </div>
               ) : (
