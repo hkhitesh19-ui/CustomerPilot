@@ -8,17 +8,19 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 31bda9c
-Full Commit Hash  : 31bda9cb52a29e9e170ecda248b56679cc78de11
-Target Fix Commit : 31bda9cb52a29e9e170ecda248b56679cc78de11
-Branch Name       : deploy/pricing-update-20261102 (Feature: feature/pricing-postpaid-and-combos-20261102)
-Deployment Date   : 02 Nov 2026, 03:10 PM IST
+Active Git Commit : 2119d39
+Full Commit Hash  : 2119d39ebbeeae371c4d117afda5587560abba9d
+Target Fix Commit : 2119d39ebbeeae371c4d117afda5587560abba9d
+Branch Name       : deploy/pricing-update-20261102
+Deployment Date   : 03 Nov 2026, 02:15 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(gbp): automate google places detection on signup and add 1-click superadmin sync
+Commit Title      : feat(reviews-whatsapp): dynamic anti-repetition review drafting engine across 10 categories and whatsapp qr pairing stability
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 Merchant Status   : Vinayak Fashion & Cake Connection Live (Cake Connection WhatsApp Socket Open & Healthy)
+Dynamic Reviews   : 10 Categories (Bakery, South Indian, Punjabi, Cafe, Salon, Parlour, Car Wash, Education, Clinic, Gym) Live with Interactive Shuffle UI on /review
+WhatsApp QR Sync  : Safe Baileys reconnect & non-destructive webhook handling active on /api/whatsapp/connect & /api/webhook/evolution
 Pricing Engine    : Postpaid Monthly (0.3% sales, ₹0 upfront) for CustomerPilot Complete + Gear 2, Gear 3, Gear 4 Combos Live with 100% English UI
 WhatsApp Fleet    : Intelligent 5-case diagnostic engine, 6-hr anti-spam cooldown, personalized Hinglish alerts from SuperAdmin (+91 9033304707) live on /api/cron/whatsapp-health & SuperAdmin UI
 GBP Rank-1 Agent  : CustomerPilot Autonomous GBP Rank-1 Optimization Engine Live on /api/gbp/agent (Deterministic local generator + Gemini AI cascade, Clean Locality 'Manjalpur' & Title 'Cake Connection')
@@ -36,6 +38,7 @@ Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in 
 ----------------------------------------------------------
 
 Deployment History Log:
+- 03 Nov 2026, 02:15 PM: 2119d39 - feat(reviews-whatsapp): dynamic anti-repetition review drafting engine across 10 categories and whatsapp qr pairing stability
 - 02 Nov 2026, 03:10 PM: 31bda9c - feat(gbp): automate google places detection on signup and add 1-click superadmin sync
 - 02 Nov 2026, 10:50 AM: 80d1538 - style(pricing): elevate growth packs & combos with vibrant tiered color themes
 - 02 Nov 2026, 08:25 AM: 758f686 (Local: 680ba7c) - feat(pricing): add postpaid monthly billing and gear 2, 3, 4 combo plans with English UI
