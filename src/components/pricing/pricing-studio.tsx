@@ -1097,190 +1097,163 @@ export function PricingStudio({
             }, 0)
             const savings1YrVsStandalone = Math.max(0, standalone1YrSum - p365)
 
-            // Card thematic design styles
-            const cardTheme = isGear5
-              ? "bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900 text-white border-2 border-cyan-400/90 shadow-2xl hover:shadow-cyan-500/20"
+            // Card thematic design styles - clean, high-contrast, fully aligned
+            const cardBorder = isGear5
+              ? "border-2 border-indigo-600 dark:border-indigo-500 shadow-md hover:shadow-xl hover:shadow-indigo-500/10"
               : isGear4
-              ? "bg-gradient-to-b from-purple-50/80 via-white to-indigo-50/40 dark:from-purple-950/40 dark:via-slate-900 dark:to-slate-900 border-2 border-purple-400 dark:border-purple-600 shadow-lg hover:shadow-xl hover:shadow-purple-500/20"
+              ? "border-2 border-purple-500/50 dark:border-purple-600/70 shadow-sm hover:shadow-lg hover:shadow-purple-500/10"
               : isGear3
-              ? "bg-gradient-to-b from-amber-50/90 via-white to-orange-50/40 dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900 border-2 border-amber-400 dark:border-amber-500 shadow-xl hover:shadow-2xl hover:shadow-amber-500/20 md:-translate-y-2 md:scale-[1.02]"
-              : "bg-gradient-to-b from-emerald-50/70 via-white to-teal-50/30 dark:from-emerald-950/30 dark:via-slate-900 dark:to-slate-900 border-2 border-emerald-400/70 dark:border-emerald-700/60 shadow-md hover:shadow-xl hover:shadow-emerald-500/15"
+              ? "border-2 border-amber-500/50 dark:border-amber-600/70 shadow-sm hover:shadow-lg hover:shadow-amber-500/10"
+              : "border-2 border-emerald-500/50 dark:border-emerald-600/70 shadow-sm hover:shadow-lg hover:shadow-emerald-500/10"
 
             const badgeTheme = isGear5
-              ? "bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 text-slate-950 font-black shadow-md"
+              ? "bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/70 dark:text-indigo-300 dark:border-indigo-800"
               : isGear4
-              ? "bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-black shadow-sm"
+              ? "bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/70 dark:text-purple-300 dark:border-purple-800"
               : isGear3
-              ? "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-slate-950 font-black shadow-sm"
-              : "bg-emerald-600 text-white font-black shadow-xs"
+              ? "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800"
+              : "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800"
 
-            const discountBadgeTheme = isGear5
-              ? "text-cyan-300 bg-cyan-950/90 border border-cyan-400/50 font-black"
+            const primaryBtnTheme = isGear5
+              ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20"
               : isGear4
-              ? "text-purple-900 bg-purple-100 border border-purple-300 font-black"
+              ? "bg-purple-600 hover:bg-purple-700 text-white shadow-purple-600/20"
               : isGear3
-              ? "text-amber-950 bg-amber-200 border border-amber-300 font-black"
-              : "text-emerald-800 bg-emerald-100 border border-emerald-300 font-black"
+              ? "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/20"
+              : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20"
+
+            const primaryBoxBg = isGear5
+              ? "bg-indigo-50/50 border-indigo-200 dark:bg-indigo-950/30 dark:border-indigo-800/60"
+              : isGear4
+              ? "bg-purple-50/50 border-purple-200 dark:bg-purple-950/30 dark:border-purple-800/60"
+              : isGear3
+              ? "bg-amber-50/50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800/60"
+              : "bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800/60"
 
             return (
               <div
                 key={combo.gearKey}
-                className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${cardTheme}`}
+                className={`bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 flex flex-col justify-between h-full transition-all duration-300 relative overflow-hidden ${cardBorder}`}
               >
-                {/* Glow accent for Gear 5 */}
-                {isGear5 && (
-                  <div className="absolute -top-20 -right-20 w-52 h-52 bg-gradient-to-br from-cyan-500/25 to-indigo-500/25 rounded-full blur-3xl pointer-events-none" />
-                )}
-
                 <div>
-                  {/* Top Badge & Discount */}
-                  <div className="flex items-center justify-between gap-2 mb-4">
-                    <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full whitespace-nowrap ${badgeTheme}`}>
+                  {/* Top Badge & Discount Header */}
+                  <div className="flex items-center justify-between gap-1.5 mb-3.5">
+                    <span className={`text-[10.5px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full truncate ${badgeTheme}`}>
                       {combo.badge}
                     </span>
-                    <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full ${discountBadgeTheme}`}>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-800">
                       50% OFF
                     </span>
                   </div>
 
-                  {/* Title & Subtitle */}
-                  <h3 className={`text-lg sm:text-xl font-black leading-snug ${isGear4 ? "text-white" : "text-slate-900 dark:text-white"}`}>
-                    {combo.name}
-                  </h3>
-                  <p className={`text-xs mt-1.5 mb-5 leading-relaxed ${isGear4 ? "text-slate-300" : "text-slate-600 dark:text-slate-400"}`}>
+                  {/* Title & Subtitle with fixed min-height for uniform alignment */}
+                  <div className="min-h-[56px] flex items-center">
+                    <h3 className="text-base sm:text-lg font-black leading-snug text-slate-900 dark:text-white">
+                      {combo.name}
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 mb-4 leading-relaxed min-h-[44px]">
                     {combo.subtitle}
                   </p>
 
-                  {/* Included Engines Checklist */}
-                  <div className="space-y-2.5 mb-6">
-                    <span className={`text-[11px] font-bold uppercase tracking-wider ${isGear4 ? "text-cyan-300" : isGear3 ? "text-amber-800 dark:text-amber-300" : "text-emerald-800 dark:text-emerald-300"}`}>
+                  {/* Included Engines Checklist with min-height */}
+                  <div className="mb-5">
+                    <span className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-2">
                       Included Modules:
                     </span>
-                    {combo.modulesIncluded.map((modKey) => {
-                      const serv = STANDALONE_SERVICES.find((s) => s.i === modKey)
-                      return (
-                        <div key={modKey} className={`flex items-center gap-2.5 text-xs font-semibold ${isGear4 ? "text-slate-100" : "text-slate-800 dark:text-slate-200"}`}>
-                          <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
-                            isGear4
-                              ? "bg-cyan-500/20 text-cyan-300 border border-cyan-400/40"
-                              : isGear3
-                              ? "bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300"
-                              : "bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300"
-                          }`}>
-                            <Check className="w-3 h-3 stroke-[3]" />
+                    <div className="space-y-2 min-h-[105px]">
+                      {combo.modulesIncluded.map((modKey) => {
+                        const serv = STANDALONE_SERVICES.find((s) => s.i === modKey)
+                        return (
+                          <div key={modKey} className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
+                            <div className="w-4 h-4 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                              <Check className="w-3 h-3 stroke-[3]" />
+                            </div>
+                            <span className="truncate">{serv?.n || modKey}</span>
                           </div>
-                          <span>{serv?.n || modKey}</span>
-                        </div>
-                      )
-                    })}
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pricing Tiers Section */}
+                <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                  {/* ─── 1 Year Plan (Featured Primary Offer) ─── */}
+                  <div className={`p-4 rounded-2xl border transition-all ${primaryBoxBg}`}>
+                    <div className="flex items-center justify-between gap-1 mb-1.5">
+                      <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                        1 Year Plan
+                      </span>
+                      {savings1YrVsStandalone > 0 ? (
+                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs">
+                          Save {inr(savings1YrVsStandalone)}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-900 text-white dark:bg-slate-700">
+                          Best Value
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Price Line */}
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <span className="text-2xl font-black text-slate-900 dark:text-white">
+                        {inr(p365)}
+                      </span>
+                      <span className="text-xs font-semibold text-slate-400 line-through decoration-rose-500">
+                        {inr(m365)}
+                      </span>
+                      <span className="text-xs font-bold text-slate-600 dark:text-slate-400 ml-auto">
+                        {dy(p365, 365)}
+                      </span>
+                    </div>
+
+                    {/* Full-Width 1Y Action Button (Never clipped) */}
+                    <button
+                      type="button"
+                      onClick={() => handleSelectGearCombo(combo, 365)}
+                      className={`w-full mt-3 py-2.5 px-4 rounded-xl text-xs font-black shadow-xs transition-all duration-150 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-1.5 ${primaryBtnTheme}`}
+                    >
+                      <span>Choose 1 Year Plan</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
 
-                  {/* Pricing Tiers Box */}
-                  <div className={`space-y-3 pt-4 border-t ${isGear4 ? "border-slate-800" : isGear3 ? "border-amber-200/80 dark:border-slate-800" : "border-emerald-200/80 dark:border-slate-800"}`}>
-                    {/* 1 Year Option (Recommended) */}
-                    <div className={`p-4 rounded-2xl flex items-center justify-between gap-3 ${
-                      isGear4
-                        ? "bg-gradient-to-r from-indigo-950 to-slate-900/90 border-2 border-cyan-400 shadow-lg backdrop-blur-md"
-                        : isGear3
-                        ? "bg-gradient-to-r from-amber-100 to-orange-100/90 dark:from-amber-950/70 dark:to-orange-950/50 border-2 border-amber-400 shadow-sm"
-                        : "bg-gradient-to-r from-emerald-100/90 to-teal-100/70 dark:from-emerald-950/60 dark:to-teal-950/40 border-2 border-emerald-400 shadow-xs"
-                    }`}>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className={`text-xs font-black ${isGear4 ? "text-white" : "text-slate-950"}`}>
-                            1 Year Plan
-                          </span>
-                          {savings1YrVsStandalone > 0 ? (
-                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                              isGear4
-                                ? "bg-cyan-400 text-slate-950"
-                                : isGear3
-                                ? "bg-amber-800 text-white"
-                                : "bg-emerald-800 text-white"
-                            }`}>
-                              Save {inr(savings1YrVsStandalone)}
-                            </span>
-                          ) : (
-                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                              isGear4
-                                ? "bg-cyan-400 text-slate-950"
-                                : "bg-slate-900 text-white"
-                            }`}>
-                              Best Value
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-baseline gap-1.5 mt-1">
-                          <span className={`text-lg sm:text-xl font-black ${isGear4 ? "text-cyan-300" : "text-slate-950"}`}>
-                            {inr(p365)}
-                          </span>
-                          <span className={`text-[11px] font-semibold line-through decoration-rose-500 ${isGear4 ? "text-slate-400 decoration-rose-400" : "text-slate-500"}`}>
-                            {inr(m365)}
-                          </span>
-                          <span className={`text-[11px] font-bold ${isGear4 ? "text-cyan-200/90" : isGear3 ? "text-amber-950" : "text-emerald-950"}`}>
-                            {dy(p365, 365)}
-                          </span>
-                        </div>
+                  {/* ─── 6 Months Plan (Secondary Option) ─── */}
+                  <div className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-slate-600 dark:text-slate-400">
+                        6 Months Plan
+                      </span>
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-sm font-black text-slate-900 dark:text-white">
+                          {inr(p180)}
+                        </span>
+                        <span className="text-[10px] font-semibold text-slate-400 line-through decoration-rose-500">
+                          {inr(m180)}
+                        </span>
+                        <span className="text-[10px] font-semibold text-slate-500">
+                          {dy(p180, 180)}
+                        </span>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleSelectGearCombo(combo, 365)}
-                        className={`text-xs font-black px-4 py-2 rounded-xl transition transform hover:scale-[1.02] cursor-pointer shrink-0 ${
-                          isGear4
-                            ? "bg-gradient-to-r from-cyan-400 to-sky-300 hover:from-cyan-300 hover:to-sky-200 text-slate-950 shadow-md"
-                            : isGear3
-                            ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 shadow-md"
-                            : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
-                        }`}
-                      >
-                        Choose 1Y
-                      </button>
                     </div>
 
-                    {/* 6 Months Option */}
-                    <div className={`p-3.5 rounded-2xl flex items-center justify-between gap-3 ${
-                      isGear4
-                        ? "bg-white/5 border border-white/15"
-                        : isGear3
-                        ? "bg-white/95 dark:bg-slate-900 border border-amber-200 dark:border-amber-800/60"
-                        : "bg-white/95 dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/60"
-                    }`}>
-                      <div>
-                        <span className={`text-xs font-bold ${isGear4 ? "text-slate-200" : "text-slate-700 dark:text-slate-300"}`}>
-                          6 Months Plan
-                        </span>
-                        <div className="flex items-baseline gap-1.5 mt-0.5">
-                          <span className={`text-sm sm:text-base font-extrabold ${isGear4 ? "text-white" : "text-slate-900 dark:text-white"}`}>
-                            {inr(p180)}
-                          </span>
-                          <span className={`text-[11px] font-semibold line-through decoration-rose-500 ${isGear4 ? "text-slate-400 decoration-rose-400" : "text-slate-400"}`}>
-                            {inr(m180)}
-                          </span>
-                          <span className={`text-[11px] font-medium ${isGear4 ? "text-slate-300" : "text-slate-500"}`}>
-                            {dy(p180, 180)}
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleSelectGearCombo(combo, 180)}
-                        className={`text-xs font-bold px-3 py-1.5 rounded-xl transition cursor-pointer shrink-0 ${
-                          isGear4
-                            ? "border border-cyan-400/50 text-cyan-300 hover:bg-cyan-950/60"
-                            : isGear3
-                            ? "bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-300"
-                            : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-300"
-                        }`}
-                      >
-                        Choose 6M
-                      </button>
-                    </div>
+                    {/* Full-Width 6M Action Button (Never clipped) */}
+                    <button
+                      type="button"
+                      onClick={() => handleSelectGearCombo(combo, 180)}
+                      className="w-full mt-2.5 py-2 px-3 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-750 transition cursor-pointer flex items-center justify-center gap-1"
+                    >
+                      <span>Choose 6 Months Plan</span>
+                    </button>
                   </div>
                 </div>
               </div>
             )
           })}
         </div>
+
       </section>
 
       {/* ─── SECTION 3: MODULAR STANDALONE TOOLS & BUILD-YOUR-OWN BUNDLE ─── */}

@@ -3,6 +3,26 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Nov 2026] Issue: Pre-Configured Gear Combos Visual Contrast Breakdown, Button Truncation & Misalignment
+- **Symptom**: On customerpilot.in/pricing, the 4 'Pre-Configured Gear Combos' cards had broken visual design:
+  1. Gear 4 card had white text rendered on a white background, making the title, subtitle, checklist, and buttons invisible.
+  2. Gear 5 card had dark slate text rendered on a dark navy background, making the text unreadable.
+  3. Action buttons (Choose 1Y, Choose 6M) were severely clipped horizontally (Choos, Choo, Choose 6) due to cramming price numbers and buttons into a 220px flex row.
+  4. Top-right '50% OFF' badge was overflowing past the card border and clipped.
+  5. Cards had uneven vertical heights: different numbers of modules and subtitles caused pricing boxes and CTA buttons to be completely misaligned across the row, compounded by an awkward translateY hover scale on Gear 3.
+- **Root Cause**:
+  1. src/components/pricing/pricing-studio.tsx: Typography conditional only checked isGear4 for text-white, but Gear 4 had a light gradient background (bg-purple-50/80 via-white), while Gear 5 had a dark background (slate-950 via-indigo-950) but received text-slate-900 because isGear4 was false.
+  2. The 1 Year and 6 Months pricing boxes used horizontal flex items-center justify-between inside a narrow 4-column desktop grid (~220px inner width), leaving insufficient space for prices + strikethrough + daily rates + CTA button.
+  3. Header badge row used whitespace-nowrap on a long string without flex wrapping or clipping constraints.
+  4. Lack of minimum height constraints on title (min-h-[56px]), subtitle (min-h-[44px]), and module checklists (min-h-[105px]) meant content variation pushed the pricing tier boxes to different vertical levels.
+- **Resolution**:
+  1. **Unified High-Contrast Design Foundation**: Restructured all 4 cards with clean, accessible bg-white dark:bg-slate-900 and high-contrast typography (text-slate-900 dark:text-white for titles/prices, text-slate-500 for subtitles, text-slate-700 for checklist items). Assigned dedicated crisp 2px border themes per tier (Gear 2: Emerald, Gear 3: Amber, Gear 4: Purple, Gear 5: Indigo).
+  2. **Zero-Clipping Full-Width CTA Buttons**: Redesigned the pricing boxes with vertical stacking: bold price summary on top and full-width (w-full) action buttons below (Choose 1 Year Plan with arrow icon, and clean outline Choose 6 Months Plan). Provides 100% horizontal breathing room with zero truncation across all device widths.
+  3. **Pixel-Perfect Vertical Alignment**: Added uniform min-h-[56px] on title container, min-h-[44px] on subtitle, and min-h-[105px] on modules checklist. Removed arbitrary translateY scale offsets so all 4 cards start, align, and end at the exact same horizontal baseline.
+  4. **Compact Header Badges**: Truncated long gear badges gracefully and used compact shrink-0 50% OFF pill badges to prevent any border clipping.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [03 Nov 2026] Issue: 1000% Bulletproof Dual-Mode WhatsApp Linking, Pricing Gear 2-5 Matrix, SuperAdmin 1-Click GBP Review QR, & Dynamic Categories
 - **Symptom**: 
   1. WhatsApp QR scanning on mobile devices frequently failed due to screen glare, camera focus turnover, and socket timeout loops during merchant signup/pairing.
