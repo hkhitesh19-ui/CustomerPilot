@@ -32,6 +32,7 @@ def deploy():
     print("[3/6] Uploading updated pricing components & trackers to VPS...")
     files_to_upload = [
         ("src/components/pricing/pricing-studio.tsx", "/var/www/CustomerPilot/src/components/pricing/pricing-studio.tsx"),
+        ("scripts/verify_typecheck_ratchet.js", "/var/www/CustomerPilot/scripts/verify_typecheck_ratchet.js"),
         ("Git Commit on VPS Live.txt", "/var/www/CustomerPilot/Git Commit on VPS Live.txt"),
         ("RESOLVED_ISSUES_LOG.md", "/var/www/CustomerPilot/RESOLVED_ISSUES_LOG.md"),
     ]
@@ -95,13 +96,20 @@ def deploy():
     ext_http_code = stdout.read().decode('utf-8', errors='replace').strip()
     print(f"  -> Live https://customerpilot.in/pricing HTTP Code: {ext_http_code}")
 
-    # Check that Postpaid text is present in the rendered HTML
+    # Check that Postpaid text and Gear Combos are present in the rendered HTML
     check_content_cmd = """
-    curl -s http://127.0.0.1:3000/pricing | grep -o "Postpaid · Monthly" | head -n 1
+    curl -s http://127.0.0.1:3000/pricing | grep -o "Growth Packs &amp; Combos" | head -n 1
     """
     stdin, stdout, stderr = ssh.exec_command(check_content_cmd)
     rendered_text = stdout.read().decode('utf-8', errors='replace').strip()
     print(f"  -> Rendered Match: '{rendered_text}'")
+
+    check_gear4_cmd = """
+    curl -s http://127.0.0.1:3000/pricing | grep -o "Gear 4 : CustomerPilot Complete" | head -n 1
+    """
+    stdin, stdout, stderr = ssh.exec_command(check_gear4_cmd)
+    rendered_gear4 = stdout.read().decode('utf-8', errors='replace').strip()
+    print(f"  -> Rendered Gear 4 Match: '{rendered_gear4}'")
 
     ssh.close()
 

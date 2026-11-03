@@ -579,12 +579,10 @@ export async function POST(req: NextRequest) {
           data: { status: "active" }
         }).catch(() => {})
       } else if (state === "close" && instanceName) {
-        console.warn(`[Webhook] ⚠️ WhatsApp connection closed for ${instanceName}`)
-        // Clean up disconnected instance reference so UI and APIs immediately reflect disconnected state
-        await db.merchant.updateMany({
-          where: { whatsappInstanceName: instanceName },
-          data: { whatsappInstanceName: null }
-        }).catch(() => {})
+        console.warn(`[Webhook] ⚠️ WhatsApp connection state changed to close for ${instanceName}`)
+        // DO NOT wipe whatsappInstanceName on transient socket closure.
+        // Baileys routinely cycles connection state during QR refresh and prekey negotiation.
+        // Wiping whatsappInstanceName orphaned new merchant QR pairings mid-scan.
       }
     }
 

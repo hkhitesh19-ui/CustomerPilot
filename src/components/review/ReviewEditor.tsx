@@ -2,15 +2,16 @@
 
 import { useRef, useState } from "react"
 import { Copy, Check, ExternalLink, Sparkles, Gift, ArrowLeft, Info, MapPin, Camera } from "lucide-react"
-import { useSystemContent } from "@/hooks/useSystemContent"
 
 export function ReviewEditor({ 
   merchant, 
   customer, 
   initialDraft,
   existingReviewText,
-  draftOptions,
-  bonusInfo
+  draftOptions: initialDraftOptions,
+  bonusInfo,
+  category,
+  productName
 }: { 
   merchant: any, 
   customer: any, 
@@ -23,20 +24,48 @@ export function ReviewEditor({
     hasPreviousPhoto?: boolean,
     rewardName?: string,
     stampsRequired?: number
-  }
+  },
+  category?: string,
+  productName?: string
 }) {
-  const { getContent } = useSystemContent()
-  const reviewBonus = bonusInfo?.googleReviewBonus ?? 2
+    const reviewBonus = bonusInfo?.googleReviewBonus ?? 2
   const photoBonus = bonusInfo?.photoBonus ?? 2
   const maxPossibleBonus = reviewBonus + photoBonus
 
   const defaultText = existingReviewText || initialDraft || `Ordered from ${merchant.name} today. Super fresh quality, loved the taste and packaging. Definitely recommended!`
   const [draft, setDraft] = useState(defaultText)
+  const [draftOptions, setDraftOptions] = useState(initialDraftOptions)
+  const [isRegenerating, setIsRegenerating] = useState(false)
   const [selectedOption, setSelectedOption] = useState<"draft1" | "draft2" | "draft3">("draft1")
   const [copied, setCopied] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [isEditingExisting, setIsEditingExisting] = useState(!!existingReviewText)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+
+  const handleRegenerate = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (isRegenerating) return
+    setIsRegenerating(true)
+    try {
+      const pParam = productName ? `&product=${encodeURIComponent(productName)}` : ""
+      const cParam = customer?.id ? `&c=${encodeURIComponent(customer.id)}` : ""
+      const res = await fetch(`/api/reviews/dynamic-draft?m=${encodeURIComponent(merchant.id)}${cParam}${pParam}`)
+      if (res.ok) {
+        const data = await res.json()
+        if (data.drafts) {
+          setDraftOptions(data.drafts)
+          if (selectedOption === "draft1") setDraft(data.drafts.draft1)
+          else if (selectedOption === "draft2") setDraft(data.drafts.draft2)
+          else if (selectedOption === "draft3" && data.drafts.draft3) setDraft(data.drafts.draft3)
+          else setDraft(data.drafts.draft1)
+        }
+      }
+    } catch (err) {
+      console.warn("[ReviewEditor] Failed to fetch dynamic draft:", err)
+    } finally {
+      setIsRegenerating(false)
+    }
+  }
 
   const googleLink = merchant.googleReviewLink 
     || (merchant.googlePlaceId ? `https://search.google.com/local/writereview?placeid=${merchant.googlePlaceId}` : "https://maps.google.com")
@@ -197,9 +226,20 @@ export function ReviewEditor({
           {/* Multi AI Draft Options Pills (Google-style Filter Chips - 3 Angles) */}
           {draftOptions && !isEditingExisting && (
             <div className="space-y-1.5">
-              <span className="text-[11px] font-bold text-[#5F6368] uppercase tracking-wider block">
-                Choose AI Review Angle:
-              </span>
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-[#5F6368] uppercase tracking-wider block">
+                  Choose AI Review Angle:
+                </span>
+                <button
+                  type="button"
+                  onClick={handleRegenerate}
+                  disabled={isRegenerating}
+                  className="text-[11px] text-[#1A73E8] hover:text-[#174EA6] font-semibold flex items-center gap-1 transition-all cursor-pointer py-0.5 px-2 rounded-lg hover:bg-[#E8F0FE]"
+                >
+                  <Sparkles className={`w-3.5 h-3.5 ${isRegenerating ? "animate-spin" : ""}`} />
+                  <span>{isRegenerating ? "Generating..." : "🔄 Try Another Idea"}</span>
+                </button>
+              </div>
               <div className={`grid ${draftOptions.draft3 ? "grid-cols-3" : "grid-cols-2"} gap-1.5 sm:gap-2`}>
                 <button
                   type="button"
@@ -342,7 +382,7 @@ export function ReviewEditor({
             ) : (
               <>
                 <Copy className="w-5 h-5 text-white" />
-                <span>{getContent('review_copy_button', isEditingExisting ? "Copy & Update on Google Maps" : "Copy & Post on Google Maps")}</span>
+                <span>{isEditingExisting ? "Copy & Update on Google Maps" : "Copy & Post on Google Maps"}</span>
                 <ExternalLink className="w-5 h-5 opacity-80 ml-1" />
               </>
             )}

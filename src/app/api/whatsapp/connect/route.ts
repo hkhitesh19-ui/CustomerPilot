@@ -129,14 +129,18 @@ async function handleConnect(req: Request) {
         })
       }
 
-      // ── Step 2: If silent background refresh and instance is actively connecting ──
-      if (isSilent && currentState === "connecting" && !forceRefresh) {
+      // ── Step 2: Check if existing instance has an active QR code / pairing code ──
+      if (!forceRefresh) {
         const connectRes = await fetch(`${EVOLUTION_API_URL}/instance/connect/${currentInstanceName}`, { headers }).catch(() => null)
         const connectData = connectRes && connectRes.ok ? await connectRes.json().catch(() => null) : null
 
         const qrCount = connectData?.qrcode?.count ?? connectData?.count ?? 0
-        // If qr count is healthy (< 22), return the rotated QR silently
-        if (qrCount < 22 && (connectData?.qrcode?.base64 || connectData?.base64 || connectData?.qrcode?.code || connectData?.code)) {
+        const hasValidQR = connectData?.qrcode?.base64 || connectData?.base64 || connectData?.qrcode?.code || connectData?.code
+        const hasPairingCode = connectData?.pairingCode
+
+        // If instance has an active pairing code or healthy QR count (< 22), reuse it!
+        // DO NOT delete the instance while the merchant is pointing their camera at the screen!
+        if (isPairing ? hasPairingCode : (qrCount < 22 && hasValidQR)) {
           let qrBase64: string | null = connectData?.qrcode?.base64 || connectData?.base64 || null
           const rawCode: string | null = connectData?.qrcode?.code || connectData?.code || null
           if (rawCode) {
@@ -146,14 +150,18 @@ async function handleConnect(req: Request) {
           }
           return NextResponse.json({
             ok: true, status: "connecting", connected: false, instanceName: currentInstanceName,
-            qrCodeBase64: qrBase64, count: qrCount
+            whatsappPhone: cleanPhone || merchant.whatsappPhone,
+            qrCodeBase64: qrBase64,
+            pairingCode: connectData?.pairingCode || null,
+            count: qrCount,
+            expiresIn: isPairing ? 120 : 30
           })
         }
-        // If count is >= 22, fall through to recreate fresh instance so it doesn't hit 30-limit wall
+        // If count >= 22 or connect failed, instance expired on WhatsApp side -> proceed to clean recreate
       }
 
-      // Clean up previous stale instance from Evolution API
-      console.log(`[WhatsApp Connect] Cleaning previous instance "${currentInstanceName}"`)
+      // Clean up previous stale instance from Evolution API only when forced or expired
+      console.log(`[WhatsApp Connect] Cleaning stale/expired instance "${currentInstanceName}"`)
       await fetch(`${EVOLUTION_API_URL}/instance/logout/${currentInstanceName}`, { method: "DELETE", headers }).catch(() => null)
       await fetch(`${EVOLUTION_API_URL}/instance/delete/${currentInstanceName}`, { method: "DELETE", headers }).catch(() => null)
     }
