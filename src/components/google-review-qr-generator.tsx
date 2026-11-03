@@ -87,214 +87,144 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Print Smart AI Google Review QR - ${storeName}</title>
+          <title>Print Standee - ${storeName}</title>
+          <meta charset="utf-8">
           <link rel="preconnect" href="https://fonts.googleapis.com">
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&family=Product+Sans:wght@700;900&display=swap" rel="stylesheet">
+          <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
           <style>
-            @page { size: A4 portrait; margin: 0; }
-            * { box-sizing: border-box; }
-            body {
-              font-family: 'Poppins', -apple-system, sans-serif;
-              background: #f1f5f9;
+            @page {
+              size: A4 portrait;
               margin: 0;
-              padding: 40px 20px;
+            }
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body {
+              font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+              background: #F1F5F9;
               display: flex;
-              justify-content: center;
               align-items: center;
+              justify-content: center;
               min-height: 100vh;
+              padding: 40px;
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
             }
             .standee-card {
-              width: 380px;
-              background: linear-gradient(180deg, #F0F7FF 0%, #FFFFFF 35%, #FFFFFF 75%, #F4F9FF 100%);
-              border-radius: 28px;
-              border: 1px solid #cbd5e1;
-              box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
-              text-align: center;
+              position: relative;
+              width: 440px;
+              background: #FFFFFF;
+              border-radius: 36px 36px 12px 12px;
+              box-shadow: 0 20px 50px rgba(0,0,0,0.15);
               overflow: hidden;
-              position: relative;
-            }
-            .standee-body {
-              padding: 28px 24px 22px 24px;
-            }
-            .ai-powered {
-              font-size: 14px;
-              font-weight: 700;
-              color: #0f172a;
               display: flex;
+              flex-direction: column;
               align-items: center;
-              justify-content: center;
-              gap: 4px;
-              margin-bottom: 6px;
+              padding: 34px 28px 24px 28px;
+              text-align: center;
+              border: 1px solid #E2E8F0;
             }
-            .smart-badge {
-              display: inline-block;
-              background: #000000;
-              color: #ffffff;
-              font-size: 11px;
-              font-weight: 900;
-              letter-spacing: 1.2px;
-              text-transform: uppercase;
-              padding: 6px 20px;
-              border-radius: 9999px;
-              margin-bottom: 16px;
+            .stripe-left {
+              position: absolute; left: 0; top: 0; bottom: 0; width: 8px; display: flex; flex-direction: column;
             }
-            .store-pill {
-              font-size: 12px;
-              font-weight: 700;
-              color: #334155;
-              background: rgba(226, 232, 240, 0.6);
-              display: inline-block;
-              padding: 4px 14px;
-              border-radius: 8px;
-              margin-bottom: 12px;
+            .stripe-right {
+              position: absolute; right: 0; top: 0; bottom: 0; width: 8px; display: flex; flex-direction: column;
             }
-            .leave-us {
-              font-size: 13px;
-              font-weight: 800;
-              letter-spacing: 2px;
-              text-transform: uppercase;
-              color: #0f172a;
-              margin-bottom: 2px;
+            .stripe-segment { flex: 1; width: 100%; }
+            .seg-blue { background: #4285F4; }
+            .seg-red { background: #EA4335; }
+            .seg-yellow { background: #FBBC05; }
+            .seg-green { background: #34A853; }
+            .brand-header {
+              margin-top: 4px; margin-bottom: 18px; display: flex; align-items: center; justify-content: center; min-height: 70px;
             }
-            .google-wordmark {
-              font-size: 46px;
-              font-weight: 900;
-              letter-spacing: -1.5px;
-              line-height: 1;
-              margin-bottom: 4px;
-              font-family: 'Product Sans', 'Poppins', sans-serif;
+            .merchant-logo {
+              height: 68px; max-width: 300px; width: auto; object-fit: contain;
             }
-            .stars-review {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 6px;
-              margin-bottom: 18px;
+            .google-reviews-logo {
+              height: 52px; width: auto; max-width: 220px; object-fit: contain; margin-bottom: 16px;
             }
-            .stars-row {
-              color: #FBBC05;
-              font-size: 24px;
-              letter-spacing: 2px;
-              line-height: 1;
+            .qr-frame-wrapper {
+              position: relative; width: 280px; height: 280px; padding: 10px; display: flex; align-items: center; justify-content: center; background: #FFFFFF; border-radius: 32px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); margin-bottom: 12px;
             }
-            .review-text {
-              font-size: 17px;
-              font-weight: 900;
-              color: #0f172a;
-              letter-spacing: 0.5px;
-            }
-            .qr-wrapper {
-              position: relative;
-              background: #ffffff;
-              padding: 16px;
-              border-radius: 20px;
-              display: inline-block;
-              margin: 4px 0 16px 0;
-            }
-            .bracket {
-              position: absolute;
-              width: 50px;
-              height: 50px;
-              pointer-events: none;
-            }
-            .bracket-tl {
-              top: -2px;
-              left: -2px;
-              border-top: 6px solid #EA4335;
-              border-left: 6px solid #EA4335;
-              border-top-left-radius: 14px;
-            }
-            .bracket-tr {
-              top: -2px;
-              right: -2px;
-              border-top: 6px solid #FBBC05;
-              border-right: 6px solid #FBBC05;
-              border-top-right-radius: 14px;
-            }
-            .bracket-bl {
-              bottom: -2px;
-              left: -2px;
-              border-bottom: 6px solid #34A853;
-              border-left: 6px solid #34A853;
-              border-bottom-left-radius: 14px;
-            }
-            .bracket-br {
-              bottom: -2px;
-              right: -2px;
-              border-bottom: 6px solid #4285F4;
-              border-right: 6px solid #4285F4;
-              border-bottom-right-radius: 14px;
+            .qr-border-svg {
+              position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
             }
             .qr-image {
-              width: 210px;
-              height: 210px;
-              display: block;
-              border-radius: 8px;
+              width: 236px; height: 236px; object-fit: contain; border-radius: 20px;
             }
-            .bottom-banner {
-              background: #0B132B;
-              color: #ffffff;
-              padding: 14px 16px;
-              margin-top: 10px;
-              border-top: 1px solid rgba(255,255,255,0.1);
+            .scan-me {
+              font-size: 18px; font-weight: 900; color: #0F172A; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 12px;
             }
-            .powered-line {
-              font-size: 9px;
-              color: #38bdf8;
-              letter-spacing: 2px;
-              margin-bottom: 2px;
-              font-weight: 700;
+            .tagline {
+              font-size: 18px; font-weight: 600; color: #334155; margin-bottom: 4px;
             }
-            .brand-line {
-              font-size: 12px;
-              font-weight: 900;
-              letter-spacing: 0.5px;
-              color: #ffffff;
+            .thank-you {
+              font-family: 'Dancing Script', cursive; font-size: 40px; font-weight: 700; color: #DC2626; margin-bottom: 20px; transform: rotate(-1.5deg);
+            }
+            .footer-section {
+              width: 100%; padding-top: 14px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; align-items: center; justify-content: center;
+            }
+            .powered-label {
+              font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #64748B; text-transform: uppercase; margin-bottom: 6px;
+            }
+            .powered-row {
+              display: flex; align-items: center; justify-content: center; gap: 8px;
+            }
+            .cp-footer-logo {
+              height: 20px; width: auto; object-fit: contain;
+            }
+            .wa-icon {
+              width: 18px; height: 18px; object-fit: contain; border-radius: 50%;
+            }
+            .powered-phone {
+              font-size: 13px; font-weight: 800; color: #0F172A;
             }
           </style>
         </head>
         <body>
           <div class="standee-card">
-            <div class="standee-body">
-              <div class="ai-powered">
-                <span style="color:#000000">✦</span> Ai - Powered
-              </div>
-              <div class="smart-badge">Smart Ai GoogleReview QR</div>
-              
-              ${qrData?.merchant?.logoUrl ? `
-                <div style="display:flex; justify-content:center; align-items:center; min-height:50px; margin: 4px auto 8px auto;">
-                  <img src="${qrData.merchant.logoUrl}" style="max-height:55px; max-width:180px; width:auto; height:auto; object-fit:contain; border-radius:10px; background:#ffffff; padding:4px; border:1px solid #cbd5e1;" />
-                </div>
-              ` : ''}
-
-              ${storeName ? `<div class="store-pill">${storeName}</div>` : ''}
-
-              <div class="leave-us">LEAVE US A</div>
-              <div class="google-wordmark">
-                <span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span>
-              </div>
-              <div class="stars-review">
-                <span class="stars-row">★★★★★</span>
-                <span class="review-text">REVIEW!</span>
-              </div>
-
-              <div class="qr-wrapper">
-                <div class="bracket bracket-tl"></div>
-                <div class="bracket bracket-tr"></div>
-                <div class="bracket bracket-bl"></div>
-                <div class="bracket bracket-br"></div>
-                <img src="${qrData.qrDataUrl}" class="qr-image" alt="QR" />
-              </div>
+            <div class="stripe-left">
+              <div class="stripe-segment seg-blue"></div>
+              <div class="stripe-segment seg-red"></div>
+              <div class="stripe-segment seg-yellow"></div>
+              <div class="stripe-segment seg-green"></div>
+            </div>
+            <div class="stripe-right">
+              <div class="stripe-segment seg-red"></div>
+              <div class="stripe-segment seg-blue"></div>
+              <div class="stripe-segment seg-green"></div>
+              <div class="stripe-segment seg-yellow"></div>
             </div>
 
-            <div class="bottom-banner">
-              <div class="powered-line">---- Powered By ----</div>
-              <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:3px;">
-                <img src="/cplogo_icon.png" style="width:18px; height:18px; border-radius:4px; object-fit:contain;" />
-                <span class="brand-line">CustomerPilot - YourReview Partner</span>
+            <div class="brand-header">
+              <img src="${qrData?.merchant?.logoUrl && !qrData.merchant.logoUrl.includes('cplogo.png') ? qrData.merchant.logoUrl : '/cake_connection_official_logo.png'}" class="merchant-logo" alt="${storeName}" />
+            </div>
+
+            <img src="/google_reviews_official_logo.png" class="google-reviews-logo" alt="Google Reviews" />
+
+            <div class="qr-frame-wrapper">
+              <svg class="qr-border-svg" viewBox="0 0 280 280" fill="none">
+                <path d="M 140 7 L 34 7 A 27 27 0 0 0 7 34 L 7 140" stroke="#4285F4" stroke-width="11" stroke-linecap="round"/>
+                <path d="M 140 7 L 246 7 A 27 27 0 0 1 273 34 L 273 140" stroke="#EA4335" stroke-width="11" stroke-linecap="round"/>
+                <path d="M 7 140 L 7 246 A 27 27 0 0 0 34 273 L 140 273" stroke="#34A853" stroke-width="11" stroke-linecap="round"/>
+                <path d="M 273 140 L 273 246 A 27 27 0 0 1 246 273 L 140 273" stroke="#FBBC05" stroke-width="11" stroke-linecap="round"/>
+              </svg>
+              <img src="${qrData?.qrDataUrl}" class="qr-image" alt="QR" />
+            </div>
+
+            <div class="scan-me">SCAN ME</div>
+            <div class="tagline">your review matters</div>
+            <div class="thank-you">Thank You</div>
+
+            <div class="footer-section">
+              <div class="powered-label">POWERED BY:</div>
+              <div class="powered-row">
+                <img src="/cplogo_notagline.png" class="cp-footer-logo" alt="CustomerPilot" />
+                <span style="color:#94a3b8; font-size:12px;">•</span>
+                <div style="display:inline-flex; align-items:center; gap:4px;">
+                  <img src="/whatsapp_clean_icon.png" class="wa-icon" alt="WhatsApp" />
+                  <span class="powered-phone">+91 9033304707</span>
+                </div>
               </div>
             </div>
           </div>
@@ -445,74 +375,53 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
               {/* ── The Counter QR Code Display ───────────────── */}
               <div className="relative w-[290px] sm:w-[320px]">
                 
-                {/* Standee Body */}
-                <div className="bg-gradient-to-b from-[#F0F7FF] via-white via-70% to-[#F4F9FF] text-slate-900 rounded-3xl pt-6 pb-0 shadow-2xl border-2 border-slate-200/90 text-center relative overflow-hidden">
+                {/* Standee Body (Final v3 Design) */}
+                <div className="bg-white text-slate-900 rounded-3xl pt-5 pb-0 shadow-2xl border-2 border-slate-200/90 text-center relative overflow-hidden flex flex-col items-center">
                   
-                  {/* Top Sparkle + AI - Powered */}
-                  <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-slate-900 mb-1">
-                    <Sparkles className="w-3.5 h-3.5 text-slate-900 fill-slate-900" />
-                    <span>Ai - Powered</span>
+                  {/* Left Colored Stripes (Google Colors) */}
+                  <div className="absolute left-0 top-0 bottom-0 w-2 flex flex-col pointer-events-none">
+                    <div className="flex-1 bg-[#4285F4]"></div>
+                    <div className="flex-1 bg-[#EA4335]"></div>
+                    <div className="flex-1 bg-[#FBBC05]"></div>
+                    <div className="flex-1 bg-[#34A853]"></div>
                   </div>
 
-                  {/* Smart Ai GoogleReview QR pill */}
-                  <div className="inline-block bg-black text-white text-[10px] font-black tracking-wider uppercase px-4 py-1.5 rounded-full mb-2 shadow-xs">
-                    Smart Ai GoogleReview QR
+                  {/* Right Colored Stripes (Google Colors) */}
+                  <div className="absolute right-0 top-0 bottom-0 w-2 flex flex-col pointer-events-none">
+                    <div className="flex-1 bg-[#EA4335]"></div>
+                    <div className="flex-1 bg-[#4285F4]"></div>
+                    <div className="flex-1 bg-[#34A853]"></div>
+                    <div className="flex-1 bg-[#FBBC05]"></div>
                   </div>
 
-                  {/* Merchant Business Logo */}
-                  {qrData?.merchant?.logoUrl && (
-                    <div className="flex flex-col items-center justify-center my-1 min-h-[46px]">
-                      <img
-                        src={qrData.merchant.logoUrl}
-                        alt={storeName}
-                        className="max-h-12 max-w-[180px] w-auto h-auto object-contain p-1 rounded-xl bg-white/95 border border-slate-200/90 shadow-xs"
-                        onError={(e) => { e.currentTarget.style.display = 'none' }}
-                      />
-                    </div>
-                  )}
-
-                  {/* Store Name Badge */}
-                  {storeName && (
-                    <div className="mb-1.5">
-                      <span className="text-[11px] font-extrabold text-slate-700 bg-slate-100 px-3 py-0.5 rounded-md inline-block max-w-[220px] truncate">
-                        {storeName}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* LEAVE US A */}
-                  <div className="text-[11px] font-extrabold tracking-widest text-slate-900 uppercase">
-                    LEAVE US A
+                  {/* Merchant Business Logo (Bigger & Ultra HD) */}
+                  <div className="flex items-center justify-center pt-1 px-4 mb-2 min-h-[64px]">
+                    <img
+                      src={qrData?.merchant?.logoUrl && !qrData.merchant.logoUrl.includes("cplogo.png") ? qrData.merchant.logoUrl : "/cake_connection_official_logo.png"}
+                      alt={storeName}
+                      className="max-h-16 sm:max-h-20 max-w-[240px] w-auto h-auto object-contain drop-shadow-sm"
+                      onError={(e) => { e.currentTarget.src = "/cake_connection_official_logo.png" }}
+                    />
                   </div>
 
-                  {/* Google Wordmark */}
-                  <div className="my-0.5">
-                    <GoogleWordmark className="text-3xl sm:text-4xl" />
+                  {/* Official Google Reviews Logo (Google + Reviews + 5 Stars) */}
+                  <div className="flex flex-col items-center justify-center my-1 px-4">
+                    <img
+                      src="/google_reviews_official_logo.png"
+                      alt="Google Reviews ★★★★★"
+                      className="h-10 sm:h-12 w-auto object-contain drop-shadow-xs"
+                      onError={(e) => { e.currentTarget.style.display = 'none' }}
+                    />
                   </div>
 
-                  {/* Stars + REVIEW! */}
-                  <div className="flex items-center justify-center gap-1.5 mb-3">
-                    <div className="flex items-center text-[#FBBC05] text-base leading-none">
-                      ★ ★ ★ ★ ★
-                    </div>
-                    <span className="text-xs font-black text-slate-900 tracking-wide">
-                      REVIEW!
-                    </span>
-                  </div>
-
-                  {/* QR Code Container with 4-Color Google Corner Brackets */}
-                  <div className="relative inline-block p-3.5 bg-white rounded-2xl shadow-sm my-1">
-                    {/* Top-Left: RED */}
-                    <div className="absolute -top-1 -left-1 w-11 h-11 border-t-[5px] border-l-[5px] border-[#EA4335] rounded-tl-xl pointer-events-none" />
-                    
-                    {/* Top-Right: YELLOW */}
-                    <div className="absolute -top-1 -right-1 w-11 h-11 border-t-[5px] border-r-[5px] border-[#FBBC05] rounded-tr-xl pointer-events-none" />
-                    
-                    {/* Bottom-Left: GREEN */}
-                    <div className="absolute -bottom-1 -left-1 w-11 h-11 border-b-[5px] border-l-[5px] border-[#34A853] rounded-bl-xl pointer-events-none" />
-                    
-                    {/* Bottom-Right: BLUE */}
-                    <div className="absolute -bottom-1 -right-1 w-11 h-11 border-b-[5px] border-r-[5px] border-[#4285F4] rounded-br-xl pointer-events-none" />
+                  {/* QR Code Container with 4-Color Google Rounded Border */}
+                  <div className="relative inline-block p-2.5 bg-white rounded-3xl shadow-sm my-1">
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 240 240" fill="none">
+                      <path d="M 120 6 L 30 6 A 24 24 0 0 0 6 30 L 6 120" stroke="#4285F4" strokeWidth="10" strokeLinecap="round" />
+                      <path d="M 120 6 L 210 6 A 24 24 0 0 1 234 30 L 234 120" stroke="#EA4335" strokeWidth="10" strokeLinecap="round" />
+                      <path d="M 6 120 L 6 210 A 24 24 0 0 0 30 234 L 120 234" stroke="#34A853" strokeWidth="10" strokeLinecap="round" />
+                      <path d="M 234 120 L 234 210 A 24 24 0 0 1 210 234 L 120 234" stroke="#FBBC05" strokeWidth="10" strokeLinecap="round" />
+                    </svg>
 
                     {/* QR Image */}
                     {loading ? (
@@ -523,7 +432,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
                       <img 
                         src={qrData.qrDataUrl} 
                         alt="Google Review QR" 
-                        className="w-40 h-40 sm:w-44 sm:h-44 object-contain rounded-lg" 
+                        className="w-40 h-40 sm:w-44 sm:h-44 object-contain rounded-2xl" 
                       />
                     ) : (
                       <div className="w-40 h-40 sm:w-44 sm:h-44 flex items-center justify-center text-xs text-slate-400">
@@ -532,20 +441,43 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
                     )}
                   </div>
 
-                  {/* Bottom Dark Banner */}
-                  <div className="bg-[#0B132B] text-white py-2.5 px-3 mt-4 border-t border-slate-800">
-                    <div className="text-[8px] font-bold text-sky-400 tracking-wider uppercase">
-                      •••• Powered By ••••
+                  {/* SCAN ME */}
+                  <div className="text-xs sm:text-sm font-black text-slate-900 tracking-widest uppercase mt-1">
+                    SCAN ME
+                  </div>
+
+                  {/* Tagline */}
+                  <div className="text-[11px] sm:text-xs font-semibold text-slate-600 tracking-tight mt-0.5">
+                    your review matters
+                  </div>
+
+                  {/* Thank You in Cursive Calligraphy */}
+                  <div className="text-xl sm:text-2xl font-bold text-rose-600 mt-0.5 mb-2.5" style={{ fontFamily: "'Dancing Script', cursive, serif" }}>
+                    Thank You
+                  </div>
+
+                  {/* Footer Section */}
+                  <div className="w-full bg-slate-50 dark:bg-slate-900/90 py-2.5 px-3 border-t border-slate-200/80 dark:border-slate-800">
+                    <div className="text-[9px] font-extrabold text-slate-500 tracking-widest uppercase mb-1">
+                      POWERED BY:
                     </div>
-                    <div className="flex items-center justify-center gap-1.5 mt-0.5">
-                      <img 
-                        src="/cplogo_icon.png" 
-                        alt="CustomerPilot" 
-                        className="w-4 h-4 rounded object-contain" 
+                    <div className="flex items-center justify-center gap-2">
+                      <img
+                        src="/cplogo_notagline.png"
+                        alt="CustomerPilot"
+                        className="h-4 sm:h-4.5 w-auto object-contain"
                       />
-                      <span className="text-[10px] font-black tracking-tight text-white truncate">
-                        CustomerPilot - YourReview Partner
-                      </span>
+                      <span className="text-slate-400 text-xs">•</span>
+                      <div className="inline-flex items-center gap-1">
+                        <img
+                          src="/whatsapp_clean_icon.png"
+                          alt="WhatsApp"
+                          className="w-3.5 h-3.5 rounded-full object-contain"
+                        />
+                        <span className="text-[11px] font-extrabold text-slate-900 dark:text-slate-100">
+                          +91 9033304707
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>

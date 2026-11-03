@@ -3,6 +3,20 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [03 Nov 2026] Feature & UI: Google Reviews Standee Final v3 Upgrade & Smart AI Reviews Settings Integration
+- **Symptom**: In `/dashboard/settings` ("Smart AI Google Reviews QR Code & Posters"), the tabletop standee preview used a legacy bracket layout with small merchant logo and old dark banner. Merchants needed a modern, high-converting acrylic tabletop standee matching the verified Kerala Kitchenz aesthetic, with larger HD store logos, official Google Reviews branding, regular square QR modules with unclipped CustomerPilot center badge, and an official WhatsApp green contact icon.
+- **Root Cause**:
+  1. `src/components/google-review-qr-generator.tsx` had hardcoded CSS brackets and small merchant logo constraints (`max-h-12`).
+  2. The center badge in `src/lib/branded-qr.ts` was generating a rectangular banner (`0.40 * 0.28`) rather than a square icon badge, causing the CustomerPilot loop to touch edges or get clipped when embedded into square QR codes.
+  3. `handlePrintStandeePDF` still generated the legacy plain standee instead of the high-res v3 acrylic tabletop layout.
+- **Resolution**:
+  1. **Final v3 Acrylic Standee Component (`src/components/google-review-qr-generator.tsx`)**: Replaced mockup preview with the verified Final v3 Design featuring Google 4-color vertical side stripes (Blue, Red, Yellow, Green), prominent merchant logo (`max-h-20`), official Google Reviews badge (`/google_reviews_official_logo.png`), Google 4-color continuous rounded border, "SCAN ME", "your review matters", and red calligraphy "Thank You".
+  2. **Zero-Clipping Center Badge Architecture (`src/lib/branded-qr.ts`)**: Built a dedicated square badge generator (`badgeSize = 0.26 * qrSize`) with rounded corners (`rx: 18`) and a 13×13 module clearance moat, ensuring CustomerPilot's Cyan-Blue infinity loop floats with balanced padding and zero clipping.
+  3. **WhatsApp Contact Footer Integration**: Replaced calling phone icon with official round green WhatsApp badge (`public/whatsapp_clean_icon.png`) next to CustomerPilot's contact number (`+91 9033304707`).
+  4. **A4 Standee Print Sync**: Upgraded `handlePrintStandeePDF` to print the exact Final v3 standalone acrylic standee on A4 paper.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [03 Nov 2026] Issue: WhatsApp 8-Digit Pairing Code Query Param Preservation, Device Phone Cryptographic Lock Guard, & SuperAdmin GBP 3-Day Trial Auto-Activation
 - **Symptom**:
   1. On `/dashboard/settings` and `/onboarding`, entering an 8-digit pairing code (e.g. `GN9F75V1` for `917203824012`) into the WhatsApp mobile app failed with: *"Couldn't link device. Check the phone number is correct on your device, or get a new code"*, whereas QR code scanning on the same merchant setup connected successfully.

@@ -93,23 +93,26 @@ export async function generateBrandedQRDataUrl(
     }
   }
 
-  // Fallback: Embed CustomerPilot Logo
-  const logoPath = path.join(process.cwd(), "public", "cplogo_notagline.png")
-  if (!fs.existsSync(logoPath)) {
+  // Fallback or Reviews mode: Embed CustomerPilot Square Icon Logo Badge
+  const iconLogoPath = path.join(process.cwd(), "public", "cplogo_icon.png")
+  const fullLogoPath = path.join(process.cwd(), "public", "cplogo_notagline.png")
+  const cpLogoPathToUse = fs.existsSync(iconLogoPath) ? iconLogoPath : fullLogoPath
+
+  if (!fs.existsSync(cpLogoPathToUse)) {
     return `data:image/png;base64,${qrBuffer.toString("base64")}`
   }
 
-  const badgeWidth = Math.round(qrSize * 0.40)
-  const badgeHeight = Math.round(badgeWidth * 0.28)
-  const logoWidth = Math.round(badgeWidth * 0.85)
+  const badgeSize = Math.round(qrSize * 0.26)
+  const logoInnerSize = Math.round(badgeSize * 0.70)
 
-  const resizedLogo = await sharp(logoPath)
-    .resize({ width: logoWidth, fit: "inside" })
+  const resizedLogo = await sharp(cpLogoPathToUse)
+    .resize({ width: logoInnerSize, height: logoInnerSize, fit: "inside" })
+    .png()
     .toBuffer()
 
   const badgeSvg = Buffer.from(
-    `<svg width="${badgeWidth}" height="${badgeHeight}">
-      <rect x="0" y="0" width="${badgeWidth}" height="${badgeHeight}" rx="14" ry="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+    `<svg width="${badgeSize}" height="${badgeSize}">
+      <rect x="0" y="0" width="${badgeSize}" height="${badgeSize}" rx="18" ry="18" fill="#ffffff" stroke="#e2e8f0" stroke-width="3"/>
     </svg>`
   )
 

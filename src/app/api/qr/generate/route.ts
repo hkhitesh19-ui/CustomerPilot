@@ -88,7 +88,7 @@ export async function GET(req: NextRequest) {
       width: 600,
       darkColor: mode === "reviews" || type.startsWith("review_") ? "#0f172a" : "#1e1b4b",
       lightColor: "#ffffff",
-      merchantLogoUrl: merchant.logoUrl || null
+      merchantLogoUrl: (mode === "reviews" || type.startsWith("review_")) ? null : (merchant.logoUrl || null)
     })
 
     return ok({
