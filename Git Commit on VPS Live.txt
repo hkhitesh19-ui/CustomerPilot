@@ -8,18 +8,22 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 3919d78
-Full Commit Hash  : 3919d78b4d179d5a13b7984c8badc257256474ac
-Target Fix Commit : 3919d78b4d179d5a13b7984c8badc257256474ac
+Active Git Commit : a937ca2
+Full Commit Hash  : a937ca2f31514d7877746abfa3af6688f1cdfc8e
+Target Fix Commit : a937ca2f31514d7877746abfa3af6688f1cdfc8e
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 03 Nov 2026, 02:15 PM IST
+Deployment Date   : 03 Nov 2026, 04:20 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(reviews-whatsapp): dynamic anti-repetition review drafting engine across 10 categories and whatsapp qr pairing stability
+Commit Title      : feat(pricing-whatsapp-gbp): gear 2-5 combo pricing, dual-mode 8-digit whatsapp pairing, 1-click gbp review qr, and dynamic business categories
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 Merchant Status   : Vinayak Fashion & Cake Connection Live (Cake Connection WhatsApp Socket Open & Healthy)
-Dynamic Reviews   : 10 Categories (Bakery, South Indian, Punjabi, Cafe, Salon, Parlour, Car Wash, Education, Clinic, Gym) Live with Interactive Shuffle UI on /review
+WhatsApp Dual-Mode: Meta 8-Digit Pairing Code (Link with phone number instead) + Stable Camera QR Scan Active on /onboarding
+Pricing Combos    : Gear 2-5 Combos with 50% Off Badges, Daily Cost Formula (offer/180, offer/365), Standalone 1Y Savings Badges, and Table Integration Live on /pricing
+GBP Review QR     : 1-Click Standalone Google Review QR & Link Generator for SuperAdmin Active on /api/admin/gbp/quick-qr
+Dynamic Categories: 35+ GBP Official Categories & Custom Category Creation Active on /api/admin/categories
+Dynamic Reviews   : 10 Categories Live with Jittered Hash Offset & Anti-Repetition Shuffle Engine on /review
 WhatsApp QR Sync  : Safe Baileys reconnect & non-destructive webhook handling active on /api/whatsapp/connect & /api/webhook/evolution
 Pricing Engine    : Postpaid Monthly (0.3% sales, ₹0 upfront) for CustomerPilot Complete + Gear 2, Gear 3, Gear 4 Combos Live with 100% English UI
 WhatsApp Fleet    : Intelligent 5-case diagnostic engine, 6-hr anti-spam cooldown, personalized Hinglish alerts from SuperAdmin (+91 9033304707) live on /api/cron/whatsapp-health & SuperAdmin UI
@@ -38,6 +42,7 @@ Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in 
 ----------------------------------------------------------
 
 Deployment History Log:
+- 03 Nov 2026, 04:20 PM: a937ca2 - feat(pricing-whatsapp-gbp): gear 2-5 combo pricing, dual-mode 8-digit whatsapp pairing, 1-click gbp review qr, and dynamic business categories
 - 03 Nov 2026, 02:15 PM: 2119d39 - feat(reviews-whatsapp): dynamic anti-repetition review drafting engine across 10 categories and whatsapp qr pairing stability
 - 02 Nov 2026, 03:10 PM: 31bda9c - feat(gbp): automate google places detection on signup and add 1-click superadmin sync
 - 02 Nov 2026, 10:50 AM: 80d1538 - style(pricing): elevate growth packs & combos with vibrant tiered color themes
