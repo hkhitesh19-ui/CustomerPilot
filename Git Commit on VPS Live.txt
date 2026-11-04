@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 9708440
-Full Commit Hash  : 9708440120ee4ae0994a4fa54e31c10269453f70
-Target Fix Commit : 9708440120ee4ae0994a4fa54e31c10269453f70
+Active Git Commit : 1c789e5
+Full Commit Hash  : 1c789e5fc6ad0318b30ef6620228b07b0b949a39
+Target Fix Commit : 1c789e5fc6ad0318b30ef6620228b07b0b949a39
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 04 Nov 2026, 11:51 PM IST
+Deployment Date   : 05 Nov 2026, 01:18 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(settings): render modern 3-tab pill switcher instead of anchor jump bar
+Commit Title      : feat(menu): 1-click excel/csv bulk menu importer with variation auto-naming and instant starter template
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -23,22 +23,9 @@ Verification Checklist:
 ----------------------------------------------------------
 [x] TypeScript Strict & Ratchet Audit: PASSED (Baseline 36)
 [x] Adversarial Red-Team Gates (1-6): PASSED
-[x] Next.js Standalone Build & Static Assets Sync: PASSED
-[x] PM2 Reload customerpilot-web: PASSED
-[x] Direct Google Maps Share Link Box & URL Resolver: Active & Verified
-[x] Modern 3-Tab Pill Switcher ([Google & Smart AI Reviews] | [QR Standee & Branding] | [Store Profile & Info]): Active & Verified
-[x] Allowed Product and Services Words (Step D Rename): Active & Verified
-[x] Zero-Friction Google OAuth & Dashboard Default Redirect: Active & Verified
-[x] Crash-Proof Onboarding Guidance Screen & Global Error Boundary: Active & Verified
-[x] Cascade SuperAdmin Merchant Deletion: Active & Verified
-
-Historical Deployments:
-----------------------------------------------------------
-Commit 9708440 - 04 Nov 2026 11:51 PM IST: Render modern 3-tab pill switcher instead of anchor jump bar
-Commit a2a152b - 04 Nov 2026 11:34 PM IST: Maps URL place resolution, tabbed settings, allowed words rename, cascade merchant deletion
-Commit e778581 - 04 Nov 2026 04:30 PM IST: Purge cake angles, enforce 50-whitelist/blacklist grounding, lock feminine grammar
-Commit 2532cf9 - 04 Nov 2026 03:30 PM IST: GBP Manager card enhancement, instructions & manual activation modal
-Commit 232276a - 04 Nov 2026 02:40 PM IST: Google Maps proof engine, Places API verification, sync
-Commit 05768d4 - 04 Nov 2026 01:15 PM IST: Direct review link deep-linking, clipboard synchronous bypass
-Commit 3d97049 - 04 Nov 2026 04:20 AM IST: Production stabilization and rate limit fix
-Commit 3d429a6 - 04 Nov 2026 02:15 AM IST: Fix for digital card styling and standalone asset sync
+[x] 1-Click Excel/CSV Bulk Menu Upload: DEPLOYED & VERIFIED
+[x] Starter Template Download Endpoint: LIVE (HTTP 200)
+[x] Dynamic Variation Auto-Naming: VERIFIED
+[x] Gated Review-Only Loyalty Stamps: DEPLOYED
+[x] Settings Tab Hierarchy Reorder: DEPLOYED
+[x] High-Contrast Dark Red SignOut: DEPLOYED

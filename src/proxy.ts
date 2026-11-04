@@ -118,8 +118,8 @@ export async function proxy(request: NextRequest) {
 
   const isPublicApi = PUBLIC_API_PREFIXES.some((prefix) => {
         if (prefix === '/api/menu') {
-      // Allow GET on public menu (e.g. /api/menu/[merchantId])
-      return pathname.startsWith('/api/menu') && request.method === 'GET' && !pathname.includes('/items');
+      // Allow GET and HEAD on public menu (e.g. /api/menu/[merchantId], /api/menu/template)
+      return pathname.startsWith('/api/menu') && (request.method === 'GET' || request.method === 'HEAD') && !pathname.includes('/items');
     }
     if (prefix === '/api/digital-card') {
       // Allow GET (card viewing) and POST (zero-signup 3-day free trial card generation)
