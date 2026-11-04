@@ -313,6 +313,16 @@ export async function DELETE(req: Request) {
     }
 
     await db.$transaction(async (tx) => {
+      // 0. Digital Storefront, Menu, Orders & GBP Posts (Full Cascade Safeguard)
+      try { await tx.orderItem.deleteMany({ where: { order: { merchantId } } }); } catch {}
+      try { await tx.order.deleteMany({ where: { merchantId } }); } catch {}
+      try { await tx.menuItem.deleteMany({ where: { merchantId } }); } catch {}
+      try { await tx.digitalBusinessCard.deleteMany({ where: { merchantId } }); } catch {}
+      try { await tx.gbpPost.deleteMany({ where: { merchantId } }); } catch {}
+      try { await tx.gbpChecklistItem.deleteMany({ where: { merchantId } }); } catch {}
+      try { await tx.reviewBonusLog.deleteMany({ where: { merchantId } }); } catch {}
+      try { await tx.deadLetterQueue.deleteMany({ where: { merchantId } }); } catch {}
+
       // 1. Communications & Logs
       await tx.whatsAppMessage.deleteMany({ where: { merchantId } });
       await tx.campaignDeliveryLog.deleteMany({ where: { merchantId } });

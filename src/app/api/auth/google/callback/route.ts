@@ -111,8 +111,8 @@ export async function GET(req: Request) {
           status: "active",
           trialEndsAt,
           enabledModules: fastTrackModule,
-          onboardingCompleted: isFastTrack,
-          currentStep: isFastTrack ? 99 : 1,
+          onboardingCompleted: true, // 1-Click Instant Activation: zero onboarding friction
+          currentStep: 99,
         },
       });
 
@@ -137,7 +137,7 @@ export async function GET(req: Request) {
         })),
       }).catch(() => {});
 
-    } else if (isFastTrack && !merchant.onboardingCompleted) {
+    } else if (!merchant.onboardingCompleted) {
       // ─── Existing Merchant stuck in onboarding: Fast-track bypass ───
       // This handles merchants who registered before the fix or via manual form
       merchant = await db.merchant.update({
@@ -240,14 +240,8 @@ export async function GET(req: Request) {
       .setExpirationTime("7d")
       .sign(secret);
 
-    const MODULE_REDIRECTS: Record<string, string> = {
-      reviews: '/dashboard/reviews',
-      autoreply: '/dashboard/reviews',
-      loyalty: '/dashboard',
-    };
-    const redirectPath = merchant.onboardingCompleted
-      ? (isFastTrack ? (MODULE_REDIRECTS[moduleParam] || '/dashboard') : '/dashboard')
-      : `/onboarding?step=${merchant.currentStep || 1}`;
+    // Always redirect directly to /dashboard/settings by default where all controls & QR are ready
+    const redirectPath = '/dashboard/settings';
 
     const res = NextResponse.redirect(`${appUrl}${redirectPath}`);
 

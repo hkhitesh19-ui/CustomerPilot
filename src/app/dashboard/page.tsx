@@ -9,12 +9,25 @@ import {
   CheckCircle2, ChevronRight, Filter, Phone, Gift, UserCheck
 } from "lucide-react"
 import { RewardModal } from "@/components/dashboard/RewardModal"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { CommunicationStatusCard } from "@/components/communication-status-card"
 import { MorningReportCard } from "@/components/morning-report-card"
 import Link from "next/link"
 
 export default function DashboardHome() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const view = searchParams.get("view")
+
+  // Default Landing Page: Whenever user navigates to /dashboard without explicit ?view=analytics,
+  // automatically serve /dashboard/settings where all business controls, reviews & QR are ready
+  useEffect(() => {
+    if (!view) {
+      router.replace("/dashboard/settings")
+    }
+  }, [view, router])
+
   const { data, isLoading, isError, refetch } = useDashboardState()
   const [selectedWaitingCustomer, setSelectedWaitingCustomer] = useState<any>(null)
   const [isRewardModalOpen, setIsRewardModalOpen] = useState(false)

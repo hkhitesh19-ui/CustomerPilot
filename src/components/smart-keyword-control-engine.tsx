@@ -157,13 +157,13 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
             </div>
             <div>
               <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                <span>Smart Keyword Control & Zero-Hallucination Guard</span>
+                <span>Allowed Product and Services words</span>
                 <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500 text-white">
                   3-Layer Active
                 </span>
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Control exact SEO, Voice Search (AEO), and AI Overview (GEO) keywords. Block unwanted items (Blacklist) to ensure AI never hallucinates wrong products.
+                Select your business category to auto-load allowed products and services. AI will strictly use only these words in customer reviews.
               </p>
             </div>
           </div>

@@ -67,6 +67,7 @@ export default function SettingsPage() {
     timezone: "",
   })
   
+  const [activeTab, setActiveTab] = useState<"reviews" | "branding" | "profile">("reviews")
   const [isSaving, setIsSaving] = useState(false)
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle")
 
@@ -264,6 +265,7 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 1: COUNTER QR STANDEE STUDIO                              */}
       {/* ══════════════════════════════════════════════════════════════════ */}
+      {activeTab === "branding" && (
       <section 
         id="sec-vip-qr" 
         className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
@@ -296,11 +298,12 @@ export default function SettingsPage() {
           <QRGenerator merchantId={merchant?.id || ""} />
         </div>
       </section>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 2: SMART AI GOOGLE REVIEWS                                */}
       {/* ══════════════════════════════════════════════════════════════════ */}
-      {isReviewsEnabled && (
+      {activeTab === "reviews" && isReviewsEnabled && (
         <section 
           id="sec-google-reviews" 
           className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
@@ -372,7 +375,7 @@ export default function SettingsPage() {
                 <div className="w-6 h-6 rounded-md bg-white border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 p-1 shadow-xs">
                   <GoogleGLogo className="w-4 h-4" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Smart Keyword Control &amp; Zero-Hallucination Guard</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Allowed Product and Services words</h3>
               </div>
               <SmartKeywordControlEngine merchantId={merchant?.id || ""} />
             </div>
@@ -383,6 +386,7 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 3: BUSINESS PROFILE & STORE DETAILS                        */}
       {/* ══════════════════════════════════════════════════════════════════ */}
+      {activeTab === "profile" && (
       <section 
         id="sec-business" 
         className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
@@ -491,11 +495,12 @@ export default function SettingsPage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 4: REWARD CARD SETUP & LOYALTY LEVELS                      */}
       {/* ══════════════════════════════════════════════════════════════════ */}
-      {isLoyaltyEnabled && (
+      {activeTab === "branding" && isLoyaltyEnabled && (
         <section 
           id="sec-reward-setup" 
           className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
@@ -573,7 +578,7 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 5: YOUR BUSINESS WHATSAPP CONNECTION                       */}
       {/* ══════════════════════════════════════════════════════════════════ */}
-      {isLoyaltyEnabled && (
+      {activeTab === "branding" && isLoyaltyEnabled && (
         <section 
           id="sec-whatsapp-conn" 
           className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
@@ -611,6 +616,7 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 6: AUTOMATION TIMERS & MESSAGE TEMPLATES                   */}
       {/* ══════════════════════════════════════════════════════════════════ */}
+      {activeTab === "branding" && (
       <section 
         id="sec-automations" 
         className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
@@ -669,10 +675,12 @@ export default function SettingsPage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 7: OPERATIONS MANUAL                                      */}
       {/* ══════════════════════════════════════════════════════════════════ */}
+      {activeTab === "profile" && (
       <section 
         id="sec-guides" 
         className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
@@ -723,6 +731,7 @@ export default function SettingsPage() {
           </Link>
         </div>
       </section>
+      )}
     </div>
   )
 }

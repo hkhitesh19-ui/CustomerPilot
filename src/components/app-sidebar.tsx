@@ -28,7 +28,7 @@ interface MainNavItem {
 
 const mainNav: MainNavItem[] = [
   { name: "Complete Setup", href: "/dashboard/settings", icon: Settings },
-  { name: "Home", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Home (Analytics)", href: "/dashboard?view=analytics", icon: LayoutDashboard },
   { name: "Digital Business Card", href: "/dashboard/digital-card", icon: Smartphone },
   { name: "Smart AI Google Reviews", href: "/dashboard/reviews", icon: Star, modules: ["REVIEWS", "AUTOREPLY"] },
   { name: "Google Maps Rank", href: "/dashboard/gbp-status", icon: MapPin },

@@ -3,6 +3,41 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [04 Nov 2026] Feature & UX: Direct Google Maps URL Resolver, Tabbed Modern Settings, Zero-Friction Signup Redirect, Crash-Proof Onboarding & Cascade Merchant Deletion
+- **Symptom**:
+  1. Merchants without direct GBP Gmail login or with complex multi-location setups could not easily connect their Google Maps Place ID and Review link without full Google OAuth.
+  2. Visiting `/dashboard` landed on raw analytics rather than central store controls (`/dashboard/settings`).
+  3. Visiting `/onboarding` or `/onboarding?step=1` while unauthenticated displayed a generic, unhelpful Next.js crash screen (`This page couldn't load. Reload to try again, or go back.`).
+  4. Google OAuth signup required filling duplicate forms before reaching dashboard controls.
+  5. The `/dashboard/settings` page was an excessively long single page with heavy vertical text, and Step D had an outdated technical title.
+  6. SuperAdmin merchant deletion failed with foreign-key constraint violations on merchants with storefront orders, GBP posts, or digital cards.
+- **Root Cause**:
+  1. Google Review URLs and Place IDs only require a public Google Maps place URL or Place ID, but the UI previously mandated Google OAuth.
+  2. `/dashboard` root route lacked an automatic router push to `/dashboard/settings`.
+  3. `/onboarding` rendered unauthenticated client state without an error boundary or graceful guidance card when 401 Unauthorized was returned.
+  4. OAuth callback did not mark new merchants as `onboardingCompleted: true` immediately.
+  5. Settings lacked section tabs, causing information overload.
+  6. `prisma.merchant.delete()` in `/api/admin/merchants` did not purge cascading child relations (`orderItem`, `order`, `menuItem`, `digitalBusinessCard`, `gbpPost`, `gbpChecklistItem`, `reviewBonusLog`, `deadLetterQueue`).
+- **Resolution**:
+  1. **Direct Google Maps Share Link Box & Resolver (`src/app/api/google-business/resolve-maps-url/route.ts` & `src/components/google-business-integration.tsx`)**:
+     - Built backend resolver supporting shortened links (`maps.app.goo.gl`, `goo.gl/maps`) and standard Google Maps URLs.
+     - Automatically resolves Place ID, place name, address, rating, and pre-fills `googleReviewUrl` (`https://search.google.com/local/writereview?placeid=...`) with ZERO Google OAuth needed.
+     - Added 1-Click "Connect via Google Maps Link" UI card in Step B.
+  2. **Tabbed Settings Modern UI (`src/app/dashboard/settings/page.tsx`)**:
+     - Replaced 7-anchor jump bar with modern 3-tab pill switcher: `[Google & Smart AI Reviews]` (default), `[QR Standee & Branding]`, `[Store Profile & Info]`.
+     - Renamed Step D title to **"Allowed Product and Services words"** with concise helper copy.
+  3. **Zero-Friction Google Signup & Default Settings Landing (`src/app/api/auth/google/callback/route.ts` & `src/app/dashboard/page.tsx`)**:
+     - Auto-activates Google OAuth signups (`onboardingCompleted: true`, `currentStep: 99`) and redirects directly to `/dashboard/settings`.
+     - `/dashboard` automatically forwards merchants to `/dashboard/settings` by default.
+  4. **Crash-Proof Onboarding & Error Boundary (`src/app/onboarding/page.tsx` & `src/app/error.tsx`)**:
+     - Handled 401 unauthenticated state with a branded, helpful guidance card directing users to Sign In or Free Trial signup.
+     - Auto-redirects authenticated merchants directly to `/dashboard/settings`.
+     - Added global Next.js error boundary `src/app/error.tsx`.
+  5. **Full-Cascade SuperAdmin Merchant Deletion (`src/app/api/admin/merchants/route.ts`)**:
+     - Purged all dependent child records inside a database transaction before deleting the merchant record, ensuring 100% reliable deletion without foreign-key constraints.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [04 Nov 2026] Issue: Cross-Category Review Hallucination Purge, 50-Keyword Whitelist/Blacklist Expansion, & Gender-Locked Grounding (Phase 3)
 - **Symptom**: When generating reviews for "SSV Saloon and academy" (a ladies beauty parlor), the AI generated absurd cross-industry combinations blending bakery, delivery, and tea angles into parlor reviews (e.g. *"SSV Saloon's Store Special midnight doorstep delivery gave me O3+ facial glow"*, *"Enjoyed the Store Special facial while sipping soothing masala chai"*, *"Celebrated Mom's birthday at SSV Saloon"*).
 - **Root Cause**:
