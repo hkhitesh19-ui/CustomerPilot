@@ -3,6 +3,35 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [05 Nov 2026] Feature & UX: Review-Only Merchant Loyalty Stamp Gating, Settings Tab Hierarchy Reorder & High-Contrast SignOut Button
+- **Symptom**:
+  1. Review-only merchants (e.g. "SSV Saloon and academy" on 3-day free trial or review-only paid subscription) still displayed loyalty stamp rewards on their public customer review pages ("+3 Bonus Stamps", "🎁 +2 Bonus Stamps Photo Reward", and VIP wallet credit text), confusing customers since these merchants do not run loyalty cards.
+  2. In `/dashboard/settings`, "Store Profile & Info" was positioned last (3rd) without numbering, and tab titles lacked clear numbered sequence.
+  3. The dashboard sidebar SignOut button was visually muted with faint text, making it difficult for merchants to locate.
+- **Root Cause**:
+  1. `ReviewEditor.tsx` and `/review` page rendered bonus stamps and photo incentives unconditionally without checking the merchant's active module permissions (`hasModule(merchant, 'LOYALTY')`).
+  2. `/dashboard/settings/page.tsx` initialized `activeTab` to "reviews" and placed profile setup at the end.
+  3. Sidebar signout element used faint `text-slate-400` styling with minimal hover state contrast.
+- **Resolution**:
+  1. **Loyalty Stamp Gating on Review Screen (`src/app/review/page.tsx` & `src/components/review/ReviewEditor.tsx`)**:
+     - Added dynamic `isLoyaltyEnabled` check via `hasModule(merchant, 'LOYALTY') && !!stampCard?.active`.
+     - When `isLoyaltyEnabled === false`:
+       - Header pill renders "⭐ 5-Star Verified" instead of "+3 Bonus Stamps".
+       - Photo reward card (`🎁 +2 Bonus Stamps Photo Reward`) is completely hidden.
+       - Post-submission VIP digital wallet CTA is hidden.
+       - Footer copy switches to warm customer appreciation: "Thank you for supporting our business! Your authentic Google review helps us grow. ⭐".
+       - Footer branding switches to "Automated Smart AI Google Review Engine for Local Merchants".
+  2. **Settings Tab Hierarchy Reordering (`src/app/dashboard/settings/page.tsx`)**:
+     - Position 1: **`1. Store Profile & Info`** (Default active tab).
+     - Position 2: **`2. Digital Loyalty Stamps QR & Rules Setup`** (Renamed from "QR Standee & Branding"; conditionally hidden if merchant is review-only).
+     - Position 3 / 2: **`Smart Ai GoogleReview Setup`** (Renamed from "Google & Smart Ai Review").
+     - Dynamic subtitle changes based on whether loyalty is active or review-only.
+  3. **High-Contrast Dark Red SignOut Button (`src/components/app-sidebar.tsx`)**:
+     - Enhanced SignOut button with prominent bold dark red text (`text-[#b91c1c] dark:text-[#ef4444] font-extrabold`) and red tinted border.
+     - Added high-contrast crimson hover state (`hover:bg-[#dc2626] hover:text-white`) with pure white icon and text transition.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [04 Nov 2026] Feature & UX: Direct Google Maps URL Resolver, Tabbed Modern Settings, Zero-Friction Signup Redirect, Crash-Proof Onboarding & Cascade Merchant Deletion
 - **Symptom**:
   1. Merchants without direct GBP Gmail login or with complex multi-location setups could not easily connect their Google Maps Place ID and Review link without full Google OAuth.
