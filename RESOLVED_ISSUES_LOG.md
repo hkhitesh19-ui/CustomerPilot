@@ -3,6 +3,27 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [05 Nov 2026] Feature & UX: 1-Click Excel/CSV Bulk Menu Importer with Weight Variation Auto-Naming & Instant Starter Template
+- **Symptom**: Merchants with large catalogs (e.g. bakeries with 50-200 cakes/pastries, restaurants with 100+ dishes, retail stores with 500+ items) faced high onboarding friction and dropped off because the system only permitted adding items one-by-one through a manual form.
+- **Root Cause**: The Online Menu system lacked bulk ingestion endpoints and client parsing interfaces to accept spreadsheets, requiring repetitive manual entry for each weight variation (e.g. 250g, 500g, 1kg).
+- **Resolution**:
+  1. **Downloadable Starter CSV/Excel Template (`src/app/api/menu/template/route.ts`)**:
+     - Provides instant download of `CustomerPilot_Menu_Import_Template.csv` with UTF-8 BOM encoding for native Microsoft Excel compatibility.
+     - Pre-configured with sample rows across categories (Cakes, Pastries, Dry Snacks, Beverages) showing item names, variations (500g, 1kg), selling prices, strike-through MRP, food type (Veg/Non-Veg), and stock availability.
+  2. **Intelligent SheetJS Header Matcher & Validator (`src/app/api/menu/bulk-preview/route.ts`)**:
+     - Accepts `.xlsx`, `.xls`, and `.csv` files up to 2,000 items.
+     - Case-insensitive, fuzzy header matching for Category, Item Name, Variation/Weight, Selling Price, MRP, Food Type, and Availability.
+     - Auto-formats compound names: if variation is supplied (e.g. `500g`), automatically pairs it with name (`Chocolate Truffle Cake (500g)`).
+     - Returns validation summary (total rows, valid count, skipped rows with reason, and live preview of first 8 items).
+  3. **Atomic Bulk Import API (`src/app/api/menu/bulk-import/route.ts`)**:
+     - Supports both `append` (add to existing catalog) and `replace` (wipe and replace with fresh catalog) modes via atomic database transaction.
+     - Records audit log `MENU_BULK_IMPORTED`.
+  4. **Modern Bulk Importer Modal (`src/app/dashboard/menu/page.tsx`)**:
+     - Added `Bulk Import (Excel / CSV)` action button in page header.
+     - Interactive modal with 1-click template download banner, drag-and-drop file upload, live preview table, mode selector, and real-time import status.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [05 Nov 2026] Feature & UX: Review-Only Merchant Loyalty Stamp Gating, Settings Tab Hierarchy Reorder & High-Contrast SignOut Button
 - **Symptom**:
   1. Review-only merchants (e.g. "SSV Saloon and academy" on 3-day free trial or review-only paid subscription) still displayed loyalty stamp rewards on their public customer review pages ("+3 Bonus Stamps", "🎁 +2 Bonus Stamps Photo Reward", and VIP wallet credit text), confusing customers since these merchants do not run loyalty cards.
