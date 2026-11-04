@@ -29,6 +29,7 @@ import { WhatsAppVerification } from "@/components/whatsapp-verification"
 import { WhatsAppJourneyTemplates } from "@/components/whatsapp-journey-templates"
 import { GoogleBusinessIntegration } from "@/components/google-business-integration"
 import { GbpManagerAccessCard } from "@/components/gbp-manager-access-card"
+import { SmartKeywordControlEngine } from "@/components/smart-keyword-control-engine"
 import { GoogleReviewQRGenerator } from "@/components/google-review-qr-generator"
 import { RewardSetupCard } from "@/components/reward-setup-card"
 import { LoyaltyCategoryCard } from "@/components/loyalty-category-card"
@@ -363,6 +364,18 @@ export default function SettingsPage() {
 
             {/* 2C: 1-Click Agency Manager Access (CustomerPilot1@gmail.com) */}
             <GbpManagerAccessCard merchantId={merchant?.id || ""} />
+
+            {/* 2D: Smart Keyword Control Engine & Grounding Guard */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xs font-black text-[#0284c7] dark:text-[#38bdf8] bg-[#0284c7]/10 px-2.5 py-0.5 rounded-md border border-[#0284c7]/20">STEP D</span>
+                <div className="w-6 h-6 rounded-md bg-white border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 p-1 shadow-xs">
+                  <GoogleGLogo className="w-4 h-4" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Smart Keyword Control &amp; Zero-Hallucination Guard</h3>
+              </div>
+              <SmartKeywordControlEngine merchantId={merchant?.id || ""} />
+            </div>
           </div>
         </section>
       )}

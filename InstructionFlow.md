@@ -317,7 +317,8 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   │   ├── automations/route.ts   # Winback & Marketing Automations Cron
 │   │   │   │   └── gbp-posts/route.ts     # Weekly 3-Post Content Generation Cron
 │   │   │   ├── merchant/              # Merchant Google Manager Access & Verification APIs
-│   │   │   │   └── gbp-manager-access/route.ts # 1-Click Agency Manager Invite & Access State API
+│   │   │   │   ├── gbp-manager-access/route.ts # 1-Click Agency Manager Invite & Access State API
+│   │   │   │   └── keyword-profile/route.ts # Smart Keyword Control & Grounding JSON Profile API
 │   │   │   ├── demo/                  # Public Sandboxed Demo APIs (AI Review Reply)
 │   │   │   ├── digital-card/          # Standalone Digital Business Card APIs
 │   │   │   │   ├── route.ts           # Digital Card CRUD API (Get/Save)
@@ -401,6 +402,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   └── super-admin/page.tsx       # Platform SuperAdmin Master Control Panel
 │   │
 │   ├── components/                    # Reusable React UI Components
+│   │   ├── smart-keyword-control-engine.tsx    # Smart Keyword Control Engine (10 Categories, SEO/AEO/GEO & Blacklist Pill Studio)
 │   │   ├── gbp-manager-access-card.tsx         # 1-Click Google Business Profile Agency Manager Access & Invite Hub (CustomerPilot1@gmail.com)
 │   │   ├── gbp-10day-sprint.tsx                # 10-Day Local Top 3 Acceleration Sprint Dashboard & 4-Lever Tactical Command Hub
 │   │   ├── gbp-ranking-audit-client.tsx        # Interactive Free 100-Point GBP & Competitor Audit Tool, Tracks Comparison & Dual-Lang FAQs
@@ -443,6 +445,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   └── services/                  # CommunicationService (Dispatch & Templates)
 │   │
 │   └── lib/                           # Core Backend Business Logic & Engines
+│       ├── keyword-matrix.ts          # 10-Category Master Keyword Matrix, SEO/AEO/GEO Presets & Negative Guardrails
 │       ├── gbp-rank1-agent.ts         # Autonomous GBP Rank-1 Optimization Engine (Decision Matrix & Gemini/Local Fallback)
 │       ├── gbp-checklist-seed.ts      # Track A & B Operational SOP Checklists & Guardrail Templates
 │       ├── gbp-post-generator.ts      # Weekly 3-Post Engine (Product Spotlight, Social Proof, Weekend Offer)

@@ -3,6 +3,26 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [04 Nov 2026] Feature & Architecture: 3-Layer Context Grounding Engine & Smart Keyword Control Studio (Phase 1 & 2)
+- **Symptom**: AI-generated Google reviews suffered from category hallucination and context mismatch (e.g. recommending Gujarati thalis for pure Punjabi restaurants, bread/cookies for cake-only shops, or men's haircuts/beard trims for ladies-only beauty parlors). Merchants also had repetitive drafts and lacked control over targeted SEO/AEO/GEO ranking keywords.
+- **Root Cause**:
+  1. Previously, LLMs received only broad category labels without explicit negative constraints (blacklists) or positive allowed offerings (whitelists).
+  2. Merchants had no database field or interactive dashboard interface to curate high-converting search keywords, voice search prompts (AEO), and geo vibe signals (GEO), nor could they ban non-applicable services.
+- **Resolution**:
+  1. **Phase 1 Database Schema & Presets Matrix (`prisma/schema.prisma` & `src/lib/keyword-matrix.ts`)**:
+     - Added `keywordProfile String?` JSON storage to the `Merchant` database model.
+     - Architected comprehensive master matrix presets for all 10 business categories (Hotels, Cafe, Bakery & Cake Shop, Restaurant, Salon Men/Unisex, Beauty Parlor Ladies, Gift Shop, Garment Shop, SuperMarket, Car Wash).
+     - Defined explicit SEO (Google Search), AEO (Voice & Question Search), GEO (AI Citations & Vibe Signals), and Strict Negative Guardrails (Banned Items/Services) for each category.
+     - Built helper resolution utilities (`getKeywordPresetForCategory`, `resolveMerchantKeywordProfile`) with fallbacks.
+  2. **Phase 1 Backend API (`src/app/api/merchant/keyword-profile/route.ts`)**:
+     - Created authenticated GET (fetches merchant's active profile or category default preset) and POST (validates and commits customized keyword & blacklist JSON).
+  3. **Phase 2 Dashboard Toggle Pills Studio (`src/components/smart-keyword-control-engine.tsx`)**:
+     - Built an interactive keyword studio with 10-category preset switcher, grammar persona selector (`All_Neutral`, `Female_Only` with "gayi thi / karwaya", `Male_Only`, `Family_Kids`, `Couples_Friends`).
+     - Implemented 4 color-coded buckets with real-time tag addition and deletion (SEO - Emerald, AEO - Sky Blue, GEO - Indigo, Strict Blacklist - Rose Red BANNED).
+     - Integrated as **STEP D** under Section 02 in `/dashboard/settings`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ---
 ## [04 Nov 2026] Issue: Google OAuth Personal Name Override, Missing GBP Place Link & Review Redirection Popup Blocker Failure
 - **Symptom**: Merchant Suvarna Sonawana logged in with her Google account (the same Gmail managing her Google Business Profile for "SSV Saloon and academy" in Manjalpur, Vadodara). However:
