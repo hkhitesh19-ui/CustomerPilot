@@ -83,7 +83,10 @@ export default async function ReviewPage({
     productName,
     merchantName: merchant.name,
     menuItems: menuItemNames,
-    seed: Math.random().toString(36)
+    seed: Math.random().toString(36),
+    merchantKeywordProfile: (merchant as any).keywordProfile || null,
+    merchantCity: merchant.city || undefined,
+    merchantAddress: merchant.address || undefined
   })
 
   const dynamicDraft = draftOptions.draft1

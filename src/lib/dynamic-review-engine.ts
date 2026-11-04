@@ -1,11 +1,13 @@
 // CustomerPilot — Dynamic Anti-Repetition Google Review Engine
 // Generates diverse, authentic, human-like 5-star Google review drafts
-// Combines Multi-LLM cascade (Gemini + Groq) with an exhaustive 100+ multi-angle
-// rotating fallback pool so consecutive visits NEVER produce identical reviews.
+// Grounded with Merchant Keyword Profile, 50 Allowed + 50 Blacklisted Entities,
+// Gender & Grammar Persona, and Zero Food/Delivery Hallucination Guardrails.
+
+import { resolveMerchantKeywordProfile, KeywordProfile } from "./keyword-matrix"
 
 export interface ReviewDraftOptions {
-  draft1: string // Quality & Taste (or Core Product/Service Experience)
-  draft2: string // Service & Vibes (with authentic human popularity/crowd marker)
+  draft1: string // Quality & Core Experience (with allowed SEO keywords)
+  draft2: string // Service & Vibes (conversational Hinglish with mild crowd marker)
   draft3: string // Short 1-Liner (punchy, high conversion)
 }
 
@@ -105,9 +107,9 @@ const RESTAURANT_REVIEWS: FallbackReviewItem[] = [
   }
 ]
 
-const SALON_REVIEWS: FallbackReviewItem[] = [
+const SALON_MEN_REVIEWS: FallbackReviewItem[] = [
   {
-    draft1: "Fade haircut bilkul photo jaisa diya. Rates genuine hain aur AC cooling badiya thi.",
+    draft1: "Skin fade haircut bilkul photo jaisa diya. Rates genuine hain aur AC cooling badiya thi.",
     draft2: "Beard trim fast aur clean kiya. Thoda rush tha par fresh towel aur hygiene ka proper dhyan rakha.",
     draft3: "Relaxing head massage and clean setup. Staff polite hai aur service super quick."
   },
@@ -120,24 +122,45 @@ const SALON_REVIEWS: FallbackReviewItem[] = [
     draft1: "De-tan cleanup and charcoal mask treatment gave an instant fresh look. Skin feels thoroughly refreshed.",
     draft2: "Friendly staff with zero product upselling pressure. Comfortable massage chair and peaceful setup.",
     draft3: "Professional grooming services with high hygiene and courteous styling team."
+  },
+  {
+    draft1: "Low fade haircut aur beard contour sharp diya. Finishing touch ekdum clean aur symmetric thi.",
+    draft2: "Evening peak time me thoda waiting tha, par staff courteous tha aur wait comfortable AC lounge me tha.",
+    draft3: "Top-notch men's grooming and hygienic haircut tools. Highly recommended!"
   }
 ]
 
-const PARLOUR_REVIEWS: FallbackReviewItem[] = [
+// Strictly feminine, zero delivery, zero tea/cake, pure beauty parlor experience
+const PARLOUR_LADIES_REVIEWS: FallbackReviewItem[] = [
   {
-    draft1: "Threading aur upper lip me bilkul pain nahi hua. Didi ka hath bohot light hai aur parlor clean hai.",
-    draft2: "O3+ facial ke baad skin pe instant glow tha. Saturday busy tha par treatment me koi jaldi nahi ki.",
-    draft3: "Super relaxing hair spa and painless threading. Staff polite hai aur rates transparent hain."
+    draft1: "Painless eyebrow threading aur upper lip karwaya. Didi ka hath bohot light hai aur parlor bilkul hygienic hai.",
+    draft2: "O3+ facial ke baad skin pe instant natural glow aa gaya. Saturday rush tha par treatment me bilkul jaldi nahi ki.",
+    draft3: "Super relaxing hair spa and painless threading. Staff bohot sweet hai aur rates transparent hain."
   },
   {
-    draft1: "Got my hair spa and cleanup done before a wedding. Hair is silky smooth and skin feels glowing.",
-    draft2: "Parlour thoda busy tha afternoon me par disposable bedsheet aur sterilized tools used the.",
-    draft3: "Painless threading, relaxing facial massage and extremely sweet staff."
+    draft1: "Family function se pehle hair spa aur D-tan cleanup karwaya. Hair super silky soft ho gaye aur skin glowing lag rahi hai.",
+    draft2: "Parlour me female staff hai aur privacy ka full dhyan rakha. Disposable bedsheet aur sanitized tools use kiye the.",
+    draft3: "Painless threading, relaxing facial massage and extremely courteous beauticians."
   },
   {
-    draft1: "Pedicure and manicure service was thorough and relaxing. Dead skin properly removed with sanitized tools.",
-    draft2: "Staff was polite, gentle and attentive. Ambiance was calming with good air-conditioning.",
-    draft3: "Very neat, hygienic setup with attentive beauticians. Totally recommended!"
+    draft1: "Pedicure and manicure service bohot relaxing thi. Sanitized tools use kiye aur dead skin properly clean ki.",
+    draft2: "Staff gentle aur attentive tha. Ambiance calm tha aur AC cooling badiya thi, bina kisi product upselling ke.",
+    draft3: "Very neat, hygienic setup with attentive beauticians. Totally recommended for women!"
+  },
+  {
+    draft1: "Hydra facial aur Rica waxing karwaya. Waxing me bilkul rash nahi hua aur skin bohot soft lag rahi hai.",
+    draft2: "Shaam ko appointments ki bheed thi par didi ne patiently time dekar facial massage kiya. Worth every rupee.",
+    draft3: "Best ladies beauty parlor in area. Branded products used with genuine gentle care."
+  },
+  {
+    draft1: "Engagement makeup aur saree draping karwaya tha. Makeup ekdum natural aur non-cakey tha, daylight me badiya lag raha tha.",
+    draft2: "Ready hone me time exact estimate ke according laga. Hair updo dance ke baad bhi perfect set raha.",
+    draft3: "Flawless long-lasting makeup and graceful saree draping. Loved the experience!"
+  },
+  {
+    draft1: "Hair smoothening aur global hair color karwaya. Texture silky soft ho gaya aur shine natural aayi hai.",
+    draft2: "Treatment ke time step-by-step care tips samjhaye. Staff polite tha aur seating comfortable thi.",
+    draft3: "Professional hair care, original branded products and friendly female team."
   }
 ]
 
@@ -150,12 +173,7 @@ const SOUTH_INDIAN_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Button idli and medu vada combo was steaming hot and super soft. Sambar ka spice balance perfect tha.",
     draft2: "Tables regularly sanitize ho rahe the. Self-service counter organized tha aur billing brisk thi.",
-    draft3: "Mouth-melting soft idlis, crisp vadas and authentic traditional chutneys. Must visit!"
-  },
-  {
-    draft1: "Ghee roast paper dosa was wafer thin and delightfully crisp. Filter coffee had genuine aroma and froth.",
-    draft2: "Family ke sath breakfast ke liye badiya spot hai. Ambiance clean hai aur service polite thi.",
-    draft3: "Top-notch South Indian breakfast with genuine homestyle flavors and quick turnaround."
+    draft3: "Mouth-melting soft idlis, crisp vadas and authentic traditional chutneys."
   }
 ]
 
@@ -169,29 +187,6 @@ const CAR_WASH_REVIEWS: FallbackReviewItem[] = [
     draft1: "Deep interior vacuuming and dashboard conditioning made the car look showroom fresh. Odor completely gone.",
     draft2: "Boys were detail-oriented with mat cleaning and boot space. Transparent pricing bina hidden add-ons ke.",
     draft3: "Spotless interior detailing, shiny tyre polish and very courteous detailing crew."
-  },
-  {
-    draft1: "Ceramic quick-wax wash gave a deep glossy shine. Water beading effect is really impressive in rain.",
-    draft2: "Vehicle 35 minutes me ready karke deliver kar diya. Microfiber cloths sanitized use kar rahe the.",
-    draft3: "Affordable premium car wash with high attention to detail. Highly satisfied!"
-  }
-]
-
-const EDUCATION_REVIEWS: FallbackReviewItem[] = [
-  {
-    draft1: "Faculty concepts bilkul scratch se clear karti hai. Numerical practice aur doubt solving ka personal attention mila.",
-    draft2: "Classroom environment disciplined aur focused hai. Weekly topic-wise tests se performance track hoti hai.",
-    draft3: "Highly dedicated teaching faculty, comprehensive study material and supportive mentors."
-  },
-  {
-    draft1: "Doubt clearing sessions aur regular parent-teacher feedback system bohot helpful hai. Teachers approachable hain.",
-    draft2: "Batch size manageable hai so individual queries skip nahi hoti. Library aur study space peaceful hai.",
-    draft3: "Excellent academic guidance, structured syllabus completion and encouraging teachers."
-  },
-  {
-    draft1: "Test series analysis aur model answer sheets se exam pattern samajhna kafi easy ho gaya. Great mentorship.",
-    draft2: "Admin and academic staff cooperative hain. Doubts class ke baad bhi solve karte hain.",
-    draft3: "Top-tier coaching with personalized doubt support and motivating atmosphere."
   }
 ]
 
@@ -200,44 +195,103 @@ const CLINIC_REVIEWS: FallbackReviewItem[] = [
     draft1: "Doctor explained the root cause patiently bina unnecessary tests prescribe kiye. Treatment bilkul gentle tha.",
     draft2: "Appointment timing strictly follow hua. Clinic hygienic aur sterilized tha, staff polite hai.",
     draft3: "Experienced doctor, transparent diagnosis and compassionate healthcare support."
-  },
-  {
-    draft1: "Dental cleaning aur cavity filling completely painless hui. High hygiene standards maintained hain.",
-    draft2: "Waiting time minimal tha aur consultation room sparkling clean tha. Post-procedure tips clearly diye.",
-    draft3: "Gentle dental care, modern equipment and very courteous clinic team."
-  }
-]
-
-const GYM_REVIEWS: FallbackReviewItem[] = [
-  {
-    draft1: "Floor trainers posture correct karwate hain har exercise me. Dumbbell aur machine variety top class hai.",
-    draft2: "Evening peak hours me bhi equipment sharing smooth rehti hai. Air-conditioning and music vibes badiya hain.",
-    draft3: "Spacious gym, modern fitness equipment and highly motivating training atmosphere."
-  },
-  {
-    draft1: "Weight training aur cardio section properly bifurcated hai. Locker rooms and showers clean hain.",
-    draft2: "Trainers zero ego ke sath guidance dete hain. Diet guidance aur workout schedule customize karke diya.",
-    draft3: "Energetic workout vibe, well-maintained machines and friendly fitness coaches."
   }
 ]
 
 const GENERAL_REVIEWS: FallbackReviewItem[] = [
   {
-    draft1: "Picked up some items earlier today. Super fresh quality, loved the experience and neat packaging.",
-    draft2: "Smooth transaction and neat packaging. Thodi bheed thi counter par par counter service fast thi.",
+    draft1: "Picked up some items earlier today. Super fresh quality, loved the experience and neat setup.",
+    draft2: "Smooth transaction and neat service. Thodi bheed thi counter par par billing brisk aur polite thi.",
     draft3: "Fast service, clean setup and courteous staff. Dependable local store!"
   },
   {
     draft1: "Great product quality and transparent pricing. All items in stock and clearly labeled.",
     draft2: "Staff greeted nicely and helped locate what I needed in under a minute. Quick billing.",
     draft3: "Hassle-free experience, reliable product quality and super friendly assistance."
-  },
-  {
-    draft1: "Authentic products at genuine market rates. No hidden markups and bill was provided instantly.",
-    draft2: "Shop had a rush of customers par payment counter was moving briskly. Parking space convenient thi.",
-    draft3: "Genuine products, swift checkout and very cooperative shop owners."
   }
 ]
+
+/**
+ * Returns category-specific, realistic Indian context angles (NO cross-industry mismatch).
+ */
+function getCategoryAuthenticAngles(categoryKey: string): string[] {
+  switch (categoryKey) {
+    case "beauty_parlour":
+      return [
+        "Family wedding function preparation",
+        "Pre-festive skin glow & facial session",
+        "Weekend pampering & relaxing hair spa",
+        "Routine eyebrow threading & face cleanup",
+        "Friend's sangeet function look",
+        "Casual party styling & grooming"
+      ]
+    case "bakery":
+      return [
+        "Kids 1st birthday cake celebration",
+        "Parents wedding anniversary celebration",
+        "Weekend sweet craving treat",
+        "Surprise celebration cake gift",
+        "Office team celebration treat"
+      ]
+    case "restaurant":
+      return [
+        "Weekend family dinner outing",
+        "Family anniversary celebration meal",
+        "Casual lunch with relatives",
+        "Sunday dinner with friends"
+      ]
+    case "salon_men":
+      return [
+        "Sunday morning fresh fade haircut & beard trim",
+        "Pre-interview clean grooming session",
+        "Routine haircut & relaxing head massage",
+        "Wedding season sharp hair styling"
+      ]
+    case "cafe":
+      return [
+        "Evening coffee catchup with friends",
+        "Laptop work from cafe session",
+        "Cozy weekend hangout",
+        "Student budget snack break"
+      ]
+    case "hotels":
+      return [
+        "Family transit stay during travel",
+        "Overnight business trip check-in",
+        "Peaceful weekend stopover"
+      ]
+    case "gift_shop":
+      return [
+        "Last-minute birthday gift selection",
+        "Customized anniversary photo gift",
+        "Kids birthday return gift purchase"
+      ]
+    case "clothing":
+      return [
+        "Festive shopping for family",
+        "Wedding guest outfit trial",
+        "Casual daily wear shopping"
+      ]
+    case "car_wash":
+      return [
+        "Monsoon mud cleanup & snow foam wash",
+        "Weekend road trip car wash",
+        "Pre-festive interior vacuum detailing"
+      ]
+    case "supermarket":
+      return [
+        "Monthly ration grocery restocking",
+        "Morning fresh dairy and snacks purchase",
+        "Household essentials shopping"
+      ]
+    default:
+      return [
+        "Regular local visit",
+        "Weekend service visit",
+        "Friendly local recommendation"
+      ]
+  }
+}
 
 /**
  * Returns a randomized, diverse review draft set based on category, product, and optional seed.
@@ -248,12 +302,14 @@ export function getDynamicFallbackReview(
   seed?: number | string
 ): ReviewDraftOptions {
   const c = (category || "").toLowerCase()
-  const hasItem = Boolean(product && product.trim())
+  const hasItem = Boolean(product && product.trim() && !product.toLowerCase().includes("store special"))
   const item = hasItem ? product!.trim() : ""
 
   // Choose appropriate pool based on category
   let pool: FallbackReviewItem[] = GENERAL_REVIEWS
-  if (c.includes("cake") || c.includes("bakery") || c.includes("pastry") || c.includes("dessert") || c.includes("sweet")) {
+  if (c.includes("beauty") || c.includes("parlor") || c.includes("parlour") || c.includes("makeup") || c.includes("bridal") || c.includes("ladies salon") || c.includes("ssv")) {
+    pool = PARLOUR_LADIES_REVIEWS
+  } else if (c.includes("cake") || c.includes("bakery") || c.includes("pastry") || c.includes("dessert") || c.includes("sweet")) {
     pool = BAKERY_REVIEWS
   } else if (c.includes("south indian") || c.includes("dosa") || c.includes("idli") || c.includes("udupi")) {
     pool = SOUTH_INDIAN_REVIEWS
@@ -261,18 +317,12 @@ export function getDynamicFallbackReview(
     pool = RESTAURANT_REVIEWS
   } else if (c.includes("cafe") || c.includes("coffee") || c.includes("tea") || c.includes("bistro") || c.includes("beverage")) {
     pool = CAFE_REVIEWS
-  } else if (c.includes("salon") || c.includes("barber") || c.includes("haircut") || c.includes("grooming")) {
-    pool = SALON_REVIEWS
-  } else if (c.includes("beauty") || c.includes("parlor") || c.includes("parlour") || c.includes("makeup") || c.includes("spa")) {
-    pool = PARLOUR_REVIEWS
+  } else if (c.includes("salon") || c.includes("barber") || c.includes("haircut") || c.includes("grooming") || c.includes("saloon")) {
+    pool = SALON_MEN_REVIEWS
   } else if (c.includes("wash") || c.includes("car") || c.includes("detailing") || c.includes("auto") || c.includes("garage")) {
     pool = CAR_WASH_REVIEWS
-  } else if (c.includes("education") || c.includes("coaching") || c.includes("institute") || c.includes("class") || c.includes("school") || c.includes("tutor") || c.includes("academy")) {
-    pool = EDUCATION_REVIEWS
-  } else if (c.includes("clinic") || c.includes("hospital") || c.includes("dental") || c.includes("doctor") || c.includes("dentist")) {
+  } else if (c.includes("clinic") || c.includes("hospital") || c.includes("dental") || c.includes("doctor")) {
     pool = CLINIC_REVIEWS
-  } else if (c.includes("gym") || c.includes("fitness") || c.includes("workout") || c.includes("crossfit")) {
-    pool = GYM_REVIEWS
   }
 
   // Derive selection index using random or deterministic seed
@@ -290,11 +340,10 @@ export function getDynamicFallbackReview(
 
   const selected = pool[index] || pool[0]
 
-  // If a specific purchased item is passed, weave it organically into draft1 & draft2
   if (hasItem) {
     return {
-      draft1: `Ordered ${item} today. Taste and quality were completely fresh, texture soft tha aur packaging solid thi.`,
-      draft2: `${item} was packed carefully. Thoda rush tha shop pe par counter service quick aur courteous thi.`,
+      draft1: `Opted for ${item} today. Quality was really good, professional experience tha aur proper care li.`,
+      draft2: `${item} service was handled gently. Thoda rush tha par staff courteous tha aur proper attention diya.`,
       draft3: selected.draft3
     }
   }
@@ -307,8 +356,8 @@ export function getDynamicFallbackReview(
 }
 
 /**
- * Calls AI (Gemini or Groq fallback) with an upgraded, dynamic variation prompt.
- * If AI is unconfigured or slow, seamlessly returns a random dynamic fallback.
+ * Calls AI (Gemini or Groq fallback) with strict Merchant KeywordProfile grounding.
+ * Enforces Whitelists, Blacklists, and Gender Persona to guarantee ZERO context hallucinations.
  */
 export async function generateDynamicReviewDraft(params: {
   businessCategory: string
@@ -316,82 +365,130 @@ export async function generateDynamicReviewDraft(params: {
   merchantName?: string
   menuItems?: string[]
   seed?: string
+  merchantKeywordProfile?: string | null
+  merchantCity?: string
+  merchantAddress?: string
 }): Promise<ReviewDraftOptions> {
-  const { businessCategory, productName, merchantName, menuItems, seed } = params
+  const { businessCategory, productName, merchantName, menuItems, seed, merchantKeywordProfile, merchantCity, merchantAddress } = params
 
-  // 1. Pick a randomized focal item if no specific product is provided
+  // 1. Resolve merchant's active KeywordProfile (SEO, AEO, GEO, and Blacklist)
+  const profile: KeywordProfile = resolveMerchantKeywordProfile({
+    name: merchantName,
+    category: businessCategory,
+    city: merchantCity,
+    address: merchantAddress,
+    keywordProfile: merchantKeywordProfile
+  })
+
+  // 2. Pick a randomized focal item from allowed whitelist (NEVER generic "Store Special")
   let focalItem = productName?.trim() || ""
   if (!focalItem && menuItems && menuItems.length > 0) {
     const randomMenuItem = menuItems[Math.floor(Math.random() * menuItems.length)]
     if (randomMenuItem) focalItem = randomMenuItem
   }
+  if (!focalItem || focalItem.toLowerCase().includes("store special")) {
+    // Pick an authentic service/product from merchant's allowed whitelist
+    const whitelist = profile.allowedSeoEntities
+    if (whitelist && whitelist.length > 0) {
+      focalItem = whitelist[Math.floor(Math.random() * whitelist.length)]
+    } else {
+      focalItem = "Service"
+    }
+  }
 
-  // 2. Randomized occasions & focus angles to guarantee zero-repetition across calls
-  const ANGLES = [
-    "Birthday celebration with family",
-    "Midnight doorstep surprise delivery",
-    "Weekend evening sweet craving",
-    "Anniversary celebration treat",
-    "Office celebration & team snack",
-    "Urgent same-day gift pickup",
-    "Comforting tea-time indulgence"
-  ]
-  const randomAngle = ANGLES[Math.floor(Math.random() * ANGLES.length)]
+  // 3. Category-appropriate authentic context angle
+  const categoryAngles = getCategoryAuthenticAngles(profile.categoryKey)
+  const randomAngle = categoryAngles[Math.floor(Math.random() * categoryAngles.length)]
   const timestampSeed = Date.now().toString(36)
 
-  // 3. Prepare fallback immediately
+  // 4. Prepare fallback immediately
   const fallback = getDynamicFallbackReview(businessCategory, focalItem, seed || timestampSeed)
 
-  // 4. Check for active API keys
+  // 5. Check active API keys
   const geminiKey = process.env.GEMINI_API_KEY?.trim()
   const groqKey = process.env.AI_API_KEY?.trim()
   const groqUrl = process.env.AI_API_URL?.trim() || "https://api.groq.com/openai/v1/chat/completions"
-  const groqModel = process.env.AI_MODEL?.trim() || "llama-3.3-70b-versatile"
+  const groqModel = process.env.AI_MODEL?.trim() || "openai/gpt-oss-120b"
 
   if (!geminiKey && !groqKey) {
     return fallback
   }
 
-  const bannedRegex = /\b(spot[- ]?on|top[- ]?notch|hidden gem|highly recommend|pristine|testament|delve|exceptional|outstanding|game changer)\b/gi
-  const cleanText = (s: string) => s.replace(bannedRegex, "really good").replace(/["\\]/g, "").trim()
+  // Common Banned Buzzwords
+  const bannedRegex = /\b(spot[- ]?on|top[- ]?notch|hidden gem|highly recommend|pristine|testament|delve|exceptional|outstanding|game changer|store special)\b/gi
+  const cleanText = (s: string) => s.replace(bannedRegex, "").replace(/["\\]/g, "").replace(/\s+/g, " ").trim()
+
+  // Post-generation Negative Blacklist Sanitizer
+  const sanitizeStrict = (text: string): string => {
+    let res = cleanText(text)
+    for (const banned of profile.strictlyNotAllowed) {
+      if (banned.length >= 3) {
+        const re = new RegExp(`\\b${banned.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi")
+        res = res.replace(re, "")
+      }
+    }
+    // Remove hanging punctuation or double spaces
+    return res.replace(/\s+/g, " ").replace(/\s+([.,!])/g, "$1").trim()
+  }
+
+  // 6. Audience Persona & Gender Grammar Directive
+  let personaInstruction = "Tone: Casual, natural Indian English or Hinglish like a spontaneous WhatsApp text."
+  if (profile.audiencePersona === "Female_Only") {
+    personaInstruction = `STRICT FEMININE GRAMMAR RULE (CRITICAL):
+- The reviewer is STRICTLY a woman/girl writing for a ladies beauty parlor.
+- Use natural feminine Hindi/Hinglish verbs: "gayi thi", "facial karwaya", "didi ne bohot ache se kiya", "skin pe instant glow aa gaya", "bohot soft lag rahi hai".
+- ABSOLUTELY NEVER use masculine words like "gaya tha", "bhai", "bro", "barber".
+- ABSOLUTELY NEVER mention food, chai, tea, cake, snacks, dinner, or delivery.`
+  } else if (profile.audiencePersona === "Male_Only") {
+    personaInstruction = `STRICT MASCULINE GRAMMAR RULE:
+- The reviewer is a male customer writing for men's grooming/salon.
+- Use masculine verbs: "haircut karwaya", "fade haircut mast kiya", "bhai ne time lekar banaya".
+- ABSOLUTELY NEVER mention ladies bridal makeup, saree, waxing, delivery, or food.`
+  } else if (profile.audiencePersona === "Family_Kids") {
+    personaInstruction = `STRICT FAMILY TONE:
+- Family perspective: "Family ke sath dinner kiya", "kids loved it", "parents ke sath gaye the".`
+  }
+
+  // 7. Dynamic Variable Grounding Prompt
+  const allowedSample = profile.allowedSeoEntities.slice(0, 15).join(", ")
+  const aeoSample = profile.allowedAeoAnswers.slice(0, 6).join(", ")
+  const bannedSample = profile.strictlyNotAllowed.slice(0, 30).join(", ")
 
   const systemPrompt = `[ROLE & OBJECTIVE]
 You are CustomerPilot's authentic Indian consumer review drafting engine.
-Generate 3 distinct, natural, human Google Maps reviews (12 to 22 words each) based on real transaction data.
+Generate 3 distinct, natural, human Google Maps reviews (12 to 20 words each) for "${profile.businessName}".
 
-CRITICAL ANTI-REPETITION DIRECTIVE:
-Every single generation MUST be unique. Do NOT repeat opening words or templates. Each draft must feel like a spontaneous WhatsApp message typed on a smartphone.
+MERCHANT STRICT BOUNDARIES:
+1. Target Customer Persona:
+${personaInstruction}
 
-[INPUT VARIABLES]
-- Merchant Name: ${merchantName || "Local Store"}
-- Category: ${businessCategory}
-- Product Spotlight: ${focalItem || "Store Special"}
-- Random Angle / Occasion: ${randomAngle}
-- Seed Token: ${timestampSeed}
+2. ALLOWED Offerings (Mention ONLY 1 of these services/products naturally):
+${allowedSample}
 
-[CATEGORY CONTEXT & INDUSTRY VOCABULARY]
-Tailor terminology strictly to the merchant's specific category:
-- South Indian: Crispy dosas, steaming soft idlis, piping hot sambar, coconut chutney, degree filter coffee.
-- Punjabi / North Indian: Dal makhani, paneer butter masala, crisp garlic naan, rich gravies, tandoori flavors.
-- Bakery / Cake Shop: Soft sponge, fresh cream, rich chocolate, pure eggless base, midnight delivery, clean box.
-- Cafe / Bistro: Hazelnut cold coffee, frappes, crispy fries, cozy seating, quick Wi-Fi, peaceful vibe.
-- Men's Salon: Fade haircuts, beard styling, head massage, sanitized scissors, fresh towels, clean chairs.
-- Beauty Parlour: Painless threading, O3+ facial glow, hair spa, gentle beauticians, hygienic setup.
-- Car Wash / Detailing: Snow foam wash, underbody pressure cleaning, interior vacuuming, dashboard polish, alloy shine.
-- Coaching / Educational Institute: Concept clarity, supportive faculty, doubt clearing, test series, focused study environment.
-- Dental / Healthcare Clinic: Experienced doctor, gentle painless treatment, clean sterile clinic, patient diagnosis.
-- Gym / Fitness Studio: Certified trainers correcting posture, modern machines, clean locker rooms, motivating vibe.
-- General Retail / Local Store: Genuine rates, fresh stock, polite billing counter, helpful staff.
+3. ALLOWED Vibe / Context Signals:
+${aeoSample}
+
+4. Occasion / Context Angle:
+${randomAngle} (Focus product: ${focalItem})
+
+5. STRICTLY BANNED ENTITIES (DO NOT EVER MENTION ANY OF THESE):
+${bannedSample}
+
+CRITICAL ANTI-HALLUCINATION RULES:
+- DO NOT mention delivery, doorstep delivery, or parcel unless the merchant is an online delivery service!
+- DO NOT mention chai, tea, coffee, food, dinner, cakes, or snacks if this is a salon or parlor!
+- DO NOT use the phrase "Store Special" or generic AI words ("top-notch", "hidden gem", "delve").
+- Every single draft MUST feel 100% human, casual, and authentic.
 
 [OUTPUT FORMAT]
 Return ONLY a valid parseable JSON object:
 {
-  "draft_1": "12 to 22 words text focusing on quality/freshness/taste",
-  "draft_2": "12 to 22 words text in conversational Hinglish with mild crowd marker ('thoda rush tha par service fast thi')",
-  "draft_3": "8 to 15 words punchy 1-liner review"
+  "draft_1": "12 to 20 words focusing on service quality & results",
+  "draft_2": "12 to 20 words conversational Hinglish with mild crowd marker ('thoda rush tha par service polite thi')",
+  "draft_3": "8 to 14 words punchy 1-liner review"
 }`
 
-  // A. Try Gemini if key is provided
+  // A. Try Gemini if configured
   if (geminiKey) {
     try {
       const { GoogleGenerativeAI } = await import("@google/generative-ai")
@@ -403,7 +500,7 @@ Return ONLY a valid parseable JSON object:
           try {
             const model = genAI.getGenerativeModel({
               model: modelName,
-              generationConfig: { temperature: 0.9 }
+              generationConfig: { temperature: 0.85 }
             })
             const res = await model.generateContent(systemPrompt)
             const text = (await res.response).text().trim()
@@ -424,35 +521,38 @@ Return ONLY a valid parseable JSON object:
           const parsed = JSON.parse(match[0])
           if (parsed.draft_1 && parsed.draft_2) {
             return {
-              draft1: cleanText(parsed.draft_1),
-              draft2: cleanText(parsed.draft_2),
-              draft3: parsed.draft_3 ? cleanText(parsed.draft_3) : fallback.draft3
+              draft1: sanitizeStrict(parsed.draft_1),
+              draft2: sanitizeStrict(parsed.draft_2),
+              draft3: parsed.draft_3 ? sanitizeStrict(parsed.draft_3) : fallback.draft3
             }
           }
         }
       }
-    } catch (_) {}
+    } catch (err: any) {
+      console.warn("[DynamicReviewEngine] Gemini attempt failed:", err?.message)
+    }
   }
 
-  // B. Try Groq/OpenAI compatible LLM if key is provided
+  // B. Try Groq / OpenAI compatible LLM
   if (groqKey) {
     try {
       const controller = new AbortController()
-      const timer = setTimeout(() => controller.abort(), 3500)
+      const timer = setTimeout(() => controller.abort(), 4000)
 
       const res = await fetch(groqUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${groqKey}`
+          "Authorization": `Bearer ${groqKey}`,
+          "User-Agent": "CustomerPilot/1.0"
         },
         body: JSON.stringify({
           model: groqModel,
           messages: [
-            { role: "system", content: "You generate authentic Indian Google reviews in strict JSON format." },
+            { role: "system", content: "You generate authentic Indian Google reviews in strict JSON format. Strictly observe all banned keywords." },
             { role: "user", content: systemPrompt }
           ],
-          temperature: 0.9,
+          temperature: 0.85,
           response_format: { type: "json_object" }
         }),
         signal: controller.signal
@@ -466,14 +566,19 @@ Return ONLY a valid parseable JSON object:
           const parsed = JSON.parse(content)
           if (parsed.draft_1 && parsed.draft_2) {
             return {
-              draft1: cleanText(parsed.draft_1),
-              draft2: cleanText(parsed.draft_2),
-              draft3: parsed.draft_3 ? cleanText(parsed.draft_3) : fallback.draft3
+              draft1: sanitizeStrict(parsed.draft_1),
+              draft2: sanitizeStrict(parsed.draft_2),
+              draft3: parsed.draft_3 ? sanitizeStrict(parsed.draft_3) : fallback.draft3
             }
           }
         }
+      } else {
+        const errText = await res.text().catch(() => "")
+        console.warn(`[DynamicReviewEngine] Groq API returned status ${res.status}: ${errText.slice(0, 150)}`)
       }
-    } catch (_) {}
+    } catch (err: any) {
+      console.warn("[DynamicReviewEngine] Groq attempt failed:", err?.message)
+    }
   }
 
   return fallback

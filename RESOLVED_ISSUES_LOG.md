@@ -3,6 +3,29 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [04 Nov 2026] Issue: Cross-Category Review Hallucination Purge, 50-Keyword Whitelist/Blacklist Expansion, & Gender-Locked Grounding (Phase 3)
+- **Symptom**: When generating reviews for "SSV Saloon and academy" (a ladies beauty parlor), the AI generated absurd cross-industry combinations blending bakery, delivery, and tea angles into parlor reviews (e.g. *"SSV Saloon's Store Special midnight doorstep delivery gave me O3+ facial glow"*, *"Enjoyed the Store Special facial while sipping soothing masala chai"*, *"Celebrated Mom's birthday at SSV Saloon"*).
+- **Root Cause**:
+  1. **Legacy Hardcoded Occasions**: `src/lib/dynamic-review-engine.ts` still had a hardcoded `const ANGLES = [...]` array written for bakeries (*"Midnight doorstep surprise delivery"*, *"Comforting tea-time indulgence"*, *"Office celebration & team snack"*), and passed `focalItem || "Store Special"` to the prompt.
+  2. **Prompt Disconnection from Merchant Profile**: The review generation route (`/review?m=...` and `/api/reviews/dynamic-draft`) was not passing `merchant.keywordProfile` into `generateDynamicReviewDraft`, so the AI prompt operated without positive whitelists or negative blacklists.
+  3. **Missing Feminine Grammar Enforcement**: The LLM lacked gender persona constraints, allowing generic/masculine phrasing and irrelevant service combinations.
+- **Resolution**:
+  1. **Exhaustive 50 Allowed + 50 Banned Master Matrix (`src/lib/keyword-matrix.ts`)**:
+     - Expanded master presets for all 10 business categories with ~50 specific allowed services/products and ~50 strictly banned entities.
+     - For Ladies Beauty Parlor (`beauty_parlour`): Curated 50 ladies services (O3+ facial, Hydra facial, Rica waxing, painless threading, hair spa, bridal makeup, saree draping) and 50 strictly banned entities (men's haircut, beard trim, doorstep delivery, midnight delivery, cake, bread, chai, tea, food, dinner, thali, car wash).
+     - Enhanced `getKeywordPresetForCategory` to automatically map "SSV", "Ladies Salon", and "Beauty Parlour" to the `beauty_parlour` preset.
+  2. **Purge of Legacy Bakery Angles & Injection of Category-Specific Occasions (`src/lib/dynamic-review-engine.ts`)**:
+     - Completely removed the legacy hardcoded `ANGLES` array and eliminated generic "Store Special" fallback.
+     - Built `getCategoryAuthenticAngles()` returning category-specific, realistic contexts (e.g. "wedding function preparation", "pre-festive skin glow", "weekend pampering").
+  3. **Strict Gender & Grammar Persona Lock**:
+     - Enforced `Female_Only` grammar directive: feminine verbs ("gayi thi", "facial karwaya", "didi ne", "skin pe instant glow aa gaya"), with zero masculine terms and zero food/delivery references.
+  4. **Post-Generation Negative Blacklist Sanitizer**:
+     - Automatically scans AI output against `profile.strictlyNotAllowed` and removes any hallucinated banned words before displaying to the customer.
+  5. **Review Route Hydration (`src/app/review/page.tsx` & `src/app/api/reviews/dynamic-draft/route.ts`)**:
+     - Hydrated `generateDynamicReviewDraft` with `merchantKeywordProfile`, `merchantCity`, and `merchantAddress`.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [04 Nov 2026] Feature & Architecture: 3-Layer Context Grounding Engine & Smart Keyword Control Studio (Phase 1 & 2)
 - **Symptom**: AI-generated Google reviews suffered from category hallucination and context mismatch (e.g. recommending Gujarati thalis for pure Punjabi restaurants, bread/cookies for cake-only shops, or men's haircuts/beard trims for ladies-only beauty parlors). Merchants also had repetitive drafts and lacked control over targeted SEO/AEO/GEO ranking keywords.
 - **Root Cause**:

@@ -55,7 +55,10 @@ export async function GET(req: NextRequest) {
       productName,
       merchantName: merchant.name,
       menuItems: menuItemNames,
-      seed: Math.random().toString(36)
+      seed: Math.random().toString(36),
+      merchantKeywordProfile: (merchant as any).keywordProfile || null,
+      merchantCity: merchant.city || undefined,
+      merchantAddress: merchant.address || undefined
     })
 
     return NextResponse.json({
