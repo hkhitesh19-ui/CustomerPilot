@@ -8,44 +8,37 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : e778581
-Full Commit Hash  : e77858104322ba3e6833eb752dd46baaf2ecd5f3
-Target Fix Commit : e77858104322ba3e6833eb752dd46baaf2ecd5f3
+Active Git Commit : 9708440
+Full Commit Hash  : 9708440120ee4ae0994a4fa54e31c10269453f70
+Target Fix Commit : 9708440120ee4ae0994a4fa54e31c10269453f70
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 04 Nov 2026, 04:30 PM IST
+Deployment Date   : 04 Nov 2026, 11:51 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(review-ai): purge cake angles, enforce 50-whitelist and 50-blacklist grounding, and lock feminine grammar for ladies parlor
+Commit Title      : fix(settings): render modern 3-tab pill switcher instead of anchor jump bar
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
-Merchant Status   : Vinayak Fashion, Cake Connection & SSV Saloon and academy Live
-Review AI Engine  : Grounded with 50-Whitelist & 50-Blacklist Zero-Hallucination Guard, Feminine Grammar Lock, & Category-Specific Occasions
-Groq AI Engine    : Active on VPS (.env: gsk_fAh...TC65p, model: openai/gpt-oss-120b)
-Review Deep-Link  : Bulletproof mobile window.location redirection, synchronous clipboard execCommand, desktop popup-blocker bypass, and direct review fallback link
-GBP Store Sync    : Auto-syncs authentic store name, formatted address, Place ID, rating, and review URL to merchant record on GBP connect
-Suvarna Sonawana  : Hydrated with authentic Place ID (ChIJ9fZfykHFXzkRs1Zswnh7-VA), store name 'SSV Saloon and academy', 4.3★ rating, 23 reviews, Manjalpur address
-Google Review QR  : Smart AI Google Reviews Standee Final v3 with isolated merchant logo, CustomerPilot square zero-clipping badge in QR, and synced A4 print template
-Pricing Combos    : Gear 2-5 Combos with 50% Off Badges, Daily Cost Formula, Standalone 1Y Savings Badges, and Table Integration Live on /pricing
-GBP Review QR     : 1-Click Standalone Google Review QR & Link Generator for SuperAdmin Active on /api/admin/gbp/quick-qr
-Dynamic Categories: 35+ GBP Official Categories & Custom Category Creation Active on /api/admin/categories
-Dynamic Reviews   : 10 Categories Live with Jittered Hash Offset & Anti-Repetition Shuffle Engine on /review
-WhatsApp QR Sync  : Safe Baileys reconnect & non-destructive webhook handling active on /api/whatsapp/connect & /api/webhook/evolution
-Pricing Engine    : Postpaid Monthly (0.3% sales, ₹0 upfront) for CustomerPilot Complete + Gear 2, Gear 3, Gear 4 Combos Live with 100% English UI
-WhatsApp Fleet    : Intelligent 5-case diagnostic engine, 6-hr anti-spam cooldown, personalized Hinglish alerts from SuperAdmin (+91 9033304707) live on /api/cron/whatsapp-health & SuperAdmin UI
-Nginx Static Alias: Direct /_next/static/ disk alias active (HTTP 200 chunk delivery)
-Backup Engine     : /root/backup_migration_bundle.sh & /root/restore_migration_bundle.sh (Active)
-Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in (:3001)
-----------------------------------------------------------
 
-Deployment History Log:
-- 04 Nov 2026, 04:30 PM: e778581 - fix(review-ai): purge cake angles, enforce 50-whitelist and 50-blacklist grounding, and lock feminine grammar for ladies parlor
-- 04 Nov 2026, 03:55 PM: 86c0c5c - feat(keywords): 3-layer context grounding presets matrix and dashboard keyword control engine (Phase 1 & 2)
-- 04 Nov 2026, 03:00 PM: 7ccef9a - fix(review): bulletproof google review deep-linking, popup bypass, and gbp store sync
-- 04 Nov 2026, 10:20 AM: 7f26c5d - feat(signup-reviews): top 10 categories at signup, isolated brand logo standee, and gbp multi-location switcher
-- 03 Nov 2026, 11:35 PM: 5d37ecd - revert(billing): remove upi payment section and upi id fields across digital card and billing settings
-- 03 Nov 2026, 09:45 PM: 6928cef - feat(billing): direct upi configuration in digital card, auto-prefixing, and evolution api whatsapp pdf attachment dispatch
-- 03 Nov 2026, 08:25 PM: 631ca01 - feat(billing): itemized whatsapp billing, gst pos invoice engine and upi payment on digital card
-- 03 Nov 2026, 07:15 PM: 01e8e71 - feat(reviews): upgrade Smart AI Google Reviews standee to Final v3 in dashboard/settings, add square zero-clipping CP badge in QR, and sync A4 print template
-- 03 Nov 2026, 05:40 PM: cbe86f4 - fix(whatsapp): preserve pairing query in connect poll, add phone match guidance, and auto-provision 3-day trial on GBP quick-qr
-- 03 Nov 2026, 04:50 PM: 6b9f5e5 - fix(pricing): redesign gear combo cards for high-contrast readability, full-width zero-clipping buttons, and pixel-perfect height alignment
-- 03 Nov 2026, 04:20 PM: a937ca2 - feat(pricing-whatsapp-gbp): gear 2-5 combo pricing, dual-mode 8-digit whatsapp pairing, 1-click gbp review qr, and dynamic business categories
+Verification Checklist:
+----------------------------------------------------------
+[x] TypeScript Strict & Ratchet Audit: PASSED (Baseline 36)
+[x] Adversarial Red-Team Gates (1-6): PASSED
+[x] Next.js Standalone Build & Static Assets Sync: PASSED
+[x] PM2 Reload customerpilot-web: PASSED
+[x] Direct Google Maps Share Link Box & URL Resolver: Active & Verified
+[x] Modern 3-Tab Pill Switcher ([Google & Smart AI Reviews] | [QR Standee & Branding] | [Store Profile & Info]): Active & Verified
+[x] Allowed Product and Services Words (Step D Rename): Active & Verified
+[x] Zero-Friction Google OAuth & Dashboard Default Redirect: Active & Verified
+[x] Crash-Proof Onboarding Guidance Screen & Global Error Boundary: Active & Verified
+[x] Cascade SuperAdmin Merchant Deletion: Active & Verified
+
+Historical Deployments:
+----------------------------------------------------------
+Commit 9708440 - 04 Nov 2026 11:51 PM IST: Render modern 3-tab pill switcher instead of anchor jump bar
+Commit a2a152b - 04 Nov 2026 11:34 PM IST: Maps URL place resolution, tabbed settings, allowed words rename, cascade merchant deletion
+Commit e778581 - 04 Nov 2026 04:30 PM IST: Purge cake angles, enforce 50-whitelist/blacklist grounding, lock feminine grammar
+Commit 2532cf9 - 04 Nov 2026 03:30 PM IST: GBP Manager card enhancement, instructions & manual activation modal
+Commit 232276a - 04 Nov 2026 02:40 PM IST: Google Maps proof engine, Places API verification, sync
+Commit 05768d4 - 04 Nov 2026 01:15 PM IST: Direct review link deep-linking, clipboard synchronous bypass
+Commit 3d97049 - 04 Nov 2026 04:20 AM IST: Production stabilization and rate limit fix
+Commit 3d429a6 - 04 Nov 2026 02:15 AM IST: Fix for digital card styling and standalone asset sync
