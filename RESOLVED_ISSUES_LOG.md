@@ -5302,3 +5302,21 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   6. Cleaned database records for Cake Connection in `dev.db` locally and on VPS.
   7. Ran full Master Adversarial Guard (all 6 gates passed cleanly).
 - **Status**: ✅ Resolved, Fully Verified, and Deployed to Live VPS.
+
+---
+## [04 Nov 2026] Feature: Top 10 Business Categories at Signup & Standalone Smart Review QR Logo Isolation with GBP Location Switcher
+- **Symptom**:
+  1. On `/signup`, merchants only had 5 generic categories, and for standalone Smart AI Google Reviews (`?module=reviews`), the category dropdown was hidden completely.
+  2. In `/dashboard/settings` ("Smart AI Google Reviews QR Code & Posters"), when a new merchant (e.g. Hitesh Kumar on 3-Day Free Trial) had no logo uploaded, the standee erroneously defaulted to displaying the 'Cake Connection LIVE CAKE SHOP' logo.
+  3. Merchants lacked direct options on the standee card to upload, change, or remove their custom business logo, or choose which attached Google Business Profile location to generate the review QR for if multiple locations existed.
+- **Root Cause**:
+  1. `src/components/signup-client.tsx` restricted options to 5 hardcoded items and wrapped category in a conditional that skipped `isReviewsMode` and `isAutoReplyMode`.
+  2. `src/components/google-review-qr-generator.tsx` had hardcoded fallbacks to `"/cake_connection_official_logo.png"` in the brand header and PDF print layout whenever `merchant.logoUrl` was null or missing.
+  3. No interactive file input or GBP location selector was exposed in `GoogleReviewQRGenerator`.
+- **Resolution**:
+  1. **Top 10 High-Converting Categories on Signup (`src/components/signup-client.tsx`)**: Replaced 5-item list with full 10-category matrix (Bakery, Cafe, Restaurant, South Indian & Fast Food, Men's Salon, Beauty Parlour & Spa, Car Wash & Detailing, Dental & Healthcare Clinic, Coaching & Education, Gym & Fitness, plus Retail & Other). Category selector is now visible on all signup modes (including `reviews` standalone).
+  2. **Multi-Category Rules & Dynamic Draft Mapping (`src/lib/industry-campaigns.ts`, `src/app/api/auth/register/route.ts`, `src/app/dashboard/settings/page.tsx`)**: Added automated category mapping on registration and updated Settings Section 03 dropdown.
+  3. **Strict Cake Connection Logo Isolation (`src/components/google-review-qr-generator.tsx`)**: Completely removed hardcoded Cake Connection fallbacks. Merchants without custom logos now render an ultra-clean, elegant typographic store badge (`storeName` + `★ Official Review QR ★`), completely isolated from other merchants.
+  4. **Direct Standee Logo Management**: Added interactive 1-click 'Upload Store Logo', 'Change Logo', and 'Remove Logo' tools directly on the QR generator card, connected to `/api/merchant/upload-brand` and `/api/merchant/update`.
+  5. **Attached GBP Location Switcher**: Integrated multi-location dropdown connected to `/api/google-business/locations` and `/api/google-business/select-location`, allowing merchants to select any attached branch and regenerate their review QR on the fly.
+- **Status**: ✅ Resolved, Verified with Adversarial Guard (6/6 Gates Passed), and Committed Locally.

@@ -126,6 +126,7 @@ export async function POST(req: Request) {
         ownerName: ownerName || '',
         email: cleanEmail,
         businessType: businessType || 'bakery',
+        category: businessType || 'bakery',
         address: businessAddress || '',
         whatsappPhone: cleanPhone || undefined,
         plan: 'trial',

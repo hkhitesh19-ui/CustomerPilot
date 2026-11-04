@@ -1,10 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { Star, Download, Printer, Copy, CheckCircle2, Sparkles, ExternalLink, RefreshCw } from "lucide-react"
+import { 
+  Star, Download, Printer, Copy, CheckCircle2, Sparkles, ExternalLink, 
+  RefreshCw, Upload, Trash2, MapPin, Building2, Image as ImageIcon 
+} from "lucide-react"
 
 interface GoogleReviewQRGeneratorProps {
   merchantId: string
@@ -27,35 +30,203 @@ function GoogleWordmark({ className = "text-3xl" }: { className?: string }) {
 
 export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName }: GoogleReviewQRGeneratorProps) {
   const { toast } = useToast()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  
   const [loading, setLoading] = useState(true)
   const [qrType, setQrType] = useState<string>("review_counter")
   const [qrData, setQrData] = useState<any>(null)
   const [copied, setCopied] = useState(false)
+  const [imgFailed, setImgFailed] = useState(false)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+
+  // Multi-location GBP attached locations state
+  const [locations, setLocations] = useState<any[]>([])
+  const [selectedLocationId, setSelectedLocationId] = useState<string>("")
+  const [switchingLocation, setSwitchingLocation] = useState(false)
+
+  // 1. Fetch QR Data
+  const loadQR = async () => {
+    if (!merchantId) return
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/qr/generate?mode=reviews&type=${qrType}`, {
+        headers: { "x-merchant-id": merchantId }
+      })
+      const json = await res.json().catch(() => null)
+      if (res.ok && json) {
+        setQrData(json.data || json)
+        setImgFailed(false)
+      } else {
+        toast({ title: "Error", description: json?.error || "Failed to generate Reviews QR", variant: "destructive" })
+      }
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message, variant: "destructive" })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    let isMounted = true
-    async function loadQR() {
-      if (!merchantId) return
-      setLoading(true)
+    loadQR()
+  }, [merchantId, qrType])
+
+  // 2. Fetch Attached GBP Locations for this account
+  useEffect(() => {
+    if (!merchantId) return
+    async function fetchLocations() {
       try {
-        const res = await fetch(`/api/qr/generate?mode=reviews&type=${qrType}`, {
+        const res = await fetch("/api/google-business/locations", {
           headers: { "x-merchant-id": merchantId }
         })
         const json = await res.json().catch(() => null)
-        if (res.ok && json && isMounted) {
-          setQrData(json.data || json)
-        } else if (!res.ok && isMounted) {
-          toast({ title: "Error", description: json?.error || "Failed to generate Reviews QR", variant: "destructive" })
+        if (json && json.ok && json.data?.locations?.length > 0) {
+          setLocations(json.data.locations)
+          const activeLoc = json.data.locations.find((l: any) => l.isSelected) || json.data.locations[0]
+          if (activeLoc) {
+            setSelectedLocationId(activeLoc.id)
+          }
         }
-      } catch (e: any) {
-        if (isMounted) toast({ title: "Error", description: e.message, variant: "destructive" })
-      } finally {
-        if (isMounted) setLoading(false)
+      } catch (e) {
+        console.warn("[GoogleReviewQRGenerator] Could not load attached locations:", e)
       }
     }
-    loadQR()
-    return () => { isMounted = false }
-  }, [toast, merchantId, qrType])
+    fetchLocations()
+  }, [merchantId])
+
+  // Handle switching attached Google location
+  const handleLocationChange = async (newLocationId: string) => {
+    const loc = locations.find((l) => l.id === newLocationId)
+    if (!loc) return
+    
+    setSelectedLocationId(newLocationId)
+    setSwitchingLocation(true)
+    try {
+      const res = await fetch("/api/google-business/select-location", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-merchant-id": merchantId
+        },
+        body: JSON.stringify({
+          placeId: loc.placeId,
+          placeName: loc.name || loc.businessTitle,
+          address: loc.address,
+          googleReviewUrl: loc.reviewUrl || loc.mapsUri,
+          cid: loc.cid,
+          mapsUri: loc.mapsUri
+        })
+      })
+      const json = await res.json().catch(() => null)
+      if (res.ok) {
+        toast({
+          title: "Location Switched!",
+          description: `QR Code regenerated for: ${loc.name || loc.businessTitle}`
+        })
+        // Refresh QR Code with newly selected location URL
+        await loadQR()
+      } else {
+        throw new Error(json?.error || "Failed to switch location")
+      }
+    } catch (e: any) {
+      toast({
+        title: "Error Switching Location",
+        description: e.message,
+        variant: "destructive"
+      })
+    } finally {
+      setSwitchingLocation(false)
+    }
+  }
+
+  // Handle Uploading Store Logo
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please select an image smaller than 5MB.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setUploadingLogo(true)
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("type", "logo")
+
+      const res = await fetch("/api/merchant/upload-brand", {
+        method: "POST",
+        headers: { "x-merchant-id": merchantId },
+        body: formData
+      })
+      const json = await res.json().catch(() => null)
+
+      if (res.ok && (json.data?.url || json.url)) {
+        const uploadedUrl = json.data?.url || json.url
+        setQrData((prev: any) => ({
+          ...prev,
+          merchant: {
+            ...prev?.merchant,
+            logoUrl: uploadedUrl
+          }
+        }))
+        setImgFailed(false)
+        toast({
+          title: "Store Logo Updated! ✅",
+          description: "Your business logo is now active on the Smart Review Standee."
+        })
+      } else {
+        throw new Error(json?.error || "Failed to upload logo")
+      }
+    } catch (e: any) {
+      toast({
+        title: "Logo Upload Failed",
+        description: e.message,
+        variant: "destructive"
+      })
+    } finally {
+      setUploadingLogo(false)
+      if (fileInputRef.current) fileInputRef.current.value = ""
+    }
+  }
+
+  // Handle Removing Store Logo (Revert to Clean Typographic Badge)
+  const handleRemoveLogo = async () => {
+    try {
+      const res = await fetch("/api/merchant/update", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-merchant-id": merchantId
+        },
+        body: JSON.stringify({ logoUrl: null })
+      })
+      if (res.ok) {
+        setQrData((prev: any) => ({
+          ...prev,
+          merchant: {
+            ...prev?.merchant,
+            logoUrl: null
+          }
+        }))
+        setImgFailed(false)
+        toast({
+          title: "Logo Removed",
+          description: "Standee will now display your official store name badge."
+        })
+      }
+    } catch (e: any) {
+      toast({
+        title: "Error",
+        description: e.message,
+        variant: "destructive"
+      })
+    }
+  }
 
   const handleCopyLink = () => {
     if (!qrData?.targetUrl) return
@@ -77,11 +248,19 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
   }
 
   /* ─────────────────────────────────────────────────────────────────────────
-   * Print High-Res A4 Acrylic Standee
+   * Print High-Res A4 Acrylic Standee (Strict Isolation: Store Logo or Clean Typo)
    * ─────────────────────────────────────────────────────────────────────── */
   const handlePrintStandeePDF = () => {
     if (!qrData?.qrDataUrl) return
     const storeName = qrData?.merchant?.name || placeName || "Our Store"
+    const hasCustomLogo = Boolean(qrData?.merchant?.logoUrl && !qrData.merchant.logoUrl.includes("cplogo.png") && !imgFailed)
+
+    const brandHeaderHtml = hasCustomLogo
+      ? `<img src="${qrData.merchant.logoUrl}" class="merchant-logo" alt="${storeName}" />`
+      : `<div class="store-name-badge">
+           <div class="store-title">${storeName}</div>
+           <div class="store-subtitle">★ Official 5-Star Review Hub ★</div>
+         </div>`
 
     const printContent = `
       <!DOCTYPE html>
@@ -135,10 +314,19 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
             .seg-yellow { background: #FBBC05; }
             .seg-green { background: #34A853; }
             .brand-header {
-              margin-top: 4px; margin-bottom: 18px; display: flex; align-items: center; justify-content: center; min-height: 70px;
+              margin-top: 4px; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; min-height: 70px; width: 100%;
             }
             .merchant-logo {
-              height: 68px; max-width: 300px; width: auto; object-fit: contain;
+              height: 68px; max-width: 320px; width: auto; object-fit: contain;
+            }
+            .store-name-badge {
+              display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 22px; background: #F8FAFC; border: 2px solid #E2E8F0; border-radius: 20px; max-width: 340px; width: 100%;
+            }
+            .store-title {
+              font-size: 22px; font-weight: 900; color: #0F172A; text-transform: uppercase; letter-spacing: 1px; line-height: 1.2;
+            }
+            .store-subtitle {
+              font-size: 10px; font-weight: 800; color: #D97706; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px;
             }
             .google-reviews-logo {
               height: 52px; width: auto; max-width: 220px; object-fit: contain; margin-bottom: 16px;
@@ -197,7 +385,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
             </div>
 
             <div class="brand-header">
-              <img src="${qrData?.merchant?.logoUrl && !qrData.merchant.logoUrl.includes('cplogo.png') ? qrData.merchant.logoUrl : '/cake_connection_official_logo.png'}" class="merchant-logo" alt="${storeName}" />
+              ${brandHeaderHtml}
             </div>
 
             <img src="/google_reviews_official_logo.png" class="google-reviews-logo" alt="Google Reviews" />
@@ -244,6 +432,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
   }
 
   const storeName = qrData?.merchant?.name || placeName || "Our Store"
+  const hasCustomLogo = Boolean(qrData?.merchant?.logoUrl && !qrData.merchant.logoUrl.includes("cplogo.png") && !imgFailed)
 
   return (
     <Card className="bg-white/90 dark:bg-slate-900/60 border-amber-500/30 backdrop-blur-xl shadow-2xl relative overflow-hidden">
@@ -299,8 +488,113 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
       <CardContent className="p-4 sm:p-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
-          {/* ── Left Column: Controls & Information ───────────────────────── */}
+          {/* ── Left Column: Controls, Logo Management & Location Selector ── */}
           <div className="lg:col-span-6 space-y-4">
+            
+            {/* 1. Store Logo Uploader & Management */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-50/50 via-white to-slate-50 dark:from-slate-800/40 dark:to-slate-900/40 border border-amber-200/60 dark:border-slate-800 space-y-3 shadow-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                  <ImageIcon className="w-4 h-4 text-amber-500" />
+                  Your Business Logo on Standee
+                </span>
+                {hasCustomLogo && (
+                  <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-300 dark:border-emerald-800">
+                    Custom Logo Active
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between gap-3 pt-1">
+                <div className="flex items-center gap-3">
+                  {hasCustomLogo ? (
+                    <div className="w-14 h-14 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-1 flex items-center justify-center shrink-0 shadow-xs">
+                      <img src={qrData.merchant.logoUrl} alt="Logo" className="max-w-full max-h-full object-contain" />
+                    </div>
+                  ) : (
+                    <div className="w-14 h-14 rounded-xl border-2 border-dashed border-amber-300 dark:border-slate-700 bg-amber-50/60 dark:bg-slate-800/40 flex flex-col items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                      <Building2 className="w-6 h-6" />
+                      <span className="text-[8px] font-bold uppercase mt-0.5">No Logo</span>
+                    </div>
+                  )}
+                  <div className="text-xs space-y-0.5">
+                    <p className="font-bold text-slate-800 dark:text-slate-200">
+                      {hasCustomLogo ? "Active Store Logo" : "Clean Typographic Badge Active"}
+                    </p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {hasCustomLogo 
+                        ? "Logo is rendered in Ultra HD on the tabletop standee."
+                        : "Upload your store's PNG or JPG logo to replace the text badge."}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                    className="hidden"
+                    onChange={handleLogoUpload}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingLogo}
+                    className="border-amber-300 dark:border-amber-500/40 bg-white dark:bg-slate-800 hover:bg-amber-50 text-amber-900 dark:text-amber-300 text-xs font-bold rounded-xl shadow-xs"
+                  >
+                    <Upload className="w-3.5 h-3.5 mr-1 text-amber-600" />
+                    {uploadingLogo ? "Uploading..." : (hasCustomLogo ? "Change Logo" : "Upload Logo")}
+                  </Button>
+
+                  {hasCustomLogo && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRemoveLogo}
+                      title="Remove custom logo and display clean store typography"
+                      className="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 p-2 h-8 w-8 rounded-xl"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Attached Google Business Locations Switcher */}
+            {locations.length > 0 && (
+              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50 dark:from-blue-950/30 dark:to-slate-900/40 border border-blue-200/80 dark:border-blue-900/50 space-y-2 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-extrabold text-blue-950 dark:text-blue-200 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    Active Google Business Location ({locations.length} Attached)
+                  </label>
+                  {switchingLocation && (
+                    <span className="text-[10px] text-blue-600 dark:text-blue-400 animate-pulse font-bold">
+                      Switching Location...
+                    </span>
+                  )}
+                </div>
+                <select
+                  value={selectedLocationId}
+                  onChange={(e) => handleLocationChange(e.target.value)}
+                  disabled={switchingLocation}
+                  className="w-full text-xs font-semibold bg-white dark:bg-slate-900 border border-blue-300 dark:border-blue-700/80 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                >
+                  {locations.map((loc: any) => (
+                    <option key={loc.id} value={loc.id}>
+                      {loc.name || loc.businessTitle} {loc.branch ? `(${loc.branch})` : ""} {loc.address ? `• ${loc.address}` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* 3. QR Placement Mode */}
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-800 dark:text-slate-200">
                 Choose QR Code Placement
@@ -328,7 +622,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
               </div>
             </div>
 
-            {/* Smart Review Benefit Card */}
+            {/* 4. Smart Review Benefit Card */}
             <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-50/80 via-white to-blue-50/50 dark:from-slate-800/60 dark:to-slate-900/60 border border-amber-200/60 dark:border-slate-700/60 space-y-2.5 shadow-xs">
               <div className="flex items-center gap-2 text-xs font-extrabold text-amber-800 dark:text-amber-400">
                 <Sparkles className="w-4 h-4 text-amber-500" />
@@ -350,7 +644,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
               </ul>
             </div>
 
-            {/* Review Link Display */}
+            {/* 5. Review Link Display */}
             {qrData?.targetUrl && (
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
@@ -366,7 +660,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
             )}
           </div>
 
-          {/* ── Right Column: Live Mockup Preview (Prominent Centered Acrylic Standee) ── */}
+          {/* ── Right Column: Live Mockup Preview (Isolated Brand Logo or Clean Typo) ── */}
           <div className="lg:col-span-6 flex flex-col items-center justify-center pt-2">
             
             {/* Mockup Canvas */}
@@ -394,14 +688,25 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
                     <div className="flex-1 bg-[#FBBC05]"></div>
                   </div>
 
-                  {/* Merchant Business Logo (Bigger & Ultra HD) */}
-                  <div className="flex items-center justify-center pt-1 px-4 mb-2 min-h-[64px]">
-                    <img
-                      src={qrData?.merchant?.logoUrl && !qrData.merchant.logoUrl.includes("cplogo.png") ? qrData.merchant.logoUrl : "/cake_connection_official_logo.png"}
-                      alt={storeName}
-                      className="max-h-16 sm:max-h-20 max-w-[240px] w-auto h-auto object-contain drop-shadow-sm"
-                      onError={(e) => { e.currentTarget.src = "/cake_connection_official_logo.png" }}
-                    />
+                  {/* Merchant Business Logo (or Clean Store Name Typography Badge) */}
+                  <div className="flex items-center justify-center pt-1 px-4 mb-2 min-h-[64px] w-full">
+                    {hasCustomLogo ? (
+                      <img
+                        src={qrData.merchant.logoUrl}
+                        alt={storeName}
+                        className="max-h-16 sm:max-h-20 max-w-[240px] w-auto h-auto object-contain drop-shadow-sm"
+                        onError={() => setImgFailed(true)}
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-2 px-3.5 bg-slate-50 border border-slate-200/90 rounded-2xl shadow-xs max-w-[260px] w-full">
+                        <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight uppercase line-clamp-1">
+                          {storeName}
+                        </span>
+                        <span className="text-[10px] font-extrabold text-amber-600 tracking-wider uppercase flex items-center gap-1 mt-0.5">
+                          <span>★</span> <span>Official Review QR</span> <span>★</span>
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Official Google Reviews Logo (Google + Reviews + 5 Stars) */}

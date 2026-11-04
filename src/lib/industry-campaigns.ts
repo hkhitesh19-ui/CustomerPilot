@@ -226,29 +226,124 @@ export function getIndustryLoyaltyRule(businessType?: string | null, businessNam
     if (key.includes(k) || k.includes(key)) return rule
   }
 
-  // Common aliases
-  if (key.includes('cake') || key.includes('sweet') || key.includes('dessert') || key.includes('pastry')) {
+  // Common aliases across Top 10 Recommended Categories
+  if (key.includes('cake') || key.includes('sweet') || key.includes('dessert') || key.includes('pastry') || key.includes('bakery')) {
     return industryLoyaltyRules.bakery
   }
-  if (key.includes('food') || key.includes('dine') || key.includes('dhaba') || key.includes('bhojnalay')) {
+  if (key.includes('southindian') || key.includes('dosa') || key.includes('fastfood') || key.includes('pizza') || key.includes('burger')) {
+    return {
+      industry: 'South Indian & Fast Food',
+      categoryKey: 'south_indian_fastfood',
+      rewardName: 'Free Special Dosa / Pizza Slice',
+      stampsRequired: 6,
+      stampValue: 180,
+      validityDays: 180,
+      googleReviewBonus: 1,
+      photoBonus: 1,
+      joiningBonusEnabled: true,
+      joiningBonusStamps: 1,
+      vipUpgradeBonusStamps: 2,
+      color: '#ea580c',
+      emoji: '🥞',
+      description: '6 visits (Min ₹180) = Free Special Dosa / Pizza Slice',
+      getCardTitle: (b) => `${b || 'Fast Food'} VIP Club`,
+    }
+  }
+  if (key.includes('food') || key.includes('dine') || key.includes('dhaba') || key.includes('bhojnalay') || key.includes('restaurant') || key.includes('punjabi')) {
     return industryLoyaltyRules.restaurant
   }
-  if (key.includes('coffee') || key.includes('tea') || key.includes('chai')) {
+  if (key.includes('coffee') || key.includes('tea') || key.includes('chai') || key.includes('cafe')) {
     return industryLoyaltyRules.cafe
   }
-  if (key.includes('hair') || key.includes('barber') || key.includes('beauty') || key.includes('parlour')) {
+  if (key.includes('wash') || key.includes('car') || key.includes('auto') || key.includes('detailing')) {
+    return {
+      industry: 'Car Wash & Auto Detailing',
+      categoryKey: 'car_wash',
+      rewardName: 'Free Snow Foam Wash & Vacuum',
+      stampsRequired: 4,
+      stampValue: 350,
+      validityDays: 180,
+      googleReviewBonus: 1,
+      photoBonus: 1,
+      joiningBonusEnabled: true,
+      joiningBonusStamps: 1,
+      vipUpgradeBonusStamps: 2,
+      color: '#0284c7',
+      emoji: '🚗',
+      description: '4 visits = Free Snow Foam Wash & Vacuum',
+      getCardTitle: (b) => `${b || 'Auto Detailing'} VIP Club`,
+    }
+  }
+  if (key.includes('coach') || key.includes('tuition') || key.includes('class') || key.includes('school') || key.includes('education') || key.includes('hobby')) {
+    return {
+      industry: 'Coaching & Education',
+      categoryKey: 'coaching_classes',
+      rewardName: 'Free Test Series / Subject Workshop',
+      stampsRequired: 4,
+      stampValue: 500,
+      validityDays: 180,
+      googleReviewBonus: 1,
+      photoBonus: 1,
+      joiningBonusEnabled: true,
+      joiningBonusStamps: 1,
+      vipUpgradeBonusStamps: 2,
+      color: '#4f46e5',
+      emoji: '📚',
+      description: '4 months = Free Test Series / Subject Workshop',
+      getCardTitle: (b) => `${b || 'Academy'} VIP Scholar Pass`,
+    }
+  }
+  if (key.includes('dental') || key.includes('clinic') || key.includes('doctor') || key.includes('health') || key.includes('hospital')) {
+    return {
+      industry: 'Dental & Healthcare Clinic',
+      categoryKey: 'dental_clinic',
+      rewardName: 'Free Teeth Polishing / Consultation Off',
+      stampsRequired: 3,
+      stampValue: 500,
+      validityDays: 180,
+      googleReviewBonus: 1,
+      photoBonus: 1,
+      joiningBonusEnabled: true,
+      joiningBonusStamps: 1,
+      vipUpgradeBonusStamps: 2,
+      color: '#059669',
+      emoji: '🩺',
+      description: '3 visits = Free Teeth Polishing / Consultation Off',
+      getCardTitle: (b) => `${b || 'Clinic'} Health VIP Pass`,
+    }
+  }
+  if (key.includes('barber') || key.includes('menssalon') || key.includes('grooming') || key.includes('fade')) {
+    return {
+      industry: "Men's Salon & Grooming",
+      categoryKey: 'mens_salon',
+      rewardName: 'Free Relaxing Head Massage or D-Tan',
+      stampsRequired: 5,
+      stampValue: 200,
+      validityDays: 180,
+      googleReviewBonus: 1,
+      photoBonus: 1,
+      joiningBonusEnabled: true,
+      joiningBonusStamps: 1,
+      vipUpgradeBonusStamps: 2,
+      color: '#0284c7',
+      emoji: '✂️',
+      description: '5 visits (Min ₹200) = Free Head Massage or D-Tan',
+      getCardTitle: (b) => `${b || 'Grooming'} VIP Club`,
+    }
+  }
+  if (key.includes('hair') || key.includes('beauty') || key.includes('parlour') || key.includes('parlor') || key.includes('spa') || key.includes('unisex') || key.includes('makeup')) {
     return industryLoyaltyRules.salon
   }
-  if (key.includes('fitness') || key.includes('crossfit') || key.includes('yoga')) {
+  if (key.includes('fitness') || key.includes('crossfit') || key.includes('yoga') || key.includes('gym') || key.includes('pilates')) {
     return industryLoyaltyRules.gym
   }
-  if (key.includes('cloth') || key.includes('apparel') || key.includes('garment') || key.includes('boutique')) {
+  if (key.includes('cloth') || key.includes('apparel') || key.includes('garment') || key.includes('boutique') || key.includes('jewel') || key.includes('footwear') || key.includes('retail')) {
     return industryLoyaltyRules.retail
   }
-  if (key.includes('kirana') || key.includes('mart') || key.includes('supermarket')) {
+  if (key.includes('kirana') || key.includes('mart') || key.includes('supermarket') || key.includes('grocery')) {
     return industryLoyaltyRules.grocery
   }
-  if (key.includes('med') || key.includes('drug') || key.includes('chemist') || key.includes('clinic')) {
+  if (key.includes('med') || key.includes('drug') || key.includes('chemist')) {
     return industryLoyaltyRules.pharmacy
   }
 

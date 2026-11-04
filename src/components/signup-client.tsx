@@ -9,6 +9,20 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+export const TOP_RECOMMENDED_CATEGORIES = [
+  { value: "bakery", label: "🎂 Bakery, Cake Shop & Desserts" },
+  { value: "cafe", label: "☕ Cafe & Coffee Shop" },
+  { value: "restaurant", label: "🍲 Restaurant & Family Dining (North Indian / Punjabi)" },
+  { value: "south_indian_fastfood", label: "🥞 South Indian & Fast Food (Dosa, Pizza, Burgers)" },
+  { value: "mens_salon", label: "✂️ Men's Salon & Grooming" },
+  { value: "beauty_parlour", label: "💅 Beauty Parlour, Spa & Unisex Salon" },
+  { value: "car_wash", label: "🚗 Car Wash & Auto Detailing" },
+  { value: "dental_clinic", label: "🩺 Dental & Healthcare Clinic" },
+  { value: "coaching_classes", label: "📚 Coaching, Tuition & Hobby Classes" },
+  { value: "gym_fitness", label: "💪 Gym, Fitness & Yoga Studio" },
+  { value: "retail_other", label: "🛒 Retail Store & Other Businesses" },
+]
+
 function SignupForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -324,7 +338,7 @@ function SignupForm() {
                   )}
                 </div>
 
-                {!isReviewsMode && !isAutoReplyMode && (
+                {!isReviewsMode && !isAutoReplyMode ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
@@ -340,22 +354,40 @@ function SignupForm() {
                   </div>
                   <div>
                     <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
-                      Business Category
+                      Business Category *
                     </Label>
                     <Select value={form.businessType} onValueChange={v => update("businessType", v)}>
                       <SelectTrigger className="mt-1 text-xs bg-stone-50 border-stone-200">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="bakery">🍰 Bakery &amp; Cake Shop</SelectItem>
-                        <SelectItem value="cafe">☕ Cafe &amp; Coffee Shop</SelectItem>
-                        <SelectItem value="restaurant">🍽️ Restaurant &amp; Dine-in</SelectItem>
-                        <SelectItem value="salon">💇 Salon, Spa &amp; Beauty</SelectItem>
-                        <SelectItem value="retail">🛍️ Retail &amp; Supermarket</SelectItem>
+                        {TOP_RECOMMENDED_CATEGORIES.map(cat => (
+                          <SelectItem key={cat.value} value={cat.value}>
+                            {cat.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
+                ) : (
+                  <div>
+                    <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
+                      Business Category (For AI Review Prompts) *
+                    </Label>
+                    <Select value={form.businessType} onValueChange={v => update("businessType", v)}>
+                      <SelectTrigger className="mt-1 text-xs bg-stone-50 border-stone-200">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TOP_RECOMMENDED_CATEGORIES.map(cat => (
+                          <SelectItem key={cat.value} value={cat.value}>
+                            {cat.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 )}
 
                 <div>

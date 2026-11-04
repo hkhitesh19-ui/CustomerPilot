@@ -10,6 +10,7 @@ export async function PATCH(req: NextRequest) {
 
   // Validate only the allowed fields
   const allowedUpdates: any = {}
+  if (body.logoUrl !== undefined) allowedUpdates.logoUrl = body.logoUrl
   if (body.name !== undefined) allowedUpdates.name = body.name
   if (body.ownerName !== undefined) allowedUpdates.ownerName = body.ownerName
   if (body.businessType !== undefined) allowedUpdates.businessType = body.businessType

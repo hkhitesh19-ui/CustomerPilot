@@ -448,13 +448,17 @@ export default function SettingsPage() {
                   <SelectValue placeholder="Select business type" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100">
-                  <SelectItem value="BAKERY">Bakery 🥐</SelectItem>
-                  <SelectItem value="RESTAURANT">Restaurant / Cafe ☕</SelectItem>
-                  <SelectItem value="RETAIL">Retail Store 🛍️</SelectItem>
-                  <SelectItem value="SALON">Salon / Spa 💇</SelectItem>
-                  <SelectItem value="GYM">Gym / Fitness 💪</SelectItem>
-                  <SelectItem value="CLINIC">Clinic 🏥</SelectItem>
-                  <SelectItem value="OTHER">Other Local Retail 📦</SelectItem>
+                  <SelectItem value="BAKERY">🎂 Bakery, Cake Shop &amp; Desserts</SelectItem>
+                  <SelectItem value="CAFE">☕ Cafe &amp; Coffee Shop</SelectItem>
+                  <SelectItem value="RESTAURANT">🍲 Restaurant &amp; Family Dining</SelectItem>
+                  <SelectItem value="SOUTH_INDIAN_FASTFOOD">🥞 South Indian &amp; Fast Food</SelectItem>
+                  <SelectItem value="MENS_SALON">✂️ Men's Salon &amp; Grooming</SelectItem>
+                  <SelectItem value="BEAUTY_PARLOUR">💅 Beauty Parlour, Spa &amp; Unisex Salon</SelectItem>
+                  <SelectItem value="CAR_WASH">🚗 Car Wash &amp; Auto Detailing</SelectItem>
+                  <SelectItem value="DENTAL_CLINIC">🩺 Dental &amp; Healthcare Clinic</SelectItem>
+                  <SelectItem value="COACHING_CLASSES">📚 Coaching, Tuition &amp; Hobby Classes</SelectItem>
+                  <SelectItem value="GYM_FITNESS">💪 Gym, Fitness &amp; Yoga Studio</SelectItem>
+                  <SelectItem value="RETAIL_OTHER">🛒 Retail Store &amp; Other Businesses</SelectItem>
                 </SelectContent>
               </Select>
             </div>
