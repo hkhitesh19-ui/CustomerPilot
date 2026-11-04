@@ -276,10 +276,10 @@ export function AppSidebar() {
                 await signOut({ redirect: false });
                 window.location.href = '/login';
               }}
-              className="w-full justify-start cursor-pointer text-slate-400 hover:text-rose-400 hover:bg-rose-950/20"
+              className="group w-full justify-start cursor-pointer border border-red-300 dark:border-red-900/60 bg-red-50/80 dark:bg-red-950/40 text-[#b91c1c] dark:text-[#ef4444] font-extrabold hover:bg-[#dc2626] hover:text-white dark:hover:bg-[#dc2626] dark:hover:text-white hover:border-[#dc2626] transition-all duration-200 py-2.5 px-3 rounded-xl shadow-xs"
             >
-              <LogOut className="h-4 w-4" />
-              <span className="text-xs font-semibold">Sign Out</span>
+              <LogOut className="h-4 w-4 text-[#b91c1c] dark:text-[#ef4444] group-hover:text-white transition-colors stroke-[2.5]" />
+              <span className="text-xs font-black tracking-wide text-[#b91c1c] dark:text-[#ef4444] group-hover:text-white transition-colors">Sign Out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

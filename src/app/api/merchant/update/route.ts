@@ -56,6 +56,9 @@ export async function PATCH(req: NextRequest) {
     const d = Number(body.almostThereInactivityDays)
     if (Number.isInteger(d) && d > 0) allowedUpdates.almostThereInactivityDays = d
   }
+  if (body.enabledModules !== undefined && typeof body.enabledModules === 'string') {
+    allowedUpdates.enabledModules = body.enabledModules
+  }
 
   try {
     const updated = await db.merchant.update({

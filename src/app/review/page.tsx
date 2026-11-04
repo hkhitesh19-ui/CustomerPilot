@@ -1,3 +1,4 @@
+import { hasModule } from "@/lib/feature-gate"
 import { db } from "@/lib/db"
 import { ReviewEditor } from "@/components/review/ReviewEditor"
 import { generateDynamicReviewDraft } from "@/lib/dynamic-review-engine"
@@ -126,6 +127,7 @@ export default async function ReviewPage({
   const stampCard = await db.stampCard.findFirst({
     where: { merchantId, active: true }
   })
+  const isLoyaltyEnabled = hasModule(merchant, "LOYALTY") && !!stampCard?.active
   const googleReviewBonus = stampCard?.googleReviewBonus ?? 1
   const photoBonus = stampCard?.photoBonus ?? 2
   const existingReviewText = existingReview?.finalText || existingReview?.aiDraft || null
@@ -157,6 +159,7 @@ export default async function ReviewPage({
       }}
       category={businessCategory}
       productName={productName}
+      isLoyaltyEnabled={isLoyaltyEnabled}
     />
   )
 }

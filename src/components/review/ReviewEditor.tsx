@@ -11,7 +11,8 @@ export function ReviewEditor({
   draftOptions: initialDraftOptions,
   bonusInfo,
   category,
-  productName
+  productName,
+  isLoyaltyEnabled = true
 }: { 
   merchant: any, 
   customer: any, 
@@ -26,7 +27,8 @@ export function ReviewEditor({
     stampsRequired?: number
   },
   category?: string,
-  productName?: string
+  productName?: string,
+  isLoyaltyEnabled?: boolean
 }) {
     const reviewBonus = bonusInfo?.googleReviewBonus ?? 2
   const photoBonus = bonusInfo?.photoBonus ?? 2
@@ -202,11 +204,18 @@ export function ReviewEditor({
             </div>
           </div>
 
-          {/* CustomerPilot VIP Bonus Pill */}
-          <div className="flex items-center gap-1.5 bg-[#E6F4EA] border border-[#CEEAD6] text-[#137333] px-2.5 py-1 rounded-full text-xs font-semibold shrink-0">
-            <Sparkles className="w-3.5 h-3.5 text-[#137333]" />
-            <span>+{maxPossibleBonus} Bonus Stamps</span>
-          </div>
+          {/* CustomerPilot VIP Bonus Pill (Only if Loyalty Enabled) */}
+          {isLoyaltyEnabled ? (
+            <div className="flex items-center gap-1.5 bg-[#E6F4EA] border border-[#CEEAD6] text-[#137333] px-2.5 py-1 rounded-full text-xs font-semibold shrink-0">
+              <Sparkles className="w-3.5 h-3.5 text-[#137333]" />
+              <span>+{maxPossibleBonus} Bonus Stamps</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-800 px-2.5 py-1 rounded-full text-xs font-bold shrink-0 shadow-2xs">
+              <span className="text-amber-500 text-xs">⭐</span>
+              <span>5-Star Verified</span>
+            </div>
+          )}
         </header>
 
         <div className="p-5 sm:p-7 space-y-6">
@@ -357,27 +366,29 @@ export function ReviewEditor({
             )}
           </div>
 
-          {/* Photo Bonus Incentive Highlight Card */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-50/90 via-emerald-50/80 to-amber-50/90 border-2 border-emerald-300 p-3.5 sm:p-4 shadow-xs">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-amber-400 via-emerald-500 to-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight flex items-center gap-1">
-                    <span>🎁 +{photoBonus || 2} Bonus Stamps</span>
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider shadow-2xs">
-                    Photo Reward
-                  </span>
+          {/* Photo Bonus Incentive Highlight Card (Only if Loyalty Enabled) */}
+          {isLoyaltyEnabled && (
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-50/90 via-emerald-50/80 to-amber-50/90 border-2 border-emerald-300 p-3.5 sm:p-4 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-amber-400 via-emerald-500 to-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <p className="text-[11.5px] sm:text-xs text-slate-700 font-medium mt-0.5 leading-snug">
-                  Upload a <strong>Product Photo</strong> or <strong>Shop Photo</strong> with your Google review to unlock <strong>+{photoBonus || 2} Extra Bonus Stamps</strong>! 📸
-                </p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight flex items-center gap-1">
+                      <span>🎁 +{photoBonus || 2} Bonus Stamps</span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider shadow-2xs">
+                      Photo Reward
+                    </span>
+                  </div>
+                  <p className="text-[11.5px] sm:text-xs text-slate-700 font-medium mt-0.5 leading-snug">
+                    Upload a <strong>Product Photo</strong> or <strong>Shop Photo</strong> with your Google review to unlock <strong>+{photoBonus || 2} Extra Bonus Stamps</strong>! 📸
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* 1-Click Copy & Open Google Button (Google Blue Primary CTA) */}
           <button 
@@ -418,8 +429,8 @@ export function ReviewEditor({
             </a>
           </div>
 
-          {/* Live Digital Wallet Button on Submitted */}
-          {submitted && (
+          {/* Live Digital Wallet Button on Submitted (Only for Loyalty) */}
+          {submitted && isLoyaltyEnabled && (
             <div className="p-4 bg-[#E6F4EA] border border-[#CEEAD6] rounded-2xl text-center space-y-3 animate-in fade-in zoom-in-95 duration-300">
               <div className="inline-flex p-2 bg-white rounded-full text-[#137333] shadow-xs">
                 <Sparkles className="w-6 h-6" />
@@ -446,12 +457,16 @@ export function ReviewEditor({
             <p className="text-xs text-[#5F6368] leading-relaxed">
               {isEditingExisting 
                 ? "💡 Google will open your previous review. Select the text, paste this new draft, and hit Post!" 
-                : "After posting, our system will automatically credit bonus stamps to your VIP Wallet! 🎁"}
+                : isLoyaltyEnabled
+                ? "After posting, our system will automatically credit bonus stamps to your VIP Wallet! 🎁"
+                : "Thank you for supporting our business! Your authentic Google review helps us grow. ⭐"}
             </p>
-            <p className="text-[11px] text-emerald-700 font-semibold flex items-center justify-center gap-1">
-              <Camera className="w-3.5 h-3.5 text-emerald-600 shrink-0 inline" />
-              <span>Attach a photo on Google Maps for +{photoBonus || 2} extra stamps!</span>
-            </p>
+            {isLoyaltyEnabled && (
+              <p className="text-[11px] text-emerald-700 font-semibold flex items-center justify-center gap-1">
+                <Camera className="w-3.5 h-3.5 text-emerald-600 shrink-0 inline" />
+                <span>Attach a photo on Google Maps for +{photoBonus || 2} extra stamps!</span>
+              </p>
+            )}
           </div>
         </div>
 
@@ -461,7 +476,9 @@ export function ReviewEditor({
             Powered by <a href="/for-business" className="text-[#1A73E8] hover:underline font-semibold">CustomerPilot</a> 🚀
           </p>
           <p className="text-[11px] text-[#80868B]">
-            Automated Google Review & Loyalty System for Local Merchants
+            {isLoyaltyEnabled 
+              ? "Automated Google Review & Loyalty System for Local Merchants"
+              : "Automated Smart AI Google Review Engine for Local Merchants"}
           </p>
         </footer>
       </div>

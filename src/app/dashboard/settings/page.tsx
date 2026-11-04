@@ -67,7 +67,7 @@ export default function SettingsPage() {
     timezone: "",
   })
   
-  const [activeTab, setActiveTab] = useState<"reviews" | "branding" | "profile">("reviews")
+  const [activeTab, setActiveTab] = useState<"profile" | "branding" | "reviews">("profile")
   const [isSaving, setIsSaving] = useState(false)
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle")
 
@@ -172,42 +172,15 @@ export default function SettingsPage() {
           Settings &amp; Configuration
         </h1>
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-          Manage your counter standees, Google review AI automations, business details, loyalty stamp rules, WhatsApp device linking, and timers.
+          {isLoyaltyEnabled
+            ? "Manage your business details, loyalty stamp rules, counter standees, Google review AI automations, and WhatsApp device linking."
+            : "Manage your business profile, Google review AI automations, review QR posters, and operations guide."}
         </p>
       </div>
 
-      {/* ─── Modern Tab Switcher (Suggestion 6B) ─────────────────────────── */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-inner">
-        <button
-          type="button"
-          onClick={() => setActiveTab("reviews")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-            activeTab === "reviews"
-              ? "bg-white dark:bg-slate-800 text-[#0284c7] dark:text-[#38bdf8] shadow-md border border-slate-200/80 dark:border-slate-700"
-              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-          }`}
-        >
-          <div className="w-5 h-5 rounded-md bg-white border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 p-0.5 shadow-xs">
-            <GoogleGLogo className="w-3.5 h-3.5" />
-          </div>
-          <span>Google &amp; Smart AI Reviews</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("branding")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-            activeTab === "branding"
-              ? "bg-white dark:bg-slate-800 text-[#0284c7] dark:text-[#38bdf8] shadow-md border border-slate-200/80 dark:border-slate-700"
-              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-          }`}
-        >
-          <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-sky-500 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-            <QrCode className="w-3 h-3" />
-          </div>
-          <span>QR Standee &amp; Branding</span>
-        </button>
-
+      {/* ─── Modern Tab Switcher ───────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-inner">
+        {/* Tab 1: Store Profile & Info */}
         <button
           type="button"
           onClick={() => setActiveTab("profile")}
@@ -220,14 +193,50 @@ export default function SettingsPage() {
           <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs">
             <Store className="w-3 h-3" />
           </div>
-          <span>Store Profile &amp; Info</span>
+          <span>1. Store Profile &amp; Info</span>
         </button>
+
+        {/* Tab 2: Digital Loyalty Stamps QR & Rules Setup (Only if Loyalty Enabled) */}
+        {isLoyaltyEnabled && (
+          <button
+            type="button"
+            onClick={() => setActiveTab("branding")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              activeTab === "branding"
+                ? "bg-white dark:bg-slate-800 text-[#0284c7] dark:text-[#38bdf8] shadow-md border border-slate-200/80 dark:border-slate-700"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            }`}
+          >
+            <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-sky-500 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <QrCode className="w-3 h-3" />
+            </div>
+            <span>2. Digital Loyalty Stamps QR &amp; Rules Setup</span>
+          </button>
+        )}
+
+        {/* Tab 3 / 2: Smart Ai GoogleReview Setup */}
+        {isReviewsEnabled && (
+          <button
+            type="button"
+            onClick={() => setActiveTab("reviews")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              activeTab === "reviews"
+                ? "bg-white dark:bg-slate-800 text-[#0284c7] dark:text-[#38bdf8] shadow-md border border-slate-200/80 dark:border-slate-700"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            }`}
+          >
+            <div className="w-5 h-5 rounded-md bg-white border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 p-0.5 shadow-xs">
+              <GoogleGLogo className="w-3.5 h-3.5" />
+            </div>
+            <span>{isLoyaltyEnabled ? "3. Smart Ai GoogleReview Setup" : "2. Smart Ai GoogleReview Setup"}</span>
+          </button>
+        )}
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 1: COUNTER QR STANDEE STUDIO                              */}
       {/* ══════════════════════════════════════════════════════════════════ */}
-      {activeTab === "branding" && (
+      {activeTab === "branding" && isLoyaltyEnabled && (
       <section 
         id="sec-vip-qr" 
         className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
