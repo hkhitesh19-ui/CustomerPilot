@@ -176,90 +176,52 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      {/* ─── Quick-Jump Anchor Bar ───────────────────────────────────────── */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-slate-200 dark:border-slate-800/80 -mx-1 px-1">
-        <a 
-          href="#sec-vip-qr" 
-          className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
+      {/* ─── Modern Tab Switcher (Suggestion 6B) ─────────────────────────── */}
+      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-inner">
+        <button
+          type="button"
+          onClick={() => setActiveTab("reviews")}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            activeTab === "reviews"
+              ? "bg-white dark:bg-slate-800 text-[#0284c7] dark:text-[#38bdf8] shadow-md border border-slate-200/80 dark:border-slate-700"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+          }`}
+        >
+          <div className="w-5 h-5 rounded-md bg-white border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 p-0.5 shadow-xs">
+            <GoogleGLogo className="w-3.5 h-3.5" />
+          </div>
+          <span>Google &amp; Smart AI Reviews</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("branding")}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            activeTab === "branding"
+              ? "bg-white dark:bg-slate-800 text-[#0284c7] dark:text-[#38bdf8] shadow-md border border-slate-200/80 dark:border-slate-700"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+          }`}
         >
           <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-sky-500 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
             <QrCode className="w-3 h-3" />
           </div>
-          <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8]">01</span>
-          <span>Standee Studio</span>
-        </a>
+          <span>QR Standee &amp; Branding</span>
+        </button>
 
-        {isReviewsEnabled && (
-          <a 
-            href="#sec-google-reviews" 
-            className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
-          >
-            <div className="w-5 h-5 rounded-md bg-white border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 p-0.5 shadow-xs">
-              <GoogleGLogo className="w-3.5 h-3.5" />
-            </div>
-            <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8]">02</span>
-            <span>Google Reviews</span>
-          </a>
-        )}
-
-        <a 
-          href="#sec-business" 
-          className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
+        <button
+          type="button"
+          onClick={() => setActiveTab("profile")}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            activeTab === "profile"
+              ? "bg-white dark:bg-slate-800 text-[#0284c7] dark:text-[#38bdf8] shadow-md border border-slate-200/80 dark:border-slate-700"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+          }`}
         >
           <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs">
             <Store className="w-3 h-3" />
           </div>
-          <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8]">03</span>
-          <span>Business Info</span>
-        </a>
-
-        {isLoyaltyEnabled && (
-          <a 
-            href="#sec-reward-setup" 
-            className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
-          >
-            <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-              <Gift className="w-3 h-3" />
-            </div>
-            <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8]">04</span>
-            <span>Reward Setup</span>
-          </a>
-        )}
-
-        {isLoyaltyEnabled && (
-          <a 
-            href="#sec-whatsapp-conn" 
-            className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
-          >
-            <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-emerald-500 via-[#25D366] to-[#128C7E] text-white flex items-center justify-center shrink-0 shadow-xs">
-              <WhatsAppLogo className="w-3 h-3" />
-            </div>
-            <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8]">05</span>
-            <span>WhatsApp</span>
-          </a>
-        )}
-
-        <a 
-          href="#sec-automations" 
-          className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
-        >
-          <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-violet-600 to-fuchsia-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-            <Clock className="w-3 h-3" />
-          </div>
-          <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8]">06</span>
-          <span>Timers &amp; Templates</span>
-        </a>
-
-        <a 
-          href="#sec-guides" 
-          className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-[#0284c7]/50 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
-        >
-          <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-amber-500 to-orange-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-            <BookOpen className="w-3 h-3" />
-          </div>
-          <span className="text-[10px] font-black text-[#0284c7] dark:text-[#38bdf8]">07</span>
-          <span>Operations Manual</span>
-        </a>
+          <span>Store Profile &amp; Info</span>
+        </button>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════ */}
@@ -616,7 +578,7 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* SECTION 6: AUTOMATION TIMERS & MESSAGE TEMPLATES                   */}
       {/* ══════════════════════════════════════════════════════════════════ */}
-      {activeTab === "branding" && (
+      {activeTab === "profile" && (
       <section 
         id="sec-automations" 
         className="rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6 relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700"
