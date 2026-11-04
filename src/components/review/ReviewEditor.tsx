@@ -67,14 +67,25 @@ export function ReviewEditor({
     }
   }
 
+  const fallbackSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${merchant.name || "Store"} ${merchant.address || ""}`.trim())}`
   const googleLink = merchant.googleReviewLink 
-    || (merchant.googlePlaceId ? `https://search.google.com/local/writereview?placeid=${merchant.googlePlaceId}` : "https://maps.google.com")
+    || (merchant.googlePlaceId ? `https://search.google.com/local/writereview?placeid=${merchant.googlePlaceId}` : fallbackSearchUrl)
 
-  // Robust multi-layered clipboard copy
+  // Robust multi-layered clipboard copy with user-activation safety
   const performCopy = async (text: string): Promise<boolean> => {
     let success = false
 
-    // 1. Try modern async Clipboard API FIRST while document is 100% focused
+    // 1. Direct synchronous selection of textarea FIRST (keeps user activation alive in browser)
+    if (textareaRef.current) {
+      try {
+        textareaRef.current.focus()
+        textareaRef.current.select()
+        textareaRef.current.setSelectionRange(0, text.length)
+        success = document.execCommand('copy')
+      } catch (_) {}
+    }
+
+    // 2. Modern async Clipboard API
     if (typeof window !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
       try {
         await navigator.clipboard.writeText(text)
@@ -82,16 +93,6 @@ export function ReviewEditor({
       } catch (err) {
         console.warn("[ReviewEditor] navigator.clipboard.writeText failed:", err)
       }
-    }
-
-    // 2. Direct synchronous selection of textarea fallback
-    if (!success && textareaRef.current) {
-      try {
-        textareaRef.current.focus()
-        textareaRef.current.select()
-        textareaRef.current.setSelectionRange(0, text.length)
-        success = document.execCommand('copy')
-      } catch (_) {}
     }
 
     // 3. Off-screen temporary textarea fallback
@@ -131,23 +132,38 @@ export function ReviewEditor({
 
     setSubmitted(true)
 
-    // 2. Fire backend notification (records post + enqueues automated photo verification)
-    fetch('/api/reviews/record-google-post', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        customerId: customer?.id, 
-        merchantId: merchant.id, 
-        reviewText: draft, 
-        rating: 5
-      })
-    }).catch(() => {})
+    // 2. Fire backend notification with keepalive so it completes even during tab navigation
+    if (typeof fetch !== "undefined") {
+      fetch('/api/reviews/record-google-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          customerId: customer?.id, 
+          merchantId: merchant.id, 
+          reviewText: draft, 
+          rating: 5
+        }),
+        keepalive: true
+      }).catch(() => {})
+    }
 
-    // 3. Open Google Maps in a new tab now that text is safely in clipboard
-    try {
-      window.open(googleLink, '_blank', 'noopener,noreferrer')
-    } catch (_) {
+    // 3. Reliable Redirection: Mobile deep-links directly, Desktop checks popup blocker
+    const isMobile = typeof navigator !== "undefined" && /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent)
+
+    if (isMobile) {
+      // Mobile browsers immediately open Google Maps app or direct review sheet
       window.location.href = googleLink
+    } else {
+      let win: Window | null = null
+      try {
+        win = window.open(googleLink, '_blank', 'noopener,noreferrer')
+      } catch (_) {
+        win = null
+      }
+      // If popup blocker trapped window.open or returned null, directly redirect current window!
+      if (!win || win.closed || typeof win.closed === "undefined") {
+        window.location.href = googleLink
+      }
     }
   }
 
@@ -387,6 +403,20 @@ export function ReviewEditor({
               </>
             )}
           </button>
+
+          {/* Direct Tap Fallback Link (In case automated redirection was delayed) */}
+          <div className="text-center pt-1">
+            <a 
+              href={googleLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => performCopy(draft)}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A73E8] hover:text-[#1557B0] hover:underline transition-colors py-1 px-3 rounded-lg hover:bg-blue-50"
+            >
+              <span>Direct Google Review Link (Tap here if not opened automatically)</span>
+              <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+            </a>
+          </div>
 
           {/* Live Digital Wallet Button on Submitted */}
           {submitted && (

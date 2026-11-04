@@ -58,11 +58,15 @@ export async function POST(req: NextRequest) {
       }
     })
 
-    // Also update merchant table if extended
-    await (db.merchant as any).update({
+    // Also sync authentic store name, address and rating to merchant table
+    await db.merchant.update({
       where: { id: merchantId },
       data: {
-        googleReviewLink: calculatedReviewUrl
+        name: finalPlaceName,
+        address: finalAddress,
+        googleReviewLink: calculatedReviewUrl,
+        baselineRating: placeDetails?.rating ? Number(placeDetails.rating) : undefined,
+        baselineReviewCount: placeDetails?.userRatingCount ? Number(placeDetails.userRatingCount) : undefined,
       }
     }).catch(() => {})
 

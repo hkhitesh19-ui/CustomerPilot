@@ -591,6 +591,23 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
                     </option>
                   ))}
                 </select>
+
+                <div className="flex items-center justify-between pt-1">
+                  <a
+                    href="#sec-google-reviews"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      const el = document.querySelector("input[placeholder*='Google Maps']") || document.getElementById("sec-business")
+                      if (el) {
+                        el.scrollIntoView({ behavior: "smooth" })
+                        ;(el as HTMLElement).focus?.()
+                      }
+                    }}
+                    className="text-[11px] font-bold text-blue-600 hover:text-blue-800 dark:text-blue-400 flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <span>🔍 Not your shop? Link your authentic Google Maps listing in Step B below ↓</span>
+                  </a>
+                </div>
               </div>
             )}
 

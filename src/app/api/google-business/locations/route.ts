@@ -124,12 +124,13 @@ export async function GET(req: NextRequest) {
         }
       ];
     } else {
+      const isConnected = !!(conn?.placeId || merchant?.googleReviewLink);
       defaultLocations = [
         {
           id: `loc_${merchant?.id || "main"}`,
           name: conn?.placeName || merchant?.name || "Store Location",
-          branch: "Main Branch",
-          businessTitle: merchant?.name || "Store",
+          branch: isConnected ? "Main Branch" : "⚠️ Google Profile Not Linked",
+          businessTitle: conn?.placeName || merchant?.name || "Store",
           address: conn?.address || merchant?.address || "Store Address",
           placeId: conn?.placeId || (merchant?.googleReviewLink ? "custom_place" : ""),
           cid: conn?.gbpAccountId?.replace("accounts/", "") || "",

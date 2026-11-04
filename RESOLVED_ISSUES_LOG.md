@@ -3,6 +3,33 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+---
+## [04 Nov 2026] Issue: Google OAuth Personal Name Override, Missing GBP Place Link & Review Redirection Popup Blocker Failure
+- **Symptom**: Merchant Suvarna Sonawana logged in with her Google account (the same Gmail managing her Google Business Profile for "SSV Saloon and academy" in Manjalpur, Vadodara). However:
+  1. The tabletop standee in `/dashboard/settings` displayed her personal profile name "SUVARNA SONAWANA" instead of the business name "SSV Saloon and academy", and the location selector listed an unverified fallback.
+  2. When scanning the Smart AI Review QR code (`/review?m=cmw0dloss...`), the AI generated the review draft, but clicking "Copy & Post on Google Maps" failed to redirect to Google Reviews, leaving the customer stranded with "Opening Google Maps...".
+- **Root Cause**:
+  1. **Google OAuth Profile vs. GBP API Partitioning**: Google OAuth standard consent scopes (`openid email profile`) only return personal account metadata (`Suvarna Sonawana`). Google's My Business API requires enterprise partner whitelisting and returns 403 Forbidden on unapproved apps, causing the OAuth callback to fall back to the personal profile name and leave `googleReviewLink: null` and `placeId: null`.
+  2. **Transient User Gesture Expiration & Popup Blocker Interception**: In `src/components/review/ReviewEditor.tsx`, `handleCopyAndPostClick` ran `await performCopy(draft)` before calling `window.open(googleLink, '_blank')`. In modern mobile/desktop browsers (Chrome, Safari, Edge), awaiting an asynchronous Promise (`navigator.clipboard.writeText`) causes transient user activation to expire. The browser's popup blocker silently blocked `window.open`, returning `null` without throwing a catchable exception.
+  3. **Missing Fallback in Review Route**: In `src/app/review/page.tsx`, `googleReviewLink` was only read from `googleConnection?.googleReviewUrl` and ignored `merchant.googleReviewLink`. If both were null, `googleLink` defaulted to generic `"https://maps.google.com"` rather than the merchant's store location.
+- **Resolution**:
+  1. **Direct Google Maps Deep-Linking & Popup-Bypass Architecture (`src/components/review/ReviewEditor.tsx`)**:
+     - Swapped clipboard sequence to execute synchronous `document.execCommand('copy')` on the textarea first to preserve user activation context before invoking async APIs.
+     - Redesigned redirection: mobile browsers (`Android|iPhone`) directly execute `window.location.href = googleLink` to deep-link straight into the native Google Maps app / write-review sheet without popup blocker interference. Desktop browsers verify `win && !win.closed` and immediately fallback to `window.location.href = googleLink` if blocked.
+     - Added an explicit direct fallback link (`<a href={googleLink}>Direct Google Review Link (Tap here if not opened automatically)</a>`) directly below the primary CTA.
+     - Configured intelligent fallback: if Place ID and review link are absent, dynamically route to `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(merchant.name + ' ' + merchant.address)}`.
+  2. **Dual-Source Review Hydration (`src/app/review/page.tsx`)**:
+     - Hydrated `googleReviewLink` from both `googleConnection?.googleReviewUrl` and `merchant.googleReviewLink`.
+     - Added Place ID regex extraction (`placeid=([^&]+)`) and Google Maps search fallback URL generation.
+  3. **Merchant Name & Rating Synchronization on GBP Connect (`src/app/api/google-business/connect/route.ts`)**:
+     - Ensured linking a Google Place ID updates `db.merchant` with the authentic store name (`name: finalPlaceName`), formatted address, direct review link, baseline rating, and review count.
+  4. **Unlinked Location Status Indicator (`src/app/api/google-business/locations/route.ts` & `src/components/google-review-qr-generator.tsx`)**:
+     - Marked unlinked locations with `⚠️ Google Profile Not Linked` in dropdowns and added a 1-click shortcut link pointing to Section Step B to connect authentic Google Maps profiles.
+  5. **Live Production Hydration for Suvarna Sonawana**:
+     - Queried Google Places API, resolved authentic Place ID (`ChIJ9fZfykHFXzkRs1Zswnh7-VA`), 4.3★ rating, 23 reviews, and verified address (`ShreePalli society, Manjalpur, Vadodara, Gujarat 390011, India`).
+     - Updated `db.merchant` and `db.merchantGoogleConnection` on production VPS (`187.127.170.36`), immediately transforming the standee and review destination to "SSV Saloon and academy".
+- **Status**: ✅ Resolved and Verified.
+
 ## [03 Nov 2026] Feature & UI: Google Reviews Standee Final v3 Upgrade & Smart AI Reviews Settings Integration
 - **Symptom**: In `/dashboard/settings` ("Smart AI Google Reviews QR Code & Posters"), the tabletop standee preview used a legacy bracket layout with small merchant logo and old dark banner. Merchants needed a modern, high-converting acrylic tabletop standee matching the verified Kerala Kitchenz aesthetic, with larger HD store logos, official Google Reviews branding, regular square QR modules with unclipped CustomerPilot center badge, and an official WhatsApp green contact icon.
 - **Root Cause**:

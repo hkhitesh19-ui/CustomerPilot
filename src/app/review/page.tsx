@@ -89,11 +89,26 @@ export default async function ReviewPage({
   const dynamicDraft = draftOptions.draft1
 
   let googlePlaceId: string | null = googleConnection?.placeId || null
-  let googleReviewLink: string | null = googleConnection?.googleReviewUrl || null
+  let googleReviewLink: string | null = googleConnection?.googleReviewUrl || merchant.googleReviewLink || null
+
+  if (!googlePlaceId && googleReviewLink && googleReviewLink.includes("placeid=")) {
+    try {
+      const match = googleReviewLink.match(/placeid=([^&]+)/)
+      if (match && match[1]) {
+        googlePlaceId = match[1]
+      }
+    } catch (_) {}
+  }
 
   if (googlePlaceId === "manual_url") {
-    googleReviewLink = googleConnection?.address || googleConnection?.googleReviewUrl || null
+    googleReviewLink = googleConnection?.address || googleConnection?.googleReviewUrl || merchant.googleReviewLink || null
     googlePlaceId = null
+  }
+
+  // Fail-safe Google Maps Search fallback if no review link or placeId exists
+  const fallbackMapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${merchant.name} ${merchant.address || ''}`.trim())}`
+  if (!googleReviewLink && !googlePlaceId) {
+    googleReviewLink = fallbackMapsSearchUrl
   }
 
   // Fetch existing review if customer already posted previously
@@ -121,6 +136,7 @@ export default async function ReviewPage({
       merchant={{
         id: merchant.id,
         name: merchant.name,
+        address: merchant.address,
         logoUrl: merchant.logoUrl,
         googleReviewLink: googleReviewLink,
         googlePlaceId: googlePlaceId
