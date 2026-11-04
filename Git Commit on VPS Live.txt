@@ -8,17 +8,19 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 7ccef9a
-Full Commit Hash  : 7ccef9ae11445eb83501803b6742cf74233e4e85
-Target Fix Commit : 7ccef9ae11445eb83501803b6742cf74233e4e85
+Active Git Commit : 86c0c5c
+Full Commit Hash  : 86c0c5c9ce0cea690411c6ef5661a9a4671b6cc3
+Target Fix Commit : 86c0c5c9ce0cea690411c6ef5661a9a4671b6cc3
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 04 Nov 2026, 03:00 PM IST
+Deployment Date   : 04 Nov 2026, 03:55 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(review): bulletproof google review deep-linking, popup bypass, and gbp store sync
+Commit Title      : feat(keywords): 3-layer context grounding presets matrix and dashboard keyword control engine (Phase 1 & 2)
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 Merchant Status   : Vinayak Fashion, Cake Connection & SSV Saloon and academy Live
+Keyword Engine    : 3-Layer Context Grounding System & Smart Keyword Control Studio (10 Categories, SEO/AEO/GEO & Banned Blacklist) Active on /dashboard/settings
+Groq AI Engine    : Active on VPS (.env: gsk_fAh...TC65p, model: openai/gpt-oss-120b)
 Review Deep-Link  : Bulletproof mobile window.location redirection, synchronous clipboard execCommand, desktop popup-blocker bypass, and direct review fallback link
 GBP Store Sync    : Auto-syncs authentic store name, formatted address, Place ID, rating, and review URL to merchant record on GBP connect
 Suvarna Sonawana  : Hydrated with authentic Place ID (ChIJ9fZfykHFXzkRs1Zswnh7-VA), store name 'SSV Saloon and academy', 4.3★ rating, 23 reviews, Manjalpur address
@@ -36,6 +38,7 @@ Nginx             : Configured for customerpilot.in (:3000) & cakeconnection.in 
 ----------------------------------------------------------
 
 Deployment History Log:
+- 04 Nov 2026, 03:55 PM: 86c0c5c - feat(keywords): 3-layer context grounding presets matrix and dashboard keyword control engine (Phase 1 & 2)
 - 04 Nov 2026, 03:00 PM: 7ccef9a - fix(review): bulletproof google review deep-linking, popup bypass, and gbp store sync
 - 04 Nov 2026, 10:20 AM: 7f26c5d - feat(signup-reviews): top 10 categories at signup, isolated brand logo standee, and gbp multi-location switcher
 - 03 Nov 2026, 11:35 PM: 5d37ecd - revert(billing): remove upi payment section and upi id fields across digital card and billing settings
