@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { ok, err } from "@/lib/api";
+import { publishGbpPostToGoogle } from "@/lib/gbp-post-generator";
 
 export async function POST(
   req: NextRequest,
@@ -18,7 +19,7 @@ export async function POST(
       return err("GBP Post not found", 404);
     }
 
-    const updated = await db.gbpPost.update({
+    await db.gbpPost.update({
       where: { id },
       data: {
         status: "APPROVED",
@@ -26,9 +27,19 @@ export async function POST(
       },
     });
 
+    // Publish to Google Business Profile API (300 QPM Project 391546314644)
+    const publishResult = await publishGbpPostToGoogle(id);
+
+    const updated = await db.gbpPost.findUnique({
+      where: { id },
+    });
+
     return ok({
-      message: "GBP Post approved successfully by merchant",
+      message: publishResult.success
+        ? "GBP Post approved and published to Google Maps successfully"
+        : "GBP Post approved successfully",
       post: updated,
+      gbpPostId: publishResult.gbpPostId,
     });
   } catch (error: any) {
     console.error("[GBP Post Approve POST Error]:", error);

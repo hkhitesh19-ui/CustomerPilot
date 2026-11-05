@@ -76,6 +76,85 @@ export default function MenuManagementPage() {
   const [bulkError, setBulkError] = useState<string | null>(null)
   const [bulkSuccessMsg, setBulkSuccessMsg] = useState<string | null>(null)
 
+  // Photo-to-Menu AI Ingestion State
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false)
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoLoading, setPhotoLoading] = useState(false)
+  const [photoPreviewItems, setPhotoPreviewItems] = useState<any[]>([])
+  const [photoMode, setPhotoMode] = useState<"append" | "replace">("append")
+  const [photoImporting, setPhotoImporting] = useState(false)
+  const [photoError, setPhotoError] = useState<string | null>(null)
+  const [photoSuccessMsg, setPhotoSuccessMsg] = useState<string | null>(null)
+
+  const resetPhotoModal = () => {
+    setPhotoFile(null)
+    setPhotoLoading(false)
+    setPhotoPreviewItems([])
+    setPhotoMode("append")
+    setPhotoImporting(false)
+    setPhotoError(null)
+    setPhotoSuccessMsg(null)
+  }
+
+  const handlePhotoFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setPhotoFile(file)
+    setPhotoLoading(true)
+    setPhotoError(null)
+    setPhotoSuccessMsg(null)
+    setPhotoPreviewItems([])
+
+    try {
+      const fd = new FormData()
+      fd.append("file", file)
+      const res = await fetch("/api/menu/extract-from-image", {
+        method: "POST",
+        body: fd
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Failed to scan menu image")
+      if (data.data?.items) {
+        setPhotoPreviewItems(data.data.items)
+      } else {
+        throw new Error("No items detected in this menu photo")
+      }
+    } catch (err: any) {
+      setPhotoError(err.message || "Failed to parse menu card")
+    } finally {
+      setPhotoLoading(false)
+    }
+  }
+
+  const handleCommitPhotoItems = async () => {
+    if (photoPreviewItems.length === 0) return
+    setPhotoImporting(true)
+    setPhotoError(null)
+
+    try {
+      const res = await fetch("/api/menu/bulk-import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: photoPreviewItems,
+          mode: photoMode
+        })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Failed to import items")
+      setPhotoSuccessMsg(`Successfully imported ${data.data?.importedCount || photoPreviewItems.length} items to your live menu!`)
+      fetchItems()
+      setTimeout(() => {
+        setIsPhotoModalOpen(false)
+        resetPhotoModal()
+      }, 1800)
+    } catch (err: any) {
+      setPhotoError(err.message || "Failed to save items to menu")
+    } finally {
+      setPhotoImporting(false)
+    }
+  }
+
   const resetBulkModal = () => {
     setBulkFile(null)
     setBulkLoading(false)
@@ -311,6 +390,14 @@ export default function MenuManagementPage() {
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            onClick={() => { resetPhotoModal(); setIsPhotoModalOpen(true); }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-700 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-md transition"
+          >
+            <Sparkles className="w-4 h-4 text-amber-200" />
+            <span>Photo-to-Menu (AI Ingest)</span>
+          </button>
+
           <button
             onClick={() => { resetBulkModal(); setIsBulkModalOpen(true); }}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-800 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-md transition"
@@ -855,6 +942,189 @@ export default function MenuManagementPage() {
                 )}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {/* ── PHOTO-TO-MENU AI INGESTION MODAL ── */}
+      {isPhotoModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col">
+            
+            {/* Modal Header */}
+            <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between sticky top-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center shadow-md">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <span>Photo-to-Menu AI Ingestion</span>
+                    <span className="text-[10px] uppercase font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 px-2 py-0.5 rounded-full">
+                      Gemini Vision
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Snap or upload a photo of your physical printed menu card. AI extracts items, variations &amp; prices in seconds!
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => { setIsPhotoModalOpen(false); resetPhotoModal(); }}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-6 flex-1">
+              {/* Upload Dropzone */}
+              <div className="border-2 border-dashed border-amber-300 dark:border-amber-800/60 rounded-3xl p-6 sm:p-8 text-center bg-amber-50/40 dark:bg-amber-950/20 hover:border-amber-500 transition relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoFileChange}
+                  disabled={photoLoading}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                />
+                <div className="flex flex-col items-center justify-center gap-2 pointer-events-none">
+                  <div className="w-14 h-14 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-400 mb-1">
+                    <UploadCloud className="w-7 h-7" />
+                  </div>
+                  <span className="font-extrabold text-sm text-slate-800 dark:text-slate-200">
+                    {photoFile ? photoFile.name : "Tap to Snap Photo or Upload Menu Card Image"}
+                  </span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    Supports JPG, PNG, WEBP (Camera photos from smartphone supported)
+                  </span>
+                </div>
+              </div>
+
+              {/* Loading Indicator */}
+              {photoLoading && (
+                <div className="p-6 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center gap-3">
+                  <RefreshCw className="w-5 h-5 text-amber-600 dark:text-amber-400 animate-spin" />
+                  <span className="text-xs font-bold text-amber-900 dark:text-amber-200">
+                    Scanning Menu Image with Gemini Vision AI... Extracting dishes, prices &amp; variations...
+                  </span>
+                </div>
+              )}
+
+              {/* Error Message */}
+              {photoError && (
+                <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <span>{photoError}</span>
+                </div>
+              )}
+
+              {/* Success Message */}
+              {photoSuccessMsg && (
+                <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2 font-bold">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span>{photoSuccessMsg}</span>
+                </div>
+              )}
+
+              {/* Extracted Items Preview */}
+              {photoPreviewItems.length > 0 && (
+                <div className="space-y-4 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
+                        AI Extracted {photoPreviewItems.length} Menu Items
+                      </h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Review the extracted catalog. You can tweak names or prices anytime.
+                      </p>
+                    </div>
+
+                    {/* Mode Selector */}
+                    <div className="flex items-center gap-2 text-xs">
+                      <label className="font-bold text-slate-700 dark:text-slate-300">Import Mode:</label>
+                      <select
+                        value={photoMode}
+                        onChange={(e) => setPhotoMode(e.target.value as "append" | "replace")}
+                        className="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-bold"
+                      >
+                        <option value="append">Append (Add to Menu)</option>
+                        <option value="replace">Replace All Existing</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden max-h-64 overflow-y-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 font-bold border-b border-slate-200 dark:border-slate-700 sticky top-0">
+                        <tr>
+                          <th className="p-2.5">Category</th>
+                          <th className="p-2.5">Item Name</th>
+                          <th className="p-2.5">Variation</th>
+                          <th className="p-2.5">Price</th>
+                          <th className="p-2.5">MRP</th>
+                          <th className="p-2.5">Diet</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {photoPreviewItems.map((it, idx) => (
+                          <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                            <td className="p-2.5 font-bold text-slate-700 dark:text-slate-300">{it.category}</td>
+                            <td className="p-2.5 font-extrabold text-slate-900 dark:text-white">{it.name}</td>
+                            <td className="p-2.5 text-slate-500">{it.variation || "—"}</td>
+                            <td className="p-2.5 font-black text-emerald-600 dark:text-emerald-400">₹{it.price}</td>
+                            <td className="p-2.5 text-slate-400 line-through">{it.originalPrice ? `₹${it.originalPrice}` : "—"}</td>
+                            <td className="p-2.5">
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                it.isVeg
+                                  ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                                  : "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                              }`}>
+                                {it.isVeg ? "Veg" : "Non-Veg"}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex items-center justify-between">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
+                {photoPreviewItems.length > 0 ? `${photoPreviewItems.length} items ready for instant activation` : "Waiting for menu card photo..."}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setIsPhotoModalOpen(false); resetPhotoModal(); }}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCommitPhotoItems}
+                  disabled={photoPreviewItems.length === 0 || photoImporting}
+                  className="px-6 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 disabled:opacity-50 text-white font-extrabold text-xs shadow-md transition flex items-center gap-2"
+                >
+                  {photoImporting ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving to Menu...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Save All to Live Menu</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       )}

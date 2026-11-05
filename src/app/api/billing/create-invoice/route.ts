@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { ok, err, getAuthenticatedMerchant } from "@/lib/api"
+import { hasModule } from "@/lib/feature-gate"
 import { generateInvoicePdf, InvoicePdfData } from "@/lib/invoice-pdf-generator"
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
@@ -151,11 +152,18 @@ export async function POST(req: NextRequest) {
     const billingSettingsRecord = await db.systemContent.findUnique({
       where: { key: `MERCHANT_BILLING_SETTINGS_${merchantId}` }
     })
-    let billingSettings = {
+    let billingSettings: {
+      invoicePrefix: string
+      gstin: string
+      terms: string
+      upiId: string
+      thankYouMessage: string
+    } = {
       invoicePrefix: "",
       gstin: "",
       terms: "Thank you for shopping with us! Goods once sold will not be returned.",
-      upiId: ""
+      upiId: "",
+      thankYouMessage: "🙏 Thank you for your visit! Please visit again."
     }
     if (billingSettingsRecord?.value) {
       try {
@@ -261,6 +269,64 @@ export async function POST(req: NextRequest) {
         include: { items: true }
       })
 
+      // Check if Loyalty is active and calculate stamps to award
+      let stampsAwardedThisBill = 0
+      if (hasModule(merchant, "LOYALTY")) {
+        const stampCard = await tx.stampCard.findFirst({
+          where: { merchantId, active: true },
+          orderBy: { createdAt: "desc" }
+        })
+        if (stampCard) {
+          const rewardPoints = stampCard.stampValue || 300
+          stampsAwardedThisBill = Math.floor(finalGrandTotal / rewardPoints)
+          if (stampsAwardedThisBill > 0) {
+            let card = await tx.customerStampCard.findFirst({
+              where: { customerId: waitingCustomer.customerId, stampCardId: stampCard.id, completed: false, redeemed: false },
+              orderBy: { createdAt: "desc" }
+            })
+            if (!card) {
+              card = await tx.customerStampCard.create({
+                data: { customerId: waitingCustomer.customerId, stampCardId: stampCard.id, merchantId, stampsCollected: 0 }
+              })
+            }
+            for (let s = 0; s < stampsAwardedThisBill; s++) {
+              await tx.stamp.create({
+                data: {
+                  customerId: waitingCustomer.customerId,
+                  stampCardId: stampCard.id,
+                  customerStampCardId: card.id,
+                  merchantId,
+                  source: "purchase"
+                }
+              })
+            }
+            const stampsRequired = stampCard.stampsRequired || 10
+            const newCount = card.stampsCollected + stampsAwardedThisBill
+            if (newCount >= stampsRequired) {
+              await tx.customerStampCard.update({
+                where: { id: card.id },
+                data: { stampsCollected: stampsRequired, completed: true }
+              })
+              const overflow = newCount - stampsRequired
+              if (overflow > 0) {
+                await tx.customerStampCard.create({
+                  data: { customerId: waitingCustomer.customerId, stampCardId: stampCard.id, merchantId, stampsCollected: overflow }
+                })
+              }
+            } else {
+              await tx.customerStampCard.update({
+                where: { id: card.id },
+                data: { stampsCollected: newCount }
+              })
+            }
+            await tx.customer.update({
+              where: { id: waitingCustomer.customerId },
+              data: { lifetimeStamps: { increment: stampsAwardedThisBill } }
+            })
+          }
+        }
+      }
+
       // Create Bill record for customer spend & CRM history
       await tx.bill.create({
         data: {
@@ -269,7 +335,7 @@ export async function POST(req: NextRequest) {
           issuedById: staff.id,
           number: orderNo,
           amount: finalGrandTotal,
-          stampsAwarded: 0,
+          stampsAwarded: stampsAwardedThisBill,
           status: "paid",
           notes: `Itemized Tax Invoice #${orderNo}`
         }
@@ -312,36 +378,73 @@ export async function POST(req: NextRequest) {
     const customerDisplayName = waitingCustomer.customer.name || "Customer"
     const formattedDate = new Date().toLocaleDateString("en-IN", {
       day: "2-digit",
-      month: "short",
+      month: "long",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
       hour12: true
     })
 
+    const hasGstin = Boolean(billingSettings.gstin && billingSettings.gstin.trim())
+    const invoiceTitle = hasGstin ? "TAX INVOICE" : "INVOICE"
+
+    // Construct Loyalty Update Block (if Loyalty is active)
+    let loyaltyRewardText = ""
+    if (hasModule(merchant, "LOYALTY")) {
+      const stampCard = await db.stampCard.findFirst({
+        where: { merchantId, active: true },
+        orderBy: { createdAt: "desc" }
+      })
+      if (stampCard) {
+        const rewardPoints = stampCard.stampValue || 300
+        const stampsEarned = Math.floor(finalGrandTotal / rewardPoints)
+        const currentCard = await db.customerStampCard.findFirst({
+          where: { customerId: waitingCustomer.customerId, stampCardId: stampCard.id, completed: false },
+          orderBy: { createdAt: "desc" }
+        })
+        const currentStamps = currentCard?.stampsCollected ?? (waitingCustomer.customer.lifetimeStamps || 0)
+        const stampsRequired = stampCard.stampsRequired || 10
+        const remaining = Math.max(0, stampsRequired - currentStamps)
+
+        loyaltyRewardText =
+          `---------------------------------\n` +
+          `🎉 *LOYALTY REWARD UPDATE:*\n` +
+          `+${stampsEarned} Stamp${stampsEarned === 1 ? "" : "s"} Earned on this purchase!\n` +
+          `Current Balance: ${currentStamps} / ${stampsRequired} Stamps 🎂\n` +
+          (remaining === 0
+            ? `🏆 *REWARD UNLOCKED: ${stampCard.rewardName || "Free Gift"}!*\n`
+            : `(Only ${remaining} more stamp(s) to unlock ${stampCard.rewardName || "Free Reward"}!)\n`)
+      }
+    }
+
     const waBillMessage =
-      `🧾 *TAX INVOICE / CASH BILL*\n` +
+      `🧾 *${invoiceTitle}*\n` +
       `*${merchant.name.toUpperCase()}*\n` +
       (merchant.address ? `📍 ${merchant.address}\n` : "") +
-      (billingSettings.gstin ? `🏛️ GSTIN: ${billingSettings.gstin}\n` : "") +
+      (merchant.whatsappPhone ? `📞 Contact: +${merchant.whatsappPhone}\n` : "") +
+      (hasGstin ? `🏛️ GSTIN: ${billingSettings.gstin.trim()}\n` : "") +
       `---------------------------------\n` +
-      `*Invoice No:* #${orderNo}\n` +
-      `*Date:* ${formattedDate}\n` +
-      `*Billed To:* ${customerDisplayName} (${waitingCustomer.customer.phone})\n` +
+      `*INVOICE DETAILS*\n` +
+      `*Bill No:* #${orderNo}\n` +
+      `*Bill Date:* ${formattedDate}\n` +
+      `*Customer:* ${customerDisplayName} (${waitingCustomer.customer.phone})\n` +
       `---------------------------------\n` +
-      `*ITEMS PURCHASED:*\n` +
+      `*ITEM DETAILS*\n` +
       `${itemLines}\n` +
       `---------------------------------\n` +
-      `*Subtotal:* ₹${Number(subtotal).toFixed(2)}\n` +
-      (discount > 0 ? `*Discount (${discountType === "percent" ? "Promo %" : "Flat ₹"}):* -₹${Number(discount).toFixed(2)}\n` : "") +
-      `*Taxable Value:* ₹${Number(taxableAmount).toFixed(2)}\n` +
+      `Item Total       : ₹${Number(subtotal).toFixed(2)}\n` +
+      (discount > 0 ? `Discount         : -₹${Number(discount).toFixed(2)}\n` : "") +
+      `Taxable Amount   : ₹${Number(taxableAmount).toFixed(2)}\n` +
       taxBreakdown +
-      `*GRAND TOTAL PAID:* *₹${finalGrandTotal.toFixed(2)}*\n` +
-      `*Payment Method:* ${paymentMethod}\n` +
       `---------------------------------\n` +
-      `📄 *View / Download Official PDF Invoice:*\n` +
-      `${invoiceUrl}\n\n` +
-      `🙏 *Thank you for shopping with us!*`
+      `*GRAND TOTAL     : ₹${finalGrandTotal.toFixed(2)} (PAID)*\n` +
+      `Payment Mode     : ${paymentMethod}\n` +
+      loyaltyRewardText +
+      `---------------------------------\n` +
+      `📎 *Download Official ${invoiceTitle} PDF attached below:*\n` +
+      `${invoiceUrl}\n` +
+      (billingSettings.terms ? `\n📌 *Terms & Conditions:*\n${billingSettings.terms}\n` : "") +
+      `\n${billingSettings.thankYouMessage || "🙏 *Thank you for your visit! Please visit again.*"}`
 
     // Generate Binary PDF Buffer for direct WhatsApp document attachment
     let pdfBase64: string | undefined

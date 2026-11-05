@@ -116,19 +116,15 @@ export async function POST(req: Request) {
     let matchConfidence: number | null = null;
 
     if (!alreadyHadPhoto && configuredPhotoBonus > 0) {
-      // During Google Business Profile Enterprise API approval period (10-15 business days),
-      // by default treat all CustomerPilot Google Review posts as having a verified product photo,
-      // awarding full 2 + 2 = 4 bonus stamps immediately.
-      const DEFAULT_PHOTO_BONUS_GRACE_PERIOD = true;
-
-      if (DEFAULT_PHOTO_BONUS_GRACE_PERIOD) {
+      // 1. Direct photo attachment check (user uploaded photo with review)
+      if (photoAttached && (body?.photoUrl || matchedPhotoUri)) {
         photoBonusToAward = configuredPhotoBonus;
         photoVerificationStatus = "VERIFIED";
-        verificationStage = "PRE_APPROVED_GRACE_PERIOD";
+        verificationStage = "DIRECT_ATTACHED_PHOTO";
         matchedPhotoUri = body?.photoUrl || matchedPhotoUri || null;
         matchConfidence = 1.0;
       } else {
-        // Check if photo can be verified immediately (sandbox session photo or live GBP)
+        // 2. Query Google Business Profile API customer media endpoint
         const photoCheck = await verifyCustomerGooglePhoto(
           merchantId,
           customer.name || "VIP Member",
@@ -142,8 +138,11 @@ export async function POST(req: Request) {
           matchedPhotoUri = photoCheck.photoUri || matchedPhotoUri;
           matchConfidence = photoCheck.confidence ?? null;
         } else {
-          // Enqueue 20-min verification check in ReviewBonusLog
+          // No photo detected initially -> Award only review bonus (1 stamp).
+          // Schedule background recheck in ReviewBonusLog for late photo uploads.
+          photoBonusToAward = 0;
           photoVerificationStatus = "PENDING";
+          verificationStage = "AWAITING_GOOGLE_PHOTO_INDEXING";
         }
       }
     }

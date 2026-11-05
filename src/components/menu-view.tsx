@@ -1,4 +1,5 @@
 "use client"
+import QRCode from "qrcode"
 
 import { useState, useMemo, useRef, useEffect } from "react"
 import { 
@@ -44,6 +45,7 @@ export interface MerchantMenuData {
   rating?: number
   reviewsCount?: number
   slug?: string
+  upiId?: string | null
 }
 
 interface CartItem {
@@ -75,6 +77,8 @@ export function MenuView({
   const [deliveryAddress, setDeliveryAddress] = useState("")
   const [orderNotes, setOrderNotes] = useState("")
   const [orderSuccess, setOrderSuccess] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<"COD" | "UPI">("COD")
+  const [upiQrCode, setUpiQrCode] = useState<string>("")
 
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
@@ -118,6 +122,22 @@ export function MenuView({
 
   const packagingCharges = itemTotalAmount > 0 ? (itemTotalAmount > 500 ? 0 : 25) : 0
   const grandTotal = itemTotalAmount + packagingCharges
+
+  // Generate dynamic UPI QR Code when amount or merchant upiId changes
+  useEffect(() => {
+    async function makeUpiQr() {
+      const upiId = merchant.upiId || "customerpilot@upi"
+      const note = `Order at ${merchant.name}`.replace(/[^a-zA-Z0-9\s_-]/g, "").slice(0, 30)
+      const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(merchant.name)}&am=${grandTotal.toFixed(2)}&cu=INR&tn=${encodeURIComponent(note)}`
+      try {
+        const qr = await QRCode.toDataURL(upiUri, { width: 220, margin: 1, color: { dark: "#0f172a", light: "#ffffff" } })
+        setUpiQrCode(qr)
+      } catch (_) {}
+    }
+    if (grandTotal > 0) {
+      makeUpiQr()
+    }
+  }, [grandTotal, merchant.upiId, merchant.name])
 
   // Add to cart helper
   const updateQuantity = (item: MenuItemData, delta: number) => {
@@ -181,6 +201,7 @@ export function MenuView({
         ? `📍 Address: ${deliveryAddress.trim()}\n`
         : "") +
       `💰 Total: ₹${grandTotal}\n` +
+      `💳 Payment: ${paymentMethod === "UPI" ? "⚡ Paid / Paying via Instant UPI (0% Fee)" : "💵 Cash on Delivery (COD)"}\n` +
       (customerName.trim() ? `👤 Name: ${customerName.trim()}\n` : "") +
       (orderNotes.trim() ? `📝 Note: ${orderNotes.trim()}\n` : "") +
       `\n#ORDER`
@@ -556,6 +577,76 @@ export function MenuView({
                   </button>
                 </div>
               </div>
+
+              {/* ── Payment Method Selector (COD vs UPI PG) ── */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Select Payment Method:
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("COD")}
+                    className={`p-3 rounded-xl border text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${
+                      paymentMethod === "COD"
+                        ? "border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 shadow-xs"
+                        : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
+                    }`}
+                  >
+                    <span>💵 Cash on Delivery (COD)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("UPI")}
+                    className={`p-3 rounded-xl border text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${
+                      paymentMethod === "UPI"
+                        ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 shadow-xs"
+                        : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
+                    }`}
+                  >
+                    <span>⚡ Instant UPI (0% Fee)</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* UPI Payment Gateway Card */}
+              {paymentMethod === "UPI" && (
+                <div className="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 text-xs space-y-2.5 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-extrabold text-indigo-900 dark:text-indigo-200 block">
+                        Direct Bank UPI Payment (0% Gateway Fee)
+                      </span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                        Payee: {merchant.upiId || "customerpilot@upi"}
+                      </span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">
+                      Verified UPI
+                    </span>
+                  </div>
+
+                  {/* Mobile Deep Link Button */}
+                  <a
+                    href={`upi://pay?pa=${encodeURIComponent(merchant.upiId || "customerpilot@upi")}&pn=${encodeURIComponent(merchant.name)}&am=${grandTotal.toFixed(2)}&cu=INR&tn=${encodeURIComponent(`Order at ${merchant.name}`)}`}
+                    className="w-full py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold flex items-center justify-center gap-2 shadow-xs transition"
+                  >
+                    <span>🚀 Pay ₹{grandTotal} via UPI App (GPay / PhonePe / Paytm)</span>
+                  </a>
+
+                  {/* Desktop QR Scan View */}
+                  {upiQrCode && (
+                    <div className="pt-2 flex flex-col items-center justify-center border-t border-indigo-200 dark:border-indigo-800/40">
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-1.5 font-medium">
+                        Or scan with any UPI App camera:
+                      </p>
+                      <div className="p-1.5 bg-white rounded-xl shadow-xs border border-indigo-100">
+                        <img src={upiQrCode} alt="UPI QR Code" className="w-28 h-28 object-contain" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Delivery Address (if Delivery) */}
               {deliveryType === "delivery" && (

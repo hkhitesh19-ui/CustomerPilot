@@ -116,8 +116,10 @@ export function generateInvoicePdf(data: InvoicePdfData): Buffer {
   }
 
   // Invoice Pill on right
+  const hasGstin = Boolean(data.gstin && data.gstin.trim())
+  const docTitle = hasGstin ? "TAX INVOICE" : "INVOICE"
   pdf.addRect(410, 750, 135, 45, true, true, 0.90, 0.94, 0.99)
-  pdf.addText("F2", 12, 420, 778, "TAX INVOICE")
+  pdf.addText("F2", 12, 420, 778, docTitle)
   pdf.addText("F1", 10, 420, 764, `#${data.orderNo}`)
 
   // 2. Metadata / Billed To Section

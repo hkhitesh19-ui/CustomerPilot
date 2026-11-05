@@ -176,7 +176,7 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
 
           <div className="text-left sm:text-right">
             <span className="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-black text-[10px] uppercase tracking-wider border border-emerald-400/30">
-              Tax Invoice / Bill of Supply
+              {invoice.merchant.gstin?.trim() ? "Tax Invoice" : "Invoice"}
             </span>
             <div className="mt-2 text-white">
               <span className="text-xs text-emerald-200/80 block">Invoice Number</span>
@@ -201,12 +201,14 @@ export function InvoiceView({ invoice }: InvoiceViewProps) {
               PAID ({invoice.financials.paymentMethod})
             </span>
           </div>
-          <div>
-            <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold block">Merchant GSTIN</span>
-            <span className="font-mono font-bold text-slate-800">
-              {invoice.merchant.gstin || "Exempt / Unregistered"}
-            </span>
-          </div>
+          {invoice.merchant.gstin?.trim() ? (
+            <div>
+              <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold block">Merchant GSTIN</span>
+              <span className="font-mono font-bold text-slate-800">
+                {invoice.merchant.gstin.trim()}
+              </span>
+            </div>
+          ) : null}
         </div>
 
         {/* Customer Info */}

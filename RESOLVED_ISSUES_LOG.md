@@ -3,6 +3,35 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [05 Nov 2026] Feature & Architecture: Dynamic Tax-Invoice/Invoice Layout, Photo-to-Live-Menu AI Ingestion, Free UPI PG & GBP Enterprise Quota Engine
+- **Symptom**:
+  1. Billing invoices lacked conditional GST naming logic (merchants without GSTIN displayed "Tax Invoice" instead of "Invoice", or had blank placeholders), and customer WhatsApp bills lacked structured item details, permanent PDF download links, loyalty reward blocks, and editable merchant thank-you notes.
+  2. PDF 1.4 invoices contained accidental loyalty text in simulated layouts which should be strictly isolated to WhatsApp.
+  3. Merchants lacked an AI vision ingestion mechanism to convert physical printed menu cards into a live Zomato-style catalog, and mobile online ordering lacked zero-commission Indian UPI payment gateway integration (COD only).
+  4. Google Business Profile reviews lacked verified customer photo bonus bifurcations (1 stamp for text vs 3 stamps for photo) and automated live post publishing via official 300 QPM allowlisted APIs.
+- **Root Cause**:
+  1. `invoice-pdf-generator.ts` and `create-invoice/route.ts` hardcoded the header "TAX INVOICE" without checking `data.gstin` presence.
+  2. The online menu system lacked an image ingestion endpoint with Gemini Vision AI, and `menu-view.tsx` lacked NPCI UPI deep-linking protocols (`upi://pay`).
+  3. `record-google-post/route.ts` previously had a blanket grace period active during Google API verification, awarding photo bonus without checking user uploads.
+- **Resolution**:
+  1. **Dynamic Tax-Invoice vs Invoice Engine (`src/lib/invoice-pdf-generator.ts` & `src/components/invoice/invoice-view.tsx`)**:
+     - Automatically renders "TAX INVOICE" when merchant GSTIN is present; switches to "INVOICE" with zero blank space when GSTIN is omitted.
+     - Strict isolation: zero loyalty text in PDF documents.
+     - Enhanced formatted WhatsApp bill layout with logo preview, contact, itemized breakdown, taxable amounts, GST split, loyalty balance updates (if active), permanent web PDF download link, terms & conditions, and customizable thank-you message (`src/app/api/billing/create-invoice/route.ts`).
+  2. **Merchant Billing Customization (`src/app/api/billing/settings/route.ts` & `src/components/itemized-billing-settings-card.tsx`)**:
+     - Added configurable `terms` and `thankYouMessage` settings saved in `MERCHANT_BILLING_SETTINGS_{merchantId}`.
+  3. **Photo-to-Live-Menu AI Vision Ingest (`src/app/api/menu/extract-from-image/route.ts` & `src/app/dashboard/menu/page.tsx`)**:
+     - Added Gemini 1.5 Flash Vision ingestion endpoint to extract categories, items, weights, and prices from physical menu card photos.
+     - Added interactive modal in `/dashboard/menu` with live scanning, preview table, append/replace mode, and 1-click import.
+  4. **Free UPI Payment Gateway (`src/lib/upi-gateway.ts` & `src/components/menu-view.tsx`)**:
+     - Implemented 100% free NPCI standard UPI deep-link URI generator (`upi://pay?pa=...`) and dynamic 280x280 QR code generator with 0% gateway commission.
+     - Added COD vs Instant UPI selector on Zomato-style checkout sheet.
+  5. **Operational GBP AutoReply, Photo Verification & Post Publishing (`src/app/api/reviews/record-google-post/route.ts` & `src/lib/gbp-post-generator.ts`)**:
+     - Deactivated blanket grace period: reviews without photo receive 1 stamp; reviews with photo receive 1 + 2 = 3 stamps.
+     - Added `publishGbpPostToGoogle` to publish approved weekly posts directly to Google Business Profile API under approved project `391546314644` (300 QPM).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [05 Nov 2026] Feature & UX: 1-Click Excel/CSV Bulk Menu Importer with Weight Variation Auto-Naming & Instant Starter Template
 - **Symptom**: Merchants with large catalogs (e.g. bakeries with 50-200 cakes/pastries, restaurants with 100+ dishes, retail stores with 500+ items) faced high onboarding friction and dropped off because the system only permitted adding items one-by-one through a manual form.
 - **Root Cause**: The Online Menu system lacked bulk ingestion endpoints and client parsing interfaces to accept spreadsheets, requiring repetitive manual entry for each weight variation (e.g. 250g, 500g, 1kg).

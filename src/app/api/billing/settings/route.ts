@@ -10,6 +10,7 @@ export interface BillingSettings {
   invoicePrefix: string
   upiId: string
   terms: string
+  thankYouMessage: string
 }
 
 const DEFAULT_SETTINGS: BillingSettings = {
@@ -20,6 +21,7 @@ const DEFAULT_SETTINGS: BillingSettings = {
   invoicePrefix: "INV-",
   upiId: "",
   terms: "Thank you for shopping with us! Goods once sold will not be returned.",
+  thankYouMessage: "🙏 Thank you for your visit! Please visit again.",
 }
 
 async function resolveMerchantId(req: NextRequest): Promise<string | null> {
@@ -80,6 +82,7 @@ export async function POST(req: NextRequest) {
       invoicePrefix: body.invoicePrefix !== undefined ? String(body.invoicePrefix).trim().toUpperCase() : existing.invoicePrefix,
       upiId: body.upiId !== undefined ? String(body.upiId).trim() : existing.upiId,
       terms: body.terms !== undefined ? String(body.terms).trim() : existing.terms,
+      thankYouMessage: body.thankYouMessage !== undefined ? String(body.thankYouMessage).trim() : (existing.thankYouMessage || DEFAULT_SETTINGS.thankYouMessage),
     }
 
     await db.systemContent.upsert({

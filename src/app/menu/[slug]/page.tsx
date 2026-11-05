@@ -110,6 +110,22 @@ export default async function PublicMenuPage({ params }: PageProps) {
     items: catItems,
   }))
 
+  // Resolve UPI ID from merchant billing settings or phone
+  const billingSettingsRecord = await db.systemContent.findUnique({
+    where: { key: `MERCHANT_BILLING_SETTINGS_${merchant.id}` }
+  })
+  let upiId: string | null = null
+  if (billingSettingsRecord?.value) {
+    try {
+      const parsed = JSON.parse(billingSettingsRecord.value)
+      upiId = parsed.upiId || null
+    } catch (_) {}
+  }
+  if (!upiId && merchant.whatsappPhone) {
+    const rawDigits = merchant.whatsappPhone.replace(/\D/g, "")
+    upiId = rawDigits ? `${rawDigits.slice(-10)}@upi` : null
+  }
+
   const merchantData = {
     id: merchant.id,
     name: merchant.name,
@@ -121,6 +137,7 @@ export default async function PublicMenuPage({ params }: PageProps) {
     rating: card?.googleRating || 4.8,
     reviewsCount: card?.googleReviewsCnt || 120,
     slug: card?.slug || cleanSlug,
+    upiId: upiId || "paytmqr2810050501011@paytm",
   }
 
   return (

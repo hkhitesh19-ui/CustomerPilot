@@ -16,6 +16,7 @@ interface BillingSettings {
   gstin: string
   invoicePrefix: string
   terms: string
+  thankYouMessage?: string
 }
 
 export function ItemizedBillingSettingsCard({ merchantId }: { merchantId: string }) {
@@ -29,6 +30,7 @@ export function ItemizedBillingSettingsCard({ merchantId }: { merchantId: string
     gstin: "",
     invoicePrefix: "INV-",
     terms: "Thank you for shopping with us! Goods once sold will not be returned.",
+    thankYouMessage: "🙏 Thank you for your visit! Please visit again.",
   })
 
   useEffect(() => {
@@ -216,7 +218,7 @@ export function ItemizedBillingSettingsCard({ merchantId }: { merchantId: string
             {/* Invoice Terms & Conditions */}
             <div className="sm:col-span-3 space-y-1.5">
               <Label htmlFor="termsInput" className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                Invoice Footer Terms &amp; Policy
+                Invoice Footer Terms &amp; Policy (Terms &amp; Conditions)
               </Label>
               <Input
                 id="termsInput"
@@ -225,6 +227,23 @@ export function ItemizedBillingSettingsCard({ merchantId }: { merchantId: string
                 onChange={(e) => setSettings(prev => ({ ...prev, terms: e.target.value }))}
                 className="h-10 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
               />
+            </div>
+
+            {/* Custom Thank You Message */}
+            <div className="sm:col-span-3 space-y-1.5">
+              <Label htmlFor="thanksInput" className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                WhatsApp Message Custom Thank You Note
+              </Label>
+              <Input
+                id="thanksInput"
+                placeholder="e.g. 🙏 Thank you for your visit! Please visit again."
+                value={settings.thankYouMessage || ''}
+                onChange={(e) => setSettings(prev => ({ ...prev, thankYouMessage: e.target.value }))}
+                className="h-10 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+              />
+              <p className="text-[11px] text-slate-400 mt-1">
+                💡 <strong>Auto-Title Rule:</strong> Agar GSTIN entered hai toh bill ka title automatically <strong>Tax Invoice</strong> hoga. Agar GSTIN khali hai toh automatically <strong>Invoice</strong> hoga.
+              </p>
             </div>
           </div>
         )}
