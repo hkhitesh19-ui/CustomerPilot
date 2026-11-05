@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 1c789e5
-Full Commit Hash  : 1c789e5fc6ad0318b30ef6620228b07b0b949a39
-Target Fix Commit : 1c789e5fc6ad0318b30ef6620228b07b0b949a39
+Active Git Commit : 4e416e2
+Full Commit Hash  : 4e416e2be00793132e4d0d3d52485e9a0fba6868
+Target Fix Commit : 4e416e2be00793132e4d0d3d52485e9a0fba6868
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 05 Nov 2026, 01:18 AM IST
+Deployment Date   : 05 Nov 2026, 09:23 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(menu): 1-click excel/csv bulk menu importer with variation auto-naming and instant starter template
+Commit Title      : feat(billing-menu-gbp): dynamic invoice format, photo-to-menu ai vision, free upi pg, and gbp photo review bifurcations
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -23,9 +23,8 @@ Verification Checklist:
 ----------------------------------------------------------
 [x] TypeScript Strict & Ratchet Audit: PASSED (Baseline 36)
 [x] Adversarial Red-Team Gates (1-6): PASSED
-[x] 1-Click Excel/CSV Bulk Menu Upload: DEPLOYED & VERIFIED
-[x] Starter Template Download Endpoint: LIVE (HTTP 200)
-[x] Dynamic Variation Auto-Naming: VERIFIED
-[x] Gated Review-Only Loyalty Stamps: DEPLOYED
-[x] Settings Tab Hierarchy Reorder: DEPLOYED
-[x] High-Contrast Dark Red SignOut: DEPLOYED
+[x] Dynamic Tax-Invoice/Invoice Header: VERIFIED (GSTIN check + 0 empty space)
+[x] Zero-Dependency PDF 1.4: VERIFIED (0 loyalty text leaks)
+[x] Photo-to-Live-Menu AI Vision Ingestion: DEPLOYED & LIVE
+[x] Free UPI Payment Gateway (0% Fee): DEPLOYED & LIVE (NPCI intent + QR)
+[x] GBP 300 QPM Enterprise Quota & Photo Split Rewards: ACTIVE
