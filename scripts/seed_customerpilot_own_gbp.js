@@ -88,6 +88,18 @@ async function seedCustomerPilot() {
   const placeId = "ChIJCustomerPilotVadodaraHQ";
   const reviewLink = `https://search.google.com/local/writereview?placeid=${placeId}`;
 
+  // Ensure official WhatsApp phone is freed from any previous test merchants
+  const existingPhoneMerchant = await prisma.merchant.findUnique({
+    where: { whatsappPhone: "919033304707" },
+  });
+  if (existingPhoneMerchant && existingPhoneMerchant.id !== merchantId) {
+    console.log(`ℹ️ Freeing WhatsApp phone from previous test record ${existingPhoneMerchant.id} (${existingPhoneMerchant.name})...`);
+    await prisma.merchant.update({
+      where: { id: existingPhoneMerchant.id },
+      data: { whatsappPhone: null },
+    });
+  }
+
   // Upsert Merchant
   const merchant = await prisma.merchant.upsert({
     where: { id: merchantId },
