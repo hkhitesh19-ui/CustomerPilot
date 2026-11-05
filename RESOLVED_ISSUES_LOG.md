@@ -3,6 +3,34 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [06 Nov 2026] Feature & Optimization: Merchant "Cake Connection" Track B GBP Optimization Suite (Phases 1-5)
+- **Symptom**: Flagship artisanal bakery merchant "Cake Connection" (`cmtymavfx0002kx008lbfvp57`, Shop No. 7, Eva The Mall, Manjalpur, Vadodara) had strong baseline reviews (688 reviews, 4.6★) but was unconfigured in Track B (`gbpServiceTrack: "NONE"`), lacked an active Google Connection record, had 0 GBP checklist items in the database, had no pre-approved weekly posts, and lacked automated bakery-specific review flywheel triggers and verified ground-truth assertion guards.
+- **Root Cause**:
+  1. Cake Connection lacked an automated seeding and maintenance script to initialize Track B existing-shop accelerator in CustomerPilot's database.
+  2. `MerchantGoogleConnection` was missing Place ID `ChIJCakeConnectionVadodaraEva`.
+  3. No pre-generated weekly 3-post schedule (Tuesday Belgian Truffle Spotlight, Thursday Social Proof Sneha Patel review, Saturday Weekend VIP 2x Stamps Offer) was active in `prisma.gbpPost`.
+  4. Lacked a dedicated test suite and ground-truth verification guard to prevent placeholder/dummy data regressions for Cake Connection.
+- **Resolution**:
+  1. **Automated Seeding Script (`scripts/seed_cake_connection_gbp.js`)**:
+     - Updated merchant `cmtymavfx0002kx008lbfvp57` to Track B (`TRACK_B_EXISTING`), verified status (`VERIFIED`), baseline rating 4.6★ with 688 reviews, and enabled `GBP_OPERATIONS` module.
+     - Upserted `MerchantGoogleConnection` with Place ID `ChIJCakeConnectionVadodaraEva`, address `Shop No. 7, Ground Floor, Eva The Mall, Manjalpur, Vadodara`, and review link `https://maps.google.com/?cid=1264426543950275899`.
+     - Seeded 16 Track B SOP Checklist Items with Phase 1 tasks (Category, Products, Mini-Website, Attributes) marked completed.
+     - Seeded 3 pre-approved advance weekly posts in `prisma.gbpPost` with status `APPROVED`.
+  2. **Keyword & Dynamic Review Integration (`src/lib/keyword-matrix.ts` & `src/lib/dynamic-review-engine.ts`)**:
+     - Verified `bakery` preset with 50 allowed cake/dessert entities, 6 AEO answers, and 45 blacklisted non-bakery terms.
+     - Verified `getDynamicFallbackReview("bakery", "Belgian Chocolate Truffle Cake")` returns authentic customer review drafts.
+  3. **Weekly 3-Post Engine & Dynamic Cards (`src/lib/gbp-post-generator.ts` & `src/app/api/gbp/posts/card/route.ts`)**:
+     - Tuesday: Product Spotlight (`Belgian Chocolate Truffle Cake` @ ₹650) with direct WhatsApp CTA.
+     - Thursday: Social Proof (`Sneha Patel 5-Star Birthday Review`) with verified card overlay.
+     - Saturday: Weekend VIP Offer (`WEEKEND 2X STAMPS DEAL`, Coupon `CAKEVIP10`).
+  4. **Automated Testing & Ground-Truth Verification**:
+     - Created `tests/cake-connection-gbp.test.ts` (4/4 tests passed in Vitest).
+     - Created `scripts/verify_cake_connection_ground_truth.js` (Zero dummy data, real store name, real address, real phone `917203824012`, real baseline).
+     - Executed Master Adversarial Red-Team Guard (`scripts/run_adversarial_guard.js`) with all 6 gates passing cleanly.
+- **Status**: ✅ Resolved and Verified.
+
+
+---
 ## [06 Nov 2026] Feature & Architecture: CustomerPilot Own GBP Optimization Module & B2B SaaS Dogfooding Suite (Phases 1-5)
 - **Symptom**: CustomerPilot had an elite GBP Rank-1 Engine and 3-Post weekly generator, but all categories, keyword presets, post captions, and review drafts were hardcoded exclusively for B2C retail merchants (bakeries, salons, cafes, restaurants). When optimizing CustomerPilot's own Google Business Profile (as a B2B SaaS / tech agency), the system had no software company presets, suffered from cross-industry hallucinations (cakes/haircuts), lacked an internal merchant entity, had no mechanism to collect reviews from onboarded store owners, and had no SuperAdmin Dogfooding command center.
 - **Root Cause**:
