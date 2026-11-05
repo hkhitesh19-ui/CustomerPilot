@@ -308,6 +308,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   ├── (auth)/                    # Authentication Route Group (login, register, forgot-password)
 │   │   ├── api/                       # Backend API Endpoint Routes (JSON Services)
 │   │   │   ├── admin/                     # SuperAdmin Management, Impersonate & Sync-VPS APIs
+│   │   │   │   ├── gbp/self-operations/route.ts # CustomerPilot Own GBP Operations & Post Queue API
 │   │   │   │   ├── impersonate/route.ts   # Impersonation Token & Session Issuer
 │   │   │   │   ├── merchants/route.ts     # Merchant Fleet List & Profile Editor
 │   │   │   │   ├── digital-cards/route.ts # SuperAdmin On-Behalf Digital Card Management API
@@ -433,6 +434,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   ├── pricing/                   # Pricing Studio v4 Architecture
 │   │   │   └── pricing-studio.tsx     # Pricing Studio v4 (Interactive Bundle Builder, Tenure Comparison & Admin Edit Mode)
 │   │   └── super-admin/               # SuperAdmin Management UI Panels
+│   │       ├── customerpilot-self-gbp-modal.tsx # SuperAdmin CustomerPilot Own GBP & Dogfooding Modal
 │   │       ├── whatsapp-fleet-monitor.tsx # SuperAdmin WhatsApp Disconnection & Targeted Alert Fleet Dashboard
 │   │       ├── gbp-operations-dashboard.tsx # GBP Dual-Track Operations Command Center
 │   │       ├── merchant-gbp-post-queue.tsx # 1-Click Weekly Content Queue & Caption Copy Tool
@@ -446,7 +448,8 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   └── services/                  # CommunicationService (Dispatch & Templates)
 │   │
 │   └── lib/                           # Core Backend Business Logic & Engines
-│       ├── keyword-matrix.ts          # 10-Category Master Keyword Matrix, SEO/AEO/GEO Presets & Negative Guardrails
+│       ├── gbp-review-flywheel.ts     # B2B Merchant-to-CustomerPilot Review Invitation Generator
+│       ├── keyword-matrix.ts          # 11-Category Master Keyword Matrix (Retail + saas_agency Preset) & Negative Guardrails
 │       ├── gbp-rank1-agent.ts         # Autonomous GBP Rank-1 Optimization Engine (Decision Matrix & Gemini/Local Fallback)
 │       ├── gbp-checklist-seed.ts      # Track A & B Operational SOP Checklists & Guardrail Templates
 │       ├── gbp-post-generator.ts      # Weekly 3-Post Engine (Product Spotlight, Social Proof, Weekend Offer)
@@ -470,7 +473,12 @@ F:\CustomerPilot_ByGLM_July2026
 │   ├── merchant-journey.spec.ts       # Full Merchant User Journey, Auth & Marketing Pages E2E Spec
 │   └── allowlist-contract.spec.ts     # Dedicated Strict Allowlist Contract Tests (Proving Every Entry /api/auth/me, /api/auth/logout, /favicon.ico is Exercised & Permitted)
 │
+├── tests/                             # Unit & Deterministic Vitest Test Suites
+│   └── customerpilot-self-gbp.test.ts # Deterministic Vitest Suite for CustomerPilot Self-GBP Module
+│
 ├── scripts/                           # Production Health, Seed & Playwright Verification Scripts
+│   ├── seed_customerpilot_own_gbp.js  # Day-0 Seed Script for CustomerPilot Internal GBP Profile
+│   ├── verify_self_gbp_ground_truth.js # Deterministic Ground-Truth Assertion Suite for Self-GBP
 │   ├── run_autonomous_qa.js           # Deterministic Autonomous QA & Self-Debug Runner with Error Traps
 │   ├── verify_trap_mutation.js        # Hardened Error Trap Mutation Proof & Failure Verification Script (6 Vectors)
 │   ├── test_gbp_rank1_agent.js        # Deterministic Test Suite for GBP Rank-1 Engine (Track A/B, Guardrails, API)
@@ -501,6 +509,7 @@ F:\CustomerPilot_ByGLM_July2026
 | **Autonomous QA & Self-Debug Testing Engine** | scripts/run_autonomous_qa.js<br/>e2e/gbp-ranking-audit.spec.ts | e2e/fixtures/hardened-test.ts<br/>playwright.config.ts | Deterministic end-to-end testing and runtime error trapping framework. Listens to browser console errors, page crashes, and unwhitelisted 4xx/5xx network responses during user interaction flows. Writes failure traces to scratch/qa_debug_trace.json to empower Antigravity to autonomously debug and fix UI bugs before presenting results to the Admin. |
 | **Google Business Profile (GBP) Dedicated SEO/AEO/GEO Landing Page & Free Audit Tool** | `src/app/google-business-profile-ranking/page.tsx`<br/>`src/app/gbp-audit/page.tsx` | `src/components/gbp-ranking-audit-client.tsx`<br/>`src/app/api/gbp/audit/route.ts`<br/>`scripts/verify_gbp_landing_page.js` | Dedicated high-converting public landing page and interactive diagnostic tool. Allows merchants to run a free 100-point self-audit on their GBP listing, assesses Google Sandbox ban risk, detects competitor keyword spam with physical signboard redressal opportunities, benchmarks against local top 3 competitors, and presents Track A ("New Business Launchpad") and Track B ("Top 3 Rank Accelerator") with the 5 zero-ban operational guardrails. |
 | **Smart AI Google Review & Grounding Engine** | src/app/review/page.tsx<br/>src/app/dashboard/settings/page.tsx | src/lib/keyword-matrix.ts<br/>src/lib/dynamic-review-engine.ts<br/>SMART_AI_GOOGLE_REVIEW_ENGINE.md | Multi-tenant anti-hallucination Google Review engine. Enforces 50 Allowed Whitelist and 50 Strictly Banned Blacklist rules, AEO voice solutions, and GEO context. Guarantees 0% alien product generation for specialized micro-catalog stores (e.g. Sandwich-only or 4-item burger/pizza/cold drink shops). |
+| **CustomerPilot Own GBP Optimization & Dogfooding Suite** | `src/app/api/admin/gbp/self-operations/route.ts`<br/>`src/components/super-admin/customerpilot-self-gbp-modal.tsx` | `src/lib/keyword-matrix.ts` (saas_agency)<br/>`src/lib/gbp-review-flywheel.ts`<br/>`src/lib/gbp-post-generator.ts` | Complete B2B SaaS Google Business Profile optimization engine for CustomerPilot itself. Features 50 allowed B2B SEO entities, 52 blacklist guards, internal merchant entity (customerpilot-hq) with Place ID ChIJCustomerPilotVadodaraHQ, automated merchant review flywheel (milestone triggers), and weekly 3-post engine (Tuesday Tech Spotlight, Thursday Case Study, Saturday Founding Offer). |
 | **CustomerPilot Autonomous GBP Rank-1 Engine** | `src/app/api/gbp/agent/route.ts`<br/>`.agent/agents/gbp-optimization-agent.md` | `src/lib/gbp-rank1-agent.ts`<br/>`scripts/test_gbp_rank1_agent.js` | Elite deterministic Local SEO, AEO, and GEO optimization AI engine for Indian SMBs to move from Rank #10-#50 to Google Maps Local Top 3 in 30 days. Executes 7-Pillar Algorithmic Weightage Matrix (Category alignment, WhatsApp photo review velocity, legitimate DBA signboard verification, triple LocalBusiness+FAQPage+OfferCatalog schema, weekend CTR map booster, competitor redressal purge, and 15 AEO seed Q&As) while enforcing 4 strict Google Policy Red Lines with Gemini AI & 100% deterministic local fallback. |
 | **Google Business Profile (GBP) Dual-Track Operations Engine** | `src/app/dashboard/gbp-status/page.tsx`<br/>`src/components/super-admin/gbp-operations-dashboard.tsx` | `src/lib/gbp-checklist-seed.ts`<br/>`src/app/api/gbp/assign-track/route.ts`<br/>`src/app/api/gbp/checklist/complete/route.ts`<br/>`src/app/api/gbp/map-traffic-broadcast/route.ts`<br/>`src/app/api/gbp/monthly-report/route.ts` | Complete non-technical operations framework and software automation for Track A ("New Business Launchpad", 0 to Top 3 in 60 days, 30-day sandbox review velocity throttle) and Track B ("Top 3 Rank Accelerator", #10-#50 to Top 3, 90-min surgery checklist, WhatsApp honest photo review flywheel, and weekend map booster). Includes 5 operational guardrails: 1) Zero-Ban honest feedback without review gating, 2) ₹500 physical sub-board upgrade before name edits, 3) Redressal complaint spam purge form, 4) Outside-GBP GEO article mentions for ChatGPT/Gemini, and 5) Hidden attributes & WhatsApp order links. |
 | **Universal Master QR Loyalty Standee System & Print Engine** | `src/app/api/qr/standee/route.ts`<br/>`src/components/qr-generator.tsx` | `public/standees/standee_universal_base.jpg`<br/>`src/lib/branded-qr.ts`<br/>`scripts/verify_master_standee_generator.js` | Locks the Master Tabletop Standee template across CustomerPilot. Renders 3D "SCAN to EARN" headline, gold satin "CONFIRM REWARDS", 3 benefit pills (Exclusive Offers, Loyalty Rewards, Membership Discount), VIP Member footer bar, and CustomerPilot tagline ("Turns Every Walkins into LifeTime Customers"). Supports dynamic merchant logo with Times New Roman serif fallback, vector A4/A5 acrylic print engine, and instant high-res JPG poster downloads. |

@@ -367,6 +367,56 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
       "Engine mechanical overhaul", "Transmission repair", "Denting and body painting", "Wheel alignment and balancing", "Tyre puncture repair",
       "Car audio music system installation", "Doorstep home wash", "Bakery", "Food", "Chai", "Salon", "Clothes", "Medicines"
     ]
+  },
+
+  saas_agency: {
+    id: "saas_agency",
+    label: "Software Company & Digital Marketing Agency (CustomerPilot)",
+    gbpCategory: "Software Company / Marketing Agency",
+    audiencePersona: "All_Neutral",
+    serviceMode: "SaaS Software + Remote & On-Site Agency Operations",
+    seoEntities: [
+      "WhatsApp Digital Loyalty Card Software", "Smart AI Google Review Standee", "1-Click AI Owner Review Auto-Reply",
+      "Google Business Profile Optimization Engine", "Local SEO Google Maps Rank Booster", "Acrylic Countertop QR Standee",
+      "Smart Digital NFC Business Card", "Customer Retention Platform for Retailers", "Zomato Alternative Zero-Commission Ordering",
+      "Automated Customer Winback WhatsApp Bot", "5-Star Review Velocity Booster", "Tabletop Standee for Billing Counter",
+      "Paper Punch Card Digital Replacement", "Bakery Customer Retention Software", "Salon Appointment and Review Automation",
+      "Restaurant VIP Loyalty Wallet", "Retail Repeat Footfall Engine", "Multi-Tenant Review Auto-Responder",
+      "Google Maps Top 3 Pack Accelerator", "Organic Review Volume Booster", "Anti-Suspension GBP Compliance",
+      "Verified Physical Signboard DBA Strategy", "Hyper-Local Triple Schema Integration", "B2B SaaS Growth Software",
+      "Local Marketing Tech Platform", "Meta Cloud API WhatsApp Partner", "Google Cloud Verified Platform",
+      "Zero App Download Loyalty Card", "1-Tap Contact Saving Digital Card", "VIP Customer Wallet Web App",
+      "Instant UPI Zero Commission Payment QR", "Tax Invoice and Thermal Bill Generator", "Menu Bulk Excel CSV Ingestion",
+      "AI Vision Menu Photo to Catalog", "Automated Birthday Anniversary Offers", "SuperAdmin Multi-Store Fleet Command",
+      "Local Search Engine Optimization Agency", "Vadodara SaaS Software Company", "Indian Retail Digital Automation",
+      "Real-Time WhatsApp Delivery Receipts", "Customer Stamp Card Web App", "Founder Loyalty Growth Bundle",
+      "3-Day Free Trial No Credit Card", "Dedicated Agency Manager Support", "Transparent SaaS Subscription Pricing",
+      "Enterprise Quota 300 QPM Google Access", "High Converting Retail Signage", "Competitor Keyword Redressal Service",
+      "Google Local Pack Specialist", "Customer Retention ROI Calculator"
+    ],
+    aeoAnswers: [
+      "CustomerPilot helps retail merchants double repeat footfall and 10x Google reviews",
+      "Zero app download required — works seamlessly inside WhatsApp and mobile browsers",
+      "Official Google Business Profile API compliance with zero account suspension risk",
+      "Complete counter kit with custom branded acrylic tabletop QR standee delivered",
+      "3-day full access free trial with instant 2-minute WhatsApp onboarding",
+      "Automated AI owner auto-replies published directly to Google Maps"
+    ],
+    geoContext: [
+      "Top rated software company in Vadodara Gujarat",
+      "Trusted by leading bakeries, salons, cafes and retailers across India",
+      "Proven 800%+ review growth case studies (Cake Connection, SSV Saloon)",
+      "High converting retail customer retention technology",
+      "Reliable local tech support team in Gujarat"
+    ],
+    blacklist: [
+      "Cake", "Pastry", "Birthday cake", "Truffle", "Bread", "Puff", "Cookies", "Brownie",
+      "Haircut", "Beard trim", "Fade cut", "Shave", "Bridal facial", "Hydra facial", "Waxing", "Threading", "Saree draping",
+      "Dal makhani", "Paneer", "Butter naan", "Biryani", "Chicken", "Mutton", "Egg", "Thali", "Dosa", "Sambar",
+      "Coffee", "Tea", "Cappuccino", "Burger", "Fries", "Pizza", "Alcohol", "Beer", "Wine",
+      "Car foam wash", "Ceramic coating", "Tyre puncture", "Engine repair", "Mechanic", "Diesel", "Petrol",
+      "Medicines", "Pharmacy", "Doctor", "Clinic", "Hospital", "Kurtis", "Lehenga", "Shoes", "Jewelry"
+    ]
   }
 };
 
@@ -375,6 +425,21 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
  */
 export function getKeywordPresetForCategory(category?: string | null, merchantName?: string | null): CategoryPreset {
   const c = ((category || "") + " " + (merchantName || "")).toLowerCase();
+
+  // SaaS / Software / Marketing Agency / Tech / CustomerPilot takes high priority
+  if (
+    c.includes("saas") ||
+    c.includes("software") ||
+    c.includes("customerpilot") ||
+    c.includes("customer pilot") ||
+    c.includes("marketing agency") ||
+    c.includes("digital agency") ||
+    c.includes("it service") ||
+    c.includes("b2b") ||
+    c.includes("tech company")
+  ) {
+    return MASTER_KEYWORD_PRESETS.saas_agency;
+  }
 
   // Beauty Parlour & Ladies Salon takes precedence if female/beauty keywords appear
   if (

@@ -3,6 +3,35 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [06 Nov 2026] Feature & Architecture: CustomerPilot Own GBP Optimization Module & B2B SaaS Dogfooding Suite (Phases 1-5)
+- **Symptom**: CustomerPilot had an elite GBP Rank-1 Engine and 3-Post weekly generator, but all categories, keyword presets, post captions, and review drafts were hardcoded exclusively for B2C retail merchants (bakeries, salons, cafes, restaurants). When optimizing CustomerPilot's own Google Business Profile (as a B2B SaaS / tech agency), the system had no software company presets, suffered from cross-industry hallucinations (cakes/haircuts), lacked an internal merchant entity, had no mechanism to collect reviews from onboarded store owners, and had no SuperAdmin Dogfooding command center.
+- **Root Cause**:
+  1. `src/lib/keyword-matrix.ts` only supported 10 retail B2C categories and defaulted tech queries to `restaurant`.
+  2. Database lacked a master internal merchant entity for CustomerPilot HQ with Place ID `ChIJCustomerPilotVadodaraHQ` and Track B Accelerator configuration.
+  3. `src/lib/dynamic-review-engine.ts` lacked B2B merchant-to-SaaS review drafts and persona rules.
+  4. `src/lib/gbp-post-generator.ts` and card SVG routes only generated retail food/salon captions and lacked software feature spotlights, case studies, and founding merchant offers.
+  5. SuperAdmin lacked a dedicated Dogfooding interface to monitor CustomerPilot's own profile and trigger B2B review invitations.
+- **Resolution**:
+  1. **B2B SaaS / Agency Keyword & Grounding Matrix (`src/lib/keyword-matrix.ts`)**:
+     - Added `saas_agency` preset with 50 specific Allowed SEO entities (WhatsApp Loyalty Software, Smart AI Review Standee, 1-Click AutoReply, Top 3 Pack Accelerator), 10+ AEO voice search answers, GEO context, and 52 strictly banned blacklist guardrails.
+     - Updated `getKeywordPresetForCategory` to resolve `saas_agency` for all software, SaaS, marketing agency, tech, and CustomerPilot queries.
+  2. **Internal Entity Seeding & Place ID Linking (`scripts/seed_customerpilot_own_gbp.js`)**:
+     - Seeded `customerpilot-hq` in `db.merchant` and `db.merchantGoogleConnection` with Place ID `ChIJCustomerPilotVadodaraHQ`, category `Software Company`, rating 5.0★, 48 reviews, Track B Accelerator, and Track B SOP checklist.
+  3. **B2B Review Collector & Merchant Review Flywheel (`src/lib/dynamic-review-engine.ts` & `src/lib/gbp-review-flywheel.ts`)**:
+     - Added `SAAS_AGENCY_REVIEWS` pool, B2B merchant persona directives ("Hamare store ke liye CustomerPilot lagaya"), and automated WhatsApp invitation generator for merchants reaching retention milestones (e.g. Cake Connection).
+  4. **Weekly B2B 3-Post Engine & Branded Card Generator (`src/lib/gbp-post-generator.ts` & `src/app/api/gbp/posts/card/route.ts`)**:
+     - Added `saas_agency` and `software company` to `INDUSTRY_PRODUCT_PRESETS`.
+     - Built B2B Tuesday Tech Spotlight, Thursday Verified Merchant Case Study (+895% reviews), and Saturday Founding Merchant Weekend Deal (`FOUNDER50`).
+     - Enhanced SVG card route with dynamic CustomerPilot tech badge and cyan-indigo styling.
+  5. **SuperAdmin Self-GBP Command Hub (`src/components/super-admin/customerpilot-self-gbp-modal.tsx`, `src/app/api/admin/gbp/self-operations/route.ts`, & `src/components/super-admin/gbp-operations-dashboard.tsx`)**:
+     - Built dedicated SuperAdmin Dogfooding modal with tabs for Merchant Review Flywheel, Weekly 3-Post Engine, and SOP Checklist.
+     - Added `🚀 CustomerPilot Own GBP Hub` action button in SuperAdmin GBP Operations.
+  6. **Automated Verification & Zero-Regression Proof**:
+     - Vitest suite `tests/customerpilot-self-gbp.test.ts` passed 4/4 tests.
+     - Master Adversarial Guard (`scripts/run_adversarial_guard.js`) passed all 6 hard gates (0 TypeScript ratchet regressions, 0 secret leaks, 12 boundary tests, 0 SQLite tracked files).
+     - Ground-truth assertion script (`scripts/verify_self_gbp_ground_truth.js`) passed 5/5 assertions with Exit Code 0.
+- **Status**: ✅ Resolved and Verified.
+---
 ## [05 Nov 2026] Feature & Architecture: Dynamic Tax-Invoice/Invoice Layout, Photo-to-Live-Menu AI Ingestion, Free UPI PG & GBP Enterprise Quota Engine
 - **Symptom**:
   1. Billing invoices lacked conditional GST naming logic (merchants without GSTIN displayed "Tax Invoice" instead of "Invoice", or had blank placeholders), and customer WhatsApp bills lacked structured item details, permanent PDF download links, loyalty reward blocks, and editable merchant thank-you notes.

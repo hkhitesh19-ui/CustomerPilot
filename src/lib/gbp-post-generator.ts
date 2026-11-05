@@ -37,6 +37,20 @@ const INDUSTRY_PRODUCT_PRESETS: Record<string, Array<{ name: string; tag: string
     { name: "Gourmet Paneer Tikka Panini", tag: "Hot & Crispy", price: "₹220" },
     { name: "Classic Belgian Chocolate Shake", tag: "Thick Shake", price: "₹190" },
   ],
+  saas_agency: [
+    { name: "Smart AI Google Review Standee", tag: "Counter Hardware Best-Seller", price: "Free with 1Y Plan" },
+    { name: "WhatsApp Digital Loyalty Stamp Card System", tag: "Repeat Footfall Booster", price: "₹799/mo" },
+    { name: "1-Click AI Owner Review Auto-Reply Engine", tag: "Google Top 3 Pack Accelerator", price: "Included in All Plans" },
+    { name: "Smart Digital NFC Business Card", tag: "1-Tap Contact Saving", price: "₹499/mo" },
+    { name: "CustomerPilot Complete All-in-One Retention Stack", tag: "Flagship Growth Suite", price: "₹1,499/mo" },
+  ],
+  "software company": [
+    { name: "Smart AI Google Review Standee", tag: "Counter Hardware Best-Seller", price: "Free with 1Y Plan" },
+    { name: "WhatsApp Digital Loyalty Stamp Card System", tag: "Repeat Footfall Booster", price: "₹799/mo" },
+    { name: "1-Click AI Owner Review Auto-Reply Engine", tag: "Google Top 3 Pack Accelerator", price: "Included in All Plans" },
+    { name: "Smart Digital NFC Business Card", tag: "1-Tap Contact Saving", price: "₹499/mo" },
+    { name: "CustomerPilot Complete All-in-One Retention Stack", tag: "Flagship Growth Suite", price: "₹1,499/mo" },
+  ],
   default: [
     { name: "Signature Special Offering", tag: "Top Recommended", price: "Best Value" },
     { name: "Premium Customer Choice Package", tag: "Customer Favorite", price: "Special Price" },
@@ -125,13 +139,21 @@ export async function buildTuesdayProductPost(merchant: any, date: Date, revisio
   const phone = merchant.whatsappPhone || "";
   const waLink = phone ? `https://wa.me/${phone.replace(/\D/g, '')}?text=Hi%20${encodeURIComponent(storeName)},%20I%20saw%20your%20Google%20Post%20for%20${encodeURIComponent(product.name)}!` : `https://customerpilot.in`;
 
+  const isSaas = categoryKey.includes("saas") || categoryKey.includes("software") || categoryKey.includes("agency") || storeName.toLowerCase().includes("customerpilot");
+
   // Deterministic Local SEO Caption
-  let caption = `Craving fresh, authentic ${product.name} in ${locality}? 🎂✨\n\n` +
-    `At ${storeName}, our ${product.name} is handcrafted fresh daily using premium ingredients. ` +
-    `Whether it's a family celebration, birthday, or a personal treat, we've got you covered!\n\n` +
-    `⭐ ${product.tag} — Available today at ${product.price}\n` +
-    `📍 Visit us at: ${merchant.address || locality}\n` +
-    `📲 Tap below or message us on WhatsApp for fast direct delivery / in-store pickup!`;
+  let caption = isSaas
+    ? `Looking to 10x your authentic Google Reviews & retain repeat customers in ${locality}? 🚀✨\n\n` +
+      `At ${storeName}, our ${product.name} empowers local Indian retail stores to automate 5-star review collection and launch seamless WhatsApp loyalty stamp cards with zero app download.\n\n` +
+      `⭐ ${product.tag} — Available now: ${product.price}\n` +
+      `📍 Vadodara HQ: ${merchant.address || locality}\n` +
+      `📲 Tap below to start your 3-Day Free Trial or book a live 10-minute demo!`
+    : `Craving fresh, authentic ${product.name} in ${locality}? 🎂✨\n\n` +
+      `At ${storeName}, our ${product.name} is handcrafted fresh daily using premium ingredients. ` +
+      `Whether it's a family celebration, birthday, or a personal treat, we've got you covered!\n\n` +
+      `⭐ ${product.tag} — Available today at ${product.price}\n` +
+      `📍 Visit us at: ${merchant.address || locality}\n` +
+      `📲 Tap below or message us on WhatsApp for fast direct delivery / in-store pickup!`;
 
   // Image card URL
   const imageUrl = merchant.coverUrl || `/api/gbp/posts/card?type=product&name=${encodeURIComponent(product.name)}&store=${encodeURIComponent(storeName)}&price=${encodeURIComponent(product.price)}&loc=${encodeURIComponent(locality)}`;
@@ -192,11 +214,19 @@ export async function buildThursdayReviewPost(merchant: any, date: Date, revisio
     // Graceful fallback to authentic preset review
   }
 
-  const caption = `See why ${reviewerName} loved our ${category} in ${locality}! ⭐⭐⭐⭐⭐\n\n` +
-    `"${reviewText}"\n\n` +
-    `Thank you so much for the 5-star love! ❤️ At ${storeName}, giving every customer an exceptional, heartwarming experience is our greatest passion.\n\n` +
-    `📍 Come visit us today at: ${merchant.address || locality}\n` +
-    `🎁 Don't forget to ask for your Loyalty Card on your visit to earn instant rewards!`;
+  const isSaas = category.toLowerCase().includes("saas") || category.toLowerCase().includes("software") || storeName.toLowerCase().includes("customerpilot");
+
+  const caption = isSaas
+    ? `See why retail store owners trust CustomerPilot in ${locality}! ⭐⭐⭐⭐⭐\n\n` +
+      `"${reviewText}"\n\n` +
+      `Thank you to our verified merchant partners for trusting CustomerPilot to double repeat footfall and dominate Google Maps Top 3 pack! ❤️\n\n` +
+      `📍 CustomerPilot Vadodara HQ: ${merchant.address || locality}\n` +
+      `🎁 Tap below to explore verified merchant case studies and start your free trial!`
+    : `See why ${reviewerName} loved our ${category} in ${locality}! ⭐⭐⭐⭐⭐\n\n` +
+      `"${reviewText}"\n\n` +
+      `Thank you so much for the 5-star love! ❤️ At ${storeName}, giving every customer an exceptional, heartwarming experience is our greatest passion.\n\n` +
+      `📍 Come visit us today at: ${merchant.address || locality}\n` +
+      `🎁 Don't forget to ask for your Loyalty Card on your visit to earn instant rewards!`;
 
   const imageUrl = reviewPhotoUrl || merchant.coverUrl || `/api/gbp/posts/card?type=review&store=${encodeURIComponent(storeName)}&author=${encodeURIComponent(reviewerName)}&loc=${encodeURIComponent(locality)}`;
 
@@ -226,11 +256,19 @@ export async function buildSaturdayOfferPost(merchant: any, date: Date, revision
   offerEnd.setDate(offerEnd.getDate() + 1);
   offerEnd.setHours(23, 59, 59, 999);
 
-  const offerPresets = [
-    { code: "WEEKEND2X", title: "Weekend Double Stamp Special", desc: "Earn DOUBLE loyalty stamps on every visit this Saturday & Sunday!" },
-    { code: "WEEKENDVIP", title: "Weekend VIP Reward Upgrade", desc: "Get an extra surprise bonus stamp with every purchase over the weekend!" },
-    { code: "WEEKEND15", title: "Weekend Family Special Combo", desc: "Special celebratory combo treats and double reward points for all visiting families!" },
-  ];
+  const isSaas = (merchant.category || "").toLowerCase().includes("saas") || (merchant.category || "").toLowerCase().includes("software") || storeName.toLowerCase().includes("customerpilot");
+
+  const offerPresets = isSaas
+    ? [
+        { code: "FOUNDER50", title: "Founding Merchant 50% Off & Free Standee", desc: "Get 50% OFF our Annual Growth Pack + a Premium Custom Acrylic QR Standee shipped directly to your store counter!" },
+        { code: "TRIALVIP", title: "3-Day Free VIP Retention Trial", desc: "Launch WhatsApp Loyalty Cards & Smart AI Google Reviews with zero setup cost or credit card required!" },
+        { code: "STANDFREE", title: "Free Acrylic Countertop QR Standee Kit", desc: "Subscribe to any 6M or 1Y plan this weekend and get our physical branded acrylic QR standee delivered free!" },
+      ]
+    : [
+        { code: "WEEKEND2X", title: "Weekend Double Stamp Special", desc: "Earn DOUBLE loyalty stamps on every visit this Saturday & Sunday!" },
+        { code: "WEEKENDVIP", title: "Weekend VIP Reward Upgrade", desc: "Get an extra surprise bonus stamp with every purchase over the weekend!" },
+        { code: "WEEKEND15", title: "Weekend Family Special Combo", desc: "Special celebratory combo treats and double reward points for all visiting families!" },
+      ];
   const chosenOffer = offerPresets[revisionOffset % offerPresets.length];
   const couponCode = chosenOffer.code;
 

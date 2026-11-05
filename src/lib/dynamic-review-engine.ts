@@ -198,6 +198,29 @@ const CLINIC_REVIEWS: FallbackReviewItem[] = [
   }
 ]
 
+const SAAS_AGENCY_REVIEWS: FallbackReviewItem[] = [
+  {
+    draft1: "CustomerPilot lagane ke baad hamare store ke Google reviews 3 mahine me 800% badh gaye. Counter acrylic standee ka response zabardast hai!",
+    draft2: "WhatsApp digital loyalty card system se repeat customers ka footfall double ho gaya. Store dashboard simple hai aur live support fast hai.",
+    draft3: "Best customer retention software for retail stores. Google Map ranking aur reviews bohot fast improve hue!"
+  },
+  {
+    draft1: "Smart AI Google review engine works like magic. Billing counter pe customers QR scan karte hi 10 second me review post kar dete hain.",
+    draft2: "1-Click AI owner review auto-reply feature ne hamara daily time bacha diya. Great software for busy store owners.",
+    draft3: "Professional SaaS platform, polite team and game-changer WhatsApp loyalty system for Indian retailers."
+  },
+  {
+    draft1: "Replaced our old paper stamp cards with CustomerPilot WhatsApp loyalty wallet. Customers love seeing their stamps on mobile.",
+    draft2: "Onboarding was done in 5 minutes with zero technical hassle. Team in Vadodara provided exceptional guidance.",
+    draft3: "100% value for money software. Helps genuine local businesses reach Google Maps Top 3 pack."
+  },
+  {
+    draft1: "Customer retention aur Google review automation ke liye CustomerPilot se better koi tool nahi hai. Transparent pricing and great support.",
+    draft2: "Automated WhatsApp winback messages se puraane customers wapas aane lage. Store sales me noticeable jump aaya.",
+    draft3: "Highly recommended software company for retail merchants looking to grow repeat business."
+  }
+]
+
 const GENERAL_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Picked up some items earlier today. Super fresh quality, loved the experience and neat setup.",
@@ -284,6 +307,14 @@ function getCategoryAuthenticAngles(categoryKey: string): string[] {
         "Morning fresh dairy and snacks purchase",
         "Household essentials shopping"
       ]
+    case "saas_agency":
+      return [
+        "Google review 10x growth milestone",
+        "Paper loyalty card to WhatsApp digital transition",
+        "Customer retention & repeat footfall increase",
+        "Billing counter QR standee implementation",
+        "Owner AI review auto-reply automation"
+      ]
     default:
       return [
         "Regular local visit",
@@ -323,6 +354,8 @@ export function getDynamicFallbackReview(
     pool = CAR_WASH_REVIEWS
   } else if (c.includes("clinic") || c.includes("hospital") || c.includes("dental") || c.includes("doctor")) {
     pool = CLINIC_REVIEWS
+  } else if (c.includes("saas") || c.includes("software") || c.includes("customerpilot") || c.includes("agency") || c.includes("tech")) {
+    pool = SAAS_AGENCY_REVIEWS
   }
 
   // Derive selection index using random or deterministic seed
@@ -433,7 +466,12 @@ export async function generateDynamicReviewDraft(params: {
 
   // 6. Audience Persona & Gender Grammar Directive
   let personaInstruction = "Tone: Casual, natural Indian English or Hinglish like a spontaneous WhatsApp text."
-  if (profile.audiencePersona === "Female_Only") {
+  if (profile.categoryKey === "saas_agency") {
+    personaInstruction = `STRICT B2B MERCHANT PERSONA RULE:
+- The reviewer is an authentic local retail store owner / merchant / shop manager writing for CustomerPilot (SaaS platform).
+- Perspective: "Hamare store/bakery/salon ke liye CustomerPilot WhatsApp loyalty lagaya", "Google reviews 800% badh gaye", "Counter standee se customers khush hoke review dete hain", "1-click owner auto-reply se daily time bachta hai".
+- ABSOLUTELY NEVER mention ordering food, haircut, doctor visit, cakes, thali, or personal services.`
+  } else if (profile.audiencePersona === "Female_Only") {
     personaInstruction = `STRICT FEMININE GRAMMAR RULE (CRITICAL):
 - The reviewer is STRICTLY a woman/girl writing for a ladies beauty parlor.
 - Use natural feminine Hindi/Hinglish verbs: "gayi thi", "facial karwaya", "didi ne bohot ache se kiya", "skin pe instant glow aa gaya", "bohot soft lag rahi hai".

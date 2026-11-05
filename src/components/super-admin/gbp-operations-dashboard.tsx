@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { MerchantGbpPostQueue } from "./merchant-gbp-post-queue"
 import { QuickGbpQrModal } from "./quick-gbp-qr-modal"
 import { GbpCategoriesModal } from "./gbp-categories-modal"
+import { CustomerPilotSelfGbpModal } from "./customerpilot-self-gbp-modal"
 
 type ChecklistItem = {
   id: string
@@ -97,6 +98,7 @@ export function GbpOperationsDashboard() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
   const [quickQrOpen, setQuickQrOpen] = useState(false)
   const [categoriesOpen, setCategoriesOpen] = useState(false)
+  const [selfGbpOpen, setSelfGbpOpen] = useState(false)
 
   const loadDossiers = async (mId: string) => {
     if (dossierMerchantId === mId) {
@@ -255,6 +257,14 @@ export function GbpOperationsDashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2.5">
+          <Button
+            size="sm"
+            onClick={() => setSelfGbpOpen(true)}
+            className="bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-xs shadow-md shadow-sky-600/30"
+          >
+            <Sparkles className="w-3.5 h-3.5 mr-1.5 text-amber-300" />
+            🚀 CustomerPilot Own GBP Hub
+          </Button>
           <Button
             size="sm"
             onClick={() => setQuickQrOpen(true)}
@@ -577,6 +587,7 @@ export function GbpOperationsDashboard() {
       {/* SuperAdmin Modals */}
       <QuickGbpQrModal open={quickQrOpen} onOpenChange={setQuickQrOpen} />
       <GbpCategoriesModal open={categoriesOpen} onOpenChange={setCategoriesOpen} />
+      <CustomerPilotSelfGbpModal open={selfGbpOpen} onOpenChange={setSelfGbpOpen} />
     </div>
   )
 }
