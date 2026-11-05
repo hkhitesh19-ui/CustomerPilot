@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 4e416e2
-Full Commit Hash  : 4e416e2be00793132e4d0d3d52485e9a0fba6868
-Target Fix Commit : 4e416e2be00793132e4d0d3d52485e9a0fba6868
+Active Git Commit : 6957cf1 (Core: c730e27)
+Full Commit Hash  : 6957cf198f5bdb1fe1664ab3150ad542d2831e63
+Target Fix Commit : c730e27577c9e59d5ce0a963ae033fc4f3780d9b
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 05 Nov 2026, 09:23 AM IST
+Deployment Date   : 06 Nov 2026, 12:51 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(billing-menu-gbp): dynamic invoice format, photo-to-menu ai vision, free upi pg, and gbp photo review bifurcations
+Commit Title      : feat(gbp): complete CustomerPilot own GBP optimization & B2B SaaS dogfooding suite (Phases 1-5)
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -23,8 +23,9 @@ Verification Checklist:
 ----------------------------------------------------------
 [x] TypeScript Strict & Ratchet Audit: PASSED (Baseline 36)
 [x] Adversarial Red-Team Gates (1-6): PASSED
-[x] Dynamic Tax-Invoice/Invoice Header: VERIFIED (GSTIN check + 0 empty space)
-[x] Zero-Dependency PDF 1.4: VERIFIED (0 loyalty text leaks)
-[x] Photo-to-Live-Menu AI Vision Ingestion: DEPLOYED & LIVE
-[x] Free UPI Payment Gateway (0% Fee): DEPLOYED & LIVE (NPCI intent + QR)
-[x] GBP 300 QPM Enterprise Quota & Photo Split Rewards: ACTIVE
+[x] CustomerPilot HQ Internal Merchant Seeding: VERIFIED (customerpilot-hq)
+[x] B2B SaaS Dogfooding Keyword Matrix (saas_agency): ACTIVE & DEPLOYED
+[x] Merchant Review Flywheel & Milestone WhatsApp Invitations: ACTIVE & DEPLOYED
+[x] Weekly 3-Post Engine (Tech, Case Study, Founder Deal): ACTIVE & DEPLOYED
+[x] SuperAdmin CustomerPilot Self-Operations Command Center: ACTIVE & DEPLOYED
+[x] Live Health Checks (localhost:3000 & customerpilot.in): HTTP 200 OK
