@@ -1311,7 +1311,11 @@ function MerchantManagement() {
                           <div className="flex items-center gap-2">
                             <div className="text-[10px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded flex items-center gap-1">
                               <span>⭐ {m.baselineRating || "0.0"}</span>
-                              <span className="text-slate-400">({m.baselineReviewCount || 0} reviews)</span>
+                              <span className="text-slate-400">({m.baselineReviewCount || 0} Day-0)</span>
+                            </div>
+                            <div className="text-[10px] font-extrabold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.5 rounded flex items-center gap-1" title="New reviews posted via CustomerPilot Smart AI Reviews">
+                              <Sparkles className="w-2.5 h-2.5 text-emerald-400" />
+                              <span>+{m.reviews || 0} via CP</span>
                             </div>
                             <Button
                               size="sm"
