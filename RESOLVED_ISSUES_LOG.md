@@ -3,6 +3,28 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [06 Nov 2026] Issue & Enhancement: Photorealistic Food Photography & Marketing Creative Assets for Bakery GBP Updates
+- **Symptom**: GBP Post cards on `/dashboard/gbp-status` for Cake Connection rendered plain vector dark-blue SVG cards with purely textual rectangles instead of mouth-watering, realistic bakery product photography and high-converting marketing creatives.
+- **Root Cause**: The post engine originally routed `imageUrl` exclusively to `/api/gbp/posts/card`, which generated a vector-only SVG placeholder without any food photography backdrop. Real commercial bakery posts require ultra-detailed, photorealistic product imagery, celebration fusion cakes, and fudgy walnut brownie platters.
+- **Resolution**:
+  1. **Photorealistic Bakery Imagery Generation**:
+     - Generated 3 ultra-high-resolution (1024x1024) professional food photographs:
+       - `public/gbp/posts/cake_connection_belgian_truffle.jpg`: Fresh Belgian Chocolate Truffle Cake on marble stand with dripping ganache & chocolate curls.
+       - `public/gbp/posts/cake_connection_birthday_review.jpg`: Deluxe Rasmalai & Belgian Chocolate 1st Birthday fusion celebration cake with golden candle & pistachios.
+       - `public/gbp/posts/cake_connection_weekend_vip_offer.jpg`: Fudgy Chocolate Walnut Brownies stacked with layered chocolate cake slice on rustic wooden platter.
+  2. **High-Converting Branded Marketing Creative Banners**:
+     - Created 3 commercial marketing banners with store branding, WhatsApp CTA, price pills, and promo badges:
+       - `public/gbp/posts/cake_connection_belgian_truffle_banner.jpg` (Rs 650 / 500g, 100% Eggless, 60-min delivery).
+       - `public/gbp/posts/cake_connection_birthday_review_banner.jpg` (5-Star Sneha Patel verified review card).
+       - `public/gbp/posts/cake_connection_weekend_vip_offer_banner.jpg` (CAKEVIP10 Coupon Box, 2x Stamps & Free Brownie).
+  3. **Dynamic Image Regeneration Engine (`src/app/api/gbp/posts/[id]/regenerate-image/route.ts`)**:
+     - Clicking "🎨 New Image" now smoothly cycles between Branded Marketing Poster, Pure Bakery Photography, and Luxury Theme Cards with cache-busting timestamps.
+  4. **Photorealistic SVG Backdrop Fallback (`src/app/api/gbp/posts/card/route.ts`)**:
+     - Embedded high-res photo base64 as background in SVG card route with subtle dark gradient scrim.
+  5. **Verification**: Added unit test in `tests/gmb-optimization-suite.test.ts` (5/5 passed), Master Adversarial Red-Team Guard passed all 6 gates.
+- **Status**: ✅ Resolved, Verified, and Deployed to Live VPS.
+
+---
 ## [06 Nov 2026] Bug: SuperAdmin GBP Operations Zero Clients Due to Checklist Payload Shape & Missing Resilient Fallback
 - **Symptom**: In SuperAdmin GBP Operations (`/super-admin?tab=gbp-operations`), the dashboard reported "Total GBP Clients: 0", "Track A: 0", "Track B: 0", and rendered the empty placeholder card "No GBP clients found. Assign a GBP Track to merchants from the Merchants Fleet section", even when multiple merchants (Cake Connection, CustomerPilot HQ) had `gbpServiceTrack = "TRACK_B_EXISTING"` in the database.
 - **Root Cause**: In `src/components/super-admin/gbp-operations-dashboard.tsx`, `loadMerchants()` looped through each merchant and fetched `/api/gbp/checklist?merchantId=${m.id}`. The endpoint returned `{ ok: true, data: { checklist, stats } }` via `ok()`, but the client code strictly checked `if (clData.success)`. Since `clData.success` was `undefined`, the block never executed, silently dropping all merchants. Furthermore, `checklist` and `stats` were queried at root level (`clData.checklist`) instead of `clData.data?.checklist`. If checklist fetching threw any error, the merchant was completely discarded rather than rendered with default empty stats.

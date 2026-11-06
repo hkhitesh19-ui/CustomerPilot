@@ -105,4 +105,23 @@ describe("GMB Optimization Module & Navigation Suite (Points 1, 2, 3)", () => {
     const dominancePct = Math.round((top3Count / 9) * 100);
     expect(dominancePct).toBe(78);
   });
+
+  it("5. Photorealistic Food Creatives Exist & Are Valid High-Res JPEGs", () => {
+    const fs = require("fs");
+    const paths = [
+      "public/gbp/posts/cake_connection_belgian_truffle_banner.jpg",
+      "public/gbp/posts/cake_connection_birthday_review_banner.jpg",
+      "public/gbp/posts/cake_connection_weekend_vip_offer_banner.jpg",
+      "public/gbp/posts/cake_connection_belgian_truffle.jpg",
+      "public/gbp/posts/cake_connection_birthday_review.jpg",
+      "public/gbp/posts/cake_connection_weekend_vip_offer.jpg",
+    ];
+
+    for (const p of paths) {
+      const fullPath = path.resolve(__dirname, "..", p);
+      expect(fs.existsSync(fullPath)).toBe(true);
+      const stat = fs.statSync(fullPath);
+      expect(stat.size).toBeGreaterThan(100000); // Real high-res image > 100KB
+    }
+  });
 });

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import fs from "fs";
+import path from "path";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -112,6 +114,30 @@ export async function GET(req: NextRequest) {
     `;
   }
 
+  const isCakeStore = store.toLowerCase().includes("cake") || merchant?.category === "bakery";
+  let photoImageTag = "";
+
+  if (isCakeStore) {
+    try {
+      const fileName =
+        type === "review"
+          ? "cake_connection_birthday_review.jpg"
+          : type === "offer"
+          ? "cake_connection_weekend_vip_offer.jpg"
+          : "cake_connection_belgian_truffle.jpg";
+      const filePath = path.join(process.cwd(), "public", "gbp", "posts", fileName);
+      if (fs.existsSync(filePath)) {
+        const b64 = fs.readFileSync(filePath).toString("base64");
+        photoImageTag = `
+          <image href="data:image/jpeg;base64,${b64}" x="0" y="110" width="1200" height="700" preserveAspectRatio="xMidYMid slice" opacity="0.45" />
+          <rect x="0" y="110" width="1200" height="700" fill="url(#photoDarkOverlay)" />
+        `;
+      }
+    } catch {
+      // fallback
+    }
+  }
+
   const svg = `
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900">
     <defs>
@@ -123,9 +149,14 @@ export async function GET(req: NextRequest) {
         <stop offset="0%" stop-color="#451a03" />
         <stop offset="100%" stop-color="${selectedTheme.bg1}" />
       </linearGradient>
+      <linearGradient id="photoDarkOverlay" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#020617" stop-opacity="0.6" />
+        <stop offset="100%" stop-color="#020617" stop-opacity="0.85" />
+      </linearGradient>
     </defs>
     <!-- Background -->
     <rect width="1200" height="900" fill="url(#bg)" />
+    ${photoImageTag}
     
     <!-- Top Brand Bar -->
     <rect x="0" y="0" width="1200" height="110" fill="${selectedTheme.barColor}" />
