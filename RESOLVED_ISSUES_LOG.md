@@ -3,6 +3,19 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [06 Nov 2026] Bug: SuperAdmin GBP Operations Zero Clients Due to Checklist Payload Shape & Missing Resilient Fallback
+- **Symptom**: In SuperAdmin GBP Operations (`/super-admin?tab=gbp-operations`), the dashboard reported "Total GBP Clients: 0", "Track A: 0", "Track B: 0", and rendered the empty placeholder card "No GBP clients found. Assign a GBP Track to merchants from the Merchants Fleet section", even when multiple merchants (Cake Connection, CustomerPilot HQ) had `gbpServiceTrack = "TRACK_B_EXISTING"` in the database.
+- **Root Cause**: In `src/components/super-admin/gbp-operations-dashboard.tsx`, `loadMerchants()` looped through each merchant and fetched `/api/gbp/checklist?merchantId=${m.id}`. The endpoint returned `{ ok: true, data: { checklist, stats } }` via `ok()`, but the client code strictly checked `if (clData.success)`. Since `clData.success` was `undefined`, the block never executed, silently dropping all merchants. Furthermore, `checklist` and `stats` were queried at root level (`clData.checklist`) instead of `clData.data?.checklist`. If checklist fetching threw any error, the merchant was completely discarded rather than rendered with default empty stats.
+- **Resolution**:
+  1. Updated `loadMerchants()` in `src/components/super-admin/gbp-operations-dashboard.tsx` with resilient payload parsing:
+     - `const stats = clData?.data?.stats || clData?.stats`
+     - `const checklist = clData?.data?.checklist || clData?.checklist || []`
+  2. Wrapped each checklist request in a resilient try/catch block so that even if checklist retrieval fails, the merchant is still pushed into the list with zeroed stats rather than dropped.
+  3. Replaced `if (data.success)` with `if (data.ok || data.success)` in `handleCompleteItem()` and `handleAssignTrack()`.
+  4. Verified all 6 gates of CustomerPilot Master Adversarial Red-Team Guard pass cleanly.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [06 Nov 2026] Feature & Architecture: GMB Optimization Suite, SuperAdmin & Paid Merchant Navigation, Post Studio & Telemetry Radar (Points 1, 2, 3)
 - **Symptom**:
   1. SuperAdmin dashboard lacked a prominently named "GMB Optimization" left navigation link for self dogfooding, and the GBP Operations panel displayed 0 clients due to unpaged merchant queries. SuperAdmin could not inline edit post copy, regenerate card image themes, customize post weekdays/time, or approve posts for auto-posting.

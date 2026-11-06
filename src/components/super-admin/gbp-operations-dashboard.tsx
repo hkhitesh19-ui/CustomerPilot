@@ -134,16 +134,26 @@ export function GbpOperationsDashboard() {
       const gbpMerchants: MerchantGbpData[] = []
       for (const m of data.merchants ?? []) {
         if (!m.gbpServiceTrack || m.gbpServiceTrack === "NONE") continue
-        // Fetch checklist for each GBP merchant
-        const clRes = await fetch(`/api/gbp/checklist?merchantId=${m.id}`)
-        const clData = await clRes.json()
-        if (clData.success) {
+        // Fetch checklist for each GBP merchant with resilient fallback
+        try {
+          const clRes = await fetch(`/api/gbp/checklist?merchantId=${m.id}`)
+          const clData = await clRes.json()
+          const stats = clData?.data?.stats || clData?.stats
+          const checklist = clData?.data?.checklist || clData?.checklist || []
           gbpMerchants.push({
             ...m,
-            checklist: clData.checklist ?? [],
-            completionPct: clData.stats?.completionPct ?? 0,
-            doneItems: clData.stats?.doneItems ?? 0,
-            totalItems: clData.stats?.totalItems ?? 0,
+            checklist,
+            completionPct: stats?.completionPct ?? 0,
+            doneItems: stats?.doneItems ?? 0,
+            totalItems: stats?.totalItems ?? 0,
+          })
+        } catch {
+          gbpMerchants.push({
+            ...m,
+            checklist: [],
+            completionPct: 0,
+            doneItems: 0,
+            totalItems: 0,
           })
         }
       }
@@ -166,7 +176,7 @@ export function GbpOperationsDashboard() {
         body: JSON.stringify({ itemId, doneByEmail: execEmail }),
       })
       const data = await res.json()
-      if (data.success) await loadMerchants()
+      if (data.ok || data.success) await loadMerchants()
     } catch (e) {
       console.error("[GbpOps] Complete item error:", e)
     } finally {
@@ -183,7 +193,7 @@ export function GbpOperationsDashboard() {
         body: JSON.stringify({ merchantId, track }),
       })
       const data = await res.json()
-      if (data.success) await loadMerchants()
+      if (data.ok || data.success) await loadMerchants()
       else alert("Error: " + (data.error ?? "Unknown"))
     } catch (e) {
       console.error("[GbpOps] Assign track error:", e)
