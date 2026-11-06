@@ -20,7 +20,7 @@ const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
 // Industry catalog presets for rotation
 const INDUSTRY_PRODUCT_PRESETS: Record<string, Array<{ name: string; tag: string; price: string }>> = {
   bakery: [
-    { name: "Belgian Chocolate Truffle Cake", tag: "Signature Best-Seller", price: "₹650" },
+    { name: "Belgian Chocolate Truffle Cake", tag: "Signature Best-Seller", price: "₹650/- for 500g" },
     { name: "Fresh Blueberry Glazed Cheesecake", tag: "Fresh Berry Special", price: "₹750" },
     { name: "Dutch Almond Pastry", tag: "Chef's Special", price: "₹140" },
     { name: "Eggless Red Velvet Heart Cake", tag: "Customer Favorite", price: "₹600" },
