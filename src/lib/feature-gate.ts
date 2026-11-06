@@ -8,9 +8,18 @@
  * Default: All modules enabled (backward compatible with existing merchants).
  */
 
-export type Module = "LOYALTY" | "REVIEWS" | "AUTOREPLY" | "DIGITAL_CARD";
+export type Module = "LOYALTY" | "REVIEWS" | "AUTOREPLY" | "DIGITAL_CARD" | "GBP_OPERATIONS";
 
-export const ALL_MODULES: Module[] = ["LOYALTY", "REVIEWS", "AUTOREPLY", "DIGITAL_CARD"];
+export const ALL_MODULES: Module[] = ["LOYALTY", "REVIEWS", "AUTOREPLY", "DIGITAL_CARD", "GBP_OPERATIONS"];
+
+/**
+ * Check if a merchant has GBP Optimization active (either via gbpServiceTrack or GBP_OPERATIONS module).
+ */
+export function isGbpActive(merchant: { gbpServiceTrack?: string | null; enabledModules?: string | null } | null | undefined): boolean {
+  if (!merchant) return false;
+  if (merchant.gbpServiceTrack && merchant.gbpServiceTrack !== "NONE") return true;
+  return hasModule(merchant, "GBP_OPERATIONS");
+}
 
 /**
  * Check if a merchant has a specific module enabled.
@@ -59,6 +68,7 @@ export const PLAN_MODULE_MAP: Record<string, Module[]> = {
   autoreply: ["AUTOREPLY"],
   card: ["DIGITAL_CARD"],
   digital_card: ["DIGITAL_CARD"],
+  gbp: ["GBP_OPERATIONS"],
   // Combined plans (existing + new combos)
   starter: ALL_MODULES,
   growth: ALL_MODULES,

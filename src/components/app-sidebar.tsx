@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, ChevronRight, TrendingUp, BarChart3, FileText, Image, Share2, UserPlus, ChevronDown, BookOpen, Star, Smartphone, MapPin, ShoppingBag, UtensilsCrossed } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { useDashboardState } from "@/hooks/use-dashboard-state"
-import { hasModule, type Module } from "@/lib/feature-gate"
+import { hasModule, isGbpActive, type Module } from "@/lib/feature-gate"
 
 import {
   Sidebar,
@@ -24,6 +24,8 @@ interface MainNavItem {
   icon: any
   module?: Module
   modules?: Module[]
+  gbpOnly?: boolean
+  badge?: string
 }
 
 const mainNav: MainNavItem[] = [
@@ -31,7 +33,7 @@ const mainNav: MainNavItem[] = [
   { name: "Home (Analytics)", href: "/dashboard?view=analytics", icon: LayoutDashboard },
   { name: "Digital Business Card", href: "/dashboard/digital-card", icon: Smartphone },
   { name: "Smart AI Google Reviews", href: "/dashboard/reviews", icon: Star, modules: ["REVIEWS", "AUTOREPLY"] },
-  { name: "Google Maps Rank", href: "/dashboard/gbp-status", icon: MapPin },
+  { name: "GMB Optimization", href: "/dashboard/gbp-status", icon: MapPin, gbpOnly: true, badge: "PRO" },
   { name: "Live Queue", href: "/dashboard/queue", icon: Clock, module: "LOYALTY" as Module },
   { name: "Live Orders", href: "/dashboard/orders", icon: ShoppingBag },
   { name: "Online Menu", href: "/dashboard/menu", icon: UtensilsCrossed },
@@ -162,6 +164,9 @@ export function AppSidebar() {
         <SidebarMenu>
           {mainNav
             .filter((item) => {
+              if (item.gbpOnly) {
+                return isGbpActive(merchant)
+              }
               if (item.modules) {
                 return item.modules.some((m) => hasModule(merchant, m))
               }
@@ -170,9 +175,16 @@ export function AppSidebar() {
             .map((item) => (
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton asChild isActive={pathname === item.href}>
-                  <Link href={item.href} onClick={handleNavClick}>
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.name}</span>
+                  <Link href={item.href} onClick={handleNavClick} className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2">
+                      <item.icon className="h-5 w-5" />
+                      <span>{item.name}</span>
+                    </div>
+                    {item.badge && (
+                      <span className="text-[9px] font-black tracking-wider px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        {item.badge}
+                      </span>
+                    )}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

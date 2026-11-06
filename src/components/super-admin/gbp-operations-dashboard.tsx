@@ -127,7 +127,7 @@ export function GbpOperationsDashboard() {
     setLoading(true)
     try {
       // Fetch all merchants with GBP track assigned
-      const res = await fetch("/api/admin/merchants")
+      const res = await fetch("/api/admin/merchants?filter=gbp")
       const data = await res.json()
       if (!data.success) return
 

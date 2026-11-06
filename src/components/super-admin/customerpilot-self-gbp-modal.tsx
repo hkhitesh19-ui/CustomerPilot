@@ -25,7 +25,10 @@ import {
   ShieldCheck,
   Building2,
   FileCheck2,
+  Compass,
 } from "lucide-react";
+import { GbpPostCardItem } from "@/components/gbp-post-card-item";
+import { GbpAnalyticsPanel } from "@/components/gbp-analytics-panel";
 
 interface SelfGbpModalProps {
   open: boolean;
@@ -35,7 +38,7 @@ interface SelfGbpModalProps {
 export function CustomerPilotSelfGbpModal({ open, onOpenChange }: SelfGbpModalProps) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"flywheel" | "posts" | "checklist">("flywheel");
+  const [activeTab, setActiveTab] = useState<"flywheel" | "posts" | "telemetry" | "checklist">("posts");
   const [generatingPosts, setGeneratingPosts] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -90,7 +93,7 @@ export function CustomerPilotSelfGbpModal({ open, onOpenChange }: SelfGbpModalPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-950 border-slate-800 text-slate-100 p-6 rounded-2xl shadow-2xl">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-slate-950 border-slate-800 text-slate-100 p-6 rounded-2xl shadow-2xl">
         <DialogHeader className="border-b border-slate-800 pb-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -149,35 +152,21 @@ export function CustomerPilotSelfGbpModal({ open, onOpenChange }: SelfGbpModalPr
             <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5">
               <Star className="w-3.5 h-3.5 text-amber-400" /> Google Rating
             </span>
-            <p className="text-sm font-extrabold text-amber-300 mt-1 flex items-center gap-1">
-              5.0 ★ <span className="text-xs font-medium text-slate-400">({data?.merchant?.baselineReviewCount || 48} reviews)</span>
-            </p>
-            <p className="text-[10px] text-slate-500 mt-0.5">Zero negative reviews</p>
+            <p className="text-sm font-extrabold text-amber-300 mt-1">5.0 ★ (48 Reviews)</p>
+            <p className="text-[10px] text-slate-500 mt-0.5">100% 5-Star B2B Reviews</p>
           </div>
 
           <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
             <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-rose-400" /> Vadodara HQ Pin
+              <MapPin className="w-3.5 h-3.5 text-indigo-400" /> Verified Place ID
             </span>
-            <p className="text-sm font-extrabold text-white mt-1">Alkapuri / Gotri</p>
-            <p className="text-[10px] text-slate-500 mt-0.5 truncate">Place ID: ChIJCustomerPilot...</p>
+            <p className="text-xs font-mono font-bold text-slate-200 mt-1 truncate">ChIJCustomerPilotVadodaraHQ</p>
+            <p className="text-[10px] text-slate-500 mt-0.5">Manjalpur, Vadodara HQ</p>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 border-b border-slate-800 pb-2 mt-4">
-          <button
-            onClick={() => setActiveTab("flywheel")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === "flywheel"
-                ? "bg-sky-600 text-white shadow-md shadow-sky-600/30"
-                : "bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800"
-            }`}
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            1. Merchant Review Flywheel ({data?.eligibleReviewers?.length || 0})
-          </button>
-
+        <div className="flex flex-wrap items-center gap-2 mt-5 border-b border-slate-800 pb-3">
           <button
             onClick={() => setActiveTab("posts")}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
@@ -187,7 +176,31 @@ export function CustomerPilotSelfGbpModal({ open, onOpenChange }: SelfGbpModalPr
             }`}
           >
             <Calendar className="w-3.5 h-3.5" />
-            2. Weekly 3-Post Engine ({data?.posts?.length || 0})
+            1. Weekly 3-Post Engine ({data?.posts?.length || 0})
+          </button>
+
+          <button
+            onClick={() => setActiveTab("telemetry")}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === "telemetry"
+                ? "bg-sky-600 text-white shadow-md shadow-sky-600/30"
+                : "bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800"
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            2. Keywords &amp; 9-Point Geo-Grid
+          </button>
+
+          <button
+            onClick={() => setActiveTab("flywheel")}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === "flywheel"
+                ? "bg-sky-600 text-white shadow-md shadow-sky-600/30"
+                : "bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800"
+            }`}
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            3. Merchant Review Flywheel ({data?.eligibleReviewers?.length || 0})
           </button>
 
           <button
@@ -199,13 +212,63 @@ export function CustomerPilotSelfGbpModal({ open, onOpenChange }: SelfGbpModalPr
             }`}
           >
             <FileCheck2 className="w-3.5 h-3.5" />
-            3. SOP Checklist ({data?.merchant?.checklistProgress || 0}%)
+            4. SOP Checklist ({data?.merchant?.checklistProgress || 0}%)
           </button>
         </div>
 
         {/* Tab Content */}
         <div className="mt-4">
-          {/* TAB 1: Merchant Review Flywheel */}
+          {/* TAB 1: Weekly 3-Post Engine */}
+          {activeTab === "posts" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800">
+                <div>
+                  <h4 className="text-xs font-bold text-white flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    Automated Weekly 3-Post Content Studio
+                  </h4>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    View posts, edit copy, 🎨 regenerate designer cards, customize weekday/time schedule, and approve for auto-post.
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={handleGenerateWeeklyPosts}
+                  disabled={generatingPosts}
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs h-8 shadow-md"
+                >
+                  <Zap className={`w-3.5 h-3.5 mr-1.5 ${generatingPosts ? "animate-spin" : ""}`} />
+                  {generatingPosts ? "Generating..." : "Generate Fresh 3-Posts"}
+                </Button>
+              </div>
+
+              {(!data?.posts || data.posts.length === 0) ? (
+                <div className="text-center py-12 text-slate-500 text-xs border border-dashed border-slate-800 rounded-2xl">
+                  No weekly posts generated yet. Click &quot;Generate Fresh 3-Posts&quot; to initialize Tuesday, Thursday, and Saturday content.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                  {data.posts.map((post: any) => (
+                    <GbpPostCardItem
+                      key={post.id}
+                      post={post}
+                      onPostUpdated={fetchSelfData}
+                      isAdmin={true}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 2: Telemetry & Radar */}
+          {activeTab === "telemetry" && (
+            <div className="space-y-4">
+              <GbpAnalyticsPanel merchantId="customerpilot-hq" />
+            </div>
+          )}
+
+          {/* TAB 3: Merchant Review Flywheel */}
           {activeTab === "flywheel" && (
             <div className="space-y-3">
               <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/20 flex items-start justify-between gap-3">
@@ -283,84 +346,7 @@ export function CustomerPilotSelfGbpModal({ open, onOpenChange }: SelfGbpModalPr
             </div>
           )}
 
-          {/* TAB 2: Weekly 3-Post Engine */}
-          {activeTab === "posts" && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-800">
-                <div>
-                  <h4 className="text-xs font-bold text-white">Automated Weekly 3-Post Content Queue</h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    Tuesday (Tech Spotlight), Thursday (Case Study), Saturday (Founding Offer).
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  onClick={handleGenerateWeeklyPosts}
-                  disabled={generatingPosts}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs h-8"
-                >
-                  <Zap className={`w-3.5 h-3.5 mr-1.5 ${generatingPosts ? "animate-spin" : ""}`} />
-                  {generatingPosts ? "Generating..." : "Generate 3-Posts Now"}
-                </Button>
-              </div>
-
-              {(!data?.posts || data.posts.length === 0) ? (
-                <div className="text-center py-12 text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl">
-                  No weekly posts generated yet. Click &quot;Generate 3-Posts Now&quot; to initialize Tuesday, Thursday, and Saturday content.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {data.posts.map((post: any, idx: number) => (
-                    <div key={idx} className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2.5">
-                      <div className="flex items-center justify-between">
-                        <Badge className="bg-sky-500/10 text-sky-400 border-sky-500/30 text-[10px] font-black">
-                          {post.scheduledDay}
-                        </Badge>
-                        <span className="text-[10px] text-slate-500">
-                          {new Date(post.scheduledDate).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
-                        </span>
-                      </div>
-
-                      <div className="rounded-lg overflow-hidden border border-slate-800 bg-slate-950">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={post.imageUrl}
-                          alt={post.title || "GBP Post Card"}
-                          className="w-full h-32 object-cover"
-                        />
-                      </div>
-
-                      <h5 className="font-extrabold text-xs text-white line-clamp-1">{post.title}</h5>
-                      <p className="text-[11px] text-slate-400 line-clamp-3 leading-relaxed whitespace-pre-line">
-                        {post.caption}
-                      </p>
-
-                      <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
-                        <span className="text-[10px] text-emerald-400 font-bold uppercase">
-                          CTA: {post.ctaType || "LEARN_MORE"}
-                        </span>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => copyToClipboard(post.caption, `cap-${idx}`)}
-                          className="h-7 text-[11px] text-slate-400 hover:text-white"
-                        >
-                          {copiedKey === `cap-${idx}` ? (
-                            <Check className="w-3 h-3 text-emerald-400 mr-1" />
-                          ) : (
-                            <Copy className="w-3 h-3 mr-1" />
-                          )}
-                          Copy Caption
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* TAB 3: SOP Checklist */}
+          {/* TAB 4: SOP Checklist */}
           {activeTab === "checklist" && (
             <div className="space-y-2">
               {(!data?.checklist || data.checklist.length === 0) ? (

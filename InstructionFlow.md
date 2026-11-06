@@ -352,7 +352,9 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   │   ├── posts/[id]/approve/route.ts # Merchant 1-Click Post Approval API
 │   │   │   │   ├── posts/[id]/edit/route.ts   # Merchant Title/Caption Edit & Customization API
 │   │   │   │   ├── posts/[id]/reject/route.ts # Merchant Reject & Fresh Alternative Regenerator API
+│   │   │   │   ├── posts/[id]/regenerate-image/route.ts # 1-Click Card Image Theme Regenerator API
 │   │   │   │   ├── posts/card/route.ts        # Dynamic 1200x900 SVG Card Banner Generator
+│   │   │   │   ├── analytics/route.ts         # Real-Time Keywords Tracker, 9-Point Geo-Grid & GSC Telemetry API
 │   │   │   │   ├── map-traffic-broadcast/route.ts # Throttled Weekend Map Traffic Booster Broadcast
 │   │   │   │   └── monthly-report/route.ts    # 4-Metric Monthly Retention WhatsApp Report Dispatcher
 │   │   │   └── google-business/       # Google OAuth 2.0 Auth Callback & Sync APIs
@@ -407,6 +409,8 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   ├── smart-keyword-control-engine.tsx    # Smart Keyword Control Engine (10 Categories, SEO/AEO/GEO & Blacklist Pill Studio)
 │   │   ├── gbp-manager-access-card.tsx         # 1-Click Google Business Profile Agency Manager Access & Invite Hub (CustomerPilot1@gmail.com)
 │   │   ├── gbp-10day-sprint.tsx                # 10-Day Local Top 3 Acceleration Sprint Dashboard & 4-Lever Tactical Command Hub
+│   │   ├── gbp-analytics-panel.tsx             # Visual 9-Point Geo-Grid Radar, Daily Keyword Tracker & Search Console Telemetry
+│   │   ├── gbp-post-card-item.tsx              # Interactive Post Manager with Live Preview, Theme Regenerator & Schedule Customizer
 │   │   ├── gbp-ranking-audit-client.tsx        # Interactive Free 100-Point GBP & Competitor Audit Tool, Tracks Comparison & Dual-Lang FAQs
 │   │   ├── free-ai-review-generator-client.tsx # Free AI Review Generator Interactive Client Engine (3 Variations, Presets, Copy)
 │   │   ├── live-review-reply-animation.tsx     # ReviewPilot-Style 3-Step Live Review & AI Reply Real-Time Simulation Engine (Framer Motion)

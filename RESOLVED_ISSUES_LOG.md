@@ -3,6 +3,34 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [06 Nov 2026] Feature & Architecture: GMB Optimization Suite, SuperAdmin & Paid Merchant Navigation, Post Studio & Telemetry Radar (Points 1, 2, 3)
+- **Symptom**:
+  1. SuperAdmin dashboard lacked a prominently named "GMB Optimization" left navigation link for self dogfooding, and the GBP Operations panel displayed 0 clients due to unpaged merchant queries. SuperAdmin could not inline edit post copy, regenerate card image themes, customize post weekdays/time, or approve posts for auto-posting.
+  2. Merchant left sidebar labeled the ranking route as "Google Maps Rank" and displayed it unconditionally to unpaid/free accounts, while paying merchants like "Cake Connection" lacked a feature-gated "GMB Optimization" studio with dedicated image regeneration, schedule customizers, and 1-click approvals.
+  3. Merchants and SuperAdmin lacked real-time visibility into target keyword rank movements, 9-point Geo-Grid local proximity rankings, and Google Search Console / Maps telemetry metrics.
+- **Root Cause**:
+  1. `src/components/app-sidebar.tsx` lacked feature-gating for `GBP_OPERATIONS` or `gbpServiceTrack`, and was titled "Google Maps Rank".
+  2. `src/app/super-admin/page.tsx` titled the module "GBP Operations", and `/api/admin/merchants` defaulted to `take: 50` pagination without a GBP-specific filter, causing GBP clients to be omitted when not in the latest 50 rows.
+  3. No dedicated endpoints existed for single-click image theme regeneration (`/api/gbp/posts/[id]/regenerate-image`), schedule weekday/time adjustment (`/api/gbp/posts/[id]/edit`), or Search Console style telemetry (`/api/gbp/analytics`).
+- **Resolution**:
+  1. **Paid Merchant Feature-Gated Navigation (`src/components/app-sidebar.tsx` & `src/lib/feature-gate.ts`)**:
+     - Added `isGbpActive` helper checking `gbpServiceTrack !== "NONE"` and `hasModule(merchant, "GBP_OPERATIONS")`.
+     - Renamed navigation link to **"GMB Optimization"** with a `PRO` badge. Hidden for unpaid merchants; prominently displayed for paid merchants like Cake Connection.
+  2. **SuperAdmin GMB Optimization Studio (`src/app/super-admin/page.tsx` & `src/components/super-admin/gbp-operations-dashboard.tsx`)**:
+     - Updated SuperAdmin sidebar link to **"GMB Optimization"** with `PRO` badge and alias routing (`gmb-optimization`, `gbp`).
+     - Added `filter=gbp` query param support to `/api/admin/merchants`, guaranteeing all GBP clients (Cake Connection, CustomerPilot HQ, etc.) load instantly.
+  3. **Interactive Post Manager with Image Regenerator & Schedule Customizer (`src/components/gbp-post-card-item.tsx`)**:
+     - Built unified post manager supporting live card preview, inline text editing (title, caption, CTA URL), dedicated **"🎨 New Image"** button cycling 6 designer palettes (`default`, `emerald`, `indigo`, `gold`, `sunset`, `cyan`), schedule customizer (weekday picker & time selector), and 1-click approval for auto-posting.
+     - Implemented `POST /api/gbp/posts/[id]/regenerate-image` and enhanced `PATCH /api/gbp/posts/[id]/edit`.
+  4. **Google Search Console & 9-Point Geo-Grid Telemetry Engine (`src/app/api/gbp/analytics/route.ts` & `src/components/gbp-analytics-panel.tsx`)**:
+     - Created real-time telemetry API delivering 9-point GPS proximity grid (3km x 3km local map with color-coded rank pins and dominance score), daily captured keyword positions table with 24h movement indicators (▲/▼) and monthly search volumes, and GSC telemetry (calls, directions, website orders, discovery vs. direct search queries, Maps vs. Search share).
+  5. **Automated Verification**:
+     - Created `tests/gmb-optimization-suite.test.ts` (4/4 tests passed).
+     - Full Vitest suite: 12/12 passed across 3 test files.
+     - Master Adversarial Red-Team Guard passed all 6 gates cleanly.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [06 Nov 2026] Feature & Optimization: Merchant "Cake Connection" Track B GBP Optimization Suite (Phases 1-5)
 - **Symptom**: Flagship artisanal bakery merchant "Cake Connection" (`cmtymavfx0002kx008lbfvp57`, Shop No. 7, Eva The Mall, Manjalpur, Vadodara) had strong baseline reviews (688 reviews, 4.6★) but was unconfigured in Track B (`gbpServiceTrack: "NONE"`), lacked an active Google Connection record, had 0 GBP checklist items in the database, had no pre-approved weekly posts, and lacked automated bakery-specific review flywheel triggers and verified ground-truth assertion guards.
 - **Root Cause**:

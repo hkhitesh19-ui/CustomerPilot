@@ -41,7 +41,7 @@ export default function SuperAdminPage() {
         { id: "digital-cards", label: "Smart Digital Cards", icon: Smartphone, badge: "NEW" },
         { id: "subscriptions", label: "Subscriptions & Pricing", icon: CreditCard },
         { id: "analytics", label: "Global Intelligence", icon: Globe },
-        { id: "gbp-operations", label: "GBP Operations", icon: MapPin, badge: "NEW" },
+        { id: "gbp-operations", label: "GMB Optimization", icon: MapPin, badge: "PRO" },
         { id: "whatsapp-fleet", label: "WhatsApp Fleet & Alerts", icon: Smartphone, badge: "DEFENSE" },
       ]
     },
@@ -83,6 +83,8 @@ export default function SuperAdminPage() {
           setActiveSection("subscriptions")
         } else if (target === "default-settings" || target === "defaults" || target === "reward-setup" || target === "stamps") {
           setActiveSection("default-settings")
+        } else if (target === "gmb-optimization" || target === "gmb" || target === "gbp" || target === "gbp-operations") {
+          setActiveSection("gbp-operations")
         } else {
           const match = allItems.find(it => it.id.toLowerCase() === target)
           if (match) setActiveSection(match.id)

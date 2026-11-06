@@ -21,7 +21,17 @@ export async function PATCH(
       return err("GBP Post not found", 404);
     }
 
-    const { title, caption, ctaType, ctaUrl, couponCode, imageUrl } = body;
+    const {
+      title,
+      caption,
+      ctaType,
+      ctaUrl,
+      couponCode,
+      imageUrl,
+      scheduledDate,
+      scheduledDay,
+      status,
+    } = body;
 
     const updated = await db.gbpPost.update({
       where: { id },
@@ -32,6 +42,9 @@ export async function PATCH(
         ...(ctaUrl !== undefined && { ctaUrl }),
         ...(couponCode !== undefined && { couponCode }),
         ...(imageUrl !== undefined && { imageUrl }),
+        ...(scheduledDate !== undefined && { scheduledDate: new Date(scheduledDate) }),
+        ...(scheduledDay !== undefined && { scheduledDay }),
+        ...(status !== undefined && { status }),
       },
     });
 

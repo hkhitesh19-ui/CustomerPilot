@@ -62,10 +62,18 @@ export async function GET(req: Request) {
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
     const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') ?? '50', 10)))
     const skip = (page - 1) * pageSize
+    const isGbpFilter = searchParams.get('filter') === 'gbp' || searchParams.get('gbpOnly') === 'true'
+    const whereClause: any = isGbpFilter ? {
+      OR: [
+        { gbpServiceTrack: { not: 'NONE' } },
+        { enabledModules: { contains: 'GBP_OPERATIONS' } }
+      ]
+    } : {}
 
     const [total, merchants] = await Promise.all([
-      db.merchant.count(),
+      db.merchant.count({ where: whereClause }),
       db.merchant.findMany({
+        where: whereClause,
         include: {
           stampCards: { where: { active: true }, orderBy: { updatedAt: 'desc' }, take: 1 },
           merchantGoogleConnections: true,
@@ -78,8 +86,8 @@ export async function GET(req: Request) {
           }
         },
         orderBy: { createdAt: 'desc' },
-        take: pageSize,
-        skip,
+        take: isGbpFilter ? 200 : pageSize,
+        skip: isGbpFilter ? 0 : skip,
       }),
     ]);
 
