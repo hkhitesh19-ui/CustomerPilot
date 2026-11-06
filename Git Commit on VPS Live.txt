@@ -8,25 +8,22 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 3e1c4a8
-Full Commit Hash  : 3e1c4a8bdf4a426366f5d65472425d97652ac42c
+Active Git Commit : 196ed7b
+Full Commit Hash  : 196ed7bab729161e6d74d2af0f8a6037c7d4b444
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 06 Nov 2026, 09:11 AM IST
+Deployment Date   : 06 Nov 2026, 09:32 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(gmb): implement GMB Optimization module, SuperAdmin & paid merchant left navigation, post editor & schedule customizer, and 9-point Geo-Grid telemetry radar (Points 1, 2, 3)
+Commit Title      : fix(super-admin): ensure resilient checklist parsing in GBP operations dashboard so clients are always displayed
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
-Verification Checklist:
+Verified Endpoints on Live VPS:
 ----------------------------------------------------------
-[x] TypeScript Strict & Ratchet Audit: PASSED (Baseline 36)
-[x] Adversarial Red-Team Gates (1-6): PASSED CLEANLY
-[x] SuperAdmin Left Navigation: "GMB Optimization" [PRO] (with ?filter=gbp query fix)
-[x] Paid Merchant Navigation: "GMB Optimization" [PRO] (feature-gated via isGbpActive)
-[x] Post Studio: View, Edit Copy, 🎨 Regenerate Image Themes, Modify Weekday & Time Schedule, 1-Click Approve
-[x] Real-time Telemetry: 3km x 3km 9-Point Geo-Grid Radar & Daily Keyword Tracker (06:00 AM IST)
-[x] Google Search Console Telemetry: Phone Calls, Directions, Orders, Discovery vs Direct split
-[x] Cake Connection Merchant Seeding: VERIFIED (cmtymavfx0002kx008lbfvp57)
-[x] CustomerPilot HQ Internal Dogfooding Seeding: VERIFIED (customerpilot-hq)
-[x] Live Health Checks (localhost:3000 & https://customerpilot.in): HTTP 200 OK
+- Domain URL      : https://customerpilot.in (HTTP/2 200 OK)
+- Dynamic SVG Card: https://customerpilot.in/api/gbp/posts/card?type=product&name=Belgian%20Chocolate&price=650&theme=emerald
+- SuperAdmin GMB  : https://customerpilot.in/super-admin?tab=gmb-optimization (GMB Optimization PRO link active)
+- Merchant GMB    : https://customerpilot.in/dashboard/gbp-status (GMB Optimization PRO link active for Cake Connection)
+- Telemetry API   : https://customerpilot.in/api/gbp/analytics?merchantId=cmtymavfx0002kx008lbfvp57 (9-point GeoGrid + GSC Telemetry)
+- SQLite Database : /var/www/CustomerPilot/prisma/dev.db (Cake Connection & CustomerPilot HQ seeded)
+==========================================================
