@@ -160,22 +160,28 @@ If Google Gemini and Groq APIs are unreachable, rate-limited, or encounter timeo
 
 ---
 
-## 5. Master 10 Business Category Presets (`MASTER_KEYWORD_PRESETS`)
+## 5. Master Business Category Presets (`MASTER_KEYWORD_PRESETS`)
 
-CustomerPilot comes pre-loaded with comprehensive 50-Allowed and 50-Banned definitions across 10 core Indian retail verticals:
+CustomerPilot comes pre-loaded with comprehensive 50-Allowed and 50-Banned definitions across 15+ core Indian retail & service verticals:
 
 | # | Preset ID | Business Vertical | GBP Category | Audience Persona | Strict Blacklist Exclusions |
 | :-: | :--- | :--- | :--- | :--- | :--- |
 | **1** | `beauty_parlour` | Beauty Parlor (Ladies Only) | Beauty Salon / Make-up Artist | `Female_Only` | Men's grooming, barbers, food, cakes, tea, parcel, deliveries |
 | **2** | `bakery` | Cake Shop & Bakery | Cake Shop / Bakery | `All_Neutral` | Bread, pav, thalis, cooked meals, salon services, car repairs |
-| **3** | `restaurant` | Restaurant (Family Dining) | Restaurant / North Indian | `Family_Kids` | Non-veg (for pure veg), alcohol, hookahs, cakes, salon services |
+| **3** | `restaurant` | Restaurant (Family Dining & North Indian) | Restaurant / North Indian | `Family_Kids` | Non-veg (for pure veg), alcohol, hookahs, cakes, salon services |
 | **4** | `salon_men` | Salon - Men / Unisex | Hair Salon / Barber Shop | `Male_Only` | Bridal makeup, sarees, ladies waxing, food, deliveries |
 | **5** | `cafe` | Cafe & Coffee Shop | Cafe / Coffee Shop | `Couples_Friends` | Full dinner thalis, dal makhani, roti, alcohol, haircuts |
-| **6** | `hotels` | Hotels & Stays | Hotel / Homestay | `All_Neutral` | Unmarried couples without ID, dormitory, alcohol (if dry hotel) |
-| **7** | `gift_shop` | Gift Shop & Novelty Store | Gift Shop / Novelty Store | `All_Neutral` | Fresh flowers, perishable cakes, jewelry, raw tailoring |
-| **8** | `clothing` | Garment Shop & Boutique | Clothing Store / Boutique | `All_Neutral` | Tailoring from raw cloth, rental wear, footwear, grocery |
-| **9** | `supermarket` | Supermarket & Grocery | Supermarket / Grocery Store | `Family_Kids` | Non-veg meat (if veg mart), tobacco, prescription drugs |
-| **10**| `car_wash` | Car Wash & Detailing | Car Wash / Auto Spa | `All_Neutral` | Heavy mechanical repairs, engine rebuilds, food, garments |
+| **6** | `fast_food` | Fast Food & Street Snacks (Dabeli, Vadapav, Burger, Samosa, Sandwich) | Fast Food Restaurant / Snack Bar | `Couples_Friends` | Dal makhani, thalis, non-veg, haircut, bridal makeup, car wash |
+| **7** | `pizza_restaurant` | Pizza Restaurant & Pizzeria | Pizza Restaurant / Italian | `Couples_Friends` | Dal makhani, roti, sabzi, thali, biryani, haircut, salon, car wash |
+| **8** | `non_veg_restaurant` | Non-Veg Restaurant & Biryani House | Non-Vegetarian Restaurant / Mughlai | `Family_Kids` | Pure veg claims, salon, haircut, car wash, tailoring, medicines |
+| **9** | `dental_clinic` | Dental Clinic & Orthodontist | Dentist / Dental Clinic | `All_Neutral` | Food, chicken, mutton, cakes, chai, haircut, salon, car wash |
+| **10**| `pet_clinic` | Pet Clinic & Veterinary Hospital | Veterinarian / Animal Hospital | `All_Neutral` | Human medicine, human clinic, haircut, salon, bakery, car wash |
+| **11**| `hotels` | Hotels & Stays | Hotel / Homestay | `All_Neutral` | Unmarried couples without ID, dormitory, alcohol (if dry hotel) |
+| **12**| `gift_shop` | Gift Shop & Novelty Store | Gift Shop / Novelty Store | `All_Neutral` | Fresh flowers, perishable cakes, jewelry, raw tailoring |
+| **13**| `clothing` | Garment Shop & Boutique | Clothing Store / Boutique | `All_Neutral` | Tailoring from raw cloth, rental wear, footwear, grocery |
+| **14**| `supermarket` | Supermarket & Grocery | Supermarket / Grocery Store | `Family_Kids` | Non-veg meat (if veg mart), tobacco, prescription drugs |
+| **15**| `car_wash` | Car Wash & Detailing | Car Wash / Auto Spa | `All_Neutral` | Heavy mechanical repairs, engine rebuilds, food, garments |
+| **16**| `saas_agency` | Software Company & Marketing Agency (CustomerPilot) | Software Company / Marketing Agency | `All_Neutral` | Food orders, haircuts, doctor visits, cakes, personal services |
 
 ---
 

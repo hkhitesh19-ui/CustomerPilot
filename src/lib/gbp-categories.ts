@@ -55,12 +55,30 @@ export const OFFICIAL_GBP_CATEGORIES: GbpCategoryItem[] = [
   },
   {
     id: "fast_food",
-    label: "Fast Food & Pizzeria",
+    label: "Fast Food & Street Snacks (Dabeli, Vadapav, Burger, Samosa, Sandwich)",
+    group: "Food & Dining",
+    icon: "🥪",
+    googleType: "fast_food_restaurant",
+    reviewKeywords: ["butter dabeli", "crispy vadapav", "garlic chutney", "cheese grill sandwich", "veg burger", "samosa chaat"],
+    defaultLoyaltyRule: { stamps: 6, reward: "Free Cheese Grill Sandwich or Vadapav Combo", value: 120 }
+  },
+  {
+    id: "pizza_restaurant",
+    label: "Pizza Restaurant & Pizzeria",
     group: "Food & Dining",
     icon: "🍕",
-    googleType: "meal_takeaway",
-    reviewKeywords: ["wood fired pizza", "crispy burger", "loaded fries", "cheese pull", "quick bite"],
-    defaultLoyaltyRule: { stamps: 6, reward: "Free Medium Pizza or Shake", value: 180 }
+    googleType: "pizza_restaurant",
+    reviewKeywords: ["wood fired pizza", "cheese burst", "mozzarella cheese pull", "stuffed garlic bread", "sourdough crust"],
+    defaultLoyaltyRule: { stamps: 6, reward: "Free Medium Pizza or Stuffed Garlic Bread", value: 220 }
+  },
+  {
+    id: "non_veg_restaurant",
+    label: "Non-Veg Restaurant & Biryani House",
+    group: "Food & Dining",
+    icon: "🍗",
+    googleType: "restaurant",
+    reviewKeywords: ["chicken dum biryani", "butter chicken", "tandoori chicken", "juicy kebabs", "mutton rogan josh"],
+    defaultLoyaltyRule: { stamps: 6, reward: "Free Chicken Starter or ₹250 Off on Bill", value: 250 }
   },
   {
     id: "sweet_shop",
@@ -215,6 +233,15 @@ export const OFFICIAL_GBP_CATEGORIES: GbpCategoryItem[] = [
     defaultLoyaltyRule: { stamps: 3, reward: "Free Ultrasonic Teeth Polishing or ₹300 Off", value: 300 }
   },
   {
+    id: "pet_clinic",
+    label: "Pet Clinic & Veterinary Hospital",
+    group: "Healthcare & Clinics",
+    icon: "🐾",
+    googleType: "veterinary_care",
+    reviewKeywords: ["puppy vaccination", "compassionate vet", "gentle pet handling", "deworming", "flea tick care"],
+    defaultLoyaltyRule: { stamps: 3, reward: "Free Pet General Health Checkup or 20% Off Vaccination", value: 300 }
+  },
+  {
     id: "polyclinic",
     label: "Polyclinic & General Physician",
     group: "Healthcare & Clinics",
@@ -337,6 +364,15 @@ export const OFFICIAL_GBP_CATEGORIES: GbpCategoryItem[] = [
   },
 
   // ── Services & Professional ────────────────────────────────────────────────
+  {
+    id: "saas_agency",
+    label: "Software Company & Digital Marketing Agency (CustomerPilot)",
+    group: "Services & Professional",
+    icon: "🚀",
+    googleType: "marketing_agency",
+    reviewKeywords: ["whatsapp loyalty software", "google review standee", "1-click auto reply", "maps rank booster"],
+    defaultLoyaltyRule: { stamps: 3, reward: "Free Counter Acrylic QR Standee or 1-Month Free Trial", value: 499 }
+  },
   {
     id: "real_estate",
     label: "Real Estate & Property Consultant",

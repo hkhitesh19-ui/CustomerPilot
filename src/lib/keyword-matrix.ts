@@ -417,6 +417,201 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
       "Car foam wash", "Ceramic coating", "Tyre puncture", "Engine repair", "Mechanic", "Diesel", "Petrol",
       "Medicines", "Pharmacy", "Doctor", "Clinic", "Hospital", "Kurtis", "Lehenga", "Shoes", "Jewelry"
     ]
+  },
+
+  dental_clinic: {
+    id: "dental_clinic",
+    label: "Dental Clinic & Orthodontist",
+    gbpCategory: "Dentist / Dental Clinic",
+    audiencePersona: "All_Neutral",
+    serviceMode: "Appointment + Walk-in",
+    seoEntities: [
+      "Painless root canal treatment", "Single sitting RCT", "Ultrasonic teeth scaling", "Teeth polishing", "Dental implants",
+      "Invisible clear aligners", "Zirconia ceramic crown", "Teeth whitening bleaching", "Composite tooth filling", "Painless wisdom tooth extraction",
+      "Pediatric kids dental care", "Digital dental X-ray", "Metal and ceramic braces", "Braces wire tightening", "Gum bleeding pyorrhea treatment",
+      "Cosmetic smile makeover", "Dental bridge fixing", "Complete denture fitting", "Tooth sensitivity relief", "Gentle dental checkup",
+      "Sterilized dental operatory", "Sealed disposable instrument pouches", "Advanced ergonomic dental chair", "Zero pain local anesthesia", "Emergency toothache relief",
+      "RCT with rubber dam isolation", "Fluoride application for kids", "Porcelain dental veneers", "Night guard for bruxism grinding", "Deep periodontal scaling",
+      "Orthodontic smile alignment", "Transparent dental rate card", "Patient compassionate doctor consultation", "Experienced dental surgeon", "Hygienic sterilized clinic",
+      "Crown cap fitting with warranty", "Tooth gap closure bonding", "Tooth enamel restoration", "Oral hygiene guidance", "Cavity detection checkup",
+      "Post-extraction healing care", "Cosmetic tooth shaping", "Dental emergency walk-in", "Friendly clinic staff", "Clean waiting lounge",
+      "Modern dental equipment", "Affordable dental treatment packages", "Child friendly dental clinic", "Gentle teeth cleaning", "Long-lasting dental restorations"
+    ],
+    aeoAnswers: [
+      "100% painless single sitting root canal treatment",
+      "Strictly sterilized instruments in sealed autoclave pouches",
+      "Advanced digital X-ray with immediate diagnosis",
+      "Invisible clear aligners and metal/ceramic braces",
+      "Gentle and compassionate dentist for kids and elders"
+    ],
+    geoContext: [
+      "Best painless dental clinic in locality",
+      "Experienced dental surgeon with gentle touch",
+      "Transparent treatment cost without hidden fees",
+      "Spotless hygienic dental clinic setup",
+      "Punctual appointment timing with minimal waiting"
+    ],
+    blacklist: [
+      "Chicken", "Mutton", "Biryani", "Fish", "Egg", "Food", "Dinner", "Lunch", "Thali",
+      "Dal makhani", "Paneer", "Pizza", "Burger", "Sandwich", "Cake", "Pastry", "Truffle", "Brownie",
+      "Chai", "Tea", "Coffee", "Alcohol", "Beer", "Wine", "Haircut", "Beard trim", "Fade cut",
+      "Bridal makeup", "Facial", "Waxing", "Threading", "Saree draping", "Car wash", "Ceramic coating",
+      "Garage", "Mechanic", "Engine oil", "Clothes", "Kurtis", "Footwear", "Tailoring"
+    ]
+  },
+
+  pet_clinic: {
+    id: "pet_clinic",
+    label: "Pet Clinic & Veterinary Hospital",
+    gbpCategory: "Veterinarian / Animal Hospital",
+    audiencePersona: "All_Neutral",
+    serviceMode: "Appointment + Emergency Care",
+    seoEntities: [
+      "Puppy 7-in-1 vaccination", "Anti-rabies vaccine for dogs and cats", "Kitten core vaccination", "Routine pet health checkup", "Pet deworming tablet treatment",
+      "Tick and flea spot-on treatment", "Pet blood test and CBC report", "Animal wound cleaning and dressing", "Compassionate veterinary doctor", "Gentle pet handling technique",
+      "Pet surgery and spaying neutering", "Dog ultrasonic dental scaling", "Pet skin allergy and fungal treatment", "Emergency pet veterinary care", "Puppy weight and growth monitoring",
+      "Canine parvovirus critical care", "Pet ear infection cleaning", "Cat and dog medical grooming", "Senior pet arthritis joint care", "Veterinary pharmacy with genuine pet meds",
+      "Animal digital X-ray and ultrasound", "Pet nutrition and diet prescription", "Painless animal injection technique", "Sanitized pet examination table", "Courteous veterinary staff",
+      "Post-surgery animal care guidance", "Affordable puppy vaccination schedule", "Tick fever diagnosis and drip care", "Emergency IV fluid therapy for pets", "Pet health passport and record card",
+      "Dog microchip implant", "Cat fever and viral treatment", "Skin scraping allergy test", "Nutritional supplements for pets", "Puppy calcium and multivitamin syrup",
+      "Stomach infection treatment for dogs", "Hygiene certified veterinary clinic", "Gentle animal doctor interaction", "Pet recovery observation area", "Calm stress-free clinic environment",
+      "Preventive pet healthcare packages", "Doctor explains pet health clearly", "Cat vaccination card", "Dog flea shampoo bath", "Emergency contact for sick pets",
+      "Pet liver and kidney tonics", "Safe anesthesia for pet surgery", "Puppy first checkup consultation", "Reliable animal hospital in city", "Affordable veterinary care"
+    ],
+    aeoAnswers: [
+      "Compassionate veterinary doctors with gentle stress-free pet handling",
+      "Complete puppy and kitten vaccination schedules with health passport",
+      "In-house veterinary pharmacy with genuine pet medicines and vaccines",
+      "Quick diagnosis for tick fever, parvovirus, and skin allergies",
+      "Clean sanitized examination rooms safe for anxious dogs and cats"
+    ],
+    geoContext: [
+      "Best veterinary pet clinic in locality",
+      "Caring and patient animal doctor for pets",
+      "Affordable pet vaccination and medicine rates",
+      "Safe and calm environment for sick pets",
+      "Dependable pet healthcare and emergency support"
+    ],
+    blacklist: [
+      "Human medicine", "Human hospital", "Human dental", "Haircut", "Men grooming", "Beard styling",
+      "Ladies facial", "Bridal makeup", "Threading", "Waxing", "Bakery", "Cake", "Pastry", "Biryani",
+      "Chicken dinner", "Mutton", "Pizza", "Burger", "Sandwich", "Car wash", "Mechanic", "Clothes", "Kurtis", "Footwear"
+    ]
+  },
+
+  fast_food: {
+    id: "fast_food",
+    label: "Fast Food & Street Snacks (Dabeli, Vadapav, Burger, Samosa, Sandwich)",
+    gbpCategory: "Fast Food Restaurant / Snack Bar",
+    audiencePersona: "Couples_Friends",
+    serviceMode: "Takeaway + Quick Dine-in",
+    seoEntities: [
+      "Butter Kutchi Dabeli", "Crispy Jumbo Vadapav", "Mumbai Batata Vada with spicy garlic chutney", "Bombay Masala Toast Sandwich", "Cheese Grill Sandwich",
+      "Veg Club Sandwich", "Cheese Chilli Toast", "Crispy Veg Burger", "Peri Peri Burger", "Aloo Tikki Burger",
+      "Hot Punjabi Samosa", "Samosa Chaat with curd and chutneys", "Sweet tamarind and green mint chutney", "French Fries with peri peri seasoning", "Cheese Corn Sandwich",
+      "Chilled soft drinks", "Masala Thums Up", "Fast 5-minute parcel takeaway", "Freshly fried hot snacks", "Generous Amul butter and cheese",
+      "Crispy golden fried patties", "Food-grade safe parcel packing", "Clean hygienic frying oil", "Quick evening snacks with friends", "Spicy red lehsun chutney",
+      "Crunchy roasted masala peanuts in dabeli", "Soft fresh ladi pav buns", "Pocket-friendly student pricing", "Steaming hot snacks counter", "Hygienic stainless steel setup",
+      "Transparent pricing", "Sev Puri and Bhel Chaat", "Paneer Tikka Sandwich", "Mayonnaise veg burger", "Schezwan Vadapav",
+      "Cheese burst dabeli", "Loaded french fries with cheese dip", "Piping hot delivery", "Quick order preparation", "Crispy toasted bread slices",
+      "Spicy potato filling", "Hygienic glove-wearing staff", "Evening crowd favorite spot", "Great street food taste", "Generous cheese topping",
+      "Freshly prepared on order", "Best vadapav and dabeli in area", "Clean parcel containers", "Friendly counter bhaiya", "Popular college hangout bite"
+    ],
+    aeoAnswers: [
+      "Freshly prepared piping hot Vadapav and Butter Dabeli in 5 minutes",
+      "Clean hygienic fresh oil used with zero reused oil",
+      "Secure parcel packaging with separate green and red chutneys",
+      "Authentic Mumbai spicy garlic chutney and Kutchi dabeli masala",
+      "Pocket-friendly snack combos ideal for students and youth"
+    ],
+    geoContext: [
+      "Best evening Vadapav and Dabeli stall in locality",
+      "Super crispy sandwiches and delicious burgers",
+      "Top street food hangout spot for friends",
+      "Clean hygienic live counter preparation",
+      "Very genuine and pocket-friendly pricing"
+    ],
+    blacklist: [
+      "Dal makhani", "Paneer butter masala", "North Indian thali", "Unlimited thali", "Roti", "Non-veg",
+      "Chicken", "Mutton", "Fish", "Biryani", "Haircut", "Beard trim", "Fade cut", "Bridal makeup",
+      "Facial", "Salon", "Car wash", "Ceramic coating", "Hotel room stay", "Prescription medicines", "Tailoring"
+    ]
+  },
+
+  pizza_restaurant: {
+    id: "pizza_restaurant",
+    label: "Pizza Restaurant & Pizzeria",
+    gbpCategory: "Pizza Restaurant / Italian",
+    audiencePersona: "Couples_Friends",
+    serviceMode: "Dine-in + Takeaway",
+    seoEntities: [
+      "Wood-fired Neapolitan pizza", "Farmhouse cheese burst pizza", "Margherita pizza with fresh basil", "Paneer Tikka pizza", "Sourdough artisanal crust",
+      "Gourmet thin crust pizza", "Stuffed garlic bread with cheese dip", "100% mozzarella cheese pull", "Peri Peri pasta", "White sauce Alfredo penne pasta",
+      "Red sauce Arrabbiata pasta", "Mexican fiesta spicy pizza", "Barbecue mushroom pizza", "Cheesy peri peri fries", "Chilled peach iced tea",
+      "Fresh lime virgin mojito", "Molten chocolate lava cake", "Pizza meal combo for couples", "Large family pizza feast", "Fresh hand-tossed dough",
+      "San Marzano style tomato sauce", "Stone baked oven aroma", "Fast 15-minute table service", "Hygienic open pizza kitchen", "Comfortable booth dining seating",
+      "Air-conditioned indoor dining", "Student friendly pizza offers", "Crispy blistered crust edge", "Piping hot delivery box", "Unlimited pizza buffet",
+      "Cheesy dip cups", "Oregano and chilli flakes packets", "Jain pizza options without onion garlic", "Clean cutlery and sanitized tables", "Smooth digital table ordering",
+      "Loaded vegetable toppings", "Smoky wood oven flavor", "Friendly serving team", "Instagrammable cafe aesthetic", "Weekend pizza hangout with friends",
+      "Crunchy crust with chewy interior", "Pesto sauce pizza", "Garlic butter glazed crust", "Tandoori paneer pizza", "Kids favorite cheese pizza",
+      "Prompt delivery turnaround", "Safe damage-free pizza boxes", "Top-rated pizzeria in city", "Authentic Italian seasoning", "Great value pizza combos"
+    ],
+    aeoAnswers: [
+      "Fresh hand-tossed pizza dough baked live in wood-fired stone oven",
+      "Generous 100% mozzarella cheese with impressive cheese pull",
+      "Fast 15-minute table service and steaming hot takeaway delivery",
+      "Pure vegetarian and Jain pizza options available",
+      "Pocket-friendly couple and family pizza combo deals"
+    ],
+    geoContext: [
+      "Best wood-fired pizza restaurant in locality",
+      "Authentic sourdough crust and delicious stuffed garlic bread",
+      "Lively youthful ambiance with great background music",
+      "Generous cheese toppings and fresh ingredients",
+      "Spotless clean and modern pizzeria"
+    ],
+    blacklist: [
+      "Dal makhani", "Roti", "Sabzi", "Unlimited North Indian thali", "Biryani", "Mutton", "Chicken",
+      "Haircut", "Salon", "Facial", "Waxing", "Car wash", "Engine oil", "Medicines", "Pharmacy", "Clothes", "Footwear"
+    ]
+  },
+
+  non_veg_restaurant: {
+    id: "non_veg_restaurant",
+    label: "Non-Veg Restaurant & Biryani House",
+    gbpCategory: "Non-Vegetarian Restaurant / Mughlai",
+    audiencePersona: "Family_Kids",
+    serviceMode: "Dine-in + Parcel",
+    seoEntities: [
+      "Chicken Dum Biryani", "Mutton Dum Biryani", "Rich Butter Chicken", "Smoky Tandoori Chicken", "Juicy Chicken Tikka Kebab",
+      "Mutton Rogan Josh", "Chicken Kolhapuri", "Chicken Shawarma Roll", "Crispy Chicken Lollipop", "Fish Curry with Steamed Rice",
+      "Crispy Garlic Naan", "Soft Rumali Roti", "Tandoori Chicken Platter", "Hyderabadi Biryani with Mirchi Salan", "Chilled Boondi Raita",
+      "Mutton Keema Pav", "Chicken Bhuna Masala", "Chicken Malai Tikka", "Mutton Galouti Kebab", "Fish Tikka Tandoori",
+      "100% Halal certified meat", "Tender and juicy meat pieces", "Slow cooked rich aromatic gravies", "Family AC dining hall", "Generous non-veg portions",
+      "Leak-proof fast parcel packing", "Authentic Mughlai flavors", "Sparkling clean cutlery", "Warm Indian hospitality", "Sizzling brownie with ice cream",
+      "Sweet Lassi and Fresh Chaas", "Spacious family sofa tables", "Quick attentive table service", "Non-veg dinner feast with friends", "Weekend family celebration dinner",
+      "Smoky tandoori charcoal aroma", "Less oily homestyle non-veg curry", "Chicken Rara Gosht", "Tawa Chicken with hot rotis", "Egg Biryani combo",
+      "Mutton Sukka", "Chicken Tangdi Kebab", "Prawns Masala Fry", "Transparent computerized bill with GST", "Birthday party non-veg dining",
+      "Authentic spicy coastal fish curry", "Fresh succulent meat guarantee", "Hygiene verified non-veg kitchen", "Top non-veg dining spot in area", "Dependable family restaurant"
+    ],
+    aeoAnswers: [
+      "Fresh 100% Halal certified meat cooked to tender juicy perfection",
+      "Authentic slow cooked dum biryani served with flavorful salan and raita",
+      "Fast and hygienic parcel packaging with leak-proof containers",
+      "Spacious air-conditioned dining suitable for family and corporate dinners",
+      "Rich Mughlai and Tandoori gravies without excessive artificial coloring"
+    ],
+    geoContext: [
+      "Best chicken biryani and butter chicken in locality",
+      "Tender juicy kebabs and rich aromatic non-veg gravies",
+      "Top-rated non-veg family restaurant in city",
+      "Generous portion sizes for 3-4 person family dinners",
+      "Dependable courteous table service even during peak hours"
+    ],
+    blacklist: [
+      "Pure vegetarian pure veg kitchen", "Jain thali", "Haircut", "Beard trim", "Fade cut", "Bridal makeup",
+      "Facial", "Salon", "Car wash", "Ceramic coating", "Tailoring", "Clothes", "Medicines", "Grocery ration"
+    ]
   }
 };
 
@@ -439,6 +634,53 @@ export function getKeywordPresetForCategory(category?: string | null, merchantNa
     c.includes("tech company")
   ) {
     return MASTER_KEYWORD_PRESETS.saas_agency;
+  }
+
+  // Dental Clinic & Orthodontist
+  if (c.includes("dental") || c.includes("dentist") || c.includes("tooth") || c.includes("teeth") || c.includes("orthodont") || c.includes("rct") || c.includes("smile care")) {
+    return MASTER_KEYWORD_PRESETS.dental_clinic;
+  }
+
+  // Pet Clinic & Veterinary Hospital
+  if (c.includes("pet clinic") || c.includes("veterinary") || c.includes("animal hospital") || c.includes("pet hospital") || c.includes("vet clinic") || (c.includes("pet") && (c.includes("care") || c.includes("clinic") || c.includes("doctor")))) {
+    return MASTER_KEYWORD_PRESETS.pet_clinic;
+  }
+
+  // Pizza Restaurant & Pizzeria
+  if (c.includes("pizza") || c.includes("pizzeria") || c.includes("wood fired") || c.includes("wood-fired")) {
+    return MASTER_KEYWORD_PRESETS.pizza_restaurant;
+  }
+
+  // Fast Food & Street Snacks (Dabeli, Vadapav, Burger, Samosa, Sandwich)
+  if (
+    c.includes("dabeli") ||
+    c.includes("vadapav") ||
+    c.includes("vada pav") ||
+    c.includes("samosa") ||
+    c.includes("sandwich") ||
+    c.includes("burger") ||
+    c.includes("fast food") ||
+    c.includes("street snack") ||
+    c.includes("street food") ||
+    c.includes("chaat") ||
+    c.includes("fries")
+  ) {
+    return MASTER_KEYWORD_PRESETS.fast_food;
+  }
+
+  // Non-Veg Restaurant & Biryani House
+  if (
+    c.includes("non veg") ||
+    c.includes("non-veg") ||
+    c.includes("chicken") ||
+    c.includes("mutton") ||
+    c.includes("fish") ||
+    c.includes("biryani") ||
+    c.includes("mughlai") ||
+    c.includes("kebab") ||
+    c.includes("shawarma")
+  ) {
+    return MASTER_KEYWORD_PRESETS.non_veg_restaurant;
   }
 
   // Beauty Parlour & Ladies Salon takes precedence if female/beauty keywords appear

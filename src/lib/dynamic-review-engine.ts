@@ -198,6 +198,71 @@ const CLINIC_REVIEWS: FallbackReviewItem[] = [
   }
 ]
 
+const DENTAL_REVIEWS: FallbackReviewItem[] = [
+  {
+    draft1: "Painless single-sitting root canal karwaya. Doctor bohot gentle the aur sterilization standards top class the.",
+    draft2: "Teeth scaling aur polishing ke baad zero sensitivity hui. Clinic spotlessly clean hai aur appointment time par start hua.",
+    draft3: "Experienced dentist, completely painless treatment and very transparent pricing. Best dental clinic!"
+  },
+  {
+    draft1: "Got composite tooth filling and dental checkup done. Doctor explained the X-ray findings patiently and clearly.",
+    draft2: "Hygienic clinic with sealed disposable instruments. Staff was courteous and the procedure was completely comfortable.",
+    draft3: "Gentle dental care, advanced high-tech clinic and zero waiting time. Highly recommended!"
+  }
+]
+
+const PET_CLINIC_REVIEWS: FallbackReviewItem[] = [
+  {
+    draft1: "Puppy 7-in-1 vaccination aur deworming ke liye visit kiya. Vet doctor ne bohot gently handle kiya, pet bilkul calm raha.",
+    draft2: "Clean hygienic clinic and caring veterinary team. Doctor gave clear feeding and post-vaccination care tips.",
+    draft3: "Compassionate veterinary doctors, gentle pet handling and genuine medicines. Best pet clinic in area!"
+  },
+  {
+    draft1: "Doctor diagnosed my dog's skin allergy accurately and prescribed effective treatment. Visible relief within 3 days.",
+    draft2: "Staff is polite and clinic is sanitized after every pet. Emergency support was very prompt and reassuring.",
+    draft3: "Outstanding veterinary care, stress-free environment for pets and reasonable consultation charges."
+  }
+]
+
+const FAST_FOOD_REVIEWS: FallbackReviewItem[] = [
+  {
+    draft1: "Butter Kutchi Dabeli aur Crispy Vadapav super fresh the. Spicy red garlic chutney ka taste ekdum authentic Mumbai style tha.",
+    draft2: "Evening crowd kafi tha counter pe, par 5 minute me piping hot parcel deliver kar diya. Fresh oil use karte hain.",
+    draft3: "Delicious butter dabeli, crispy hot vadapav and quick polite service. Best evening street snack spot!"
+  },
+  {
+    draft1: "Cheese Grill Sandwich aur Peri Peri Burger ka combo unbeatable tha. Bread super crisp thi aur cheese pull badiya tha.",
+    draft2: "Sunday evening rush tha billing par, par counter staff brisk aur well-mannered tha. Neat food-grade parcel packing mili.",
+    draft3: "Crispy delicious sandwiches, fresh burgers and pocket-friendly rates. Must-visit fast food corner!"
+  }
+]
+
+const PIZZA_REVIEWS: FallbackReviewItem[] = [
+  {
+    draft1: "Wood-fired Margherita and Farmhouse cheese burst pizza taste me unbeatable the. Crust perfectly crispy tha aur cheese pull rich tha.",
+    draft2: "Stuffed garlic bread hot and cheesy serve hua. Ambiance cozy tha aur order 15 minutes me table pe aa gaya.",
+    draft3: "Authentic wood-fired crust, generous mozzarella cheese and wonderful dining ambiance. Top-tier pizza!"
+  },
+  {
+    draft1: "Tried their Paneer Tikka pizza and Alfredo pasta. Sourdough base was light on the stomach and toppings were super fresh.",
+    draft2: "Weekend evening me cafe packed tha par staff attentive tha aur service prompt thi. Great youthful vibe.",
+    draft3: "Mouth-watering artisanal pizzas, fresh garlic bread and polite team. Value for money family combos!"
+  }
+]
+
+const NON_VEG_REVIEWS: FallbackReviewItem[] = [
+  {
+    draft1: "Chicken Dum Biryani aur Butter Chicken ka taste proper authentic Mughlai tha. Chicken pieces juicy aur tender the.",
+    draft2: "Family dinner ke liye AC dining hall comfortable tha. Garlic naan steaming hot aayi aur serving staff polite tha.",
+    draft3: "Delicious aromatic biryani, rich creamy butter chicken and warm hospitality. Best non-veg restaurant in locality!"
+  },
+  {
+    draft1: "Tandoori Chicken super smoky aur well-marinated tha. Mutton Rogan Josh gravy rich thi bina excess oil ke.",
+    draft2: "Saturday night family dinner ke liye rush tha, par manager arranged comfortable table quickly. Fast parcel counter service.",
+    draft3: "Top-notch non-veg food quality, generous portions and courteous service. Highly recommended!"
+  }
+]
+
 const SAAS_AGENCY_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "CustomerPilot lagane ke baad hamare store ke Google reviews 3 mahine me 800% badh gaye. Counter acrylic standee ka response zabardast hai!",
@@ -307,6 +372,44 @@ function getCategoryAuthenticAngles(categoryKey: string): string[] {
         "Morning fresh dairy and snacks purchase",
         "Household essentials shopping"
       ]
+    case "dental_clinic":
+      return [
+        "Routine dental cleaning and scaling",
+        "Painless single-sitting root canal treatment",
+        "Cosmetic smile design and aligners consultation",
+        "Wisdom tooth extraction recovery",
+        "Kids dental cavity filling visit"
+      ]
+    case "pet_clinic":
+      return [
+        "Puppy core vaccination and deworming visit",
+        "Routine pet health and wellness checkup",
+        "Tick and flea prevention treatment",
+        "Emergency pet care and recovery",
+        "Skin allergy treatment and dietary consultation"
+      ]
+    case "fast_food":
+      return [
+        "Evening street snack hangout with friends",
+        "Quick vadapav and dabeli parcel takeaway",
+        "College afternoon snack break",
+        "Crispy cheese grill sandwich craving",
+        "Family weekend fast food treat"
+      ]
+    case "pizza_restaurant":
+      return [
+        "Weekend wood-fired pizza date",
+        "Family pizza and garlic bread feast",
+        "College friends cheese burst pizza party",
+        "Late evening gourmet sourdough pizza craving"
+      ]
+    case "non_veg_restaurant":
+      return [
+        "Weekend family non-veg feast",
+        "Chicken biryani and kebabs dinner outing",
+        "Special butter chicken and tandoori treat",
+        "Anniversary Mughlai dinner with family"
+      ]
     case "saas_agency":
       return [
         "Google review 10x growth milestone",
@@ -338,7 +441,17 @@ export function getDynamicFallbackReview(
 
   // Choose appropriate pool based on category
   let pool: FallbackReviewItem[] = GENERAL_REVIEWS
-  if (c.includes("beauty") || c.includes("parlor") || c.includes("parlour") || c.includes("makeup") || c.includes("bridal") || c.includes("ladies salon") || c.includes("ssv")) {
+  if (c.includes("dental") || c.includes("dentist") || c.includes("tooth") || c.includes("teeth") || c.includes("orthodont")) {
+    pool = DENTAL_REVIEWS
+  } else if (c.includes("pet clinic") || c.includes("veterinary") || c.includes("animal hospital") || c.includes("pet hospital") || c.includes("vet clinic") || (c.includes("pet") && (c.includes("clinic") || c.includes("doctor")))) {
+    pool = PET_CLINIC_REVIEWS
+  } else if (c.includes("pizza") || c.includes("pizzeria") || c.includes("wood fired") || c.includes("wood-fired")) {
+    pool = PIZZA_REVIEWS
+  } else if (c.includes("dabeli") || c.includes("vadapav") || c.includes("vada pav") || c.includes("samosa") || c.includes("sandwich") || c.includes("fast food") || c.includes("street snack")) {
+    pool = FAST_FOOD_REVIEWS
+  } else if (c.includes("non veg") || c.includes("non-veg") || c.includes("chicken") || c.includes("mutton") || c.includes("biryani") || c.includes("mughlai") || c.includes("kebab")) {
+    pool = NON_VEG_REVIEWS
+  } else if (c.includes("beauty") || c.includes("parlor") || c.includes("parlour") || c.includes("makeup") || c.includes("bridal") || c.includes("ladies salon") || c.includes("ssv")) {
     pool = PARLOUR_LADIES_REVIEWS
   } else if (c.includes("cake") || c.includes("bakery") || c.includes("pastry") || c.includes("dessert") || c.includes("sweet")) {
     pool = BAKERY_REVIEWS
@@ -352,7 +465,7 @@ export function getDynamicFallbackReview(
     pool = SALON_MEN_REVIEWS
   } else if (c.includes("wash") || c.includes("car") || c.includes("detailing") || c.includes("auto") || c.includes("garage")) {
     pool = CAR_WASH_REVIEWS
-  } else if (c.includes("clinic") || c.includes("hospital") || c.includes("dental") || c.includes("doctor")) {
+  } else if (c.includes("clinic") || c.includes("hospital") || c.includes("doctor")) {
     pool = CLINIC_REVIEWS
   } else if (c.includes("saas") || c.includes("software") || c.includes("customerpilot") || c.includes("agency") || c.includes("tech")) {
     pool = SAAS_AGENCY_REVIEWS

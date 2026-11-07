@@ -3,6 +3,18 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+## [08 Nov 2026] Feature & Taxonomy Expansion: Dental Clinic, Pet Clinic, Fast Food, Pizza & Non-Veg Restaurant Integration & Public Tool 2-Tier Selection Redesign
+- **Symptom**: Merchants and customers in specialized verticals (Dental Clinics, Pet Clinics/Vets, Fast Food stalls selling Dabeli/Vadapav/Burgers/Samosas/Sandwiches, Pizza restaurants, and Non-Veg Biryani houses) lacked dedicated zero-hallucination keyword presets, causing generic fallbacks. Furthermore, the public free review generator (/free-ai-google-review-generator) presented a flat 6-button list without hierarchical Main Business category and Sub-category selection.
+- **Root Cause**: MASTER_KEYWORD_PRESETS in src/lib/keyword-matrix.ts was limited to 11 presets without dedicated presets for Dental, Pet Care, Fast Food/Street Snacks, Pizza, or Non-Veg dining. OFFICIAL_GBP_CATEGORIES grouped fast food and pizza together, and the public tool lacked a 2-tier (Main Industry Group -> Sub-Category) interactive selector.
+- **Resolution**:
+  1. Master Keyword Matrix Presets (src/lib/keyword-matrix.ts): Added 5 comprehensive Master Category Presets with 50-Allowed SEO whitelists, AEO voice search solutions, and strict negative blacklists (dental_clinic, pet_clinic, fast_food, pizza_restaurant, non_veg_restaurant) and updated getKeywordPresetForCategory().
+  2. Dynamic Review Fallback Engine (src/lib/dynamic-review-engine.ts): Added authentic fallback pools (DENTAL_REVIEWS, PET_CLINIC_REVIEWS, FAST_FOOD_REVIEWS, PIZZA_REVIEWS, NON_VEG_REVIEWS) and updated getCategoryAuthenticAngles() and getDynamicFallbackReview().
+  3. Extended GBP Taxonomy (src/lib/gbp-categories.ts): Redesigned 8 Main Industry Groups with clear subcategories, review keywords, and loyalty reward rules.
+  4. Public Free Review Tool Redesign (src/components/free-ai-review-generator-client.tsx): Redesigned the tool into an interactive 2-tier workbench with 8 Main Industry Groups and interactive Sub-Categories, auto-filling authentic store presets and 3 distinct 5-star review drafts.
+  5. Verification: Executed Master Adversarial Red-Team Guard (node scripts/run_adversarial_guard.js) with all 6 security and mathematical gates passing cleanly.
+- **Status**: ✅ Resolved, Verified, and Ready for Local Git Commit.
+
+---
 ## [06 Nov 2026] Issue & Enhancement: Photorealistic Food Photography & Marketing Creative Assets for Bakery GBP Updates
 - **Symptom**: GBP Post cards on `/dashboard/gbp-status` for Cake Connection rendered plain vector dark-blue SVG cards with purely textual rectangles instead of mouth-watering, realistic bakery product photography and high-converting marketing creatives.
 - **Root Cause**: The post engine originally routed `imageUrl` exclusively to `/api/gbp/posts/card`, which generated a vector-only SVG placeholder without any food photography backdrop. Real commercial bakery posts require ultra-detailed, photorealistic product imagery, celebration fusion cakes, and fudgy walnut brownie platters.

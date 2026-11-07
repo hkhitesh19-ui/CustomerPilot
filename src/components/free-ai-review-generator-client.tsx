@@ -14,64 +14,370 @@ import {
   ShieldCheck,
   CheckCircle2,
   TrendingUp,
-  MessageSquare
+  ChevronRight
 } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { Button } from "@/components/ui/button"
 import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
 
-type CategoryKey = "bakery" | "dental" | "cafe" | "salon" | "electronics" | "restaurant"
-
-interface CategoryPreset {
-  id: CategoryKey
+export interface SubCategoryPreset {
+  id: string
   label: string
   icon: string
   sampleStore: string
   sampleHighlight: string
 }
 
-const CATEGORIES: CategoryPreset[] = [
+export interface MainIndustryGroup {
+  id: string
+  label: string
+  icon: string
+  subCategories: SubCategoryPreset[]
+}
+
+export const MAIN_INDUSTRY_GROUPS: MainIndustryGroup[] = [
   {
-    id: "bakery",
-    label: "Bakery & Cakes",
-    icon: "🎂",
-    sampleStore: "Cake Connection",
-    sampleHighlight: "Fresh Dutch Chocolate Truffle cake, eggless options & super polite staff"
-  },
-  {
-    id: "dental",
-    label: "Dental & Clinic",
-    icon: "🦷",
-    sampleStore: "Smile Studio Dental",
-    sampleHighlight: "Painless root canal treatment, doctor explained clearly & very hygienic setup"
-  },
-  {
-    id: "cafe",
-    label: "Cafe & Coffee",
-    icon: "☕",
-    sampleStore: "The Roast Room",
-    sampleHighlight: "Hazelnut Cold Brew was amazing, quiet ambience with fast WiFi for work"
-  },
-  {
-    id: "salon",
-    label: "Salon & Spa",
-    icon: "💇",
-    sampleStore: "Looks Luxe Studio",
-    sampleHighlight: "Keratin hair spa was soothing, stylist Ramesh gave great styling recommendations"
-  },
-  {
-    id: "restaurant",
+    id: "food_dining",
     label: "Food & Dining",
     icon: "🍽️",
-    sampleStore: "Tasty Vadapav",
-    sampleHighlight: "Hot crispy jumbo batata vada with garlic chutney, authentic Mumbai taste"
+    subCategories: [
+      {
+        id: "fast_food",
+        label: "Fast Food & Street Snacks (Dabeli, Vadapav, Burger, Samosa, Sandwich)",
+        icon: "🥪",
+        sampleStore: "Tasty Vadapav & Dabeli Center",
+        sampleHighlight: "Butter Kutchi Dabeli, Crispy Jumbo Vadapav with spicy garlic chutney & Cheese Grill Sandwich"
+      },
+      {
+        id: "pizza_restaurant",
+        label: "Pizza Restaurant & Pizzeria",
+        icon: "🍕",
+        sampleStore: "Artisan Wood-Fired Pizzeria",
+        sampleHighlight: "Wood-fired Margherita with fresh basil, Farmhouse cheese burst pizza & Stuffed Garlic Bread"
+      },
+      {
+        id: "non_veg_restaurant",
+        label: "Non-Veg Restaurant & Biryani House",
+        icon: "🍗",
+        sampleStore: "Lazeez Biryani & Kebabs",
+        sampleHighlight: "Chicken Dum Biryani, Rich Butter Chicken with garlic naan & smoky Tandoori Chicken"
+      },
+      {
+        id: "bakery",
+        label: "Bakery & Cake Shop",
+        icon: "🎂",
+        sampleStore: "Cake Connection",
+        sampleHighlight: "Fresh Dutch Chocolate Truffle cake, pure eggless custom theme cakes & chocolate brownies"
+      },
+      {
+        id: "punjabi_restaurant",
+        label: "Punjabi / North Indian (Pure Veg)",
+        icon: "🍲",
+        sampleStore: "Shreeji Punjabi Restaurant",
+        sampleHighlight: "Dal Makhani, creamy Paneer Butter Masala, crispy garlic naan & family dining AC hall"
+      },
+      {
+        id: "south_indian",
+        label: "South Indian Restaurant",
+        icon: "🥞",
+        sampleStore: "Udupi Dosa Corner",
+        sampleHighlight: "Crispy Mysore Masala Dosa, steaming hot Button Idli, sambar & authentic degree filter coffee"
+      },
+      {
+        id: "cafe",
+        label: "Cafe & Coffee Shop",
+        icon: "☕",
+        sampleStore: "The Roast Room & Cafe",
+        sampleHighlight: "Thick Hazelnut Cold Coffee, cheesy peri peri fries & cozy ambiance with fast Wi-Fi"
+      },
+      {
+        id: "sweet_shop",
+        label: "Sweet Shop / Mithai & Farsan",
+        icon: "🍬",
+        sampleStore: "Kanhaiya Sweets & Farsan",
+        sampleHighlight: "Pure desi ghee Kaju Katli, warm Motichoor Laddus & crispy fresh nylon khaman"
+      },
+      {
+        id: "ice_cream",
+        label: "Ice Cream & Dessert Parlour",
+        icon: "🍨",
+        sampleStore: "Natural Scoop Gelato",
+        sampleHighlight: "Belgian dark chocolate sundae, seasonal fresh mango scoops & crispy waffle cones"
+      }
+    ]
   },
   {
-    id: "electronics",
-    label: "Retail & Electronics",
-    icon: "📱",
-    sampleStore: "Gujarat Photo Goods",
-    sampleHighlight: "Sony Alpha camera demo was very thorough, best genuine prices in Vadodara"
+    id: "healthcare_clinics",
+    label: "Healthcare & Veterinary",
+    icon: "🩺",
+    subCategories: [
+      {
+        id: "dental_clinic",
+        label: "Dental Clinic & Orthodontist",
+        icon: "🦷",
+        sampleStore: "Smile Studio Dental Clinic",
+        sampleHighlight: "Painless single-sitting root canal treatment, ultrasonic teeth scaling & gentle compassionate dentist"
+      },
+      {
+        id: "pet_clinic",
+        label: "Pet Clinic & Veterinary Hospital",
+        icon: "🐾",
+        sampleStore: "Paws & Care Veterinary Clinic",
+        sampleHighlight: "Puppy 7-in-1 vaccination, routine pet health checkup, gentle pet handling & tick/flea prevention"
+      },
+      {
+        id: "polyclinic",
+        label: "Polyclinic & General Physician",
+        icon: "🩺",
+        sampleStore: "LifeCare Health Clinic",
+        sampleHighlight: "Patient doctor consultation, accurate health diagnosis, minimal medicines & clean clinic"
+      },
+      {
+        id: "diagnostic_lab",
+        label: "Pathology Lab & Diagnostic Center",
+        icon: "🔬",
+        sampleStore: "Metro Diagnostic Pathology",
+        sampleHighlight: "Painless blood sample collection, same-day digital test reports & 100% hygienic sample tubes"
+      },
+      {
+        id: "pharmacy",
+        label: "Pharmacy & Chemist",
+        icon: "💊",
+        sampleStore: "Apollo Meds Chemist",
+        sampleHighlight: "Genuine prescribed medicines, quick home delivery & helpful pharmacist guidance"
+      },
+      {
+        id: "physiotherapy",
+        label: "Physiotherapy & Rehab Center",
+        icon: "🏃",
+        sampleStore: "Spine & Joint Rehab Center",
+        sampleHighlight: "Back pain relief therapy, targeted exercise guidance & caring physiotherapist"
+      }
+    ]
+  },
+  {
+    id: "beauty_grooming",
+    label: "Beauty & Grooming",
+    icon: "💇",
+    subCategories: [
+      {
+        id: "salon_men",
+        label: "Men's Salon & Grooming",
+        icon: "✂️",
+        sampleStore: "Sharp Looks Men's Salon",
+        sampleHighlight: "Skin fade haircut, precision beard shaping, refreshing head massage & sanitized clippers"
+      },
+      {
+        id: "beauty_parlour",
+        label: "Beauty Parlour & Ladies Spa",
+        icon: "💅",
+        sampleStore: "Suvarna Beauty Parlour",
+        sampleHighlight: "Painless eyebrow threading, O3+ glow facial, L'Oreal hair spa & private female cabins"
+      },
+      {
+        id: "unisex_salon",
+        label: "Unisex Salon & Makeup Studio",
+        icon: "💄",
+        sampleStore: "Luxe Glow Unisex Studio",
+        sampleHighlight: "Keratin hair smoothening, balayage highlights, HD bridal makeup & expert stylists"
+      },
+      {
+        id: "tattoo_studio",
+        label: "Tattoo & Piercing Studio",
+        icon: "🎨",
+        sampleStore: "Ink Aura Tattoo Studio",
+        sampleHighlight: "Fine line custom tattoo artwork, sterilized single-use needles & painless piercing"
+      }
+    ]
+  },
+  {
+    id: "automotive_detailing",
+    label: "Automotive & Detailing",
+    icon: "🚗",
+    subCategories: [
+      {
+        id: "car_wash",
+        label: "Car Wash & Auto Detailing",
+        icon: "🚗",
+        sampleStore: "SpeedShine Car Spa & Detailing",
+        sampleHighlight: "High-pressure snow foam wash, underbody mud wash & deep interior vacuum cleaning"
+      },
+      {
+        id: "auto_garage",
+        label: "Automobile Repair & Garage",
+        icon: "🔧",
+        sampleStore: "Apex Motors Multibrand Garage",
+        sampleHighlight: "Genuine engine oil service, suspension diagnostics, honest mechanic & clear estimates"
+      },
+      {
+        id: "bike_service",
+        label: "Two-Wheeler Service Center",
+        icon: "🏍️",
+        sampleStore: "SuperBike Tuning & Service",
+        sampleHighlight: "Smooth engine pickup tuning, chain lube & wash, disc brake service & timely delivery"
+      },
+      {
+        id: "car_accessories",
+        label: "Car Accessories & Tyres",
+        icon: "🛞",
+        sampleStore: "DrivePro Accessories & Tyres",
+        sampleHighlight: "Custom bucket seat covers fitting, Android infotainment screen & 3D wheel alignment"
+      }
+    ]
+  },
+  {
+    id: "retail_shopping",
+    label: "Retail & Shopping",
+    icon: "🛒",
+    subCategories: [
+      {
+        id: "supermarket",
+        label: "Supermarket & Grocery Store",
+        icon: "🛒",
+        sampleStore: "Daily Mart Supermarket",
+        sampleHighlight: "Monthly grocery ration, fresh daily vegetables, discounts below MRP & quick express billing"
+      },
+      {
+        id: "clothing_boutique",
+        label: "Clothing & Fashion Boutique",
+        icon: "👗",
+        sampleStore: "Vogue Cotton & Silk Boutique",
+        sampleHighlight: "Pure cotton daily kurtis, designer partywear gowns, size S to 5XL & spacious trial rooms"
+      },
+      {
+        id: "electronics_mobile",
+        label: "Mobile & Electronics Store",
+        icon: "📱",
+        sampleStore: "TechZone Mobile & Gadgets",
+        sampleHighlight: "Latest smartphones, original accessories, 11D tempered glass fitting & genuine warranties"
+      },
+      {
+        id: "jewellery_store",
+        label: "Jewellery & Silver Showroom",
+        icon: "💍",
+        sampleStore: "Swarna Jewellers",
+        sampleHighlight: "916 BIS Hallmark certified gold, trendy lightweight silver jewellery & transparent making rates"
+      },
+      {
+        id: "footwear_store",
+        label: "Footwear & Shoe Store",
+        icon: "👟",
+        sampleStore: "Comfort Step Footwear",
+        sampleHighlight: "Cushioned formal shoes, branded running sneakers, durable daily sandals & patient staff"
+      },
+      {
+        id: "furniture_decor",
+        label: "Furniture & Home Decor Store",
+        icon: "🛋️",
+        sampleStore: "Urban Living Furniture",
+        sampleHighlight: "Solid teakwood sofas, ergonomic work desks, safe home delivery & modern aesthetic decor"
+      },
+      {
+        id: "pet_shop",
+        label: "Pet Shop & Supplies",
+        icon: "🐶",
+        sampleStore: "Pet Paradise Foods & Toys",
+        sampleHighlight: "Royal Canin pet food, fun puppy toys, comfortable cat beds & friendly owner guidance"
+      }
+    ]
+  },
+  {
+    id: "services_professional",
+    label: "Services & Professional",
+    icon: "💼",
+    subCategories: [
+      {
+        id: "saas_agency",
+        label: "Software & Digital Agency (CustomerPilot)",
+        icon: "🚀",
+        sampleStore: "CustomerPilot Growth SaaS",
+        sampleHighlight: "WhatsApp digital loyalty card software, smart AI review standees & 1-click review auto-reply"
+      },
+      {
+        id: "real_estate",
+        label: "Real Estate & Property Consultant",
+        icon: "🏢",
+        sampleStore: "Prime Landmark Properties",
+        sampleHighlight: "Verified commercial and residential properties, transparent paperwork & honest site visits"
+      },
+      {
+        id: "ca_finance",
+        label: "CA & Tax Consultant",
+        icon: "💼",
+        sampleStore: "Apex Tax Advisors & CA",
+        sampleHighlight: "Smooth ITR filing, GST compliance accuracy, proactive tax planning & punctual delivery"
+      },
+      {
+        id: "photo_studio",
+        label: "Photography & Video Studio",
+        icon: "📸",
+        sampleStore: "Candid Moments Photography",
+        sampleHighlight: "Candid wedding photography, vibrant cinematic color grading & instant passport prints"
+      },
+      {
+        id: "laundry_drycleaning",
+        label: "Dry Cleaner & Laundry Service",
+        icon: "👔",
+        sampleStore: "WhiteGlow Steam Laundry",
+        sampleHighlight: "Crisp steam ironing, gentle stain removal, doorstep pickup & pleasant fabric fragrance"
+      }
+    ]
+  },
+  {
+    id: "education_coaching",
+    label: "Education & Coaching",
+    icon: "📚",
+    subCategories: [
+      {
+        id: "coaching_institute",
+        label: "Coaching Institute & Exam Prep",
+        icon: "📚",
+        sampleStore: "Excel Academy & Coaching",
+        sampleHighlight: "Supportive faculty, clear conceptual teaching, rigorous test series & individual doubt solving"
+      },
+      {
+        id: "preschool_daycare",
+        label: "Preschool & Daycare",
+        icon: "🧸",
+        sampleStore: "Little Sprouts Preschool",
+        sampleHighlight: "Caring teachers, clean and safe play area, fun creative activities & live CCTV access"
+      },
+      {
+        id: "tuition_classes",
+        label: "Tuition & Learning Center",
+        icon: "✏️",
+        sampleStore: "Bright Minds Tuition Center",
+        sampleHighlight: "Small batch size, personalized attention, regular homework follow-up & weekly tests"
+      },
+      {
+        id: "music_dance_academy",
+        label: "Music & Dance Academy",
+        icon: "🎵",
+        sampleStore: "Rhythm Beats Dance Studio",
+        sampleHighlight: "Patient choreographers, classical rhythm foundation & energetic stage performance training"
+      }
+    ]
+  },
+  {
+    id: "fitness_sports",
+    label: "Fitness & Sports",
+    icon: "💪",
+    subCategories: [
+      {
+        id: "gym",
+        label: "Gym & Fitness Studio",
+        icon: "💪",
+        sampleStore: "IronCore Fitness Gym",
+        sampleHighlight: "Imported strength machines, certified personal trainers, motivating music & clean locker room"
+      },
+      {
+        id: "yoga_studio",
+        label: "Yoga & Pilates Studio",
+        icon: "🧘",
+        sampleStore: "Prana Yoga & Wellness Space",
+        sampleHighlight: "Calm peaceful atmosphere, mindful breathing techniques, posture alignment & gentle guidance"
+      }
+    ]
   }
 ]
 
@@ -81,25 +387,165 @@ interface ReviewVariation {
   text: string
 }
 
-function generateReviews(category: CategoryKey, storeName: string, highlight: string): ReviewVariation[] {
+function generateReviews(subCatId: string, storeName: string, highlight: string): ReviewVariation[] {
   const name = storeName.trim() || "this store"
-  const detail = highlight.trim() || "friendly customer service and top quality"
+  const detail = highlight.trim() || "top quality and courteous service"
+
+  if (subCatId === "dental_clinic") {
+    return [
+      {
+        title: "Keyword-Rich SEO Champion",
+        tag: "Best for Google Maps Ranking",
+        text: `Visited ${name} for dental care and had an exceptionally smooth experience. Their ${detail}. The clinic maintains high sterilization standards and the doctor explained the procedure with utmost clarity. Highly recommend ${name} for painless dental treatments in the city!`
+      },
+      {
+        title: "Warm Experience & Doctor Trust",
+        tag: "High Trust & Authenticity",
+        text: `Consulted ${name} today on a strong recommendation. ${detail}. What truly sets this clinic apart is the gentle, caring approach and zero unnecessary procedures. Felt completely comfortable throughout!`
+      },
+      {
+        title: "Short, Punchy & High-Impact",
+        tag: "Fastest 1-Tap Submission",
+        text: `Painless treatment and spotlessly clean clinic at ${name}! ${detail}. Punctual appointments and very transparent fees. 5 stars!`
+      }
+    ]
+  }
+
+  if (subCatId === "pet_clinic") {
+    return [
+      {
+        title: "Keyword-Rich SEO Champion",
+        tag: "Best for Google Maps Ranking",
+        text: `Brought my pet to ${name} and could not be happier with the veterinary care. Their ${detail}. The vet doctor is truly compassionate and handles anxious animals with incredible gentleness. Best pet clinic in the area!`
+      },
+      {
+        title: "Warm Experience & Pet Parent Trust",
+        tag: "High Trust & Authenticity",
+        text: `Visited ${name} today for my pet's checkup. ${detail}. The clinic is sanitized, staff is warm, and the doctor patiently answered all my diet and vaccination questions. Truly dependable animal hospital!`
+      },
+      {
+        title: "Short, Punchy & High-Impact",
+        tag: "Fastest 1-Tap Submission",
+        text: `Outstanding veterinary care at ${name}! ${detail}. Gentle animal handling and genuine medicines. Highly recommended for every pet parent!`
+      }
+    ]
+  }
+
+  if (subCatId === "fast_food") {
+    return [
+      {
+        title: "Keyword-Rich SEO Champion",
+        tag: "Best for Google Maps Ranking",
+        text: `Had an amazing street food bite at ${name}! Their ${detail}. The snacks were served piping hot and the authentic spicy red garlic chutney is absolutely unforgettable. Best fast food joint in town!`
+      },
+      {
+        title: "Warm Experience & Evening Hangout",
+        tag: "High Trust & Authenticity",
+        text: `Visited ${name} with friends for an evening snack. ${detail}. Despite the counter rush, our parcel was handed over in 5 minutes with neat safe packaging. Crispy, delicious, and pocket-friendly!`
+      },
+      {
+        title: "Short, Punchy & High-Impact",
+        tag: "Fastest 1-Tap Submission",
+        text: `Super fresh and mouth-watering street snacks at ${name}! ${detail}. Fresh oil used and brisk counter service. 10/10 recommended!`
+      }
+    ]
+  }
+
+  if (subCatId === "pizza_restaurant") {
+    return [
+      {
+        title: "Keyword-Rich SEO Champion",
+        tag: "Best for Google Maps Ranking",
+        text: `Had a delicious dining experience at ${name}! Their ${detail}. The wood-fired artisanal crust was delightfully crisp with generous melted mozzarella cheese pull. Best pizzeria in the city!`
+      },
+      {
+        title: "Warm Experience & Cafe Vibes",
+        tag: "High Trust & Authenticity",
+        text: `Visited ${name} for a weekend pizza dinner. ${detail}. The cozy youthful ambiance, great music, and steaming hot garlic bread made our evening memorable. Attentive table service!`
+      },
+      {
+        title: "Short, Punchy & High-Impact",
+        tag: "Fastest 1-Tap Submission",
+        text: `Authentic wood-fired pizzas and superb cheesy sides at ${name}! ${detail}. Spotless clean cafe and value for money combos. Must visit!`
+      }
+    ]
+  }
+
+  if (subCatId === "non_veg_restaurant") {
+    return [
+      {
+        title: "Keyword-Rich SEO Champion",
+        tag: "Best for Google Maps Ranking",
+        text: `Dined at ${name} and the authentic Mughlai flavors were phenomenal. Their ${detail}. The chicken pieces were succulent and well-marinated, and the dum biryani aroma was incredible. Top non-veg restaurant in the locality!`
+      },
+      {
+        title: "Warm Experience & Family Dining",
+        tag: "High Trust & Authenticity",
+        text: `Visited ${name} for a family feast. ${detail}. The air-conditioned dining hall is very comfortable, food was served steaming hot with prompt table service, and portion sizes were generous!`
+      },
+      {
+        title: "Short, Punchy & High-Impact",
+        tag: "Fastest 1-Tap Submission",
+        text: `Juicy tandoori kebabs and aromatic biryani at ${name}! ${detail}. Clean setup, authentic taste, and polite staff. 5 stars all the way!`
+      }
+    ]
+  }
+
+  if (subCatId === "bakery") {
+    return [
+      {
+        title: "Keyword-Rich SEO Champion",
+        tag: "Best for Google Maps Ranking",
+        text: `Ordered a celebration cake from ${name} and it exceeded all expectations! Their ${detail}. Perfectly balanced sweetness, soft fresh sponge, and stunning cake presentation. Best bakery in the area!`
+      },
+      {
+        title: "Warm Experience & Celebration Delight",
+        tag: "High Trust & Authenticity",
+        text: `Celebrated our special day with treats from ${name}. ${detail}. The delivery was punctual, the box was damage-free, and the bakery team gave helpful custom recommendations. Loved it!`
+      },
+      {
+        title: "Short, Punchy & High-Impact",
+        tag: "Fastest 1-Tap Submission",
+        text: `Super fresh 100% pure eggless cakes at ${name}! ${detail}. Melt-in-the-mouth sponge and pristine hygiene. Highly recommended!`
+      }
+    ]
+  }
+
+  if (subCatId === "saas_agency") {
+    return [
+      {
+        title: "Keyword-Rich SEO Champion",
+        tag: "Best for Google Maps Ranking",
+        text: `CustomerPilot transformed our retail footfall and online reputation! Their ${detail}. Customers love the frictionless WhatsApp digital cards and 5-star Google review velocity tripled within 60 days. Essential SaaS growth platform for store owners!`
+      },
+      {
+        title: "Warm Experience & Business Growth",
+        tag: "High Trust & Authenticity",
+        text: `Partnered with ${name} for our multi-store loyalty system. ${detail}. The acrylic billing counter standees get instant scans, and customer retention jumped noticeably. Outstanding tech support team!`
+      },
+      {
+        title: "Short, Punchy & High-Impact",
+        tag: "Fastest 1-Tap Submission",
+        text: `Game-changer software for retail stores! ${detail}. Zero app downloads and automatic review boost. 10/10 value!`
+      }
+    ]
+  }
 
   return [
     {
       title: "Keyword-Rich SEO Champion",
       tag: "Best for Google Maps Ranking",
-      text: `Had a wonderful experience at ${name}! Their ${detail}. The ambience was welcoming and the entire team was courteous and prompt. Highly recommend ${name} to anyone looking for genuine quality and dependable service in the area. 5 stars all the way!`
+      text: `Had a wonderful experience at ${name}! Their ${detail}. The ambiance was welcoming and the entire team was courteous, skilled, and prompt. Highly recommend ${name} to anyone looking for genuine quality and dependable service in the area. 5 stars all the way!`
     },
     {
       title: "Warm Experience & Staff Compliment",
       tag: "High Trust & Authenticity",
-      text: `Visited ${name} today on a friend's recommendation and they completely exceeded my expectations. ${detail}. What truly stands out is how warmly the staff treats every customer. Will definitely be a regular visitor here!`
+      text: `Visited ${name} today and they completely exceeded my expectations. ${detail}. What truly stands out is how warmly the team treats every customer with transparent pricing. Will definitely be a regular visitor here!`
     },
     {
       title: "Short, Punchy & High-Impact",
       tag: "Fastest 1-Tap Submission",
-      text: `Top notch experience at ${name}! ${detail}. Clean setup, quick billing, and consistently great quality. 10/10 recommended!`
+      text: `Top-notch experience at ${name}! ${detail}. Spotless clean setup, quick billing, and consistently high quality. 10/10 recommended!`
     }
   ]
 }
@@ -118,10 +564,10 @@ const FREE_TOOL_FAQS: DualLangFaqItem[] = [
     id: 2,
     questionEn: "How do keyword-rich reviews help my store rank #1 on Google Maps?",
     answerEn:
-      "Google's local search algorithm indexes words inside user reviews. When customer reviews mention specific products (e.g., 'eggless chocolate cake' or 'painless root canal'), Google Maps displays your business higher when local buyers search for those exact items.",
+      "Google's local search algorithm indexes words inside user reviews. When customer reviews mention specific products (e.g., 'butter dabeli', 'wood-fired pizza', or 'painless root canal'), Google Maps displays your business higher when local buyers search for those exact items.",
     questionHi: "Keyword-rich reviews se meri dukan Google Maps par #1 kaise aati hai?",
     answerHi:
-      "Google Maps ka algorithm reviews ke andar ke keywords ko read karta hai. Jab customer review me 'fresh cake' ya 'dental cleaning' likhta hai, toh Google Maps un keywords par aapki shop ko top local pack me show karta hai."
+      "Google Maps ka algorithm reviews ke andar ke keywords ko read karta hai. Jab customer review me 'crispy vadapav' ya 'dental cleaning' likhta hai, toh Google Maps un keywords par aapki shop ko top local pack me show karta hai."
   },
   {
     id: 3,
@@ -144,36 +590,53 @@ const FREE_TOOL_FAQS: DualLangFaqItem[] = [
 ]
 
 export function FreeAiReviewGeneratorClient() {
-  const [selectedCategory, setSelectedCategory] = useState<CategoryKey>("bakery")
-  const [storeName, setStoreName] = useState("Cake Connection")
-  const [highlight, setHighlight] = useState(
-    "Fresh Dutch Chocolate Truffle cake, eggless options & super polite staff"
-  )
-  const [isGenerating, setIsGenerating] = useState(false)
+  const [selectedMainGroup, setSelectedMainGroup] = useState<string>("food_dining")
+  const currentGroup = MAIN_INDUSTRY_GROUPS.find((g) => g.id === selectedMainGroup) || MAIN_INDUSTRY_GROUPS[0]
+
+  const [selectedSubCat, setSelectedSubCat] = useState<string>("fast_food")
+  const currentSubCat = currentGroup.subCategories.find((s) => s.id === selectedSubCat) || currentGroup.subCategories[0]
+
+  const [storeName, setStoreName] = useState<string>(currentSubCat.sampleStore)
+  const [highlight, setHighlight] = useState<string>(currentSubCat.sampleHighlight)
+  const [isGenerating, setIsGenerating] = useState<boolean>(false)
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
 
   const [reviews, setReviews] = useState<ReviewVariation[]>(() =>
-    generateReviews("bakery", "Cake Connection", "Fresh Dutch Chocolate Truffle cake, eggless options & super polite staff")
+    generateReviews(currentSubCat.id, currentSubCat.sampleStore, currentSubCat.sampleHighlight)
   )
 
-  const handleApplyPreset = (preset: CategoryPreset) => {
-    setSelectedCategory(preset.id)
-    setStoreName(preset.sampleStore)
-    setHighlight(preset.sampleHighlight)
+  const handleSelectMainGroup = (groupId: string) => {
+    setSelectedMainGroup(groupId)
+    const newGroup = MAIN_INDUSTRY_GROUPS.find((g) => g.id === groupId) || MAIN_INDUSTRY_GROUPS[0]
+    const defaultSub = newGroup.subCategories[0]
+    setSelectedSubCat(defaultSub.id)
+    setStoreName(defaultSub.sampleStore)
+    setHighlight(defaultSub.sampleHighlight)
     setIsGenerating(true)
     setTimeout(() => {
-      setReviews(generateReviews(preset.id, preset.sampleStore, preset.sampleHighlight))
+      setReviews(generateReviews(defaultSub.id, defaultSub.sampleStore, defaultSub.sampleHighlight))
       setIsGenerating(false)
-    }, 280)
+    }, 250)
+  }
+
+  const handleSelectSubCategory = (subCat: SubCategoryPreset) => {
+    setSelectedSubCat(subCat.id)
+    setStoreName(subCat.sampleStore)
+    setHighlight(subCat.sampleHighlight)
+    setIsGenerating(true)
+    setTimeout(() => {
+      setReviews(generateReviews(subCat.id, subCat.sampleStore, subCat.sampleHighlight))
+      setIsGenerating(false)
+    }, 250)
   }
 
   const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault()
     setIsGenerating(true)
     setTimeout(() => {
-      setReviews(generateReviews(selectedCategory, storeName, highlight))
+      setReviews(generateReviews(selectedSubCat, storeName, highlight))
       setIsGenerating(false)
-    }, 320)
+    }, 300)
   }
 
   const handleCopy = (text: string, index: number) => {
@@ -219,25 +682,25 @@ export function FreeAiReviewGeneratorClient() {
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-200/80 bg-white px-4 py-1.5 shadow-xs">
               <Sparkles className="h-3.5 w-3.5 text-amber-600" />
               <span className="text-xs font-bold text-slate-800">
-                100% Free Online Tool • Zero Sign-Up Required
+                100% Free Online Tool • Zero Sign-Up Required • 8 Industry Taxonomies
               </span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
               Free AI Google Review Generator:{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700">
-                Create 5-Star Reviews in Seconds
+                5-Star Reviews for Every Business
               </span>
             </h1>
 
-            {/* Direct Answer Snippet for SGE / Perplexity */}
+            {/* Direct Answer Snippet */}
             <div className="max-w-3xl mx-auto bg-amber-50/70 border border-amber-200/90 rounded-2xl p-4 sm:p-5 shadow-xs text-left space-y-1.5">
               <div className="flex items-center gap-2 text-xs font-bold text-amber-800 uppercase tracking-wider">
                 <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                <span>AI Review Generator Snippet</span>
+                <span>Multi-Category AI Review Generator</span>
               </div>
               <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
-                CustomerPilot&apos;s Free AI Google Review Generator instantly drafts keyword-rich, authentic 5-star Google review variations for local shops, cafes, clinics, and salons. It eliminates blank screen anxiety for customers and boosts local Google Maps Local Pack ranking.
+                Select your **Main Industry Group** (Food &amp; Dining, Healthcare, Beauty, Retail, Automotive, etc.) and tap your exact **Sub-Category** (e.g. Fast Food &amp; Vadapav, Dental Clinic, Pet Hospital, Wood-Fired Pizza, Non-Veg Biryani). CustomerPilot crafts keyword-rich 5-star Google review drafts that boost your Google Maps Local Pack ranking.
               </p>
             </div>
           </div>
@@ -251,10 +714,10 @@ export function FreeAiReviewGeneratorClient() {
               <div>
                 <h2 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
                   <Store className="w-5 h-5 text-amber-600" />
-                  <span>Customize Your Store &amp; Customer Experience</span>
+                  <span>Interactive Industry &amp; Sub-Category Selector</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Pick a retail category preset or enter your custom business details below:
+                  Pick your Main Business Category first, then click your specific Sub-Category below:
                 </p>
               </div>
               <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full self-start sm:self-auto">
@@ -263,34 +726,71 @@ export function FreeAiReviewGeneratorClient() {
               </div>
             </div>
 
-            {/* Preset Buttons Strip */}
-            <div className="p-4 sm:p-6 border-b border-slate-100 bg-slate-50/40">
-              <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
-                Quick 1-Click Retail Presets:
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {CATEGORIES.map((preset) => {
-                  const isActive = selectedCategory === preset.id
+            {/* STEP 1: Main Business Category Tabs (8 Groups) */}
+            <div className="p-4 sm:p-6 border-b border-slate-100 bg-slate-50/40 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                  Step 1: Choose Main Business Category (8 Industry Groups):
+                </span>
+                <span className="text-[11px] font-semibold text-slate-500">
+                  Selected: <strong className="text-slate-900">{currentGroup.icon} {currentGroup.label}</strong>
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {MAIN_INDUSTRY_GROUPS.map((group) => {
+                  const isActive = selectedMainGroup === group.id
                   return (
                     <button
-                      key={preset.id}
+                      key={group.id}
                       type="button"
-                      onClick={() => handleApplyPreset(preset)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      onClick={() => handleSelectMainGroup(group.id)}
+                      className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold text-left transition-all ${
                         isActive
-                          ? "bg-amber-500 text-slate-950 shadow-xs"
+                          ? "bg-slate-900 text-white shadow-md ring-2 ring-slate-900 ring-offset-1"
                           : "bg-white border border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
                       }`}
                     >
-                      <span>{preset.icon}</span>
-                      <span>{preset.label}</span>
+                      <span className="text-base">{group.icon}</span>
+                      <span className="truncate">{group.label}</span>
                     </button>
                   )
                 })}
               </div>
             </div>
 
-            {/* Input Form */}
+            {/* STEP 2: Sub-Category Pills for Selected Main Group */}
+            <div className="p-4 sm:p-6 border-b border-slate-100 bg-amber-50/20 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-amber-800">
+                  Step 2: Select Sub-Category Preset ({currentGroup.subCategories.length} Options in {currentGroup.label}):
+                </span>
+                <span className="text-[10px] font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-md">
+                  1-Click Auto-Fill
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {currentGroup.subCategories.map((sub) => {
+                  const isSubActive = selectedSubCat === sub.id
+                  return (
+                    <button
+                      key={sub.id}
+                      type="button"
+                      onClick={() => handleSelectSubCategory(sub)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                        isSubActive
+                          ? "bg-amber-500 text-slate-950 shadow-md ring-2 ring-amber-500 ring-offset-1"
+                          : "bg-white border border-slate-200 text-slate-700 hover:border-amber-300 hover:bg-amber-50/50"
+                      }`}
+                    >
+                      <span>{sub.icon}</span>
+                      <span>{sub.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Input Form with Store Name & Custom Highlights */}
             <form onSubmit={handleGenerate} className="p-5 sm:p-8 space-y-6">
               <div className="grid sm:grid-cols-2 gap-5">
                 <div className="space-y-2">
@@ -302,30 +802,30 @@ export function FreeAiReviewGeneratorClient() {
                     type="text"
                     value={storeName}
                     onChange={(e) => setStoreName(e.target.value)}
-                    placeholder="e.g. Cake Connection, Smile Studio Dental"
+                    placeholder="e.g. Tasty Vadapav, Smile Dental, Paws Vet Clinic"
                     className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
                     required
                   />
                   <p className="text-[11px] text-slate-500">
-                    The name of your shop or service as it appears on Google Business Profile.
+                    Your business or practice name as listed on Google Business Profile.
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <label htmlFor="experience-input" className="block text-xs font-bold text-slate-800 uppercase tracking-wide">
-                    Key Highlights / Experience Keywords
+                    Key Highlights / Product &amp; Service Keywords
                   </label>
                   <input
                     id="experience-input"
                     type="text"
                     value={highlight}
                     onChange={(e) => setHighlight(e.target.value)}
-                    placeholder="e.g. Fresh Dutch chocolate cake, fast billing & polite staff"
+                    placeholder="e.g. Butter dabeli, wood-fired pizza, painless root canal"
                     className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
                     required
                   />
                   <p className="text-[11px] text-slate-500">
-                    Specific specialties or services you want highlighted in the Google review.
+                    Specific specialties you want included in customer Google reviews for local ranking.
                   </p>
                 </div>
               </div>
@@ -333,7 +833,7 @@ export function FreeAiReviewGeneratorClient() {
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
                 <div className="flex items-center gap-2 text-xs text-slate-500">
                   <Sparkles className="w-4 h-4 text-amber-500" />
-                  <span>Powered by Gemini Generative AI • Instant local SEO keyword injection</span>
+                  <span>Powered by Gemini Generative AI • Instant local SEO keyword grounding</span>
                 </div>
                 <Button
                   type="submit"
@@ -348,16 +848,17 @@ export function FreeAiReviewGeneratorClient() {
 
             {/* Generated Review Output Cards */}
             <div className="p-5 sm:p-8 bg-slate-50/70 border-t border-slate-200 space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <h3 className="text-base font-extrabold text-slate-900">
-                    Ready-to-Copy 5-Star Google Review Variations
+                  <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                    <span>Ready-to-Copy 5-Star Google Review Variations</span>
+                    <span className="text-xs font-normal text-slate-500">({currentSubCat.label})</span>
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Click &ldquo;Copy Review&rdquo; to paste directly into your customer&apos;s Google review prompt:
+                    Click &ldquo;Copy Review Text&rdquo; to paste directly into your customer&apos;s Google review prompt:
                   </p>
                 </div>
-                <span className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
+                <span className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full self-start sm:self-auto">
                   3 Variations Ready
                 </span>
               </div>
@@ -385,7 +886,7 @@ export function FreeAiReviewGeneratorClient() {
                         {item.tag}
                       </span>
 
-                      <p className="text-xs text-slate-700 leading-relaxed italic bg-slate-50/60 p-3 rounded-xl border border-slate-100">
+                      <p className="text-xs text-slate-700 leading-relaxed italic bg-slate-50/60 p-3 rounded-xl border border-slate-100 min-h-[96px]">
                         &ldquo;{item.text}&rdquo;
                       </p>
                     </div>
@@ -418,7 +919,7 @@ export function FreeAiReviewGeneratorClient() {
           </div>
         </section>
 
-        {/* ============ INTERNAL NAVIGATION STRIP — SEO FLYWHEEL ============ */}
+        {/* ============ INTERNAL NAVIGATION STRIP ============ */}
         <div className="py-4 px-4 sm:px-6 bg-slate-50 border-t border-slate-100">
           <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-3 text-[11px] font-semibold text-slate-500">
             <span>You might also need:</span>
@@ -537,7 +1038,7 @@ export function FreeAiReviewGeneratorClient() {
               </div>
               <h4 className="font-extrabold text-slate-900 text-base">Long-Tail Keyword Indexing</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
-                When customers mention items like &ldquo;custom birthday cake&rdquo; or &ldquo;teeth whitening&rdquo; in their reviews, Google Maps indexes those terms. Your store appears in search queries even when customers don&apos;t search for your brand name.
+                When customers mention items like &ldquo;butter dabeli&rdquo;, &ldquo;wood-fired pizza&rdquo;, or &ldquo;painless root canal&rdquo; in their reviews, Google Maps indexes those terms. Your store appears in search queries even when customers don&apos;t search for your brand name.
               </p>
             </div>
 
