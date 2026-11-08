@@ -7,21 +7,95 @@ import { Building2, User, Phone, Mail, Lock, ArrowRight, CheckCircle2, Sparkles,
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-export const TOP_RECOMMENDED_CATEGORIES = [
-  { value: "bakery", label: "🎂 Bakery, Cake Shop & Desserts" },
-  { value: "cafe", label: "☕ Cafe & Coffee Shop" },
-  { value: "restaurant", label: "🍲 Restaurant & Family Dining (North Indian / Punjabi)" },
-  { value: "south_indian_fastfood", label: "🥞 South Indian & Fast Food (Dosa, Pizza, Burgers)" },
-  { value: "mens_salon", label: "✂️ Men's Salon & Grooming" },
-  { value: "beauty_parlour", label: "💅 Beauty Parlour, Spa & Unisex Salon" },
-  { value: "car_wash", label: "🚗 Car Wash & Auto Detailing" },
-  { value: "dental_clinic", label: "🩺 Dental & Healthcare Clinic" },
-  { value: "coaching_classes", label: "📚 Coaching, Tuition & Hobby Classes" },
-  { value: "gym_fitness", label: "💪 Gym, Fitness & Yoga Studio" },
-  { value: "retail_other", label: "🛒 Retail Store & Other Businesses" },
+export interface SignupCategoryGroup {
+  group: string
+  items: { value: string; label: string }[]
+}
+
+export const SIGNUP_CATEGORY_GROUPS: SignupCategoryGroup[] = [
+  {
+    group: "Healthcare & Clinics",
+    items: [
+      { value: "clinic_doctor", label: "🩺 Clinic & General Physician (Doctor / Medical)" },
+      { value: "dental_clinic", label: "🦷 Dental Clinic & Orthodontist" },
+      { value: "pet_clinic", label: "🐾 Pet Clinic & Veterinary Hospital" },
+      { value: "diagnostic_lab", label: "🔬 Pathology Lab & Diagnostic Center" },
+      { value: "pharmacy", label: "💊 Pharmacy & Chemist" },
+      { value: "physiotherapy", label: "🏃‍♂️ Physiotherapy & Rehab Center" },
+    ]
+  },
+  {
+    group: "Food & Dining",
+    items: [
+      { value: "bakery", label: "🎂 Bakery, Cake Shop & Desserts" },
+      { value: "cafe", label: "☕ Cafe & Coffee Shop" },
+      { value: "restaurant", label: "🍲 Punjabi / North Indian Restaurant" },
+      { value: "south_indian_restaurant", label: "🥞 South Indian Restaurant & Tiffins" },
+      { value: "fast_food", label: "🥪 Fast Food & Street Snacks (Dabeli, Vadapav, Burger, Sandwich)" },
+      { value: "pizza_restaurant", label: "🍕 Pizza Restaurant & Pizzeria" },
+      { value: "non_veg_restaurant", label: "🍗 Non-Veg Restaurant & Biryani House" },
+      { value: "sweet_shop", label: "🍬 Sweet Shop / Mithai & Farsan" },
+      { value: "ice_cream", label: "🍨 Ice Cream & Dessert Parlour" },
+      { value: "cloud_kitchen", label: "🥡 Cloud Kitchen & Delivery Hub" },
+    ]
+  },
+  {
+    group: "Beauty & Grooming",
+    items: [
+      { value: "salon", label: "✂️ Men's Salon & Grooming" },
+      { value: "beauty_parlour", label: "💅 Beauty Parlour & Women's Spa" },
+      { value: "unisex_salon", label: "💄 Unisex Salon & Makeup Studio" },
+      { value: "tattoo_studio", label: "🎨 Tattoo & Piercing Studio" },
+    ]
+  },
+  {
+    group: "Automotive & Detailing",
+    items: [
+      { value: "car_wash", label: "🚗 Car Wash & Auto Detailing" },
+      { value: "auto_garage", label: "🔧 Automobile Repair & Garage" },
+      { value: "bike_service", label: "🏍️ Two-Wheeler Service Center" },
+      { value: "car_accessories", label: "🛞 Car Accessories & Tyres" },
+    ]
+  },
+  {
+    group: "Education & Coaching",
+    items: [
+      { value: "coaching_classes", label: "📚 Coaching Institute & Exam Prep" },
+      { value: "preschool_daycare", label: "🧸 Preschool & Daycare" },
+      { value: "tuition_classes", label: "✏️ Tuition & Learning Center" },
+      { value: "music_dance_academy", label: "🎵 Music & Dance Academy" },
+    ]
+  },
+  {
+    group: "Fitness & Sports",
+    items: [
+      { value: "gym_fitness", label: "💪 Gym & Fitness Center" },
+      { value: "yoga_studio", label: "🧘 Yoga & Meditation Studio" },
+    ]
+  },
+  {
+    group: "Retail & Shopping",
+    items: [
+      { value: "supermarket", label: "🛒 Supermarket & Grocery Store" },
+      { value: "clothing_boutique", label: "👗 Clothing & Fashion Boutique" },
+      { value: "jewellery_store", label: "💍 Jewellery & Silver Showroom" },
+      { value: "footwear_store", label: "👟 Footwear Store" },
+      { value: "electronics_mobile", label: "📱 Mobile & Electronics Shop" },
+      { value: "furniture_decor", label: "🛋️ Furniture & Home Decor Store" },
+      { value: "retail_other", label: "🛍️ Retail Store & Other Businesses" },
+    ]
+  },
+  {
+    group: "Agency & Professional Services",
+    items: [
+      { value: "saas_agency", label: "💻 Software, Marketing Agency & Professional Services" },
+    ]
+  }
 ]
+
+export const TOP_RECOMMENDED_CATEGORIES = SIGNUP_CATEGORY_GROUPS.flatMap(g => g.items)
 
 function SignupForm() {
   const router = useRouter()
@@ -360,11 +434,18 @@ function SignupForm() {
                       <SelectTrigger className="mt-1 text-xs bg-stone-50 border-stone-200">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        {TOP_RECOMMENDED_CATEGORIES.map(cat => (
-                          <SelectItem key={cat.value} value={cat.value}>
-                            {cat.label}
-                          </SelectItem>
+                      <SelectContent className="max-h-[320px]">
+                        {SIGNUP_CATEGORY_GROUPS.map((grp) => (
+                          <SelectGroup key={grp.group}>
+                            <SelectLabel className="text-[10px] font-extrabold uppercase tracking-wider text-stone-500 bg-stone-100/80 px-2 py-1 my-0.5 rounded-xs">
+                              {grp.group}
+                            </SelectLabel>
+                            {grp.items.map((cat) => (
+                              <SelectItem key={cat.value} value={cat.value} className="text-xs">
+                                {cat.label}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
                         ))}
                       </SelectContent>
                     </Select>
@@ -379,11 +460,18 @@ function SignupForm() {
                       <SelectTrigger className="mt-1 text-xs bg-stone-50 border-stone-200">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        {TOP_RECOMMENDED_CATEGORIES.map(cat => (
-                          <SelectItem key={cat.value} value={cat.value}>
-                            {cat.label}
-                          </SelectItem>
+                      <SelectContent className="max-h-[320px]">
+                        {SIGNUP_CATEGORY_GROUPS.map((grp) => (
+                          <SelectGroup key={grp.group}>
+                            <SelectLabel className="text-[10px] font-extrabold uppercase tracking-wider text-stone-500 bg-stone-100/80 px-2 py-1 my-0.5 rounded-xs">
+                              {grp.group}
+                            </SelectLabel>
+                            {grp.items.map((cat) => (
+                              <SelectItem key={cat.value} value={cat.value} className="text-xs">
+                                {cat.label}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
                         ))}
                       </SelectContent>
                     </Select>

@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized: SuperAdmin access required' }, { status: 401 });
     }
     const { payload } = await jwtVerify(token, new TextEncoder().encode(getJwtSecret()));
-    if (payload.role !== 'super_admin') {
+    if (payload.role !== 'super_admin' && payload.impersonatedBy !== 'super_admin') {
       return NextResponse.json({ error: 'Unauthorized: SuperAdmin access required' }, { status: 401 });
     }
 

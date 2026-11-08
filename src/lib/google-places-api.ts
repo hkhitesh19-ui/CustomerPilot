@@ -130,7 +130,7 @@ export async function searchPlaces(
   // Check if query is a Google Maps URL
   if (cleanQuery.includes("google.com/maps") || cleanQuery.includes("maps.app.goo.gl") || cleanQuery.includes("g.page") || cleanQuery.includes("goo.gl/maps")) {
     const extractedName = extractNameFromGoogleUrl(cleanQuery)
-    const placeId = extractPlaceIdFromUrl(cleanQuery) || generateRealisticPlaceId(extractedName, 0)
+    const placeId = extractPlaceIdFromUrl(cleanQuery) || "manual_url"
     
     return {
       results: [{
@@ -289,8 +289,10 @@ function extractNameFromGoogleUrl(url: string): string {
 }
 
 function extractPlaceIdFromUrl(url: string): string | null {
-  const match = url.match(/ChIJ[A-Za-z0-9_-]{23}/)
-  return match ? match[0] : null
+  const match = url.match(/[?&](?:placeid|place_id|query_place_id)=([A-Za-z0-9_-]+)/i) || url.match(/(ChIJ[A-Za-z0-9_-]{20,})/i)
+  const id = match ? (match[1] || match[0]) : null
+  if (id === "ChIJnv3BJRZhpx5DLTbjrz7FNVdlt19") return null
+  return id
 }
 
 /**

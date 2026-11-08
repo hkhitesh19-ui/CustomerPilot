@@ -95,9 +95,6 @@ export async function POST(req: NextRequest) {
 
     const finalName = placeDetails?.displayName?.text || extractedName || "Google Business Profile"
     const finalAddress = placeDetails?.formattedAddress || "Google Maps Verified Location"
-    const googleReviewUrl = placeId && placeId !== "manual_url"
-      ? `https://search.google.com/local/writereview?placeid=${placeId}`
-      : finalUrl
 
     // Extract Locality & City from formatted address or query
     let locality = "Local Area"
@@ -111,6 +108,15 @@ export async function POST(req: NextRequest) {
         locality = parts[0]
         city = parts[1]
       }
+    }
+
+    // Ensure we do NOT replace an authentic Google Maps URL with a broken/mock placeid link
+    const isMockPlaceId = !placeId || placeId === "manual_url" || placeId.startsWith("manual_") || placeId === "ChIJnv3BJRZhpx5DLTbjrz7FNVdlt19"
+    let googleReviewUrl = finalUrl
+    if (!isMockPlaceId && placeId) {
+      googleReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`
+    } else if (!googleReviewUrl || googleReviewUrl.includes("ChIJnv3BJRZhpx5DLTbjrz7FNVdlt19")) {
+      googleReviewUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${finalName} ${locality} ${city}`.trim())}`
     }
 
     // Detect Category Preset & Auto-generate High-Search Keywords (6 Tiers)

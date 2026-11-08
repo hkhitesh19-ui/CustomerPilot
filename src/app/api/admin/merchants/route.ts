@@ -10,7 +10,7 @@ async function requireSuperAdmin(): Promise<{ error: NextResponse } | null> {
   if (!token) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
   try {
     const { payload } = await jwtVerify(token, new TextEncoder().encode(getJwtSecret()));
-    if (payload.role !== 'super_admin') return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
+    if (payload.role !== 'super_admin' && payload.impersonatedBy !== 'super_admin') return { error: NextResponse.json({ error: 'Forbidden: Super Admin access required' }, { status: 403 }) };
     return null;
   } catch {
     return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
@@ -185,14 +185,20 @@ export async function POST(req: Request) {
           ...(address !== undefined && { address }),
           ...(category !== undefined && { category }),
           ...(plan !== undefined && { plan: String(plan).toLowerCase() }),
-          ...(status !== undefined && { status: String(status).toLowerCase() }),
+          ...(status !== undefined && { status: String(status) }),
           ...(googleReviewLink !== undefined && { googleReviewLink }),
           ...(baselineReviewCount !== undefined && { baselineReviewCount: Number(baselineReviewCount) }),
           ...(baselineRating !== undefined && { baselineRating: Number(baselineRating) }),
           ...(baselineScreenshotUrl !== undefined && { baselineScreenshotUrl }),
           ...(onboardingCompleted !== undefined && { onboardingCompleted: Boolean(onboardingCompleted) }),
           ...(currentStep !== undefined && { currentStep: Number(currentStep) }),
-          ...(trialEndsAt !== undefined && { trialEndsAt: trialEndsAt ? new Date(trialEndsAt) : null }),
+          ...(trialEndsAt !== undefined && {
+            trialEndsAt: (() => {
+              if (!trialEndsAt || (typeof trialEndsAt === 'string' && trialEndsAt.trim() === '')) return null;
+              const d = new Date(trialEndsAt);
+              return isNaN(d.getTime()) ? null : d;
+            })()
+          }),
           ...(body.gbpServiceTrack !== undefined && { gbpServiceTrack: body.gbpServiceTrack }),
           ...(body.gbpProfileStatus !== undefined && { gbpProfileStatus: body.gbpProfileStatus }),
           ...(body.gbpReviewVelocityCap !== undefined && { gbpReviewVelocityCap: Number(body.gbpReviewVelocityCap) }),

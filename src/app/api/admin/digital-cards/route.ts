@@ -13,7 +13,7 @@ async function verifySuperAdmin(req: NextRequest): Promise<{ ok: boolean; error?
       return { ok: false, error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) }
     }
     const { payload } = await jwtVerify(token, new TextEncoder().encode(getJwtSecret()))
-    if (payload.role !== "super_admin") {
+    if (payload.role !== 'super_admin' && payload.impersonatedBy !== 'super_admin') {
       return { ok: false, error: NextResponse.json({ error: "Forbidden: SuperAdmin access required" }, { status: 403 }) }
     }
     return { ok: true }

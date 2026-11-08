@@ -431,6 +431,46 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
     ]
   },
 
+  clinic_doctor: {
+    id: "clinic_doctor",
+    label: "Clinic & General Physician (Doctor & Healthcare)",
+    gbpCategory: "Doctor / Medical Clinic",
+    audiencePersona: "All_Neutral",
+    serviceMode: "Walk-in + Appointment",
+    seoEntities: [
+      "Doctor consultation", "General physician consultation", "Experienced MBBS MD doctor", "Accurate medical diagnosis", "Routine full body health checkup",
+      "Blood pressure monitoring", "Blood sugar diabetes check", "Fever and viral infection care", "Seasonal cold cough flu treatment", "Minimal medicine prescription",
+      "Compassionate patient listener doctor", "Clean sanitized clinic environment", "Hygienic sterilized instruments", "Comfortable AC waiting lounge", "Punctual appointment timing",
+      "Minimal clinic waiting time", "Emergency walk-in doctor consultation", "Pediatric child health checkup", "Senior citizen elderly health care", "Digital prescription slip",
+      "Follow-up medical consultation", "Polite and helpful clinic receptionist", "Preventive wellness guidance", "Reliable neighborhood family doctor", "Transparent consultation fee",
+      "Affordable doctor visit charges", "ECG and pulse oximeter vitals check", "Stomach infection gastric pain relief", "Headache migraine treatment", "Allergy and asthma consultation",
+      "Throat infection tonsillitis care", "Holistic health advice", "Thyroid health checkup", "Vaccination advice for kids and adults", "Clean examination bed",
+      "Prompt emergency medical attention", "Patient doctor counseling", "Post-illness recovery guidance", "Reliable healthcare clinic in city", "Trusted general practitioner"
+    ],
+    aeoAnswers: [
+      "Experienced doctor providing accurate diagnosis with compassionate, patient listening",
+      "Minimal medicine prescription focused on quick and natural health recovery",
+      "Spotless clean and sanitized clinic environment with comfortable waiting lounge",
+      "Punctual appointments with minimal wait time and walk-in consultation",
+      "Affordable and transparent consultation charges with complete healthcare guidance"
+    ],
+    geoContext: [
+      "Best general physician doctor clinic in locality",
+      "Trusted family doctor with patient and compassionate approach",
+      "Accurate diagnosis and effective treatment for fever, cough, and viral illness",
+      "Spotless clean hygienic clinic setup safe for children and senior citizens",
+      "Dependable healthcare clinic with minimal waiting time"
+    ],
+    blacklist: [
+      "Chicken", "Mutton", "Biryani", "Fish", "Egg", "Food", "Dinner", "Lunch", "Thali",
+      "Dal makhani", "Paneer", "Pizza", "Burger", "Sandwich", "Cake", "Pastry", "Truffle", "Brownie",
+      "Chai", "Tea", "Coffee", "Alcohol", "Beer", "Wine", "Haircut", "Beard trim", "Fade cut",
+      "Bridal makeup", "Facial", "Waxing", "Threading", "Saree draping", "Car wash", "Ceramic coating",
+      "Garage", "Mechanic", "Engine oil", "Clothes", "Kurtis", "Footwear", "Tailoring",
+      "Dog vaccination", "Pet medicine", "Veterinary"
+    ]
+  },
+
   dental_clinic: {
     id: "dental_clinic",
     label: "Dental Clinic & Orthodontist",
@@ -648,6 +688,27 @@ export function getKeywordPresetForCategory(category?: string | null, merchantNa
     return MASTER_KEYWORD_PRESETS.saas_agency;
   }
 
+  // Clinic, General Physician, Doctor, Healthcare & Medical Centers
+  if (
+    c.includes("clinic") ||
+    c.includes("doctor") ||
+    c.includes("physician") ||
+    c.includes("hospital") ||
+    c.includes("health") ||
+    c.includes("medical") ||
+    c.includes("polyclinic") ||
+    c.includes("pediatric") ||
+    c.includes("orthopedic") ||
+    c.includes("ent") ||
+    c.includes("gynec") ||
+    c.includes("consultant") ||
+    c.includes("pathology") ||
+    c.includes("diagnostic") ||
+    c.includes("physiotherapy")
+  ) {
+    return MASTER_KEYWORD_PRESETS.clinic_doctor;
+  }
+
   // Dental Clinic & Orthodontist
   if (c.includes("dental") || c.includes("dentist") || c.includes("tooth") || c.includes("teeth") || c.includes("orthodont") || c.includes("rct") || c.includes("smile care")) {
     return MASTER_KEYWORD_PRESETS.dental_clinic;
@@ -752,6 +813,49 @@ export function generateAutoKeywordsForLocation(
   const cty = (city || "").trim() || "Vadodara";
 
   switch (categoryKey) {
+    case "clinic_doctor":
+    case "polyclinic":
+      return {
+        coreGeo: [
+          `clinic in ${loc}`,
+          `doctor in ${loc} ${cty}`,
+          `general physician in ${loc}`,
+          `best clinic near me in ${loc}`,
+          `family doctor in ${loc} ${cty}`
+        ],
+        commercial: [
+          `fever doctor in ${loc}`,
+          `emergency clinic near me in ${loc}`,
+          `experienced general physician ${loc}`,
+          `child specialist doctor in ${loc}`,
+          `cough and cold doctor consultation ${cty}`
+        ],
+        services: [
+          "Doctor consultation",
+          "General physician care",
+          "Fever and viral treatment",
+          "Blood pressure and sugar check",
+          "Pediatric child care",
+          "Routine health checkup",
+          "Digital prescription"
+        ],
+        catchmentLandmarks: [
+          `${loc} main road clinic`,
+          `top rated doctor near ${loc}`,
+          `trusted family clinic ${cty}`
+        ],
+        voiceAeoQuestions: [
+          `who is the best doctor in ${loc}`,
+          `which clinic is open now near me in ${loc}`,
+          `best general physician for viral fever in ${cty}`
+        ],
+        semanticReviewPhrases: [
+          "Very polite, patient, and knowledgeable doctor who diagnoses accurately with minimal medicines.",
+          "Spotless clean clinic with very short waiting time. Doctor explained the condition clearly and recovery was quick.",
+          "Best family doctor in the area. Compassionate consultation and attentive clinic staff."
+        ]
+      };
+
     case "pet_clinic":
       return {
         coreGeo: [

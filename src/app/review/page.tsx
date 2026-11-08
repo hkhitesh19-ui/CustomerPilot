@@ -131,13 +131,17 @@ export default async function ReviewPage({
     } catch (_) {}
   }
 
-  if (googlePlaceId === "manual_url") {
+  if (googlePlaceId === "manual_url" || googlePlaceId === "ChIJnv3BJRZhpx5DLTbjrz7FNVdlt19") {
     googleReviewLink = googleConnection?.address || googleConnection?.googleReviewUrl || merchant.googleReviewLink || null
     googlePlaceId = null
   }
 
   // Fail-safe Google Maps Search fallback if no review link or placeId exists
-  const fallbackMapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${merchant.name} ${merchant.address || ''}`.trim())}`
+  const fallbackMapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${merchant.name} ${merchant.address || merchant.city || ''}`.trim())}`
+  if (googleReviewLink && googleReviewLink.includes("ChIJnv3BJRZhpx5DLTbjrz7FNVdlt19")) {
+    googleReviewLink = fallbackMapsSearchUrl
+    googlePlaceId = null
+  }
   if (!googleReviewLink && !googlePlaceId) {
     googleReviewLink = fallbackMapsSearchUrl
   }

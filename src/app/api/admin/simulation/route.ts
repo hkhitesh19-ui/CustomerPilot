@@ -10,7 +10,7 @@ async function requireSuperAdmin(): Promise<{ error: NextResponse } | null> {
   if (!token) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
   try {
     const { payload } = await jwtVerify(token, new TextEncoder().encode(getJwtSecret()));
-    if (payload.role !== 'super_admin') return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
+    if (payload.role !== 'super_admin' && payload.impersonatedBy !== 'super_admin') return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
     return null;
   } catch {
     return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };

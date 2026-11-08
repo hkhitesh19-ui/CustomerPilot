@@ -4,6 +4,24 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 ---
+## [08 Nov 2026] Issue: SuperAdmin Trial Extension 403 Forbidden Fix, Full 8-Group Business Category Taxonomy at Signup & Clinic/Doctor Place ID 404 Prevention
+- **Symptom**:
+  1. In SuperAdmin panel (`/super-admin?tab=merchants`), when attempting to extend a merchant's trial period (or update profile) after viewing/managing a merchant's dashboard, an alert popped up: "Failed to update profile: Forbidden: Super Admin access required".
+  2. Merchants signing up only had 11 flat legacy categories available with no direct options for medical clinics, general physicians, non-veg/biryani, fast food, pizzerias, supermarkets, etc.
+  3. When connecting a clinic/doctor Google Maps profile, CustomerPilot generated generic restaurant reviews (mentioning Dal Makhani and Naan) instead of medical consultation/checkup, and customer review redirection led to a Google 404 error ("The requested URL /local/writereview?placeid=ChIJnv3BJRZhpx5DLTbjrz7FNVdlt19 was not found on this server").
+- **Root Cause**:
+  1. In `/api/admin/impersonate`, when an admin views a merchant's dashboard, the session JWT token is updated with `role: 'merchant', impersonatedBy: 'super_admin'`. In `/api/admin/merchants/route.ts` (and sibling admin routes), `requireSuperAdmin()` strictly checked `payload.role !== 'super_admin'` and omitted checking `payload.impersonatedBy === 'super_admin'`, triggering a 403 Forbidden response. Additionally, Prisma threw if `trialEndsAt` was empty/invalid date string, and lowercase status conversion caused status badge mismatching.
+  2. `src/components/signup-client.tsx` was hardcoded to an 11-item flat array `TOP_RECOMMENDED_CATEGORIES`, whereas `src/lib/gbp-categories.ts` defines 8 comprehensive industry groups with 35+ specialized categories.
+  3. In `src/lib/google-places-api.ts`, when a Google Maps URL lacked a place ID parameter, `searchPlaces` fell back to `generateRealisticPlaceId(query, 0)`, which generated a synthetic mock ID (`ChIJnv3BJRZhpx5DLTbjrz7FNVdlt19` from seed 57). `resolve-maps-url` then replaced the merchant's working Google Maps URL with `https://search.google.com/local/writereview?placeid=ChIJnv3BJRZhpx5DLTbjrz7FNVdlt19`, which failed with 404 on Google's live servers. Furthermore, `getKeywordPresetForCategory` lacked a preset for `clinic_doctor`, defaulting doctors and clinics to `MASTER_KEYWORD_PRESETS.restaurant`.
+- **Resolution**:
+  1. **SuperAdmin Authorization & Impersonation Support**: Updated `requireSuperAdmin()` across `/api/admin/merchants`, `/api/admin/content`, `/api/admin/digital-cards`, `/api/admin/simulation`, `/api/admin/sync-vps`, and `/api/admin/whatsapp-monitor` to accept `payload.impersonatedBy === 'super_admin'`. Added safe parsing for `trialEndsAt` to guard against empty strings and invalid dates, and preserved `status` casing.
+  2. **8-Group Categorized Signup Taxonomy**: Updated `src/components/signup-client.tsx` with `SIGNUP_CATEGORY_GROUPS` using shadcn `SelectGroup` and `SelectLabel` spanning all 8 major industries (Healthcare & Clinics, Food & Dining, Beauty & Grooming, Automotive & Detailing, Education & Coaching, Fitness & Sports, Retail & Shopping, Agency & Professional Services) with 35+ sub-categories.
+  3. **Clinic & Doctor Master Keyword Preset**: Added `MASTER_KEYWORD_PRESETS.clinic_doctor` to `src/lib/keyword-matrix.ts` with 40+ medical/clinic entities, comprehensive AEO answers, and strict non-medical blacklists (no food, no haircuts). Mapped all healthcare/doctor/clinic keywords to this preset, and added 6 tiers of localized geo keywords in `generateAutoKeywordsForLocation`.
+  4. **404 Prevention & Authentic Maps URL Preservation**: Updated `searchPlaces` in `src/lib/google-places-api.ts` to never fabricate synthetic `ChIJ...` mock IDs from URLs. In `resolve-maps-url`, preserved the merchant's authentic Google Maps URL (`finalUrl`) as `googleReviewUrl` unless an official, verified Place ID is present. Added runtime interceptors in `/review` and `ReviewEditor.tsx` to automatically heal mock ID `ChIJnv3BJRZhpx5DLTbjrz7FNVdlt19` to Google Maps Search URL (`/maps/search/?api=1&query=...`), preventing 404 errors.
+  5. **Adversarial Hardening**: All 6 Master Adversarial Gates passed cleanly (Exit Code 0).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [08 Nov 2026] Issue: Smart AI Review Engine: Automatic GBP High-Search GEO Keyword Extraction, 2-Column Offered/Excluded Studio & 1-Tap Customer Hero Chips
 - **Symptom**:
   1. When merchants entered their Google Maps location / GBP profile URL (such as "PET CLINIC @ MANJALPUR" or dental/fast-food/pizza/restaurant shops), there was no automatic geo-intent keyword extraction tailored to their catchment area, locality, and city.

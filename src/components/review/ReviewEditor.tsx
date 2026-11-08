@@ -99,8 +99,11 @@ export function ReviewEditor({
   }
 
   const fallbackSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${merchant.name || "Store"} ${merchant.address || ""}`.trim())}`
-  const googleLink = merchant.googleReviewLink 
-    || (merchant.googlePlaceId ? `https://search.google.com/local/writereview?placeid=${merchant.googlePlaceId}` : fallbackSearchUrl)
+  let googleLink = merchant.googleReviewLink 
+    || (merchant.googlePlaceId && merchant.googlePlaceId !== "ChIJnv3BJRZhpx5DLTbjrz7FNVdlt19" ? `https://search.google.com/local/writereview?placeid=${merchant.googlePlaceId}` : fallbackSearchUrl)
+  if (googleLink.includes("ChIJnv3BJRZhpx5DLTbjrz7FNVdlt19")) {
+    googleLink = fallbackSearchUrl
+  }
 
   // Robust multi-layered clipboard copy with user-activation safety
   const performCopy = async (text: string): Promise<boolean> => {
