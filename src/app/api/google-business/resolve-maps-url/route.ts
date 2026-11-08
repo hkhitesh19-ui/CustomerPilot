@@ -18,8 +18,8 @@ export async function POST(req: NextRequest) {
     let finalUrl = rawUrl || ""
     let extractedName = fallbackName || ""
 
-    // 1. Expand Shortened Google Maps links (e.g. maps.app.goo.gl or goo.gl/maps)
-    if (finalUrl && (finalUrl.includes("maps.app.goo.gl") || finalUrl.includes("goo.gl/maps") || finalUrl.includes("g.page"))) {
+    // 1. Expand Shortened Google Maps links (e.g. maps.app.goo.gl, goo.gl/maps, share.google)
+    if (finalUrl && (finalUrl.includes("maps.app.goo.gl") || finalUrl.includes("goo.gl/maps") || finalUrl.includes("g.page") || finalUrl.includes("share.google"))) {
       try {
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort(), 4000)
@@ -64,6 +64,22 @@ export async function POST(req: NextRequest) {
           extractedName = decodeURIComponent(rawNamePart.replace(/\+/g, " ")).trim()
         }
       } catch {}
+    }
+
+    // 4B. Extract Store Name from Google Search / Knowledge Panel query `q=` (common in share.google links)
+    if (finalUrl.includes("google.com/search") && /[?&]q=/.test(finalUrl)) {
+      try {
+        const urlObj = new URL(finalUrl)
+        const qParam = urlObj.searchParams.get("q")
+        if (qParam && qParam.trim()) {
+          extractedName = qParam.trim()
+        }
+      } catch {
+        const qMatch = finalUrl.match(/[?&]q=([^&]+)/)
+        if (qMatch && qMatch[1]) {
+          extractedName = decodeURIComponent(qMatch[1].replace(/\+/g, " ")).trim()
+        }
+      }
     }
 
     // 5. If we still don't have placeId or need verified store details, query Google Places Search
