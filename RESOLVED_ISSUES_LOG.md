@@ -4,6 +4,22 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 ---
+## [08 Nov 2026] UI/UX & Asset Integrity: Master Source Uncut Logo Restoration & Resolution of Clipped "C"/"P" Curves Across All Icon Assets
+- **Symptom**: When directly viewing `customerpilot.in/icon.png` or `customerpilot.in/favicon.ico` in the browser, the CustomerPilot ribbon logo displayed flat-sliced edges — specifically the top curve of the "P", the outer right loop of the "P", the bottom stem point, and the outer left curve of the "C" were physically cut off flat.
+- **Root Cause**: The source asset `public/cplogo_icon.png` in the repository was an improperly cropped legacy raster image (305x220) where the bounding box had been sliced directly through the logo geometry with full opacity (alpha 255) touching all 4 boundaries (left, right, top, bottom). Sizing or padding that file still preserved the pre-existing flat cuts on the glyph itself.
+- **Resolution**:
+  1. **Master Uncut Asset Extraction**: Located the original unclipped vector-raster render in `Logo/cplogo1.png` (1024x1024), which contains the complete, undamaged CP ribbon logo with full rounded geometry. Extracted the authentic 533x353 icon where all 4 borders taper naturally into smooth anti-aliased alpha transparency (Col 0 alpha: 1, Col 532 alpha: 1, Row 0 alpha: 1, Row 352 alpha: 74).
+  2. **Source Replacement**: Overwrote `public/cplogo_icon.png` with this authentic, 100% uncut 533x353 master source.
+  3. **Comprehensive Icon Asset Regeneration**: Regenerated all 11 icon assets from the uncut master:
+     - `public/icon-512.png` & `src/app/icon.png`: 512x512 transparent with 380px wide uncut logo (67px horizontal padding, 131px vertical padding, 62.4px clearance to circular edge).
+     - `public/icon-192.png`, `public/icon-96.png`, `public/icon-48.png`: Proportional transparent icons with smooth rounded curves.
+     - `public/favicon.ico` & `src/app/favicon.ico`: Multi-resolution binary ICO files (16, 32, 48, 64, 128, 256) embedded with the uncut logo.
+     - `public/apple-touch-icon.png` & `src/app/apple-icon.png`: 180x180 icons with clean `#ffffff` background.
+     - `public/icon-maskable-192.png` & `public/icon-maskable-512.png`: Safe-zone maskable icons with solid `#ffffff` background for Android adaptive launchers.
+  4. **Ground-Truth Verification**: Verified at the pixel level that the right curve of the "P" tapers smoothly (Col 435 to Col 450: 88 -> 83 -> 78 -> 67 -> 44 -> 27 -> 8 -> 0 pixels) with zero flat cuts.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [08 Nov 2026] UI/UX & SEO: Google Search Results Circular Favicon Clipping Fix & Global Skills Installation (Claude Code Plugins & AI Documentary Director)
 - **Symptom**:
   1. In Google Search results (e.g. searching for `customerpilot.in` / `CustomerPilot vs. Traditional POS Loyalty Systems Comparison`), the brand favicon displayed inside Google's circular search result badge was clipped on the outer edges — the left loop of "C" and right loop of "P" were cut off.
