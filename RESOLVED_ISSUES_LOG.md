@@ -3,6 +3,34 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+---
+## [08 Nov 2026] Feature & Mobile UX: Responsive Mobile Pricing Cards, SuperAdmin Mobile Drawer, PWA Adaptive Icon Safe-Zones & Global Skills
+- **Symptom**:
+  1. On mobile devices, the pricing section "Or Choose Exactly What You Need" rendered in a 700px-wide table with horizontal scroll, hiding prices, discounts, and "Add" buttons off-screen.
+  2. In the SuperAdmin Command Center (`/super-admin`), mobile administrators could not access the left navigation panel because the sidebar was `hidden lg:flex` and the header lacked a mobile menu toggle.
+  3. When users installed or created a mobile home screen shortcut on Android (Samsung One UI / Pixel), the launcher's squircle mask clipped the outer curves of the "CP" ribbon logo, and the PWA splash screen appeared distorted.
+  4. Global AI skills for Logo Motion Graphics and Claude Instagram Connectors were requested for system-wide availability.
+- **Root Cause**:
+  1. `pricing-studio.tsx` lacked responsive card-stacking for `< md` screens.
+  2. `src/app/super-admin/page.tsx` lacked a mobile hamburger drawer trigger.
+  3. `public/manifest.json` only declared `favicon.ico` without dedicated 192x192/512x512 PWA icons and lacked a `purpose: "maskable"` icon with the Android-mandated 20% safe-zone margin.
+- **Resolution**:
+  1. **Direct Mobile Pricing Cards (`src/components/pricing/pricing-studio.tsx`)**:
+     - Hid horizontal table on `< md` screens (`hidden md:block`).
+     - Added dedicated mobile card stack (`block md:hidden`) displaying all 4 standalone tools, 6-Month and 1-Year price blocks, strikethrough MRP, per-day costs, savings tags, and 1-tap `[+ Add]` buttons vertically without any left/right scroll.
+     - Added mobile cards for Total Row and Gear 2, 3, 4, 5 combos.
+  2. **SuperAdmin Mobile Drawer (`src/app/super-admin/page.tsx`)**:
+     - Added mobile `Menu` button in header (`lg:hidden`).
+     - Implemented animated slide-over glassmorphism drawer (`AnimatePresence` + `motion.aside`) with instant category navigation, backdrop dismiss, and sign-out control.
+  3. **PWA Adaptive Icon Safe-Zone Engine (`public/manifest.json` & `src/app/layout.tsx`)**:
+     - Generated 5 high-resolution PWA icons with PIL: `icon-192.png`, `icon-512.png`, `icon-maskable-192.png` (22% safe-zone padding), `icon-maskable-512.png`, and `apple-touch-icon.png` (180x180).
+     - Configured `purpose: "any"` and `purpose: "maskable"` in `manifest.json` with clean `#ffffff` background.
+     - Registered icons in Next.js `metadata.icons` in `src/app/layout.tsx`.
+  4. **Global System Skills (`C:\Users\Admin\.gemini\config\skills\`)**:
+     - Installed `logo-motion-graphics` (Universal Logo Motion Graphics Master Prompt & Storyboard framework).
+     - Installed `claude-instagram-prompts` (Claude + Instagram Ootto connector & 4 ready-made growth prompts).
+- **Status**: ✅ Resolved and Verified.
+
 ## [08 Nov 2026] Feature & Taxonomy Expansion: Dental Clinic, Pet Clinic, Fast Food, Pizza & Non-Veg Restaurant Integration & Public Tool 2-Tier Selection Redesign
 - **Symptom**: Merchants and customers in specialized verticals (Dental Clinics, Pet Clinics/Vets, Fast Food stalls selling Dabeli/Vadapav/Burgers/Samosas/Sandwiches, Pizza restaurants, and Non-Veg Biryani houses) lacked dedicated zero-hallucination keyword presets, causing generic fallbacks. Furthermore, the public free review generator (/free-ai-google-review-generator) presented a flat 6-button list without hierarchical Main Business category and Sub-category selection.
 - **Root Cause**: MASTER_KEYWORD_PRESETS in src/lib/keyword-matrix.ts was limited to 11 presets without dedicated presets for Dental, Pet Care, Fast Food/Street Snacks, Pizza, or Non-Veg dining. OFFICIAL_GBP_CATEGORIES grouped fast food and pizza together, and the public tool lacked a 2-tier (Main Industry Group -> Sub-Category) interactive selector.

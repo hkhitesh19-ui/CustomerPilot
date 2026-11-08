@@ -1271,7 +1271,7 @@ export function PricingStudio({
         </div>
 
         {/* Responsive Table Container */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xs">
+        <div className="hidden md:block bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left min-w-[700px] border-collapse">
               <thead>
@@ -1539,6 +1539,233 @@ export function PricingStudio({
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* ─── Mobile Vertical Cards (Zero Horizontal Scroll - Direct Pricing) ─── */}
+        <div className="block md:hidden space-y-3.5">
+          {STANDALONE_SERVICES.map((s) => {
+            const dbPlan6 = getPlanByKey(s.planKey6Mo)
+            const dbPlan1 = getPlanByKey(s.planKey1Yr)
+
+            const p180 = dbPlan6?.price || s.p[180][0]
+            const m180 = dbPlan6?.originalPrice || s.p[180][1]
+
+            const p365 = dbPlan1?.price || s.p[365][0]
+            const m365 = dbPlan1?.originalPrice || s.p[365][1]
+
+            const isAdded180 = selectedStandalone[s.i] === 180
+            const isAdded365 = selectedStandalone[s.i] === 365
+
+            return (
+              <div
+                key={s.i}
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-3"
+              >
+                {/* Header: Icon + Name + Description */}
+                <div className="flex items-start gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${s.iconBg}`}>
+                    {s.i === "loyalty" && <Gift className="w-5 h-5" />}
+                    {s.i === "star" && <Star className="w-5 h-5" />}
+                    {s.i === "chat" && <MessageSquare className="w-5 h-5" />}
+                    {s.i === "card" && <CreditCard className="w-5 h-5" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-snug">
+                      {s.n}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                      {s.t}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Direct Pricing Options Grid: 6 Months & 1 Year */}
+                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100 dark:border-slate-800">
+                  {/* 6 Months Box */}
+                  <div className={`rounded-xl p-2.5 border flex flex-col justify-between transition ${
+                    isAdded180
+                      ? "bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-500/60 ring-1 ring-indigo-500/40"
+                      : "bg-slate-50/60 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800"
+                  }`}>
+                    <div>
+                      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-500 mb-0.5">
+                        <span>6 Months</span>
+                        <span className="text-emerald-700 dark:text-emerald-300 font-extrabold bg-emerald-100 dark:bg-emerald-950/80 px-1 py-0.2 rounded">
+                          {off(p180, m180)}%
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-500 line-through decoration-rose-500">
+                        {inr(m180)}
+                      </div>
+                      <div className="text-base font-black text-slate-900 dark:text-white leading-tight">
+                        {inr(p180)}
+                      </div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                        {dy(p180, 180)}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleStandalone(s.i, 180)}
+                      className={`w-full mt-2 text-xs font-bold py-1.5 rounded-lg border transition cursor-pointer text-center ${
+                        isAdded180
+                          ? "bg-indigo-600 border-indigo-600 text-white shadow-xs"
+                          : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600"
+                      }`}
+                    >
+                      {isAdded180 ? "✓ Added" : "+ Add 6M"}
+                    </button>
+                  </div>
+
+                  {/* 1 Year Box */}
+                  <div className={`rounded-xl p-2.5 border flex flex-col justify-between transition ${
+                    isAdded365
+                      ? "bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-500/60 ring-1 ring-indigo-500/40"
+                      : "bg-slate-50/60 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800"
+                  }`}>
+                    <div>
+                      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-500 mb-0.5">
+                        <span>1 Year</span>
+                        <span className="text-emerald-700 dark:text-emerald-300 font-extrabold bg-emerald-100 dark:bg-emerald-950/80 px-1 py-0.2 rounded">
+                          {off(p365, m365)}%
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-500 line-through decoration-rose-500">
+                        {inr(m365)}
+                      </div>
+                      <div className="text-base font-black text-slate-900 dark:text-white leading-tight">
+                        {inr(p365)}
+                      </div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                        {dy(p365, 365)}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleStandalone(s.i, 365)}
+                      className={`w-full mt-2 text-xs font-bold py-1.5 rounded-lg border transition cursor-pointer text-center ${
+                        isAdded365
+                          ? "bg-indigo-600 border-indigo-600 text-white shadow-xs"
+                          : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600"
+                      }`}
+                    >
+                      {isAdded365 ? "✓ Added" : "+ Add 1Y"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+
+          {/* Mobile Total Row Card */}
+          <div className="bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-3">
+            <div className="font-extrabold text-slate-900 dark:text-white text-sm">
+              Total · 4 Standalone Engines
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                <div className="text-[10px] font-bold text-slate-500 uppercase">6 Months Total</div>
+                <div className="text-slate-500 line-through text-[11px] mt-0.5">{inr(standaloneMrpTot(180))}</div>
+                <div className="text-base font-black text-slate-900 dark:text-white">{inr(standaloneTot(180))}</div>
+                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+                  Save {inr(standaloneMrpTot(180) - standaloneTot(180))}
+                </div>
+              </div>
+              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                <div className="text-[10px] font-bold text-slate-500 uppercase">1 Year Total</div>
+                <div className="text-slate-500 line-through text-[11px] mt-0.5">{inr(standaloneMrpTot(365))}</div>
+                <div className="text-base font-black text-slate-900 dark:text-white">{inr(standaloneTot(365))}</div>
+                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+                  Save {inr(standaloneMrpTot(365) - standaloneTot(365))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Gear Combos Cards (Gear 2, 3, 4, 5) */}
+          {GEAR_COMBOS.map((combo) => {
+            const dbPlan6 = getPlanByKey(combo.tenures[180].planKey)
+            const dbPlan1 = getPlanByKey(combo.tenures[365].planKey)
+
+            const p180 = dbPlan6?.price || combo.tenures[180].offer
+            const m180 = dbPlan6?.originalPrice || combo.tenures[180].regular
+
+            const p365 = dbPlan1?.price || combo.tenures[365].offer
+            const m365 = dbPlan1?.originalPrice || combo.tenures[365].regular
+
+            const savings1Yr = getGearSavings1Yr(combo, getPlanByKey)
+
+            return (
+              <div
+                key={combo.gearKey}
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-3"
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${combo.iconBg}`}>
+                    <Zap className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        {combo.badge}
+                      </span>
+                      <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                        50% OFF
+                      </span>
+                    </div>
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-snug">
+                      {combo.name}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      {combo.subtitle}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Direct Pricing Options Grid */}
+                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100 dark:border-slate-800">
+                  {/* 6M Combo Box */}
+                  <div className="rounded-xl p-2.5 border bg-slate-50/60 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                    <div>
+                      <div className="text-[10px] font-black uppercase text-slate-500 mb-0.5">6 Months</div>
+                      <div className="text-xs text-slate-500 line-through decoration-rose-500">{inr(m180)}</div>
+                      <div className="text-base font-black text-slate-900 dark:text-white leading-tight">{inr(p180)}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400">{dy(p180, 180)}</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectGearCombo(combo, 180)}
+                      className="w-full mt-2 text-xs font-semibold py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600 transition cursor-pointer text-center"
+                    >
+                      Choose 6M
+                    </button>
+                  </div>
+
+                  {/* 1Y Combo Box */}
+                  <div className="rounded-xl p-2.5 border bg-slate-50/60 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                    <div>
+                      <div className="text-[10px] font-black uppercase text-slate-500 mb-0.5">1 Year</div>
+                      <div className="text-xs text-slate-500 line-through decoration-rose-500">{inr(m365)}</div>
+                      <div className="text-base font-black text-slate-900 dark:text-white leading-tight">{inr(p365)}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400">{dy(p365, 365)}</div>
+                      {savings1Yr > 0 && (
+                        <div className="text-[9px] text-emerald-700 dark:text-emerald-300 font-bold mt-0.5">
+                          Save {inr(savings1Yr)}
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectGearCombo(combo, 365)}
+                      className="w-full mt-2 text-xs font-semibold py-1.5 rounded-lg border border-indigo-600 bg-indigo-600 text-white hover:bg-indigo-700 shadow-xs transition cursor-pointer text-center"
+                    >
+                      Choose 1Y
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
         </div>
 
         {/* ─── Lifetime Deal Card (Smart Digital Business Card) ─── */}

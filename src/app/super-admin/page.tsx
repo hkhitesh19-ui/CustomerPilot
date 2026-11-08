@@ -8,7 +8,7 @@ import {
   Settings, Globe, Shield, Code, Zap, Crown, Store, Check, X, Search,
   MessageSquare, RefreshCw, RotateCcw, Activity, Server, Cpu, Sparkles,
   Layers, ArrowUpRight, Lock, CheckCircle2, ChevronRight, Trash2, AlertTriangle, Eye, UserX, LogOut,
-  MapPin, ExternalLink, Clock, Rocket, Loader2, Edit3, Smartphone, Gift, Calendar, Plus
+  MapPin, Menu, ExternalLink, Clock, Rocket, Loader2, Edit3, Smartphone, Gift, Calendar, Plus
 } from "lucide-react"
 import { WhatsAppTemplateManager } from "@/components/whatsapp-template-manager"
 import { SubscriptionPlansManager } from "@/components/super-admin/subscription-plans-manager"
@@ -30,6 +30,7 @@ import { Switch } from "@/components/ui/switch"
 
 export default function SuperAdminPage() {
   const [activeSection, setActiveSection] = useState("dashboard")
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   const navCategories = [
     {
@@ -95,6 +96,7 @@ export default function SuperAdminPage() {
 
   const handleNavSelect = (id: string) => {
     setActiveSection(id)
+    setMobileNavOpen(false)
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href)
       url.searchParams.set("tab", id)
@@ -191,13 +193,125 @@ export default function SuperAdminPage() {
         </div>
       </aside>
 
+      {/* Mobile Navigation Drawer Overlay */}
+      <AnimatePresence>
+        {mobileNavOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden flex">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileNavOpen(false)}
+              className="fixed inset-0 bg-slate-950/80 backdrop-blur-md"
+            />
+
+            {/* Drawer Sheet */}
+            <motion.aside
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 250 }}
+              className="relative w-80 max-w-[85vw] bg-slate-900 border-r border-slate-800 shadow-2xl flex flex-col justify-between h-full z-10"
+            >
+              <div>
+                {/* Header */}
+                <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <img src="/cplogo.png" alt="CustomerPilot" className="h-8 w-auto object-contain rounded-lg p-1 bg-slate-950 border border-slate-800" />
+                    <div>
+                      <div className="font-extrabold text-xs text-white flex items-center gap-1">
+                        Super Admin <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-indigo-500/20 text-indigo-400">V6.5</span>
+                      </div>
+                      <div className="text-[10px] text-emerald-400 font-semibold flex items-center gap-0.5">
+                        <Crown className="w-2.5 h-2.5 text-amber-400 fill-amber-400" /> Executive Command
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setMobileNavOpen(false)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Nav Categories */}
+                <div className="p-3 space-y-5 overflow-y-auto max-h-[calc(100vh-180px)] custom-scrollbar">
+                  {navCategories.map((group, gIdx) => (
+                    <div key={gIdx} className="space-y-1">
+                      <div className="px-3 text-[10px] font-extrabold tracking-wider uppercase text-slate-500 mb-1.5">
+                        {group.title}
+                      </div>
+                      {group.items.map((item) => {
+                        const isActive = activeSection === item.id
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => handleNavSelect(item.id)}
+                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                              isActive
+                                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/20 border border-indigo-500/40"
+                                : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <item.icon className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-400"}`} />
+                              <span>{item.label}</span>
+                            </div>
+                            {item.badge && (
+                              <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-md ${
+                                isActive ? "bg-white/20 text-white" : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                              }`}>
+                                {item.badge}
+                              </span>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mobile Drawer Footer */}
+              <div className="p-3 border-t border-slate-800 bg-slate-950/60 space-y-2">
+                <button
+                  onClick={async () => {
+                    await fetch('/api/auth/logout', { method: 'POST' });
+                    const { signOut } = await import("next-auth/react");
+                    await signOut({ redirect: false });
+                    window.location.href = '/login';
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 transition"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </motion.aside>
+          </div>
+        )}
+      </AnimatePresence>
+
+
       {/* Main Content Workspace */}
       <main className="flex-1 overflow-y-auto bg-gradient-to-b from-slate-950 via-slate-900/60 to-slate-950 min-h-screen">
         {/* Top Floating Glass Header */}
         <header className="bg-slate-900/80 border-b border-slate-800/80 px-6 h-16 flex items-center justify-between sticky top-0 z-10 backdrop-blur-xl shadow-xl">
-          <div className="flex items-center gap-3">
-            {currentNav && <currentNav.icon className="w-5 h-5 text-indigo-400" />}
-            <h1 className="font-extrabold text-white text-lg tracking-tight">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(true)}
+              className="lg:hidden p-2 -ml-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 transition flex items-center gap-1.5 cursor-pointer border border-slate-800 bg-slate-900/60"
+              title="Open Navigation Menu"
+            >
+              <Menu className="w-5 h-5 text-indigo-400" />
+              <span className="text-xs font-bold text-slate-200 sm:inline">Menu</span>
+            </button>
+            {currentNav && <currentNav.icon className="w-5 h-5 text-indigo-400 hidden sm:block" />}
+            <h1 className="font-extrabold text-white text-base sm:text-lg tracking-tight">
               {currentNav?.label || "Command Center"}
             </h1>
           </div>
