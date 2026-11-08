@@ -8,12 +8,12 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 196ed7b
-Full Commit Hash  : 196ed7bab729161e6d74d2af0f8a6037c7d4b444
+Active Git Commit : ee67003
+Full Commit Hash  : ee67003323ba2423727ecdd83e8c4cf42ca515ae
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 06 Nov 2026, 09:32 AM IST
+Deployment Date   : 08 Nov 2026, 10:42 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(super-admin): ensure resilient checklist parsing in GBP operations dashboard so clients are always displayed
+Commit Title      : fix(seo): google search circular favicon safe-zone inset and multi-res icons
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
