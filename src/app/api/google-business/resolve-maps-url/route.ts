@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server"
 import { ok, err } from "@/lib/api"
 import { searchPlaces } from "@/lib/google-places-api"
+import { getKeywordPresetForCategory, generateAutoKeywordsForLocation } from "@/lib/keyword-matrix"
 
 export const dynamic = "force-dynamic"
 
@@ -98,6 +99,24 @@ export async function POST(req: NextRequest) {
       ? `https://search.google.com/local/writereview?placeid=${placeId}`
       : finalUrl
 
+    // Extract Locality & City from formatted address or query
+    let locality = "Local Area"
+    let city = "Vadodara"
+    if (finalAddress && finalAddress !== "Google Maps Verified Location") {
+      const parts = finalAddress.split(",").map((p: string) => p.trim())
+      if (parts.length >= 3) {
+        locality = parts[parts.length - 3] || parts[parts.length - 2]
+        city = parts[parts.length - 2]
+      } else if (parts.length >= 2) {
+        locality = parts[0]
+        city = parts[1]
+      }
+    }
+
+    // Detect Category Preset & Auto-generate High-Search Keywords (6 Tiers)
+    const categoryPreset = getKeywordPresetForCategory(placeDetails?.primaryType || finalName, finalName)
+    const autoKeywords = generateAutoKeywordsForLocation(categoryPreset.id, locality, city, finalName)
+
     return ok({
       success: true,
       placeId,
@@ -107,7 +126,16 @@ export async function POST(req: NextRequest) {
       rating: placeDetails?.rating || 4.8,
       reviewCount: placeDetails?.userRatingCount || 25,
       rawUrl,
-      expandedUrl: finalUrl
+      expandedUrl: finalUrl,
+      detectedCategoryKey: categoryPreset.id,
+      detectedCategoryLabel: categoryPreset.label,
+      locality,
+      city,
+      autoKeywords,
+      defaultAllowedEntities: categoryPreset.seoEntities,
+      defaultStrictlyNotAllowed: categoryPreset.blacklist,
+      suggestedHeroServices: categoryPreset.seoEntities.slice(0, 5),
+      suggestedHeroProducts: categoryPreset.seoEntities.slice(5, 10),
     })
   } catch (error: any) {
     console.error("[resolve-maps-url] Error:", error.message)

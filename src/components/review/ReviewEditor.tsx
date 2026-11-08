@@ -12,7 +12,8 @@ export function ReviewEditor({
   bonusInfo,
   category,
   productName,
-  isLoyaltyEnabled = true
+  isLoyaltyEnabled = true,
+  heroChips = []
 }: { 
   merchant: any, 
   customer: any, 
@@ -28,7 +29,8 @@ export function ReviewEditor({
   },
   category?: string,
   productName?: string,
-  isLoyaltyEnabled?: boolean
+  isLoyaltyEnabled?: boolean,
+  heroChips?: string[]
 }) {
     const reviewBonus = bonusInfo?.googleReviewBonus ?? 2
   const photoBonus = bonusInfo?.photoBonus ?? 2
@@ -42,7 +44,34 @@ export function ReviewEditor({
   const [copied, setCopied] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [isEditingExisting, setIsEditingExisting] = useState(!!existingReviewText)
+  const [activeProduct, setActiveProduct] = useState(productName || "")
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+
+  const handleSelectChip = async (chip: string) => {
+    const next = activeProduct.toLowerCase() === chip.toLowerCase() ? "" : chip
+    setActiveProduct(next)
+    if (isRegenerating) return
+    setIsRegenerating(true)
+    try {
+      const pParam = next ? `&product=${encodeURIComponent(next)}` : ""
+      const cParam = customer?.id ? `&c=${encodeURIComponent(customer.id)}` : ""
+      const res = await fetch(`/api/reviews/dynamic-draft?m=${encodeURIComponent(merchant.id)}${cParam}${pParam}`)
+      if (res.ok) {
+        const data = await res.json()
+        if (data.drafts) {
+          setDraftOptions(data.drafts)
+          if (selectedOption === "draft1") setDraft(data.drafts.draft1)
+          else if (selectedOption === "draft2") setDraft(data.drafts.draft2)
+          else if (selectedOption === "draft3" && data.drafts.draft3) setDraft(data.drafts.draft3)
+          else setDraft(data.drafts.draft1)
+        }
+      }
+    } catch (err) {
+      console.warn("[ReviewEditor] Failed to fetch dynamic draft for chip:", err)
+    } finally {
+      setIsRegenerating(false)
+    }
+  }
 
   const handleRegenerate = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -244,6 +273,47 @@ export function ReviewEditor({
                     Use Fresh AI Draft
                   </button>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* 1-Tap Purchased Item / Service Selection Hero Chips */}
+          {heroChips && heroChips.length > 0 && !isEditingExisting && (
+            <div className="space-y-1.5 pb-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-[#5F6368] uppercase tracking-wider flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>What did you visit / enjoy today?</span>
+                </span>
+                {activeProduct && (
+                  <button
+                    type="button"
+                    onClick={() => handleSelectChip("")}
+                    className="text-[10px] text-slate-500 hover:text-slate-800 underline cursor-pointer"
+                  >
+                    Reset to General
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {heroChips.map((chip, idx) => {
+                  const isSelected = activeProduct.toLowerCase() === chip.toLowerCase()
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handleSelectChip(chip)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                        isSelected
+                          ? "bg-emerald-600 text-white border-emerald-600 shadow-xs font-bold"
+                          : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 hover:border-slate-400"
+                      }`}
+                    >
+                      {isSelected ? <Check className="w-3 h-3 text-white" /> : <span className="text-[10px] opacity-60">⭐</span>}
+                      <span>{chip}</span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
           )}

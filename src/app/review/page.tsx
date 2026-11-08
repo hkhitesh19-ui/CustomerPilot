@@ -2,6 +2,7 @@ import { hasModule } from "@/lib/feature-gate"
 import { db } from "@/lib/db"
 import { ReviewEditor } from "@/components/review/ReviewEditor"
 import { generateDynamicReviewDraft } from "@/lib/dynamic-review-engine"
+import { resolveMerchantKeywordProfile } from "@/lib/keyword-matrix"
 
 export const dynamic = "force-dynamic"
 
@@ -49,9 +50,10 @@ export default async function ReviewPage({
       })
     : null
 
-  // Extract actual purchased product from customer bills if available
-  let productName = ""
-  if (customer) {
+  const rawItemParam = typeof params.item === "string" ? params.item : (typeof params.product === "string" ? params.product : undefined)
+  // Extract actual purchased product from customer bills if available, or URL param
+  let productName = rawItemParam?.trim() || ""
+  if (!productName && customer) {
     for (const bill of customer.bills || []) {
       if (bill.notes) {
         const match = bill.notes.match(/Product:\s*([^|]+)/i)
@@ -77,6 +79,31 @@ export default async function ReviewPage({
 
   const businessCategory = merchant.category?.trim() || merchant.businessType || "Retail Store"
   const menuItemNames = menuItems.map((m: { name: string }) => m.name)
+
+  // Resolve keywordProfile & extract Top 5 Hero Chips for customer 1-tap review
+  const kwProfile = resolveMerchantKeywordProfile({
+    name: merchant.name,
+    category: businessCategory,
+    city: merchant.city || undefined,
+    address: merchant.address || undefined,
+    keywordProfile: (merchant as any).keywordProfile || null
+  })
+
+  let heroChips: string[] = []
+  if (kwProfile.heroServices && kwProfile.heroServices.length > 0) {
+    heroChips.push(...kwProfile.heroServices.slice(0, 5))
+  }
+  if (heroChips.length < 5 && kwProfile.heroProducts && kwProfile.heroProducts.length > 0) {
+    for (const p of kwProfile.heroProducts) {
+      if (!heroChips.includes(p) && heroChips.length < 5) heroChips.push(p)
+    }
+  }
+  if (heroChips.length === 0 && kwProfile.allowedSeoEntities) {
+    heroChips = kwProfile.allowedSeoEntities.slice(0, 5)
+  }
+  if (productName && !heroChips.includes(productName)) {
+    heroChips.unshift(productName)
+  }
 
   // Generate dynamic, anti-repetitive AI / multi-angle rotating drafts
   const draftOptions = await generateDynamicReviewDraft({
@@ -160,6 +187,7 @@ export default async function ReviewPage({
       category={businessCategory}
       productName={productName}
       isLoyaltyEnabled={isLoyaltyEnabled}
+      heroChips={heroChips}
     />
   )
 }

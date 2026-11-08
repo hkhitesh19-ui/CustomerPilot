@@ -4,6 +4,39 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 ---
+## [08 Nov 2026] Issue: Smart AI Review Engine: Automatic GBP High-Search GEO Keyword Extraction, 2-Column Offered/Excluded Studio & 1-Tap Customer Hero Chips
+- **Symptom**:
+  1. When merchants entered their Google Maps location / GBP profile URL (such as "PET CLINIC @ MANJALPUR" or dental/fast-food/pizza/restaurant shops), there was no automatic geo-intent keyword extraction tailored to their catchment area, locality, and city.
+  2. Merchants had no interface to cleanly separate offerings into "What We Sell/Offer" vs "What We Strictly DO NOT Sell/Offer", risking hallucinated review drafts mentioning items they don't provide.
+  3. All review drafts were generic to the whole shop and could not personalize to the exact transaction (e.g. if a pet clinic customer only came for Dog Vaccination or Deworming, reviews would randomly mention surgeries or grooming).
+- **Root Cause**:
+  1. The Google Maps URL resolver (`/api/google-business/resolve-maps-url`) only extracted raw address components without generating localized multi-tier search keywords.
+  2. `smart-keyword-control-engine.tsx` was a flat single list that did not provide a 2-column Offered (whitelist) vs Excluded (blacklist) visual studio.
+  3. The customer review flow (`/review` and `ReviewEditor.tsx`) lacked 1-tap Hero item selector chips to anchor the dynamic draft specifically to the customer's actual visit/purchase.
+- **Resolution**:
+  1. **Multi-Tier Auto Keyword Generator (`src/lib/keyword-matrix.ts`)**: Built `generateAutoKeywordsForLocation(categoryKey, locality, city, businessName)` generating high-search keywords across 6 structured tiers:
+     - Tier 1: Core Primary Keywords
+     - Tier 2: Commercial & High-Intent / Emergency Phrases
+     - Tier 3: Specific Treatment / Hero Offerings
+     - Tier 4: Catchment Landmarks & Micro-Locality Tags
+     - Tier 5: Voice Search / AEO Conversational Phrases
+     - Tier 6: High-Converting Review Phrases
+  2. **URL Resolver Auto-Detection (`/api/google-business/resolve-maps-url`)**: Augmented endpoint to detect business vertical, parse locality/city, and auto-return the full keyword package, default allowed items, default strictly prohibited items, and suggested hero items.
+  3. **2-Column Offered vs Excluded Studio (`src/components/smart-keyword-control-engine.tsx`)**:
+     - Built 2 interactive side-by-side columns: "What You Provide / Sell (Active Whitelist)" and "Strictly DO NOT Provide (Blacklist & Negative Filter)".
+     - Added 1-click arrow buttons (`[→]`, `[←]`) to move items between columns with instant JSON persistence.
+     - Added Top 5 Hero Review Chips with star badges (⭐) and custom chip creator.
+     - Added collapsible panel for auto-extracted high-search keywords with 1-click clipboard copy.
+  4. **Customer-Facing 1-Tap Hero Chips (`src/app/review/page.tsx` & `ReviewEditor.tsx`)**:
+     - Added interactive horizontal chip pills ("What did you visit or purchase today?").
+     - Tapping a chip dynamically generates review drafts focused strictly on the chosen product/service with zero typing.
+     - Updated dynamic review API (`/api/reviews/dynamic-draft`) to accept `?item=` and `?product=`.
+  5. **Deterministic Verification**:
+     - Playwright E2E test `e2e/dynamic-review-flow.spec.ts` passed 3/3 tests (25.9s, 181ms, 729ms) with 0 console errors and 0 network failures.
+     - All 6 Adversarial Master Security Gates passed cleanly.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [08 Nov 2026] UI/UX & Asset Integrity: Master Source Uncut Logo Restoration & Resolution of Clipped "C"/"P" Curves Across All Icon Assets
 - **Symptom**: When directly viewing `customerpilot.in/icon.png` or `customerpilot.in/favicon.ico` in the browser, the CustomerPilot ribbon logo displayed flat-sliced edges — specifically the top curve of the "P", the outer right loop of the "P", the bottom stem point, and the outer left curve of the "C" were physically cut off flat.
 - **Root Cause**: The source asset `public/cplogo_icon.png` in the repository was an improperly cropped legacy raster image (305x220) where the bounding box had been sliced directly through the logo geometry with full opacity (alpha 255) touching all 4 boundaries (left, right, top, bottom). Sizing or padding that file still preserved the pre-existing flat cuts on the glyph itself.

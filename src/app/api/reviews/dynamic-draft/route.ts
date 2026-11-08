@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const merchantId = searchParams.get("m")
     const customerId = searchParams.get("c") || undefined
-    const productParam = searchParams.get("product") || undefined
+    const productParam = searchParams.get("product") || searchParams.get("item") || undefined
 
     if (!merchantId) {
       return NextResponse.json({ error: "merchantId is required" }, { status: 400 })

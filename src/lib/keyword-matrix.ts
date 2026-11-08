@@ -13,6 +13,15 @@ export interface CategoryPreset {
   blacklist: string[];        // Strictly Not Allowed (Blacklist) ~50 items
 }
 
+export interface AutoExtractedKeywordsPackage {
+  coreGeo: string[];
+  commercial: string[];
+  services: string[];
+  catchmentLandmarks: string[];
+  voiceAeoQuestions: string[];
+  semanticReviewPhrases: string[];
+}
+
 export interface KeywordProfile {
   categoryKey: string;
   businessName: string;
@@ -25,6 +34,9 @@ export interface KeywordProfile {
   allowedAeoAnswers: string[];
   allowedGeoContext: string[];
   strictlyNotAllowed: string[];
+  heroProducts?: string[];
+  heroServices?: string[];
+  autoExtractedKeywords?: AutoExtractedKeywordsPackage;
 }
 
 export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
@@ -727,6 +739,323 @@ export function getKeywordPresetForCategory(category?: string | null, merchantNa
 }
 
 /**
+ * Generates location-tailored high-search SEO & GEO keywords across all 6 tiers
+ * based on merchant's detected Google category and micro-location.
+ */
+export function generateAutoKeywordsForLocation(
+  categoryKey: string,
+  locality?: string,
+  city?: string,
+  businessName?: string
+): AutoExtractedKeywordsPackage {
+  const loc = (locality || "").trim() || "Local Area";
+  const cty = (city || "").trim() || "Vadodara";
+
+  switch (categoryKey) {
+    case "pet_clinic":
+      return {
+        coreGeo: [
+          `pet clinic in ${loc}`,
+          `veterinary clinic in ${loc} ${cty}`,
+          `pet doctor in ${loc}`,
+          `best animal hospital in ${loc}`,
+          `dog clinic in ${loc}`,
+          `vet doctor near me ${loc}`,
+          `veterinary doctor in ${loc} ${cty}`
+        ],
+        commercial: [
+          `emergency pet clinic in ${loc}`,
+          `pet clinic open today ${loc}`,
+          `dog doctor in ${loc} open now`,
+          `24 hour pet hospital near ${loc} ${cty}`,
+          `urgent veterinary doctor ${loc}`,
+          `puppy emergency doctor in ${loc}`
+        ],
+        services: [
+          `dog vaccination in ${loc}`,
+          `puppy 7-in-1 vaccine ${cty}`,
+          `anti rabies vaccine for pets ${loc}`,
+          `pet blood test in ${loc}`,
+          `dog sterilization and neutering ${loc}`,
+          `cat clinic in ${loc}`,
+          `tick and flea treatment for dogs ${loc}`,
+          `pet deworming tablet ${loc}`
+        ],
+        catchmentLandmarks: [
+          `${loc} Main Road`,
+          `Near Eva Mall`,
+          `Near Bahubali Circle`,
+          `Tarsali`,
+          `Makarpura`,
+          `Vadsar Road`
+        ],
+        voiceAeoQuestions: [
+          `Which is the best pet clinic in ${loc} for puppy vaccination?`,
+          `Is there any good veterinary doctor near ${loc}?`,
+          `What is the cost of dog vaccination in ${cty}?`,
+          `Where can I get emergency treatment for sick dog in ${loc}?`
+        ],
+        semanticReviewPhrases: [
+          "gentle pet handling",
+          "painless puppy vaccination",
+          "compassionate veterinary doctor",
+          "accurate diagnosis for tick fever",
+          "clean sanitized clinic",
+          "affordable vet consultation fee"
+        ]
+      };
+
+    case "dental_clinic":
+      return {
+        coreGeo: [
+          `dental clinic in ${loc}`,
+          `dentist in ${loc} ${cty}`,
+          `best dental doctor in ${loc}`,
+          `dental hospital in ${loc}`,
+          `teeth clinic near me ${loc}`,
+          `orthodontist in ${loc} ${cty}`,
+          `family dental care in ${loc}`
+        ],
+        commercial: [
+          `emergency dentist in ${loc}`,
+          `dental clinic open today ${loc}`,
+          `tooth pain emergency doctor ${loc}`,
+          `wisdom tooth extraction in ${loc}`,
+          `dental consultation appointment ${loc}`
+        ],
+        services: [
+          `painless root canal treatment in ${loc}`,
+          `teeth whitening in ${cty}`,
+          `invisible braces aligners ${loc}`,
+          `dental implants clinic in ${loc}`,
+          `ultrasonic teeth cleaning scaling ${loc}`,
+          `ceramic crown bridge ${loc}`,
+          `kids dental treatment ${loc}`,
+          `tooth cavity filling ${loc}`
+        ],
+        catchmentLandmarks: [
+          `${loc} Main Road`,
+          `Near Market ${loc}`,
+          `${loc} Cross Road`,
+          `Station Road`
+        ],
+        voiceAeoQuestions: [
+          `Which is the best dental clinic in ${loc} for root canal?`,
+          `Is root canal painful at dental clinic in ${loc}?`,
+          `Cost of invisible aligners in ${cty}?`
+        ],
+        semanticReviewPhrases: [
+          "painless root canal treatment",
+          "strict sterilisation standards",
+          "gentle dentist explanation",
+          "sparkling clean teeth whitening",
+          "caring staff and modern clinic"
+        ]
+      };
+
+    case "fast_food":
+      return {
+        coreGeo: [
+          `fast food in ${loc}`,
+          `best vadapav in ${loc}`,
+          `dabeli center in ${loc} ${cty}`,
+          `street food in ${loc}`,
+          `sandwich shop in ${loc}`,
+          `burger joint near me ${loc}`,
+          `evening snacks in ${loc}`
+        ],
+        commercial: [
+          `fast food takeaway parcel in ${loc}`,
+          `vadapav open now ${loc}`,
+          `cheese grill sandwich near me ${loc}`,
+          `best street food spot ${loc} ${cty}`
+        ],
+        services: [
+          `Butter Kutchi Dabeli in ${loc}`,
+          `Crispy Jumbo Vadapav in ${loc}`,
+          `Cheese Grill Sandwich in ${loc}`,
+          `Bombay Masala Toast in ${loc}`,
+          `Crispy Veg Burger in ${loc}`,
+          `Hot Punjabi Samosa in ${loc}`,
+          `Peri peri french fries in ${loc}`,
+          `Spicy garlic red chutney in ${loc}`
+        ],
+        catchmentLandmarks: [
+          `${loc} Market`,
+          `${loc} Circle`,
+          `Opposite College ${loc}`
+        ],
+        voiceAeoQuestions: [
+          `Where can I get the best vadapav and dabeli in ${loc}?`,
+          `Famous cheese sandwich shop in ${loc} ${cty}?`
+        ],
+        semanticReviewPhrases: [
+          "crispy hot jumbo vadapav",
+          "butter loaded dabeli with spicy garlic chutney",
+          "cheese pull sandwich was delicious",
+          "fast 5 minute parcel service",
+          "clean hygienic oil and preparation"
+        ]
+      };
+
+    case "pizza_restaurant":
+      return {
+        coreGeo: [
+          `pizza restaurant in ${loc}`,
+          `best pizza in ${loc} ${cty}`,
+          `wood fired pizza in ${loc}`,
+          `pizzeria near me ${loc}`,
+          `authentic italian pizza in ${loc}`,
+          `cheese burst pizza ${loc}`,
+          `pizza cafe in ${loc}`
+        ],
+        commercial: [
+          `pizza delivery in ${loc}`,
+          `pizza open now ${loc}`,
+          `best pizza place for party in ${loc}`
+        ],
+        services: [
+          `Wood-Fired Margherita Pizza in ${loc}`,
+          `Farmhouse Cheese Burst Pizza in ${loc}`,
+          `Stuffed Garlic Bread in ${loc}`,
+          `Artisan Sourdough Pizza in ${loc}`,
+          `Paneer Tikka Pizza in ${loc}`,
+          `Truffle mushroom pizza ${loc}`,
+          `Crispy thin crust pizza ${loc}`
+        ],
+        catchmentLandmarks: [
+          `${loc} High Street`,
+          `Near Mall ${loc}`,
+          `${loc} Main Road`
+        ],
+        voiceAeoQuestions: [
+          `Which is the best wood-fired pizza restaurant in ${loc}?`,
+          `Best cheese burst pizza in ${cty}?`
+        ],
+        semanticReviewPhrases: [
+          "authentic wood-fired oven crust",
+          "generous fresh mozzarella cheese pull",
+          "stuffed garlic bread was piping hot",
+          "cozy dining ambiance with great music"
+        ]
+      };
+
+    case "non_veg_restaurant":
+      return {
+        coreGeo: [
+          `non veg restaurant in ${loc}`,
+          `best biryani in ${loc} ${cty}`,
+          `chicken restaurant in ${loc}`,
+          `mutton biryani in ${loc}`,
+          `non veg dining near me ${loc}`,
+          `kebab corner in ${loc}`,
+          `mughlai food in ${loc}`
+        ],
+        commercial: [
+          `non veg parcel takeaway ${loc}`,
+          `biryani delivery near me ${loc}`,
+          `late night non veg restaurant ${loc}`
+        ],
+        services: [
+          `Chicken Dum Biryani in ${loc}`,
+          `Butter Chicken and Garlic Naan in ${loc}`,
+          `Smoky Tandoori Chicken in ${loc}`,
+          `Mutton Rogan Josh in ${loc}`,
+          `Chicken Tikka Kebab in ${loc}`,
+          `Fish Fry in ${loc}`
+        ],
+        catchmentLandmarks: [
+          `${loc} Station Road`,
+          `${loc} Ring Road`,
+          `Near Highway ${loc}`
+        ],
+        voiceAeoQuestions: [
+          `Where to get authentic chicken dum biryani in ${loc}?`,
+          `Best butter chicken restaurant in ${cty}?`
+        ],
+        semanticReviewPhrases: [
+          "authentic rich dum biryani aroma",
+          "succulent tender chicken pieces",
+          "creamy butter chicken with hot garlic naan",
+          "quick table service and family AC section"
+        ]
+      };
+
+    case "bakery":
+      return {
+        coreGeo: [
+          `bakery in ${loc}`,
+          `cake shop in ${loc} ${cty}`,
+          `birthday cake in ${loc}`,
+          `custom cake maker in ${loc}`,
+          `pastry shop near me ${loc}`,
+          `eggless bakery in ${loc}`,
+          `online cake delivery ${loc}`
+        ],
+        commercial: [
+          `same day cake delivery in ${loc}`,
+          `cake shop open today ${loc}`,
+          `custom theme cake order ${loc}`
+        ],
+        services: [
+          `Dutch Chocolate Truffle Cake in ${loc}`,
+          `Eggless Custom Theme Cake in ${loc}`,
+          `Fresh Fruit Cake in ${loc}`,
+          `Red Velvet Pastry in ${loc}`,
+          `Chocolate Walnut Brownie in ${loc}`,
+          `Rasmalai Fusion Cake in ${loc}`
+        ],
+        catchmentLandmarks: [
+          `${loc} Main Market`,
+          `Near Mall ${loc}`,
+          `${loc} Circle`
+        ],
+        voiceAeoQuestions: [
+          `Best eggless custom cake shop in ${loc}?`,
+          `Can I get on-time birthday cake delivery in ${loc} ${cty}?`
+        ],
+        semanticReviewPhrases: [
+          "freshly baked moist cake sponge",
+          "exact theme design as reference photo",
+          "100% pure eggless and delicious",
+          "safe damage-free cake box delivery"
+        ]
+      };
+
+    default:
+      return {
+        coreGeo: [
+          `${categoryKey.replace(/_/g, " ")} in ${loc}`,
+          `best ${categoryKey.replace(/_/g, " ")} in ${loc} ${cty}`,
+          `${categoryKey.replace(/_/g, " ")} near me ${loc}`
+        ],
+        commercial: [
+          `${categoryKey.replace(/_/g, " ")} open now ${loc}`,
+          `top rated ${categoryKey.replace(/_/g, " ")} ${loc}`
+        ],
+        services: [
+          `Quality ${categoryKey.replace(/_/g, " ")} service in ${loc}`,
+          `Professional service in ${cty}`,
+          `Affordable rates in ${loc}`
+        ],
+        catchmentLandmarks: [
+          `${loc} Main Road`,
+          `${loc} Market`,
+          `${loc} Circle`
+        ],
+        voiceAeoQuestions: [
+          `Which is the best ${categoryKey.replace(/_/g, " ")} in ${loc}?`
+        ],
+        semanticReviewPhrases: [
+          "professional staff and prompt service",
+          "great experience and highly recommended",
+          "fair transparent pricing"
+        ]
+      };
+  }
+}
+
+/**
  * Builds or normalizes a merchant's active KeywordProfile from DB JSON or defaults.
  */
 export function resolveMerchantKeywordProfile(merchant: {
@@ -744,11 +1073,16 @@ export function resolveMerchantKeywordProfile(merchant: {
   if (merchant.keywordProfile) {
     try {
       const parsed = JSON.parse(merchant.keywordProfile);
+      const locality = Array.isArray(parsed.localityLandmarks) && parsed.localityLandmarks[0]
+        ? parsed.localityLandmarks[0]
+        : "Manjalpur";
+      const cityName = merchant.city || parsed.city || "Vadodara";
+
       return {
         categoryKey: parsed.categoryKey || categoryPreset.id,
         businessName: merchant.name || parsed.businessName || "Local Business",
         gbpPrimaryCategory: parsed.gbpPrimaryCategory || categoryPreset.gbpCategory,
-        city: merchant.city || parsed.city || "Vadodara",
+        city: cityName,
         localityLandmarks: Array.isArray(parsed.localityLandmarks) ? parsed.localityLandmarks : ["Main Market"],
         audiencePersona: parsed.audiencePersona || categoryPreset.audiencePersona,
         serviceMode: parsed.serviceMode || categoryPreset.serviceMode,
@@ -756,6 +1090,14 @@ export function resolveMerchantKeywordProfile(merchant: {
         allowedAeoAnswers: Array.isArray(parsed.allowedAeoAnswers) && parsed.allowedAeoAnswers.length > 0 ? parsed.allowedAeoAnswers : categoryPreset.aeoAnswers,
         allowedGeoContext: Array.isArray(parsed.allowedGeoContext) && parsed.allowedGeoContext.length > 0 ? parsed.allowedGeoContext : categoryPreset.geoContext,
         strictlyNotAllowed: Array.isArray(parsed.strictlyNotAllowed) && parsed.strictlyNotAllowed.length > 0 ? parsed.strictlyNotAllowed : categoryPreset.blacklist,
+        heroServices: Array.isArray(parsed.heroServices) && parsed.heroServices.length > 0 ? parsed.heroServices : categoryPreset.seoEntities.slice(0, 5),
+        heroProducts: Array.isArray(parsed.heroProducts) && parsed.heroProducts.length > 0 ? parsed.heroProducts : categoryPreset.seoEntities.slice(5, 10),
+        autoExtractedKeywords: parsed.autoExtractedKeywords || generateAutoKeywordsForLocation(
+          parsed.categoryKey || categoryPreset.id,
+          locality,
+          cityName,
+          merchant.name || parsed.businessName || ""
+        )
       };
     } catch (_) {}
   }
@@ -766,12 +1108,20 @@ export function resolveMerchantKeywordProfile(merchant: {
     businessName: merchant.name || "Local Business",
     gbpPrimaryCategory: categoryPreset.gbpCategory,
     city: merchant.city || "Vadodara",
-    localityLandmarks: ["Main Market", "Near Station"],
+    localityLandmarks: ["Manjalpur", "Eva Mall", "Near Station"],
     audiencePersona: categoryPreset.audiencePersona,
     serviceMode: categoryPreset.serviceMode,
     allowedSeoEntities: [...categoryPreset.seoEntities],
     allowedAeoAnswers: [...categoryPreset.aeoAnswers],
     allowedGeoContext: [...categoryPreset.geoContext],
     strictlyNotAllowed: [...categoryPreset.blacklist],
+    heroServices: [...categoryPreset.seoEntities.slice(0, 5)],
+    heroProducts: [...categoryPreset.seoEntities.slice(5, 10)],
+    autoExtractedKeywords: generateAutoKeywordsForLocation(
+      categoryPreset.id,
+      "Manjalpur",
+      merchant.city || "Vadodara",
+      merchant.name || "Local Business"
+    )
   };
 }

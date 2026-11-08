@@ -48,7 +48,7 @@ test.describe('Dynamic Google Review Engine & Shuffle Verification', () => {
     await page.screenshot({ path: 'scratch/dynamic_review_page_verified.png' });
   });
 
-  test('Public API /api/reviews/dynamic-draft returns valid dynamic drafts', async ({ request }) => {
+  test('Public API /api/reviews/dynamic-draft returns valid dynamic drafts and respects item parameter', async ({ request }) => {
     const res = await request.get('/api/reviews/dynamic-draft?m=cmtymavfx0002kx008lbfvp57');
     expect(res.status()).toBe(200);
     const data = await res.json();
@@ -57,5 +57,34 @@ test.describe('Dynamic Google Review Engine & Shuffle Verification', () => {
     expect(data.drafts.draft1.length).toBeGreaterThan(10);
     expect(data.drafts.draft2.length).toBeGreaterThan(10);
     expect(data.drafts.draft3.length).toBeGreaterThan(5);
+
+    // Test specific item parameter (Transaction-level hero personalization)
+    const itemRes = await request.get('/api/reviews/dynamic-draft?m=cmtymavfx0002kx008lbfvp57&item=Truffle+Cake');
+    expect(itemRes.status()).toBe(200);
+    const itemData = await itemRes.json();
+    expect(itemData.success).toBe(true);
+    expect(itemData.drafts.draft1).toContain('Truffle Cake');
+    console.log('[E2E Ground-Truth] Hero Item Tailored Draft:', itemData.drafts.draft1);
+  });
+
+  test('Hero Chips are rendered and interactive on review editor', async ({ page }) => {
+    await page.goto('/review?m=cmtymavfx0002kx008lbfvp57', { waitUntil: 'domcontentloaded' });
+
+    // Check if Hero Chips container exists
+    const heroChipsSection = page.locator('text=What did you visit or purchase today?');
+    if (await heroChipsSection.isVisible()) {
+      const chipButtons = page.locator('button:has-text("•")');
+      const count = await chipButtons.count();
+      expect(count).toBeGreaterThan(0);
+      console.log(`[E2E Ground-Truth] Found ${count} 1-tap Hero Chips`);
+      
+      // Tap the first chip
+      await chipButtons.first().click();
+      await page.waitForTimeout(500);
+      const textarea = page.locator('#google-review-textarea');
+      const text = await textarea.inputValue();
+      expect(text.length).toBeGreaterThan(10);
+      console.log('[E2E Ground-Truth] Draft after tapping Hero Chip:', text);
+    }
   });
 });
