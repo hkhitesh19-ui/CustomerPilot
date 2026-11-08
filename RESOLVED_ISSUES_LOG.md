@@ -4,6 +4,29 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 ---
+## [08 Nov 2026] UI/UX & SEO: Google Search Results Circular Favicon Clipping Fix & Global Skills Installation (Claude Code Plugins & AI Documentary Director)
+- **Symptom**:
+  1. In Google Search results (e.g. searching for `customerpilot.in` / `CustomerPilot vs. Traditional POS Loyalty Systems Comparison`), the brand favicon displayed inside Google's circular search result badge was clipped on the outer edges — the left loop of "C" and right loop of "P" were cut off.
+  2. The user requested global installation of skills from the attached PDFs ("Claude Code ke 5 Free Plugins" by AI With Ankit / Turban Tech Guy and "Make a one-hour documentary with Claude" by @theharshchouksey).
+- **Root Cause**:
+  1. The legacy `public/favicon.ico` and `src/app/favicon.ico` files were actually 305x220 unpadded rectangular PNG files with 0 margin. When Google Search's favicon crawler (`Googlebot-Favicon`) crawled the site and rendered the favicon inside Google's circular frame (diameter $D$), the wider aspect ratio ($305/220 = 1.386$) caused the outer 15.3% corners and horizontal edges to be violently cut off by Google's circular boundary mask. In addition, Google Search requires square favicons that are multiples of 48px (48x48, 96x96, etc.), which were previously missing from the icon declarations.
+  2. The system lacked global skill modules for the 5 Claude Code open-source power plugins and the 12-step code-rendered documentary filmmaking framework.
+- **Resolution**:
+  1. **Circular Safe-Zone Favicon & Multi-Resolution Engine**:
+     - Calculated exact circular safe-zone geometry: for an inscribed circle of radius $R = 256\text{px}$, sized the logo to $340\text{px}$ width with centered positioning, guaranteeing a massive $62.5\text{px}$ ($24.4\%$) safe buffer to the circular boundary.
+     - Generated true multi-resolution binary ICO files (`public/favicon.ico` and `src/app/favicon.ico`) embedding 16x16, 32x32, 48x48, 64x64, 128x128, and 256x256 frames.
+     - Generated Google Search compliant 48px square multiples: `public/icon-48.png` (48x48), `public/icon-96.png` (96x96), `public/icon-192.png` (192x192), `public/icon-512.png` (512x512), and `src/app/icon.png` (512x512).
+     - Generated Apple touch icons: `public/apple-touch-icon.png` and `src/app/apple-icon.png` (180x180).
+     - Generated maskable icons with white background: `public/icon-maskable-192.png` and `public/icon-maskable-512.png`.
+     - Updated `src/app/layout.tsx` metadata with complete icon declarations (`/favicon.ico`, `/icon-48.png`, `/icon-96.png`, `/icon-192.png`, `/icon-512.png`, `/apple-touch-icon.png`).
+     - Updated `public/manifest.json` with all icon variants.
+     - Verified with PIL circular mask simulation that 0 logo pixels touch the boundary and 100% of the "CP" logo is visible inside Google's circular search snippet.
+  2. **Global Skills Installed (`C:\Users\Admin\.gemini\config\skills\`)**:
+     - `claude-code-plugins`: Master guide and commands for the 5 free plugins (OmniRoute, Claude-Mem, Headroom, Claude-Code-Setup, Task Observer).
+     - `ai-documentary-director`: Complete 12-step master blueprint (Research, Story Bible, 8-chapter script at 150 wpm, 25 visual styles matrix, HTML Canvas/ffmpeg/Python rendering, Whisper/ElevenLabs audio sync, shot recipe rotation, and YouTube packaging).
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [08 Nov 2026] Feature & Mobile UX: Responsive Mobile Pricing Cards, SuperAdmin Mobile Drawer, PWA Adaptive Icon Safe-Zones & Global Skills
 - **Symptom**:
   1. On mobile devices, the pricing section "Or Choose Exactly What You Need" rendered in a 700px-wide table with horizontal scroll, hiding prices, discounts, and "Add" buttons off-screen.
