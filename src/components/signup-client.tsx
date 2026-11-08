@@ -8,92 +8,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { MAIN_CATEGORY_GROUPS, getSubcategoriesForGroup, findMainGroupForCategory } from "@/lib/gbp-categories"
 
 export interface SignupCategoryGroup {
   group: string
   items: { value: string; label: string }[]
 }
 
-export const SIGNUP_CATEGORY_GROUPS: SignupCategoryGroup[] = [
-  {
-    group: "Healthcare & Clinics",
-    items: [
-      { value: "clinic_doctor", label: "🩺 Clinic & General Physician (Doctor / Medical)" },
-      { value: "dental_clinic", label: "🦷 Dental Clinic & Orthodontist" },
-      { value: "pet_clinic", label: "🐾 Pet Clinic & Veterinary Hospital" },
-      { value: "diagnostic_lab", label: "🔬 Pathology Lab & Diagnostic Center" },
-      { value: "pharmacy", label: "💊 Pharmacy & Chemist" },
-      { value: "physiotherapy", label: "🏃‍♂️ Physiotherapy & Rehab Center" },
-    ]
-  },
-  {
-    group: "Food & Dining",
-    items: [
-      { value: "bakery", label: "🎂 Bakery, Cake Shop & Desserts" },
-      { value: "cafe", label: "☕ Cafe & Coffee Shop" },
-      { value: "restaurant", label: "🍲 Punjabi / North Indian Restaurant" },
-      { value: "south_indian_restaurant", label: "🥞 South Indian Restaurant & Tiffins" },
-      { value: "fast_food", label: "🥪 Fast Food & Street Snacks (Dabeli, Vadapav, Burger, Sandwich)" },
-      { value: "pizza_restaurant", label: "🍕 Pizza Restaurant & Pizzeria" },
-      { value: "non_veg_restaurant", label: "🍗 Non-Veg Restaurant & Biryani House" },
-      { value: "sweet_shop", label: "🍬 Sweet Shop / Mithai & Farsan" },
-      { value: "ice_cream", label: "🍨 Ice Cream & Dessert Parlour" },
-      { value: "cloud_kitchen", label: "🥡 Cloud Kitchen & Delivery Hub" },
-    ]
-  },
-  {
-    group: "Beauty & Grooming",
-    items: [
-      { value: "salon", label: "✂️ Men's Salon & Grooming" },
-      { value: "beauty_parlour", label: "💅 Beauty Parlour & Women's Spa" },
-      { value: "unisex_salon", label: "💄 Unisex Salon & Makeup Studio" },
-      { value: "tattoo_studio", label: "🎨 Tattoo & Piercing Studio" },
-    ]
-  },
-  {
-    group: "Automotive & Detailing",
-    items: [
-      { value: "car_wash", label: "🚗 Car Wash & Auto Detailing" },
-      { value: "auto_garage", label: "🔧 Automobile Repair & Garage" },
-      { value: "bike_service", label: "🏍️ Two-Wheeler Service Center" },
-      { value: "car_accessories", label: "🛞 Car Accessories & Tyres" },
-    ]
-  },
-  {
-    group: "Education & Coaching",
-    items: [
-      { value: "coaching_classes", label: "📚 Coaching Institute & Exam Prep" },
-      { value: "preschool_daycare", label: "🧸 Preschool & Daycare" },
-      { value: "tuition_classes", label: "✏️ Tuition & Learning Center" },
-      { value: "music_dance_academy", label: "🎵 Music & Dance Academy" },
-    ]
-  },
-  {
-    group: "Fitness & Sports",
-    items: [
-      { value: "gym_fitness", label: "💪 Gym & Fitness Center" },
-      { value: "yoga_studio", label: "🧘 Yoga & Meditation Studio" },
-    ]
-  },
-  {
-    group: "Retail & Shopping",
-    items: [
-      { value: "supermarket", label: "🛒 Supermarket & Grocery Store" },
-      { value: "clothing_boutique", label: "👗 Clothing & Fashion Boutique" },
-      { value: "jewellery_store", label: "💍 Jewellery & Silver Showroom" },
-      { value: "footwear_store", label: "👟 Footwear Store" },
-      { value: "electronics_mobile", label: "📱 Mobile & Electronics Shop" },
-      { value: "furniture_decor", label: "🛋️ Furniture & Home Decor Store" },
-      { value: "retail_other", label: "🛍️ Retail Store & Other Businesses" },
-    ]
-  },
-  {
-    group: "Agency & Professional Services",
-    items: [
-      { value: "saas_agency", label: "💻 Software, Marketing Agency & Professional Services" },
-    ]
-  }
-]
+export const SIGNUP_CATEGORY_GROUPS: SignupCategoryGroup[] = MAIN_CATEGORY_GROUPS.map(g => ({
+  group: g.name,
+  items: g.subcategories.map(s => ({ value: s.id, label: `${s.icon} ${s.label}` }))
+}))
 
 export const TOP_RECOMMENDED_CATEGORIES = SIGNUP_CATEGORY_GROUPS.flatMap(g => g.items)
 
@@ -113,6 +38,11 @@ function SignupForm() {
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
 
+  // 2-Tier Category Selection states:
+  const [mainCategory, setMainCategory] = useState("food_dining")
+  const [subCategory, setSubCategory] = useState("bakery")
+  const [customCategory, setCustomCategory] = useState("")
+
   const [form, setForm] = useState({
     businessName: "",
     ownerName: "",
@@ -126,6 +56,40 @@ function SignupForm() {
   const update = (field: string, value: string) =>
     setForm(prev => ({ ...prev, [field]: value }))
 
+  const handleMainCategoryChange = (groupId: string) => {
+    setMainCategory(groupId)
+    if (groupId === "other") {
+      setSubCategory("other_custom")
+      const finalVal = customCategory.trim() || "other"
+      update("businessType", finalVal)
+    } else {
+      const subs = getSubcategoriesForGroup(groupId)
+      const firstSub = subs[0]?.id || "other"
+      setSubCategory(firstSub)
+      if (firstSub === "other_custom" || firstSub.startsWith("other_")) {
+        update("businessType", customCategory.trim() || "other")
+      } else {
+        update("businessType", firstSub)
+      }
+    }
+  }
+
+  const handleSubCategoryChange = (subId: string) => {
+    setSubCategory(subId)
+    if (subId === "other_custom" || subId.startsWith("other_")) {
+      update("businessType", customCategory.trim() || "other")
+    } else {
+      update("businessType", subId)
+    }
+  }
+
+  const handleCustomCategoryChange = (val: string) => {
+    setCustomCategory(val)
+    update("businessType", val.trim() || "other")
+  }
+
+  const isCustomCategoryVisible = mainCategory === "other" || subCategory === "other_custom" || subCategory.startsWith("other_")
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
@@ -138,8 +102,12 @@ function SignupForm() {
       setError("Owner Name is required.")
       return
     }
-    if (form.password.length < 6) {
-      setError("Password must be at least 6 characters.")
+    if (isCustomCategoryVisible && !customCategory.trim()) {
+      setError("Please specify your custom business / sub-category.")
+      return
+    }
+    if (form.password.length < 8) {
+      setError("Password must be at least 8 characters.")
       return
     }
 
@@ -412,8 +380,7 @@ function SignupForm() {
                   )}
                 </div>
 
-                {!isReviewsMode && !isAutoReplyMode ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {!isReviewsMode && !isAutoReplyMode && (
                   <div>
                     <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
                       <Phone className="w-3.5 h-3.5 text-emerald-600" /> WhatsApp Number *
@@ -426,55 +393,72 @@ function SignupForm() {
                       required
                     />
                   </div>
+                )}
+
+                {/* 2-Tier Category Hierarchy: Main Category + Sub-Category */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
-                      Business Category *
+                      <Building2 className="w-3.5 h-3.5 text-emerald-600" /> Main Business Category *
                     </Label>
-                    <Select value={form.businessType} onValueChange={v => update("businessType", v)}>
+                    <Select value={mainCategory} onValueChange={handleMainCategoryChange}>
                       <SelectTrigger className="mt-1 text-xs bg-stone-50 border-stone-200">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="max-h-[320px]">
-                        {SIGNUP_CATEGORY_GROUPS.map((grp) => (
-                          <SelectGroup key={grp.group}>
-                            <SelectLabel className="text-[10px] font-extrabold uppercase tracking-wider text-stone-500 bg-stone-100/80 px-2 py-1 my-0.5 rounded-xs">
-                              {grp.group}
-                            </SelectLabel>
-                            {grp.items.map((cat) => (
-                              <SelectItem key={cat.value} value={cat.value} className="text-xs">
-                                {cat.label}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
+                        {MAIN_CATEGORY_GROUPS.map((grp) => (
+                          <SelectItem key={grp.id} value={grp.id} className="text-xs font-medium">
+                            <span className="mr-1.5">{grp.icon}</span>
+                            <span>{grp.name}</span>
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-                ) : (
+
                   <div>
                     <Label className="text-xs font-semibold text-stone-700 flex items-center gap-1">
-                      Business Category (For AI Review Prompts) *
+                      Sub-Category / Specialization *
                     </Label>
-                    <Select value={form.businessType} onValueChange={v => update("businessType", v)}>
-                      <SelectTrigger className="mt-1 text-xs bg-stone-50 border-stone-200">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-[320px]">
-                        {SIGNUP_CATEGORY_GROUPS.map((grp) => (
-                          <SelectGroup key={grp.group}>
-                            <SelectLabel className="text-[10px] font-extrabold uppercase tracking-wider text-stone-500 bg-stone-100/80 px-2 py-1 my-0.5 rounded-xs">
-                              {grp.group}
-                            </SelectLabel>
-                            {grp.items.map((cat) => (
-                              <SelectItem key={cat.value} value={cat.value} className="text-xs">
-                                {cat.label}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {mainCategory === "other" ? (
+                      <div className="mt-1 h-9 px-3 rounded-md bg-stone-100 border border-stone-200 text-xs flex items-center text-stone-500 italic">
+                        Type custom below ↓
+                      </div>
+                    ) : (
+                      <Select value={subCategory} onValueChange={handleSubCategoryChange}>
+                        <SelectTrigger className="mt-1 text-xs bg-stone-50 border-stone-200">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[320px]">
+                          {getSubcategoriesForGroup(mainCategory).map((sub) => (
+                            <SelectItem key={sub.id} value={sub.id} className="text-xs">
+                              <span className="mr-1.5">{sub.icon}</span>
+                              <span>{sub.label}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
+                </div>
+
+                {/* 9th Option 'Other' / Custom Subcategory Edit Box */}
+                {isCustomCategoryVisible && (
+                  <div className="p-3 bg-emerald-50/60 border border-emerald-200 rounded-xl space-y-1">
+                    <Label className="text-xs font-bold text-emerald-800 flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> Specify Your Custom Business / Sub-Category *
+                    </Label>
+                    <Input
+                      type="text"
+                      placeholder="e.g. Wedding Planner, Architecture, Event Decor, Carpenter, etc."
+                      value={customCategory}
+                      onChange={e => handleCustomCategoryChange(e.target.value)}
+                      className="mt-1 text-xs bg-white border-emerald-300 focus:ring-emerald-500 font-medium"
+                      required
+                    />
+                    <p className="text-[10px] text-emerald-600">
+                      AI Review Engine will automatically draft authentic Google reviews tailored strictly to this sub-category.
+                    </p>
                   </div>
                 )}
 
@@ -499,7 +483,7 @@ function SignupForm() {
                   <div className="relative mt-1">
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="At least 6 characters"
+                      placeholder="At least 8 characters"
                       value={form.password}
                       onChange={e => update("password", e.target.value)}
                       className="text-xs bg-stone-50 border-stone-200 focus:bg-white pr-10"

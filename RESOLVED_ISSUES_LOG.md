@@ -4,6 +4,37 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 ---
+## [08 Nov 2026] Issue: 8-Character Password Alignment, Onboarding Prisma Bundle Leak Immunity, 2-Tier 8-Group Business Taxonomy with Custom "Other" Input & Home/Professional Services Presets
+- **Symptom**:
+  1. In the signup screen (`/signup`), the password placeholder read "At least 6 characters", but submitting a 6 or 7 character password yielded the red error banner "Password must be at least 8 characters", creating user confusion.
+  2. After entering a valid 8-character password and completing signup, navigating to `https://customerpilot.in/onboarding?step=1` threw the global React error boundary (`src/app/error.tsx`: "Something went wrong. The page encountered an unexpected issue while loading data. Please try reloading or head over to settings.").
+  3. "Beauty Parlour & Women's Spa" were merged as a single option without separate choices, and "Women's Salon" was missing.
+  4. The signup, onboarding, and store settings pages only had a flat/rigid list lacking a structured 2-tier hierarchy across the 8 core industries and missing home/agency professions (Plumbing, Electrical, AC Repair, Carpenter, Pest Control, Accountant, Real Estate Broker, Visa Consultancy, Wedding Planning, Photography, Architecture/Construction, Patent Consultant).
+  5. There was no 9th "Other" option allowing merchants to enter their own custom sub-category in an editable text box.
+- **Root Cause**:
+  1. Password input placeholder in `src/components/signup-client.tsx` was hardcoded to `"At least 6 characters"` while client validation checked `< 6` and server `src/app/api/auth/register/route.ts` enforced `< 8`.
+  2. `src/lib/gbp-categories.ts` previously had `import { db } from "@/lib/db"` for database functions (`getAllGbpCategories`, `addCustomGbpCategory`, `deleteCustomGbpCategory`). Because `src/app/onboarding/page.tsx` is a `"use client"` Next.js component, importing `gbp-categories.ts` caused Webpack/Turbopack to attempt bundling PrismaClient into the browser runtime, throwing an uncaught exception in the browser and triggering Next.js's global error boundary (`src/app/error.tsx`). In addition, `if (m.id) router.replace("/dashboard/settings")` prematurely redirected active onboarding flows before completion.
+  3. `gbp-categories.ts` lacked separate keys for `womens_salon` vs `beauty_parlour` vs `womens_spa`.
+  4. The 8 main categories lacked dynamic 2-tier subcategory filtering in `SignupClient`, `OnboardStep1Business`, and `SettingsPage`, and `src/lib/keyword-matrix.ts` lacked dedicated AI review presets for home trades and professional services, causing plumbers and electricians to inherit restaurant reviews.
+  5. There was no conditional custom input field when a merchant chose "Other" or custom specialization.
+- **Resolution**:
+  1. **Password Placeholder & Validation Harmonization**: Updated `src/components/signup-client.tsx` placeholder to `"At least 8 characters"` and validated `form.password.length < 8` with error `"Password must be at least 8 characters."`.
+  2. **Prisma Client Decoupling & Server-Client Isolation**: Created `src/lib/gbp-categories-server.ts` to host server-only database operations (`getAllGbpCategories`, `addCustomGbpCategory`, `deleteCustomGbpCategory`) using `@/lib/db`. Purged all server database imports from `src/lib/gbp-categories.ts`, making it 100% isomorphic and client-bundle safe. In `src/app/onboarding/page.tsx`, updated the redirect to trigger ONLY when `m.onboardingCompleted` is true, completely eliminating the crash.
+  3. **Beauty & Grooming Segmentation**: Separated into 6 distinct categories in `MAIN_CATEGORY_GROUPS`: `womens_salon` (Women's Salon - Hair & Styling), `beauty_parlour` (Beauty Parlour - Skin & Makeup), `womens_spa` (Women's Spa & Wellness Center), `salon` (Men's Salon), `unisex_salon`, `tattoo_studio`.
+  4. **2-Tier Hierarchical Business Category Selector (8 Main Groups + Sub-Categories)**:
+     - Configured `MAIN_CATEGORY_GROUPS` across: Healthcare & Clinics, Food & Dining, Beauty & Grooming, Automotive & Detailing, Education & Coaching, Fitness & Sports, Retail & Shopping, and Agency & Professionals.
+     - Added all 12 requested professions under `agency_professionals`: `plumbing_services`, `electrical_services`, `ac_repair_services`, `carpenter_services`, `pest_control_services`, `accountant_services`, `real_estate_broker`, `visa_consultancy`, `wedding_planning_agency`, `photography_agency`, `architecture_engineering_consultancy`, `patent_trademark_consultant`, `saas_agency`.
+     - Added dedicated keyword presets for `womens_salon`, `womens_spa`, and `home_professionals` in `src/lib/keyword-matrix.ts`, and updated `industry-campaigns.ts` for home services loyalty.
+     - Upgraded `src/components/signup-client.tsx`, `src/app/onboarding/page.tsx` (Step 1), and `src/app/dashboard/settings/page.tsx` (Section 03) to 2-tier reactive dropdowns (Main Category Group ➔ Sub-Category / Specialization).
+  5. **9th Option "Other" with Editable Custom Input**:
+     - Added 9th group `"other"` ("Other / Custom Business") in `MAIN_CATEGORY_GROUPS` with `"other_custom"`.
+     - When "Other" is selected, an editable text input appears (`"Enter your business specialization / industry..."`), synchronizing the merchant's custom trade with CustomerPilot AI review drafts.
+  6. **Adversarial & Playwright Verification**:
+     - Master Adversarial Guard (`scripts/run_adversarial_guard.js`): All 6 security gates passed cleanly (Exit Code 0).
+     - Playwright E2E Suite (`e2e/category-hierarchy-and-signup-hardening.spec.ts`): All 3 tests passed in 21.5s with zero console errors and zero network failures.
+- **Status**: ✅ Resolved and Verified.
+
+---
 ## [08 Nov 2026] Issue: SuperAdmin Trial Extension 403 Forbidden Fix, Full 8-Group Business Category Taxonomy at Signup & Clinic/Doctor Place ID 404 Prevention
 - **Symptom**:
   1. In SuperAdmin panel (`/super-admin?tab=merchants`), when attempting to extend a merchant's trial period (or update profile) after viewing/managing a merchant's dashboard, an alert popped up: "Failed to update profile: Forbidden: Super Admin access required".

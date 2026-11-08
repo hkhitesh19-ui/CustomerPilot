@@ -346,6 +346,25 @@ export function getIndustryLoyaltyRule(businessType?: string | null, businessNam
   if (key.includes('med') || key.includes('drug') || key.includes('chemist')) {
     return industryLoyaltyRules.pharmacy
   }
+  if (key.includes('plumb') || key.includes('electr') || key.includes('ac') || key.includes('carpenter') || key.includes('pest') || key.includes('account') || key.includes('ca') || key.includes('realestate') || key.includes('broker') || key.includes('visa') || key.includes('wedding') || key.includes('photo') || key.includes('architect') || key.includes('patent') || key.includes('agency') || key.includes('consult')) {
+    return {
+      industry: 'Professional & Home Services',
+      categoryKey: 'home_services',
+      rewardName: 'Free Inspection Checkup or ₹200 Off on Next Booking',
+      stampsRequired: 3,
+      stampValue: 500,
+      validityDays: 180,
+      googleReviewBonus: 1,
+      photoBonus: 1,
+      joiningBonusEnabled: true,
+      joiningBonusStamps: 1,
+      vipUpgradeBonusStamps: 2,
+      color: '#0d9488',
+      emoji: '💼',
+      description: '3 services = Free Inspection Checkup or ₹200 Off',
+      getCardTitle: (b) => `${b || 'Services'} VIP Pass`,
+    }
+  }
 
   return industryLoyaltyRules.bakery
 }

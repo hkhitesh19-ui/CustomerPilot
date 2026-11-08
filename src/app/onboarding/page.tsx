@@ -26,7 +26,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { hasModule, type Module } from "@/lib/feature-gate"
 import { getRecommendedCampaign, getIndustryLoyaltyRule } from "@/lib/industry-campaigns"
 import { ImpersonationBanner } from "@/components/impersonation-banner"
-import { OFFICIAL_GBP_CATEGORIES } from "@/lib/gbp-categories"
+import { OFFICIAL_GBP_CATEGORIES, MAIN_CATEGORY_GROUPS, getSubcategoriesForGroup, findMainGroupForCategory } from "@/lib/gbp-categories"
 
 // ─── Types ────────────────────────────────────────────────────
 interface WizardData {
@@ -211,9 +211,9 @@ function OnboardingPageContent() {
             if (m.enabledModules) {
               setMerchantModules(m.enabledModules)
             }
-            // Auto-redirect authenticated merchant straight to /dashboard/settings
-            if (m.id) {
-              router.replace("/dashboard/settings")
+            // Redirect to dashboard ONLY if onboarding has already been completed
+            if (m.onboardingCompleted) {
+              router.replace("/dashboard")
               return
             }
           }
@@ -519,6 +519,80 @@ function OnboardingPageContent() {
 
 // ─── Step 1: Business Info (read-only from signup, update allowed) ─────────────────────
 function OnboardStep1Business({ data, setData }: any) {
+  const currentMainGroup = findMainGroupForCategory(data.businessType || "bakery")
+  const [selectedMainGroup, setSelectedMainGroup] = useState(currentMainGroup)
+  const [customCategoryInput, setCustomCategoryInput] = useState(
+    currentMainGroup === "other" ? (data.businessType || "") : ""
+  )
+
+  const handleMainGroupChange = (grpId: string) => {
+    setSelectedMainGroup(grpId)
+    if (grpId === "other") {
+      const finalVal = customCategoryInput.trim() || "other"
+      const rule = getIndustryLoyaltyRule(finalVal, data.businessName)
+      setData((prev: any) => ({
+        ...prev,
+        businessType: finalVal,
+        cardName: rule.getCardTitle(data.businessName),
+        stampsRequired: rule.stampsRequired,
+        rewardName: rule.rewardName,
+        stampValue: rule.stampValue,
+      }))
+    } else {
+      const subs = getSubcategoriesForGroup(grpId)
+      const firstSub = subs[0]?.id || grpId
+      const rule = getIndustryLoyaltyRule(firstSub, data.businessName)
+      setData((prev: any) => ({
+        ...prev,
+        businessType: firstSub,
+        cardName: rule.getCardTitle(data.businessName),
+        stampsRequired: rule.stampsRequired,
+        rewardName: rule.rewardName,
+        stampValue: rule.stampValue,
+      }))
+    }
+  }
+
+  const handleSubcategoryChange = (subId: string) => {
+    if (subId === "other_custom" || subId.startsWith("other_")) {
+      const finalVal = customCategoryInput.trim() || "other"
+      const rule = getIndustryLoyaltyRule(finalVal, data.businessName)
+      setData((prev: any) => ({
+        ...prev,
+        businessType: finalVal,
+        cardName: rule.getCardTitle(data.businessName),
+        stampsRequired: rule.stampsRequired,
+        rewardName: rule.rewardName,
+        stampValue: rule.stampValue,
+      }))
+    } else {
+      const rule = getIndustryLoyaltyRule(subId, data.businessName)
+      setData((prev: any) => ({
+        ...prev,
+        businessType: subId,
+        cardName: rule.getCardTitle(data.businessName),
+        stampsRequired: rule.stampsRequired,
+        rewardName: rule.rewardName,
+        stampValue: rule.stampValue,
+      }))
+    }
+  }
+
+  const handleCustomInputChange = (text: string) => {
+    setCustomCategoryInput(text)
+    const rule = getIndustryLoyaltyRule(text.trim() || "other", data.businessName)
+    setData((prev: any) => ({
+      ...prev,
+      businessType: text.trim() || "other",
+      cardName: rule.getCardTitle(data.businessName),
+      stampsRequired: rule.stampsRequired,
+      rewardName: rule.rewardName,
+      stampValue: rule.stampValue,
+    }))
+  }
+
+  const isCustomVisible = selectedMainGroup === "other" || data.businessType === "other_custom" || (typeof data.businessType === "string" && data.businessType.startsWith("other_"))
+
   return (
     <div className="p-6 sm:p-8">
       <div className="flex items-center gap-3 mb-6">
@@ -550,34 +624,73 @@ function OnboardStep1Business({ data, setData }: any) {
             className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 font-medium shadow-xs"
           />
         </div>
+
+        {/* 2-Tier Hierarchical Business Category Selector */}
         <div>
-          <Label className="text-xs font-bold text-slate-800">Business Type</Label>
+          <Label className="text-xs font-bold text-slate-800">Main Business Category *</Label>
           <Select 
-            value={data.businessType} 
-            onValueChange={v => {
-              const rule = getIndustryLoyaltyRule(v, data.businessName)
-              setData({ 
-                ...data, 
-                businessType: v,
-                cardName: rule.getCardTitle(data.businessName),
-                stampsRequired: rule.stampsRequired,
-                rewardName: rule.rewardName,
-                stampValue: rule.stampValue,
-              })
-            }}
+            value={selectedMainGroup} 
+            onValueChange={handleMainGroupChange}
           >
-            <SelectTrigger className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 font-medium focus:ring-emerald-500 shadow-xs"><SelectValue /></SelectTrigger>
-            <SelectContent className="bg-white text-slate-900 border-slate-200 shadow-xl">
-              {OFFICIAL_GBP_CATEGORIES.map(t => (
-                <SelectItem key={t.id} value={t.id} className="text-slate-900 hover:bg-slate-100 font-medium">
-                  <span className="mr-2">{t.icon}</span>
-                  <span>{t.label}</span>
-                  <span className="ml-2 text-[10px] text-slate-400 font-normal">({t.group})</span>
+            <SelectTrigger className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 font-medium focus:ring-emerald-500 shadow-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-white text-slate-900 border-slate-200 shadow-xl max-h-[300px]">
+              {MAIN_CATEGORY_GROUPS.map(g => (
+                <SelectItem key={g.id} value={g.id} className="text-slate-900 hover:bg-slate-100 font-medium">
+                  <span className="mr-2">{g.icon}</span>
+                  <span>{g.name}</span>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
+
+        <div>
+          <Label className="text-xs font-bold text-slate-800">Sub-Category / Specialization *</Label>
+          {selectedMainGroup === "other" ? (
+            <div className="mt-1.5 h-10 px-3 rounded-md bg-slate-100 border border-slate-300 text-xs flex items-center text-slate-500 italic">
+              Type custom below ↓
+            </div>
+          ) : (
+            <Select 
+              value={data.businessType} 
+              onValueChange={handleSubcategoryChange}
+            >
+              <SelectTrigger className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 font-medium focus:ring-emerald-500 shadow-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-white text-slate-900 border-slate-200 shadow-xl max-h-[300px]">
+                {getSubcategoriesForGroup(selectedMainGroup).map(t => (
+                  <SelectItem key={t.id} value={t.id} className="text-slate-900 hover:bg-slate-100 font-medium">
+                    <span className="mr-2">{t.icon}</span>
+                    <span>{t.label}</span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+
+        {/* 9th Option 'Other' / Custom Subcategory Edit Box */}
+        {isCustomVisible && (
+          <div className="md:col-span-2 p-3.5 bg-emerald-50/70 border border-emerald-300 rounded-xl space-y-1.5">
+            <Label className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-emerald-600" /> Specify Your Custom Business / Sub-Category *
+            </Label>
+            <Input
+              value={customCategoryInput}
+              onChange={e => handleCustomInputChange(e.target.value)}
+              placeholder="e.g. Wedding Planner, Architecture & Interior, Plumbing, etc."
+              className="mt-1 text-sm bg-white text-slate-900 border-emerald-400 font-medium placeholder:text-slate-400 focus-visible:ring-emerald-500 shadow-xs"
+              required
+            />
+            <p className="text-[11px] text-emerald-700">
+              CustomerPilot AI will automatically generate authentic, keyword-optimized review prompts matching this exact trade.
+            </p>
+          </div>
+        )}
+
         <div>
           <Label className="text-xs font-bold text-slate-800">Business Address / City</Label>
           <Input
@@ -596,7 +709,7 @@ function OnboardStep1Business({ data, setData }: any) {
             className="mt-1.5 text-sm bg-white text-slate-900 border-slate-300 placeholder:text-slate-400 focus-visible:ring-emerald-500 focus-visible:border-emerald-500 font-medium shadow-xs"
           />
         </div>
-        <div>
+        <div className="md:col-span-2">
           <Label className="text-xs font-bold text-slate-800">Email (from signup)</Label>
           <Input
             value={data.email}

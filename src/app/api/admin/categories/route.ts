@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { ok, err } from "@/lib/api"
-import { getAllGbpCategories, addCustomGbpCategory, deleteCustomGbpCategory } from "@/lib/gbp-categories"
+import { getAllGbpCategories, addCustomGbpCategory, deleteCustomGbpCategory } from "@/lib/gbp-categories-server"
 
 export const dynamic = "force-dynamic"
 
@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
       id: catId,
       label: label.trim(),
       group: (group || "Custom Categories").trim(),
+      groupId: (group || "custom").trim().toLowerCase().replace(/[^a-z0-9_]/g, "_"),
       icon: (icon || "⭐").trim(),
       googleType: (googleType || "establishment").trim(),
       reviewKeywords: keywords,

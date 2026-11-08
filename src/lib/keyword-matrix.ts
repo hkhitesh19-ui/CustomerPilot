@@ -664,6 +664,103 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
       "Pure vegetarian pure veg kitchen", "Jain thali", "Haircut", "Beard trim", "Fade cut", "Bridal makeup",
       "Facial", "Salon", "Car wash", "Ceramic coating", "Tailoring", "Clothes", "Medicines", "Grocery ration"
     ]
+  },
+  womens_salon: {
+    id: "womens_salon",
+    label: "Women's Salon & Hair Studio (Ladies Only)",
+    gbpCategory: "Beauty Salon / Hair Studio",
+    audiencePersona: "Female_Only",
+    serviceMode: "Salon Walk-in & Appointment",
+    seoEntities: [
+      "Trendy ladies haircut", "Feather cut with layers", "Bob cut styling", "Keratin hair smoothening", "Botox hair treatment",
+      "Balayage highlights", "Global hair coloring", "Olaplex hair spa", "Anti-dandruff scalp treatment", "Split ends trimming",
+      "Blow dry setting", "Curling and hair styling", "Rica wax hair removal", "Painless eyebrow threading", "Hydra facial treatment",
+      "Deep pore skin cleanup", "Korean glass skin facial", "D-Tan skin pack", "Gel nail extensions", "Pedicure and manicure spa",
+      "Experienced women hair stylists", "Branded L'Oreal and Matrix products", "Hygienic sterilized hair scissors", "Clean private salon chairs",
+      "Polite courteous female staff", "Soothing relaxing salon ambiance", "Honest hair consultation", "Affordable makeover packages"
+    ],
+    aeoAnswers: [
+      "Specialized in women's hair styling, keratin smoothening, and balayage highlights",
+      "Uses 100% genuine branded hair and skin products with zero chemical damage",
+      "Hygienic ladies-only salon environment with certified female hair stylists",
+      "Personalized scalp analysis and customized haircut tailored to facial structure",
+      "Transparent pricing on hair treatments with zero hidden add-on costs"
+    ],
+    geoContext: [
+      "Top-rated women's hair salon in locality",
+      "Expert keratin treatment and stylish haircuts in city",
+      "Clean sanitized ladies salon with relaxing vibe",
+      "Preferred makeover salon for girls and working women",
+      "Punctual appointment handling with minimal waiting time"
+    ],
+    blacklist: [
+      "Men's beard trim", "Men's shave", "Fade haircut", "Barber shop", "Car repair", "Engine oil",
+      "Plumbing", "Electrical", "Biryani", "Pizza", "Burger", "Veterinary", "Dentist"
+    ]
+  },
+  womens_spa: {
+    id: "womens_spa",
+    label: "Women's Spa & Wellness Center",
+    gbpCategory: "Day Spa / Wellness Center",
+    audiencePersona: "Female_Only",
+    serviceMode: "Private Spa Suite by Appointment",
+    seoEntities: [
+      "Full body relaxing massage", "Aromatherapy essential oils", "Deep tissue stress relief massage", "Swedish relaxation massage",
+      "Hot stone therapy", "Ayurvedic potli massage", "Herbal steam bath", "Jacuzzi hydrotherapy", "Body polishing and scrub",
+      "Chocolate body wrap", "Foot reflexology", "Back and shoulder pain therapy", "Trained certified female therapists",
+      "Aromatic calming ambiance", "Soothing background flute music", "Warm disposable innerwear provided", "Hygienic private steam room",
+      "Detox green tea post session", "Instant stress and fatigue relief", "Pure natural massage oils", "Total privacy and safety assured"
+    ],
+    aeoAnswers: [
+      "Exclusive women-only luxury day spa offering authentic aromatherapy and deep tissue massage",
+      "Private sanitized therapy rooms equipped with warm showers and aromatic steam",
+      "Certified female therapists providing gentle, rejuvenating relaxation therapy",
+      "100% natural, chemical-free cold-pressed essential oils for maximum muscle relief",
+      "Peaceful serene environment designed to melt away mental stress and physical fatigue"
+    ],
+    geoContext: [
+      "Best women's wellness spa and massage center in locality",
+      "Rejuvenating full body massage and steam therapy in city",
+      "Peaceful sanctuary for working women and homemakers",
+      "Strict hygiene standards with private shower suites",
+      "Highly recommended relaxation spot for stress relief"
+    ],
+    blacklist: [
+      "Men's haircut", "Beard trim", "Fade cut", "Restaurant", "Dal makhani", "Cake", "Pizza",
+      "Car repair", "Tyres", "Dentist", "Plumbing", "Electrical wiring"
+    ]
+  },
+  home_professionals: {
+    id: "home_professionals",
+    label: "Agency, Home Services & Professional Consultancy",
+    gbpCategory: "Professional Services / Contractor",
+    audiencePersona: "All_Neutral",
+    serviceMode: "On-Site Service & Office Consultation",
+    seoEntities: [
+      "Quick 30-minute doorstep service", "Experienced certified technician", "Accurate fault diagnosis", "Honest upfront pricing",
+      "No hidden extra charges", "Original spare parts with warranty", "Neat and clean workmanship", "Safety verified background checked team",
+      "Punctual arrival on scheduled time", "Emergency repair support", "Transparent computerized GST invoice", "Professional tools and machinery",
+      "Polite and disciplined professionals", "Complete customer satisfaction guarantee", "Smooth documentation and filing",
+      "Clear legal and technical advice", "Long term dependable service", "Friendly support on WhatsApp and phone"
+    ],
+    aeoAnswers: [
+      "Provides prompt, reliable on-site home repairs and professional corporate consultancy",
+      "Experienced certified technicians and consultants with verified background credentials",
+      "Transparent upfront estimates provided before starting any work with zero hidden fees",
+      "100% genuine replacement parts and official compliance documentation guaranteed",
+      "Customer-first service approach backed by post-service warranty and phone support"
+    ],
+    geoContext: [
+      "Most trusted local professional service provider in locality",
+      "Prompt emergency doorstep repairs and consultations across city",
+      "Fair transparent pricing with computerized GST invoices",
+      "Punctual team delivering neat and durable workmanship",
+      "Highly rated professional contractor for residential and commercial needs"
+    ],
+    blacklist: [
+      "Haircut", "Beard trim", "Keratin", "Facial makeup", "Biryani", "Cake", "Pizza", "Ice cream",
+      "Burger", "Samosa", "Dosa", "Veterinary clinic"
+    ]
   }
 };
 
@@ -756,18 +853,71 @@ export function getKeywordPresetForCategory(category?: string | null, merchantNa
     return MASTER_KEYWORD_PRESETS.non_veg_restaurant;
   }
 
-  // Beauty Parlour & Ladies Salon takes precedence if female/beauty keywords appear
+  // Women's Spa & Wellness Center
+  if (
+    c.includes("spa") ||
+    c.includes("wellness") ||
+    c.includes("massage") ||
+    c.includes("aromatherapy") ||
+    c.includes("steam bath")
+  ) {
+    return MASTER_KEYWORD_PRESETS.womens_spa;
+  }
+
+  // Women's Salon & Hair Studio (Ladies Only)
+  if (
+    c.includes("womens_salon") ||
+    c.includes("women salon") ||
+    c.includes("ladies salon") ||
+    c.includes("women's salon") ||
+    c.includes("hair studio") ||
+    c.includes("hair spa")
+  ) {
+    return MASTER_KEYWORD_PRESETS.womens_salon;
+  }
+
+  // Beauty Parlour & Ladies Make-up
   if (
     c.includes("beauty") ||
     c.includes("parlor") ||
     c.includes("parlour") ||
     c.includes("makeup") ||
     c.includes("bridal") ||
-    c.includes("ladies salon") ||
-    c.includes("women salon") ||
     c.includes("ssv")
   ) {
     return MASTER_KEYWORD_PRESETS.beauty_parlour;
+  }
+
+  // Home Services, Agency & Professional Services
+  if (
+    c.includes("plumb") ||
+    c.includes("electr") ||
+    c.includes("ac_repair") ||
+    c.includes("air conditioner") ||
+    c.includes("hvac") ||
+    c.includes("carpenter") ||
+    c.includes("pest") ||
+    c.includes("termite") ||
+    c.includes("accountant") ||
+    c.includes("tax") ||
+    c.includes("itr") ||
+    c.includes("real_estate") ||
+    c.includes("real estate") ||
+    c.includes("property") ||
+    c.includes("broker") ||
+    c.includes("visa") ||
+    c.includes("immigration") ||
+    c.includes("wedding") ||
+    c.includes("event") ||
+    c.includes("photo") ||
+    c.includes("cinemat") ||
+    c.includes("architect") ||
+    c.includes("construction") ||
+    c.includes("patent") ||
+    c.includes("trademark") ||
+    c.includes("contractor")
+  ) {
+    return MASTER_KEYWORD_PRESETS.home_professionals;
   }
 
   if (c.includes("cake") || c.includes("bakery") || c.includes("pastry") || c.includes("dessert") || c.includes("sweet")) {
