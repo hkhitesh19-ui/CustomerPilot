@@ -8,22 +8,25 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 5e39925
-Full Commit Hash  : 5e39925bf17ad524d7f4175247ac5143abbc919d
+Active Git Commit : 92c3956
+Full Commit Hash  : 92c39567cc4f59a508847fec900919c0798e2159
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 09 Nov 2026, 12:00 PM IST
+Deployment Date   : 09 Nov 2026, 04:57 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(reviews): add inline editing for top 10 products/services in settings and implement ultra-compact zero-scroll customer review mobile layout
+Commit Title      : feat(rankpilot): implement revenue leak calculator, fraud-proof gemini vision review verifier webhook, and SSR triple schema micro-page
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
-- Domain URL      : https://customerpilot.in (HTTP/2 200 OK)
-- Dynamic Review  : https://customerpilot.in/review (Hero Chips & Category Isolation)
-- Settings Studio : https://customerpilot.in/dashboard/settings (2-Column Offered/Excluded Keyword Control)
-- SuperAdmin GMB  : https://customerpilot.in/super-admin?tab=gmb-optimization (GMB Optimization PRO link active)
-- Merchant GMB    : https://customerpilot.in/dashboard/gbp-status (GMB Optimization PRO link active for Cake Connection)
-- SQLite Database : /var/www/CustomerPilot/prisma/dev.db (Cake Connection & CustomerPilot HQ seeded)
+- Domain URL        : https://customerpilot.in (HTTP/2 200 OK)
+- Revenue Leak Calc : https://customerpilot.in/google-business-profile-ranking (Live AOV & Volume Slider, HTTP/2 200 OK)
+- Review Verifier   : https://customerpilot.in/api/webhooks/whatsapp-review (Fraud-Proof Vision OCR Webhook Active)
+- SSR Micro-Page    : https://customerpilot.in/vadodara/cake-connection (Triple Schema: LocalBusiness + FAQPage + OfferCatalog)
+- Dynamic Review    : https://customerpilot.in/review (Hero Chips & Category Isolation)
+- Settings Studio   : https://customerpilot.in/dashboard/settings (2-Column Offered/Excluded Keyword Control)
+- SuperAdmin GMB    : https://customerpilot.in/super-admin?tab=gmb-optimization (GMB Optimization PRO link active)
+- Merchant GMB      : https://customerpilot.in/dashboard/gbp-status (GMB Optimization PRO link active for Cake Connection)
+- SQLite Database   : /var/www/CustomerPilot/prisma/dev.db (ReviewVerificationLog Table Active, Seeded)
 ==========================================================
