@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic"
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const merchantId = searchParams.get("m")
+    const merchantId = searchParams.get("m") || searchParams.get("merchantId")
     const customerId = searchParams.get("c") || undefined
     const productParam = searchParams.get("product") || searchParams.get("item") || undefined
 
@@ -47,11 +47,12 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const businessCategory = merchant.category?.trim() || merchant.businessType || "Retail Store"
+    const businessCategory = merchant.businessType?.trim() || merchant.category?.trim() || "Retail Store"
     const menuItemNames = menuItems.map((m: { name: string }) => m.name)
 
     const drafts = await generateDynamicReviewDraft({
       businessCategory,
+      businessType: merchant.businessType || undefined,
       productName,
       merchantName: merchant.name,
       menuItems: menuItemNames,

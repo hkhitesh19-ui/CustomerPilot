@@ -77,13 +77,15 @@ export default async function ReviewPage({
   }).catch(() => [])
     : []
 
-  const businessCategory = merchant.category?.trim() || merchant.businessType || "Retail Store"
+  const businessCategory = merchant.businessType?.trim() || merchant.category?.trim() || "Retail Store"
   const menuItemNames = menuItems.map((m: { name: string }) => m.name)
 
   // Resolve keywordProfile & extract Top 5 Hero Chips for customer 1-tap review
   const kwProfile = resolveMerchantKeywordProfile({
+    id: merchant.id,
     name: merchant.name,
-    category: businessCategory,
+    category: merchant.category,
+    businessType: merchant.businessType,
     city: merchant.city || undefined,
     address: merchant.address || undefined,
     keywordProfile: (merchant as any).keywordProfile || null
@@ -120,7 +122,8 @@ export default async function ReviewPage({
 
   // Generate dynamic, anti-repetitive AI / multi-angle rotating drafts
   const draftOptions = await generateDynamicReviewDraft({
-    businessCategory,
+    businessCategory: kwProfile.categoryKey || businessCategory,
+    businessType: merchant.businessType || undefined,
     productName,
     merchantName: merchant.name,
     menuItems: menuItemNames,

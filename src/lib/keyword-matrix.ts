@@ -788,7 +788,36 @@ export function getKeywordPresetForCategory(category?: string | null, merchantNa
     return MASTER_KEYWORD_PRESETS.saas_agency;
   }
 
-  // Clinic, General Physician, Doctor, Healthcare & Medical Centers
+  // Pet Clinic & Veterinary Hospital (MUST be evaluated BEFORE general clinic/doctor)
+  if (
+    c.includes("pet") ||
+    c.includes("veterin") ||
+    c.includes("animal hospital") ||
+    c.includes("pet hospital") ||
+    c.includes("vet clinic") ||
+    c.includes("pet clinic") ||
+    c.includes("dog clinic") ||
+    c.includes("cat clinic") ||
+    c.includes("paws") ||
+    c.includes("animal care")
+  ) {
+    return MASTER_KEYWORD_PRESETS.pet_clinic;
+  }
+
+  // Dental Clinic & Orthodontist (MUST be evaluated BEFORE general clinic/doctor)
+  if (
+    c.includes("dental") ||
+    c.includes("dentist") ||
+    c.includes("tooth") ||
+    c.includes("teeth") ||
+    c.includes("orthodont") ||
+    c.includes("rct") ||
+    c.includes("smile care")
+  ) {
+    return MASTER_KEYWORD_PRESETS.dental_clinic;
+  }
+
+  // General Human Clinic, Physician, Doctor & Medical Centers (ONLY if not pet or dental)
   if (
     c.includes("clinic") ||
     c.includes("doctor") ||
@@ -807,16 +836,6 @@ export function getKeywordPresetForCategory(category?: string | null, merchantNa
     c.includes("physiotherapy")
   ) {
     return MASTER_KEYWORD_PRESETS.clinic_doctor;
-  }
-
-  // Dental Clinic & Orthodontist
-  if (c.includes("dental") || c.includes("dentist") || c.includes("tooth") || c.includes("teeth") || c.includes("orthodont") || c.includes("rct") || c.includes("smile care")) {
-    return MASTER_KEYWORD_PRESETS.dental_clinic;
-  }
-
-  // Pet Clinic & Veterinary Hospital
-  if (c.includes("pet clinic") || c.includes("veterinary") || c.includes("animal hospital") || c.includes("pet hospital") || c.includes("vet clinic") || (c.includes("pet") && (c.includes("care") || c.includes("clinic") || c.includes("doctor")))) {
-    return MASTER_KEYWORD_PRESETS.pet_clinic;
   }
 
   // Pizza Restaurant & Pizzeria
@@ -1324,7 +1343,28 @@ export function resolveMerchantKeywordProfile(merchant: {
   address?: string | null;
   keywordProfile?: string | null;
 }): KeywordProfile {
-  const categoryPreset = getKeywordPresetForCategory(merchant.category || merchant.businessType, merchant.name);
+  // 1. Direct lookup by businessType preset key if exact match exists
+  let categoryPreset: CategoryPreset;
+  const bType = (merchant.businessType || "").toLowerCase().trim();
+  if (bType && (MASTER_KEYWORD_PRESETS as any)[bType]) {
+    categoryPreset = (MASTER_KEYWORD_PRESETS as any)[bType];
+  } else {
+    // Check businessType first, then category, taking merchant name into account
+    categoryPreset = getKeywordPresetForCategory(merchant.businessType || merchant.category, merchant.name);
+  }
+
+  // Detect whether this business is actually a Pet Clinic or Dental Clinic
+  const isPetBusiness = bType === "pet_clinic" ||
+    (merchant.name && (merchant.name.toLowerCase().includes("pet") || merchant.name.toLowerCase().includes("vet") || merchant.name.toLowerCase().includes("animal hospital")));
+  const isDentalBusiness = bType === "dental_clinic" ||
+    (merchant.name && (merchant.name.toLowerCase().includes("dental") || merchant.name.toLowerCase().includes("dentist")));
+
+  // If detected as pet or dental, ensure categoryPreset is definitively set
+  if (isPetBusiness && categoryPreset.id !== "pet_clinic") {
+    categoryPreset = MASTER_KEYWORD_PRESETS.pet_clinic;
+  } else if (isDentalBusiness && categoryPreset.id !== "dental_clinic") {
+    categoryPreset = MASTER_KEYWORD_PRESETS.dental_clinic;
+  }
 
   // If merchant has saved profile in DB, parse and merge
   if (merchant.keywordProfile) {
@@ -1335,23 +1375,41 @@ export function resolveMerchantKeywordProfile(merchant: {
         : "Manjalpur";
       const cityName = merchant.city || parsed.city || "Vadodara";
 
+      // Protective Auto-Heal: If saved profile was contaminated with human clinic data for a pet or dental merchant
+      let effectiveCategoryKey = parsed.categoryKey || categoryPreset.id;
+      let effectiveAllowedSeo = Array.isArray(parsed.allowedSeoEntities) && parsed.allowedSeoEntities.length > 0 ? parsed.allowedSeoEntities : categoryPreset.seoEntities;
+      let effectiveStrictlyNotAllowed = Array.isArray(parsed.strictlyNotAllowed) && parsed.strictlyNotAllowed.length > 0 ? parsed.strictlyNotAllowed : categoryPreset.blacklist;
+      let effectiveHeroServices = Array.isArray(parsed.heroServices) && parsed.heroServices.length > 0 ? parsed.heroServices : categoryPreset.seoEntities.slice(0, 5);
+
+      if (isPetBusiness && (effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("mbbs") || s.toLowerCase().includes("physician") || s.toLowerCase().includes("routine full body")))) {
+        effectiveCategoryKey = "pet_clinic";
+        effectiveAllowedSeo = MASTER_KEYWORD_PRESETS.pet_clinic.seoEntities;
+        effectiveStrictlyNotAllowed = MASTER_KEYWORD_PRESETS.pet_clinic.blacklist;
+        effectiveHeroServices = MASTER_KEYWORD_PRESETS.pet_clinic.seoEntities.slice(0, 5);
+      } else if (isDentalBusiness && (effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("mbbs") || s.toLowerCase().includes("physician")))) {
+        effectiveCategoryKey = "dental_clinic";
+        effectiveAllowedSeo = MASTER_KEYWORD_PRESETS.dental_clinic.seoEntities;
+        effectiveStrictlyNotAllowed = MASTER_KEYWORD_PRESETS.dental_clinic.blacklist;
+        effectiveHeroServices = MASTER_KEYWORD_PRESETS.dental_clinic.seoEntities.slice(0, 5);
+      }
+
       return {
-        categoryKey: parsed.categoryKey || categoryPreset.id,
+        categoryKey: effectiveCategoryKey,
         businessName: merchant.name || parsed.businessName || "Local Business",
         gbpPrimaryCategory: parsed.gbpPrimaryCategory || categoryPreset.gbpCategory,
         city: cityName,
         localityLandmarks: Array.isArray(parsed.localityLandmarks) ? parsed.localityLandmarks : ["Main Market"],
-        audiencePersona: parsed.audiencePersona || categoryPreset.audiencePersona,
+        audiencePersona: isPetBusiness ? "Pet_Owner" : isDentalBusiness ? "Dental_Patient" : (parsed.audiencePersona || categoryPreset.audiencePersona),
         serviceMode: parsed.serviceMode || categoryPreset.serviceMode,
-        allowedSeoEntities: Array.isArray(parsed.allowedSeoEntities) && parsed.allowedSeoEntities.length > 0 ? parsed.allowedSeoEntities : categoryPreset.seoEntities,
+        allowedSeoEntities: effectiveAllowedSeo,
         allowedAeoAnswers: Array.isArray(parsed.allowedAeoAnswers) && parsed.allowedAeoAnswers.length > 0 ? parsed.allowedAeoAnswers : categoryPreset.aeoAnswers,
         allowedGeoContext: Array.isArray(parsed.allowedGeoContext) && parsed.allowedGeoContext.length > 0 ? parsed.allowedGeoContext : categoryPreset.geoContext,
-        strictlyNotAllowed: Array.isArray(parsed.strictlyNotAllowed) && parsed.strictlyNotAllowed.length > 0 ? parsed.strictlyNotAllowed : categoryPreset.blacklist,
-        heroServices: Array.isArray(parsed.heroServices) && parsed.heroServices.length > 0 ? parsed.heroServices : categoryPreset.seoEntities.slice(0, 5),
+        strictlyNotAllowed: effectiveStrictlyNotAllowed,
+        heroServices: effectiveHeroServices,
         heroProducts: Array.isArray(parsed.heroProducts) && parsed.heroProducts.length > 0 ? parsed.heroProducts : categoryPreset.seoEntities.slice(5, 10),
         pastPublicReviews: Array.isArray(parsed.pastPublicReviews) ? parsed.pastPublicReviews : [],
         autoExtractedKeywords: parsed.autoExtractedKeywords || generateAutoKeywordsForLocation(
-          parsed.categoryKey || categoryPreset.id,
+          effectiveCategoryKey,
           locality,
           cityName,
           merchant.name || parsed.businessName || ""

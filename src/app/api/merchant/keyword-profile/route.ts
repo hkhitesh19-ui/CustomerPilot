@@ -5,7 +5,9 @@ import { resolveMerchantKeywordProfile, MASTER_KEYWORD_PRESETS } from "@/lib/key
 
 export async function GET(req: NextRequest) {
   try {
-    const merchantId = req.headers.get("x-merchant-id") || req.nextUrl.searchParams.get("merchantId");
+    const queryMerchantId = req.nextUrl.searchParams.get("merchantId");
+    const headerMerchantId = req.headers.get("x-merchant-id");
+    const merchantId = queryMerchantId || headerMerchantId;
     if (!merchantId) return err("Merchant ID required", 400);
 
     const merchant = await db.merchant.findUnique({

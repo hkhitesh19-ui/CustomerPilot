@@ -471,10 +471,10 @@ export function getDynamicFallbackReview(
 
   // Choose appropriate pool based on category
   let pool: FallbackReviewItem[] = GENERAL_REVIEWS
-  if (c.includes("dental") || c.includes("dentist") || c.includes("tooth") || c.includes("teeth") || c.includes("orthodont")) {
-    pool = DENTAL_REVIEWS
-  } else if (c.includes("pet clinic") || c.includes("veterinary") || c.includes("animal hospital") || c.includes("pet hospital") || c.includes("vet clinic") || (c.includes("pet") && (c.includes("clinic") || c.includes("doctor")))) {
+  if (c.includes("pet") || c.includes("veterin") || c.includes("animal") || c.includes("dog") || c.includes("cat") || c.includes("puppy") || c.includes("kitten") || c.includes("pet_clinic")) {
     pool = PET_CLINIC_REVIEWS
+  } else if (c.includes("dental") || c.includes("dentist") || c.includes("tooth") || c.includes("teeth") || c.includes("orthodont") || c.includes("rct") || c.includes("dental_clinic")) {
+    pool = DENTAL_REVIEWS
   } else if (c.includes("pizza") || c.includes("pizzeria") || c.includes("wood fired") || c.includes("wood-fired")) {
     pool = PIZZA_REVIEWS
   } else if (c.includes("dabeli") || c.includes("vadapav") || c.includes("vada pav") || c.includes("samosa") || c.includes("sandwich") || c.includes("fast food") || c.includes("street snack")) {
@@ -541,9 +541,9 @@ function getCategoryAwareItemDrafts(
 
   // ── PET CLINIC ───────────────────────────────────────────────────────────────
   if (
-    c.includes("pet clinic") || c.includes("veterinary") || c.includes("animal hospital") ||
-    c.includes("pet hospital") || c.includes("vet clinic") ||
-    (c.includes("pet") && (c.includes("clinic") || c.includes("doctor")))
+    c.includes("pet") || c.includes("veterin") || c.includes("animal") ||
+    c.includes("dog") || c.includes("cat") || c.includes("puppy") || c.includes("kitten") ||
+    c.includes("pet_clinic")
   ) {
     const templates = [
       {
@@ -771,6 +771,7 @@ function getCategoryAwareItemDrafts(
  */
 export async function generateDynamicReviewDraft(params: {
   businessCategory: string
+  businessType?: string
   productName?: string
   merchantName?: string
   menuItems?: string[]
@@ -780,12 +781,13 @@ export async function generateDynamicReviewDraft(params: {
   merchantAddress?: string
   pastPublicReviews?: string[]
 }): Promise<ReviewDraftOptions> {
-  const { businessCategory, productName, merchantName, menuItems, seed, merchantKeywordProfile, merchantCity, merchantAddress, pastPublicReviews } = params
+  const { businessCategory, businessType, productName, merchantName, menuItems, seed, merchantKeywordProfile, merchantCity, merchantAddress, pastPublicReviews } = params
 
   // 1. Resolve merchant's active KeywordProfile (SEO, AEO, GEO, and Blacklist)
   const profile: KeywordProfile = resolveMerchantKeywordProfile({
     name: merchantName,
     category: businessCategory,
+    businessType: businessType,
     city: merchantCity,
     address: merchantAddress,
     keywordProfile: merchantKeywordProfile
@@ -813,7 +815,7 @@ export async function generateDynamicReviewDraft(params: {
   const timestampSeed = Date.now().toString(36)
 
   // 4. Prepare fallback immediately
-  const fallback = getDynamicFallbackReview(businessCategory, focalItem, seed || timestampSeed)
+  const fallback = getDynamicFallbackReview(profile.categoryKey || businessCategory, focalItem, seed || timestampSeed)
 
   // 5. Check active API keys
   const geminiKey = process.env.GEMINI_API_KEY?.trim()

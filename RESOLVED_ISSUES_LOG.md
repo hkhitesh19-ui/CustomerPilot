@@ -5,6 +5,26 @@ This document serves as a historical record of all major bugs, configuration iss
 ---
 
 ---
+
+---
+## [09 Nov 2026] Issue: Pet Clinic & Dental Clinic Subcategory Preset Resolution Hijack Elimination & Automatic Profile Grounding
+- **Symptom**:
+  1. For merchant "PET CLINIC @ MANJALPUR" (`customerpilot.in/review?m=cmw60b1in1jsckv9d3wwc0cb6`) and `/dashboard/settings`, the customer review page and settings control studio rendered human MBBS MD doctor chips: "Doctor consultation", "General physician consultation", "Experienced MBBS MD doctor", "Accurate medical diagnosis", "Routine full body health checkup".
+  2. Dynamic review drafts continued to generate human medicine consultation reviews: "Went for routine full body health checkup, doctor was thorough, clinic spotless, got clear results quickly."
+- **Root Cause**:
+  1. In `src/lib/keyword-matrix.ts`, `getKeywordPresetForCategory` evaluated `clinic_doctor` BEFORE `pet_clinic` and `dental_clinic`. Because `PET CLINIC @ MANJALPUR` and `Healthcare & Clinics` contained the word "clinic", `c.includes("clinic")` matched at line 793 and immediately assigned `clinic_doctor` (human doctor), never reaching `pet_clinic`.
+  2. In `src/app/review/page.tsx` (line 80) and `src/app/api/reviews/dynamic-draft/route.ts` (line 50), `businessCategory` prioritized `merchant.category` ("Healthcare & Clinics") over `merchant.businessType` ("pet_clinic"), discarding the specific subcategory.
+  3. In `resolveMerchantKeywordProfile`, there was no direct lookup for `merchant.businessType`, and when merging saved profiles, corrupted or default profiles containing human doctor tags were not auto-healed.
+  4. In `src/lib/dynamic-review-engine.ts`, line 816 passed `businessCategory` ("Healthcare & Clinics") instead of `profile.categoryKey` ("pet_clinic") to `getDynamicFallbackReview`, which evaluated to `CLINIC_REVIEWS` (human clinic).
+  5. In `src/app/api/reviews/dynamic-draft/route.ts`, the parameter `searchParams.get("m")` did not support `merchantId`.
+- **Resolution**:
+  1. **Reordered Preset Evaluation**: In `getKeywordPresetForCategory`, moved `pet_clinic` and `dental_clinic` to the top of the evaluation chain before `clinic_doctor`.
+  2. **Direct Subcategory Preset Lookup & Auto-Heal**: In `resolveMerchantKeywordProfile`, added direct check for `MASTER_KEYWORD_PRESETS[merchant.businessType]` and built defensive auto-healing to sanitize contaminated saved profiles for pet and dental merchants.
+  3. **Subcategory Priority**: Changed `businessCategory` resolution to `merchant.businessType || merchant.category || "Retail Store"` across `/review/page.tsx` and `/api/reviews/dynamic-draft/route.ts`.
+  4. **Fallback Category Synchronization**: Updated `dynamic-review-engine.ts` to pass `profile.categoryKey || businessCategory` to `getDynamicFallbackReview` and enforce strict veterinary pool selection.
+  5. **Deterministic Playwright E2E Verification**: Created `e2e/pet-clinic-review.spec.ts` asserting 0 human doctor chips, authentic veterinary hero chips (`Puppy 7-in-1 vaccination`, `Anti-rabies vaccine`), and pet-owner dynamic review generation.
+- **Status**: ✅ Resolved and Verified.
+
 ## [09 Nov 2026] Issue: Pet Clinic Human Healthcare Leaks Elimination, Category-Aware Fallback Architecture, Pet Owner & Dental Personas, and Real GBP Past Reviews Style Inspiration
 - **Symptom**:
   1. For veterinary merchants (e.g. "PET CLINIC @ MANJALPUR"), AI-generated and fallback Google review suggestions were drafted with human healthcare terminology: *"Doctor consultation at PET CLINIC @ MANJALPUR was thorough, friendly, and solved my fever quickly."*, *"Maine apne kutte ke liye doctor consultation li, doctor ne turant diagnosis di, prescribed minimal medicine."*
