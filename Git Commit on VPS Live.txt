@@ -8,12 +8,12 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 894e358
-Full Commit Hash  : 894e3582037da029afc09c636d8b77dae5acb6af
+Active Git Commit : 5ec5989
+Full Commit Hash  : 5ec5989185333901e246ce198352348e16b5a5a4
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 08 Nov 2026, 05:23 PM IST
+Deployment Date   : 09 Nov 2026, 06:55 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(auth & taxonomy): align 8-character password placeholder, decouple categories from db to prevent onboarding crash, and implement 2-tier 8-group business taxonomy with custom input for other
+Commit Title      : docs: log Google Place ID resolution and 404 writereview elimination for PET CLINIC @ MANJALPUR in RESOLVED_ISSUES_LOG.md
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
