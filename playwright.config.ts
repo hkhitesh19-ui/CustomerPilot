@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 
 const hasStandaloneServer = fs.existsSync(path.resolve(__dirname, '.next/standalone/server.js'));
-const serverCommand = process.env.CI || hasStandaloneServer ? 'node .next/standalone/server.js' : 'npm run dev';
+const serverCommand = (process.env.CI || process.env.USE_STANDALONE === 'true') && hasStandaloneServer ? 'node .next/standalone/server.js' : 'npm run dev';
 
 export default defineConfig({
   testDir: './e2e',
@@ -33,7 +33,7 @@ export default defineConfig({
   webServer: {
     command: serverCommand,
     port: 3000,
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
     env: {
       PORT: '3000',

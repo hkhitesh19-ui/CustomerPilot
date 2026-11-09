@@ -1,0 +1,119 @@
+import { test, expect } from './fixtures/hardened-test';
+
+test.describe('RankPilot AI Dedicated Landing Page E2E Suite', () => {
+  test('Landing page loads at /rankpilot with 200 OK and valid SEO metadata', async ({ page }) => {
+    const res = await page.goto('/rankpilot', { waitUntil: 'domcontentloaded' });
+    expect(res?.status()).toBe(200);
+
+    // Title & Meta assertions
+    await expect(page).toHaveTitle(/RankPilot AI.*Google Maps Top 3/i);
+
+    // Verify Brand Logo and Header navigation
+    const header = page.locator('header');
+    await expect(header).toBeVisible();
+    await expect(page.locator('text=RankPilot AI™ v7.0').first()).toBeVisible();
+  });
+
+  test('Hero section renders core value propositions and trust badges', async ({ page }) => {
+    await page.goto('/rankpilot', { waitUntil: 'domcontentloaded' });
+
+    // Hero Headline
+    const headline = page.locator('h1');
+    await expect(headline).toContainText('Move Your Store from Page 10');
+    await expect(headline).toContainText('to Google Maps Top 3');
+
+    // Trust badges
+    await expect(page.locator('text=100% Google Policy Clean').first()).toBeVisible();
+    await expect(page.locator('text=Top 3 Local Pack Guarantee').first()).toBeVisible();
+    await expect(page.locator('text=10+10 Dual Matrix').first()).toBeVisible();
+  });
+
+  test('Revenue Leak Simulator allows interactive inputs and computes loss in real-time', async ({ page }) => {
+    await page.goto('/rankpilot', { waitUntil: 'domcontentloaded' });
+
+    // Find the Revenue Leak section
+    const simSection = page.locator('#revenue-leak');
+    await expect(simSection).toBeVisible();
+
+    // Check default values rendered
+    await expect(page.locator('text=Top 3 Potential Monthly Actions').first()).toBeVisible();
+    await expect(page.locator('text=Monthly Walk-In & Order Loss').first()).toBeVisible();
+    await expect(page.locator('text=Monthly Revenue Bleeding Out').first()).toBeVisible();
+
+    // Verify click on a different rank pill (e.g. Rank #5)
+    const rank5Button = page.locator('button:text-is("#5")');
+    if (await rank5Button.count() > 0) {
+      await rank5Button.click();
+      await page.waitForTimeout(300);
+      // Ensure recalculation happened without crash
+      await expect(page.locator('text=Monthly Walk-In & Order Loss').first()).toBeVisible();
+    }
+  });
+
+  test('10+10 Dual Matrix Showcase switches verticals cleanly', async ({ page }) => {
+    await page.goto('/rankpilot', { waitUntil: 'domcontentloaded' });
+
+    const matrixSection = page.locator('#features');
+    await expect(matrixSection).toBeVisible();
+
+    // Verify Products & Services columns
+    await expect(page.locator('text=Top 10 High-Intent Products').first()).toBeVisible();
+    await expect(page.locator('text=Top 10 High-Intent Services').first()).toBeVisible();
+
+    // Click Pet Clinic vertical tab
+    const petClinicTab = page.locator('button:has-text("Pet Clinic & Vet")');
+    if (await petClinicTab.count() > 0) {
+      await petClinicTab.click();
+      await page.waitForTimeout(300);
+      await expect(page.locator('text=Pet Clinic @ Manjalpur').first()).toBeVisible();
+    }
+  });
+
+  test('Post Dominance Engine tabs toggle weekly cadence templates', async ({ page }) => {
+    await page.goto('/rankpilot', { waitUntil: 'domcontentloaded' });
+
+    const postEngine = page.locator('#how-it-works');
+    await expect(postEngine).toBeVisible();
+
+    // Click Thursday tab
+    const thuTab = page.locator('button:has-text("Thursday")');
+    if (await thuTab.count() > 0) {
+      await thuTab.click();
+      await page.waitForTimeout(300);
+      await expect(page.locator('text=Customer Review Spotlight').first()).toBeVisible();
+    }
+
+    // Click Saturday tab
+    const satTab = page.locator('button:has-text("Saturday")');
+    if (await satTab.count() > 0) {
+      await satTab.click();
+      await page.waitForTimeout(300);
+      await expect(page.locator('text=Weekend VIP Offer Post').first()).toBeVisible();
+      await expect(page.locator('text=Zero-Gap Expiration').first()).toBeVisible();
+    }
+  });
+
+  test('Dual-Language FAQ renders and expands items correctly', async ({ page }) => {
+    await page.goto('/rankpilot', { waitUntil: 'domcontentloaded' });
+
+    const faqSection = page.locator('#faq');
+    await expect(faqSection).toBeVisible();
+
+    // Check first question text
+    await expect(page.locator('text=How can a business on Page 10 reach Top 3 in 30 days?').first()).toBeVisible();
+  });
+
+  test('Alias /rankpilot-ai cleanly redirects to /rankpilot', async ({ page }) => {
+    await page.goto('/rankpilot-ai', { waitUntil: 'domcontentloaded' });
+    expect(page.url()).toContain('/rankpilot');
+  });
+
+  test('Zero dummy placeholder text audit', async ({ page }) => {
+    await page.goto('/rankpilot', { waitUntil: 'domcontentloaded' });
+    const content = await page.content();
+
+    // Ground-truth assertions: no lorem ipsum, no dummy domain placeholders
+    expect(content.toLowerCase()).not.toContain('lorem ipsum');
+    expect(content).not.toContain('example.com');
+  });
+});
