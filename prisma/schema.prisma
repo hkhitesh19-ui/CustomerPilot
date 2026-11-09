@@ -995,6 +995,25 @@ model GbpPost {
   @@index([merchantId, postType])
 }
 
+model ReviewVerificationLog {
+  id                 String   @id @default(cuid())
+  merchantId         String
+  customerPhone      String
+  imageSha256Hash    String   @unique
+  reviewFingerprint  String   @unique
+  reviewerName       String?
+  extractedText      String?
+  starRating         Int
+  hasKeywordMatch    Boolean  @default(false)
+  hasPhotoAttached   Boolean  @default(false)
+  stampsCredited     Int      @default(1)
+  status             String   // "APPROVED" | "REJECTED"
+  rejectionReason    String?
+  createdAt          DateTime @default(now())
+
+  @@index([merchantId, customerPhone])
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // WHATSAPP ORDERING SYSTEM — MenuItem, Order, OrderItem

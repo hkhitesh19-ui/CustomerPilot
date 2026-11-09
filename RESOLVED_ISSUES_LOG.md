@@ -4,6 +4,42 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+---
+
+## [09 Nov 2026] Issue: RankPilot AI™ Master Playbook Implementation — Mathematical Revenue Leak Engine, Fraud-Proof Gemini Vision Review Verifier & SSR Triple Schema Micro-Pages
+- **Symptom**:
+  1. The public GBP Free Audit tool lacked the dynamic "Monthly & Annual Revenue Leak" financial calculator and AOV slider defined in the RankPilot AI™ Master Playbook (Page 7), making audit results less compelling for merchant conversions.
+  2. Merchants had no fraud-proof mechanism to automatically verify Google Review screenshots submitted by customers via WhatsApp for loyalty stamp awards. Malicious actors could claim bonus stamps by submitting unposted draft reviews (with the blue "Post" button still visible), screenshots of reviews posted to other shops, or the same screenshot multiple times.
+  3. Merchants lacked dynamic hyper-local SSR micro-pages (`/[city]/[slug]`) with auto-generated Triple Schema (`LocalBusiness` with GeoCoordinates + `FAQPage` + `OfferCatalog`) and 500m nearby landmarks to trigger Google SGE, Perplexity, and ChatGPT AEO citation cards.
+- **Root Cause**:
+  1. `src/lib/auditCalculator.ts` did not exist; click-share dropoff percentages and revenue leak formulas (V * deltaS_click * C_conv * AOV) were not codified.
+  2. `prisma/schema.prisma` was missing a persistent `ReviewVerificationLog` table with cryptographic SHA-256 hash checking, review fingerprinting, and 30-day throttle tracking. No Vision AI parser existed to detect draft screens or verify shop name matching.
+  3. No Next.js SSR dynamic route or unified `@graph` JSON-LD schema injector existed for location-grounded local business landing pages.
+- **Resolution**:
+  1. **Step 1 — Mathematical Revenue Leak Engine & 100-Point Competitor Spy (`src/lib/auditCalculator.ts`)**:
+     - Codified exact click-share tiers (r=1: 24%, r=2: 15%, r=3: 10%, r=4-10: 3%, r=11-20: 1.2%, r>20: 0.4%).
+     - Implemented `calculateRevenueLeak` returning Top 3 Potential Actions (Atop3), Current Actions (Acurrent), Missed Actions (deltaA), Monthly Lost Orders (Lorders), Monthly Revenue Leak (Rmonthly), and Annual Revenue Leak (Rannual). Verified with Playbook Page 7 worked example (V=2500, r=18, Cconv=0.20, AOV=Rs 500 => Lost Orders=74, Monthly Leak=Rs 37,000, Annual Leak=Rs 4,44,000).
+     - Implemented `calculateCompetitorSpyScore` (100-point 5-component scoring engine).
+     - Integrated interactive real-time AOV slider (Rs 100 to Rs 3,000) and volume slider directly into `src/components/gbp-ranking-audit-client.tsx`.
+  2. **Step 2 — Fraud-Proof Gemini 2.5 Flash Vision Review Verifier & WhatsApp Webhook (`src/lib/geminiReviewVerifier.ts` & `src/app/api/webhooks/whatsapp-review/route.ts`)**:
+     - Added `ReviewVerificationLog` model to `prisma/schema.prisma` with `imageSha256Hash` (unique), `reviewFingerprint` (unique), `customerPhone`, `stampsCredited`, `status`, and `rejectionReason`.
+     - Built `verifyGoogleReviewScreenshot` in `src/lib/geminiReviewVerifier.ts` using Gemini 2.5 Flash Vision structured prompt to detect:
+       - Fraud Scheme 1: Draft Screen Scam (blue 'Post' button visible => REJECTED).
+       - Fraud Scheme 2: Wrong Shop Scam (reviewer posted on a different merchant => REJECTED).
+       - Fraud Scheme 3: Low Star Rating (< 4 stars => REJECTED for bonus stamp).
+       - Legitimate Review: Published review matching shop name => APPROVED (+1 Bonus Loyalty Stamp).
+       - Offline deterministic fallback for test reliability and zero-cost local QA.
+     - Built WhatsApp inbound webhook in `src/app/api/webhooks/whatsapp-review/route.ts`: checks SHA-256 duplicate image hash, enforces 30-day throttle per customer, invokes verifier, creates audit log, and increments customer's `lifetimeStamps` by 1 with instant WhatsApp congratulatory reply.
+  3. **Step 3 — Dynamic SSR Micro-Page & Triple Schema Generator (`src/components/seo/schema-injector.tsx` & `src/app/[city]/[slug]/page.tsx`)**:
+     - Built `generateMerchantGeoAeoSchema` producing a unified `@graph` JSON-LD containing `LocalBusiness` (lat/long GeoCoordinates, `areaServed` landmarks, `sameAs` citations, `hasOfferCatalog`), `FAQPage` (conversational AEO Q&As), and `OfferCatalog`.
+     - Built dynamic SSR route `src/app/[city]/[slug]/page.tsx` rendering SEO H1 `[Category] in [Locality, City] — [Business Name]`, Google review trust badge, 500m Geo-Landmarks narrative, popular menu with INR prices, AEO FAQ accordion, and WhatsApp ordering / Google Maps directions buttons.
+  4. **Adversarial & Unit Verification**:
+     - All 6 Master Adversarial Gates passed cleanly (`scripts/run_adversarial_guard.js`, Exit Code 0).
+     - Full playbook test suite passed 28/28 checks (`scripts/verify_playbook_implementation.py`, Exit Code 0).
+     - Playbook comprehensive TypeScript suite passed 8/8 suites (`scripts/run_playbook_unit_tests.ts`, Exit Code 0).
+     - Full-app TypeScript ratchet guard passed with 36/36 errors (baseline maintained, zero regressions).
+- **Status**: ✅ Resolved and Verified.
+
 ## [09 Nov 2026] Issue: Top 10 Bestseller Products & Services Inline Editor in Settings & Ultra-Compact Zero-Scroll Mobile Customer Review Dialog
 - **Symptom**:
   1. In `https://customerpilot.in/dashboard/settings` (Dual Bestseller Review Studio), merchants could pin/unpin products and services, but had no way to edit or rename existing pinned items. If there was a typo or a name tweak needed, the merchant had to unpin, re-type, and re-pin from scratch.

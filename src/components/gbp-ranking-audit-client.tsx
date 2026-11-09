@@ -30,6 +30,7 @@ import {
 } from "lucide-react"
 import { BrandLogo } from "@/components/brand-logo"
 import { DualLangFaq, DualLangFaqItem } from "@/components/dual-lang-faq"
+import { calculateRevenueLeak } from "@/lib/auditCalculator"
 
 function OfficialWhatsAppIcon({ className = "w-5 h-5 fill-current" }: { className?: string }) {
   return (
@@ -100,6 +101,8 @@ export function GbpRankingAuditClient() {
   const [auditResult, setAuditResult] = useState<any>(null)
   const [loadingStep, setLoadingStep] = useState("")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [aov, setAov] = useState(500)
+  const [monthlySearchVolume, setMonthlySearchVolume] = useState(2500)
 
   const handleRunAudit = async (
     e?: React.FormEvent,
@@ -492,6 +495,147 @@ export function GbpRankingAuditClient() {
                       {auditResult.trackDetails.cta} →
                     </a>
                   </div>
+
+                  {/* 2.5 The 60-Second Reality Check: Monthly Revenue Leak Calculator (Playbook Section 3.1 & 3.2) */}
+                  {(() => {
+                    const leak = calculateRevenueLeak({
+                      monthlySearchVolume: Number(monthlySearchVolume) || 2500,
+                      currentGridRankAvg: auditResult.business.detectedRank || 18,
+                      averageOrderValueINR: Number(aov) || 500
+                    });
+
+                    return (
+                      <div className="mt-8 bg-gradient-to-br from-slate-950 via-slate-900 to-rose-950/40 text-white rounded-2xl border-2 border-rose-500/40 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-slate-800 gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                              💸 The 60-Second Reality Check
+                            </span>
+                            <span className="text-xs text-slate-400 font-semibold">Playbook Formula (Page 7)</span>
+                          </div>
+                          <span className="text-xs font-bold text-amber-300 bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/20">
+                            Rank #{auditResult.business.detectedRank} Click Share: {(leak.currentClickShare * 100).toFixed(1)}% vs Top 3 Avg: 16.0%
+                          </span>
+                        </div>
+
+                        <div className="mt-4">
+                          <h4 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                            Monthly &amp; Annual Revenue Leak Calculation
+                          </h4>
+                          <p className="text-xs sm:text-sm text-slate-300 mt-1">
+                            Because your listing is stuck at rank #{auditResult.business.detectedRank}, you are missing high-intent customers who choose your Top 3 competitors.
+                          </p>
+                        </div>
+
+                        {/* Interactive Sliders */}
+                        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-900/80 p-5 rounded-xl border border-slate-800">
+                          <div>
+                            <div className="flex items-center justify-between text-xs font-bold mb-2">
+                              <span className="text-slate-300">Average Order Value (AOV):</span>
+                              <span className="text-cyan-400 font-mono text-sm">₹{aov.toLocaleString("en-IN")}</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="100"
+                              max="3000"
+                              step="50"
+                              value={aov}
+                              onChange={(e) => setAov(Number(e.target.value))}
+                              className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                            />
+                            <div className="flex justify-between text-[10px] text-slate-500 mt-1 font-semibold">
+                              <span>₹100 (Chai/Pastry)</span>
+                              <span>₹500 (Cake/Salon)</span>
+                              <span>₹3,000 (Clinic/Party)</span>
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="flex items-center justify-between text-xs font-bold mb-2">
+                              <span className="text-slate-300">Monthly Local Searches in Area (V):</span>
+                              <span className="text-cyan-400 font-mono text-sm">{monthlySearchVolume.toLocaleString("en-IN")}</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="500"
+                              max="6000"
+                              step="100"
+                              value={monthlySearchVolume}
+                              onChange={(e) => setMonthlySearchVolume(Number(e.target.value))}
+                              className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                            />
+                            <div className="flex justify-between text-[10px] text-slate-500 mt-1 font-semibold">
+                              <span>500 (Niche)</span>
+                              <span>2,500 (Vadodara Avg)</span>
+                              <span>6,000+ (High Intent)</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Real-Time Mathematical Cards */}
+                        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                          <div className="bg-slate-950/90 border border-rose-500/30 p-4 rounded-xl">
+                            <span className="text-[11px] font-bold text-rose-300 uppercase tracking-wider block mb-1">
+                              Monthly Revenue Leak
+                            </span>
+                            <div className="text-2xl sm:text-3xl font-black text-rose-400">
+                              ₹{leak.monthlyRevenueLeakINR.toLocaleString("en-IN")}
+                              <span className="text-xs font-normal text-slate-400 block sm:inline"> /month</span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 mt-1 block">Direct lost cash flow</span>
+                          </div>
+
+                          <div className="bg-slate-950/90 border border-amber-500/30 p-4 rounded-xl">
+                            <span className="text-[11px] font-bold text-amber-300 uppercase tracking-wider block mb-1">
+                              Annual Revenue Leak
+                            </span>
+                            <div className="text-2xl sm:text-3xl font-black text-amber-400">
+                              ₹{leak.annualRevenueLeakINR.toLocaleString("en-IN")}
+                              <span className="text-xs font-normal text-slate-400 block sm:inline"> /year</span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 mt-1 block">Compounded 12-month drain</span>
+                          </div>
+
+                          <div className="bg-slate-950/90 border border-slate-800 p-4 rounded-xl">
+                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                              Lost High-Intent Orders
+                            </span>
+                            <div className="text-2xl sm:text-3xl font-black text-white">
+                              {leak.lostOrdersMonthly}
+                              <span className="text-xs font-normal text-slate-400"> orders/mo</span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 mt-1 block">At 20% conversion rate</span>
+                          </div>
+
+                          <div className="bg-slate-950/90 border border-cyan-500/30 p-4 rounded-xl">
+                            <span className="text-[11px] font-bold text-cyan-300 uppercase tracking-wider block mb-1">
+                              Top 3 Action Benchmark
+                            </span>
+                            <div className="text-2xl sm:text-3xl font-black text-cyan-400">
+                              {leak.top3PotentialActionsMonthly}
+                              <span className="text-xs font-normal text-slate-400"> vs {leak.currentActionsMonthly}</span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 mt-1 block">+{leak.missedActionsMonthly} missed clicks/calls</span>
+                          </div>
+                        </div>
+
+                        {/* CTA Footer */}
+                        <div className="mt-6 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                          <span className="text-xs text-slate-400 text-center sm:text-left">
+                            Locking your profile into Top 3 recovers an estimated <strong>₹{leak.monthlyRevenueLeakINR.toLocaleString("en-IN")}/month</strong> in verified walk-in and delivery sales.
+                          </span>
+                          <a
+                            href="https://wa.me/919033304707?text=Hi%20CustomerPilot,%20my%20store%20is%20leaking%20revenue%20on%20Google%20Maps.%20I%20want%20to%20plug%20it%20with%20Top%203%20Accelerator!"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow-lg transition-transform hover:scale-105 whitespace-nowrap no-underline"
+                          >
+                            Plug This Revenue Leak →
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {/* 3. Six Diagnostic Pillars Breakdown */}
                   <div className="mt-8 space-y-4">
