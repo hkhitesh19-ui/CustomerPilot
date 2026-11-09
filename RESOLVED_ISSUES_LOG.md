@@ -5785,3 +5785,18 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   4. **Direct Standee Logo Management**: Added interactive 1-click 'Upload Store Logo', 'Change Logo', and 'Remove Logo' tools directly on the QR generator card, connected to `/api/merchant/upload-brand` and `/api/merchant/update`.
   5. **Attached GBP Location Switcher**: Integrated multi-location dropdown connected to `/api/google-business/locations` and `/api/google-business/select-location`, allowing merchants to select any attached branch and regenerate their review QR on the fly.
 - **Status**: ✅ Resolved, Verified with Adversarial Guard (6/6 Gates Passed), and Committed Locally.
+
+---
+## [09 Nov 2026] Issue: Google Place ID Resolution from share.google Short Links & Elimination of 404 Error on WriteReview
+- **Symptom**: When merchants pasted Google Search / Knowledge Panel share links (e.g. `https://share.google/Soo3Q4XebAGrQobaS` for PET CLINIC @ MANJALPUR / Dr. Bipin Prajapati), CustomerPilot failed to resolve the exact business, fell back to generic search resulting in mismatched businesses (City Pet Clinic), or generated synthetic Place IDs (`ChIJnv3BJRZhpx5DLTbjrz7FNVdlt19` / `ChIJAAAA...`) that triggered a Google 404 error page: `404. That's an error. The requested URL /local/writereview?placeid=... was not found on this server.`
+- **Root Cause**: 
+  1. `src/app/api/google-business/resolve-maps-url/route.ts` only expanded `maps.app.goo.gl` and `goo.gl/maps`, ignoring Google's modern `share.google` domain.
+  2. Share URLs expand to Google Search URLs with query parameters (`?q=...&kgmid=...`), but the resolver lacked search query extraction.
+  3. Standard Google Maps URLs contain 64-bit Hex Feature IDs (`!1s0x<f1>:0x<f2>`) rather than raw `ChIJ...` strings; without a native converter, the system fell back to Places API / synthetic Place ID generator (`generateRealisticPlaceId`) which produced invalid hashes that 404 on Google.
+- **Resolution**:
+  1. **Short Link Expansion**: Added `share.google` to short-link expander in `src/app/api/google-business/resolve-maps-url/route.ts`.
+  2. **Query Extraction**: Extracted `q=` search parameter from Google Search / Knowledge Panel URLs.
+  3. **Protobuf Hex-to-PlaceID Converter (`hexFeatureToPlaceId`)**: Built a deterministic 64-bit little-endian protobuf converter (`Tag 0x0a`, `Tag 0x09` f1, `Tag 0x11` f2) that converts Google's raw feature hex IDs directly into official `ChIJ...` Place IDs (e.g., converting `0x395fc52c855a2ad1:0x508edc26725e38e3` directly to `ChIJ0SpahSzFXzkR4zhecibcjlA`).
+  4. **404 Mock ID Suppression**: Blocked all synthetic IDs (`ChIJAAAA...`, `manual_...`, `ChIJnv3B...`) from generating `/local/writereview?placeid=` URLs, routing to safe maps search fallback if unverified.
+  5. **Ground-Truth Verification for PET CLINIC @ MANJALPUR**: Verified `https://search.google.com/local/writereview?placeid=ChIJ0SpahSzFXzkR4zhecibcjlA` in headless Chromium via Playwright; confirmed HTTP 200 Google Review dialog open with 0 404 errors.
+- **Status**: ✅ Resolved and Verified Locally.
