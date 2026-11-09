@@ -8,12 +8,12 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 5ec5989
-Full Commit Hash  : 5ec5989185333901e246ce198352348e16b5a5a4
+Active Git Commit : 0270817
+Full Commit Hash  : 0270817e892f8e1d1077d082fed5d858d6d6b14c
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 09 Nov 2026, 06:55 AM IST
+Deployment Date   : 09 Nov 2026, 08:42 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : docs: log Google Place ID resolution and 404 writereview elimination for PET CLINIC @ MANJALPUR in RESOLVED_ISSUES_LOG.md
+Commit Title      : docs(reviews): upgrade SMART_AI_GOOGLE_REVIEW_ENGINE.md to v4.0 with 2-column studio, hero chips, anti-404 moat and compliance protocols
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -21,9 +21,9 @@ Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 O
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
 - Domain URL      : https://customerpilot.in (HTTP/2 200 OK)
-- Dynamic SVG Card: https://customerpilot.in/api/gbp/posts/card?type=product&name=Belgian%20Chocolate&price=650&theme=emerald
+- Dynamic Review  : https://customerpilot.in/review (Hero Chips & Category Isolation)
+- Settings Studio : https://customerpilot.in/dashboard/settings (2-Column Offered/Excluded Keyword Control)
 - SuperAdmin GMB  : https://customerpilot.in/super-admin?tab=gmb-optimization (GMB Optimization PRO link active)
 - Merchant GMB    : https://customerpilot.in/dashboard/gbp-status (GMB Optimization PRO link active for Cake Connection)
-- Telemetry API   : https://customerpilot.in/api/gbp/analytics?merchantId=cmtymavfx0002kx008lbfvp57 (9-point GeoGrid + GSC Telemetry)
 - SQLite Database : /var/www/CustomerPilot/prisma/dev.db (Cake Connection & CustomerPilot HQ seeded)
 ==========================================================
