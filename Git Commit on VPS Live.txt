@@ -8,12 +8,12 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 92c3956
-Full Commit Hash  : 92c39567cc4f59a508847fec900919c0798e2159
+Active Git Commit : a0c0307
+Full Commit Hash  : a0c03070adc65bedb6e39adb485a205ff5c86259
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 09 Nov 2026, 04:57 PM IST
+Deployment Date   : 09 Nov 2026, 05:27 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(rankpilot): implement revenue leak calculator, fraud-proof gemini vision review verifier webhook, and SSR triple schema micro-page
+Commit Title      : docs(rankpilot): expand Section 3.4 Google Post Dominance Engine with 3-post triad, 100-300 words anatomy, and zero-gap expiration lifecycle protocol
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -21,6 +21,7 @@ Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 O
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
 - Domain URL        : https://customerpilot.in (HTTP/2 200 OK)
+- Master Playbook   : /var/www/CustomerPilot/RANKPILOT_AI_TOP3_LOCAL_DOMINATION_PLAYBOOK.md (Active, Verified)
 - Revenue Leak Calc : https://customerpilot.in/google-business-profile-ranking (Live AOV & Volume Slider, HTTP/2 200 OK)
 - Review Verifier   : https://customerpilot.in/api/webhooks/whatsapp-review (Fraud-Proof Vision OCR Webhook Active)
 - SSR Micro-Page    : https://customerpilot.in/vadodara/cake-connection (Triple Schema: LocalBusiness + FAQPage + OfferCatalog)
