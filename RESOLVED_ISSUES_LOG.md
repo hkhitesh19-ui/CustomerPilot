@@ -3,6 +3,39 @@
 This document serves as a historical record of all major bugs, configuration issues, and logical errors resolved in the CustomerPilot project. It includes the symptom, root cause, resolution details, and timestamp of the fix.
 
 ---
+
+---
+## [09 Nov 2026] Issue: Pet Clinic Human Healthcare Leaks Elimination, Category-Aware Fallback Architecture, Pet Owner & Dental Personas, and Real GBP Past Reviews Style Inspiration
+- **Symptom**:
+  1. For veterinary merchants (e.g. "PET CLINIC @ MANJALPUR"), AI-generated and fallback Google review suggestions were drafted with human healthcare terminology: *"Doctor consultation at PET CLINIC @ MANJALPUR was thorough, friendly, and solved my fever quickly."*, *"Maine apne kutte ke liye doctor consultation li, doctor ne turant diagnosis di, prescribed minimal medicine."*
+  2. These reviews were inauthentic, non-SEO-optimized, and dangerously hallucinated human ailments ("fever", "headache", "human doctor consultation") for a veterinary animal hospital.
+  3. The Smart AI Google Review engine had no ability to study or adopt the natural phrasing, tone, and Hinglish dialect from the merchant's real, publicly open Google Maps reviews.
+- **Root Cause**:
+  1. In `src/lib/dynamic-review-engine.ts`, when a product/service `item` was provided (`hasItem = true`), the fallback engine bypassed category-specific review pools and used a single generic English template: `Opted for ${item} today. Quality was really good...`.
+  2. In the AI system prompt (`systemPrompt`), `audiencePersona` only handled `Female_Only` (Ladies parlour), `Male_Only` (Men salon), and `Family_Kids`. There was NO `Pet_Owner` or `Dental_Patient` persona rule, causing the LLM to treat "clinic" as general human medicine and hallucinating fever, colds, and human treatment.
+  3. In `src/lib/keyword-matrix.ts`, `pet_clinic.blacklist` lacked explicit prohibitions against human ailment terms ("My fever", "My headache", "My illness", "Doctor consultation for me", "Prescribed medicine for me").
+  4. Real past 5-star customer reviews from the merchant's Google Business Profile / Google Places API were not ingested or used as few-shot style demonstrations in the prompt.
+- **Resolution**:
+  1. **Category-Aware Fallback Engine (`getCategoryAwareItemDrafts`)**:
+     - Completely replaced the single generic template with vertical-isolated fallback generators for Pet Clinics, Dental Clinics, Fast Food, Pizza Restaurants, Non-Veg Restaurants, Beauty Parlours, Men Salons, Bakeries, Cafes, Car Detailing, and SaaS Agencies.
+     - For Pet Clinics, all drafts strictly use pet/animal terminology (*"Mera dog ka {item} karwaya. Vet doctor ne bahut gently handle kiya..."*, *"Meri billi ka {item} kiya gaya..."*). Zero human fever or human medicine terms.
+     - Expanded `PET_CLINIC_REVIEWS` pool with 8 authentic veterinary drafts covering puppy vaccinations, tick fever IV fluids, cat allergies, spaying surgery, parvovirus care, and senior pet joint care.
+  2. **Pet Owner & Dental Patient Personas & Prompt Guards**:
+     - Added `"Pet_Owner"` and `"Dental_Patient"` to `CategoryPreset` and `KeywordProfile` in `src/lib/keyword-matrix.ts`.
+     - Injected strict vertical hard guards into `systemPrompt` in `src/lib/dynamic-review-engine.ts` with legal prohibitions: words like "mera fever", "doctor consultation for me personally", "mujhe medicine di" are strictly banned.
+     - Hardened `pet_clinic.blacklist` to explicitly exclude all human illness and consultation phrases.
+  3. **Real GBP Past Reviews Style Inspiration Layer (Few-Shot Grounding)**:
+     - Updated `generateDynamicReviewDraft` to accept `pastPublicReviews?: string[]`.
+     - Injected real 5-star Google reviews into the AI system prompt under Section 6: `REAL PAST GOOGLE MAPS REVIEWS (STYLE & TONE INSPIRATION)` to mirror customer cadence and Hinglish blend.
+     - Updated `/api/google-business/resolve-maps-url/route.ts` to fetch real reviews from Google Places API when available and return them in the onboarding/URL resolution response.
+     - Connected `src/app/review/page.tsx` to automatically pull recent 5-star reviews from `db.googleBusinessReview` and pass them into the review draft generator.
+  4. **SOP & Documentation Synchronization**:
+     - Updated `SMART_AI_GOOGLE_REVIEW_ENGINE.md` to formally document Layer 4 (`getCategoryAwareItemDrafts`) and Layer 5 (Real GBP Past Reviews Style Inspiration).
+  5. **Automated Red-Team & E2E Verification**:
+     - Master Adversarial Guard (`scripts/run_adversarial_guard.js`): All 6 security gates PASSED cleanly (Exit Code 0).
+     - Playwright E2E Suite (`e2e/dynamic-review-flow.spec.ts` & `e2e/free-review-generator.spec.ts`): All 4 tests PASSED cleanly with 0 console errors.
+- **Status**: ✅ Resolved and Verified.
+
 ---
 ## [08 Nov 2026] Issue: 8-Character Password Alignment, Onboarding Prisma Bundle Leak Immunity, 2-Tier 8-Group Business Taxonomy with Custom "Other" Input & Home/Professional Services Presets
 - **Symptom**:

@@ -5,7 +5,7 @@ export interface CategoryPreset {
   id: string;
   label: string;
   gbpCategory: string;
-  audiencePersona: "All_Neutral" | "Female_Only" | "Male_Only" | "Family_Kids" | "Couples_Friends";
+  audiencePersona: "All_Neutral" | "Female_Only" | "Male_Only" | "Family_Kids" | "Couples_Friends" | "Pet_Owner" | "Dental_Patient";
   serviceMode: string;
   seoEntities: string[];      // Allowed: SEO (Products / Entities / Services) ~50 items
   aeoAnswers: string[];       // Allowed: AEO (Voice / Answers / Practical Solutions)
@@ -28,7 +28,7 @@ export interface KeywordProfile {
   gbpPrimaryCategory: string;
   city: string;
   localityLandmarks: string[];
-  audiencePersona: "All_Neutral" | "Female_Only" | "Male_Only" | "Family_Kids" | "Couples_Friends";
+  audiencePersona: "All_Neutral" | "Female_Only" | "Male_Only" | "Family_Kids" | "Couples_Friends" | "Pet_Owner" | "Dental_Patient";
   serviceMode: string;
   allowedSeoEntities: string[];
   allowedAeoAnswers: string[];
@@ -37,6 +37,7 @@ export interface KeywordProfile {
   heroProducts?: string[];
   heroServices?: string[];
   autoExtractedKeywords?: AutoExtractedKeywordsPackage;
+  pastPublicReviews?: string[];
 }
 
 export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
@@ -475,7 +476,7 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
     id: "dental_clinic",
     label: "Dental Clinic & Orthodontist",
     gbpCategory: "Dentist / Dental Clinic",
-    audiencePersona: "All_Neutral",
+    audiencePersona: "Dental_Patient",
     serviceMode: "Appointment + Walk-in",
     seoEntities: [
       "Painless root canal treatment", "Single sitting RCT", "Ultrasonic teeth scaling", "Teeth polishing", "Dental implants",
@@ -516,7 +517,7 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
     id: "pet_clinic",
     label: "Pet Clinic & Veterinary Hospital",
     gbpCategory: "Veterinarian / Animal Hospital",
-    audiencePersona: "All_Neutral",
+    audiencePersona: "Pet_Owner",
     serviceMode: "Appointment + Emergency Care",
     seoEntities: [
       "Puppy 7-in-1 vaccination", "Anti-rabies vaccine for dogs and cats", "Kitten core vaccination", "Routine pet health checkup", "Pet deworming tablet treatment",
@@ -545,7 +546,9 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
       "Dependable pet healthcare and emergency support"
     ],
     blacklist: [
-      "Human medicine", "Human hospital", "Human dental", "Haircut", "Men grooming", "Beard styling",
+      "Human medicine", "Human hospital", "Human dental", "Human patient", "My fever", "My headache", "My illness",
+      "Doctor consultation for me", "Prescribed medicine for me", "My diagnosis", "My treatment", "Doctor visit for myself",
+      "Haircut", "Men grooming", "Beard styling",
       "Ladies facial", "Bridal makeup", "Threading", "Waxing", "Bakery", "Cake", "Pastry", "Biryani",
       "Chicken dinner", "Mutton", "Pizza", "Burger", "Sandwich", "Car wash", "Mechanic", "Clothes", "Kurtis", "Footwear"
     ]
@@ -1346,6 +1349,7 @@ export function resolveMerchantKeywordProfile(merchant: {
         strictlyNotAllowed: Array.isArray(parsed.strictlyNotAllowed) && parsed.strictlyNotAllowed.length > 0 ? parsed.strictlyNotAllowed : categoryPreset.blacklist,
         heroServices: Array.isArray(parsed.heroServices) && parsed.heroServices.length > 0 ? parsed.heroServices : categoryPreset.seoEntities.slice(0, 5),
         heroProducts: Array.isArray(parsed.heroProducts) && parsed.heroProducts.length > 0 ? parsed.heroProducts : categoryPreset.seoEntities.slice(5, 10),
+        pastPublicReviews: Array.isArray(parsed.pastPublicReviews) ? parsed.pastPublicReviews : [],
         autoExtractedKeywords: parsed.autoExtractedKeywords || generateAutoKeywordsForLocation(
           parsed.categoryKey || categoryPreset.id,
           locality,

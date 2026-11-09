@@ -186,6 +186,27 @@ export async function POST(req: NextRequest) {
     const categoryPreset = getKeywordPresetForCategory(placeDetails?.primaryType || finalName, finalName)
     const autoKeywords = generateAutoKeywordsForLocation(categoryPreset.id, locality, city, finalName)
 
+    // Fetch real past Google reviews for authentic style inspiration if Places API key is present
+    let pastPublicReviews: string[] = []
+    if (placeId && !isMockPlaceId && process.env.GOOGLE_PLACES_API_KEY) {
+      try {
+        const pRes = await fetch(
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(placeId)}&fields=reviews&key=${process.env.GOOGLE_PLACES_API_KEY}`
+        )
+        if (pRes.ok) {
+          const pData = await pRes.json()
+          if (pData?.result?.reviews && Array.isArray(pData.result.reviews)) {
+            pastPublicReviews = pData.result.reviews
+              .map((r: any) => r.text)
+              .filter((t: any) => typeof t === "string" && t.trim().length > 15)
+              .slice(0, 5)
+          }
+        }
+      } catch (revErr: any) {
+        console.warn("[resolve-maps-url] Public reviews fetch notice:", revErr.message)
+      }
+    }
+
     return ok({
       success: true,
       placeId,
@@ -201,6 +222,7 @@ export async function POST(req: NextRequest) {
       locality,
       city,
       autoKeywords,
+      pastPublicReviews,
       defaultAllowedEntities: categoryPreset.seoEntities,
       defaultStrictlyNotAllowed: categoryPreset.blacklist,
       suggestedHeroServices: categoryPreset.seoEntities.slice(0, 5),

@@ -213,14 +213,44 @@ const DENTAL_REVIEWS: FallbackReviewItem[] = [
 
 const PET_CLINIC_REVIEWS: FallbackReviewItem[] = [
   {
-    draft1: "Puppy 7-in-1 vaccination aur deworming ke liye visit kiya. Vet doctor ne bohot gently handle kiya, pet bilkul calm raha.",
-    draft2: "Clean hygienic clinic and caring veterinary team. Doctor gave clear feeding and post-vaccination care tips.",
-    draft3: "Compassionate veterinary doctors, gentle pet handling and genuine medicines. Best pet clinic in area!"
+    draft1: "Mera Labrador puppy ka 7-in-1 vaccination aur deworming karwaya. Vet doctor ne bohot gently handle kiya, pet bilkul calm raha poori visit mein.",
+    draft2: "Clean hygienic clinic aur caring veterinary team. Doctor ne post-vaccination feeding aur care ke baare mein clearly samjhaya.",
+    draft3: "Gentle vet doctor, clean clinic and genuine pet medicines. Best pet clinic for vaccinations!"
   },
   {
-    draft1: "Doctor diagnosed my dog's skin allergy accurately and prescribed effective treatment. Visible relief within 3 days.",
-    draft2: "Staff is polite and clinic is sanitized after every pet. Emergency support was very prompt and reassuring.",
-    draft3: "Outstanding veterinary care, stress-free environment for pets and reasonable consultation charges."
+    draft1: "Meri billi ka skin allergy diagnosis accurately kiya aur effective treatment di. 3 din mein visible relief dikhi, cat bilkul comfortable ho gayi.",
+    draft2: "Clinic sanitized hai aur staff polite hai. Emergency support bahut prompt tha, doctor ne immediately attend kiya.",
+    draft3: "Compassionate vet care, stress-free for pets and transparent charges. Highly recommended!"
+  },
+  {
+    draft1: "Mera German Shepherd ka tick fever diagnose karke IV drip aur medicines di. Doctor ne poora treatment patiently explain kiya.",
+    draft2: "Weekend emergency mein bhi doctor available the. Clinic pe rush tha par pet ko immediately attend kiya aur mujhe calm kiya.",
+    draft3: "Life-saving emergency pet care, 24/7 support and caring vet team. Best animal clinic!"
+  },
+  {
+    draft1: "Golden Retriever ki spaying surgery successfully karwai. Anesthesia safe tha aur post-surgery recovery guide clear di doctor ne.",
+    draft2: "Dedicated pet recovery area hai clinic mein. Staff ne surgery ke baad bhi follow-up call ki, great caring service.",
+    draft3: "Safe pet surgery, expert vet doctors and excellent post-op care. Truly caring clinic!"
+  },
+  {
+    draft1: "Kitten ka first core vaccination aur health checkup kiya. Doctor ne vaccination card di aur next schedule clearly bataya.",
+    draft2: "Waiting room comfortable aur clean hai. Doctor ne kitten ko gently handle kiya, bacchi bilkul nervous nahi hui.",
+    draft3: "Thorough kitten vaccination, gentle handling and informative vet. Perfect first clinic visit!"
+  },
+  {
+    draft1: "Puppy ka parvovirus mein critical care mila. Doctor ne quickly diagnose kiya, fluids shuru kiye aur 4 din mein recovery ho gayi.",
+    draft2: "24-hour emergency care available hai. Night mein bhi doctor phone pe guide kiya aur clinic available tha, bahut grateful hoon.",
+    draft3: "Life-saving parvovirus treatment, round-the-clock emergency and expert vet. Hero clinic for pets!"
+  },
+  {
+    draft1: "Dog ka ear infection properly clean karke drops prescribe ki. Doctor ne ghar pe care kaise karein clearly demonstrate kiya.",
+    draft2: "Clinic mein examination table sanitized thi aur vet gloves wear karke handle kiya. Hygienic aur professional setup.",
+    draft3: "Thorough ear infection treatment, hygienic clinic and caring doctor. My dog loves visiting here!"
+  },
+  {
+    draft1: "Senior dog ki arthritis ke liye joint supplement aur physiotherapy advice mili. Doctor ne age-appropriate diet chart bhi diya.",
+    draft2: "Doctor ne senior pet ke sath extra patience rakkhi. Unhurried consultation, sab kuch samjhaya bina rush kiye.",
+    draft3: "Expert senior pet care, detailed diet advice and gentle doctor. Best geriatric pet clinic!"
   }
 ]
 
@@ -487,17 +517,251 @@ export function getDynamicFallbackReview(
   const selected = pool[index] || pool[0]
 
   if (hasItem) {
-    return {
-      draft1: `Opted for ${item} today. Quality was really good, professional experience tha aur proper care li.`,
-      draft2: `${item} service was handled gently. Thoda rush tha par staff courteous tha aur proper attention diya.`,
-      draft3: selected.draft3
-    }
+    return getCategoryAwareItemDrafts(c, item, selected)
   }
 
   return {
     draft1: selected.draft1,
     draft2: selected.draft2,
     draft3: selected.draft3
+  }
+}
+
+/**
+ * Generates category-specific draft1 and draft2 when a focal item (service/product) is provided.
+ * draft3 is always taken from the category pool entry for consistency.
+ * This prevents generic human-medical language leaking into Pet Clinic, Dental, etc.
+ */
+function getCategoryAwareItemDrafts(
+  category: string,
+  item: string,
+  poolEntry: FallbackReviewItem
+): ReviewDraftOptions {
+  const c = category.toLowerCase()
+
+  // ── PET CLINIC ───────────────────────────────────────────────────────────────
+  if (
+    c.includes("pet clinic") || c.includes("veterinary") || c.includes("animal hospital") ||
+    c.includes("pet hospital") || c.includes("vet clinic") ||
+    (c.includes("pet") && (c.includes("clinic") || c.includes("doctor")))
+  ) {
+    const templates = [
+      {
+        draft1: `Mera dog ka ${item} karwaya. Vet doctor ne bahut gently handle kiya, pet poori visit mein calm aur comfortable raha.`,
+        draft2: `${item} ke liye visit ki — doctor ne clearly samjhaya kya karein aur kya nahi. Clinic clean aur hygienic hai.`
+      },
+      {
+        draft1: `Meri billi ka ${item} kiya gaya. Procedure smooth raha aur doctor ne post-care instructions clearly di.`,
+        draft2: `${item} ke baad pet ki condition mein quick improvement aayi. Vet team caring aur professional hai.`
+      },
+      {
+        draft1: `Puppy ka ${item} karwaya — vet ne gently handle kiya, bilkul dard nahi hua pet ko. Genuine medicines use ki.`,
+        draft2: `${item} ke liye appointment timely mila. Staff polite tha aur examination table properly sanitized thi.`
+      }
+    ]
+    const t = templates[Math.floor(Math.random() * templates.length)]
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+  }
+
+  // ── DENTAL CLINIC ────────────────────────────────────────────────────────────
+  if (
+    c.includes("dental") || c.includes("dentist") || c.includes("tooth") ||
+    c.includes("teeth") || c.includes("orthodont")
+  ) {
+    const templates = [
+      {
+        draft1: `${item} karwaya — completely painless procedure tha. Doctor ne X-ray dikhakar sab clearly explain kiya.`,
+        draft2: `${item} ke liye visit kiya. Clinic sterilized instruments use karti hai aur zero waiting time tha.`
+      },
+      {
+        draft1: `${item} done here — doctor bahut gentle the aur chair pe bilkul comfortable feel hua throughout.`,
+        draft2: `${item} ke baad teeth ekdum fresh aur clean feel ho rahe hain. Transparent pricing, no hidden charges.`
+      }
+    ]
+    const t = templates[Math.floor(Math.random() * templates.length)]
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+  }
+
+  // ── PIZZA RESTAURANT ─────────────────────────────────────────────────────────
+  if (c.includes("pizza") || c.includes("pizzeria") || c.includes("wood fired") || c.includes("wood-fired")) {
+    const templates = [
+      {
+        draft1: `${item} order kiya — crust perfectly crispy aur cheese pull rich tha. Best pizza in the area!`,
+        draft2: `${item} tha menu mein, served hot aur fresh. Thoda rush tha par service quick aur attentive thi.`
+      },
+      {
+        draft1: `Tried their ${item} — sourdough base light on stomach aur toppings generously fresh the.`,
+        draft2: `${item} ka order 15 minutes mein aa gaya. Ambiance cozy aur staff very welcoming tha.`
+      }
+    ]
+    const t = templates[Math.floor(Math.random() * templates.length)]
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+  }
+
+  // ── FAST FOOD / STREET SNACKS ─────────────────────────────────────────────────
+  if (
+    c.includes("dabeli") || c.includes("vadapav") || c.includes("vada pav") ||
+    c.includes("samosa") || c.includes("sandwich") || c.includes("fast food") ||
+    c.includes("street snack")
+  ) {
+    const templates = [
+      {
+        draft1: `${item} order kiya — super crispy, piping hot aur spicy chutney ka taste authentic tha. Bilkul paisa vasool!`,
+        draft2: `${item} ke liye evening mein gaye — counter pe thoda rush tha par 5 minute mein parcel ready kar diya.`
+      },
+      {
+        draft1: `${item} here is unmatched — fresh fried, generous fillings aur pocket-friendly price. Daily craving spot!`,
+        draft2: `${item} ka taste ghar yaad dilata hai — spicy, hot aur authentic. Staff brisk aur polite tha.`
+      }
+    ]
+    const t = templates[Math.floor(Math.random() * templates.length)]
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+  }
+
+  // ── NON-VEG RESTAURANT ────────────────────────────────────────────────────────
+  if (
+    c.includes("non veg") || c.includes("non-veg") || c.includes("chicken") ||
+    c.includes("mutton") || c.includes("biryani") || c.includes("mughlai") || c.includes("kebab")
+  ) {
+    const templates = [
+      {
+        draft1: `${item} order kiya — chicken tender, gravy aromatic aur dum ka taste proper authentic tha. Unforgettable meal!`,
+        draft2: `${item} ke liye family ke sath aaye — serving hot, portion generous aur staff very courteous tha.`
+      },
+      {
+        draft1: `Best ${item} in the city — well-marinated, smoky aur rich gravy bina excess oil ke. Worth every penny!`,
+        draft2: `Tried ${item} here on a weekend — rush tha par manager ne quickly seating arrange ki. Great dining experience.`
+      }
+    ]
+    const t = templates[Math.floor(Math.random() * templates.length)]
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+  }
+
+  // ── LADIES BEAUTY PARLOUR ─────────────────────────────────────────────────────
+  if (
+    c.includes("beauty") || c.includes("parlor") || c.includes("parlour") ||
+    c.includes("makeup") || c.includes("bridal") || c.includes("ladies salon")
+  ) {
+    const templates = [
+      {
+        draft1: `${item} karwaya — didi ke haath mein jadoo hai. Skin pe instant glow aa gaya, results better than expected!`,
+        draft2: `${item} ke liye appointment liya — parlour clean aur AC mein comfortable tha. Didi ne bohot ache se kiya.`
+      },
+      {
+        draft1: `Gayi thi ${item} ke liye — bohot relaxing experience tha. Products high quality aur no irritation on skin.`,
+        draft2: `${item} ke baad skin ekdum soft aur glowing lag rahi thi. Staff bahut friendly aur hygienic tha.`
+      }
+    ]
+    const t = templates[Math.floor(Math.random() * templates.length)]
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+  }
+
+  // ── MEN SALON / BARBER ────────────────────────────────────────────────────────
+  if (c.includes("salon") || c.includes("barber") || c.includes("haircut") || c.includes("grooming") || c.includes("saloon")) {
+    const templates = [
+      {
+        draft1: `${item} karwaya — bhai ne zero mistake se kiya. Fresh clean look mila, bilkul jaisa bola tha waisa.`,
+        draft2: `${item} ke liye drop-in gaya — waiting time 10 min tha par result top class nikla. Fair pricing.`
+      },
+      {
+        draft1: `${item} done perfectly — steady scissors, clean razor finish aur attention to detail zabardast tha.`,
+        draft2: `Tried ${item} here for the first time — staff patient tha aur exactly jo chaha wo deliver kiya.`
+      }
+    ]
+    const t = templates[Math.floor(Math.random() * templates.length)]
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+  }
+
+  // ── BAKERY / CAKE SHOP ────────────────────────────────────────────────────────
+  if (c.includes("cake") || c.includes("bakery") || c.includes("pastry") || c.includes("dessert") || c.includes("sweet")) {
+    const templates = [
+      {
+        draft1: `${item} order kiya — super moist, perfectly sweet aur presentation photo se bhi zyada premium aayi!`,
+        draft2: `${item} ke liye evening mein gaye — counter pe thodi bheed thi par box 10 minute mein ready ho gayi.`
+      },
+      {
+        draft1: `Tried their ${item} — sponge ultra soft tha aur cream absolutely fresh. Made our celebration perfect!`,
+        draft2: `${item} customize kiya with name on top — unhone bina extra charge ke beautifully piping kar di.`
+      }
+    ]
+    const t = templates[Math.floor(Math.random() * templates.length)]
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+  }
+
+  // ── CAFE / COFFEE SHOP ────────────────────────────────────────────────────────
+  if (c.includes("cafe") || c.includes("coffee") || c.includes("tea") || c.includes("bistro") || c.includes("beverage")) {
+    const templates = [
+      {
+        draft1: `${item} order kiya — perfect temperature, rich flavour aur presentation Instagram-worthy thi!`,
+        draft2: `${item} ke sath ek peaceful afternoon spend ki — Wi-Fi fast tha, music decent aur ambiance cozy.`
+      },
+      {
+        draft1: `Tried their ${item} — fresh brewed, excellent balance of sweet and bitter. Instant mood booster!`,
+        draft2: `${item} came quickly despite weekend crowd. Comfortable seating aur AC properly chilled tha.`
+      }
+    ]
+    const t = templates[Math.floor(Math.random() * templates.length)]
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+  }
+
+  // ── GENERAL RESTAURANT / FOOD ─────────────────────────────────────────────────
+  if (
+    c.includes("restaurant") || c.includes("dining") || c.includes("dhaba") ||
+    c.includes("food") || c.includes("thali") || c.includes("kitchen") ||
+    c.includes("south indian") || c.includes("punjabi")
+  ) {
+    const templates = [
+      {
+        draft1: `${item} order kiya — garam, fresh aur taste mein bilkul ghar jaisi quality. Full paisa vasool!`,
+        draft2: `${item} ke liye family ke sath aaye. Rush tha par service quick thi aur sabka order sahi aa gaya.`
+      },
+      {
+        draft1: `Best ${item} I've had in this area — generous portion, authentic spices aur piping hot served.`,
+        draft2: `${item} ka taste lag raha tha jaise ghar pe kha rahe hoon. Staff friendly aur serving prompt tha.`
+      }
+    ]
+    const t = templates[Math.floor(Math.random() * templates.length)]
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+  }
+
+  // ── CAR WASH / GARAGE ─────────────────────────────────────────────────────────
+  if (c.includes("wash") || c.includes("car") || c.includes("detailing") || c.includes("auto") || c.includes("garage")) {
+    const templates = [
+      {
+        draft1: `${item} karwaya — car ekdum showroom jaisi shine mein aa gayi. Detailed cleaning without any scratch!`,
+        draft2: `${item} done in estimated time — staff professional tha aur every corner properly cleaned. Impressed!`
+      }
+    ]
+    const t = templates[Math.floor(Math.random() * templates.length)]
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+  }
+
+  // ── SAAS / AGENCY ─────────────────────────────────────────────────────────────
+  if (c.includes("saas") || c.includes("software") || c.includes("customerpilot") || c.includes("agency") || c.includes("tech")) {
+    return {
+      draft1: `${item} feature set up kiya — simple onboarding, zero technical hassle aur results immediately visible hue.`,
+      draft2: `${item} se hamare store ke Google reviews fast badh rahe hain. ROI clearly dikh raha hai dashboard mein.`,
+      draft3: poolEntry.draft3
+    }
+  }
+
+  // ── GENERIC CLINIC / DOCTOR (Human medical — NOT pet) ────────────────────────
+  if (c.includes("clinic") || c.includes("hospital") || c.includes("doctor")) {
+    const templates = [
+      {
+        draft1: `${item} ke liye doctor ke paas gaya — thorough consultation, accurate diagnosis aur clear prescription mili.`,
+        draft2: `${item} done here — doctor patient the aur bina rush kiye sab samjhaya. Clean hygenic clinic environment.`
+      }
+    ]
+    const t = templates[Math.floor(Math.random() * templates.length)]
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+  }
+
+  // ── DEFAULT FALLBACK (completely generic) ─────────────────────────────────────
+  return {
+    draft1: `${item} liya — quality genuine thi, professional experience aur seamless transaction. Definitely coming back!`,
+    draft2: `${item} ke liye visit kiya — counter pe thoda rush tha par staff courteous aur quick tha. Satisfied customer.`,
+    draft3: poolEntry.draft3
   }
 }
 
@@ -514,8 +778,9 @@ export async function generateDynamicReviewDraft(params: {
   merchantKeywordProfile?: string | null
   merchantCity?: string
   merchantAddress?: string
+  pastPublicReviews?: string[]
 }): Promise<ReviewDraftOptions> {
-  const { businessCategory, productName, merchantName, menuItems, seed, merchantKeywordProfile, merchantCity, merchantAddress } = params
+  const { businessCategory, productName, merchantName, menuItems, seed, merchantKeywordProfile, merchantCity, merchantAddress, pastPublicReviews } = params
 
   // 1. Resolve merchant's active KeywordProfile (SEO, AEO, GEO, and Blacklist)
   const profile: KeywordProfile = resolveMerchantKeywordProfile({
@@ -584,6 +849,21 @@ export async function generateDynamicReviewDraft(params: {
 - The reviewer is an authentic local retail store owner / merchant / shop manager writing for CustomerPilot (SaaS platform).
 - Perspective: "Hamare store/bakery/salon ke liye CustomerPilot WhatsApp loyalty lagaya", "Google reviews 800% badh gaye", "Counter standee se customers khush hoke review dete hain", "1-click owner auto-reply se daily time bachta hai".
 - ABSOLUTELY NEVER mention ordering food, haircut, doctor visit, cakes, thali, or personal services.`
+  } else if (profile.categoryKey === "pet_clinic") {
+    personaInstruction = `STRICT PET OWNER PERSONA RULE (CRITICAL — READ CAREFULLY):
+- This is a VETERINARY / PET CLINIC. The reviewer is a PET OWNER, NOT a human patient.
+- The reviewer visits to get their DOG, CAT, RABBIT, or other ANIMAL treated — not themselves.
+- ALWAYS use pet owner language: "mera dog", "meri billi", "mera puppy", "hamare pet", "mera Golden Retriever", "meri Persian cat".
+- Use vet-specific terms: "vaccination", "deworming", "vet doctor", "veterinary", "animal", "pet", "parvovirus", "tick fever", "drip treatment", "neutering", "spaying", "pet surgery".
+- ABSOLUTELY NEVER write "mera fever", "meri headache", "doctor consultation for me", "medicine for me", "mujhe diagnosis di" — these are human medical phrases STRICTLY FORBIDDEN here.
+- ABSOLUTELY NEVER mention food delivery, parcel, cake, haircut, or grooming (human).
+- Example correct phrases: "Mera dog ka vaccination karwaya", "Vet ne meri billi ko gently handle kiya", "Puppy ki deworming done, clinic clean thi", "Doctor ne pet ki condition clearly explain ki".`
+  } else if (profile.categoryKey === "dental_clinic") {
+    personaInstruction = `STRICT DENTAL PATIENT PERSONA RULE:
+- This is a DENTAL CLINIC. The reviewer is a human dental patient.
+- Use dental-specific terms: "root canal", "scaling", "polishing", "tooth filling", "dental checkup", "X-ray", "orthodontic", "braces", "wisdom tooth extraction".
+- ABSOLUTELY NEVER mention food delivery, animal/pet, biryani, haircut, or non-dental medical terms.
+- Example: "Root canal completely painless tha", "Teeth scaling ke baad zero sensitivity", "Doctor ne X-ray clearly explain kiya".`
   } else if (profile.audiencePersona === "Female_Only") {
     personaInstruction = `STRICT FEMININE GRAMMAR RULE (CRITICAL):
 - The reviewer is STRICTLY a woman/girl writing for a ladies beauty parlor.
@@ -605,9 +885,62 @@ export async function generateDynamicReviewDraft(params: {
   const aeoSample = profile.allowedAeoAnswers.slice(0, 6).join(", ")
   const bannedSample = profile.strictlyNotAllowed.slice(0, 30).join(", ")
 
+  // Category-specific anti-hallucination guard lines injected into prompt
+  let categoryGuard = ""
+  if (profile.categoryKey === "pet_clinic") {
+    categoryGuard = `
+CATEGORY-SPECIFIC HARD RULES (PET CLINIC — VETERINARY):
+- BUSINESS TYPE: PET CLINIC / VETERINARY HOSPITAL. NOT a human hospital or medical clinic.
+- Reviewer = PET OWNER. Subject = PET (dog/cat/puppy/kitten/rabbit). NOT a human patient.
+- LEGAL PROHIBITION: Words "mera fever", "meri headache", "doctor consultation for me personally", "mujhe medicine di", "meri diagnosis", "my illness" are COMPLETELY BANNED.
+- MUST USE PET TERMS: dog, cat, puppy, kitten, billi, kutte, pet, animal, vet, vaccination, deworming, parvovirus, tick fever, spaying, neutering, IV drip.
+- EXAMPLE CORRECT: "Mera Labrador ka vaccination karwaya — vet bohot gentle tha."
+- EXAMPLE WRONG (NEVER DO THIS): "Doctor consultation for me was thorough", "my fever was cured", "prescribed medicine for me".`
+  } else if (profile.categoryKey === "dental_clinic") {
+    categoryGuard = `
+CATEGORY-SPECIFIC HARD RULES (DENTAL CLINIC):
+- BUSINESS TYPE: DENTAL / TEETH CLINIC. NOT general medicine, not veterinary, not food.
+- Reviewer = human dental patient getting teeth/gum treatment.
+- MUST USE DENTAL TERMS: root canal, teeth scaling, polishing, filling, braces, extraction, dental X-ray, gum treatment, teeth whitening.
+- NEVER mention food ordering, delivery, haircut, animal/pet, biryani, or general medicine.`
+  } else if (profile.categoryKey === "fast_food" || profile.categoryKey === "pizza_restaurant" || profile.categoryKey === "non_veg_restaurant") {
+    categoryGuard = `
+CATEGORY-SPECIFIC HARD RULES (FOOD BUSINESS):
+- BUSINESS TYPE: FOOD RESTAURANT / EATERY.
+- Reviewer = customer who visited to EAT. Focus on taste, freshness, service speed, ambiance.
+- NEVER mention doctor, clinic, medicine, haircut, salon, car wash, or software.`
+  } else if (profile.audiencePersona === "Female_Only") {
+    categoryGuard = `
+CATEGORY-SPECIFIC HARD RULES (LADIES BEAUTY PARLOUR):
+- BUSINESS TYPE: LADIES BEAUTY PARLOUR. Reviewer = woman/girl customer.
+- MUST USE feminine language. NEVER masculine verbs or food/delivery context.`
+  } else if (profile.audiencePersona === "Male_Only") {
+    categoryGuard = `
+CATEGORY-SPECIFIC HARD RULES (MEN SALON / BARBERSHOP):
+- BUSINESS TYPE: MEN SALON / BARBER. Reviewer = male customer getting haircut/grooming.
+- MUST USE masculine language and grooming terms. NEVER ladies makeup or food context.`
+  }
+
+  // 8. Authentic Real GBP Past Reviews Style Inspiration (Few-Shot Grounding)
+  const pastReviewsPool = (pastPublicReviews && pastPublicReviews.length > 0)
+    ? pastPublicReviews
+    : (profile.pastPublicReviews && profile.pastPublicReviews.length > 0)
+      ? profile.pastPublicReviews
+      : []
+
+  const validPastReviews = pastReviewsPool
+    .filter((r) => typeof r === "string" && r.trim().length >= 10)
+    .slice(0, 3)
+
+  let pastReviewStyleGuide = ""
+  if (validPastReviews.length > 0) {
+    pastReviewStyleGuide = `\n6. REAL PAST GOOGLE MAPS REVIEWS (STYLE & TONE INSPIRATION):\nBelow are authentic 5-star customer reviews previously left by real customers on "${profile.businessName}"'s Google Maps profile:\n${validPastReviews.map((r, i) => `   - Example ${i + 1}: "${r.replace(/"/g, "'").trim()}"`).join("\n")}\nDirectives:\n- Match the exact conversational style, Hinglish/English balance, and real emotional warmth of these genuine reviews.\n- Do NOT copy them word-for-word; write completely new, fresh drafts following their natural cadence.\n`
+  }
+
   const systemPrompt = `[ROLE & OBJECTIVE]
 You are CustomerPilot's authentic Indian consumer review drafting engine.
 Generate 3 distinct, natural, human Google Maps reviews (12 to 20 words each) for "${profile.businessName}".
+${categoryGuard}
 
 MERCHANT STRICT BOUNDARIES:
 1. Target Customer Persona:
@@ -624,7 +957,7 @@ ${randomAngle} (Focus product: ${focalItem})
 
 5. STRICTLY BANNED ENTITIES (DO NOT EVER MENTION ANY OF THESE):
 ${bannedSample}
-
+${pastReviewStyleGuide}
 CRITICAL ANTI-HALLUCINATION RULES:
 - DO NOT mention delivery, doorstep delivery, or parcel unless the merchant is an online delivery service!
 - DO NOT mention chai, tea, coffee, food, dinner, cakes, or snacks if this is a salon or parlor!

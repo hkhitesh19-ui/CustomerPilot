@@ -105,6 +105,19 @@ export default async function ReviewPage({
     heroChips.unshift(productName)
   }
 
+  // Fetch authentic real past Google reviews for few-shot style inspiration
+  const realReviews = (db as any).googleBusinessReview?.findMany
+    ? await (db as any).googleBusinessReview.findMany({
+        where: { merchantId: merchant.id, rating: { gte: 4 }, comment: { not: null } },
+        take: 3,
+        orderBy: { createdAt: "desc" },
+        select: { comment: true }
+      }).catch(() => [])
+    : []
+  const pastPublicReviews: string[] = realReviews
+    .map((r: { comment: string | null }) => r.comment!)
+    .filter((c: string) => typeof c === "string" && c.trim().length > 10)
+
   // Generate dynamic, anti-repetitive AI / multi-angle rotating drafts
   const draftOptions = await generateDynamicReviewDraft({
     businessCategory,
@@ -114,7 +127,8 @@ export default async function ReviewPage({
     seed: Math.random().toString(36),
     merchantKeywordProfile: (merchant as any).keywordProfile || null,
     merchantCity: merchant.city || undefined,
-    merchantAddress: merchant.address || undefined
+    merchantAddress: merchant.address || undefined,
+    pastPublicReviews
   })
 
   const dynamicDraft = draftOptions.draft1

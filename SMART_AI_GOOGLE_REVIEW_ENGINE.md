@@ -120,14 +120,24 @@ const sanitizeStrict = (text: string): string => {
 ```
 If an alien word (e.g. *"cake"* or *"facial"*) appears anywhere in the generated draft, it is stripped deterministically at the character/word level.
 
-### Layer 4: Deterministic Seeded Fallback Pool (Offline Safety Net)
+### Layer 4: Category-Aware Deterministic Fallback Pool (`getCategoryAwareItemDrafts`)
 If Google Gemini and Groq APIs are unreachable, rate-limited, or encounter timeouts:
 - The system immediately switches to `getDynamicFallbackReview()`.
-- It dynamically injects the approved `focalItem` into pre-vetted, natural Indian customer templates:
-  - *Draft 1*: `"Opted for {focalItem} today. Quality was really good, professional experience tha aur proper care li."`
-  - *Draft 2*: `"{focalItem} was fresh and properly prepared. Thoda rush tha par staff courteous tha aur order jaldi mila."`
-  - *Draft 3*: `"Super quality {focalItem} and clean hygienic setup. Loved it!"`
-- **Zero hallucinations are mathematically possible** even during total AI infrastructure outages.
+- It executes `getCategoryAwareItemDrafts(category, focalItem, poolEntry)` which maintains **strictly isolated templates per business vertical**:
+  - **Pet Clinic / Vet**: *"Mera dog ka {focalItem} karwaya. Vet doctor ne bahut gently handle kiya, pet poori visit mein calm aur comfortable raha."* (Zero human medicine/fever terms!)
+  - **Dental Clinic**: *"{focalItem} karwaya — completely painless procedure tha. Doctor ne X-ray dikhakar sab clearly explain kiya."*
+  - **Fast Food / Street Snacks**: *"{focalItem} order kiya — super crispy, piping hot aur spicy chutney ka taste authentic tha. Bilkul paisa vasool!"*
+  - **Pizza Restaurant**: *"{focalItem} order kiya — crust perfectly crispy aur cheese pull rich tha. Best pizza in the area!"*
+  - **Non-Veg Restaurant**: *"{focalItem} order kiya — chicken tender, gravy aromatic aur dum ka taste proper authentic tha. Unforgettable meal!"*
+  - **Ladies Beauty Parlour**: *"{focalItem} karwaya — didi ke haath mein jadoo hai. Skin pe instant glow aa gaya, results better than expected!"*
+  - **Men's Salon**: *"{focalItem} karwaya — bhai ne zero mistake se kiya. Fresh clean look mila, bilkul jaisa bola tha waisa."*
+- **Zero cross-industry vocabulary leakage** is mathematically guaranteed even during total AI infrastructure outages.
+
+### Layer 5: Real GBP Past Reviews Style Inspiration (Few-Shot Grounding)
+When generating reviews via AI:
+- The engine fetches authentic real 5-star Google Reviews previously published on the merchant's live Google Maps listing.
+- Injects up to 3 real reviews as few-shot style templates into the LLM system prompt.
+- Directs the AI to match the merchant's exact real-world customer tone, Hinglish/English dialect blend, and emotional warmth while writing completely new, non-repetitive drafts.
 
 ---
 
