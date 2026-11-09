@@ -289,6 +289,7 @@ This section provides the complete, authoritative map of all directories, files,
 F:\CustomerPilot_ByGLM_July2026
 ├── Git Commit on VPS Live.txt         # Active Live Git Commit & Deployment History Tracker on Hostinger VPS
 ├── SMART_AI_GOOGLE_REVIEW_ENGINE.md   # Master Technical Blueprint & Multi-Tenant Grounding Specification for Smart AI Google Reviews
+├── RANKPILOT_AI_TOP3_LOCAL_DOMINATION_PLAYBOOK.md # RankPilot AI 30-Day Automated GBP Top-3 Domination Master Playbook (10 Products + 10 Services)
 ├── prisma/
 │   └── schema.prisma                  # Master Database Schema (Prisma ORM: Customer, Merchant, AuditLog, DeadLetterQueue, etc.)
 │
