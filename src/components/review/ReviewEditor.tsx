@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Copy, Check, ExternalLink, Sparkles, Gift, ArrowLeft, Info, MapPin, Camera } from "lucide-react"
+import { Copy, Check, ExternalLink, Sparkles, Gift, ArrowLeft, Info, MapPin, Camera, ShoppingBag } from "lucide-react"
 
 export function ReviewEditor({ 
   merchant, 
@@ -13,7 +13,9 @@ export function ReviewEditor({
   category,
   productName,
   isLoyaltyEnabled = true,
-  heroChips = []
+  heroChips = [],
+  heroServices = [],
+  heroProducts = []
 }: { 
   merchant: any, 
   customer: any, 
@@ -30,7 +32,9 @@ export function ReviewEditor({
   category?: string,
   productName?: string,
   isLoyaltyEnabled?: boolean,
-  heroChips?: string[]
+  heroChips?: string[],
+  heroServices?: string[],
+  heroProducts?: string[]
 }) {
     const reviewBonus = bonusInfo?.googleReviewBonus ?? 2
   const photoBonus = bonusInfo?.photoBonus ?? 2
@@ -280,13 +284,13 @@ export function ReviewEditor({
             </div>
           )}
 
-          {/* 1-Tap Purchased Item / Service Selection Hero Chips */}
-          {heroChips && heroChips.length > 0 && !isEditingExisting && (
-            <div className="space-y-1.5 pb-2">
+          {/* 1-Tap Dual Bestseller Selection: Services (Up to 10) + Products (Up to 10) */}
+          {((heroServices && heroServices.length > 0) || (heroProducts && heroProducts.length > 0) || (heroChips && heroChips.length > 0)) && !isEditingExisting && (
+            <div className="space-y-3 pb-2">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold text-[#5F6368] uppercase tracking-wider flex items-center gap-1">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  <span>What did you visit / enjoy today?</span>
+                  <span>What did you visit / purchase today?</span>
                 </span>
                 {activeProduct && (
                   <button
@@ -298,26 +302,92 @@ export function ReviewEditor({
                   </button>
                 )}
               </div>
-              <div className="flex flex-wrap gap-1.5">
-                {heroChips.map((chip, idx) => {
-                  const isSelected = activeProduct.toLowerCase() === chip.toLowerCase()
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => handleSelectChip(chip)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border flex items-center gap-1.5 ${
-                        isSelected
-                          ? "bg-emerald-600 text-white border-emerald-600 shadow-xs font-bold"
-                          : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 hover:border-slate-400"
-                      }`}
-                    >
-                      {isSelected ? <Check className="w-3 h-3 text-white" /> : <span className="text-[10px] opacity-60">⭐</span>}
-                      <span>{chip}</span>
-                    </button>
-                  )
-                })}
-              </div>
+
+              {/* SECTION A: Services (if present) */}
+              {heroServices && heroServices.length > 0 && (
+                <div className="space-y-1">
+                  {heroProducts && heroProducts.length > 0 && (
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                      <span>🩺 Services Received:</span>
+                    </span>
+                  )}
+                  <div className="flex flex-wrap gap-1.5">
+                    {heroServices.map((chip, idx) => {
+                      const isSelected = activeProduct.toLowerCase() === chip.toLowerCase()
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => handleSelectChip(chip)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                            isSelected
+                              ? "bg-emerald-600 text-white border-emerald-600 shadow-xs font-bold"
+                              : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 hover:border-slate-400"
+                          }`}
+                        >
+                          {isSelected ? <Check className="w-3 h-3 text-white" /> : <span className="text-[10px] opacity-60">⭐</span>}
+                          <span>{chip}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION B: Products (if present) */}
+              {heroProducts && heroProducts.length > 0 && (
+                <div className="space-y-1">
+                  {heroServices && heroServices.length > 0 && (
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                      <span>🛍️ Products Purchased:</span>
+                    </span>
+                  )}
+                  <div className="flex flex-wrap gap-1.5">
+                    {heroProducts.map((chip, idx) => {
+                      const isSelected = activeProduct.toLowerCase() === chip.toLowerCase()
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => handleSelectChip(chip)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                            isSelected
+                              ? "bg-emerald-600 text-white border-emerald-600 shadow-xs font-bold"
+                              : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 hover:border-slate-400"
+                          }`}
+                        >
+                          {isSelected ? <Check className="w-3 h-3 text-white" /> : <ShoppingBag className="w-3 h-3 text-emerald-600 opacity-70" />}
+                          <span>{chip}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* FALLBACK: If neither heroServices nor heroProducts were split, render heroChips */}
+              {(!heroServices || heroServices.length === 0) && (!heroProducts || heroProducts.length === 0) && heroChips && heroChips.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {heroChips.map((chip, idx) => {
+                    const isSelected = activeProduct.toLowerCase() === chip.toLowerCase()
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleSelectChip(chip)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                          isSelected
+                            ? "bg-emerald-600 text-white border-emerald-600 shadow-xs font-bold"
+                            : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 hover:border-slate-400"
+                        }`}
+                      >
+                        {isSelected ? <Check className="w-3 h-3 text-white" /> : <span className="text-[10px] opacity-60">⭐</span>}
+                        <span>{chip}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           )}
 

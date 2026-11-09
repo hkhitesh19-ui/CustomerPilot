@@ -1,5 +1,5 @@
 # CustomerPilot — Smart AI Google Review & Zero-Hallucination Grounding Engine
-*Version 4.0 — Enterprise Architecture, 2-Column Studio, Hero Chips & Google Compliance Specification*
+*Version 4.5 — Enterprise Architecture, 10+10 Dual Bestseller Studio, Hero Chips, Reverse NLP Owner Reply & Google Compliance Specification*
 
 ---
 
@@ -20,24 +20,26 @@ In local business marketing, generic generative AI (e.g. unconstrained ChatGPT o
 
 ---
 
-## 2. End-to-End System Architecture (Version 4.0)
+## 2. End-to-End System Architecture (Version 4.5)
 
 ```mermaid
 flowchart TD
     A["Customer Scans Billing Counter QR / Taps WhatsApp Link"] --> B["Customer Review Portal: /review?m=merchantId&item=..."]
     B --> C["Fetch Merchant KeywordProfile: resolveMerchantKeywordProfile()"]
     
-    subgraph StudioEngine["Phase 3: 2-Column Smart Keyword Control Studio"]
+    subgraph StudioEngine["Phase 3: Dual Bestseller Studio & Keyword Control"]
         C --> D["Database: merchant.keywordProfile (JSON)"]
-        D --> E["Left Column: Offered Keywords (Green Allowed Whitelist)"]
-        D --> F["Right Column: Excluded Keywords (Pink Strictly Banned Blacklist)"]
-        E --> G["⭐ Top 5 Hero Services & Top 5 Hero Products Selection"]
+        D --> E["Left Column: Allowed Whitelist (Green)"]
+        D --> F["Right Column: Strict Blacklist (Pink/Red)"]
+        D --> G1["🛍️ Top 10 Bestseller Products (Custom/Auto)"]
+        D --> G2["🩺 / 🛠️ Top 10 Bestseller Services (Custom/Auto)"]
     end
 
-    subgraph HeroChipJourney["Phase 4: Customer 1-Tap Hero Chip Selection"]
-        G --> H["Render Interactive ⭐ Hero Chips on Mobile Screen"]
-        H --> I["Customer Taps Specific Item e.g. 'Puppy 7-in-1 Vaccination'"]
-        I --> J["Focal Product Locked: focalItem"]
+    subgraph HeroChipJourney["Phase 4: Customer Dual-Category 1-Tap Chips"]
+        G1 & G2 --> H["Render Dual-Category 1-Tap Chips on Mobile Screen"]
+        H --> I1["Customer Taps Product Chip: e.g. 'Puppy Starter Food'"]
+        H --> I2["Customer Taps Service Chip: e.g. 'Puppy 7-in-1 Vaccination'"]
+        I1 & I2 --> J["Focal Entity Locked: focalItem"]
     end
 
     subgraph MultiLayerFortress["5-Layer Zero-Hallucination Fortress"]
@@ -54,6 +56,13 @@ flowchart TD
         Q -- "4 or 5 Stars" --> R["1-Tap Deep-Link to Official Google Maps writereview"]
         Q -- "1 to 3 Stars" --> S["Private Owner Redressal Form (Instant WhatsApp Owner Alert)"]
         S -. "Transparent Google Bypass Link" .-> R
+    end
+
+    subgraph OwnerAutoReply["Reverse NLP Owner Auto-Reply Engine"]
+        R --> OA["Published Google Maps Review Ingested via Places API"]
+        OA --> OB["Extract Mentioned Entities & GEO Keywords"]
+        OB --> OC["Generate SEO-Optimized Appreciative Owner Reply (4-Part Formula)"]
+        OC --> OD["Publish Owner Response Directly to GBP via Google Business API"]
     end
 
     subgraph Anti404Moat["Phase 2: Protobuf Hex-to-PlaceID Derivation Engine"]
@@ -77,7 +86,7 @@ CustomerPilot guarantees **0% hallucinated products** through five sequential de
   `["Veg Grilled Sandwich", "Cheese Burst Sandwich", "Paneer Tikka Sandwich", "Club Sandwich", "Corn Cheese Sandwich"]`.
 - If a shop is a **Pet Clinic**, its whitelist contains strictly veterinary care:
   `["Puppy 7-in-1 vaccination", "Anti-rabies vaccine", "Pet deworming", "Tick fever treatment", "Dog dental scaling"]`.
-- The engine dynamically picks a `focalItem` directly from this whitelist or the merchant's live `MenuItem` table. It **never** uses generic fallback placeholders like *"Store Special"*.
+- The engine dynamically picks a `focalItem` directly from this whitelist, `heroProducts`, `heroServices`, or the merchant's live `MenuItem` table. It **never** uses generic fallback placeholders like *"Store Special"*.
 
 ### Layer 2: Prompt-Level Dynamic Whitelist, Negative Blacklist & Vertical Persona
 When calling Gemini or Groq, the engine constructs a mathematically constrained prompt with category-specific persona rules:
@@ -146,6 +155,12 @@ When generating reviews via AI:
   ```
 - Result: Generated reviews match the authentic cadence, local dialect blend, and emotional style of real customers.
 
+### Layer 6: Subcategory Priority & Protective Auto-Heal Moat (`businessType > category`)
+To prevent parent category hijacks (e.g. general healthcare clinic hijacking pet clinic or dental clinic):
+1. **Resolution Hierarchy**: `merchant.businessType` always overrides `merchant.category` across all review APIs, keyword resolvers, and fallback pools:
+   `const businessCategory = merchant.businessType?.trim() || merchant.category?.trim() || "Retail Store"`
+2. **Defensive Runtime Auto-Heal**: When reading `merchant.keywordProfile` from the database, if a pet clinic or dental merchant has legacy contaminated doctor tags (`mbbs`, `physician`, `routine full body`), the system automatically wipes the contaminated tags and replaces them with authentic veterinary or dental presets.
+
 ---
 
 ## 4. Phase 1: High-Search GEO Keyword Engine (6 Tiers)
@@ -199,30 +214,41 @@ export function hexFeatureToPlaceId(hex1Str: string, hex2Str: string): string {
 
 ---
 
-## 6. Phase 3: The 2-Column Offered vs Excluded Studio
+## 6. Phase 3: The Dual Bestseller Review Studio (10 Products + 10 Services)
 
-In `/dashboard/settings`, merchants control their keywords through a visual 2-column studio (`src/components/smart-keyword-control-engine.tsx`):
+In `/dashboard/settings`, merchants control their keywords through the **Dual Bestseller Review Studio** (`src/components/smart-keyword-control-engine.tsx`):
 
 ```
-┌───────────────────────────────────────────────┬───────────────────────────────────────────────┐
-│  🟢 Allowed / Offered Products & Services     │  🔴 Strictly Banned / Excluded Words          │
-│  (Keywords customer reviews are allowed to use)│  (Alien words completely blocked from reviews) │
-├───────────────────────────────────────────────┼───────────────────────────────────────────────┤
-│  [⭐ Puppy 7-in-1 vaccination] [⇄ Exclude]    │  [Human medicine] [⇄ Move to Allowed]         │
-│  [⭐ Anti-rabies vaccine]      [⇄ Exclude]    │  [Human hospital] [⇄ Move to Allowed]         │
-│  [⭐ Routine pet health checkup][⇄ Exclude]   │  [My fever]       [⇄ Move to Allowed]         │
-│  [⭐ Dog dental scaling]       [⇄ Exclude]    │  [Haircut]        [⇄ Move to Allowed]         │
-│  [⭐ Pet skin allergy treatment][⇄ Exclude]   │  [Cake / Pastry]  [⇄ Move to Allowed]         │
-│  [+ Add Custom Service/Product]               │  [+ Add Banned Word]                          │
-└───────────────────────────────────────────────┴───────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────────────┐
+│  ⭐ DUAL BESTSELLER REVIEW STUDIO (UP TO 10 PRODUCTS + UP TO 10 SERVICES)                     │
+├──────────────────────────────────────────────┬───────────────────────────────────────────────┤
+│  🛍️ Top 10 Bestseller Products (X/10)        │  🩺 / 🛠️ Top 10 Bestseller Services (Y/10)    │
+│  (Physical Goods: Food, Cakes, Boxes etc.)   │  (Procedures: Vaccinations, Spa, RCT etc.)    │
+├──────────────────────────────────────────────┼───────────────────────────────────────────────┤
+│  [🛍️ Puppy Starter Food] [✕]                 │  [⭐ Puppy 7-in-1 Vaccination] [✕]            │
+│  [🛍️ Royal Canin Dog Food] [✕]               │  [⭐ Anti-Rabies Vaccine] [✕]                 │
+│  [🛍️ Flea & Tick Shampoo] [✕]                │  [⭐ Pet Deworming] [✕]                       │
+│  [🛍️ Chew Bones] [✕]                         │  [⭐ Dog Dental Scaling] [✕]                  │
+│  [+ Pin Bestseller Product Input]             │  [+ Pin Bestseller Service Input]             │
+└──────────────────────────────────────────────┴───────────────────────────────────────────────┘
+┌──────────────────────────────────────────────┬───────────────────────────────────────────────┐
+│  🟢 Allowed Whitelist Matrix                 │  🔴 Strictly Banned Blacklist                 │
+│  [🛍️] [⭐] [Puppy Vaccination] [⇄ Exclude]   │  [Human medicine] [⇄ Move to Allowed]         │
+│  [🛍️] [⭐] [Royal Canin Food]   [⇄ Exclude]   │  [My fever]       [⇄ Move to Allowed]         │
+└──────────────────────────────────────────────┴───────────────────────────────────────────────┘
 ```
 
-- **Interactive 1-Click Swap (`⇄`)**: Tapping `⇄` on an Allowed item instantly moves it to Excluded, and vice versa.
-- **⭐ Hero Star Selector**: Clicking the star icon designates an item as a **Hero Chip** (up to 5 Services and 5 Products).
+- **Dual 10-Item Catalog Limits**:
+  - Up to 10 Bestseller Products (`heroProducts`).
+  - Up to 10 Bestseller Services (`heroServices`).
+- **Interactive 1-Click Toggles**:
+  - Tapping `🛍️` on any allowed keyword toggles it in/out of Top 10 Bestseller Products.
+  - Tapping `⭐` on any allowed keyword toggles it in/out of Top 10 Bestseller Services.
+  - Tapping `⇄` moves any item to the Strict Blacklist.
 
 ---
 
-## 7. Phase 4: Customer 1-Tap ⭐ Hero Chips Selection Journey
+## 7. Phase 4: Customer Dual-Category 1-Tap Chips Selection Journey
 
 When a customer scans the counter QR code or opens `/review?m=merchantId`:
 
@@ -231,13 +257,15 @@ When a customer scans the counter QR code or opens `/review?m=merchantId`:
 │  PET CLINIC @ MANJALPUR                                │
 │  ⭐⭐⭐⭐⭐ 4.9 (185 Google Reviews)                   │
 ├────────────────────────────────────────────────────────┤
-│  What service did your pet receive today?              │
-│  ┌──────────────────────┐  ┌─────────────────────────┐ │
-│  │ 🐾 Puppy 7-in-1 Vac  │  │ 💉 Anti-rabies Vaccine  │ │
-│  └──────────────────────┘  └─────────────────────────┘ │
-│  ┌──────────────────────┐  ┌─────────────────────────┐ │
-│  │ 🩺 Routine Checkup   │  │ 🐕 Dog Dental Scaling   │ │
-│  └──────────────────────┘  └─────────────────────────┘ │
+│  What did you visit / purchase today?                  │
+│                                                        │
+│  🩺 SERVICES RECEIVED:                                 │
+│  [⭐ Puppy 7-in-1 Vac]   [⭐ Anti-rabies Vaccine]      │
+│  [⭐ Pet Deworming]      [⭐ Dog Dental Scaling]       │
+│                                                        │
+│  🛍️ PRODUCTS PURCHASED:                                │
+│  [🛍️ Puppy Starter Food] [🛍️ Flea Shampoo]            │
+│  [🛍️ Chew Bones]        [🛍️ Cat Litter Box]          │
 ├────────────────────────────────────────────────────────┤
 │  AI Review Drafts (Click to Edit or Copy):             │
 │  [ Quality & Care ]  [ Service & Vibes ]  [ 1-Liner ]   │
@@ -250,8 +278,8 @@ When a customer scans the counter QR code or opens `/review?m=merchantId`:
 └────────────────────────────────────────────────────────┘
 ```
 
-- **Zero Typing Friction**: 1 tap on a Hero Chip immediately tailors all 3 review draft angles to that exact service.
-- **Customer Personalization**: If customer had a specific service, the review reflects reality rather than generic praise.
+- **Zero Typing Friction**: 1 tap on any Product or Service chip instantly rewrites all 3 AI drafts focused strictly on that purchase.
+- **Categorized Separation**: Prevents confusion between products bought and clinical services taken.
 
 ---
 
@@ -288,11 +316,26 @@ CustomerPilot's review engine dynamically adapts to India's multilingual retail 
 
 ---
 
-## 10. Negative Review AI Damage Control & Escalation SLA
+## 10. Algorithmic Google Owner Auto-Reply Engine (Reverse NLP Entity Reinforcement)
 
-When a customer posts a 1-star or 2-star review on Google Maps, the automated reply engine (`src/lib/ai-review-reply.ts`) executes a strict crisis management protocol:
+### 10.1 The SEO Mechanics of Owner Replies on Google Maps
+Google Maps ranking algorithms crawl **both customer reviews and owner responses**. When an owner replies to a customer review:
+1. **Entity Reinforcement**: If the customer praised *"Puppy 7-in-1 vaccination"*, the owner's response repeating that exact entity signals to Google that the listing is an authoritative provider of puppy vaccinations in that locality.
+2. **Anti-Spam Human Variation**: Identical copy-pasted owner replies (*"Thanks for visiting! Come again!"*) trigger Google's spam filter. CustomerPilot generates dynamic, customized responses matching the 4-part SEO formula:
 
-### Crisis Response Rules:
+### 10.2 The 4-Part SEO Owner Reply Formula
+```
+[1. Personalized Appreciative Opening] + 
+[2. Specific Entity & Quality Validation] + 
+[3. Local GEO / Landmark Context Reinforcement] + 
+[4. Warm Invitation / Future Call-to-Action]
+```
+
+**Real Example (Pet Clinic):**
+> *"Thank you so much, [Customer Name]! We are thrilled to hear that your puppy felt completely at ease during their 7-in-1 vaccination. Gentle pet handling and stress-free pet care are our highest priorities here in Manjalpur. Looking forward to seeing your fur baby healthy and playful during your next routine checkup!"*
+
+### 10.3 Negative Review AI Damage Control & Escalation SLA (1-Star & 2-Star)
+When a negative review appears:
 1. **Never Be Defensive**: Never argue, blame the customer, or deny the incident publicly.
 2. **Acknowledge & Empathize**: Validate the customer's frustration immediately.
 3. **No Legal Liability Admission**: State commitment to standards without admitting legal fault.
@@ -347,8 +390,27 @@ To ensure continuous system integrity across all deployments:
    - Gate 4: Scoring Engine Mathematical Boundaries (12 boundary tests)
    - Gate 5: Critical Financial & Auth Payments Regression
    - Gate 6: Git Hygiene & Database Untracking (0 SQLite `.db` files tracked)
-2. **Playwright Autonomous Headless QA**: `node scripts/run_autonomous_qa.js e2e/dynamic-review-flow.spec.ts` validates:
+2. **Playwright Autonomous Headless QA**: `node scripts/run_autonomous_qa.js e2e/pet-clinic-review.spec.ts` validates:
    - Dynamic drafts render within 800ms with zero console errors.
-   - ⭐ Hero Chips interactively update drafts on tap.
+   - Dual Bestseller Chips (Services vs Products) interactively update drafts on tap.
    - Angle switching (Quality ➔ Vibes ➔ 1-Liner) works seamlessly.
 3. **Zero Dummy Data Guarantee**: Real merchant names, authentic addresses, valid Google Place IDs, and real menu/service items are strictly enforced across all review interfaces.
+
+---
+
+## 14. Master Multi-Vertical Gold-Standard Benchmark Library
+
+Below are gold-standard operational benchmarks for Review Suggestions and Owner Auto-Replies across core business verticals:
+
+| Vertical | Top Bestseller Entity | Gold-Standard Review Suggestion | SEO Owner Auto-Reply Example |
+| :--- | :--- | :--- | :--- |
+| **Pet Clinic** | *Puppy 7-in-1 Vaccination* | *"Mera puppy ka 7-in-1 vaccination karwaya. Vet doctor ne bohot gently handle kiya, pet bilkul calm raha. Clean clinic and genuine medicines in Manjalpur!"* | *"Thank you [Name]! We are glad your puppy had a smooth 7-in-1 vaccination experience. Ensuring gentle, stress-free pet care in Manjalpur is our highest mission. See you for routine checkups!"* |
+| **Dental Clinic** | *Single-Sitting Root Canal* | *"Got my single sitting root canal done here. Dr. was extremely experienced, procedure was completely painless and X-ray explanation was super clear."* | *"Thank you [Name]! Providing completely painless single-sitting root canal treatments with digital precision is what we strive for. Keep that bright healthy smile!"* |
+| **Bakery** | *Dutch Chocolate Truffle Cake* | *"Ordered Dutch chocolate truffle cake for my sister's birthday. Sponge moist tha, rich dark chocolate flavor authentic tha aur time par delivery mili."* | *"Thank you [Name]! Thrilled you loved our rich Dutch Chocolate Truffle Cake. We bake with 100% pure eggless love and look forward to sweetening your next celebration!"* |
+| **Restaurant** | *Paneer Butter Masala & Garlic Naan* | *"Had family dinner tonight. Paneer butter masala creamy aur fresh tha, garlic naan crisp aur hot tha. Best family dining ambience in the area!"* | *"Thank you [Name]! So delighted your family enjoyed our authentic Paneer Butter Masala and crispy Garlic Naans. It was an honor hosting you at our family dining room!"* |
+| **Fast Food** | *Cheese Burst Vadapav & Peri Peri Fries* | *"Piping hot cheese burst vadapav with crunchy peri peri fries! Spicy green chutney ka taste mindblowing tha. Quick service and pocket-friendly."* | *"Thank you [Name]! Piping hot Cheese Burst Vadapav and crunchy Peri Peri fries are our house specialties. Can't wait to serve you your next quick snack craving!"* |
+| **Ladies Beauty Parlour** | *Hydra Facial & Painless Threading* | *"Got Hydra Facial done before wedding function. Skin pe instant natural glow aa gaya! Painless eyebrow threading experience and 100% hygienic private cabins."* | *"Thank you [Name]! We are so happy to see that radiant Hydra Facial glow on your skin! Providing painless threading and private luxury beauty care is always our promise."* |
+| **Men Salon** | *Beard Sculpting & Fade Haircut* | *"Bhai ne clean skin fade haircut aur sharp beard shaping kiya. Zero rush, proper styling guidance and branded grooming products used."* | *"Thanks [Name]! Glad you loved the clean skin fade and sharp beard shaping. Looking sharp is key, catch you next time for your regular grooming session!"* |
+| **Pizza Restaurant** | *Wood-Fired Farmhouse Pizza* | *"Crispy thin crust with generous mozzarella cheese pull! Fresh veggies, authentic tomato basil sauce. Definitely the top pizzeria in town."* | *"Thank you [Name]! Our slow-fermented wood-fired crust and authentic Italian mozzarella cheese pull are crafted for true pizza lovers. See you soon for another slice!"* |
+| **Car Wash / Detailing** | *Ceramic Coating & Deep Interior Foam Wash* | *"Got ceramic coating and deep interior foam wash done. Mirror shine on car paint, stains completely removed and AC cabin smelling fresh like new."* | *"Thank you [Name]! Maintaining that deep gloss ceramic coating mirror finish and spotless cabin hygiene is what our detailing crew lives for. Drive safe!"* |
+| **SaaS / Digital Agency** | *CustomerPilot AI Review Automation* | *"CustomerPilot increased our Google Maps reviews by 300% in 30 days! Zero hallucinated products, genuine customer feedback and automated ranking surge."* | *"Thank you [Name]! We are thrilled to power your local business growth. Automating genuine Google reviews and driving #1 local Maps ranking is our commitment!"* |

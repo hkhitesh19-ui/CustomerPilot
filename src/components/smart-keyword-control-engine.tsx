@@ -21,7 +21,9 @@ import {
   ChevronUp,
   CheckCircle2,
   Store,
-  Compass
+  Compass,
+  ShoppingBag,
+  Wrench
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -42,7 +44,8 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
   const [newAeoTag, setNewAeoTag] = useState("");
   const [newGeoTag, setNewGeoTag] = useState("");
   const [newBlacklistTag, setNewBlacklistTag] = useState("");
-  const [newHeroChip, setNewHeroChip] = useState("");
+  const [newHeroProduct, setNewHeroProduct] = useState("");
+  const [newHeroService, setNewHeroService] = useState("");
   const [showAutoKeywords, setShowAutoKeywords] = useState(false);
   const [copiedKeywords, setCopiedKeywords] = useState(false);
 
@@ -75,13 +78,15 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
     const removedItem = currentList[index];
     const updated = currentList.filter((_, i) => i !== index);
     
-    // Also remove from heroServices if removed from allowedSeoEntities
-    let newHeroes = profile.heroServices;
-    if (field === "allowedSeoEntities" && removedItem && newHeroes) {
-      newHeroes = newHeroes.filter(t => t !== removedItem);
+    // Also remove from heroServices and heroProducts if removed from allowedSeoEntities
+    let newHeroServices = profile.heroServices;
+    let newHeroProducts = profile.heroProducts;
+    if (field === "allowedSeoEntities" && removedItem) {
+      if (newHeroServices) newHeroServices = newHeroServices.filter(t => t !== removedItem);
+      if (newHeroProducts) newHeroProducts = newHeroProducts.filter(t => t !== removedItem);
     }
 
-    setProfile({ ...profile, [field]: updated, heroServices: newHeroes });
+    setProfile({ ...profile, [field]: updated, heroServices: newHeroServices, heroProducts: newHeroProducts });
   };
 
   // Handle Adding Custom Tag
@@ -107,13 +112,15 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
     const newBlocked = profile.strictlyNotAllowed.includes(item)
       ? profile.strictlyNotAllowed
       : [item, ...profile.strictlyNotAllowed];
-    const newHeroes = (profile.heroServices || []).filter(t => t !== item);
+    const newHeroServices = (profile.heroServices || []).filter(t => t !== item);
+    const newHeroProducts = (profile.heroProducts || []).filter(t => t !== item);
 
     setProfile({
       ...profile,
       allowedSeoEntities: newAllowed,
       strictlyNotAllowed: newBlocked,
-      heroServices: newHeroes
+      heroServices: newHeroServices,
+      heroProducts: newHeroProducts
     });
     toast({ title: "Moved to DO NOT Offer (Banned ❌)", description: `"${item}" will NEVER be mentioned in AI reviews.` });
   };
@@ -136,52 +143,127 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
     toast({ title: "Moved to We Offer (Allowed ✅)", description: `"${item}" added to allowed products/services.` });
   };
 
-  // Toggle Hero Item (Star) for Customer Review Page
-  const toggleHeroItem = (tag: string) => {
+  // Toggle Hero Product (🛍️) - Max 10
+  const toggleHeroProduct = (tag: string) => {
     if (!profile) return;
-    const currentHeroes = Array.isArray(profile.heroServices) 
-      ? [...profile.heroServices] 
-      : [...(profile.allowedSeoEntities.slice(0, 5))];
+    const currentProducts = Array.isArray(profile.heroProducts) ? [...profile.heroProducts] : [];
 
-    if (currentHeroes.includes(tag)) {
-      const updated = currentHeroes.filter(t => t !== tag);
-      setProfile({ ...profile, heroServices: updated });
-      toast({ title: "Hero Item Unpinned", description: `"${tag}" removed from customer review 1-tap chips.` });
+    if (currentProducts.includes(tag)) {
+      const updated = currentProducts.filter(t => t !== tag);
+      setProfile({ ...profile, heroProducts: updated });
+      toast({ title: "Product Unpinned", description: `"${tag}" removed from customer bestseller product chips.` });
     } else {
-      if (currentHeroes.length >= 5) {
+      if (currentProducts.length >= 10) {
         toast({
-          title: "Maximum 5 Hero Items Allowed",
-          description: "Unpin an existing hero item first to pin a new one.",
+          title: "Maximum 10 Bestseller Products Allowed",
+          description: "Unpin an existing product first to pin a new one.",
           variant: "destructive"
         });
         return;
       }
-      const updated = [...currentHeroes, tag];
-      setProfile({ ...profile, heroServices: updated });
-      toast({ title: "⭐ Hero Item Pinned!", description: `"${tag}" is now a 1-tap customer review chip.` });
+      const updated = [...currentProducts, tag];
+      setProfile({ ...profile, heroProducts: updated });
+      toast({ title: "🛍️ Bestseller Product Pinned!", description: `"${tag}" is now a customer 1-tap product chip (${updated.length}/10).` });
     }
   };
 
-  // Add custom Hero Chip
-  const addCustomHeroChip = () => {
-    if (!profile || !newHeroChip.trim()) return;
-    const trimmed = newHeroChip.trim();
-    const currentHeroes = Array.isArray(profile.heroServices) ? [...profile.heroServices] : [];
-    if (currentHeroes.length >= 5) {
-      toast({ title: "Maximum 5 Hero Items", description: "Unpin one item before adding.", variant: "destructive" });
+  // Toggle Hero Service (🛠️ / ⭐) - Max 10
+  const toggleHeroService = (tag: string) => {
+    if (!profile) return;
+    const currentServices = Array.isArray(profile.heroServices) ? [...profile.heroServices] : [];
+
+    if (currentServices.includes(tag)) {
+      const updated = currentServices.filter(t => t !== tag);
+      setProfile({ ...profile, heroServices: updated });
+      toast({ title: "Service Unpinned", description: `"${tag}" removed from customer bestseller service chips.` });
+    } else {
+      if (currentServices.length >= 10) {
+        toast({
+          title: "Maximum 10 Bestseller Services Allowed",
+          description: "Unpin an existing service first to pin a new one.",
+          variant: "destructive"
+        });
+        return;
+      }
+      const updated = [...currentServices, tag];
+      setProfile({ ...profile, heroServices: updated });
+      toast({ title: "🛠️ Bestseller Service Pinned!", description: `"${tag}" is now a customer 1-tap service chip (${updated.length}/10).` });
+    }
+  };
+
+  // Backward compatible toggle
+  const toggleHeroItem = (tag: string) => {
+    if (profile?.heroServices?.includes(tag)) {
+      toggleHeroService(tag);
+    } else if (profile?.heroProducts?.includes(tag)) {
+      toggleHeroProduct(tag);
+    } else {
+      if ((profile?.heroServices?.length || 0) < 10) {
+        toggleHeroService(tag);
+      } else if ((profile?.heroProducts?.length || 0) < 10) {
+        toggleHeroProduct(tag);
+      } else {
+        toast({
+          title: "Bestseller Limits Reached",
+          description: "Both 10 Services and 10 Products slots are full.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
+  // Add custom Bestseller Product
+  const addCustomHeroProduct = () => {
+    if (!profile || !newHeroProduct.trim()) return;
+    const trimmed = newHeroProduct.trim();
+    const currentProducts = Array.isArray(profile.heroProducts) ? [...profile.heroProducts] : [];
+    if (currentProducts.length >= 10) {
+      toast({ title: "Maximum 10 Bestseller Products", description: "Unpin one product before adding.", variant: "destructive" });
+      return;
+    }
+    if (currentProducts.some(p => p.toLowerCase() === trimmed.toLowerCase())) {
+      toast({ title: "Product already pinned", description: `"${trimmed}" is already in your bestseller products.` });
+      setNewHeroProduct("");
       return;
     }
     const currentAllowed = Array.isArray(profile.allowedSeoEntities) ? [...profile.allowedSeoEntities] : [];
-    if (!currentAllowed.includes(trimmed)) {
+    if (!currentAllowed.some(a => a.toLowerCase() === trimmed.toLowerCase())) {
       currentAllowed.unshift(trimmed);
     }
     setProfile({
       ...profile,
       allowedSeoEntities: currentAllowed,
-      heroServices: [...currentHeroes, trimmed]
+      heroProducts: [...currentProducts, trimmed]
     });
-    setNewHeroChip("");
-    toast({ title: "⭐ Hero Item Added", description: `"${trimmed}" will appear on the customer review page.` });
+    setNewHeroProduct("");
+    toast({ title: "🛍️ Bestseller Product Added", description: `"${trimmed}" will appear in customer review product chips.` });
+  };
+
+  // Add custom Bestseller Service
+  const addCustomHeroService = () => {
+    if (!profile || !newHeroService.trim()) return;
+    const trimmed = newHeroService.trim();
+    const currentServices = Array.isArray(profile.heroServices) ? [...profile.heroServices] : [];
+    if (currentServices.length >= 10) {
+      toast({ title: "Maximum 10 Bestseller Services", description: "Unpin one service before adding.", variant: "destructive" });
+      return;
+    }
+    if (currentServices.some(s => s.toLowerCase() === trimmed.toLowerCase())) {
+      toast({ title: "Service already pinned", description: `"${trimmed}" is already in your bestseller services.` });
+      setNewHeroService("");
+      return;
+    }
+    const currentAllowed = Array.isArray(profile.allowedSeoEntities) ? [...profile.allowedSeoEntities] : [];
+    if (!currentAllowed.some(a => a.toLowerCase() === trimmed.toLowerCase())) {
+      currentAllowed.unshift(trimmed);
+    }
+    setProfile({
+      ...profile,
+      allowedSeoEntities: currentAllowed,
+      heroServices: [...currentServices, trimmed]
+    });
+    setNewHeroService("");
+    toast({ title: "🛠️ Bestseller Service Added", description: `"${trimmed}" will appear in customer review service chips.` });
   };
 
   // Switch to an auto-preset
@@ -202,14 +284,14 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
       allowedAeoAnswers: [...preset.aeoAnswers],
       allowedGeoContext: [...preset.geoContext],
       strictlyNotAllowed: [...preset.blacklist],
-      heroServices: [...preset.seoEntities.slice(0, 5)],
-      heroProducts: [...preset.seoEntities.slice(5, 10)],
+      heroServices: [...preset.seoEntities.slice(0, 10)],
+      heroProducts: [...(preset.seoEntities.length > 10 ? preset.seoEntities.slice(10, 20) : preset.seoEntities.slice(0, 5))],
       autoExtractedKeywords: autoKeywords
     });
 
     toast({
       title: `Loaded ${preset.label} Preset`,
-      description: "Tags, SEO keywords, hero items, and negative guardrails populated automatically."
+      description: "Tags, SEO keywords, up to 10 services + 10 products, and negative guardrails populated automatically."
     });
   };
 
@@ -253,7 +335,7 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
       if (res.ok) {
         toast({
           title: "Keyword Profile Saved! ✅",
-          description: "Zero-Hallucination, Offered/Excluded rules, and Top 5 Hero Review chips are now active."
+          description: "Zero-Hallucination, Offered/Excluded rules, and Up to 10 Products + 10 Services Bestseller Studio are now active."
         });
       } else {
         throw new Error(json?.error || "Failed to save profile");
@@ -280,9 +362,9 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
 
   if (!profile) return null;
 
-  const activeHeroes = (profile.heroServices && profile.heroServices.length > 0)
-    ? profile.heroServices
-    : profile.allowedSeoEntities.slice(0, 5);
+  const heroProducts = Array.isArray(profile.heroProducts) ? profile.heroProducts : [];
+  const heroServices = Array.isArray(profile.heroServices) ? profile.heroServices : [];
+  const activeHeroes = heroServices.length > 0 ? heroServices : profile.allowedSeoEntities.slice(0, 5);
 
   const autoKw = profile.autoExtractedKeywords || generateAutoKeywordsForLocation(
     profile.categoryKey,
@@ -309,7 +391,7 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
                 </span>
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Manage your Offered vs Excluded items, Top 5 Hero Review chips, and High-Search GEO keywords for Google Maps #1 ranking.
+                Manage your Offered vs Excluded items, Up to 10 Products + 10 Services Bestsellers, and High-Search GEO keywords for Google Maps #1 ranking.
               </p>
             </div>
           </div>
@@ -365,71 +447,168 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
         </div>
       </div>
 
-      {/* ⭐ MODULE 3: TOP 5 HERO REVIEW CHIPS SECTION */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-50/80 to-amber-100/40 dark:from-amber-950/30 dark:to-amber-900/20 border-2 border-amber-300 dark:border-amber-700/60 space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-amber-500 text-white rounded-lg">
-              <Star className="w-4 h-4 fill-white" />
+      {/* ⭐ MODULE 3: DUAL BESTSELLER STUDIO (UP TO 10 BESTSELLER PRODUCTS + UP TO 10 BESTSELLER SERVICES) */}
+      <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-amber-50/80 via-orange-50/30 to-amber-100/30 dark:from-amber-950/30 dark:via-slate-900/40 dark:to-amber-900/20 border-2 border-amber-300 dark:border-amber-700/60 space-y-4">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-200/80 dark:border-amber-800/60 pb-3.5">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-amber-500 text-white rounded-xl shadow-xs">
+              <Star className="w-5 h-5 fill-white" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-black text-amber-950 dark:text-amber-100">
-                Top 5 Hero Review Chips (Customer 1-Tap Selection)
-              </h4>
-              <p className="text-[11px] text-amber-800/80 dark:text-amber-300/80">
-                Ye 5 products / services review page par customer ko direct 1-tap chips ki tarah dikhenge, taaki customer ne jo purchase kiya hai sirf usi ka hyper-focused review bane.
+              <div className="flex items-center gap-2">
+                <h4 className="text-xs sm:text-sm font-black text-amber-950 dark:text-amber-100">
+                  Dual Bestseller Review Studio (Up to 10 Products + Up to 10 Services)
+                </h4>
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500 text-white">
+                  Optional Studio
+                </span>
+              </div>
+              <p className="text-[11px] text-amber-800/90 dark:text-amber-300/80 mt-0.5">
+                Merchant yahan apne top 10 best-selling products aur top 10 services select kar sakta hai. Review page par inke 1-tap chips aayenge taaki customer ne jo purchase kiya hai sirf usi ka hyper-focused review bane.
               </p>
             </div>
           </div>
-          <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-500 text-white self-start sm:self-center">
-            {activeHeroes.length} / 5 Pinned
-          </span>
-        </div>
-
-        {/* Selected Hero Chips */}
-        <div className="flex flex-wrap items-center gap-2 min-h-[44px] p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800/60">
-          {activeHeroes.map((chip, idx) => (
-            <span
-              key={idx}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-white shadow-xs"
-            >
-              <Star className="w-3 h-3 fill-white" />
-              <span>{chip}</span>
-              <button
-                type="button"
-                onClick={() => toggleHeroItem(chip)}
-                className="hover:text-amber-200 cursor-pointer ml-1"
-                title="Unpin from review chips"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-[11px] font-black px-2.5 py-1 rounded-lg bg-emerald-600 text-white shadow-2xs">
+              🛍️ {heroProducts.length}/10 Products
             </span>
-          ))}
-          {activeHeroes.length === 0 && (
-            <span className="text-xs text-slate-400 italic">No hero chips pinned. Click ⭐ on any offered item below or add custom.</span>
-          )}
+            <span className="text-[11px] font-black px-2.5 py-1 rounded-lg bg-blue-600 text-white shadow-2xs">
+              🛠️ {heroServices.length}/10 Services
+            </span>
+          </div>
         </div>
 
-        {/* Add Custom Hero Chip */}
-        {activeHeroes.length < 5 && (
-          <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Add Top Product/Service e.g. 'Puppy 7-in-1 Vaccination'..."
-              value={newHeroChip}
-              onChange={(e) => setNewHeroChip(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCustomHeroChip())}
-              className="flex-1 text-xs bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-800 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
-            />
-            <button
-              type="button"
-              onClick={addCustomHeroChip}
-              className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-xs"
-            >
-              <Plus className="w-3.5 h-3.5" /> Pin Hero Item
-            </button>
+        {/* 2-Column Grid: Products (Left) vs Services (Right) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+          {/* CARD A: Top 10 Bestseller Products */}
+          <div className="p-3.5 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-800/60 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <ShoppingBag className="w-4 h-4 text-emerald-600" />
+                <span className="text-xs font-black text-emerald-950 dark:text-emerald-100">
+                  🛍️ Top 10 Bestseller Products
+                </span>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                {heroProducts.length} / 10 Pinned
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              Cakes, Pet Food, Shampoos, Clothes, Packaged Foods etc.
+            </p>
+
+            {/* Pinned Products List */}
+            <div className="flex flex-wrap items-center gap-1.5 min-h-[44px] p-2 rounded-lg bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-900/40">
+              {heroProducts.map((prod, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-600 text-white shadow-2xs"
+                >
+                  <ShoppingBag className="w-3 h-3 text-emerald-100" />
+                  <span>{prod}</span>
+                  <button
+                    type="button"
+                    onClick={() => toggleHeroProduct(prod)}
+                    className="hover:text-emerald-200 cursor-pointer ml-0.5"
+                    title="Unpin product"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+              {heroProducts.length === 0 && (
+                <span className="text-xs text-slate-400 italic">No products pinned. Add below or click 🛍️ on offered items below.</span>
+              )}
+            </div>
+
+            {/* Add Custom Product Input */}
+            {heroProducts.length < 10 && (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Add Product e.g. 'Royal Canin Food'..."
+                  value={newHeroProduct}
+                  onChange={(e) => setNewHeroProduct(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCustomHeroProduct())}
+                  className="flex-1 text-xs bg-slate-50 dark:bg-slate-950 border border-emerald-300 dark:border-emerald-800 rounded-lg px-2.5 py-1.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                <button
+                  type="button"
+                  onClick={addCustomHeroProduct}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                >
+                  <Plus className="w-3 h-3" /> Pin Product
+                </button>
+              </div>
+            )}
           </div>
-        )}
+
+          {/* CARD B: Top 10 Bestseller Services */}
+          <div className="p-3.5 sm:p-4 rounded-xl bg-white dark:bg-slate-900 border border-blue-300 dark:border-blue-800/60 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Star className="w-4 h-4 text-blue-600 fill-blue-600" />
+                <span className="text-xs font-black text-blue-950 dark:text-blue-100">
+                  🩺 / 🛠️ Top 10 Bestseller Services
+                </span>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
+                {heroServices.length} / 10 Pinned
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              Vaccinations, Dental RCT, Hair Spa, Full Checkups, Consultations etc.
+            </p>
+
+            {/* Pinned Services List */}
+            <div className="flex flex-wrap items-center gap-1.5 min-h-[44px] p-2 rounded-lg bg-blue-50/40 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-900/40">
+              {heroServices.map((srv, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-blue-600 text-white shadow-2xs"
+                >
+                  <Star className="w-3 h-3 fill-white text-white" />
+                  <span>{srv}</span>
+                  <button
+                    type="button"
+                    onClick={() => toggleHeroService(srv)}
+                    className="hover:text-blue-200 cursor-pointer ml-0.5"
+                    title="Unpin service"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+              {heroServices.length === 0 && (
+                <span className="text-xs text-slate-400 italic">No services pinned. Add below or click 🛠️ on offered items below.</span>
+              )}
+            </div>
+
+            {/* Add Custom Service Input */}
+            {heroServices.length < 10 && (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Add Service e.g. 'Puppy 7-in-1 Vaccination'..."
+                  value={newHeroService}
+                  onChange={(e) => setNewHeroService(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCustomHeroService())}
+                  className="flex-1 text-xs bg-slate-50 dark:bg-slate-950 border border-blue-300 dark:border-blue-800 rounded-lg px-2.5 py-1.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={addCustomHeroService}
+                  className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                >
+                  <Plus className="w-3 h-3" /> Pin Service
+                </button>
+              </div>
+            )}
+          </div>
+
+        </div>
       </div>
 
       {/* 🔍 MODULE 1: AUTO-EXTRACTED HIGH-SEARCH GEO KEYWORDS */}
@@ -501,31 +680,47 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
             </span>
           </div>
           <p className="text-[11px] text-emerald-800/80 dark:text-emerald-300/80 leading-relaxed">
-            Click ⭐ to pin as Hero Review Chip, or ⇄ to move to Blocked if you do not offer this item.
+            Click 🛍️ to pin as Bestseller Product, ⭐ to pin as Bestseller Service, or ⇄ to move to Blocked.
           </p>
 
           {/* Tag Pills */}
           <div className="flex flex-wrap gap-1.5 max-h-[260px] overflow-y-auto p-2 rounded-xl bg-white dark:bg-slate-900 border border-emerald-200/80 dark:border-emerald-900/30">
             {profile.allowedSeoEntities.map((tag, idx) => {
-              const isHero = activeHeroes.includes(tag);
+              const isHeroProduct = heroProducts.includes(tag);
+              const isHeroService = heroServices.includes(tag);
               return (
                 <span
                   key={idx}
                   className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border shadow-2xs transition-all ${
-                    isHero 
-                      ? "bg-amber-100 dark:bg-amber-950/60 text-amber-950 dark:text-amber-200 border-amber-400 font-bold" 
-                      : "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-900 dark:text-emerald-200 border-emerald-300 dark:border-emerald-700"
+                    isHeroProduct
+                      ? "bg-emerald-100 dark:bg-emerald-950/80 text-emerald-950 dark:text-emerald-200 border-emerald-500 font-bold"
+                      : isHeroService
+                      ? "bg-blue-100 dark:bg-blue-950/80 text-blue-950 dark:text-blue-200 border-blue-500 font-bold"
+                      : "bg-emerald-50 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-200 border-emerald-300 dark:border-emerald-700"
                   }`}
                 >
+                  {/* Pin as Product */}
                   <button
                     type="button"
-                    onClick={() => toggleHeroItem(tag)}
+                    onClick={() => toggleHeroProduct(tag)}
                     className="hover:scale-125 transition-transform cursor-pointer"
-                    title={isHero ? "Unpin Hero Chip" : "Pin as Top 5 Hero Chip"}
+                    title={isHeroProduct ? "Unpin Product (🛍️)" : "Pin as Bestseller Product (🛍️)"}
                   >
-                    <Star className={`w-3.5 h-3.5 ${isHero ? "text-amber-500 fill-amber-500" : "text-slate-400"}`} />
+                    <ShoppingBag className={`w-3.5 h-3.5 ${isHeroProduct ? "text-emerald-600 fill-emerald-600" : "text-slate-400 hover:text-emerald-600"}`} />
                   </button>
+
+                  {/* Pin as Service */}
+                  <button
+                    type="button"
+                    onClick={() => toggleHeroService(tag)}
+                    className="hover:scale-125 transition-transform cursor-pointer"
+                    title={isHeroService ? "Unpin Service (⭐)" : "Pin as Bestseller Service (⭐)"}
+                  >
+                    <Star className={`w-3.5 h-3.5 ${isHeroService ? "text-blue-600 fill-blue-600" : "text-slate-400 hover:text-blue-600"}`} />
+                  </button>
+
                   <span>{tag}</span>
+
                   <button
                     type="button"
                     onClick={() => moveToExcluded(idx)}

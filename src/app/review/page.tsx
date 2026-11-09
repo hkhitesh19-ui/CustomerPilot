@@ -91,17 +91,18 @@ export default async function ReviewPage({
     keywordProfile: (merchant as any).keywordProfile || null
   })
 
-  let heroChips: string[] = []
-  if (kwProfile.heroServices && kwProfile.heroServices.length > 0) {
-    heroChips.push(...kwProfile.heroServices.slice(0, 5))
-  }
-  if (heroChips.length < 5 && kwProfile.heroProducts && kwProfile.heroProducts.length > 0) {
-    for (const p of kwProfile.heroProducts) {
-      if (!heroChips.includes(p) && heroChips.length < 5) heroChips.push(p)
-    }
-  }
+  // Extract up to 10 Bestseller Services and up to 10 Bestseller Products
+  const heroServices: string[] = Array.isArray(kwProfile.heroServices) && kwProfile.heroServices.length > 0
+    ? kwProfile.heroServices.slice(0, 10)
+    : []
+
+  const heroProducts: string[] = Array.isArray(kwProfile.heroProducts) && kwProfile.heroProducts.length > 0
+    ? kwProfile.heroProducts.slice(0, 10)
+    : []
+
+  let heroChips: string[] = [...heroServices, ...heroProducts]
   if (heroChips.length === 0 && kwProfile.allowedSeoEntities) {
-    heroChips = kwProfile.allowedSeoEntities.slice(0, 5)
+    heroChips = kwProfile.allowedSeoEntities.slice(0, 10)
   }
   if (productName && !heroChips.includes(productName)) {
     heroChips.unshift(productName)
@@ -209,6 +210,8 @@ export default async function ReviewPage({
       productName={productName}
       isLoyaltyEnabled={isLoyaltyEnabled}
       heroChips={heroChips}
+      heroServices={heroServices}
+      heroProducts={heroProducts}
     />
   )
 }

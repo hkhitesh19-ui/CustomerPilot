@@ -1379,18 +1379,21 @@ export function resolveMerchantKeywordProfile(merchant: {
       let effectiveCategoryKey = parsed.categoryKey || categoryPreset.id;
       let effectiveAllowedSeo = Array.isArray(parsed.allowedSeoEntities) && parsed.allowedSeoEntities.length > 0 ? parsed.allowedSeoEntities : categoryPreset.seoEntities;
       let effectiveStrictlyNotAllowed = Array.isArray(parsed.strictlyNotAllowed) && parsed.strictlyNotAllowed.length > 0 ? parsed.strictlyNotAllowed : categoryPreset.blacklist;
-      let effectiveHeroServices = Array.isArray(parsed.heroServices) && parsed.heroServices.length > 0 ? parsed.heroServices : categoryPreset.seoEntities.slice(0, 5);
+      let effectiveHeroServices = Array.isArray(parsed.heroServices) && parsed.heroServices.length > 0 ? parsed.heroServices.slice(0, 10) : categoryPreset.seoEntities.slice(0, 10);
+      let effectiveHeroProducts = Array.isArray(parsed.heroProducts) && parsed.heroProducts.length > 0 ? parsed.heroProducts.slice(0, 10) : (categoryPreset.seoEntities.length > 10 ? categoryPreset.seoEntities.slice(10, 20) : categoryPreset.seoEntities.slice(0, 5));
 
       if (isPetBusiness && (effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("mbbs") || s.toLowerCase().includes("physician") || s.toLowerCase().includes("routine full body")))) {
         effectiveCategoryKey = "pet_clinic";
         effectiveAllowedSeo = MASTER_KEYWORD_PRESETS.pet_clinic.seoEntities;
         effectiveStrictlyNotAllowed = MASTER_KEYWORD_PRESETS.pet_clinic.blacklist;
-        effectiveHeroServices = MASTER_KEYWORD_PRESETS.pet_clinic.seoEntities.slice(0, 5);
+        effectiveHeroServices = MASTER_KEYWORD_PRESETS.pet_clinic.seoEntities.slice(0, 10);
+        effectiveHeroProducts = MASTER_KEYWORD_PRESETS.pet_clinic.seoEntities.slice(10, 20);
       } else if (isDentalBusiness && (effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("mbbs") || s.toLowerCase().includes("physician")))) {
         effectiveCategoryKey = "dental_clinic";
         effectiveAllowedSeo = MASTER_KEYWORD_PRESETS.dental_clinic.seoEntities;
         effectiveStrictlyNotAllowed = MASTER_KEYWORD_PRESETS.dental_clinic.blacklist;
-        effectiveHeroServices = MASTER_KEYWORD_PRESETS.dental_clinic.seoEntities.slice(0, 5);
+        effectiveHeroServices = MASTER_KEYWORD_PRESETS.dental_clinic.seoEntities.slice(0, 10);
+        effectiveHeroProducts = MASTER_KEYWORD_PRESETS.dental_clinic.seoEntities.slice(10, 20);
       }
 
       return {
@@ -1406,7 +1409,7 @@ export function resolveMerchantKeywordProfile(merchant: {
         allowedGeoContext: Array.isArray(parsed.allowedGeoContext) && parsed.allowedGeoContext.length > 0 ? parsed.allowedGeoContext : categoryPreset.geoContext,
         strictlyNotAllowed: effectiveStrictlyNotAllowed,
         heroServices: effectiveHeroServices,
-        heroProducts: Array.isArray(parsed.heroProducts) && parsed.heroProducts.length > 0 ? parsed.heroProducts : categoryPreset.seoEntities.slice(5, 10),
+        heroProducts: effectiveHeroProducts,
         pastPublicReviews: Array.isArray(parsed.pastPublicReviews) ? parsed.pastPublicReviews : [],
         autoExtractedKeywords: parsed.autoExtractedKeywords || generateAutoKeywordsForLocation(
           effectiveCategoryKey,
@@ -1431,8 +1434,8 @@ export function resolveMerchantKeywordProfile(merchant: {
     allowedAeoAnswers: [...categoryPreset.aeoAnswers],
     allowedGeoContext: [...categoryPreset.geoContext],
     strictlyNotAllowed: [...categoryPreset.blacklist],
-    heroServices: [...categoryPreset.seoEntities.slice(0, 5)],
-    heroProducts: [...categoryPreset.seoEntities.slice(5, 10)],
+    heroServices: [...categoryPreset.seoEntities.slice(0, 10)],
+    heroProducts: [...(categoryPreset.seoEntities.length > 10 ? categoryPreset.seoEntities.slice(10, 20) : categoryPreset.seoEntities.slice(0, 5))],
     autoExtractedKeywords: generateAutoKeywordsForLocation(
       categoryPreset.id,
       "Manjalpur",

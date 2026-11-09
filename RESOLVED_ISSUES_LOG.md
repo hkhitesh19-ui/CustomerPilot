@@ -4,6 +4,25 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [09 Nov 2026] Issue: Dual Bestseller Review Studio (Up to 10 Products + Up to 10 Services), Categorized 1-Tap Customer Chips UI & Smart AI Review Engine v4.5 Upgrade
+- **Symptom**:
+  1. In `/dashboard/settings`, merchants lacked a dedicated interface to select their top-selling physical products (e.g. cakes, pet foods, packaged items) and top in-store/clinical procedures (e.g. vaccinations, dental procedures, hair treatments) independently. The UI only provided a single combined list hardcoded to a maximum of 5 items.
+  2. On the customer review page (`/review?m=...`), only up to 5 combined chips were displayed in a flat un-categorized row, preventing customers from selecting specifically the product they bought or the service they received.
+  3. `SMART_AI_GOOGLE_REVIEW_ENGINE.md` was missing documentation for the 10+10 Dual Bestseller Studio, customer split UX, algorithmic Google Owner Auto-Reply engine (Reverse NLP entity reinforcement), subcategory auto-heal rules, and the multi-vertical gold-standard benchmark library.
+- **Root Cause**:
+  1. `src/components/smart-keyword-control-engine.tsx` hardcoded `activeHeroes.length >= 5` and only managed `heroServices`, completely ignoring `heroProducts`.
+  2. `src/app/review/page.tsx` combined `heroServices` and `heroProducts` with `.slice(0, 5)` capping total chips at 5.
+  3. `src/components/review/ReviewEditor.tsx` accepted a flat array `heroChips` without dual-category segmentation.
+- **Resolution**:
+  1. **Dual Bestseller Review Studio**: Upgraded `src/components/smart-keyword-control-engine.tsx` with two dedicated responsive studio cards: Card A for **🛍️ Top 10 Bestseller Products** (`heroProducts`) and Card B for **🩺 / 🛠️ Top 10 Bestseller Services** (`heroServices`), each with live counter badges (`X/10`), independent custom adders, and quick 1-click toggles (`🛍️` and `⭐`) on every whitelist tag.
+  2. **10+10 Keyword Resolution & Preset Defaults**: Updated `src/lib/keyword-matrix.ts` so `resolveMerchantKeywordProfile` extracts up to 10 services and up to 10 products with auto-healing defenses.
+  3. **Categorized Customer Review UI**: Updated `src/app/review/page.tsx` and `src/components/review/ReviewEditor.tsx` to display dual categorized chip sections: `🩺 Services Received` and `🛍️ Products Purchased`. Tapping any chip immediately triggers dynamic AI draft rewriting focused strictly on that item.
+  4. **Engine Specification Upgrade (v4.5)**: Upgraded `SMART_AI_GOOGLE_REVIEW_ENGINE.md` with full architectural diagrams, Dual Bestseller Studio contracts, the 4-part Reverse NLP Owner Auto-Reply formula, and a 10-vertical benchmark reference library.
+  5. **Adversarial & E2E Verification**: All 6 Master Adversarial Gates passed cleanly (Exit Code 0). Automated Playwright test suite `e2e/bestseller-studio.spec.ts` passed 3/3 tests verifying 10 services, 10 products, and live dynamic review draft regeneration on chip selection.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ---
 
 ---
