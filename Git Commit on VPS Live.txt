@@ -8,12 +8,12 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : ffa08a3
-Full Commit Hash  : ffa08a3e95c8a446fd2c248eec97ddfa1f445c57
+Active Git Commit : 5e39925
+Full Commit Hash  : 5e39925bf17ad524d7f4175247ac5143abbc919d
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 09 Nov 2026, 11:05 AM IST
+Deployment Date   : 09 Nov 2026, 12:00 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(reviews): implement 10 Bestseller Products + 10 Bestseller Services studio, categorized 1-tap customer chips UI, and upgrade engine to v4.5
+Commit Title      : feat(reviews): add inline editing for top 10 products/services in settings and implement ultra-compact zero-scroll customer review mobile layout
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
