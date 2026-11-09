@@ -153,17 +153,19 @@ The Operating Contract is non-negotiable. Do not resume work without an explicit
 
 ## Daily Workflow Summary
 ```markdown
-┌─────────────────────────────────────────────────┐
-│ 1. Open Antigravity                            │
-│ 2. Paste Part 2 (session-start)                 │
-│ 3. Wait for Antigravity's contract ack          │
-│ 4. Paste Part 3C / 3D / 3B / 3E / 3F (task)     │
-│ 5. Wait for Antigravity's plan                  │
-│ 6. Review the plan                              │
-│ 7. Reply "go" if clean, else correct it         │
-│ 8. Wait for Antigravity's delivery + diff       │
-│ 9. Run tests yourself locally                   │
-│ 10. If green → merge to main yourself           │
-│ 11. If not green → use the STOP recovery prompt │
-└─────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│ 1. Open Antigravity                                         │
+│ 2. Paste Part 2 (session-start)                             │
+│ 3. Wait for Antigravity's contract ack                      │
+│ 4. Paste Part 3C / 3D / 3B / 3E / 3F (task)                 │
+│ 5. Wait for Antigravity's plan                              │
+│ 6. Review the plan                                          │
+│ 7. Reply "go" if clean, else correct it                     │
+│ 8. Wait for Antigravity's delivery + Local Commit ID        │
+│ 9. Antigravity provides ready-to-run line:                  │
+│    "Local Git Commit ID: <id> ko GitHub par Push karo..."   │
+│ 10. User replies simple "approved"                          │
+│ 11. Antigravity pushes to GitHub & deploys to VPS live      │
+│ 12. If not green → use the STOP recovery prompt             │
+└─────────────────────────────────────────────────────────────┘
 ```

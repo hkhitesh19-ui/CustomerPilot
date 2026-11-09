@@ -41,16 +41,22 @@ The correct workflow is:
 1. Make the code fix/changes locally.
 2. Run `git add` and `git commit` to save the fix locally.
 3. **Mandatory Commit ID Reporting (STRICT RULE)**: In every single user response where a local commit is performed or reported, you MUST explicitly and prominently display the **Local Git Commit ID** (both the short hash e.g. `460dd94` and full 40-character SHA e.g. `460dd94e21024142367e222ef0e2ed0ced6827f7`), branch name, and commit message in a dedicated highlighted block. Never omit or hide the commit ID.
-4. **STOP. Do NOT push yet.**
-5. Inform the user: "Fix is committed locally (Commit ID: <short_hash>). Please test it manually and confirm it's working."
-6. Wait for the user's explicit confirmation (e.g., "haan kaam kar raha hai", "confirmed", "working").
-7. ONLY AFTER user confirmation: run `git push`.
+4. **Mandatory Ready-To-Approve One-Liner (GLOBAL USER RULE)**:
+   In every response where a local commit is waiting for user confirmation, you MUST provide this exact pre-formatted command block so the user only has to reply "approved":
+   ```text
+   Local Git Commit ID: <short_hash> ko GitHub par Push karo aur VPS (187.127.170.36) pe Deploy karke reload karo
+   ```
+   Always tell the user: "Aap seedha **approved** reply kar sakte hain, ya upar di gayi command de sakte hain."
+5. **STOP. Do NOT push yet.**
+6. Inform the user: "Fix is committed locally (Commit ID: <short_hash>). Please test it manually and confirm it's working."
+7. Wait for the user's explicit confirmation (e.g., "approved", "haan kaam kar raha hai", "confirmed", "working").
+8. ONLY AFTER user confirmation: run `git push` and deploy to live VPS.
 
-Violation of this rule (pushing before user confirmation or omitting the Commit ID) is a breach of the project workflow.
+Violation of this rule (pushing before user confirmation, omitting the Commit ID, or omitting the one-liner approval template) is a breach of the project workflow.
 
 ## VPS Live Deployment & Long-Running Execution Protocol (MANDATORY)
 1. **Never End Turn on In-Progress Deployments (Strict Prohibition)**:
-   - When running Live VPS deployments (200.97.170.53) or Next.js production builds, you are STRICTLY FORBIDDEN from posting an interim text message (e.g. "Deploying... I will notify you once finished") and ending your turn while the task is still running in the background.
+   - When running Live VPS deployments (187.127.170.36) or Next.js production builds, you are STRICTLY FORBIDDEN from posting an interim text message (e.g. "Deploying... I will notify you once finished") and ending your turn while the task is still running in the background.
    - Root Cause Safeguard: In this platform, if the agent outputs text and ends its turn, the system goes into an idle state waiting for the user's next message. A completing background task does NOT wake the agent up autonomously to generate an unprompted reply.
 2. **Mandatory Single-Turn Synchronous Execution**:
    - You MUST keep deployment execution completely within the current active turn:
@@ -58,7 +64,7 @@ Violation of this rule (pushing before user confirmation or omitting the Commit 
      - Do NOT output conversational text until the deployment script finishes, PM2 reloads, and live curl health checks pass (HTTP 200).
    - ONLY send your message to the user once the entire deployment is 100% finished and verified, delivering the final success report in that single turn.
 3. **VPS Tracking File Sync (Mandatory)**:
-   - Whenever you deploy code to the live Hostinger VPS server (200.97.170.53), you MUST immediately update `Git Commit on VPS Live.txt` in the project root with the active Git commit hash, branch, timestamp, and commit message.
+   - Whenever you deploy code to the live Hostinger VPS server (187.127.170.36), you MUST immediately update `Git Commit on VPS Live.txt` in the project root with the active Git commit hash, branch, timestamp, and commit message.
    - Never complete a deployment without keeping `Git Commit on VPS Live.txt` 100% synchronized with the live server.
 
 ## Mandatory Triple-Engine Protocol: GSD Planning + Deep Code & Security Audit + Playwright Visual & Data Ground-Truth Verification
