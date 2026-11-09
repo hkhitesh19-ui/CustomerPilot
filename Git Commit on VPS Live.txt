@@ -8,12 +8,12 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 0270817
-Full Commit Hash  : 0270817e892f8e1d1077d082fed5d858d6d6b14c
+Active Git Commit : ffa08a3
+Full Commit Hash  : ffa08a3e95c8a446fd2c248eec97ddfa1f445c57
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 09 Nov 2026, 08:42 AM IST
+Deployment Date   : 09 Nov 2026, 11:05 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : docs(reviews): upgrade SMART_AI_GOOGLE_REVIEW_ENGINE.md to v4.0 with 2-column studio, hero chips, anti-404 moat and compliance protocols
+Commit Title      : feat(reviews): implement 10 Bestseller Products + 10 Bestseller Services studio, categorized 1-tap customer chips UI, and upgrade engine to v4.5
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
