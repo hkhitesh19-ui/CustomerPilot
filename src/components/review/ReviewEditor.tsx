@@ -208,13 +208,13 @@ export function ReviewEditor({
   const walletUrl = `/q/wallet/${customer?.id || ""}`
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] text-[#202124] flex flex-col items-center justify-start sm:py-8 sm:px-4 font-sans selection:bg-[#E8F0FE] selection:text-[#1A73E8]">
+    <div className="min-h-screen bg-[#F8F9FA] text-[#202124] flex flex-col items-center justify-start sm:py-6 sm:px-4 font-sans selection:bg-[#E8F0FE] selection:text-[#1A73E8]">
       {/* Google Review Native Modal Container */}
       <div className="w-full max-w-lg bg-white sm:border sm:border-[#DADCE0] sm:rounded-3xl shadow-xs overflow-hidden">
         
-        {/* Top Google Native App Bar */}
-        <header className="sticky top-0 z-10 bg-white border-b border-[#E8EAED] px-4 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
+        {/* Top Google Native App Bar (Compact Mobile Height) */}
+        <header className="sticky top-0 z-10 bg-white border-b border-[#E8EAED] px-3 py-2 sm:px-4 sm:py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
               type="button"
               onClick={() => {
@@ -224,16 +224,16 @@ export function ReviewEditor({
                   window.location.href = googleLink
                 }
               }}
-              className="p-1.5 -ml-1.5 rounded-full hover:bg-[#F1F3F4] text-[#5F6368] transition-colors"
+              className="p-1 -ml-1 rounded-full hover:bg-[#F1F3F4] text-[#5F6368] transition-colors"
               aria-label="Back"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             <div className="min-w-0">
-              <h1 className="text-sm sm:text-base font-medium text-[#202124] truncate tracking-tight">
+              <h1 className="text-xs sm:text-base font-bold text-[#202124] truncate tracking-tight">
                 {merchant.name || "Cake Connection"}
               </h1>
-              <p className="text-[11px] text-[#5F6368] truncate flex items-center gap-1">
+              <p className="text-[10px] sm:text-[11px] text-[#5F6368] truncate flex items-center gap-1">
                 <MapPin className="w-3 h-3 text-[#1A73E8]" />
                 Google Business Profile Review
               </p>
@@ -242,32 +242,32 @@ export function ReviewEditor({
 
           {/* CustomerPilot VIP Bonus Pill (Only if Loyalty Enabled) */}
           {isLoyaltyEnabled ? (
-            <div className="flex items-center gap-1.5 bg-[#E6F4EA] border border-[#CEEAD6] text-[#137333] px-2.5 py-1 rounded-full text-xs font-semibold shrink-0">
-              <Sparkles className="w-3.5 h-3.5 text-[#137333]" />
+            <div className="flex items-center gap-1 bg-[#E6F4EA] border border-[#CEEAD6] text-[#137333] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold shrink-0">
+              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#137333]" />
               <span>+{maxPossibleBonus} Bonus Stamps</span>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-800 px-2.5 py-1 rounded-full text-xs font-bold shrink-0 shadow-2xs">
-              <span className="text-amber-500 text-xs">⭐</span>
+            <div className="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-800 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold shrink-0 shadow-2xs">
+              <span className="text-amber-500 text-[10px]">⭐</span>
               <span>5-Star Verified</span>
             </div>
           )}
         </header>
 
-        <div className="p-5 sm:p-7 space-y-6">
+        <div className="p-3 sm:p-6 space-y-2.5 sm:space-y-4">
 
           {/* Existing Review Warning (if editing) */}
           {existingReviewText && (
-            <div className="bg-[#FEF7E0] border border-[#FEEFC3] rounded-xl p-3.5 text-xs text-[#7A4B04] space-y-2">
-              <div className="flex items-start gap-2">
-                <Info className="w-4 h-4 text-[#B06000] shrink-0 mt-0.5" />
-                <span>Google allows 1 review per account. Clicking below will open your review in Edit mode — paste this text to update!</span>
+            <div className="bg-[#FEF7E0] border border-[#FEEFC3] rounded-xl p-2.5 sm:p-3.5 text-xs text-[#7A4B04] space-y-1.5">
+              <div className="flex items-start gap-1.5">
+                <Info className="w-3.5 h-3.5 text-[#B06000] shrink-0 mt-0.5" />
+                <span className="text-[11px] sm:text-xs">Google allows 1 review per account. Clicking below will open your review in Edit mode — paste this text to update!</span>
               </div>
-              <div className="flex gap-2 pt-1">
+              <div className="flex gap-2 pt-0.5">
                 <button
                   type="button"
                   onClick={() => { setDraft(existingReviewText); setIsEditingExisting(true); }}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${isEditingExisting ? "bg-[#F4B400] text-slate-900" : "bg-white border border-[#FEEFC3] text-[#7A4B04]"}`}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-semibold transition-all ${isEditingExisting ? "bg-[#F4B400] text-slate-900" : "bg-white border border-[#FEEFC3] text-[#7A4B04]"}`}
                 >
                   Use My Previous Review
                 </button>
@@ -275,7 +275,7 @@ export function ReviewEditor({
                   <button
                     type="button"
                     onClick={() => { setDraft(initialDraft); setIsEditingExisting(false); }}
-                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${!isEditingExisting ? "bg-[#1A73E8] text-white" : "bg-white border border-[#FEEFC3] text-[#7A4B04]"}`}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-semibold transition-all ${!isEditingExisting ? "bg-[#1A73E8] text-white" : "bg-white border border-[#FEEFC3] text-[#7A4B04]"}`}
                   >
                     Use Fresh AI Draft
                   </button>
@@ -286,17 +286,17 @@ export function ReviewEditor({
 
           {/* 1-Tap Dual Bestseller Selection: Services (Up to 10) + Products (Up to 10) */}
           {((heroServices && heroServices.length > 0) || (heroProducts && heroProducts.length > 0) || (heroChips && heroChips.length > 0)) && !isEditingExisting && (
-            <div className="space-y-3 pb-2">
+            <div className="space-y-1.5 sm:space-y-2 pb-1 bg-white sm:bg-transparent p-2 sm:p-0 rounded-xl border sm:border-0 border-slate-200/80">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-[#5F6368] uppercase tracking-wider flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span className="text-[10px] sm:text-[11px] font-bold text-[#5F6368] uppercase tracking-wider flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-amber-500" />
                   <span>What did you visit / purchase today?</span>
                 </span>
                 {activeProduct && (
                   <button
                     type="button"
                     onClick={() => handleSelectChip("")}
-                    className="text-[10px] text-slate-500 hover:text-slate-800 underline cursor-pointer"
+                    className="text-[9.5px] sm:text-[10px] text-slate-500 hover:text-slate-800 underline cursor-pointer"
                   >
                     Reset to General
                   </button>
@@ -307,11 +307,11 @@ export function ReviewEditor({
               {heroServices && heroServices.length > 0 && (
                 <div className="space-y-1">
                   {heroProducts && heroProducts.length > 0 && (
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                    <span className="text-[9.5px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                       <span>🩺 Services Received:</span>
                     </span>
                   )}
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-1 sm:gap-1.5 max-h-[72px] sm:max-h-none overflow-y-auto no-scrollbar">
                     {heroServices.map((chip, idx) => {
                       const isSelected = activeProduct.toLowerCase() === chip.toLowerCase()
                       return (
@@ -319,13 +319,13 @@ export function ReviewEditor({
                           key={idx}
                           type="button"
                           onClick={() => handleSelectChip(chip)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                          className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10.5px] sm:text-xs font-semibold transition-all cursor-pointer border flex items-center gap-1 ${
                             isSelected
-                              ? "bg-emerald-600 text-white border-emerald-600 shadow-xs font-bold"
-                              : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 hover:border-slate-400"
+                              ? "bg-emerald-600 text-white border-emerald-600 shadow-2xs font-bold"
+                              : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
                           }`}
                         >
-                          {isSelected ? <Check className="w-3 h-3 text-white" /> : <span className="text-[10px] opacity-60">⭐</span>}
+                          {isSelected ? <Check className="w-2.5 h-2.5 text-white" /> : <span className="text-[9px] opacity-60">⭐</span>}
                           <span>{chip}</span>
                         </button>
                       )
@@ -336,13 +336,13 @@ export function ReviewEditor({
 
               {/* SECTION B: Products (if present) */}
               {heroProducts && heroProducts.length > 0 && (
-                <div className="space-y-1">
+                <div className="space-y-1 pt-0.5">
                   {heroServices && heroServices.length > 0 && (
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                    <span className="text-[9.5px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                       <span>🛍️ Products Purchased:</span>
                     </span>
                   )}
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-1 sm:gap-1.5 max-h-[72px] sm:max-h-none overflow-y-auto no-scrollbar">
                     {heroProducts.map((chip, idx) => {
                       const isSelected = activeProduct.toLowerCase() === chip.toLowerCase()
                       return (
@@ -350,13 +350,13 @@ export function ReviewEditor({
                           key={idx}
                           type="button"
                           onClick={() => handleSelectChip(chip)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                          className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10.5px] sm:text-xs font-semibold transition-all cursor-pointer border flex items-center gap-1 ${
                             isSelected
-                              ? "bg-emerald-600 text-white border-emerald-600 shadow-xs font-bold"
-                              : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 hover:border-slate-400"
+                              ? "bg-emerald-600 text-white border-emerald-600 shadow-2xs font-bold"
+                              : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
                           }`}
                         >
-                          {isSelected ? <Check className="w-3 h-3 text-white" /> : <ShoppingBag className="w-3 h-3 text-emerald-600 opacity-70" />}
+                          {isSelected ? <Check className="w-2.5 h-2.5 text-white" /> : <ShoppingBag className="w-2.5 h-2.5 text-emerald-600 opacity-70" />}
                           <span>{chip}</span>
                         </button>
                       )
@@ -367,7 +367,7 @@ export function ReviewEditor({
 
               {/* FALLBACK: If neither heroServices nor heroProducts were split, render heroChips */}
               {(!heroServices || heroServices.length === 0) && (!heroProducts || heroProducts.length === 0) && heroChips && heroChips.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1 sm:gap-1.5 max-h-[72px] sm:max-h-none overflow-y-auto no-scrollbar">
                   {heroChips.map((chip, idx) => {
                     const isSelected = activeProduct.toLowerCase() === chip.toLowerCase()
                     return (
@@ -375,13 +375,13 @@ export function ReviewEditor({
                         key={idx}
                         type="button"
                         onClick={() => handleSelectChip(chip)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                        className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10.5px] sm:text-xs font-semibold transition-all cursor-pointer border flex items-center gap-1 ${
                           isSelected
-                            ? "bg-emerald-600 text-white border-emerald-600 shadow-xs font-bold"
-                            : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 hover:border-slate-400"
+                            ? "bg-emerald-600 text-white border-emerald-600 shadow-2xs font-bold"
+                            : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
                         }`}
                       >
-                        {isSelected ? <Check className="w-3 h-3 text-white" /> : <span className="text-[10px] opacity-60">⭐</span>}
+                        {isSelected ? <Check className="w-2.5 h-2.5 text-white" /> : <span className="text-[9px] opacity-60">⭐</span>}
                         <span>{chip}</span>
                       </button>
                     )
@@ -393,31 +393,31 @@ export function ReviewEditor({
 
           {/* Multi AI Draft Options Pills (Google-style Filter Chips - 3 Angles) */}
           {draftOptions && !isEditingExisting && (
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-[#5F6368] uppercase tracking-wider block">
+                <span className="text-[10px] sm:text-[11px] font-bold text-[#5F6368] uppercase tracking-wider block">
                   Choose AI Review Angle:
                 </span>
                 <button
                   type="button"
                   onClick={handleRegenerate}
                   disabled={isRegenerating}
-                  className="text-[11px] text-[#1A73E8] hover:text-[#174EA6] font-semibold flex items-center gap-1 transition-all cursor-pointer py-0.5 px-2 rounded-lg hover:bg-[#E8F0FE]"
+                  className="text-[10px] sm:text-[11px] text-[#1A73E8] hover:text-[#174EA6] font-semibold flex items-center gap-1 transition-all cursor-pointer py-0.5 px-1.5 rounded hover:bg-[#E8F0FE]"
                 >
-                  <Sparkles className={`w-3.5 h-3.5 ${isRegenerating ? "animate-spin" : ""}`} />
+                  <Sparkles className={`w-3 h-3 ${isRegenerating ? "animate-spin" : ""}`} />
                   <span>{isRegenerating ? "Generating..." : "🔄 Try Another Idea"}</span>
                 </button>
               </div>
-              <div className={`grid ${draftOptions.draft3 ? "grid-cols-3" : "grid-cols-2"} gap-1.5 sm:gap-2`}>
+              <div className={`grid ${draftOptions.draft3 ? "grid-cols-3" : "grid-cols-2"} gap-1 sm:gap-2`}>
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedOption("draft1")
                     setDraft(draftOptions.draft1)
                   }}
-                  className={`py-2 px-1.5 sm:px-2 rounded-xl font-semibold text-[11px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer border text-center ${
+                  className={`py-1.5 px-1 sm:px-2 rounded-lg font-semibold text-[10px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer border text-center ${
                     selectedOption === "draft1"
-                      ? "bg-[#E8F0FE] text-[#1A73E8] border-[#1A73E8] shadow-xs font-bold"
+                      ? "bg-[#E8F0FE] text-[#1A73E8] border-[#1A73E8] shadow-2xs font-bold"
                       : "bg-white text-[#3C4043] border-[#DADCE0] hover:bg-[#F1F3F4]"
                   }`}
                 >
@@ -429,9 +429,9 @@ export function ReviewEditor({
                     setSelectedOption("draft2")
                     setDraft(draftOptions.draft2)
                   }}
-                  className={`py-2 px-1.5 sm:px-2 rounded-xl font-semibold text-[11px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer border text-center ${
+                  className={`py-1.5 px-1 sm:px-2 rounded-lg font-semibold text-[10px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer border text-center ${
                     selectedOption === "draft2"
-                      ? "bg-[#E8F0FE] text-[#1A73E8] border-[#1A73E8] shadow-xs font-bold"
+                      ? "bg-[#E8F0FE] text-[#1A73E8] border-[#1A73E8] shadow-2xs font-bold"
                       : "bg-white text-[#3C4043] border-[#DADCE0] hover:bg-[#F1F3F4]"
                   }`}
                 >
@@ -444,9 +444,9 @@ export function ReviewEditor({
                       setSelectedOption("draft3")
                       setDraft(draftOptions.draft3!)
                     }}
-                    className={`py-2 px-1.5 sm:px-2 rounded-xl font-semibold text-[11px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer border text-center ${
+                    className={`py-1.5 px-1 sm:px-2 rounded-lg font-semibold text-[10px] sm:text-xs transition-all flex items-center justify-center gap-1 cursor-pointer border text-center ${
                       selectedOption === "draft3"
-                        ? "bg-[#E8F0FE] text-[#1A73E8] border-[#1A73E8] shadow-xs font-bold"
+                        ? "bg-[#E8F0FE] text-[#1A73E8] border-[#1A73E8] shadow-2xs font-bold"
                         : "bg-white text-[#3C4043] border-[#DADCE0] hover:bg-[#F1F3F4]"
                     }`}
                   >
@@ -457,10 +457,10 @@ export function ReviewEditor({
             </div>
           )}
 
-          {/* Review Text Input Box (Google-style Rounded Box) */}
-          <div className="space-y-2">
+          {/* Review Text Input Box (Compact Google-style Box) */}
+          <div className="space-y-1 sm:space-y-1.5">
             <div className="flex justify-between items-center">
-              <label htmlFor="google-review-textarea" className="text-xs font-semibold text-[#5F6368] uppercase tracking-wider">
+              <label htmlFor="google-review-textarea" className="text-[10px] sm:text-xs font-semibold text-[#5F6368] uppercase tracking-wider">
                 {isEditingExisting ? "Your Review (Edit to update)" : "AI Generated Review (Tap to Edit)"}
               </label>
 
@@ -468,7 +468,7 @@ export function ReviewEditor({
               <button
                 type="button"
                 onClick={handleManualCopy}
-                className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border ${
+                className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer border ${
                   copied 
                     ? "bg-[#E6F4EA] text-[#137333] border-[#CEEAD6]" 
                     : "bg-white hover:bg-[#F1F3F4] text-[#1A73E8] border-[#DADCE0]"
@@ -476,24 +476,24 @@ export function ReviewEditor({
               >
                 {copied ? (
                   <>
-                    <Check className="w-3.5 h-3.5 text-[#137333]" />
+                    <Check className="w-3 h-3 text-[#137333]" />
                     <span>Copied! ✅</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="w-3.5 h-3.5 text-[#1A73E8]" />
+                    <Copy className="w-3 h-3 text-[#1A73E8]" />
                     <span>Copy Text</span>
                   </>
                 )}
               </button>
             </div>
 
-            <div className="relative border border-[#DADCE0] rounded-2xl p-4 bg-white focus-within:border-[#1A73E8] focus-within:ring-2 focus-within:ring-[#1A73E8]/20 transition-all shadow-xs">
+            <div className="relative border border-[#DADCE0] rounded-xl sm:rounded-2xl p-2.5 sm:p-3.5 bg-white focus-within:border-[#1A73E8] focus-within:ring-2 focus-within:ring-[#1A73E8]/20 transition-all shadow-2xs">
               <textarea
                 ref={textareaRef}
                 id="google-review-textarea"
-                rows={5}
-                className="w-full bg-transparent border-none p-0 text-[#202124] placeholder-[#80868B] focus:outline-none resize-none font-sans text-sm sm:text-base leading-relaxed"
+                rows={3}
+                className="w-full bg-transparent border-none p-0 text-[#202124] placeholder-[#80868B] focus:outline-none resize-none font-sans text-xs sm:text-sm leading-relaxed"
                 value={draft}
                 onFocus={(e) => e.target.select()}
                 onChange={(e) => setDraft(e.target.value)}
@@ -502,43 +502,43 @@ export function ReviewEditor({
 
             {/* Visual Copy Feedback Alert */}
             {copied && (
-              <div className="p-3 bg-[#E6F4EA] border border-[#CEEAD6] rounded-xl flex items-center gap-2.5 text-xs text-[#137333] animate-in fade-in duration-200">
-                <Check className="w-4 h-4 text-[#137333] shrink-0" />
-                <span>Text copied to clipboard! Just tap <strong>Paste</strong> when Google Maps opens.</span>
+              <div className="p-2 sm:p-3 bg-[#E6F4EA] border border-[#CEEAD6] rounded-lg sm:rounded-xl flex items-center gap-2 text-xs text-[#137333] animate-in fade-in duration-200">
+                <Check className="w-3.5 h-3.5 text-[#137333] shrink-0" />
+                <span className="text-[11px] sm:text-xs">Text copied! Just tap <strong>Paste</strong> when Google Maps opens.</span>
               </div>
             )}
           </div>
 
-          {/* Photo Bonus Incentive Highlight Card (Only if Loyalty Enabled) */}
+          {/* Photo Bonus Incentive Strip (Ultra-Compact on Mobile) */}
           {isLoyaltyEnabled && (
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-50/90 via-emerald-50/80 to-amber-50/90 border-2 border-emerald-300 p-3.5 sm:p-4 shadow-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-amber-400 via-emerald-500 to-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-50/90 via-emerald-50/80 to-amber-50/90 border border-emerald-300 p-2 sm:p-3 shadow-2xs">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-amber-400 via-emerald-500 to-emerald-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                  <Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight flex items-center gap-1">
-                      <span>🎁 +{photoBonus || 2} Bonus Stamps</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] sm:text-xs font-bold text-slate-900 tracking-tight">
+                      🎁 +{photoBonus || 2} Photo Reward
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider shadow-2xs">
-                      Photo Reward
+                    <span className="px-1.5 py-0.2 rounded-full bg-emerald-600 text-white text-[9px] font-black uppercase">
+                      Bonus
                     </span>
                   </div>
-                  <p className="text-[11.5px] sm:text-xs text-slate-700 font-medium mt-0.5 leading-snug">
-                    Upload a <strong>Product Photo</strong> or <strong>Shop Photo</strong> with your Google review to unlock <strong>+{photoBonus || 2} Extra Bonus Stamps</strong>! 📸
+                  <p className="text-[10px] sm:text-[11px] text-slate-700 font-medium truncate">
+                    Attach photo on Google Maps for +{photoBonus || 2} extra stamps! 📸
                   </p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* 1-Click Copy & Open Google Button (Google Blue Primary CTA) */}
+          {/* 1-Click Copy & Open Google Button (Compact High-Impact CTA) */}
           <button 
             type="button"
             onClick={handleCopyAndPostClick}
             style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' } as React.CSSProperties}
-            className={`w-full h-14 text-base font-bold rounded-2xl flex items-center justify-center gap-2.5 transition-all duration-200 cursor-pointer shadow-md ${
+            className={`w-full h-11 sm:h-13 text-xs sm:text-base font-bold rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer shadow-md ${
               copied 
                 ? "bg-[#137333] hover:bg-[#0D652D] text-white shadow-[#137333]/20" 
                 : "bg-[#1A73E8] hover:bg-[#1557B0] text-white shadow-[#1A73E8]/30 hover:shadow-lg"
@@ -546,14 +546,14 @@ export function ReviewEditor({
           >
             {copied ? (
               <>
-                <Check className="w-5 h-5 text-white" />
+                <Check className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 <span>Text Copied! Opening Google Maps...</span>
               </>
             ) : (
               <>
-                <Copy className="w-5 h-5 text-white" />
+                <Copy className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 <span>{isEditingExisting ? "Copy & Update on Google Maps" : "Copy & Post on Google Maps"}</span>
-                <ExternalLink className="w-5 h-5 opacity-80 ml-1" />
+                <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-80 ml-0.5" />
               </>
             )}
           </button>

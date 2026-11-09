@@ -4,6 +4,35 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [09 Nov 2026] Issue: Top 10 Bestseller Products & Services Inline Editor in Settings & Ultra-Compact Zero-Scroll Mobile Customer Review Dialog
+- **Symptom**:
+  1. In `https://customerpilot.in/dashboard/settings` (Dual Bestseller Review Studio), merchants could pin/unpin products and services, but had no way to edit or rename existing pinned items. If there was a typo or a name tweak needed, the merchant had to unpin, re-type, and re-pin from scratch.
+  2. On the customer review page (`/review?m=...`), rendering up to 10 services and 10 products together with angles, a 5-row textarea, photo reward banner, and copy button required significant vertical scrolling on smartphone viewports (viewport height > 780px), forcing customers to scroll multiple times just to reach the primary "Copy & Post on Google Maps" CTA button.
+- **Root Cause**:
+  1. `src/components/smart-keyword-control-engine.tsx` did not provide an inline editing state or edit pencil icon on pinned badges; items only supported toggle removal (`X`).
+  2. `src/components/review/ReviewEditor.tsx` used large mobile spacing (`p-5 sm:p-7 space-y-6`), large textarea heights (`rows={5}`), unconstrained chip wraps, and bulky banners that pushed critical actionable CTAs below the mobile fold.
+- **Resolution**:
+  1. **Top 10 Bestseller Inline Editor in Settings**:
+     - Added `editingHeroProductIndex` and `editingHeroServiceIndex` state with inline editing inputs in `src/components/smart-keyword-control-engine.tsx`.
+     - Merchants can click the `✏️ Pencil` icon on any pinned product or service tag to immediately open an inline input with Save (`✓`) and Cancel (`✕`) buttons (or press Enter/Escape).
+     - Editing validates non-empty values, prevents duplicates, updates `heroProducts`/`heroServices`, and synchronizes the renamed tag in `allowedSeoEntities`.
+  2. **Ultra-Compact Zero-Scroll Mobile Customer Review Dialog**:
+     - Redesigned `src/components/review/ReviewEditor.tsx` for high-density, crisp mobile viewports:
+       - Header: Compact height (`py-2 px-3`), crisp titles (`text-xs font-bold`), and tight bonus badge (`text-[10px]`).
+       - Dual Bestseller Chips: High-density micro-chips (`px-2 py-0.5 rounded-lg text-[10.5px] sm:text-xs`) with scrollable max-height containers (`max-h-[72px] sm:max-h-none overflow-y-auto no-scrollbar`), ensuring 20 chips take only ~56px instead of pushing content off-screen.
+       - Angles & Textarea: Compact angle pills (`py-1.5 px-1 text-[10px]`), compact 3-row review textarea (`rows={3}`, `text-xs sm:text-sm leading-snug`), and mini copy button.
+       - Photo Reward Banner: Slim line badge (`p-2 rounded-xl text-[10.5px]`, `w-7 h-7` camera icon).
+       - Primary CTA: Sleek full-width button (`h-11 sm:h-13 text-xs sm:text-base font-bold rounded-xl`).
+       - Result: Total vertical height reduced from ~790px to ~510px, completely fitting on iPhone SE, iPhone 14/15, and Android screens with minimal to zero scrolling.
+  3. **Interactive Visual Prototype Artifact**:
+     - Created `mobile_review_preview.html` with Tailwind CSS and responsive phone simulator allowing side-by-side Before/After toggle, interactive chip testing, and inline editor demonstration.
+  4. **Adversarial & E2E Verification**:
+     - All 6 Master Adversarial Gates passed cleanly (Exit Code 0).
+     - Automated Playwright test suite `e2e/bestseller-studio.spec.ts` and `e2e/pet-clinic-review.spec.ts` passed 5/5 tests (Exit Code 0).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [09 Nov 2026] Issue: Dual Bestseller Review Studio (Up to 10 Products + Up to 10 Services), Categorized 1-Tap Customer Chips UI & Smart AI Review Engine v4.5 Upgrade
 - **Symptom**:
   1. In `/dashboard/settings`, merchants lacked a dedicated interface to select their top-selling physical products (e.g. cakes, pet foods, packaged items) and top in-store/clinical procedures (e.g. vaccinations, dental procedures, hair treatments) independently. The UI only provided a single combined list hardcoded to a maximum of 5 items.

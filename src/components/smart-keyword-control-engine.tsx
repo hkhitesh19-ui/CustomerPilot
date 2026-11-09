@@ -23,7 +23,8 @@ import {
   Store,
   Compass,
   ShoppingBag,
-  Wrench
+  Wrench,
+  Pencil
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -46,6 +47,10 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
   const [newBlacklistTag, setNewBlacklistTag] = useState("");
   const [newHeroProduct, setNewHeroProduct] = useState("");
   const [newHeroService, setNewHeroService] = useState("");
+  const [editingHeroProductIndex, setEditingHeroProductIndex] = useState<number | null>(null);
+  const [editingHeroProductText, setEditingHeroProductText] = useState("");
+  const [editingHeroServiceIndex, setEditingHeroServiceIndex] = useState<number | null>(null);
+  const [editingHeroServiceText, setEditingHeroServiceText] = useState("");
   const [showAutoKeywords, setShowAutoKeywords] = useState(false);
   const [copiedKeywords, setCopiedKeywords] = useState(false);
 
@@ -264,6 +269,100 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
     });
     setNewHeroService("");
     toast({ title: "🛠️ Bestseller Service Added", description: `"${trimmed}" will appear in customer review service chips.` });
+  };
+
+  // Inline Edit Product
+  const startEditHeroProduct = (idx: number, currentText: string) => {
+    setEditingHeroProductIndex(idx);
+    setEditingHeroProductText(currentText);
+    setEditingHeroServiceIndex(null);
+  };
+
+  const saveEditHeroProduct = (idx: number) => {
+    if (!profile) return;
+    const trimmed = editingHeroProductText.trim();
+    if (!trimmed) {
+      toast({ title: "Product name cannot be empty", variant: "destructive" });
+      return;
+    }
+    const currentProducts = Array.isArray(profile.heroProducts) ? [...profile.heroProducts] : [];
+    const oldText = currentProducts[idx];
+    if (!oldText) return;
+
+    if (currentProducts.some((p, i) => i !== idx && p.toLowerCase() === trimmed.toLowerCase())) {
+      toast({ title: "Product already exists", description: `"${trimmed}" is already pinned.`, variant: "destructive" });
+      return;
+    }
+
+    currentProducts[idx] = trimmed;
+
+    let currentAllowed = Array.isArray(profile.allowedSeoEntities) ? [...profile.allowedSeoEntities] : [];
+    if (currentAllowed.includes(oldText)) {
+      currentAllowed = currentAllowed.map(item => item === oldText ? trimmed : item);
+    } else if (!currentAllowed.some(item => item.toLowerCase() === trimmed.toLowerCase())) {
+      currentAllowed.unshift(trimmed);
+    }
+
+    setProfile({
+      ...profile,
+      heroProducts: currentProducts,
+      allowedSeoEntities: currentAllowed
+    });
+    setEditingHeroProductIndex(null);
+    setEditingHeroProductText("");
+    toast({ title: "Product Updated ✅", description: `"${oldText}" renamed to "${trimmed}". Click 'Save Keyword Rules' to persist.` });
+  };
+
+  const cancelEditHeroProduct = () => {
+    setEditingHeroProductIndex(null);
+    setEditingHeroProductText("");
+  };
+
+  // Inline Edit Service
+  const startEditHeroService = (idx: number, currentText: string) => {
+    setEditingHeroServiceIndex(idx);
+    setEditingHeroServiceText(currentText);
+    setEditingHeroProductIndex(null);
+  };
+
+  const saveEditHeroService = (idx: number) => {
+    if (!profile) return;
+    const trimmed = editingHeroServiceText.trim();
+    if (!trimmed) {
+      toast({ title: "Service name cannot be empty", variant: "destructive" });
+      return;
+    }
+    const currentServices = Array.isArray(profile.heroServices) ? [...profile.heroServices] : [];
+    const oldText = currentServices[idx];
+    if (!oldText) return;
+
+    if (currentServices.some((s, i) => i !== idx && s.toLowerCase() === trimmed.toLowerCase())) {
+      toast({ title: "Service already exists", description: `"${trimmed}" is already pinned.`, variant: "destructive" });
+      return;
+    }
+
+    currentServices[idx] = trimmed;
+
+    let currentAllowed = Array.isArray(profile.allowedSeoEntities) ? [...profile.allowedSeoEntities] : [];
+    if (currentAllowed.includes(oldText)) {
+      currentAllowed = currentAllowed.map(item => item === oldText ? trimmed : item);
+    } else if (!currentAllowed.some(item => item.toLowerCase() === trimmed.toLowerCase())) {
+      currentAllowed.unshift(trimmed);
+    }
+
+    setProfile({
+      ...profile,
+      heroServices: currentServices,
+      allowedSeoEntities: currentAllowed
+    });
+    setEditingHeroServiceIndex(null);
+    setEditingHeroServiceText("");
+    toast({ title: "Service Updated ✅", description: `"${oldText}" renamed to "${trimmed}". Click 'Save Keyword Rules' to persist.` });
+  };
+
+  const cancelEditHeroService = () => {
+    setEditingHeroServiceIndex(null);
+    setEditingHeroServiceText("");
   };
 
   // Switch to an auto-preset
@@ -501,23 +600,69 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
 
             {/* Pinned Products List */}
             <div className="flex flex-wrap items-center gap-1.5 min-h-[44px] p-2 rounded-lg bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-900/40">
-              {heroProducts.map((prod, idx) => (
-                <span
-                  key={idx}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-600 text-white shadow-2xs"
-                >
-                  <ShoppingBag className="w-3 h-3 text-emerald-100" />
-                  <span>{prod}</span>
-                  <button
-                    type="button"
-                    onClick={() => toggleHeroProduct(prod)}
-                    className="hover:text-emerald-200 cursor-pointer ml-0.5"
-                    title="Unpin product"
+              {heroProducts.map((prod, idx) => {
+                if (editingHeroProductIndex === idx) {
+                  return (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-1 p-1 rounded-md text-xs font-bold bg-emerald-700 text-white shadow-xs"
+                    >
+                      <input
+                        type="text"
+                        value={editingHeroProductText}
+                        onChange={(e) => setEditingHeroProductText(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") { e.preventDefault(); saveEditHeroProduct(idx); }
+                          if (e.key === "Escape") { e.preventDefault(); cancelEditHeroProduct(); }
+                        }}
+                        autoFocus
+                        className="bg-emerald-800 text-white px-2 py-0.5 rounded text-xs focus:outline-none ring-1 ring-white/60 min-w-[120px]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => saveEditHeroProduct(idx)}
+                        className="p-1 hover:text-emerald-200 cursor-pointer"
+                        title="Save Changes"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={cancelEditHeroProduct}
+                        className="p-1 hover:text-red-200 cursor-pointer"
+                        title="Cancel"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </span>
+                  );
+                }
+                return (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-600 text-white shadow-2xs group"
                   >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
+                    <ShoppingBag className="w-3 h-3 text-emerald-100" />
+                    <span>{prod}</span>
+                    <button
+                      type="button"
+                      onClick={() => startEditHeroProduct(idx, prod)}
+                      className="opacity-70 group-hover:opacity-100 hover:text-emerald-200 cursor-pointer ml-0.5 p-0.5"
+                      title="Edit product name"
+                    >
+                      <Pencil className="w-3 h-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleHeroProduct(prod)}
+                      className="hover:text-emerald-200 cursor-pointer ml-0.5 p-0.5"
+                      title="Unpin product"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                );
+              })}
               {heroProducts.length === 0 && (
                 <span className="text-xs text-slate-400 italic">No products pinned. Add below or click 🛍️ on offered items below.</span>
               )}
@@ -564,23 +709,69 @@ export function SmartKeywordControlEngine({ merchantId }: { merchantId: string }
 
             {/* Pinned Services List */}
             <div className="flex flex-wrap items-center gap-1.5 min-h-[44px] p-2 rounded-lg bg-blue-50/40 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-900/40">
-              {heroServices.map((srv, idx) => (
-                <span
-                  key={idx}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-blue-600 text-white shadow-2xs"
-                >
-                  <Star className="w-3 h-3 fill-white text-white" />
-                  <span>{srv}</span>
-                  <button
-                    type="button"
-                    onClick={() => toggleHeroService(srv)}
-                    className="hover:text-blue-200 cursor-pointer ml-0.5"
-                    title="Unpin service"
+              {heroServices.map((srv, idx) => {
+                if (editingHeroServiceIndex === idx) {
+                  return (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-1 p-1 rounded-md text-xs font-bold bg-blue-700 text-white shadow-xs"
+                    >
+                      <input
+                        type="text"
+                        value={editingHeroServiceText}
+                        onChange={(e) => setEditingHeroServiceText(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") { e.preventDefault(); saveEditHeroService(idx); }
+                          if (e.key === "Escape") { e.preventDefault(); cancelEditHeroService(); }
+                        }}
+                        autoFocus
+                        className="bg-blue-800 text-white px-2 py-0.5 rounded text-xs focus:outline-none ring-1 ring-white/60 min-w-[120px]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => saveEditHeroService(idx)}
+                        className="p-1 hover:text-blue-200 cursor-pointer"
+                        title="Save Changes"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={cancelEditHeroService}
+                        className="p-1 hover:text-red-200 cursor-pointer"
+                        title="Cancel"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </span>
+                  );
+                }
+                return (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-blue-600 text-white shadow-2xs group"
                   >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
+                    <Star className="w-3 h-3 fill-white text-white" />
+                    <span>{srv}</span>
+                    <button
+                      type="button"
+                      onClick={() => startEditHeroService(idx, srv)}
+                      className="opacity-70 group-hover:opacity-100 hover:text-blue-200 cursor-pointer ml-0.5 p-0.5"
+                      title="Edit service name"
+                    >
+                      <Pencil className="w-3 h-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleHeroService(srv)}
+                      className="hover:text-blue-200 cursor-pointer ml-0.5 p-0.5"
+                      title="Unpin service"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                );
+              })}
               {heroServices.length === 0 && (
                 <span className="text-xs text-slate-400 italic">No services pinned. Add below or click 🛠️ on offered items below.</span>
               )}
