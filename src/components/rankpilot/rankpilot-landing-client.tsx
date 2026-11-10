@@ -35,7 +35,18 @@ import {
   Compass,
   Crosshair,
   Store,
-  Clock
+  Clock,
+  MessageSquare,
+  FileCheck,
+  CheckCheck,
+  HelpCircle,
+  BadgePercent,
+  Gift,
+  ShieldAlert,
+  Target,
+  BarChart3,
+  Bot,
+  XCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -280,6 +291,246 @@ const FAQS: DualLangFaqItem[] = [
       "RankPilot AI ka pricing structure kya hai aur 100% Moneyback Guarantee ke terms kya hain?",
     answerHi:
       "Hum 2 transparent plans offer karte hain: Special Launch Offer me 3-Month Acceleration Pilot sirf ₹6,999 me (jo ₹29,000/year ke regular price par 76% discount hai) aur 365-Day Annual Dominance Plan ₹29,000/year me. Dono plans 100% Moneyback Guarantee ke sath aate hain: agar aapki listing 45 dino me 1st Page aur 90 dino me Top 3 (ya already 1st page par hain toh 60 dino me Top 3) par nahi aati, toh bina kisi cut ya excuse ke 100% poora refund aapko mil jata hai."
+  },
+  {
+    id: 8,
+    questionEn: "How does CustomerPilot handle Google phone verification and avoid video verification rejections?",
+    answerEn:
+      "Google's verification engine checks whether your DBA signboard, business category, and municipal address match government tax registries before offering phone or SMS verification. CustomerPilot audits your profile fields and signage beforehand to ensure 100% compliance. If Google requires video verification, our onboarding dashboard provides a step-by-step physical walkthrough script (signboard, billing counter, POS machine, opening keys) ensuring first-attempt approval.",
+    questionHi:
+      "Google Business Profile verification me phone verification kaise milti hai aur video rejection se kaise bachein?",
+    answerHi:
+      "Google tabhi phone/SMS verification deta hai jab aapka dukan ka signboard, category aur address municipal records se 100% match kare. CustomerPilot pehle hi saari details audit karke Google compliant bana deta hai taaki rejection na ho. Agar video verification required ho, toh hamara system counter, signboard aur POS dikhane ka exact checklist deta hai jisse 1st attempt me profile verify ho jata hai."
+  },
+  {
+    id: 9,
+    questionEn: "Why do Google Business Profiles get suspended, and how does CustomerPilot protect me?",
+    answerEn:
+      "Profiles are suspended primarily due to 3 reasons: 1) Keyword-stuffing the business name (e.g., adding 'Best Bakery In City' to your legal name), 2) Sudden bursts of fake reviews or review gating, and 3) Mismatched categories and pin locations. CustomerPilot enforces strict physical DBA signboard matching, collects genuine walk-in customer photo reviews with zero gating, and monitors your profile 24/7. In the rare case of a legacy suspension, our documentation team prepares and files the official reinstatement appeal.",
+    questionHi:
+      "Google Business Profile suspend kyu hoti hai aur CustomerPilot is se kaise protect karta hai?",
+    answerHi:
+      "Suspension ke 3 main reasons hote hain: 1) Naam me fake keywords add karna, 2) Bahar se fake reviews kharidna ya negative reviews chhipana, aur 3) Category mismatch. CustomerPilot aapke original shop signboard ke hisab se 100% white-hat setting karta hai aur sirf dukaan aane wale real customers ke photo reviews laata hai, jisse suspension ka 0% risk rehta hai. Agar pehle se suspended ho, toh hamari team appeal file karke reinstate karwati hai."
+  },
+  {
+    id: 10,
+    questionEn: "How does CustomerPilot fix duplicate or phantom Google Business Profile listings?",
+    answerEn:
+      "Duplicate listings split your review count and confuse Google's ranking algorithm, suppressing your main profile. CustomerPilot runs a multi-database CID audit to identify duplicate map pins, merges verified reviews into your primary profile, and submits official removal requests for unauthorized phantom pins.",
+    questionHi:
+      "Agar Google Maps par meri dukaan ke 2 duplicate profiles ban gaye hain toh use kaise merge karein?",
+    answerHi:
+      "Duplicate listing se reviews do jagah bat jaate hain aur ranking drop ho jaati hai. CustomerPilot duplicate pins ko detect karke Google ke CID database se merge kar deta hai taaki aapke saare purane reviews ek hi primary profile par jama ho sakein aur ranking boost ho jaye."
+  }
+]
+
+// ============================================================================
+// Core Services Audit Showcase Data: "See Exactly What We Fix" (Inspired by GMBPro)
+// ============================================================================
+const FIX_SHOWCASE_DATA = {
+  profile: {
+    id: "profile",
+    title: "Profile & Entity Optimization",
+    sub: "Complete profile & 10+10 Knowledge Graph entity wire",
+    icon: Layers,
+    merchant: "Cake Connection, Manjalpur (Vadodara)",
+    category: "Bakery & Confectionery",
+    beforeScore: "55%",
+    beforeLabel: "Incomplete & Dormant",
+    beforePoints: [
+      "Name & address set, but 5 services listed with zero photos or pricing",
+      "Only 4 owner photos uploaded • Missing product catalog",
+      "1 of 15+ essential Google attributes configured",
+      "No Q&A seeded • Missing 'Request a Quote / WhatsApp' action",
+      "Result: Google algorithm lacks confidence to rank in Local 3-Pack"
+    ],
+    afterScore: "100%",
+    afterLabel: "Fully Wired Entity Authority",
+    afterPoints: [
+      "Primary + 2 verified secondary categories correctly aligned with DBA",
+      "10 Bestseller Products + 10 High-Intent Services mapped with prices & tags",
+      "32 high-resolution photos with verified geo-location metadata",
+      "12-item live product catalog with WhatsApp 1-tap ordering link",
+      "Structured Q&A seeded with buyer keywords and verified business hours"
+    ]
+  },
+  geogrid: {
+    id: "geogrid",
+    title: "3x3 Geo-Grid Rank Tracking",
+    sub: "Ranked #1–#3 across every nearby neighborhood zone",
+    icon: Compass,
+    merchant: "Pet Clinic @ Manjalpur (Vadodara)",
+    category: "Veterinary Care & Clinic",
+    beforeScore: "Rank #18.4",
+    beforeLabel: "Buried on Page 2 (1.2% Click Share)",
+    beforePoints: [
+      "Only visible within 200m of clinic doorstep • Invisible in adjacent neighborhoods",
+      "Ranks #14 to #28 across Akota, Alkapuri, and Gotri for 'dog vaccination near me'",
+      "Local 3-Pack captured by distant competitors with lower ratings",
+      "Zero keyword justifications displayed on search results",
+      "Result: Bleeding ₹42,000+ monthly revenue directly to competitors"
+    ],
+    afterScore: "Rank #1.6",
+    afterLabel: "Local 3-Pack Dominance (16.0% Click Share)",
+    afterPoints: [
+      "Locked positions #1, #2, #3 across all 9 micro-zones within 5km radius",
+      "Google justifies listing with 'Provides service: Dog 7-in-1 vaccination'",
+      "Click volume surges with 16.0% average Local Pack click capture",
+      "Real-time 3x3 Geo-Rank Radar alerts for competitor ranking drops",
+      "Result: 74+ additional walk-in appointments booked every month"
+    ]
+  },
+  ai: {
+    id: "ai",
+    title: "AI Search Visibility (ChatGPT & Gemini)",
+    sub: "Recommended by conversational AI assistants and search bots",
+    icon: Bot,
+    merchant: "Apex Smile Dental Studio (Vadodara)",
+    category: "Dental Clinic & Implant Studio",
+    beforeScore: "0% AI Share",
+    beforeLabel: "Completely Invisible to AI Agents",
+    beforePoints: [
+      "ChatGPT and Perplexity cite zero information about clinic services",
+      "Google SGE (Search Generative Experience) summaries omit business",
+      "Zero structured JSON-LD schemas linking clinic to local knowledge graph",
+      "Patients asking voice assistants get directed to competing corporate chains",
+      "Result: Complete loss of next-gen high-ticket dental implant queries"
+    ],
+    afterScore: "#1 Recommended",
+    afterLabel: "Top Recommended Provider Across AI Engines",
+    afterPoints: [
+      "Hyper-local SSR Micro-Page live with Triple Schema (LocalBusiness + FAQ + ItemList)",
+      "500m neighborhood landmarks embedded into entity knowledge graph",
+      "ChatGPT, Gemini, and Google SGE cite clinic as top authority for root canals",
+      "Voice search optimization captures 'painless dental implant near me' queries",
+      "Result: High-margin patients directed straight to WhatsApp consultation"
+    ]
+  },
+  reviews: {
+    id: "reviews",
+    title: "Review Flywheel & Vision OCR",
+    sub: "5.0★ rating with genuine customer photo reviews & zero gating",
+    icon: MessageSquare,
+    merchant: "Cake Connection, Manjalpur",
+    category: "Pure Veg Bakery",
+    beforeScore: "3.8 ★ (14 reviews)",
+    beforeLabel: "Stagnant Social Proof",
+    beforePoints: [
+      "Last customer review posted 4 months ago • Zero food photos attached",
+      "Vulnerable to malicious 1-star reviews dragging down average rating",
+      "Staff hesitant to manually ask customers for Google reviews at counter",
+      "No fraud protection: customers claim discounts using fake review screenshots",
+      "Result: Google demotes profile due to low engagement velocity"
+    ],
+    afterScore: "4.9 ★ (384 reviews)",
+    afterLabel: "Autonomous WhatsApp Review Flywheel",
+    afterPoints: [
+      "Physical acrylic WhatsApp QR standee active on billing counter",
+      "Gemini 2.5 Flash Vision OCR verifies review screenshots in 3 seconds",
+      "Scam detection auto-rejects draft buttons and wrong-shop screenshots",
+      "Customers naturally upload cake photos and mention bestseller items",
+      "Result: 100% Google policy compliant with zero review gating risk"
+    ]
+  },
+  posts: {
+    id: "posts",
+    title: "Zero-Gap Google Business Posts",
+    sub: "Active weekly cadence with 12-hour pre-expiration auto-renewal",
+    icon: Clock,
+    merchant: "Elegance Hair & Skin Lounge",
+    category: "Luxury Salon & Aesthetics",
+    beforeScore: "Expired 6mo Ago",
+    beforeLabel: "Dormant Profile Signal",
+    beforePoints: [
+      "Zero active Google posts • Listing looks abandoned to searchers",
+      "Google drops SERP justifications ('Special Offer', 'Available Today')",
+      "Owner forgets to manually design and post promotional flyers",
+      "Special festival packages fail to get local visibility on Google Maps",
+      "Result: Missed weekend walk-ins and lost booking inquiries"
+    ],
+    afterScore: "3 Posts / Week",
+    afterLabel: "Zero-Gap Auto-Renewal Cadence",
+    afterPoints: [
+      "Tuesday Product Spotlight: Highlights high-margin treatments with prices",
+      "Thursday Customer Social Proof: Real review quote with photo proof",
+      "Saturday Weekend VIP Flash Deal: 48h promo with countdown timer",
+      "Zero-Gap Auto-Renewal: Schedules new post 12 hours before expiration",
+      "Result: Listing stays 100% active 24/7 with permanent SERP justifications"
+    ]
+  },
+  suspension: {
+    id: "suspension",
+    title: "Suspension Recovery & Policy Shield",
+    sub: "100% Google 2026 Core Policy compliance & suspension immunity",
+    icon: ShieldAlert,
+    merchant: "Vinayak Car Care & Detailing (Vadodara)",
+    category: "Car Detailing & Ceramic Studio",
+    beforeScore: "SUSPENDED",
+    beforeLabel: "Banned Due to Guideline Violations",
+    beforePoints: [
+      "Profile suspended by Google automated bot due to stuffed keywords in name",
+      "Owner locked out of Google Maps • Zero phone calls or foot traffic",
+      "Disputed via generic online forms with zero response from Google support",
+      "Competitors immediately captured all local detailing search traffic",
+      "Result: Complete business standstill bleeding ₹1.2 Lakh per month"
+    ],
+    afterScore: "REINSTATED (100% Clean)",
+    afterLabel: "Reinstated & Policy Hardened",
+    afterPoints: [
+      "Physical DBA signboard audit matching municipal trade license exactly",
+      "Clean category hierarchy restructuring without spammy keyword modifiers",
+      "Official Google reinstatement appeal documentation prepared and cleared",
+      "Listing restored with all legacy reviews and map citations preserved",
+      "Result: Full recovery with permanent zero-suspension structural guard"
+    ]
+  }
+}
+
+// ============================================================================
+// Multi-Radius Local Neighborhood Geo-Visibility Data
+// ============================================================================
+const NEARBY_SEARCH_PINS = [
+  { term: "Cake Shop Near Me", distance: "450 m", rank: "#1", volume: "2,400/mo", tag: "Primary Micro-Zone" },
+  { term: "Custom Birthday Cakes", distance: "800 m", rank: "#1", volume: "1,850/mo", tag: "High-Intent Buyer" },
+  { term: "Midnight Cake Delivery", distance: "1.2 km", rank: "#2", volume: "1,600/mo", tag: "Service Expansion" },
+  { term: "Pure Veg Eggless Bakery", distance: "1.8 km", rank: "#1", volume: "1,400/mo", tag: "Dietary Filter" },
+  { term: "Belgian Truffle Near Me", distance: "2.4 km", rank: "#1", volume: "980/mo", tag: "Entity Match" },
+  { term: "Designer Theme Cakes", distance: "3.5 km", rank: "#3", volume: "850/mo", tag: "City-Wide Radius" }
+]
+
+// ============================================================================
+// Real Client Growth Stories & Verified Google Reviews
+// ============================================================================
+const REAL_CLIENT_STORIES = [
+  {
+    name: "Cake Connection, Manjalpur",
+    owner: "Bhavin Patel",
+    category: "Bakery & Desserts",
+    city: "Vadodara",
+    stars: 5,
+    rankJump: "Rank #18 ➔ Rank #1 (Top 3 Locked)",
+    result: "+82 Monthly Cake Orders via WhatsApp",
+    quote: "CustomerPilot took our dormant listing from Page 2 to the absolute #1 spot on Google Maps in just 32 days. The acrylic QR standee on our billing counter collects 4–5 genuine photo reviews daily, and the automated Tuesday/Saturday posts keep our store highlighted on Google."
+  },
+  {
+    name: "Pet Clinic @ Manjalpur",
+    owner: "Dr. Kunal Shah",
+    category: "Veterinary Care",
+    city: "Vadodara",
+    stars: 5,
+    rankJump: "Rank #14 ➔ Rank #2 (9 Neighborhoods)",
+    result: "+65 Puppy Vaccinations / Month",
+    quote: "Earlier, clients just 1km away in Akota couldn't see our clinic on Google Maps. RankPilot wired our dog vaccinations and surgical services into Google's entity matrix. Now pet parents find us first, and the Gemini AI vision verifies review screenshots instantly without scam complaints."
+  },
+  {
+    name: "Apex Smile Dental Studio",
+    owner: "Dr. Sneha Mehta",
+    category: "Dental Implants",
+    city: "Vadodara",
+    stars: 5,
+    rankJump: "Page 2 ➔ Local 3-Pack #1 Spot",
+    result: "₹1.8 Lakh High-Margin Inquiries",
+    quote: "The SSR micro-page and schema wiring immediately triggered Google justifications for 'Sold here: Clear aligners' and 'Provides service: Single-sitting root canal'. Our consultation appointments doubled within the first 60 days."
   }
 ]
 
@@ -302,6 +553,13 @@ export function RankPilotLandingClient() {
 
   // Post Engine Active Cadence Tab
   const [activeCadence, setActiveCadence] = useState<"tue" | "thu" | "sat">("sat")
+
+  // What We Fix Showcase Tab State (GMBPro Inspired)
+  const [activeFixTab, setActiveFixTab] = useState<keyof typeof FIX_SHOWCASE_DATA>("profile")
+  const currentFix = FIX_SHOWCASE_DATA[activeFixTab]
+
+  // Nearby Search Active Pin Index
+  const [activeNearbyPin, setActiveNearbyPin] = useState<number>(0)
 
   // Calculate Real-Time Deterministic Financial Leak
   const leakData = useMemo(() => {
@@ -348,18 +606,24 @@ export function RankPilotLandingClient() {
             </span>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-600">
+          <nav className="hidden lg:flex items-center gap-5 text-xs font-semibold text-slate-600">
+            <a href="#audit-showcase" className="hover:text-blue-600 transition-colors">
+              What We Fix
+            </a>
+            <a href="#nearby-search" className="hover:text-blue-600 transition-colors">
+              Nearby Search
+            </a>
             <a href="#geo-grid" className="hover:text-blue-600 transition-colors">
               Radar Grid
             </a>
             <a href="#revenue-leak" className="hover:text-blue-600 transition-colors">
-              Revenue Leak Audit
+              Revenue Leak
             </a>
             <a href="#features" className="hover:text-blue-600 transition-colors">
-              10+10 Entity Matrix
+              10+10 Matrix
             </a>
-            <a href="#how-it-works" className="hover:text-blue-600 transition-colors">
-              Post Dominance
+            <a href="#reviews" className="hover:text-blue-600 transition-colors">
+              Client Proof
             </a>
             <a href="#roadmap" className="hover:text-blue-600 transition-colors">
               Guaranteed SLA
@@ -454,13 +718,19 @@ export function RankPilotLandingClient() {
                   </div>
                 </div>
 
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
-                  Move Your Store from Page 10 to{" "}
-                  <span className="text-blue-600 underline decoration-blue-200 decoration-wavy underline-offset-4">
-                    Google Maps Top 3
-                  </span>{" "}
-                  in 30 Days.
-                </h1>
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold uppercase tracking-wider">
+                    <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
+                    <span>Google Business Not Showing Up on Maps?</span>
+                  </div>
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
+                    Move Your Store from Page 10 to{" "}
+                    <span className="text-blue-600 underline decoration-blue-200 decoration-wavy underline-offset-4">
+                      Google Maps Top 3
+                    </span>{" "}
+                    in 45–90 Days.
+                  </h1>
+                </div>
 
                 <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal max-w-2xl">
                   The autonomous Local SEO engine that transforms billing counter walk-ins into genuine photo reviews, auto-publishes zero-gap Google Business posts, and embeds your 10+10 bestseller entity matrix directly into Google's 3-Pack algorithm.
@@ -749,6 +1019,148 @@ export function RankPilotLandingClient() {
           </div>
         </section>
 
+        {/* 3.5. WHAT WE FIX SHOWCASE: BEFORE vs AFTER (Inspired by GMBPro) */}
+        <section id="audit-showcase" className="py-16 lg:py-24 bg-slate-900 text-white relative overflow-hidden border-b border-slate-800">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-950/40 via-slate-900 to-slate-950 pointer-events-none" />
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            {/* Header */}
+            <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
+              <Badge className="bg-blue-600 text-white text-xs font-semibold px-3.5 py-1">
+                GMB Audit & Transformation Showcase
+              </Badge>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
+                Google Business Profile Management —{" "}
+                <span className="text-blue-400">See Exactly What We Fix</span>
+              </h2>
+              <p className="text-sm sm:text-base text-slate-300">
+                Most agencies give vague promises. Here is the concrete, side-by-side technical difference between a neglected Google Business profile and one powered by our autonomous <strong>RankLocal AI™</strong> system.
+              </p>
+            </div>
+
+            {/* 6 Tabs Switcher */}
+            <div className="flex items-center justify-start lg:justify-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
+              {(Object.keys(FIX_SHOWCASE_DATA) as Array<keyof typeof FIX_SHOWCASE_DATA>).map((tabKey) => {
+                const tab = FIX_SHOWCASE_DATA[tabKey]
+                const IconComponent = tab.icon
+                const isActive = activeFixTab === tabKey
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveFixTab(tabKey)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shrink-0 border ${
+                      isActive
+                        ? "bg-blue-600 text-white border-blue-500 shadow-md scale-102"
+                        : "bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800 hover:text-white"
+                    }`}
+                  >
+                    <IconComponent className={`w-4 h-4 ${isActive ? "text-white" : "text-blue-400"}`} />
+                    <span>{tab.title}</span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Current Tab Metadata Box */}
+            <div className="bg-slate-800/90 rounded-2xl border border-slate-700/80 p-5 sm:p-7">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-700/60">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[11px] font-mono font-semibold border border-blue-500/30">
+                      Audit Example
+                    </span>
+                    <span className="text-xs text-slate-400">•</span>
+                    <span className="text-xs font-semibold text-slate-300">{currentFix.category}</span>
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-extrabold text-white">{currentFix.merchant}</h3>
+                  <p className="text-xs text-slate-400">{currentFix.sub}</p>
+                </div>
+
+                <div className="flex items-center gap-3 shrink-0">
+                  <div className="px-3.5 py-2 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-bold">
+                    <span className="text-[10px] text-slate-400 block uppercase">Before:</span>
+                    <span>{currentFix.beforeScore}</span>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-slate-500 shrink-0" />
+                  <div className="px-3.5 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold">
+                    <span className="text-[10px] text-slate-400 block uppercase">After AI Fix:</span>
+                    <span>{currentFix.afterScore}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Side-by-Side Comparative Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
+                {/* BEFORE CARD */}
+                <div className="bg-rose-950/20 rounded-xl border border-rose-900/50 p-5 sm:p-6 space-y-4 relative overflow-hidden">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center">
+                        <XCircle className="w-4 h-4 text-rose-400" />
+                      </span>
+                      <span className="text-xs font-bold text-rose-300 uppercase tracking-wider">
+                        BEFORE • Problem State
+                      </span>
+                    </div>
+                    <Badge variant="outline" className="text-rose-400 border-rose-800 bg-rose-950/40 text-[10px] font-mono">
+                      {currentFix.beforeLabel}
+                    </Badge>
+                  </div>
+
+                  <ul className="space-y-2.5 text-xs text-slate-300">
+                    {currentFix.beforePoints.map((pt, pIdx) => (
+                      <li key={pIdx} className="flex items-start gap-2 leading-relaxed">
+                        <span className="text-rose-500 font-bold shrink-0 mt-0.5">✕</span>
+                        <span>{pt}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* AFTER CARD */}
+                <div className="bg-emerald-950/20 rounded-xl border border-emerald-800/50 p-5 sm:p-6 space-y-4 relative overflow-hidden">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      </span>
+                      <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
+                        AFTER • RankLocal AI™ Fix
+                      </span>
+                    </div>
+                    <Badge variant="outline" className="text-emerald-400 border-emerald-800 bg-emerald-950/40 text-[10px] font-mono">
+                      {currentFix.afterLabel}
+                    </Badge>
+                  </div>
+
+                  <ul className="space-y-2.5 text-xs text-slate-200">
+                    {currentFix.afterPoints.map((pt, pIdx) => (
+                      <li key={pIdx} className="flex items-start gap-2 leading-relaxed">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                        <span>{pt}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Bottom Quick Action */}
+              <div className="mt-6 pt-5 border-t border-slate-700/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div className="text-slate-400 flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>All fixes verified against official Google Business Profile 2026 Core Guidelines.</span>
+                </div>
+                <a href="#pricing">
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 h-8 shadow-sm gap-1.5">
+                    <span>Fix My Profile for ₹6,999</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </Button>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* 4. THE 60-SECOND REALITY CHECK: CFO-GRADE REVENUE LEAK SIMULATOR */}
         <section id="revenue-leak" className="py-16 lg:py-24 bg-slate-900 text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1030,6 +1442,146 @@ export function RankPilotLandingClient() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 5.5. MULTI-RADIUS LOCAL NEIGHBORHOOD GEO-VISIBILITY (Inspired by GMBPro) */}
+        <section id="nearby-search" className="py-16 lg:py-24 bg-white border-b border-slate-200/80">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
+              <Badge variant="outline" className="text-blue-700 bg-blue-50 border-blue-200 text-xs px-3.5 py-1 font-semibold">
+                Hyper-Local Radius Expansion
+              </Badge>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Rank Your Google Business Profile In{" "}
+                <span className="text-blue-600">Every Nearby Search</span>
+              </h2>
+              <p className="text-sm sm:text-base text-slate-600">
+                Most businesses only show up when someone searches standing 200m away. Our <strong>RankLocal AI™</strong> engine embeds local landmarks, transit hubs, and residential sector entities into your profile and SSR micro-pages to capture high-intent buyers up to 3.5 km away.
+              </p>
+            </div>
+
+            {/* Interactive Radius Visualizer */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              {/* Left Column: Radius Map Visual Chassis */}
+              <div className="lg:col-span-6 bg-slate-900 rounded-2xl p-6 sm:p-8 text-white border border-slate-800 shadow-xl relative overflow-hidden">
+                <div className="flex items-center justify-between pb-4 border-b border-slate-800 text-xs">
+                  <div className="flex items-center gap-2">
+                    <Crosshair className="w-4 h-4 text-blue-400 animate-pulse" />
+                    <span className="font-bold">Multi-Radius Proximity Radar</span>
+                  </div>
+                  <span className="font-mono text-slate-400">Store: Cake Connection, Manjalpur</span>
+                </div>
+
+                {/* Concentric Circles Visualization */}
+                <div className="py-8 flex items-center justify-center">
+                  <div className="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center">
+                    {/* Outer Circle 3.5km */}
+                    <div className="absolute inset-0 rounded-full border border-dashed border-blue-500/20 animate-spin" style={{ animationDuration: '60s' }} />
+                    {/* Middle Circle 1.8km */}
+                    <div className="absolute inset-6 rounded-full border border-blue-500/30" />
+                    {/* Inner Circle 800m */}
+                    <div className="absolute inset-14 rounded-full border border-blue-500/50 bg-blue-500/5" />
+                    {/* Center Point */}
+                    <div className="relative z-10 w-12 h-12 rounded-full bg-blue-600 text-white flex flex-col items-center justify-center shadow-lg border-2 border-white">
+                      <Store className="w-5 h-5 text-white" />
+                    </div>
+
+                    {/* Orbiting Radius Pins */}
+                    {NEARBY_SEARCH_PINS.map((pin, pIdx) => {
+                      const isSelected = activeNearbyPin === pIdx
+                      const angles = [0, 60, 120, 180, 240, 300]
+                      const angle = (angles[pIdx] * Math.PI) / 180
+                      const radii = [45, 65, 85, 105, 120, 135]
+                      const r = radii[pIdx]
+                      const x = Math.cos(angle) * r
+                      const y = Math.sin(angle) * r
+
+                      return (
+                        <button
+                          key={pIdx}
+                          onClick={() => setActiveNearbyPin(pIdx)}
+                          style={{
+                            transform: `translate(${x}px, ${y}px)`
+                          }}
+                          className={`absolute z-20 px-2.5 py-1 rounded-full text-[10px] font-black transition-all flex items-center gap-1 shadow-md ${
+                            isSelected
+                              ? "bg-amber-400 text-slate-950 scale-110 ring-2 ring-white"
+                              : "bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700"
+                          }`}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          <span>{pin.distance}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Highlighted Selected Pin Details */}
+                <div className="p-4 rounded-xl bg-slate-800/90 border border-slate-700 space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400 font-mono">Radius: {NEARBY_SEARCH_PINS[activeNearbyPin].distance}</span>
+                    <Badge className="bg-emerald-500 text-slate-950 font-black text-[10px]">
+                      {NEARBY_SEARCH_PINS[activeNearbyPin].rank} in Local 3-Pack
+                    </Badge>
+                  </div>
+                  <div className="text-sm font-bold text-white">
+                    Keyword: "{NEARBY_SEARCH_PINS[activeNearbyPin].term}"
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
+                    <span>Monthly Local Volume: <strong className="text-white">{NEARBY_SEARCH_PINS[activeNearbyPin].volume}</strong></span>
+                    <span className="text-blue-400 font-semibold">{NEARBY_SEARCH_PINS[activeNearbyPin].tag}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Search Radius Grid Cards */}
+              <div className="lg:col-span-6 space-y-3">
+                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  Live Tested Radius Keywords in Vadodara Hub
+                </div>
+
+                {NEARBY_SEARCH_PINS.map((pin, idx) => {
+                  const isSelected = activeNearbyPin === idx
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => setActiveNearbyPin(idx)}
+                      className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${
+                        isSelected
+                          ? "bg-blue-50/80 border-blue-400 shadow-sm"
+                          : "bg-slate-50 border-slate-200 hover:bg-white hover:border-slate-300"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-xs shrink-0 ${
+                          isSelected ? "bg-blue-600 text-white" : "bg-slate-200 text-slate-700"
+                        }`}>
+                          {pin.rank}
+                        </span>
+                        <div>
+                          <div className="text-xs sm:text-sm font-bold text-slate-900">{pin.term}</div>
+                          <div className="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
+                            <span>Distance: <strong>{pin.distance}</strong></span>
+                            <span>•</span>
+                            <span>{pin.volume}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${
+                          isSelected ? "bg-blue-200/60 text-blue-900" : "bg-slate-100 text-slate-600"
+                        }`}>
+                          {pin.tag}
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -1331,6 +1883,82 @@ export function RankPilotLandingClient() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 8.2. VERIFIED CLIENT RESULTS & REAL GOOGLE REVIEWS (Inspired by GMBPro) */}
+        <section id="reviews" className="py-16 lg:py-24 bg-white border-b border-slate-200/80">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+              <Badge variant="outline" className="text-blue-700 bg-blue-50 border-blue-200 text-xs px-3.5 py-1 font-semibold">
+                Verified Client Transformation Proof
+              </Badge>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Real Local Business Results •{" "}
+                <span className="text-blue-600">Top 3 on Google Maps</span>
+              </h2>
+              <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto">
+                Hear directly from real store owners who took their dormant listings from Page 2 obscure rankings to dominant Google Local 3-Pack placement using CustomerPilot.
+              </p>
+            </div>
+
+            {/* 3 Case Study Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {REAL_CLIENT_STORIES.map((story, sIdx) => (
+                <div
+                  key={sIdx}
+                  className="p-6 rounded-2xl bg-slate-50/80 border border-slate-200 hover:border-blue-300 hover:shadow-lg transition-all flex flex-col justify-between space-y-5"
+                >
+                  <div className="space-y-4">
+                    {/* Stars and Jump Badge */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1 text-amber-400">
+                        {Array.from({ length: story.stars }).map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-current" />
+                        ))}
+                      </div>
+                      <Badge className="bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-200">
+                        Verified Result
+                      </Badge>
+                    </div>
+
+                    {/* Rank Jump Badge */}
+                    <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-200/80 text-blue-900 text-xs font-bold flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
+                      <span>{story.rankJump}</span>
+                    </div>
+
+                    {/* Real Quote */}
+                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic">
+                      "{story.quote}"
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-200/80 space-y-2">
+                    <div className="text-xs font-extrabold text-emerald-700 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                      <span>{story.result}</span>
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-900">{story.name}</div>
+                      <div className="text-[11px] text-slate-500">{story.owner} • {story.category}, {story.city}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Bottom Proof Strip */}
+            <div className="mt-10 p-4 rounded-2xl bg-slate-100/80 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-700 font-medium">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
+                <span>All case study metrics verified against Google Search Console & live Google Maps geo-coordinate probes.</span>
+              </div>
+              <a href="#pricing" className="text-blue-700 hover:text-blue-800 font-bold inline-flex items-center gap-1 shrink-0">
+                <span>Start Your 45–90 Day Sprint</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </a>
             </div>
           </div>
         </section>

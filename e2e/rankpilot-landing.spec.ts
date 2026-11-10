@@ -151,4 +151,43 @@ test.describe('RankPilot AI Dedicated Landing Page E2E Suite', () => {
     await expect(pricingSection.locator('text=Our Ironclad 100% Moneyback Guarantee').first()).toBeVisible();
     await expect(pricingSection.locator('text=Zero Financial Risk').first()).toBeVisible();
   });
+
+  test('GMBPro-inspired "See Exactly What We Fix" showcase renders and switches tabs', async ({ page }) => {
+    await page.goto('/rankpilot', { waitUntil: 'domcontentloaded' });
+
+    const auditSection = page.locator('#audit-showcase');
+    await expect(auditSection).toBeVisible();
+
+    // Verify main headline and initial tab (Profile Optimization)
+    await expect(auditSection.locator('text=See Exactly What We Fix').first()).toBeVisible();
+    await expect(auditSection.locator('text=Cake Connection, Manjalpur').first()).toBeVisible();
+    await expect(auditSection.locator('text=BEFORE • Problem State').first()).toBeVisible();
+    await expect(auditSection.locator('text=AFTER • RankLocal AI™ Fix').first()).toBeVisible();
+
+    // Switch to Suspension Recovery tab
+    const suspensionTab = auditSection.locator('button:has-text("Suspension Recovery")');
+    if (await suspensionTab.count() > 0) {
+      await suspensionTab.click();
+      await page.waitForTimeout(300);
+      await expect(auditSection.locator('text=Vinayak Car Care & Detailing').first()).toBeVisible();
+      await expect(auditSection.locator('text=REINSTATED').first()).toBeVisible();
+    }
+  });
+
+  test('Multi-Radius Nearby Search and Client Proof sections render with real local data', async ({ page }) => {
+    await page.goto('/rankpilot', { waitUntil: 'domcontentloaded' });
+
+    // Multi-Radius Section
+    const nearbySection = page.locator('#nearby-search');
+    await expect(nearbySection).toBeVisible();
+    await expect(nearbySection.locator('text=Rank Your Google Business Profile In Every Nearby Search').first()).toBeVisible();
+    await expect(nearbySection.locator('text=Cake Shop Near Me').first()).toBeVisible();
+
+    // Reviews & Proof Section
+    const reviewsSection = page.locator('#reviews');
+    await expect(reviewsSection).toBeVisible();
+    await expect(reviewsSection.locator('text=Real Local Business Results').first()).toBeVisible();
+    await expect(reviewsSection.locator('text=Cake Connection, Manjalpur').first()).toBeVisible();
+    await expect(reviewsSection.locator('text=Pet Clinic @ Manjalpur').first()).toBeVisible();
+  });
 });
