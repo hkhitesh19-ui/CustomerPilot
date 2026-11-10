@@ -53,12 +53,24 @@ export default function RankPilotPage() {
         "name": "RankPilot AI™",
         "applicationCategory": "BusinessApplication",
         "operatingSystem": "Web, Cloud",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "INR",
-          "description": "30-Day Sprint & Free Revenue Leak Audit"
-        },
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "3-Month Acceleration Pilot (Limited Launch Offer)",
+            "price": "6999",
+            "priceCurrency": "INR",
+            "description": "3-Month acceleration pilot with 45-day Page 1 and 90-day Top 3 guarantee, or 100% Moneyback.",
+            "url": "https://customerpilot.in/rankpilot#pricing"
+          },
+          {
+            "@type": "Offer",
+            "name": "Annual Local Dominance Plan",
+            "price": "29000",
+            "priceCurrency": "INR",
+            "description": "Full 365-day Google Maps Local 3-Pack domination and defense with 100% Moneyback guarantee.",
+            "url": "https://customerpilot.in/rankpilot#pricing"
+          }
+        ],
         "description": "Automated Google Business Profile Top 3 Local Pack ranking accelerator for brick-and-mortar merchants."
       },
       {

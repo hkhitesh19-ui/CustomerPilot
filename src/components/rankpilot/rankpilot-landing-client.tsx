@@ -215,11 +215,11 @@ const FAQS: DualLangFaqItem[] = [
     id: 1,
     questionEn: "How can a business on Page 10 reach Top 3 in 30 days?",
     answerEn:
-      "RankPilot AI strictly follows Google's 2026 Core Algorithm guidelines using white-hat operational engineering. It fixes the 3 core ranking bottlenecks simultaneously: 1) Knowledge Graph entity wiring through our 10+10 Product/Service matrix, 2) Honest photo review velocity via billing-counter WhatsApp QR scans (zero review gating), and 3) Zero-gap Google Post publishing with 12-hour pre-expiration auto-renewal. Because every photo, keyword, and geo-coordinate comes from real walk-in customers and verified DBA signboards, Google views the profile as the most relevant authority in the area.",
+      "While our internal RankLocal AI™ engine starts pushing rankings within 30 days, we contractually commit to a realistic, transparent SLA: 45 Days to reach 1st Page (Top 10) and the subsequent 45 Days to lock in Top 3 Local Pack status (or 60 Days to Top 3 if you are already on Page 1) — backed by an unconditional 100% Moneyback Guarantee. RankPilot AI strictly adheres to Google's Core Algorithm guidelines through 3 white-hat pillars: 10+10 Product/Service entity injection, genuine post-purchase WhatsApp photo review velocity with zero gating, and zero-gap 12-hour pre-expiration Google Post auto-renewals.",
     questionHi:
       "RankPilot AI kisi bhi dukaan ke GBP ko bina suspend huye 30 dino me Page 10 se Top 3 par kaise lata hai?",
     answerHi:
-      "RankPilot AI Google ki 2026 Core Policy ke mutabiq 100% white-hat tarike se kaam karta hai. Ye 3 main cheezon ko ek sath activate karta hai: 1) Google Knowledge Graph me dukaan ke 10 Bestseller Products aur 10 Services ko inject karna, 2) Billing counter par WhatsApp QR se genuine customers se photo reviews collect karna, aur 3) Zero-gap Google Posts jo expire hone se 12 ghante pehle khud naye update ho jate hain. Koi fake review ya black-hat trick use nahi hoti, isliye listing 100% safe rehti hai aur ranking naturally skyrocket hoti hai."
+      "Halanki hamara internal RankLocal AI™ engine 30 dino me velocity accelerate karta hai, hum transparent aur contractual SLA dete hain: 45 dino me 1st Page (Top 10) aur agle 45 dino me Top 3 Local Pack (ya agar aap already 1st page par hain toh 60 dino me Top 3) — backed by 100% Moneyback Guarantee. RankPilot AI Google ki 2026 Core Policy ke mutabiq 100% white-hat tarike se kaam karta hai: 10+10 Bestseller Products aur Services ko Google Graph me jodna, WhatsApp QR se genuine customers ke photo reviews lana, aur Zero-gap Google Posts schedule karna. Koi fake review ya black-hat trick nahi, isliye listing 100% safe rehti hai."
   },
   {
     id: 2,
@@ -270,6 +270,16 @@ const FAQS: DualLangFaqItem[] = [
       "Kya mujhe kisi SEO agency ko hire karna padega ya content khud likhna hoga?",
     answerHi:
       "Bilkul nahi. RankPilot AI poori tarah automated software hai. Post create karna, schedule karna, reviews ke keywords analyze karna, aur customer ke WhatsApp screenshots verify karke stamps dena — sab kuch software automatically karta hai. Vyapari ko sirf billing counter par QR standee rakhna hai, baaki Google Maps ranking ka poora engine autonomously background me chalta hai."
+  },
+  {
+    id: 7,
+    questionEn: "What are the pricing options and how does the 100% Moneyback Guarantee work?",
+    answerEn:
+      "RankPilot AI offers two transparent options: our limited 3-Month Acceleration Pilot at ₹6,999 (saving 76% vs the ₹29,000/yr annual rate) and our 365-Day Annual Dominance Plan at ₹29,000/year (~₹2,416/mo). Both plans come with our contractual 100% Moneyback Guarantee: If your business does not achieve Page 1 within 45 days and Top 3 in 90 days (or within 60 days if already on Page 1), we refund 100% of your payment directly to your bank account or UPI with zero questions asked.",
+    questionHi:
+      "RankPilot AI ka pricing structure kya hai aur 100% Moneyback Guarantee ke terms kya hain?",
+    answerHi:
+      "Hum 2 transparent plans offer karte hain: Special Launch Offer me 3-Month Acceleration Pilot sirf ₹6,999 me (jo ₹29,000/year ke regular price par 76% discount hai) aur 365-Day Annual Dominance Plan ₹29,000/year me. Dono plans 100% Moneyback Guarantee ke sath aate hain: agar aapki listing 45 dino me 1st Page aur 90 dino me Top 3 (ya already 1st page par hain toh 60 dino me Top 3) par nahi aati, toh bina kisi cut ya excuse ke 100% poora refund aapko mil jata hai."
   }
 ]
 
@@ -305,6 +315,28 @@ export function RankPilotLandingClient() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-blue-600 selection:text-white font-sans antialiased">
+      {/* 0. TOP ANNOUNCEMENT OFFER BAR */}
+      <aside aria-label="Limited Launch Offer" className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white py-2 px-4 text-xs font-semibold shadow-xs">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+          <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] tracking-wide uppercase shadow-2xs">
+              <Flame className="w-3 h-3 text-red-600 fill-current" />
+              Limited Launch Offer
+            </span>
+            <span className="text-blue-100">
+              <strong>3 Months at ₹6,999/-</strong> (Regular ₹29,000/yr) • 45 Days to 1st Page & 90 Days to Top 3 (or 60 Days if on Page 1) • <strong className="text-white underline decoration-amber-400 underline-offset-2">100% Moneyback Guarantee</strong>
+            </span>
+          </div>
+          <a
+            href="#pricing"
+            className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-white text-blue-900 hover:bg-blue-50 font-extrabold text-[11px] shrink-0 transition-colors shadow-2xs"
+          >
+            <span>Claim ₹6,999 Offer</span>
+            <ArrowRight className="w-3 h-3" />
+          </a>
+        </div>
+      </aside>
+
       {/* 1. STICKY ENTERPRISE HEADER */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-white/90 border-b border-slate-200/80 transition-all shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -330,7 +362,10 @@ export function RankPilotLandingClient() {
               Post Dominance
             </a>
             <a href="#roadmap" className="hover:text-blue-600 transition-colors">
-              30-Day Sprint
+              Guaranteed SLA
+            </a>
+            <a href="#pricing" className="text-blue-600 font-bold hover:text-blue-700 transition-colors">
+              Pricing & Offer
             </a>
             <a href="#faq" className="hover:text-blue-600 transition-colors">
               FAQ
@@ -343,12 +378,12 @@ export function RankPilotLandingClient() {
                 Live Audit Tool
               </Button>
             </Link>
-            <Link href="/onboarding">
+            <a href="#pricing">
               <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 h-9 shadow-sm gap-1.5 group">
-                Start 30-Day Sprint
+                Claim ₹6,999 Offer
                 <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
               </Button>
-            </Link>
+            </a>
           </div>
         </div>
       </header>
@@ -364,6 +399,59 @@ export function RankPilotLandingClient() {
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/90 text-blue-800 text-xs font-semibold">
                   <ShieldCheck className="w-4 h-4 text-blue-600" />
                   <span>100% Policy-Clean Local SEO • Zero Fake Reviews</span>
+                </div>
+
+                {/* HERO PROMINENT OFFER & 2-TIER SLA BANNER */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50/70 to-emerald-50/80 border border-blue-200 shadow-sm space-y-2.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge className="bg-amber-500 hover:bg-amber-500 text-slate-950 font-black text-[11px] px-2.5 py-0.5">
+                        🔥 SPECIAL LAUNCH OFFER: ₹6,999 / 3 MONTHS
+                      </Badge>
+                      <span className="text-xs text-slate-500 line-through font-mono">₹29,000/yr</span>
+                      <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                        Save 76%
+                      </span>
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                      <span>100% Moneyback Guarantee</span>
+                    </div>
+                  </div>
+
+                  {/* 2-Tier Realistic SLA */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-xs">
+                    <div className="p-2.5 bg-white/95 rounded-xl border border-blue-100 flex items-center gap-2 shadow-2xs">
+                      <span className="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 font-black text-xs flex items-center justify-center shrink-0">
+                        1
+                      </span>
+                      <div>
+                        <div className="font-bold text-slate-900">New Store / Page 2–10</div>
+                        <div className="text-[11px] text-slate-600">
+                          <strong>45 Days</strong> to 1st Page ➔ <strong>90 Days</strong> to Top 3
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 bg-white/95 rounded-xl border border-emerald-100 flex items-center gap-2 shadow-2xs">
+                      <span className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 font-black text-xs flex items-center justify-center shrink-0">
+                        2
+                      </span>
+                      <div>
+                        <div className="font-bold text-slate-900">Already on 1st Page</div>
+                        <div className="text-[11px] text-slate-600">
+                          <strong>60 Days Fast-Track</strong> to Top 3 Local Pack
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-600 font-medium pt-0.5">
+                    <span>Powered by internal <strong>RankLocal AI™</strong> core engine</span>
+                    <a href="#pricing" className="text-blue-700 hover:text-blue-800 font-bold inline-flex items-center gap-1">
+                      View Pricing & Guarantee <ArrowRight className="w-3 h-3" />
+                    </a>
+                  </div>
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
@@ -395,17 +483,17 @@ export function RankPilotLandingClient() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-4">
-                  <Link href="#revenue-leak">
+                  <a href="#pricing">
                     <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-6 h-12 shadow-sm gap-2 group">
-                      Calculate Your Revenue Leak
+                      Claim ₹6,999 Launch Offer
                       <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </Button>
-                  </Link>
-                  <a href="#geo-grid">
-                    <Button variant="outline" size="lg" className="w-full sm:w-auto text-slate-700 border-slate-300 font-semibold text-sm h-12 px-5 hover:bg-slate-100">
-                      Explore Interactive Radar Grid
-                    </Button>
                   </a>
+                  <Link href="#revenue-leak">
+                    <Button variant="outline" size="lg" className="w-full sm:w-auto text-slate-700 border-slate-300 font-semibold text-sm h-12 px-5 hover:bg-slate-100">
+                      Calculate Your Revenue Leak
+                    </Button>
+                  </Link>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 pt-3 text-xs text-slate-600 font-semibold">
@@ -1132,21 +1220,58 @@ export function RankPilotLandingClient() {
           </div>
         </section>
 
-        {/* 8. THE 30-DAY STEP-BY-STEP ROADMAP STEPPER */}
+        {/* 8. THE STEP-BY-STEP ROADMAP STEPPER & GUARANTEED SLA */}
         <section id="roadmap" className="py-16 lg:py-24 bg-slate-50 border-b border-slate-200/80">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-              <Badge variant="outline" className="text-blue-700 bg-blue-50 border-blue-200 text-xs px-3 py-1 font-semibold">
-                Predictable Growth Execution
+            <div className="text-center max-w-3xl mx-auto mb-10 space-y-3">
+              <Badge variant="outline" className="text-blue-700 bg-blue-50 border-blue-200 text-xs px-3.5 py-1 font-semibold">
+                Guaranteed Algorithmic SLA • 100% Moneyback
               </Badge>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
-                The 30-Day Google Local 3-Pack Sprint
+                The Guaranteed Ranking Timeline Protocol
               </h2>
               <p className="text-sm sm:text-base text-slate-600">
-                A structured, day-by-day technical execution plan engineered to safely scale your listing to the Top 3 without triggering Google suspensions.
+                While our internal <strong>RankLocal AI™</strong> core engine accelerates optimization velocity within 30 days, we hold ourselves to a realistic, contract-grade SLA on our website: <strong>45 Days to 1st Page</strong> and <strong>90 Days to Top 3</strong> (or <strong>60 Days</strong> if already on Page 1) — backed by our unconditional 100% Moneyback Guarantee.
               </p>
             </div>
 
+            {/* 2-Track SLA Visual Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto mb-10">
+              <div className="p-5 rounded-2xl bg-white border-2 border-blue-200 shadow-2xs space-y-2">
+                <div className="flex items-center justify-between text-xs font-bold text-blue-900">
+                  <span className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-blue-600 text-white text-xs flex items-center justify-center font-black">A</span>
+                    Track A: New Listing or Currently on Page 2–10
+                  </span>
+                  <Badge className="bg-blue-100 text-blue-800 text-[10px] font-bold">90-Day Full Journey</Badge>
+                </div>
+                <div className="text-xs text-slate-700 leading-relaxed font-medium pl-8">
+                  <div>• <strong>Phase 1 (Days 1–45)</strong>: 1st Page Ranking (Top 10) Guaranteed</div>
+                  <div>• <strong>Phase 2 (Days 46–90)</strong>: Google Maps Top 3 Local 3-Pack Dominance</div>
+                </div>
+                <div className="text-[11px] font-bold text-emerald-700 pl-8 pt-1">
+                  🛡️ 100% Moneyback Guarantee if Top 3 is not achieved in 90 days.
+                </div>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-white border-2 border-emerald-200 shadow-2xs space-y-2">
+                <div className="flex items-center justify-between text-xs font-bold text-emerald-900">
+                  <span className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white text-xs flex items-center justify-center font-black">B</span>
+                    Track B: Already on 1st Page (Top 10)
+                  </span>
+                  <Badge className="bg-emerald-100 text-emerald-800 text-[10px] font-bold">60-Day Fast-Track</Badge>
+                </div>
+                <div className="text-xs text-slate-700 leading-relaxed font-medium pl-8">
+                  <div>• <strong>Fast-Track SLA (60 Days)</strong>: Elevate from position #4–#10 into the elite Google Maps Top 3 Local Pack</div>
+                </div>
+                <div className="text-[11px] font-bold text-emerald-700 pl-8 pt-1">
+                  🛡️ 100% Moneyback Guarantee if Top 3 is not achieved in 60 days.
+                </div>
+              </div>
+            </div>
+
+            {/* Stepper Timeline */}
             <div className="max-w-4xl mx-auto space-y-4">
               {[
                 {
@@ -1210,6 +1335,225 @@ export function RankPilotLandingClient() {
           </div>
         </section>
 
+        {/* 8.5. GUARANTEED PRICING & 100% MONEYBACK SECTION */}
+        <section id="pricing" className="py-16 lg:py-24 bg-gradient-to-b from-white via-slate-50 to-white border-b border-slate-200/80">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Pricing Header */}
+            <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+              <Badge variant="outline" className="text-blue-700 bg-blue-50 border-blue-200 text-xs px-3.5 py-1 font-semibold">
+                Transparent Local SEO Investment • 100% Moneyback SLA
+              </Badge>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Simple, Guaranteed Pricing for Top 3 Google Domination
+              </h2>
+              <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto">
+                No hidden agency retainers. Choose between our limited <strong>3-Month Acceleration Pilot</strong> or the comprehensive <strong>365-Day Annual Dominance Plan</strong>. Both covered by our contractual 100% Moneyback Guarantee.
+              </p>
+            </div>
+
+            {/* 2 Pricing Cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto items-stretch">
+              
+              {/* CARD 1: 3-MONTH LAUNCH OFFER */}
+              <div className="relative rounded-3xl bg-white border-2 border-blue-600 shadow-xl shadow-blue-500/10 p-7 sm:p-9 flex flex-col justify-between">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                  <span className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-sm">
+                    <Flame className="w-3.5 h-3.5 text-red-600 fill-current" />
+                    Special Launch Offer • Save 76%
+                  </span>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+                      <span>3-Month Acceleration Pilot</span>
+                      <span className="text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                        Limited Time Offer
+                      </span>
+                    </div>
+
+                    <div className="mt-3 flex items-baseline gap-2">
+                      <span className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">₹6,999</span>
+                      <span className="text-sm text-slate-500 font-semibold">/ 3 Months</span>
+                      <span className="text-xs text-slate-400 line-through font-mono ml-2">₹29,000/yr</span>
+                    </div>
+
+                    <div className="mt-1 text-xs text-emerald-700 font-bold">
+                      Equivalent to just ₹2,333 / month • 90 Days Complete Coverage
+                    </div>
+                  </div>
+
+                  {/* Guaranteed SLA Callout */}
+                  <div className="p-3.5 rounded-2xl bg-blue-50/90 border border-blue-200 text-xs space-y-1.5">
+                    <div className="flex items-center gap-1.5 font-extrabold text-blue-900">
+                      <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
+                      Contractual Ranking SLA:
+                    </div>
+                    <ul className="space-y-1 text-slate-700 text-[11px] font-medium pl-5 list-disc">
+                      <li><strong>If on Page 2–10</strong>: 45 Days to 1st Page (Top 10) ➔ 90 Days to Top 3.</li>
+                      <li><strong>If already on 1st Page</strong>: 60 Days Fast-Track to Top 3 Local Pack.</li>
+                      <li className="text-emerald-800 font-bold"><strong>100% Full Moneyback Refund</strong> if ranking milestone not fulfilled.</li>
+                    </ul>
+                  </div>
+
+                  {/* Deliverables Checklist */}
+                  <div className="space-y-3 pt-2">
+                    <div className="text-xs font-bold text-slate-900 uppercase tracking-wide">Everything Included:</div>
+                    <ul className="space-y-2.5 text-xs text-slate-600">
+                      {[
+                        "10+10 Bestseller Products & Services Entity Wiring into Google Knowledge Graph",
+                        "Free Acrylic WhatsApp Loyalty QR Standee shipped directly to your billing counter",
+                        "Gemini 2.5 Flash Vision OCR screenshot parser for scam-proof review stamps",
+                        "Zero-Gap Google Business Post cadence (3 verified posts every week)",
+                        "12-Hour Pre-Expiration Auto-Renewal so your profile never goes dormant",
+                        "Interactive 3x3 Geo-Rank Radar Grid live monitoring across your city",
+                        "Real-time revenue leak tracking & customer action analytics"
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="pt-8 space-y-3">
+                  <a
+                    href="https://wa.me/919033304707?text=Hi%20CustomerPilot,%20I%20want%20to%20claim%20the%20RankLocal%20Ai%203-Month%20Offer%20(₹6,999)%20with%20100%25%20Moneyback%20Guarantee!"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm h-12 shadow-md shadow-blue-600/20 gap-2">
+                      Claim 3-Month Offer for ₹6,999
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </a>
+                  <p className="text-[11px] text-center text-slate-500">
+                    🔒 Instant WhatsApp Activation • Acrylic Standee Dispatched in 48h
+                  </p>
+                </div>
+              </div>
+
+              {/* CARD 2: ANNUAL DOMINANCE PLAN */}
+              <div className="relative rounded-3xl bg-slate-900 text-white border border-slate-700 shadow-xl p-7 sm:p-9 flex flex-col justify-between">
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex items-center justify-between text-xs font-semibold text-slate-400">
+                      <span>Annual Local Dominance</span>
+                      <span className="text-amber-400 font-bold bg-amber-950/60 border border-amber-600/50 px-2 py-0.5 rounded">
+                        Full 365 Days
+                      </span>
+                    </div>
+
+                    <div className="mt-3 flex items-baseline gap-2">
+                      <span className="text-4xl sm:text-5xl font-black text-white tracking-tight">₹29,000</span>
+                      <span className="text-sm text-slate-400 font-semibold">/ Year</span>
+                    </div>
+
+                    <div className="mt-1 text-xs text-amber-400 font-bold">
+                      Just ₹2,416 / month • Complete 365-Day Ranking Defense
+                    </div>
+                  </div>
+
+                  {/* Guaranteed SLA Callout */}
+                  <div className="p-3.5 rounded-2xl bg-slate-800/90 border border-slate-700 text-xs space-y-1.5">
+                    <div className="flex items-center gap-1.5 font-extrabold text-amber-400">
+                      <Award className="w-4 h-4 text-amber-400 shrink-0" />
+                      365-Day Dominance & SLA Guarantee:
+                    </div>
+                    <ul className="space-y-1 text-slate-300 text-[11px] font-medium pl-5 list-disc">
+                      <li><strong>Guaranteed Top 3 Retention</strong>: Lock competitors out of the Local 3-Pack all year.</li>
+                      <li><strong>SLA</strong>: 45 Days to Page 1 ➔ 90 Days to Top 3 (or 60 Days if on Page 1).</li>
+                      <li className="text-emerald-400 font-bold"><strong>100% Moneyback Guarantee</strong>: Full refund if ranking criteria not met.</li>
+                    </ul>
+                  </div>
+
+                  {/* Deliverables Checklist */}
+                  <div className="space-y-3 pt-2">
+                    <div className="text-xs font-bold text-slate-200 uppercase tracking-wide">Everything in 3-Month Pilot, Plus:</div>
+                    <ul className="space-y-2.5 text-xs text-slate-300">
+                      {[
+                        "Full 365-day continuous Google 3-Pack defense against aggressive rivals",
+                        "156+ verified Google Business posts automatically generated and posted",
+                        "Continuous 10+10 entity updates for seasonal items, festivals, and new services",
+                        "Countertop Acrylic Standee + 2 Smart NFC Tabletop Loyalty Badges",
+                        "Algorithmic Core Update protection & instant competitor poach recovery",
+                        "Multi-Keyword Neighborhood Tracking across your entire city grid",
+                        "Priority VIP 1-on-1 Account Manager access on WhatsApp"
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="pt-8 space-y-3">
+                  <a
+                    href="https://wa.me/919033304707?text=Hi%20CustomerPilot,%20I%20want%20to%20activate%20the%20RankLocal%20Ai%20Annual%20Plan%20(₹29,000/yr)%20with%20100%25%20Moneyback%20Guarantee!"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <Button size="lg" className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-sm h-12 shadow-md gap-2">
+                      Get Annual Dominance (₹29,000/yr)
+                      <ArrowRight className="w-4 h-4 text-slate-950" />
+                    </Button>
+                  </a>
+                  <p className="text-[11px] text-center text-slate-400">
+                    🛡️ Official Invoice with GST Credit • 100% Moneyback Guarantee
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            {/* THE IRONCLAD 100% MONEYBACK GUARANTEE SEAL */}
+            <div className="mt-12 max-w-4xl mx-auto rounded-3xl bg-emerald-50/80 border-2 border-emerald-300 p-6 sm:p-8 shadow-sm">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/30">
+                  <ShieldCheck className="w-8 h-8" />
+                </div>
+                <div className="space-y-2 text-center sm:text-left flex-1">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                    <span className="text-base sm:text-lg font-black text-emerald-950">
+                      Our Ironclad 100% Moneyback Guarantee
+                    </span>
+                    <Badge className="bg-emerald-600 text-white text-[11px] font-bold">
+                      Zero Financial Risk
+                    </Badge>
+                  </div>
+                  <p className="text-xs sm:text-sm text-emerald-950/80 leading-relaxed font-medium">
+                    We remove 100% of the financial risk. If your business profile does not rank on <strong>Page 1 within 45 days</strong> and in the <strong>Google Maps Top 3 within 90 days</strong> (or within <strong>60 days</strong> if you are already on Page 1), we will refund <strong>100% of your money</strong> directly to your bank account or UPI. No excuses, no complicated paperwork, zero questions asked.
+                  </p>
+                  <p className="text-xs text-emerald-900 font-semibold italic pt-1">
+                    "Agar aapki dukaan committed timeline me target rank par nahi aati, toh bina kisi sawal ke 100% poora paisa turant wapas mil jayega."
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 text-[11px] font-bold text-emerald-900">
+                    <div className="flex items-center gap-1.5 justify-center sm:justify-start">
+                      <Check className="w-3.5 h-3.5 text-emerald-700" /> 100% Full Refund
+                    </div>
+                    <div className="flex items-center gap-1.5 justify-center sm:justify-start">
+                      <Check className="w-3.5 h-3.5 text-emerald-700" /> Direct UPI / Bank
+                    </div>
+                    <div className="flex items-center gap-1.5 justify-center sm:justify-start">
+                      <Check className="w-3.5 h-3.5 text-emerald-700" /> Contractual SLA
+                    </div>
+                    <div className="flex items-center gap-1.5 justify-center sm:justify-start">
+                      <Check className="w-3.5 h-3.5 text-emerald-700" /> Zero Hidden Fees
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
         {/* 9. DUAL-LANGUAGE FREQUENTLY ASKED QUESTIONS */}
         <section id="faq" className="py-16 lg:py-24 bg-white border-b border-slate-200/80">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1238,21 +1582,26 @@ export function RankPilotLandingClient() {
             </h2>
 
             <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-              Launch your 30-Day Local 3-Pack sprint with RankPilot AI™. Full WhatsApp review flywheel, zero-gap posts, and 10+10 entity matrix wiring.
+              Launch your Google Local 3-Pack sprint with RankPilot AI™. Full WhatsApp review flywheel, zero-gap posts, 10+10 entity matrix wiring, and a contractual 100% Moneyback Guarantee.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              <Link href="/onboarding" className="w-full sm:w-auto">
+              <a href="#pricing" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm h-12 px-8 shadow-lg shadow-blue-600/30 gap-2 group">
-                  Start Your 30-Day Sprint Now
+                  Claim 3-Month Offer (₹6,999)
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Button>
-              </Link>
-              <Link href="/pricing" className="w-full sm:w-auto">
+              </a>
+              <a
+                href="https://wa.me/919033304707?text=Hi%20CustomerPilot,%20I%20want%20to%20discuss%20the%20RankLocal%20Ai%20Annual%20Plan%20(₹29,000/yr)!"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto"
+              >
                 <Button variant="outline" size="lg" className="w-full sm:w-auto text-slate-200 border-slate-700 hover:bg-slate-800 font-semibold text-sm h-12 px-6">
-                  View Transparent Pricing Plans
+                  Inquire Annual Plan (₹29,000/yr)
                 </Button>
-              </Link>
+              </a>
             </div>
 
             <div className="pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400 font-medium">
@@ -1263,7 +1612,7 @@ export function RankPilotLandingClient() {
                 <Check className="w-4 h-4 text-emerald-400" /> Zero Fake Reviews
               </span>
               <span className="flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-emerald-400" /> 14-Day Money-Back Guarantee
+                <Check className="w-4 h-4 text-emerald-400" /> 100% Moneyback Guarantee
               </span>
             </div>
           </div>

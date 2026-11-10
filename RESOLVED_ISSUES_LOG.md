@@ -8,6 +8,30 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [10 Nov 2026] Issue: RankPilot AI™ Guaranteed Ranking SLA (45-Day Page 1 / 90-Day Top 3), Top Launch Offer Bar, and 100% Moneyback Pricing Section
+- **Symptom**: RankPilot landing page needed transparent, realistic consumer-facing ranking SLA display rules (45 Days to Page 1 and 90 Days to Top 3; or 60 Days if already on Page 1), Top Launch Offer announcement bar (3 Months @ ₹6,999/- vs ₹29,000/yr), and a high-converting Pricing Section (#pricing) with an ironclad 100% Moneyback Guarantee.
+- **Root Cause**: While the internal core algorithm engine ("RankLocal AI") accelerates GBP optimization velocity in as few as 30 days, the user required the public landing page to communicate a contract-grade, realistic timeline: 45 Days to 1st Page (Top 10) and subsequent 45 Days (90 Days Total) to Top 3 (or 60 Days if already on Page 1) to eliminate customer friction and provide a risk-free 100% Moneyback Guarantee.
+- **Resolution**:
+  1. **Top Announcement Bar & Header Navigation**:
+     - Added sticky top banner (`aside[aria-label="Limited Launch Offer"]`) with "3 Months at ₹6,999/- (Regular ₹29,000/yr) • 45 Days to 1st Page & 90 Days to Top 3 (or 60 Days if on Page 1) • 100% Moneyback Guarantee" and quick CTA scroll to `#pricing`.
+     - Added "Pricing & Offer" link to the desktop navbar and updated header CTA to "Claim ₹6,999 Offer".
+  2. **Hero 2-Tier Realistic SLA Callout**:
+     - Embedded conversion callout displaying Track 1 (45 Days to Page 1 ➔ 90 Days to Top 3) and Track 2 (60 Days Fast-Track if already on Page 1) powered by internal RankLocal AI core engine.
+  3. **Roadmap Stepper Section (#roadmap)**:
+     - Updated to "The Guaranteed Ranking Timeline Protocol" featuring Track A (90-Day Full Journey) and Track B (60-Day Fast-Track) alongside day-by-day technical execution stages.
+  4. **Dedicated Guaranteed Pricing Section (#pricing)**:
+     - Card 1: 3-Month Acceleration Pilot (Limited Launch Offer @ ₹6,999 for 3 months, saving 76% vs ₹29,000/yr).
+     - Card 2: Annual Local Dominance Plan (Full 365 Days @ ₹29,000/year, ~₹2,416/mo).
+     - Ironclad 100% Moneyback Guarantee Seal: Full refund directly via UPI/Bank if ranking milestone is not fulfilled.
+  5. **SEO & Structured Data**:
+     - Updated JSON-LD `@type: SoftwareApplication` in `src/app/rankpilot/page.tsx` with both official offer tiers.
+  6. **Adversarial Red-Team & Playwright QA**:
+     - Executed `node scripts/run_adversarial_guard.js`: All 6 gates passed cleanly (Exit Code 0).
+     - Executed `node scripts/run_autonomous_qa.js e2e/rankpilot-landing.spec.ts`: All 10/10 tests passed cleanly in 31.2s with zero console or network errors.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [10 Nov 2026] Issue: RankPilot AI™ Dedicated Landing Page UI/UX Pro Max Redesign & Interactive Domain Visualizers
 - **Symptom**: User reported that the initial RankPilot landing page looked "AI-generated" (https://customerpilot.in/rankpilot-ai : page Ai ne banaya ho eisa lag raha he) and requested a bespoke, human-crafted SaaS redesign utilizing the globally installed `ui-ux-pro-max` skill.
 - **Root Cause**: The v1 landing page relied on generic gradient text cards and static bullet points without tactile domain-specific components (e.g. interactive 3x3 local geo-grid radar, dual-reality mobile Google SERP comparison, or high-contrast financial simulation workstations).

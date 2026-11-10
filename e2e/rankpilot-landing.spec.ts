@@ -116,4 +116,39 @@ test.describe('RankPilot AI Dedicated Landing Page E2E Suite', () => {
     expect(content.toLowerCase()).not.toContain('lorem ipsum');
     expect(content).not.toContain('example.com');
   });
+
+  test('Top launch offer bar and hero 2-tier SLA display correctly', async ({ page }) => {
+    await page.goto('/rankpilot', { waitUntil: 'domcontentloaded' });
+
+    // Top Announcement Bar
+    const topBar = page.locator('aside[aria-label="Limited Launch Offer"]');
+    await expect(topBar).toBeVisible();
+    await expect(topBar).toContainText('3 Months at ₹6,999/-');
+    await expect(topBar).toContainText('100% Moneyback Guarantee');
+
+    // Hero 2-tier SLA Card
+    await expect(page.locator('text=45 Days to 1st Page ➔ 90 Days to Top 3').first()).toBeVisible();
+    await expect(page.locator('text=60 Days Fast-Track to Top 3 Local Pack').first()).toBeVisible();
+    await expect(page.locator('text=RankLocal AI™').first()).toBeVisible();
+  });
+
+  test('Guaranteed Pricing section renders ₹6,999 and ₹29,000 plans with 100% Moneyback Guarantee', async ({ page }) => {
+    await page.goto('/rankpilot', { waitUntil: 'domcontentloaded' });
+
+    const pricingSection = page.locator('#pricing');
+    await expect(pricingSection).toBeVisible();
+
+    // 3-Month Plan assertions
+    await expect(pricingSection.locator('text=₹6,999').first()).toBeVisible();
+    await expect(pricingSection.locator('text=/ 3 Months').first()).toBeVisible();
+    await expect(pricingSection.locator('text=Save 76%').first()).toBeVisible();
+
+    // Annual Plan assertions
+    await expect(pricingSection.locator('text=₹29,000').first()).toBeVisible();
+    await expect(pricingSection.locator('text=/ Year').first()).toBeVisible();
+
+    // 100% Moneyback Guarantee Seal assertions
+    await expect(pricingSection.locator('text=Our Ironclad 100% Moneyback Guarantee').first()).toBeVisible();
+    await expect(pricingSection.locator('text=Zero Financial Risk').first()).toBeVisible();
+  });
 });
