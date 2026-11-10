@@ -8,12 +8,12 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : a0c0307
-Full Commit Hash  : a0c03070adc65bedb6e39adb485a205ff5c86259
+Active Git Commit : 35f6885
+Full Commit Hash  : 35f6885b1072a220e955aec6125335d7e3253c27
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 09 Nov 2026, 05:27 PM IST
+Deployment Date   : 10 Nov 2026, 08:30 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : docs(rankpilot): expand Section 3.4 Google Post Dominance Engine with 3-post triad, 100-300 words anatomy, and zero-gap expiration lifecycle protocol
+Commit Title      : feat(rankpilot): launch pro-level dedicated landing page for rankpilot ai with ui-ux pro max design system
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -21,6 +21,8 @@ Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 O
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
 - Domain URL        : https://customerpilot.in (HTTP/2 200 OK)
+- RankPilot Landing : https://customerpilot.in/rankpilot (Pro UI/UX Pro Max Landing Page, HTTP/2 200 OK)
+- RankPilot Alias   : https://customerpilot.in/rankpilot-ai (Redirect to /rankpilot, HTTP 307/308)
 - Master Playbook   : /var/www/CustomerPilot/RANKPILOT_AI_TOP3_LOCAL_DOMINATION_PLAYBOOK.md (Active, Verified)
 - Revenue Leak Calc : https://customerpilot.in/google-business-profile-ranking (Live AOV & Volume Slider, HTTP/2 200 OK)
 - Review Verifier   : https://customerpilot.in/api/webhooks/whatsapp-review (Fraud-Proof Vision OCR Webhook Active)
