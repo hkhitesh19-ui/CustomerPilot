@@ -4,6 +4,29 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [11 Nov 2026] Issue: Multi-Tiered Zero-Hallucination Guardrails for Autonomous GBP Post Generation (Grounding in MenuItem Catalog & Strict Blacklist)
+- **Symptom**: User questioned the risk of the automated GBP post engine generating posts for products or services that a merchant does not actually sell or offer (e.g., generating non-veg or bakery items that the store doesn't make, or services outside their domain).
+- **Root Cause**: While deterministic industry presets existed in `INDUSTRY_PRODUCT_PRESETS`, `buildTuesdayProductPost` in `src/lib/gbp-post-generator.ts` was not directly querying the merchant's physical inventory/catalog table (`MenuItem`) or actively cross-referencing the merchant's `strictlyNotAllowed` negative keyword blacklist from `resolveMerchantKeywordProfile`.
+- **Resolution**:
+  1. **Tier 1 Physical DB Grounding (`src/lib/gbp-post-generator.ts`)**:
+     - Connected `buildTuesdayProductPost` directly to `db.menuItem.findMany({ where: { merchantId: merchant.id, isAvailable: true } })`.
+     - Deterministically prioritizes real menu items uploaded by the merchant, respecting prices (`₹{chosen.price}/-`), vegetarian status (`100% Pure Eggless Bestseller`), and custom tags.
+  2. **Strict Negative Keyword Blacklist Filtering**:
+     - Imported `resolveMerchantKeywordProfile` from `@/lib/keyword-matrix`.
+     - Automatically extracts the category-specific `strictlyNotAllowed` blacklist (for bakeries: blacklists bread, pav, samosa, kachori, dining tables, chai, cold drinks, thali, Punjabi meals, egg cake, non-veg, chicken, mutton, salon services, car wash, tailoring, etc.).
+     - Strictly filters all candidate menu items and preset fallback items through this blacklist, completely blocking unoffered products.
+  3. **Tier 2 Custom Hero Products Whitelist**:
+     - If the merchant has configured `heroProducts` in their `keywordProfile`, the engine pulls directly from their custom whitelist.
+  4. **Tier 3 Category-Isolated Preset Fallback**:
+     - If no menu items or custom hero products exist yet, the engine falls back to `INDUSTRY_PRODUCT_PRESETS` strictly matching their registered category, with blacklist filtering applied.
+  5. **Human-in-the-Loop WhatsApp Approval Gate**:
+     - Verified that all posts default to `status: "AWAITING_APPROVAL"` and offer 1-tap WhatsApp preview with instant regeneration (`/api/gbp/posts/[id]/reject`) and direct inline editing (`/api/gbp/posts/[id]/edit`).
+  6. **Adversarial Red-Team Gate Verification**:
+     - All 6 Master Adversarial Red-Team Guard gates passed cleanly (`node scripts/run_adversarial_guard.js`).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [11 Nov 2026] Issue: Complete Removal of "AI Search Visibility (ChatGPT & Gemini)" and Associated Generative Search References across RankPilot
 - **Symptom**: User requested complete removal of "AI Search Visibility (ChatGPT & Gemini)" and all related mentions/cards ("isko and iske related sab remove karo"). Specifically, the third tab in the "Google Business Profile Management — See Exactly What We Fix" showcase (`#audit-showcase`) and Card 3 in the Kinetic 3D Hero Card Flipper (`#heroFlipper`) promoted ChatGPT/Gemini/Perplexity AI search recommendations and AEO citations, which deviated from CustomerPilot's strict Google Maps / GBP Local 3-Pack core value proposition.
 - **Root Cause**: The landing page previously carried experimental AEO/GEO listicle and generative AI bot recommendation claims (`ChatGPT · Gemini · Perplexity`) that caused brand dilution and confusing messaging for local store owners seeking pure Google Maps ranking and customer review growth.
