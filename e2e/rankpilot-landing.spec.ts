@@ -181,7 +181,8 @@ test.describe('RankPilot AI Dedicated Landing Page E2E Suite', () => {
     const nearbySection = page.locator('#nearby-search');
     await expect(nearbySection).toBeVisible();
     await expect(nearbySection.locator('text=Rank Your Google Business Profile In Every Nearby Search').first()).toBeVisible();
-    await expect(nearbySection.locator('text=Cake Shop Near Me').first()).toBeVisible();
+    await expect(nearbySection.locator('text=Cafe Near Me').first()).toBeVisible();
+    await expect(nearbySection.locator('text=Your Business').first()).toBeVisible();
 
     // Reviews & Proof Section
     const reviewsSection = page.locator('#reviews');

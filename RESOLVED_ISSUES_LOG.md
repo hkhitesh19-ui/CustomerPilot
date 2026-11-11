@@ -8,6 +8,19 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [11 Nov 2026] Issue: RankPilot AI Hero 3D Card Flipper, Multi-Radius Concentric Radar Scanning Wave, and Brand-Gradient Pricing Redesign Inspired by GMBPro
+- **Symptom**: User requested implementing https://gmbpro.in/ exact animations on https://customerpilot.in/rankpilot: (1) Hero 3D Card Flipper (hero-visual, .card-flipper, .flipper-dots, 4 cards with auto-flip and pause-on-hover) populated with CustomerPilot merchant examples; (2) Multi-Radius Proximity Radar Container (.radar-container) with 4 concentric rings, rotating 360-degree radar sweep cone (.animate-radar-sweep), center store node, 6 floating pin cards with category icons/distances, and right-hand 5-feature list; (3) Pricing Section redesigned inspired by GMBPro with 4 trust badges, left 3-Month Pilot card (INR 6,999 / 3 Months), and elevated Yearly Dominance card (INR 29,000 / Year) styled with CustomerPilot brand logo gradient (#1D4ED8 -> #2563EB -> #0D9488), crisp white text, and contractual 100% Moneyback Guarantee SLA (45 days to Page 1, 90 days to Top 3; or 60 days if on Page 1); and (4) Opening locally in browser for visual confirmation.
+- **Root Cause**: The hero and nearby sections lacked interactive 3D card flips and rotating radar sweep mechanics to match GMBPro visual delight, and the pricing section needed the signature CustomerPilot royal-blue-to-teal logo gradient along with trust badges and contractual guarantee alignment.
+- **Resolution**:
+  1. Hero 3D Card Flipper Animation (#heroFlipper): Built 4-card animated flipper container with 5-second interval, manual flipper dots, and hover-pause mechanics (Cake Connection Maps rank, AI Review OCR, Zero-Gap Posts, GEO/AEO AI Search).
+  2. Multi-Radius Concentric Radar Container (#nearby-search): Built circular radar container with 4 concentric rings, 360-degree radar sweep cone, center node, 6 floating pin cards (Cafe, Gym, Dental Clinic, Salon, Restaurant, Hotel), and 5 feature cards.
+  3. Preserved 3x3 Geo-Rank Radar Grid Section (#geo-grid): Anchored interactive 3x3 grid simulator between SERP showcase and audit showcase with Day 1 vs Day 30 toggles.
+  4. CustomerPilot Brand Gradient Pricing Section (#pricing): 4 trust badges, left 3-Month Pilot card (INR 6,999 / 3 Months), elevated Yearly Dominance card (INR 29,000 / Year) with CustomerPilot logo gradient (#1D4ED8 to #2563EB to #0D9488) and 100% Moneyback Guarantee seal.
+  5. Verification & Local Preview: All 6 adversarial security gates passed; all 12 Playwright tests passed in 37.8s; visual proofs saved in artifacts directory; opened in local browser.
+- **Status**: [RESOLVED] Resolved and Verified.
+
+---
+
 ## [11 Nov 2026] Issue: GMBPro-Inspired High-Converting Redesign of RankPilot AI Landing Page with Interactive "See Exactly What We Fix" Showcase, Multi-Radius Nearby Search, and Verified Client Proof
 - **Symptom**: User requested a deep architectural and visual analysis of `https://gmbpro.in/`, followed by an inspired, bespoke redesign of `https://customerpilot.in/rankpilot` adhering to CustomerPilot's luxury SaaS design language (`#2563EB` Trust Blue, `#0F172A` terminal chassis, high-contrast `#F8FAFC`, Lucide SVG icons, zero dummy placeholders).
 - **Root Cause**: While RankPilot had strong technical simulators, `gmbpro.in`'s high conversion mechanics (pain-point hook, side-by-side "See Exactly What We Fix" before/after showcase, multi-radius nearby search coverage, and real client reviews) were needed to maximize merchant conversion, trust, and clarity.

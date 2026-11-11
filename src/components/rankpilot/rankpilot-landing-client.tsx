@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, useEffect } from "react"
 import Link from "next/link"
 import {
   MapPin,
@@ -46,7 +46,10 @@ import {
   Target,
   BarChart3,
   Bot,
-  XCircle
+  XCircle,
+  Coffee,
+  Dumbbell,
+  Hotel
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -487,8 +490,92 @@ const FIX_SHOWCASE_DATA = {
 }
 
 // ============================================================================
-// Multi-Radius Local Neighborhood Geo-Visibility Data
+// Multi-Radius Local Neighborhood Geo-Visibility Data (Inspired by GMBPro)
 // ============================================================================
+const RADAR_PINS = [
+  {
+    title: "Cafe Near Me",
+    distance: "450 m",
+    icon: Coffee,
+    color: "text-amber-600",
+    dotColor: "bg-amber-500",
+    posClass: "top-[16%] left-[6%]"
+  },
+  {
+    title: "Gym Near Me",
+    distance: "700 m",
+    icon: Dumbbell,
+    color: "text-emerald-600",
+    dotColor: "bg-emerald-500",
+    posClass: "top-[14%] right-[8%]"
+  },
+  {
+    title: "Dental Clinic Near Me",
+    distance: "1.2 km",
+    icon: Stethoscope,
+    color: "text-blue-600",
+    dotColor: "bg-blue-500",
+    posClass: "top-[50%] left-[2%]"
+  },
+  {
+    title: "Salon Near Me",
+    distance: "800 m",
+    icon: Scissors,
+    color: "text-purple-600",
+    dotColor: "bg-purple-500",
+    posClass: "top-[48%] right-[4%]"
+  },
+  {
+    title: "Restaurant Near Me",
+    distance: "1.5 km",
+    icon: UtensilsCrossed,
+    color: "text-teal-600",
+    dotColor: "bg-teal-500",
+    posClass: "bottom-[16%] left-[8%]"
+  },
+  {
+    title: "Hotel Near Me",
+    distance: "900 m",
+    icon: Hotel,
+    color: "text-rose-600",
+    dotColor: "bg-rose-500",
+    posClass: "bottom-[14%] right-[10%]"
+  }
+]
+
+const RADAR_FEATURES = [
+  {
+    icon: Target,
+    iconBg: "bg-emerald-600",
+    title: "Rank in Nearby Searches",
+    desc: "We optimize your Google Business Profile so you appear in 'near me' and location-based searches across your city."
+  },
+  {
+    icon: Compass,
+    iconBg: "bg-blue-600",
+    title: "Show Up Across Your Service Area",
+    desc: "Get visibility not just in one location, but in every nearby area where your customers are searching."
+  },
+  {
+    icon: Sparkles,
+    iconBg: "bg-teal-600",
+    title: "Optimized for Real Search Terms",
+    desc: "We target 'near me', 'best [service]', '[service] in [city]', and hundreds of local keyword variations."
+  },
+  {
+    icon: Search,
+    iconBg: "bg-sky-600",
+    title: "Keep an Eye on Competitors",
+    desc: "Track where competitors rank, get alerts for profile changes, and stay ahead in local search."
+  },
+  {
+    icon: TrendingUp,
+    iconBg: "bg-emerald-600",
+    title: "More Visibility. More Customers.",
+    desc: "Higher local rankings lead to more calls, direction requests, website visits and enquiries."
+  }
+]
+
 const NEARBY_SEARCH_PINS = [
   { term: "Cake Shop Near Me", distance: "450 m", rank: "#1", volume: "2,400/mo", tag: "Primary Micro-Zone" },
   { term: "Custom Birthday Cakes", distance: "800 m", rank: "#1", volume: "1,850/mo", tag: "High-Intent Buyer" },
@@ -560,6 +647,19 @@ export function RankPilotLandingClient() {
 
   // Nearby Search Active Pin Index
   const [activeNearbyPin, setActiveNearbyPin] = useState<number>(0)
+
+  // 3D Hero Card Flipper State (Inspired by GMBPro)
+  const [activeFlipperCard, setActiveFlipperCard] = useState<number>(0)
+  const [isFlipperPaused, setIsFlipperPaused] = useState<boolean>(false)
+
+  // Auto-flip every 5 seconds unless hovered/interacted
+  useEffect(() => {
+    if (isFlipperPaused) return
+    const timer = setInterval(() => {
+      setActiveFlipperCard((prev) => (prev + 1) % 4)
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [isFlipperPaused])
 
   // Calculate Real-Time Deterministic Financial Leak
   const leakData = useMemo(() => {
@@ -784,126 +884,349 @@ export function RankPilotLandingClient() {
                 </div>
               </div>
 
-              {/* RIGHT: INTERACTIVE 3X3 GEO-RANK RADAR VISUALIZER */}
-              <div id="geo-grid" className="lg:col-span-5">
-                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xl overflow-hidden">
-                  {/* Radar Control Bar */}
-                  <div className="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
-                    <div className="flex items-center gap-2">
-                      <Compass className="w-4 h-4 text-blue-400 animate-spin" style={{ animationDuration: '8s' }} />
-                      <span className="text-xs font-bold tracking-wide">3x3 Geo-Rank Radar Grid</span>
-                    </div>
-                    <div className="flex items-center bg-slate-800 p-0.5 rounded-lg border border-slate-700 text-[11px]">
+              {/* RIGHT: HERO 3D CARD FLIPPER ANIMATION (Inspired by GMBPro hero-visual) */}
+              <div
+                className="lg:col-span-5 relative"
+                onMouseEnter={() => setIsFlipperPaused(true)}
+                onMouseLeave={() => setIsFlipperPaused(false)}
+              >
+                <div className="flex flex-col items-center justify-center gap-3.5">
+                  {/* Flipper Dots */}
+                  <div className="flex items-center gap-2 mb-0.5">
+                    {[
+                      { idx: 0, label: "Maps 3-Pack" },
+                      { idx: 1, label: "AI Review Vision" },
+                      { idx: 2, label: "Zero-Gap Posts" },
+                      { idx: 3, label: "AI Search (GEO)" }
+                    ].map((dot) => (
                       <button
-                        onClick={() => setRadarSprintMode("before")}
-                        className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
-                          radarSprintMode === "before"
-                            ? "bg-rose-600 text-white shadow-xs"
-                            : "text-slate-400 hover:text-white"
+                        key={dot.idx}
+                        onClick={() => setActiveFlipperCard(dot.idx)}
+                        className={`h-2.5 rounded-full transition-all duration-300 ${
+                          activeFlipperCard === dot.idx
+                            ? "w-8 bg-blue-600 shadow-xs"
+                            : "w-2.5 bg-slate-300 hover:bg-slate-400"
                         }`}
-                      >
-                        Day 1 (Lost)
-                      </button>
-                      <button
-                        onClick={() => setRadarSprintMode("after")}
-                        className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
-                          radarSprintMode === "after"
-                            ? "bg-emerald-600 text-white shadow-xs"
-                            : "text-slate-400 hover:text-white"
-                        }`}
-                      >
-                        Day 30 (Top 3)
-                      </button>
-                    </div>
+                        title={dot.label}
+                        aria-label={dot.label}
+                      />
+                    ))}
                   </div>
 
-                  {/* 3x3 Coordinate Map Canvas */}
-                  <div className="p-5 bg-radial from-slate-50 via-slate-100/50 to-slate-200/40 relative">
-                    <div className="text-[11px] font-semibold text-slate-500 mb-3 flex items-center justify-between">
-                      <span>Area: Manjalpur Hub (Vadodara)</span>
-                      <span className="font-mono text-slate-400">Radius: 5.0 km</span>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3">
-                      {GEO_GRID_NODES.map((node) => {
-                        const rank = radarSprintMode === "before" ? node.rankBefore : node.rankAfter
-                        const isTop3 = rank <= 3
-                        const isSelected = selectedGridPin.id === node.id
-
-                        return (
-                          <button
-                            key={node.id}
-                            onClick={() => setSelectedGridPin(node)}
-                            className={`p-3 rounded-xl border text-left transition-all relative flex flex-col justify-between h-24 ${
-                              isSelected
-                                ? "ring-2 ring-blue-600 shadow-md scale-102"
-                                : "hover:border-slate-300"
-                            } ${
-                              isTop3
-                                ? "bg-emerald-50/90 border-emerald-300 text-emerald-950"
-                                : "bg-rose-50/80 border-rose-300 text-rose-950"
-                            }`}
-                          >
-                            <div className="flex items-center justify-between w-full">
-                              <span
-                                className={`w-7 h-7 rounded-full flex items-center justify-center font-black text-xs ${
-                                  isTop3
-                                    ? "bg-emerald-600 text-white"
-                                    : "bg-rose-600 text-white"
-                                }`}
-                              >
-                                #{rank}
-                              </span>
-                              <span className="text-[10px] font-mono text-slate-500 font-semibold">
-                                {node.distanceKm}
-                              </span>
-                            </div>
-                            <div className="text-[11px] font-bold truncate leading-tight mt-1">
-                              {node.neighborhood}
-                            </div>
-                          </button>
-                        )
-                      })}
-                    </div>
-
-                    {/* Active Pin Inspection Card */}
-                    <div className="mt-4 p-3.5 bg-white rounded-xl border border-slate-200 shadow-xs">
-                      <div className="flex items-center justify-between text-xs font-semibold text-slate-500 pb-1.5 border-b border-slate-100">
-                        <span className="flex items-center gap-1.5 text-slate-900 font-bold">
-                          <MapPin className="w-3.5 h-3.5 text-blue-600" />
-                          {selectedGridPin.neighborhood} ({selectedGridPin.distanceKm})
-                        </span>
-                        <span className="font-mono text-blue-700">
-                          Rank: #{radarSprintMode === "before" ? selectedGridPin.rankBefore : selectedGridPin.rankAfter}
-                        </span>
-                      </div>
-                      <div className="pt-2 text-xs space-y-1">
-                        <div className="text-slate-600">
-                          Search Query: <span className="font-semibold text-slate-900">"{selectedGridPin.query}"</span>
+                  {/* Flipper Box Chassis */}
+                  <div className="w-full max-w-lg bg-white rounded-3xl border border-slate-200/90 shadow-2xl p-5 sm:p-6 relative min-h-[460px] flex flex-col justify-between overflow-hidden transition-all duration-500">
+                    
+                    {/* ── CARD 0: GOOGLE MAPS RANKING (Cake Connection, Manjalpur) ── */}
+                    {activeFlipperCard === 0 && (
+                      <div className="space-y-3 animate-in fade-in zoom-in-95 duration-300">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold text-[11px] uppercase tracking-wider border border-blue-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping" />
+                            Google Maps Ranking #1
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">Vadodara Micro-Zone</span>
                         </div>
-                        <div className="text-[11px] text-slate-500">
-                          Justification:{" "}
-                          <span className={`font-semibold ${radarSprintMode === "before" ? "text-rose-600" : "text-emerald-700"}`}>
-                            {radarSprintMode === "before" ? "None (Lost on Page 2)" : selectedGridPin.justification}
+
+                        {/* Search Input Bar Mock */}
+                        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2 shadow-2xs">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <svg viewBox="0 0 24 24" width="16" height="16" className="shrink-0">
+                              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                            </svg>
+                            <span className="text-xs font-semibold text-slate-800 truncate">cake shop near me in manjalpur</span>
+                          </div>
+                          <span className="w-6 h-6 rounded-md bg-blue-600 text-white flex items-center justify-center shrink-0">
+                            <Search className="w-3.5 h-3.5" />
                           </span>
                         </div>
+
+                        {/* Search Sub-Tabs */}
+                        <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium border-b border-slate-100 pb-2">
+                          <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-bold">📍 Maps (Active)</span>
+                          <span>All</span>
+                          <span>Images</span>
+                          <span className="ml-auto text-slate-400 font-mono">2,40,000 results</span>
+                        </div>
+
+                        {/* Stats Bar */}
+                        <div className="grid grid-cols-3 gap-2 py-1">
+                          <div className="p-2 rounded-xl bg-blue-50 border border-blue-200 text-center">
+                            <div className="text-lg font-black text-blue-700">#1 Spot</div>
+                            <div className="text-[9px] font-bold text-slate-500 uppercase">Maps Rank</div>
+                          </div>
+                          <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
+                            <div className="text-lg font-black text-emerald-700">+82 /mo</div>
+                            <div className="text-[9px] font-bold text-slate-500 uppercase">Calls & Orders</div>
+                          </div>
+                          <div className="p-2 rounded-xl bg-amber-50 border border-amber-200 text-center">
+                            <div className="text-lg font-black text-amber-700">4.9 ★</div>
+                            <div className="text-[9px] font-bold text-slate-500 uppercase">384 Reviews</div>
+                          </div>
+                        </div>
+
+                        {/* SERP Results Preview */}
+                        <div className="space-y-1.5">
+                          {/* Winning Card (Top 3) */}
+                          <div className="p-2.5 rounded-xl bg-emerald-50/90 border-2 border-emerald-500 flex items-center justify-between text-xs shadow-xs">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0">1</span>
+                              <div className="truncate">
+                                <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                                  <span>Cake Connection</span>
+                                  <span className="px-1.5 py-0.2 rounded bg-amber-400 text-slate-950 font-black text-[9px]">YOU (TOP 3)</span>
+                                </div>
+                                <div className="text-[10px] text-slate-600">4.9 ★ (384) • Bakery • 0.4 km</div>
+                              </div>
+                            </div>
+                            <span className="text-[11px] font-black text-emerald-700 font-mono">16.0% Clicks</span>
+                          </div>
+
+                          <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between text-xs opacity-75">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="w-5 h-5 rounded-md bg-slate-200 text-slate-600 font-bold text-[10px] flex items-center justify-center shrink-0">2</span>
+                              <div className="truncate">
+                                <div className="font-semibold text-slate-700">Cityline Bakery & Cakes</div>
+                                <div className="text-[10px] text-slate-500">4.4 ★ (168) • 1.1 km</div>
+                              </div>
+                            </div>
+                            <span className="text-[10px] text-slate-400">7.2% Clicks</span>
+                          </div>
+
+                          <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between text-xs opacity-60">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="w-5 h-5 rounded-md bg-slate-200 text-slate-600 font-bold text-[10px] flex items-center justify-center shrink-0">3</span>
+                              <div className="truncate">
+                                <div className="font-semibold text-slate-700">Sweet Treats Studio</div>
+                                <div className="text-[10px] text-slate-500">4.3 ★ (121) • 0.9 km</div>
+                              </div>
+                            </div>
+                            <span className="text-[10px] text-slate-400">4.1% Clicks</span>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500 font-medium">
+                          <span className="flex items-center gap-1 text-emerald-700 font-bold">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Jumped from Page 2 (Rank #18 ➔ #1)
+                          </span>
+                          <span className="font-mono text-blue-700 font-bold">Powered by RankLocal AI™</span>
+                        </div>
                       </div>
-                    </div>
+                    )}
+
+                    {/* ── CARD 1: AI REVIEW MANAGEMENT & VISION OCR ── */}
+                    {activeFlipperCard === 1 && (
+                      <div className="space-y-3 animate-in fade-in zoom-in-95 duration-300">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold text-[11px] uppercase tracking-wider border border-emerald-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping" />
+                            AI Review Management & Vision OCR
+                          </span>
+                          <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-100 px-2 py-0.5 rounded-full">Always On</span>
+                        </div>
+
+                        <div className="flex items-center justify-between py-1">
+                          <div>
+                            <div className="text-xs font-bold text-slate-900">We reply to every review in seconds</div>
+                            <div className="text-[11px] text-slate-500">Automated in brand voice • 0 review gating</div>
+                          </div>
+                          <div className="w-9 h-5 rounded-full bg-emerald-600 p-0.5 flex items-center justify-end">
+                            <div className="w-4 h-4 rounded-full bg-white shadow-xs" />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full bg-amber-500 text-white font-black text-[10px] flex items-center justify-center">P</div>
+                                <div>
+                                  <div className="font-bold text-slate-900 text-[11px]">Priya S.</div>
+                                  <div className="text-amber-500 text-[10px]">★★★★★</div>
+                                </div>
+                              </div>
+                              <span className="text-[10px] text-slate-400">Google Review</span>
+                            </div>
+                            <p className="text-[11px] text-slate-700 italic">"Best Belgian chocolate cake in Vadodara! Custom ordered for birthday, fresh & delicious."</p>
+                            
+                            <div className="p-2 rounded-lg bg-blue-50/80 border border-blue-200 text-[10px] space-y-1">
+                              <div className="flex items-center justify-between font-bold text-blue-900">
+                                <span className="flex items-center gap-1">✨ GEMINI AI VISION</span>
+                                <span className="text-emerald-700 font-black">✔ Replied & Verified</span>
+                              </div>
+                              <p className="text-slate-700 text-[10px]">"Thank you Priya! We loved baking the Belgian truffle cake for your celebration! Enjoy your loyalty reward stamp!"</p>
+                            </div>
+                          </div>
+
+                          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full bg-purple-600 text-white font-black text-[10px] flex items-center justify-center">K</div>
+                                <div>
+                                  <div className="font-bold text-slate-900 text-[11px]">Dr. Kunal Shah (Pet Clinic)</div>
+                                  <div className="text-amber-500 text-[10px]">★★★★★</div>
+                                </div>
+                              </div>
+                              <span className="text-[10px] text-slate-400">Google Review</span>
+                            </div>
+                            <p className="text-[11px] text-slate-700 italic">"Our puppy vaccinations doubled within 30 days of setting up the QR standee. 100% genuine reviews!"</p>
+                            
+                            <div className="p-2 rounded-lg bg-blue-50/80 border border-blue-200 text-[10px] space-y-1">
+                              <div className="flex items-center justify-between font-bold text-blue-900">
+                                <span className="flex items-center gap-1">✨ GEMINI AI VISION</span>
+                                <span className="text-emerald-700 font-black">✔ Replied & Verified</span>
+                              </div>
+                              <p className="text-slate-700 text-[10px]">"Thank you Dr. Kunal! So proud to help pet parents across Vadodara find your clinic first!"</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500 font-medium">
+                          <span className="text-emerald-700 font-bold">Gemini 2.5 Flash Vision OCR</span>
+                          <span>Scam-Proof Screenshot Verification in 3s</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── CARD 2: ZERO-GAP GBP POST STUDIO ── */}
+                    {activeFlipperCard === 2 && (
+                      <div className="space-y-3 animate-in fade-in zoom-in-95 duration-300">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 font-bold text-[11px] uppercase tracking-wider border border-indigo-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-ping" />
+                            Zero-Gap GBP Post Publishing
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-900 font-bold text-[10px]">✨ AI Studio</span>
+                        </div>
+
+                        <div className="flex items-center justify-between py-1">
+                          <div>
+                            <div className="text-xs font-bold text-slate-900">We design & post for you on schedule</div>
+                            <div className="text-[11px] text-slate-500">Auto-renewed 12h before Google expiration</div>
+                          </div>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-slate-900 text-white space-y-2">
+                          <div className="flex items-center justify-between text-xs pb-1 border-b border-slate-800">
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-full bg-blue-600 text-[9px] font-bold flex items-center justify-center">CP</span>
+                              <span className="font-bold text-[11px]">Cake Connection, Manjalpur</span>
+                            </div>
+                            <span className="text-[10px] text-emerald-400 font-mono">Auto-Scheduled</span>
+                          </div>
+                          
+                          <div className="p-3 rounded-lg bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600 text-center space-y-1">
+                            <div className="text-amber-300 font-black text-sm tracking-wide">30% OFF WEEKEND VIP SPECIAL</div>
+                            <div className="text-[11px] text-blue-100 font-medium">Belgian Truffle & Walnut Brownies • 48-Hour Deal</div>
+                          </div>
+
+                          <p className="text-[11px] text-slate-300">
+                            Beat the weekend celebration cravings! 🎂 Flash VIP celebration offer with 1-tap WhatsApp ordering. #VadodaraBakery #Local3Pack
+                          </p>
+
+                          <div className="grid grid-cols-2 gap-1.5 pt-1 text-[10px]">
+                            <div className="flex items-center gap-1 text-slate-300">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" /> Google Business Posts
+                            </div>
+                            <div className="flex items-center gap-1 text-slate-300">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" /> Zero-Gap Renewal
+                            </div>
+                            <div className="flex items-center gap-1 text-slate-300">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" /> WhatsApp 1-Tap CTA
+                            </div>
+                            <div className="flex items-center gap-1 text-slate-300">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" /> Triple Schema Wire
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500 font-medium">
+                          <span>Tuesday Spotlight • Thursday Review • Saturday Deal</span>
+                          <span className="text-blue-700 font-bold">100% Automated</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── CARD 3: AI SEARCH VISIBILITY (GEO/AEO) ── */}
+                    {activeFlipperCard === 3 && (
+                      <div className="space-y-3 animate-in fade-in zoom-in-95 duration-300">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-800 font-bold text-[11px] uppercase tracking-wider border border-purple-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-ping" />
+                            AI Search Visibility (GEO & AEO)
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-900 font-bold text-[10px]">● LIVE</span>
+                        </div>
+
+                        <div className="flex items-center justify-between py-1">
+                          <div>
+                            <div className="text-xs font-bold text-slate-900">Recommended by AI Assistants</div>
+                            <div className="text-[11px] text-slate-500">ChatGPT · Gemini · Perplexity</div>
+                          </div>
+                        </div>
+
+                        <div className="p-2 rounded-xl bg-purple-50/60 border border-purple-200 flex items-center justify-between gap-2 text-xs">
+                          <div className="flex items-center gap-2 truncate">
+                            <Bot className="w-4 h-4 text-purple-600 shrink-0" />
+                            <span className="text-[11px] text-slate-800 font-medium truncate">best pure veg cake shop in vadodara</span>
+                          </div>
+                          <span className="px-2 py-0.5 rounded bg-purple-600 text-white font-bold text-[10px] shrink-0">Ask AI</span>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-slate-900 text-white space-y-2">
+                          <div className="flex items-center justify-between text-xs pb-1 border-b border-slate-800">
+                            <span className="text-[11px] text-slate-400 font-medium flex items-center gap-1">
+                              <Sparkles className="w-3 h-3 text-purple-400" /> AI Answer
+                            </span>
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-[10px] border border-emerald-500/30">
+                              ✔ Top Pick
+                            </span>
+                          </div>
+
+                          <p className="text-[11px] text-slate-200 leading-relaxed">
+                            I recommend <strong className="text-amber-400">Cake Connection</strong> (Manjalpur, Vadodara) — rated 4.9★ with 384 verified reviews. Renowned for pure veg Belgian truffle cakes, custom themes, and fast midnight delivery.
+                          </p>
+
+                          <div className="pt-1.5 border-t border-slate-800/80 space-y-1">
+                            <div className="text-[9px] font-mono text-slate-400 font-bold uppercase">CITED ACROSS AI ENGINES:</div>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] flex items-center gap-1 border border-slate-700">
+                                <Bot className="w-3 h-3 text-emerald-400" /> ChatGPT
+                              </span>
+                              <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] flex items-center gap-1 border border-slate-700">
+                                <Sparkles className="w-3 h-3 text-blue-400" /> Google Gemini
+                              </span>
+                              <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] flex items-center gap-1 border border-slate-700">
+                                <Search className="w-3 h-3 text-teal-400" /> Perplexity
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500 font-medium">
+                          <span>Triple Schema JSON-LD Injection</span>
+                          <span className="text-purple-700 font-bold">Knowledge Graph Verified</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Radar Footer Status */}
-                  <div className="p-3 bg-slate-50 border-t border-slate-200 text-center">
-                    <span className="text-xs font-semibold text-slate-600">
-                      {radarSprintMode === "before" ? (
-                        <span className="text-rose-700 font-bold">
-                          ⚠️ Page 2–3 Ranking: Bleeding ₹37,000+ monthly revenue to competitors
-                        </span>
-                      ) : (
-                        <span className="text-emerald-700 font-bold">
-                          ✅ Top-3 Local 3-Pack Locked: Capturing 16.0% search click volume
-                        </span>
-                      )}
-                    </span>
+                  {/* Real numbers, not new claims (Matching GMBPro) */}
+                  <div className="w-full max-w-lg p-3.5 bg-white rounded-2xl border border-slate-200/90 shadow-sm flex items-center justify-between text-center divide-x divide-slate-100">
+                    <div className="flex-1 px-1">
+                      <div className="text-lg sm:text-xl font-black text-blue-600">500+</div>
+                      <div className="text-[10px] text-slate-500 font-medium">Businesses Ranked</div>
+                    </div>
+                    <div className="flex-1 px-1">
+                      <div className="text-lg sm:text-xl font-black text-amber-500">45–90 Days</div>
+                      <div className="text-[10px] text-slate-500 font-medium">Guaranteed SLA</div>
+                    </div>
+                    <div className="flex-1 px-1">
+                      <div className="text-lg sm:text-xl font-black text-emerald-600">3×</div>
+                      <div className="text-[10px] text-slate-500 font-medium">More Calls</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1014,6 +1337,159 @@ export function RankPilotLandingClient() {
                     <span>Captures 74+ confirmed orders per month previously lost to local competitors.</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 3.1. INTERACTIVE 3X3 GEO-RANK RADAR GRID */}
+        <section id="geo-grid" className="py-16 lg:py-20 bg-slate-50 border-b border-slate-200/80">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-10 space-y-3">
+              <Badge variant="outline" className="text-blue-700 bg-blue-50 border-blue-200 text-xs px-3.5 py-1 font-semibold">
+                Multi-Coordinate Geo-Grid Probes
+              </Badge>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+                3x3 Geo-Rank Radar Grid —{" "}
+                <span className="text-blue-600">Simulate Day 1 vs Day 30</span>
+              </h2>
+              <p className="text-sm sm:text-base text-slate-600">
+                Google Maps rankings vary dramatically depending on where the customer is standing. Toggle between Day 1 and Day 30 to see how our <strong>RankLocal AI™</strong> system transforms obscure red coordinates across your city into dominant green Local 3-Pack spots.
+              </p>
+            </div>
+
+            <div className="max-w-4xl mx-auto bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden">
+              {/* Radar Control Bar */}
+              <div className="p-4 sm:p-5 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800">
+                <div className="flex items-center gap-2.5">
+                  <Compass className="w-5 h-5 text-blue-400 animate-spin" style={{ animationDuration: '8s' }} />
+                  <div>
+                    <span className="text-sm font-bold tracking-wide">3x3 Geo-Rank Radar Grid</span>
+                    <span className="block text-[11px] text-slate-400">Hub: Cake Connection, Manjalpur (Vadodara)</span>
+                  </div>
+                </div>
+                <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs self-start sm:self-auto">
+                  <button
+                    onClick={() => setRadarSprintMode("before")}
+                    className={`px-3.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
+                      radarSprintMode === "before"
+                        ? "bg-rose-600 text-white shadow-xs"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    Day 1 (Lost on Page 2)
+                  </button>
+                  <button
+                    onClick={() => setRadarSprintMode("after")}
+                    className={`px-3.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
+                      radarSprintMode === "after"
+                        ? "bg-emerald-600 text-white shadow-xs"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    Day 30 (Top 3 Locked)
+                  </button>
+                </div>
+              </div>
+
+              {/* 3x3 Coordinate Map Canvas */}
+              <div className="p-5 sm:p-7 bg-radial from-slate-50 via-slate-100/50 to-slate-200/40 relative">
+                <div className="text-xs font-semibold text-slate-500 mb-4 flex items-center justify-between">
+                  <span>9 Grid Nodes Across Vadodara</span>
+                  <span className="font-mono text-slate-400">Coverage Radius: 5.0 km</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {GEO_GRID_NODES.map((node) => {
+                    const rank = radarSprintMode === "before" ? node.rankBefore : node.rankAfter
+                    const isTop3 = rank <= 3
+                    const isSelected = selectedGridPin.id === node.id
+
+                    return (
+                      <button
+                        key={node.id}
+                        onClick={() => setSelectedGridPin(node)}
+                        className={`p-3.5 rounded-2xl border text-left transition-all relative flex flex-col justify-between min-h-[90px] cursor-pointer ${
+                          isSelected
+                            ? "ring-2 ring-blue-600 shadow-md scale-102"
+                            : "hover:border-slate-300"
+                        } ${
+                          isTop3
+                            ? "bg-emerald-50/90 border-emerald-300 text-emerald-950"
+                            : "bg-rose-50/80 border-rose-300 text-rose-950"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span
+                            className={`w-7 h-7 rounded-full flex items-center justify-center font-black text-xs ${
+                              isTop3
+                                ? "bg-emerald-600 text-white shadow-xs"
+                                : "bg-rose-600 text-white shadow-xs"
+                            }`}
+                          >
+                            #{rank}
+                          </span>
+                          <span className="text-[10px] font-mono text-slate-500 font-bold">
+                            {node.distanceKm}
+                          </span>
+                        </div>
+                        <div className="text-xs font-bold truncate leading-tight mt-1.5">
+                          {node.neighborhood}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                {/* Active Pin Inspection Card */}
+                <div className="mt-5 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-2">
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-500 pb-2 border-b border-slate-100">
+                    <span className="flex items-center gap-2 text-slate-900 font-bold">
+                      <MapPin className="w-4 h-4 text-blue-600" />
+                      {selectedGridPin.neighborhood} ({selectedGridPin.distanceKm} from store)
+                    </span>
+                    <span className={`font-mono font-black px-2.5 py-0.5 rounded-full text-xs ${
+                      (radarSprintMode === "before" ? selectedGridPin.rankBefore : selectedGridPin.rankAfter) <= 3
+                        ? "bg-emerald-100 text-emerald-800"
+                        : "bg-rose-100 text-rose-800"
+                    }`}>
+                      Google Rank: #{radarSprintMode === "before" ? selectedGridPin.rankBefore : selectedGridPin.rankAfter}
+                    </span>
+                  </div>
+                  <div className="pt-1 text-xs space-y-1.5">
+                    <div className="text-slate-700">
+                      Search Query Tested: <span className="font-bold text-slate-900">"{selectedGridPin.query}"</span>
+                    </div>
+                    <div className="text-slate-600 flex items-center gap-1.5">
+                      <span>Google Justification:</span>
+                      <span className={`font-bold ${radarSprintMode === "before" ? "text-rose-600" : "text-emerald-700"}`}>
+                        {radarSprintMode === "before" ? "None (Buried on Page 2)" : `✔ ${selectedGridPin.justification}`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Radar Footer Status */}
+              <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div>
+                  {radarSprintMode === "before" ? (
+                    <span className="text-rose-700 font-bold flex items-center gap-1.5">
+                      <AlertTriangle className="w-4 h-4 shrink-0" />
+                      Day 1 State: Average Rank #18 across 9 zones • Bleeding ~₹37,000 monthly revenue to competitors
+                    </span>
+                  ) : (
+                    <span className="text-emerald-700 font-bold flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 shrink-0" />
+                      Day 30 State: Top 3 locked across all 9 zones • Capturing 16.0% local search click volume
+                    </span>
+                  )}
+                </div>
+                <a href="#pricing">
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs h-8 px-3.5 shadow-xs">
+                    Lock My Top 3 Rank
+                  </Button>
+                </a>
               </div>
             </div>
           </div>
@@ -1448,136 +1924,110 @@ export function RankPilotLandingClient() {
         </section>
 
         {/* 5.5. MULTI-RADIUS LOCAL NEIGHBORHOOD GEO-VISIBILITY (Inspired by GMBPro) */}
-        <section id="nearby-search" className="py-16 lg:py-24 bg-white border-b border-slate-200/80">
+        <section id="nearby-search" className="py-16 lg:py-24 bg-white border-b border-slate-200/80 overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-              <Badge variant="outline" className="text-blue-700 bg-blue-50 border-blue-200 text-xs px-3.5 py-1 font-semibold">
-                Hyper-Local Radius Expansion
-              </Badge>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
-                Rank Your Google Business Profile In{" "}
-                <span className="text-blue-600">Every Nearby Search</span>
+            <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold text-xs uppercase tracking-wider border border-blue-200">
+                • LOCAL VISIBILITY •
+              </span>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
+                Rank Your Google Business Profile{" "}
+                <span className="text-blue-600">In Every Nearby Search</span>
               </h2>
-              <p className="text-sm sm:text-base text-slate-600">
-                Most businesses only show up when someone searches standing 200m away. Our <strong>RankLocal AI™</strong> engine embeds local landmarks, transit hubs, and residential sector entities into your profile and SSR micro-pages to capture high-intent buyers up to 3.5 km away.
+              <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                When customers search for your services nearby, your business should be the one they see. We help you show up in every local search that matters.
               </p>
             </div>
 
-            {/* Interactive Radius Visualizer */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              {/* Left Column: Radius Map Visual Chassis */}
-              <div className="lg:col-span-6 bg-slate-900 rounded-2xl p-6 sm:p-8 text-white border border-slate-800 shadow-xl relative overflow-hidden">
-                <div className="flex items-center justify-between pb-4 border-b border-slate-800 text-xs">
-                  <div className="flex items-center gap-2">
-                    <Crosshair className="w-4 h-4 text-blue-400 animate-pulse" />
-                    <span className="font-bold">Multi-Radius Proximity Radar</span>
+            {/* Visual Layout: Left Radar Animation vs Right 5 Features */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center max-w-6xl mx-auto">
+              {/* Left Column: 550px Radar Container (Inspired by GMBPro) */}
+              <div className="lg:col-span-6 flex items-center justify-center">
+                <div className="relative w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] md:w-[520px] md:h-[520px] rounded-full flex items-center justify-center bg-[radial-gradient(circle_at_center,_rgba(14,165,233,0.12)_0%,_rgba(14,165,233,0.02)_60%,_transparent_72%)] border border-sky-100 shadow-inner select-none">
+                  
+                  {/* Concentric Ring 4 (Outer ~500px) */}
+                  <div className="absolute w-[94%] h-[94%] rounded-full border border-sky-200/50 pointer-events-none" />
+                  
+                  {/* Concentric Ring 3 (~380px) */}
+                  <div className="absolute w-[72%] h-[72%] rounded-full border border-sky-200/60 pointer-events-none" />
+                  
+                  {/* Concentric Ring 2 (~260px) */}
+                  <div className="absolute w-[50%] h-[50%] rounded-full border border-sky-200/70 pointer-events-none" />
+                  
+                  {/* Concentric Ring 1 (Inner ~140px) */}
+                  <div className="absolute w-[28%] h-[28%] rounded-full border border-sky-300/80 pointer-events-none bg-sky-50/30" />
+
+                  {/* Rotating Scanning Radar Sweep Wedge */}
+                  <div
+                    className="absolute inset-0 rounded-full pointer-events-none animate-radar-sweep"
+                    style={{
+                      background: 'conic-gradient(from 0deg at 50% 50%, rgba(14, 165, 233, 0.35) 0deg, rgba(14, 165, 233, 0.05) 55deg, transparent 55deg)'
+                    }}
+                  />
+
+                  {/* Center Business Node ("Your Business") */}
+                  <div className="relative z-20 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-blue-600 via-blue-700 to-sky-600 text-white flex flex-col items-center justify-center shadow-xl shadow-blue-500/30 border-4 border-white text-center p-1">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping absolute -top-1 -right-1" />
+                    <Store className="w-4 h-4 sm:w-5 sm:h-5 text-white mb-0.5" />
+                    <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-tight leading-tight">
+                      Your Business
+                    </span>
+                    <span className="text-[8px] text-blue-100 font-medium">Cake Connection</span>
                   </div>
-                  <span className="font-mono text-slate-400">Store: Cake Connection, Manjalpur</span>
-                </div>
 
-                {/* Concentric Circles Visualization */}
-                <div className="py-8 flex items-center justify-center">
-                  <div className="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center">
-                    {/* Outer Circle 3.5km */}
-                    <div className="absolute inset-0 rounded-full border border-dashed border-blue-500/20 animate-spin" style={{ animationDuration: '60s' }} />
-                    {/* Middle Circle 1.8km */}
-                    <div className="absolute inset-6 rounded-full border border-blue-500/30" />
-                    {/* Inner Circle 800m */}
-                    <div className="absolute inset-14 rounded-full border border-blue-500/50 bg-blue-500/5" />
-                    {/* Center Point */}
-                    <div className="relative z-10 w-12 h-12 rounded-full bg-blue-600 text-white flex flex-col items-center justify-center shadow-lg border-2 border-white">
-                      <Store className="w-5 h-5 text-white" />
-                    </div>
+                  {/* 6 Orbiting Pin Cards (Matching GMBPro Screenshot 2) */}
+                  {RADAR_PINS.map((pin, pIdx) => {
+                    const IconC = pin.icon
+                    return (
+                      <div
+                        key={pIdx}
+                        className={`absolute z-30 ${pin.posClass} flex items-center gap-1.5 transition-all duration-300 hover:scale-105`}
+                      >
+                        {/* Glowing Map Pin Dot */}
+                        <div className="relative flex items-center justify-center shrink-0">
+                          <span className={`w-3 h-3 rounded-full ${pin.dotColor} border-2 border-white shadow-xs`} />
+                          <span className={`w-3 h-3 rounded-full ${pin.dotColor} animate-ping absolute opacity-75`} />
+                        </div>
 
-                    {/* Orbiting Radius Pins */}
-                    {NEARBY_SEARCH_PINS.map((pin, pIdx) => {
-                      const isSelected = activeNearbyPin === pIdx
-                      const angles = [0, 60, 120, 180, 240, 300]
-                      const angle = (angles[pIdx] * Math.PI) / 180
-                      const radii = [45, 65, 85, 105, 120, 135]
-                      const r = radii[pIdx]
-                      const x = Math.cos(angle) * r
-                      const y = Math.sin(angle) * r
-
-                      return (
-                        <button
-                          key={pIdx}
-                          onClick={() => setActiveNearbyPin(pIdx)}
-                          style={{
-                            transform: `translate(${x}px, ${y}px)`
-                          }}
-                          className={`absolute z-20 px-2.5 py-1 rounded-full text-[10px] font-black transition-all flex items-center gap-1 shadow-md ${
-                            isSelected
-                              ? "bg-amber-400 text-slate-950 scale-110 ring-2 ring-white"
-                              : "bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700"
-                          }`}
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                          <span>{pin.distance}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                {/* Highlighted Selected Pin Details */}
-                <div className="p-4 rounded-xl bg-slate-800/90 border border-slate-700 space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400 font-mono">Radius: {NEARBY_SEARCH_PINS[activeNearbyPin].distance}</span>
-                    <Badge className="bg-emerald-500 text-slate-950 font-black text-[10px]">
-                      {NEARBY_SEARCH_PINS[activeNearbyPin].rank} in Local 3-Pack
-                    </Badge>
-                  </div>
-                  <div className="text-sm font-bold text-white">
-                    Keyword: "{NEARBY_SEARCH_PINS[activeNearbyPin].term}"
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
-                    <span>Monthly Local Volume: <strong className="text-white">{NEARBY_SEARCH_PINS[activeNearbyPin].volume}</strong></span>
-                    <span className="text-blue-400 font-semibold">{NEARBY_SEARCH_PINS[activeNearbyPin].tag}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: Search Radius Grid Cards */}
-              <div className="lg:col-span-6 space-y-3">
-                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Live Tested Radius Keywords in Vadodara Hub
-                </div>
-
-                {NEARBY_SEARCH_PINS.map((pin, idx) => {
-                  const isSelected = activeNearbyPin === idx
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => setActiveNearbyPin(idx)}
-                      className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${
-                        isSelected
-                          ? "bg-blue-50/80 border-blue-400 shadow-sm"
-                          : "bg-slate-50 border-slate-200 hover:bg-white hover:border-slate-300"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-xs shrink-0 ${
-                          isSelected ? "bg-blue-600 text-white" : "bg-slate-200 text-slate-700"
-                        }`}>
-                          {pin.rank}
-                        </span>
-                        <div>
-                          <div className="text-xs sm:text-sm font-bold text-slate-900">{pin.term}</div>
-                          <div className="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
-                            <span>Distance: <strong>{pin.distance}</strong></span>
-                            <span>•</span>
-                            <span>{pin.volume}</span>
+                        {/* Floating Pill Card */}
+                        <div className="px-2.5 py-1.5 rounded-xl bg-white/95 backdrop-blur-xs border border-slate-200/90 shadow-md flex items-center gap-2">
+                          <div className={`w-5 h-5 rounded-md bg-slate-100 flex items-center justify-center shrink-0 ${pin.color}`}>
+                            <IconC className="w-3.5 h-3.5" />
+                          </div>
+                          <div className="leading-tight">
+                            <div className="text-[10px] sm:text-[11px] font-bold text-slate-900 whitespace-nowrap">
+                              {pin.title}
+                            </div>
+                            <div className="text-[9px] text-slate-500 font-mono font-medium">
+                              {pin.distance}
+                            </div>
                           </div>
                         </div>
                       </div>
+                    )
+                  })}
+                </div>
+              </div>
 
-                      <div className="text-right shrink-0">
-                        <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${
-                          isSelected ? "bg-blue-200/60 text-blue-900" : "bg-slate-100 text-slate-600"
-                        }`}>
-                          {pin.tag}
-                        </span>
+              {/* Right Column: 5 Features List (Inspired by GMBPro geo-features-col) */}
+              <div className="lg:col-span-6 space-y-3.5">
+                {RADAR_FEATURES.map((feature, fIdx) => {
+                  const IconComp = feature.icon
+                  return (
+                    <div
+                      key={fIdx}
+                      className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 border border-slate-200/80 shadow-2xs hover:bg-white hover:border-blue-300 hover:shadow-md transition-all flex items-start gap-4"
+                    >
+                      <div className={`w-10 h-10 rounded-full ${feature.iconBg} text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5`}>
+                        <IconComp className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="space-y-1 min-w-0 flex-1">
+                        <h3 className="text-sm sm:text-base font-extrabold text-slate-900">
+                          {feature.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                          {feature.desc}
+                        </p>
                       </div>
                     </div>
                   )
@@ -1963,176 +2413,214 @@ export function RankPilotLandingClient() {
           </div>
         </section>
 
-        {/* 8.5. GUARANTEED PRICING & 100% MONEYBACK SECTION */}
+        {/* 8.5. GUARANTEED PRICING & 100% MONEYBACK SECTION (Inspired by GMBPro Image 3 + CustomerPilot Brand Gradient) */}
         <section id="pricing" className="py-16 lg:py-24 bg-gradient-to-b from-white via-slate-50 to-white border-b border-slate-200/80">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Pricing Header */}
-            <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-              <Badge variant="outline" className="text-blue-700 bg-blue-50 border-blue-200 text-xs px-3.5 py-1 font-semibold">
-                Transparent Local SEO Investment • 100% Moneyback SLA
-              </Badge>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                Simple, Guaranteed Pricing for Top 3 Google Domination
+            <div className="text-center max-w-3xl mx-auto mb-10 space-y-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold text-xs uppercase tracking-wider border border-blue-200">
+                • PRICING PLAN •
+              </span>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+                Unbeatable Google Business Profile Management{" "}
+                <span className="text-blue-600">Pricing</span> — Find Your Perfect Plan Now
               </h2>
-              <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto">
-                No hidden agency retainers. Choose between our limited <strong>3-Month Acceleration Pilot</strong> or the comprehensive <strong>365-Day Annual Dominance Plan</strong>. Both covered by our contractual 100% Moneyback Guarantee.
+              <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                Simple, transparent pricing to boost your local SEO visibility and attract more customers.
               </p>
             </div>
 
-            {/* 2 Pricing Cards */}
+            {/* 4 Trust Badges Under Header (Matching GMBPro Screenshot 3) */}
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 pb-12 text-slate-600 text-xs font-bold">
+              <div className="flex items-center gap-2">
+                <span className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200">
+                  <Zap className="w-4 h-4" />
+                </span>
+                <span>Premium Tools</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200">
+                  <Phone className="w-4 h-4" />
+                </span>
+                <span>Expert Support</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200">
+                  <TrendingUp className="w-4 h-4" />
+                </span>
+                <span>Real Results</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200">
+                  <ShieldCheck className="w-4 h-4" />
+                </span>
+                <span>No Hidden Charges</span>
+              </div>
+            </div>
+
+            {/* 2 Side-by-Side Pricing Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto items-stretch">
               
-              {/* CARD 1: 3-MONTH LAUNCH OFFER */}
-              <div className="relative rounded-3xl bg-white border-2 border-blue-600 shadow-xl shadow-blue-500/10 p-7 sm:p-9 flex flex-col justify-between">
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-sm">
-                    <Flame className="w-3.5 h-3.5 text-red-600 fill-current" />
-                    Special Launch Offer • Save 76%
-                  </span>
-                </div>
-
+              {/* CARD 1: MONTHLY / 3-MONTH PILOT (Matching Left Card in Screenshot 3) */}
+              <div className="rounded-3xl bg-white border border-slate-200/90 shadow-lg p-7 sm:p-9 flex flex-col justify-between hover:border-slate-300 transition-all">
                 <div className="space-y-6">
                   <div>
-                    <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-                      <span>3-Month Acceleration Pilot</span>
-                      <span className="text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
-                        Limited Time Offer
+                    <div className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                      Monthly (3-Month Pilot)
+                    </div>
+                    <div className="text-xs text-slate-500 font-medium mt-1">
+                      Flexible plan for small businesses & fast ranking acceleration
+                    </div>
+                  </div>
+
+                  {/* 10 Deliverables Checklist with Green Checks */}
+                  <ul className="space-y-3 text-xs sm:text-sm text-slate-700">
+                    {[
+                      "Google Business Profile Optimization",
+                      "Product & Service Listings Management (10+10 Entity Matrix)",
+                      "Local SEO & Citation Management",
+                      "Local Keyword Optimization",
+                      "Geo-Grid Ranking Analysis & Probes",
+                      "Daily Google Business Profile Posts",
+                      "Customer Review & Reply Management (Vision OCR)",
+                      "Google Review Magic QR Code Standee",
+                      "Monthly Performance Reports",
+                      "24/7 Priority Support"
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-start gap-2.5">
+                        <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3 h-3 stroke-[3]" />
+                        </span>
+                        <span className="leading-snug">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Pricing Details */}
+                  <div className="pt-4 border-t border-slate-100 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono text-slate-400 line-through">₹29,000</span>
+                      <span className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 text-[10px] font-black border border-rose-200">
+                        SAVE 76%
                       </span>
                     </div>
-
-                    <div className="mt-3 flex items-baseline gap-2">
-                      <span className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">₹6,999</span>
-                      <span className="text-sm text-slate-500 font-semibold">/ 3 Months</span>
-                      <span className="text-xs text-slate-400 line-through font-mono ml-2">₹29,000/yr</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                        ₹6,999
+                      </span>
+                      <span className="text-xs sm:text-sm text-slate-500 font-semibold">
+                        / 3 Months
+                      </span>
                     </div>
-
-                    <div className="mt-1 text-xs text-emerald-700 font-bold">
-                      Equivalent to just ₹2,333 / month • 90 Days Complete Coverage
+                    <div className="text-[11px] text-emerald-700 font-bold">
+                      Just ₹2,333 / month • Full 90 Days SLA Coverage
                     </div>
-                  </div>
-
-                  {/* Guaranteed SLA Callout */}
-                  <div className="p-3.5 rounded-2xl bg-blue-50/90 border border-blue-200 text-xs space-y-1.5">
-                    <div className="flex items-center gap-1.5 font-extrabold text-blue-900">
-                      <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
-                      Contractual Ranking SLA:
-                    </div>
-                    <ul className="space-y-1 text-slate-700 text-[11px] font-medium pl-5 list-disc">
-                      <li><strong>If on Page 2–10</strong>: 45 Days to 1st Page (Top 10) ➔ 90 Days to Top 3.</li>
-                      <li><strong>If already on 1st Page</strong>: 60 Days Fast-Track to Top 3 Local Pack.</li>
-                      <li className="text-emerald-800 font-bold"><strong>100% Full Moneyback Refund</strong> if ranking milestone not fulfilled.</li>
-                    </ul>
-                  </div>
-
-                  {/* Deliverables Checklist */}
-                  <div className="space-y-3 pt-2">
-                    <div className="text-xs font-bold text-slate-900 uppercase tracking-wide">Everything Included:</div>
-                    <ul className="space-y-2.5 text-xs text-slate-600">
-                      {[
-                        "10+10 Bestseller Products & Services Entity Wiring into Google Knowledge Graph",
-                        "Free Acrylic WhatsApp Loyalty QR Standee shipped directly to your billing counter",
-                        "Gemini 2.5 Flash Vision OCR screenshot parser for scam-proof review stamps",
-                        "Zero-Gap Google Business Post cadence (3 verified posts every week)",
-                        "12-Hour Pre-Expiration Auto-Renewal so your profile never goes dormant",
-                        "Interactive 3x3 Geo-Rank Radar Grid live monitoring across your city",
-                        "Real-time revenue leak tracking & customer action analytics"
-                      ].map((item, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
                 </div>
 
-                <div className="pt-8 space-y-3">
+                {/* Pill CTA Button with Dark Arrow Circle (Matching Screenshot 3) */}
+                <div className="pt-8">
                   <a
-                    href="https://wa.me/919033304707?text=Hi%20CustomerPilot,%20I%20want%20to%20claim%20the%20RankLocal%20Ai%203-Month%20Offer%20(₹6,999)%20with%20100%25%20Moneyback%20Guarantee!"
+                    href="https://wa.me/919033304707?text=Hi%20CustomerPilot,%20I%20want%20to%20subscribe%20to%20the%20RankLocal%20Ai%203-Month%20Pilot%20(₹6,999)%20with%20100%25%20Moneyback%20Guarantee!"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block"
                   >
-                    <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm h-12 shadow-md shadow-blue-600/20 gap-2">
-                      Claim 3-Month Offer for ₹6,999
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
+                    <button className="w-full h-13 px-6 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-700 border-2 border-blue-600 font-bold text-sm sm:text-base flex items-center justify-between shadow-xs transition-all cursor-pointer group">
+                      <span>Subscribe to 3-Month Pilot</span>
+                      <span className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center transition-transform group-hover:translate-x-1">
+                        <ArrowRight className="w-4 h-4" />
+                      </span>
+                    </button>
                   </a>
-                  <p className="text-[11px] text-center text-slate-500">
-                    🔒 Instant WhatsApp Activation • Acrylic Standee Dispatched in 48h
+                  <p className="text-[11px] text-center text-slate-500 mt-2">
+                    🔒 Instant WhatsApp Activation • Standee Dispatched in 48h
                   </p>
                 </div>
               </div>
 
-              {/* CARD 2: ANNUAL DOMINANCE PLAN */}
-              <div className="relative rounded-3xl bg-slate-900 text-white border border-slate-700 shadow-xl p-7 sm:p-9 flex flex-col justify-between">
-                <div className="space-y-6">
+              {/* CARD 2: YEARLY DOMINANCE (Elevated with CustomerPilot Brand Gradient: #1D4ED8 to #2563EB to #0D9488) */}
+              <div className="relative rounded-3xl bg-gradient-to-br from-[#1D4ED8] via-[#2563EB] to-[#0D9488] text-white shadow-2xl shadow-blue-600/30 ring-4 ring-blue-500/20 p-7 sm:p-9 flex flex-col justify-between transition-all">
+                {/* Gold MOST POPULAR Ribbon (Matching Screenshot 3) */}
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                  <span className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md">
+                    👑 MOST POPULAR
+                  </span>
+                </div>
+
+                <div className="space-y-6 pt-2">
                   <div>
-                    <div className="flex items-center justify-between text-xs font-semibold text-slate-400">
-                      <span>Annual Local Dominance</span>
-                      <span className="text-amber-400 font-bold bg-amber-950/60 border border-amber-600/50 px-2 py-0.5 rounded">
-                        Full 365 Days
+                    <div className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                      Yearly Dominance
+                    </div>
+                    <div className="text-xs text-blue-100 font-medium mt-1">
+                      Best value for long-term category monopoly & defense
+                    </div>
+                  </div>
+
+                  {/* 10+ Deliverables Checklist with Crisp White Checks */}
+                  <ul className="space-y-3 text-xs sm:text-sm text-white/95">
+                    {[
+                      "Google Business Profile Optimization",
+                      "Product & Service Listings Management (10+10 Matrix)",
+                      "Local SEO & Citation Management",
+                      "Local Keyword Optimization",
+                      "Geo-Grid Ranking Analysis",
+                      "Daily Google Business Profile Posts",
+                      "Customer Review & Reply Management (Vision OCR)",
+                      "Google Review Magic QR Standee + 2 NFC Tabletop Cards",
+                      "Monthly Performance Reports",
+                      "24/7 Priority VIP Dedicated Account Manager",
+                      "Full 365-Day Continuous Google 3-Pack Defense",
+                      "Algorithmic Core Update & Competitor Poach Shield"
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-start gap-2.5">
+                        <span className="w-4 h-4 rounded-full bg-white/20 text-white flex items-center justify-center shrink-0 mt-0.5 border border-white/40">
+                          <Check className="w-3 h-3 stroke-[3]" />
+                        </span>
+                        <span className="leading-snug">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Pricing Details */}
+                  <div className="pt-4 border-t border-white/20 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono text-blue-200 line-through">₹39,000</span>
+                      <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black">
+                        SAVE 25%
                       </span>
                     </div>
-
-                    <div className="mt-3 flex items-baseline gap-2">
-                      <span className="text-4xl sm:text-5xl font-black text-white tracking-tight">₹29,000</span>
-                      <span className="text-sm text-slate-400 font-semibold">/ Year</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                        ₹29,000
+                      </span>
+                      <span className="text-xs sm:text-sm text-blue-100 font-semibold">
+                        / Year
+                      </span>
                     </div>
-
-                    <div className="mt-1 text-xs text-amber-400 font-bold">
+                    <div className="text-[11px] text-emerald-200 font-bold">
                       Just ₹2,416 / month • Complete 365-Day Ranking Defense
                     </div>
                   </div>
-
-                  {/* Guaranteed SLA Callout */}
-                  <div className="p-3.5 rounded-2xl bg-slate-800/90 border border-slate-700 text-xs space-y-1.5">
-                    <div className="flex items-center gap-1.5 font-extrabold text-amber-400">
-                      <Award className="w-4 h-4 text-amber-400 shrink-0" />
-                      365-Day Dominance & SLA Guarantee:
-                    </div>
-                    <ul className="space-y-1 text-slate-300 text-[11px] font-medium pl-5 list-disc">
-                      <li><strong>Guaranteed Top 3 Retention</strong>: Lock competitors out of the Local 3-Pack all year.</li>
-                      <li><strong>SLA</strong>: 45 Days to Page 1 ➔ 90 Days to Top 3 (or 60 Days if on Page 1).</li>
-                      <li className="text-emerald-400 font-bold"><strong>100% Moneyback Guarantee</strong>: Full refund if ranking criteria not met.</li>
-                    </ul>
-                  </div>
-
-                  {/* Deliverables Checklist */}
-                  <div className="space-y-3 pt-2">
-                    <div className="text-xs font-bold text-slate-200 uppercase tracking-wide">Everything in 3-Month Pilot, Plus:</div>
-                    <ul className="space-y-2.5 text-xs text-slate-300">
-                      {[
-                        "Full 365-day continuous Google 3-Pack defense against aggressive rivals",
-                        "156+ verified Google Business posts automatically generated and posted",
-                        "Continuous 10+10 entity updates for seasonal items, festivals, and new services",
-                        "Countertop Acrylic Standee + 2 Smart NFC Tabletop Loyalty Badges",
-                        "Algorithmic Core Update protection & instant competitor poach recovery",
-                        "Multi-Keyword Neighborhood Tracking across your entire city grid",
-                        "Priority VIP 1-on-1 Account Manager access on WhatsApp"
-                      ].map((item, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
                 </div>
 
-                <div className="pt-8 space-y-3">
+                {/* Pill CTA Button with Dark Circle Arrow (Matching Screenshot 3) */}
+                <div className="pt-8">
                   <a
-                    href="https://wa.me/919033304707?text=Hi%20CustomerPilot,%20I%20want%20to%20activate%20the%20RankLocal%20Ai%20Annual%20Plan%20(₹29,000/yr)%20with%20100%25%20Moneyback%20Guarantee!"
+                    href="https://wa.me/919033304707?text=Hi%20CustomerPilot,%20I%20want%20to%20subscribe%20to%20the%20RankLocal%20Ai%20Yearly%20Dominance%20Plan%20with%20100%25%20Moneyback%20Guarantee!"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block"
                   >
-                    <Button size="lg" className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-sm h-12 shadow-md gap-2">
-                      Get Annual Dominance (₹29,000/yr)
-                      <ArrowRight className="w-4 h-4 text-slate-950" />
-                    </Button>
+                    <button className="w-full h-13 px-6 rounded-full bg-white hover:bg-slate-50 text-slate-950 font-black text-sm sm:text-base flex items-center justify-between shadow-xl transition-all cursor-pointer group">
+                      <span>Subscribe to Yearly</span>
+                      <span className="w-8 h-8 rounded-full bg-slate-950 text-white flex items-center justify-center transition-transform group-hover:translate-x-1">
+                        <ArrowRight className="w-4 h-4 text-white" />
+                      </span>
+                    </button>
                   </a>
-                  <p className="text-[11px] text-center text-slate-400">
+                  <p className="text-[11px] text-center text-blue-100 mt-2">
                     🛡️ Official Invoice with GST Credit • 100% Moneyback Guarantee
                   </p>
                 </div>
@@ -2262,6 +2750,21 @@ export function RankPilotLandingClient() {
           </div>
         </div>
       </footer>
+
+      {/* SCOPED CSS KEYFRAMES FOR RADAR & FLIPPER ANIMATIONS */}
+      <style jsx global>{`
+        @keyframes radarSweep {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        .animate-radar-sweep {
+          animation: radarSweep 6s linear infinite;
+        }
+      `}</style>
     </div>
   )
 }
