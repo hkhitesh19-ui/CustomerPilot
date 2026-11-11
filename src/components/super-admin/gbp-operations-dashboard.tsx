@@ -19,6 +19,8 @@ import { QuickGbpQrModal } from "./quick-gbp-qr-modal"
 import { GbpCategoriesModal } from "./gbp-categories-modal"
 import { CustomerPilotSelfGbpModal } from "./customerpilot-self-gbp-modal"
 import { LlmQuotaMonitor } from "./llm-quota-monitor"
+import { GbpAuditReportsModal } from "./gbp-audit-reports-modal"
+import { Camera } from "lucide-react"
 
 type ChecklistItem = {
   id: string
@@ -98,6 +100,7 @@ export function GbpOperationsDashboard() {
   const [dossiers, setDossiers] = useState<any[]>([])
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
   const [quickQrOpen, setQuickQrOpen] = useState(false)
+  const [reportsModalMerchant, setReportsModalMerchant] = useState<{ id: string; name: string } | null>(null)
   const [categoriesOpen, setCategoriesOpen] = useState(false)
   const [selfGbpOpen, setSelfGbpOpen] = useState(false)
 
@@ -439,9 +442,21 @@ export function GbpOperationsDashboard() {
                         variant="outline"
                         onClick={(e) => {
                           e.stopPropagation()
+                          setReportsModalMerchant({ id: merchant.id, name: merchant.name })
+                        }}
+                        className="text-[10px] h-6 px-2.5 bg-emerald-950/40 border-emerald-800 text-emerald-300 hover:bg-emerald-900/50 flex items-center gap-1 ml-auto"
+                      >
+                        <Camera className="w-3 h-3" />
+                        📸 Audit &amp; 30-Day Reports
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation()
                           loadDossiers(merchant.id)
                         }}
-                        className="text-[10px] h-6 px-2.5 bg-red-950/40 border-red-800 text-red-300 hover:bg-red-900/50 flex items-center gap-1 ml-auto"
+                        className="text-[10px] h-6 px-2.5 bg-red-950/40 border-red-800 text-red-300 hover:bg-red-900/50 flex items-center gap-1"
                       >
                         ⚖️ Redressal Dossiers (Atul & TCR)
                       </Button>

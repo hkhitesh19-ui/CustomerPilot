@@ -6274,3 +6274,21 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   4. **404 Mock ID Suppression**: Blocked all synthetic IDs (`ChIJAAAA...`, `manual_...`, `ChIJnv3B...`) from generating `/local/writereview?placeid=` URLs, routing to safe maps search fallback if unverified.
   5. **Ground-Truth Verification for PET CLINIC @ MANJALPUR**: Verified `https://search.google.com/local/writereview?placeid=ChIJ0SpahSzFXzkR4zhecibcjlA` in headless Chromium via Playwright; confirmed HTTP 200 Google Review dialog open with 0 404 errors.
 - **Status**: ✅ Resolved and Verified Locally.
+
+---
+## [11 Nov 2026] Feature & Integration: Automated Day-0 Baseline Audit & 30-Day Calendar Reporting with Real-Time Screenshots & Google Business Profile API Official Approval
+- **Symptom / Requirement**: 
+  1. When new merchants subscribe to GBP Optimization, an automated Day-0 Baseline Audit Report with real-time Google Maps SERP screenshots was required at onboarding to document baseline ranking, reviews, rating, and revenue leak.
+  2. Every 30 calendar days, an automated progress report with real-time visual proof of local pack movement was required for both the Merchant Dashboard (\/dashboard/gbp-status\) and SuperAdmin Dashboard (\/super-admin\).
+  3. Official verification of the Google Business Profile API allowlist approval for Project 91546314644\ granting 300 Queries Per Minute (QPM) received from \googlebusinessprofile-support@google.com\.
+- **Root Cause & Architectural Blueprint**:
+  1. Previously, audit reports were generated ad-hoc on the landing page without persistent historical tracking in the database per merchant billing cycle.
+  2. Google API quota was previously locked at 0 QPM pending allowlist review, forcing review replies into a Dead-Letter Queue. With Google's official approval of Project 91546314644\ with 300 QPM, native two-tier external reality is fully unlocked.
+- **Resolution**:
+  1. **Prisma Schema Model (\GbpAuditReport\)**: Added persistent audit report model tracking eportType\ (\DAY_0_BASELINE\ | \MONTHLY_30_DAY\), eportPeriod\, \daysSinceOnboarding\, ankScore\, \currentRank\, \aselineRank\, \	otalReviews\, \starRating\, \gridScore\, \screenshotUrl\, evenueLeakEst\, and \pdfDownloadUrl\.
+  2. **Automated Screenshot & SERP Proof Engine (\src/lib/gbp-screenshot-engine.ts\)**: Implemented \captureGbpSerpScreenshot\ with dual capability: Headless Playwright real-time capture of Google Maps/SERP standing saved to \public/uploads/gbp-reports/\, plus high-fidelity SVG/sharp proof card fallback with 9-point geo-grid matrix.
+  3. **Audit Reports API & Cron (\src/app/api/gbp/audit-reports/route.ts\, \src/app/api/cron/gbp-monthly-reports/route.ts\)**: Created endpoints to generate/fetch reports and automated 30-day recurring calendar cron to evaluate progress against Day-0 baselines.
+  4. **Print-Ready A4 PDF Certificate Export (\src/app/api/gbp/audit-reports/export/route.ts\)**: Generates official print-ready certificate of audit standing with verification badges and visual proof snapshots.
+  5. **Merchant & SuperAdmin UI Integration (\src/components/gbp-audit-reports-tab.tsx\, \src/components/super-admin/gbp-audit-reports-modal.tsx\, \src/app/dashboard/gbp-status/page.tsx\, \src/components/super-admin/gbp-operations-dashboard.tsx\)**: Integrated Tab 4 into the Merchant GBP status page and added interactive 1-click modal to the SuperAdmin GBP operations dashboard.
+  6. **Adversarial Guard Verification**: Passed all 6 gates of ode scripts/run_adversarial_guard.js\ cleanly.
+- **Status**: ✅ Resolved, Architecturally Hardened, and Verified Locally.

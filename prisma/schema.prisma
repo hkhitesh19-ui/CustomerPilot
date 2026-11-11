@@ -85,6 +85,7 @@ model Merchant {
   // When GBP track first assigned - used to compute 30-day sandbox unlock
   gbpChecklistItems         GbpChecklistItem[]
   gbpPosts                  GbpPost[]
+  gbpAuditReports           GbpAuditReport[]
   // Smart Keyword Control Engine & Grounding JSON Profile
   keywordProfile            String?
   // ---
@@ -994,6 +995,38 @@ model GbpPost {
   @@index([status, scheduledDate])
   @@index([merchantId, postType])
 }
+
+model GbpAuditReport {
+  id                    String    @id @default(cuid())
+  merchantId            String
+  reportType            String    @default("DAY_0_BASELINE") // "DAY_0_BASELINE" | "MONTHLY_30_DAY"
+  reportPeriod          String    // e.g. "DAY_0", "2026-11", "2026-12"
+  daysSinceOnboarding   Int       @default(0)
+  rankScore             Int       @default(0) // Overall Audit Score 0-100
+  currentRank           Int       @default(0) // Detected Rank in primary keyword
+  baselineRank          Int       @default(0) // Baseline rank at day 0
+  totalReviews          Int       @default(0)
+  starRating            Float     @default(0.0)
+  gridScore             Int       @default(1) // 1 to 9
+  primaryKeyword        String?
+  locality              String?
+  competitorsJson       String?   // Serialized JSON of competitors
+  revenueLeakEst        Float     @default(0.0)
+  screenshotUrl         String?   // Real-time snapshot of Google Maps / SERP
+  reportSummary         String?   // Diagnostic findings / AI insights
+  actionItemsJson       String?   // Recommended sprint actions
+  pdfDownloadUrl        String?   // Exportable report URL
+  isDeliveredWhatsApp   Boolean   @default(false)
+  deliveredAt           DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  merchant              Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@unique([merchantId, reportType, reportPeriod])
+  @@index([merchantId])
+}
+
 
 model ReviewVerificationLog {
   id                 String   @id @default(cuid())
