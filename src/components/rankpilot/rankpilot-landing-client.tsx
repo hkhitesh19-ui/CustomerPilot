@@ -1245,6 +1245,130 @@ export function RankPilotLandingClient() {
           </div>
         </section>
 
+                {/* 2.5. HEROIC CONTRACTUAL 100% MONEYBACK GUARANTEE (Very Serious & Biggest Commitment) */}
+        <section id="guarantee" className="py-12 lg:py-16 bg-gradient-to-b from-slate-50 via-emerald-50/40 to-white border-b border-emerald-200/80 relative overflow-hidden">
+          {/* Ambient Glow Aura */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-r from-emerald-400/15 via-teal-400/15 to-cyan-400/15 blur-3xl rounded-full pointer-events-none" />
+
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            {/* The Master Pro Guarantee Card */}
+            <div className="rounded-3xl bg-gradient-to-br from-white via-emerald-50/50 to-teal-50/40 border-2 border-emerald-400/90 shadow-2xl shadow-emerald-600/15 p-7 sm:p-10 lg:p-12 relative overflow-hidden">
+              {/* Pinned Security Ribbon */}
+              <div className="absolute top-0 right-0">
+                <span className="inline-flex items-center gap-1.5 px-5 py-1.5 rounded-bl-2xl rounded-tr-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xs uppercase tracking-wider shadow-md">
+                  <ShieldCheck className="w-4 h-4 text-emerald-200" /> CONTRACTUAL SLA COMMITMENT
+                </span>
+              </div>
+
+              <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
+                {/* Large Shield & Icon Badge */}
+                <div className="shrink-0 flex flex-col items-center">
+                  <div className="relative">
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-br from-emerald-500 via-teal-600 to-emerald-700 text-white flex items-center justify-center shadow-xl shadow-emerald-600/30 border-4 border-white">
+                      <ShieldCheck className="w-14 h-14 sm:w-16 sm:h-16 stroke-[2.2]" />
+                    </div>
+                    <span className="absolute -bottom-2.5 px-3 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-md border border-amber-300">
+                      100% REFUND
+                    </span>
+                  </div>
+                  <div className="mt-4 text-center">
+                    <div className="text-xs font-black text-emerald-800 uppercase tracking-wider">Zero Financial Risk</div>
+                    <div className="text-[11px] font-semibold text-slate-500">Official GST Invoice SLA</div>
+                  </div>
+                </div>
+
+                {/* Right / Main Content */}
+                <div className="flex-1 space-y-5 text-center lg:text-left">
+                  <div className="space-y-2">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-100/90 text-emerald-900 border border-emerald-300 text-xs font-extrabold uppercase tracking-wider">
+                      <span>⚖️ India's #1 Policy-Safe Local SEO Agreement</span>
+                    </div>
+                    <h2 className="text-2xl sm:text-3xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+                      Our Ironclad{" "}
+                      <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent font-black underline decoration-emerald-300 decoration-wavy underline-offset-4">
+                        100% Moneyback Guarantee
+                      </span>
+                    </h2>
+                  </div>
+
+                  <p className="text-sm sm:text-base lg:text-lg text-slate-700 leading-relaxed font-medium max-w-4xl">
+                    We remove <strong>100% of the financial risk</strong> from your shoulders. If your business profile does not rank on <strong>Page 1 within 45 days</strong> and in the <strong>Google Maps Top 3 within 90 days</strong> (or within <strong>60 days</strong> if you are already on Page 1), we will refund <strong>100% of your money</strong> directly to your bank account or UPI. Zero excuses, zero complicated paperwork, zero questions asked.
+                  </p>
+
+                  <div className="p-4 sm:p-5 rounded-2xl bg-emerald-100/70 border border-emerald-300/90 text-emerald-950">
+                    <p className="text-sm sm:text-base font-bold italic leading-relaxed">
+                      &quot;Agar aapki dukaan committed timeline me Google Maps Top 3 par nahi aati, toh bina kisi sawal ke 100% poora paisa turant aapke UPI ya bank account me refund kar diya jayega.&quot;
+                    </p>
+                  </div>
+
+                  {/* 2-Tier Milestone SLA Breakdown Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                    <div className="p-4 rounded-2xl bg-white border border-emerald-200/90 shadow-xs space-y-2 text-left">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-slate-900 uppercase tracking-wide">Case 1: New Store / Page 2–10</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">45 + 45 Days</span>
+                      </div>
+                      <div className="text-xs text-slate-600 leading-relaxed font-medium">
+                        First <strong>45 Days</strong>: Guaranteed Page 1 arrival.<br />
+                        Next <strong>45 Days</strong>: Google Maps Top 3 local domination.
+                      </div>
+                      <div className="text-[11px] font-bold text-emerald-700 flex items-center gap-1 pt-1">
+                        <Check className="w-3.5 h-3.5 text-emerald-600" /> Full 90-Day SLA Guarantee
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-white border border-emerald-200/90 shadow-xs space-y-2 text-left">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-slate-900 uppercase tracking-wide">Case 2: Already on Page 1</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200">60-Day Fast Track</span>
+                      </div>
+                      <div className="text-xs text-slate-600 leading-relaxed font-medium">
+                        Aggressive algorithmic push straight into <strong>Google Maps Top 3</strong> within <strong>60 days</strong> flat.
+                      </div>
+                      <div className="text-[11px] font-bold text-emerald-700 flex items-center gap-1 pt-1">
+                        <Check className="w-3.5 h-3.5 text-emerald-600" /> Fast-Track 60-Day SLA Guarantee
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4 Pillars of Moneyback Trust */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 text-xs font-bold text-slate-800 text-left">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 text-[10px]">✓</span>
+                      <span>100% Full Refund</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 text-[10px]">✓</span>
+                      <span>Direct UPI / Bank Transfer</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 text-[10px]">✓</span>
+                      <span>Written in Tax Invoice</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 text-[10px]">✓</span>
+                      <span>Zero Questions Asked</span>
+                    </div>
+                  </div>
+
+                  {/* Direct Action Link to Claim Offer */}
+                  <div className="pt-3 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                    <a href="#pricing">
+                      <Button size="lg" className="bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] hover:from-[#0450B8] hover:via-[#0270A8] hover:to-[#04D4C5] text-white font-bold text-sm px-7 h-12 shadow-lg shadow-blue-500/25 gap-2 cursor-pointer">
+                        <span>Claim ₹6,999 Offer with 100% Guarantee</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </a>
+                    <span className="text-xs text-slate-500 font-semibold">
+                      🔒 Secured by CustomerPilot SLA Agreement
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* 3. DUAL-REALITY SERP SHOWCASE: BEFORE VS AFTER */}
         <section className="py-16 lg:py-20 bg-white border-b border-slate-200/80">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -2493,18 +2617,104 @@ export function RankPilotLandingClient() {
         </section>
       </main>
 
-      {/* FOOTER (Clean Light Mode) */}
-      <footer className="py-8 bg-slate-100 text-slate-600 text-xs border-t border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <BrandLogo size="sm" />
-            <span className="text-slate-600">© 2026 CustomerPilot AI. All rights reserved.</span>
+      {/* ============ FOOTER (Synchronized with Main Homepage) ============ */}
+      <footer className="bg-slate-950 text-slate-400 border-t border-slate-800/80 pt-16 pb-12 relative overflow-hidden">
+        {/* Subtle top border gradient accent */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-[#05EDDD]/50 to-transparent" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-10 lg:gap-8">
+            {/* Brand Column (2 cols on large screens) */}
+            <div className="lg:col-span-2 space-y-4">
+              <Link href="/" className="no-underline inline-block bg-white/95 hover:bg-white px-3 py-1.5 rounded-xl shadow-xs transition">
+                <BrandLogo size="sm" />
+              </Link>
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm">
+                Turn every walk-in into a lifetime customer — with WhatsApp loyalty rewards, Google 5★ reviews, and replies on autopilot.
+              </p>
+
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold text-slate-300">
+                <span className="text-amber-400">★</span> 4.9 Rating · 1,200+ Indian Store Owners
+              </div>
+
+              <div className="pt-2">
+                <a
+                  href="https://wa.me/919033304707?text=Hi%20CustomerPilot%20Team%2C%20I%20need%20assistance%20with%20CustomerPilot."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-xs font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/60 px-4 py-2.5 rounded-xl border border-emerald-500/30 transition shadow-sm"
+                >
+                  <MessageSquare className="w-4 h-4 text-emerald-400" />
+                  <span>24/7 WhatsApp: +91 90333 04707</span>
+                </a>
+              </div>
+
+              <div className="text-[11px] text-slate-500 flex items-center gap-1.5 pt-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500/70" />
+                <span>100% Encrypted &amp; WhatsApp Business Approved</span>
+              </div>
+            </div>
+
+            {/* Column 2: Product */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Product Services</h4>
+              <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
+                <li><Link href="/smart-digital-business-card" className="hover:text-emerald-400 transition-colors">🪪 Smart Digital Business Card</Link></li>
+                <li><Link href="/whatsapp-digital-loyalty-card" className="hover:text-emerald-400 transition-colors">🎁 Digital Loyalty &amp; Stamps</Link></li>
+                <li><Link href="/ai-google-review-qr-generator" className="hover:text-emerald-400 transition-colors">⭐ Smart AI Google Reviews</Link></li>
+                <li><Link href="/ai-google-review-autoreply" className="hover:text-emerald-400 transition-colors">⚡ 1-Click AI AutoReply</Link></li>
+                <li><Link href="/rankpilot" className="text-cyan-400 font-bold hover:text-cyan-300 transition-colors">📍 GBP Optimization (RankPilot AI)</Link></li>
+                <li><Link href="/free-ai-google-review-generator" className="text-amber-400 font-bold hover:text-amber-300 transition-colors">✨ Free AI Review Generator</Link></li>
+                <li><Link href="/customerpilot-complete" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">🚀 CustomerPilot Complete (All-in-One)</Link></li>
+                <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing &amp; Plans</Link></li>
+              </ul>
+            </div>
+
+            {/* Column 3: Compare */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Compare</h4>
+              <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
+                <li><Link href="/vs/stamp-me" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">vs Stamp Me (New)</Link></li>
+                <li><Link href="/vs/reelo" className="hover:text-emerald-400 transition-colors">vs Reelo</Link></li>
+                <li><Link href="/vs/bingage" className="hover:text-emerald-400 transition-colors">vs Bingage</Link></li>
+                <li><Link href="/compare/vs-traditional-pos" className="hover:text-emerald-400 transition-colors">vs Traditional POS</Link></li>
+                <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Compare All Plans</Link></li>
+              </ul>
+            </div>
+
+            {/* Column 4: Industries */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Industries</h4>
+              <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
+                <li><Link href="/bakery-loyalty" className="hover:text-emerald-400 transition-colors">Bakery &amp; Cake Shops</Link></li>
+                <li><Link href="/cafe-loyalty" className="hover:text-emerald-400 transition-colors">Cafes &amp; Coffee Bars</Link></li>
+                <li><Link href="/restaurant-loyalty" className="hover:text-emerald-400 transition-colors">Restaurants &amp; Dining</Link></li>
+                <li><Link href="/salon-loyalty" className="hover:text-emerald-400 transition-colors">Salons &amp; Spas</Link></li>
+              </ul>
+            </div>
+
+            {/* Column 5: Legal & Trust */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Legal &amp; Trust</h4>
+              <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
+                <li><Link href="/privacy" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-emerald-400 transition-colors">Terms of Service</Link></li>
+                <li><Link href="/security" className="hover:text-emerald-400 transition-colors">Security &amp; Architecture</Link></li>
+                <li><Link href="/contact" className="hover:text-emerald-400 transition-colors">Contact Support</Link></li>
+                <li><Link href="/help" className="hover:text-emerald-400 transition-colors">Help &amp; Documentation</Link></li>
+              </ul>
+            </div>
           </div>
-          <div className="flex items-center gap-6 font-semibold">
-            <Link href="/" className="hover:text-blue-600 text-slate-600">Home</Link>
-            <Link href="/pricing" className="hover:text-blue-600 text-slate-600">Pricing</Link>
-            <Link href="/rankpilot" className="hover:text-blue-600 text-slate-600">RankPilot AI</Link>
-            <Link href="/google-business-profile-ranking" className="hover:text-blue-600 text-slate-600">Free Audit</Link>
+
+          {/* Footer Bottom Bar */}
+          <div className="border-t border-slate-800/80 pt-8 mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+            <div>
+              © {new Date().getFullYear()} CustomerPilot Inc. · Made with ❤️ in India · support@customerpilot.in
+            </div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-[11px] text-slate-300 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>All Systems Operational</span>
+            </div>
           </div>
         </div>
       </footer>

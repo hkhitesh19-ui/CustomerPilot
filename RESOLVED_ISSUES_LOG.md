@@ -4,6 +4,40 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [11 Nov 2026] Issue: RankPilot AI Heroic 100% Moneyback Guarantee Elevation Above SERP Showcase, Synchronized 5-Column Homepage Footer, and Standalone GBP Optimization Service on Main Homepage
+- **Symptom**:
+  1. The "Our Ironclad 100% Moneyback Guarantee" was previously rendered as an unobtrusive companion box below the pricing grid on `/rankpilot`. Because this is CustomerPilot's single highest-stakes commitment and primary sales objection crusher, user requested transforming it into a high-trust, pro-grade, large-typography card positioned prominently **above** the "What Google Displays on Customers' Phones" section (SERP Before/After showcase).
+  2. The footer on `/rankpilot` was previously a minimal 1-line strip, which broke design parity and authority with the rest of the application.
+  3. The main CustomerPilot homepage (`src/app/page.tsx`) lacked GBP Optimization (RankPilot AI) as a 5th standalone service in the Products header dropdown, the Hero exploration bar, the Core Engines feature grid, and the footer.
+  4. Links on the main homepage needed to point locally to `http://localhost:3000/rankpilot` during local testing, and dynamically resolve to `https://customerpilot.in/rankpilot` in production.
+- **Root Cause**:
+  - The Moneyback Guarantee was placed too low on the page (after pricing) instead of intercepting merchant skepticism right after the hero value proposition.
+  - Footer components were not shared between the main homepage and the standalone landing page.
+  - Main homepage feature grid previously contained only 4 core engines (Loyalty, Review Generator, AutoReply, Complete), omitting the new standalone GBP Optimization service.
+- **Resolution**:
+  1. **Heroic Contractual Moneyback Guarantee Section (`#guarantee`)**:
+     - Built a standalone, pro-grade section directly above `{/* 3. DUAL-REALITY SERP SHOWCASE: BEFORE VS AFTER */}` (`What Google Displays on Customers' Phones`) on `src/components/rankpilot/rankpilot-landing-client.tsx`.
+     - Added an ambient emerald/teal glow aura, pinned `CONTRACTUAL SLA COMMITMENT` ribbon, large emerald/teal shield icon badge with `100% REFUND` gold seal, and headline in massive typography (`text-2xl sm:text-3xl lg:text-5xl font-black`) with emerald-teal-cyan gradient text.
+     - Included an authoritative Hindi commitment quote box: *"Agar aapki dukaan committed timeline me Google Maps Top 3 par nahi aati, toh bina kisi sawal ke 100% poora paisa turant aapke UPI ya bank account me refund kar diya jayega."*.
+     - Detailed the 2-Tier Milestone SLA breakdown cards: Case 1 (New Store / Page 2–10: 45 Days to Page 1 + 45 Days to Top 3 = 90-Day SLA Guarantee) and Case 2 (Already on Page 1: 60-Day Fast-Track SLA Guarantee).
+     - Outlined 4 pillars of trust: 100% Full Refund, Direct UPI / Bank Transfer, Written in Tax Invoice, Zero Questions Asked.
+     - Included a direct CTA button: `Claim ₹6,999 Offer with 100% Guarantee` styled with CustomerPilot's signature logo gradient.
+  2. **Synchronized 5-Column Main Homepage Footer**:
+     - Replaced the minimal 1-line footer on `/rankpilot` with the comprehensive, authoritative 5-column footer matching `src/app/page.tsx`, complete with `BrandLogo`, tagline, 4.9★ rating badge, 24/7 WhatsApp button (`+91 90333 04707`), Product Services links, Compare links, Industries links, Legal & Trust links, copyright bar, and system operational status badge.
+  3. **Main Homepage GBP Optimization Standalone Integration (`src/app/page.tsx`)**:
+     - Added Service 5 to the Products header dropdown with `Top 3 Rank` badge and dynamic environment link (`process.env.NODE_ENV === "production" ? "https://customerpilot.in/rankpilot" : "http://localhost:3000/rankpilot"`).
+     - Added `📍 GBP Optimization (RankPilot AI™)` pill to the Hero section exploration bar.
+     - Added the 5th standalone card to the `#features` grid with 5 deliverables, `👑 100% Moneyback SLA` badge, pricing tag (`₹6,999 / 3-Mo`), and logo gradient CTA button.
+     - Added `📍 GBP Optimization (RankPilot AI)` to the Homepage footer under Product Services.
+  4. **Adversarial Red-Team & Autonomous QA Verification**:
+     - All 6 Master Adversarial Red-Team Guard gates passed cleanly (`node scripts/run_adversarial_guard.js`).
+     - Playwright autonomous QA suite passed 12/12 tests with 0 unwhitelisted errors (`node scripts/run_autonomous_qa.js e2e/rankpilot-landing.spec.ts`).
+     - Visual proof screenshots captured and confirmed in artifacts directory (`rankpilot_guarantee_above_serp.png`, `rankpilot_synchronized_footer.png`, `homepage_gbp_standalone_service.png`).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
+
 ## [11 Nov 2026] Issue: RankPilot AI Full-Page Logo Gradient Replacement, Section Streamlining (Removal of 3x3 Radar Grid & 10+10 Dual Matrix), and Signature Logo Gradient Pricing Elevation
 - **Symptom**: User requested 3 specific upgrades for `http://localhost:3000/rankpilot`:
   1. Replace blue highlights and blue buttons across the entire page with the CustomerPilot brand logo signature gradient (`#031B41` Deep Navy ➔ `#0566E8` Royal Electric Blue ➔ `#0284C7` Sky Cyan ➔ `#05EDDD` Radiant Turquoise).

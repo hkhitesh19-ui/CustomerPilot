@@ -10,7 +10,7 @@ import {
   Check, ArrowRight, ArrowLeft, Loader2, UserCheck,
   Printer, AlertCircle, CircleDot, Star, Rocket, X, Shield,
   Menu, ChevronDown, Calculator, TrendingUp, Sparkles, Phone,
-  Clock, Target, Camera, Layers, Flame, Coins, Repeat, CreditCard
+  Clock, Target, Camera, Compass, Layers, Flame, Coins, Repeat, CreditCard
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -453,6 +453,18 @@ export default function Home() {
                     <span className="text-[11px] text-slate-500 mt-0.5">Context-aware owner responses on Google Maps</span>
                   </Link>
 
+                  {/* Service 5: GBP Optimization (RankPilot AI) */}
+                  <Link
+                    href={process.env.NODE_ENV === "production" ? "https://customerpilot.in/rankpilot" : "http://localhost:3000/rankpilot"}
+                    className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-blue-100"
+                  >
+                    <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5"><Compass className="w-3.5 h-3.5 text-blue-600" /> GBP Optimization (RankPilot AI)</span>
+                      <span className="text-[10px] bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 font-extrabold px-1.5 py-0.5 rounded-md border border-blue-200">Top 3 Rank</span>
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Move store to Google Maps Top 3 with 100% moneyback guarantee</span>
+                  </Link>
+
                   {/* Utility: Free Tool */}
                   <Link href="/free-ai-google-review-generator" className="flex flex-col p-2 rounded-xl hover:bg-slate-50 transition bg-amber-50/40 mt-1">
                     <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
@@ -686,8 +698,14 @@ export default function Home() {
                   <Link href="/ai-google-review-autoreply" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-[11px] font-bold text-indigo-800 transition">
                     💬 1-Click AI AutoReply
                   </Link>
+                  <Link
+                    href={process.env.NODE_ENV === "production" ? "https://customerpilot.in/rankpilot" : "http://localhost:3000/rankpilot"}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-blue-50 to-cyan-50 hover:from-blue-100 hover:to-cyan-100 border border-blue-200 text-[11px] font-extrabold text-[#0566E8] transition shadow-2xs"
+                  >
+                    📍 GBP Optimization (RankPilot AI™)
+                  </Link>
                   <Link href="#features" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-[11px] font-extrabold text-slate-700 transition">
-                    📊 View All 4 Engines ↓
+                    📊 View All Engines ↓
                   </Link>
                 </div>
               </div>
@@ -1364,6 +1382,39 @@ export default function Home() {
               </Link>
             </div>
             </StaggerItem>
+
+            {/* Service 5: GBP Optimization (RankPilot AI) */}
+            <StaggerItem variant="fadeUp" className="h-full flex flex-col md:col-span-2 lg:col-span-1">
+            <div className="fcard h-full flex flex-col bg-gradient-to-b from-white via-blue-50/20 to-cyan-50/20 border-2 border-blue-200/90 shadow-md">
+              <div className="flex items-center justify-between">
+                <div className="ico blue">📍</div>
+                <span className="text-[10px] bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-800 border border-blue-200 font-black px-2.5 py-1 rounded-full">
+                  👑 100% Moneyback SLA
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">GBP Optimization (RankPilot AI™)</h3>
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                Autonomous Local SEO engine that accelerates your Google Business Profile from Page 10 to Google Maps Top 3 in 45–90 days with our 100% Moneyback Guarantee.
+              </p>
+              <ul className="space-y-1.5 mt-4 text-xs text-slate-700 flex-1">
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 45–90 Days Google Maps Top 3 Guarantee</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> AI Vision OCR Photo Reviews &amp; WhatsApp Flywheel</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Zero-Gap 3-Post Weekly Cadence Justifications</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Multi-Radius Proximity Radar Domination</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 100% Full Refund if Target Rank Not Achieved</li>
+              </ul>
+              <div className="reply-prev mt-4 text-xs bg-blue-50/60 border border-blue-200/80 p-2.5 rounded-xl flex items-center justify-between">
+                <span className="font-bold text-blue-900">🛡️ 100% Moneyback Guarantee</span>
+                <span className="text-[10px] text-blue-700 font-bold">₹6,999 / 3-Mo</span>
+              </div>
+              <Link
+                href={process.env.NODE_ENV === "production" ? "https://customerpilot.in/rankpilot" : "http://localhost:3000/rankpilot"}
+                className="mt-5 w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] hover:from-[#0450B8] hover:via-[#0270A8] hover:to-[#04D4C5] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shadow-blue-500/20"
+              >
+                <span>Explore GBP Optimization (RankPilot AI)</span> <span>→</span>
+              </Link>
+            </div>
+            </StaggerItem>
           </StaggerContainer>
         </div>
       </section>
@@ -1874,6 +1925,7 @@ export default function Home() {
                 <li><Link href="/ai-google-review-qr-generator" className="hover:text-emerald-400 transition-colors">⭐ Smart AI Google Reviews</Link></li>
                 <li><Link href="/ai-google-review-autoreply" className="hover:text-emerald-400 transition-colors">⚡ 1-Click AI AutoReply</Link></li>
                 <li><Link href="/free-ai-google-review-generator" className="text-amber-400 font-bold hover:text-amber-300 transition-colors">✨ Free AI Review Generator</Link></li>
+                <li><Link href={process.env.NODE_ENV === "production" ? "https://customerpilot.in/rankpilot" : "http://localhost:3000/rankpilot"} className="text-cyan-400 font-bold hover:text-cyan-300 transition-colors">📍 GBP Optimization (RankPilot AI)</Link></li>
                 <li><Link href="/customerpilot-complete" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">🚀 CustomerPilot Complete (All-in-One)</Link></li>
                 <li><Link href="/guide/operations" className="text-slate-300 hover:text-emerald-300 transition-colors">🔄 Live Operations Manual</Link></li>
                 <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">Pricing &amp; Plans</Link></li>
