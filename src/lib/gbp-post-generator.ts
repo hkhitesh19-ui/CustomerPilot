@@ -12,6 +12,7 @@
  */
 
 import { db } from "@/lib/db";
+import { resolveMerchantKeywordProfile } from "@/lib/keyword-matrix";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -130,9 +131,72 @@ export async function buildTuesdayProductPost(merchant: any, date: Date, revisio
   const categoryKey = (merchant.category || merchant.businessType || "default").toLowerCase();
   const presets = INDUSTRY_PRODUCT_PRESETS[categoryKey] || INDUSTRY_PRODUCT_PRESETS.default;
   
+  // Resolve merchant keyword profile & strict negative blacklist
+  let profile: any = null;
+  try {
+    profile = resolveMerchantKeywordProfile(merchant);
+  } catch (e) {
+    // Graceful fallback
+  }
+  const blacklist: string[] = profile?.strictlyNotAllowed || [];
+
   // Pick product deterministically based on date's week of year + revision offset
   const weekNumber = Math.floor(date.getTime() / (7 * 24 * 60 * 60 * 1000)) + revisionOffset;
-  const product = presets[weekNumber % presets.length];
+  
+  let product: { name: string; tag: string; price: string };
+
+  // Tier 1 Grounding: Physical Database Catalog (MenuItem table)
+  let dbMenuItems: any[] = [];
+  try {
+    if (merchant?.id) {
+      dbMenuItems = await db.menuItem.findMany({
+        where: {
+          merchantId: merchant.id,
+          isAvailable: true,
+        },
+        orderBy: { sortOrder: "asc" },
+        take: 30,
+      });
+    }
+  } catch (e) {
+    // Fallback if db unavailable
+  }
+
+  // Filter out any items violating merchant's negative blacklist
+  const safeDbMenuItems = dbMenuItems.filter(item => {
+    const itemName = (item.name || "").toLowerCase();
+    return !blacklist.some((bad: string) => itemName.includes(bad.toLowerCase()));
+  });
+
+  if (safeDbMenuItems.length > 0) {
+    const chosen = safeDbMenuItems[weekNumber % safeDbMenuItems.length];
+    let tag = chosen.isVeg ? "100% Pure Eggless Bestseller" : "Signature Best-Seller";
+    if (chosen.tags) {
+      try {
+        const parsedTags = JSON.parse(chosen.tags);
+        if (Array.isArray(parsedTags) && parsedTags.length > 0) tag = parsedTags[0];
+      } catch (e) {}
+    }
+    product = {
+      name: chosen.name,
+      tag,
+      price: `₹${chosen.price}/-`,
+    };
+  } else if (profile?.heroProducts && profile.heroProducts.length > 0) {
+    // Tier 2 Grounding: Custom Keyword Studio Hero Product Whitelist
+    const safeHero = profile.heroProducts.filter((h: string) => !blacklist.some((bad: string) => h.toLowerCase().includes(bad.toLowerCase())));
+    const chosenHero = safeHero.length > 0 ? safeHero[weekNumber % safeHero.length] : profile.heroProducts[0];
+    product = {
+      name: chosenHero,
+      tag: "Customer Favorite",
+      price: "Special Price",
+    };
+  } else {
+    // Tier 3 Grounding: Category-Isolated Industry Catalog Preset (Blacklist Guarded)
+    const safePresets = presets.filter(p => !blacklist.some((bad: string) => p.name.toLowerCase().includes(bad.toLowerCase())));
+    const finalPresets = safePresets.length > 0 ? safePresets : presets;
+    product = finalPresets[weekNumber % finalPresets.length];
+  }
 
   const locality = extractLocality(merchant.address, merchant.city);
   const storeName = merchant.name || "CustomerPilot Store";
