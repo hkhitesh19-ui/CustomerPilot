@@ -20,7 +20,8 @@ import { GbpCategoriesModal } from "./gbp-categories-modal"
 import { CustomerPilotSelfGbpModal } from "./customerpilot-self-gbp-modal"
 import { LlmQuotaMonitor } from "./llm-quota-monitor"
 import { GbpAuditReportsModal } from "./gbp-audit-reports-modal"
-import { Camera } from "lucide-react"
+import { GbpDailySerpTracker } from "@/components/gbp-daily-serp-tracker"
+import { Camera, FileSpreadsheet } from "lucide-react"
 
 type ChecklistItem = {
   id: string
@@ -103,6 +104,25 @@ export function GbpOperationsDashboard() {
   const [reportsModalMerchant, setReportsModalMerchant] = useState<{ id: string; name: string } | null>(null)
   const [categoriesOpen, setCategoriesOpen] = useState(false)
   const [selfGbpOpen, setSelfGbpOpen] = useState(false)
+  const [selectedSerpMerchantId, setSelectedSerpMerchantId] = useState<string>("cmtymavfx0002kx008lbfvp57")
+  const [batchScanning, setBatchScanning] = useState(false)
+
+  const handleRunBatchSerpScan = async () => {
+    try {
+      setBatchScanning(true)
+      const res = await fetch("/api/cron/gbp-daily-serp")
+      const data = await res.json()
+      if (data.ok) {
+        alert(`✅ Daily 09:00 AM Batch Scan Completed!\nProcessed: ${data.merchantsProcessed} stores\nKeywords Updated: ${data.totalKeywordsUpdated}`)
+      } else {
+        alert("Batch scan error: " + (data.error || "Unknown"))
+      }
+    } catch (e: any) {
+      alert("Error: " + e.message)
+    } finally {
+      setBatchScanning(false)
+    }
+  }
 
   const loadDossiers = async (mId: string) => {
     if (dossierMerchantId === mId) {
@@ -299,6 +319,90 @@ export function GbpOperationsDashboard() {
             <Tag className="w-3.5 h-3.5 mr-1.5" />
             🏷️ Business Categories Manager
           </Button>
+        </div>
+      </div>
+
+      {/* SuperAdmin Cross-Merchant SERP & GEO Ranking Studio */}
+      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                <BarChart3 className="w-5 h-5" />
+              </span>
+              <div>
+                <h3 className="text-white font-extrabold text-base flex items-center gap-2">
+                  Cross-Merchant SERP &amp; GEO Ranking Command Studio
+                  <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-[10px]">
+                    SUPERADMIN EYE
+                  </Badge>
+                </h3>
+                <p className="text-slate-400 text-xs mt-0.5">
+                  Inspect any store's 10–30 GEO, SEO, and AEO rankings, trigger 09:00 AM scans, or export consolidated telemetry CSV.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center flex-wrap gap-2.5">
+            {/* Merchant Selector Dropdown */}
+            <div className="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5">
+              <span className="text-xs text-slate-400 font-semibold">Store:</span>
+              <select
+                value={selectedSerpMerchantId}
+                onChange={(e) => setSelectedSerpMerchantId(e.target.value)}
+                className="bg-transparent text-white text-xs font-bold focus:outline-none cursor-pointer"
+              >
+                {merchants.map((m) => (
+                  <option key={m.id} value={m.id} className="bg-slate-900 text-white">
+                    {m.name}
+                  </option>
+                ))}
+                {merchants.length === 0 && (
+                  <option value="cmtymavfx0002kx008lbfvp57" className="bg-slate-900 text-white">
+                    Cake Connection
+                  </option>
+                )}
+              </select>
+            </div>
+
+            {/* Run Batch Scan for All Merchants */}
+            <Button
+              size="sm"
+              onClick={handleRunBatchSerpScan}
+              disabled={batchScanning}
+              className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30"
+            >
+              {batchScanning ? (
+                <RefreshCw className="w-3.5 h-3.5 animate-spin mr-1.5" />
+              ) : (
+                <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+              )}
+              Trigger 09:00 AM Scan (All Stores)
+            </Button>
+
+            {/* Download All Merchants Consolidated CSV */}
+            <a
+              href="/api/gbp/daily-serp/export?merchantId=ALL&period=30D"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 transition"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              Export All Stores CSV
+            </a>
+          </div>
+        </div>
+
+        {/* Embedded Live SERP Tracker for Selected Merchant */}
+        <div className="bg-white rounded-xl p-4 shadow-inner">
+          <GbpDailySerpTracker
+            merchantId={selectedSerpMerchantId}
+            merchantName={
+              merchants.find((m) => m.id === selectedSerpMerchantId)?.name ||
+              "Cake Connection"
+            }
+          />
         </div>
       </div>
 

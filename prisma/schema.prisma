@@ -85,7 +85,8 @@ model Merchant {
   // When GBP track first assigned - used to compute 30-day sandbox unlock
   gbpChecklistItems         GbpChecklistItem[]
   gbpPosts                  GbpPost[]
-  gbpAuditReports           GbpAuditReport[]
+  gbpAuditReports           GbpAuditReport[]
+  gbpKeywordDailyRanks      GbpKeywordDailyRank[]
   // Smart Keyword Control Engine & Grounding JSON Profile
   keywordProfile            String?
   // ---
@@ -1027,6 +1028,27 @@ model GbpAuditReport {
   @@index([merchantId])
 }
 
+
+model GbpKeywordDailyRank {
+  id            String   @id @default(cuid())
+  merchantId    String
+  keyword       String
+  keywordType   String   @default("SEO") // "GEO" | "SEO" | "AEO"
+  rankPosition  Int      @default(0)     // 1 to 50 (or 0 for unranked >50)
+  previousRank  Int      @default(0)     // Previous day rank for delta calculation
+  searchVolume  Int      @default(0)     // Estimated monthly searches
+  locality      String?                  // E.g. "Manjalpur", "Eva Mall", "Vadodara"
+  targetCity    String   @default("Vadodara")
+  serpFeature   String?  @default("LOCAL_3PACK") // "LOCAL_3PACK" | "ORGANIC" | "AI_OVERVIEW" | "KNOWLEDGE_PANEL"
+  snapshotDate  String                   // Format: "YYYY-MM-DD"
+  capturedAt    DateTime @default(now())
+
+  merchant      Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@unique([merchantId, keyword, snapshotDate])
+  @@index([merchantId, snapshotDate])
+  @@index([merchantId, keywordType])
+}
 
 model ReviewVerificationLog {
   id                 String   @id @default(cuid())

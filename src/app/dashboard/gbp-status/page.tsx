@@ -16,6 +16,7 @@ import { GbpAnalyticsPanel } from "@/components/gbp-analytics-panel";
 import { GbpPostCardItem } from "@/components/gbp-post-card-item";
 import { Gbp30DayMasterChecklist } from "@/components/super-admin/gbp-30day-master-checklist";
 import { GbpAuditReportsTab } from "@/components/gbp-audit-reports-tab";
+import { GbpDailySerpTracker } from "@/components/gbp-daily-serp-tracker";
 
 type GbpStatus = {
   merchant: {
@@ -252,7 +253,7 @@ export default function GbpStatusPage() {
             }`}
           >
             <Compass className="w-3.5 h-3.5" />
-            3. Keywords &amp; Geo-Grid
+            3. SERP &amp; GEO Ranking Tracker
           </button>
 
           <button
@@ -317,9 +318,13 @@ export default function GbpStatusPage() {
         </div>
       )}
 
-      {/* TAB 3: Keywords & 9-Point Geo-Grid Telemetry */}
+      {/* TAB 3: SERP & GEO Ranking Tracker + 9-Point Geo-Grid Telemetry */}
       {activeTab === "analytics" && (
-        <div className="space-y-4">
+        <div className="space-y-6">
+          <GbpDailySerpTracker
+            merchantId={merchant.id}
+            merchantName={merchant.name}
+          />
           <GbpAnalyticsPanel merchantId={merchant.id} />
         </div>
       )}
