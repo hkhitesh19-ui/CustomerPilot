@@ -112,33 +112,33 @@ export function Gbp10DaySprint({
   )}`
 
   return (
-    <Card className="bg-slate-900/90 border-indigo-500/30 overflow-hidden shadow-2xl shadow-indigo-950/40">
+    <Card className="bg-white border-slate-200 overflow-hidden shadow-sm text-slate-800">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-indigo-950 via-purple-900/50 to-slate-900 border-b border-indigo-500/20 p-4 md:p-5">
+      <div className="bg-gradient-to-r from-blue-50 via-indigo-50/60 to-purple-50 border-b border-slate-200 p-4 md:p-5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/40 text-xs px-2.5 py-0.5 flex items-center gap-1.5">
-                <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+              <Badge className="bg-amber-100 text-amber-800 border-amber-300 text-xs px-2.5 py-0.5 flex items-center gap-1.5 font-bold">
+                <Flame className="w-3.5 h-3.5 text-amber-600 fill-amber-500" />
                 10-DAY WAR SPRINT
               </Badge>
-              <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30 text-xs">
+              <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs font-semibold">
                 Rank #{currentRank} ➔ Target: Top #{targetRank}
               </Badge>
             </div>
-            <h2 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
               10-Day Local Top 3 Acceleration Plan
             </h2>
-            <p className="text-xs md:text-sm text-slate-300">
+            <p className="text-xs md:text-sm text-slate-600">
               Aggressive 4-Lever algorithm assault to push {merchantName} into Google Maps Local 3-Pack in 10 Days.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 bg-slate-950/80 px-4 py-2.5 rounded-xl border border-indigo-500/30">
-            <Target className="w-5 h-5 text-emerald-400" />
+          <div className="flex items-center gap-2.5 bg-white px-4 py-2.5 rounded-xl border border-slate-200 shadow-xs">
+            <Target className="w-5 h-5 text-emerald-600" />
             <div>
-              <div className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Sprint Target</div>
-              <div className="text-sm font-extrabold text-emerald-400">Day 1 of 10 Active</div>
+              <div className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Sprint Target</div>
+              <div className="text-sm font-extrabold text-emerald-600">Day 1 of 10 Active</div>
             </div>
           </div>
         </div>
@@ -149,7 +149,7 @@ export function Gbp10DaySprint({
             size="sm"
             variant={activeTab === "overview" ? "default" : "outline"}
             onClick={() => setActiveTab("overview")}
-            className={activeTab === "overview" ? "bg-indigo-600 hover:bg-indigo-700 text-white font-bold" : "border-slate-700 text-slate-300 hover:bg-slate-800 text-xs"}
+            className={activeTab === "overview" ? "bg-blue-600 hover:bg-blue-700 text-white font-bold" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-xs"}
           >
             📋 10-Day Timeline
           </Button>
@@ -157,15 +157,15 @@ export function Gbp10DaySprint({
             size="sm"
             variant={activeTab === "lever1" ? "default" : "outline"}
             onClick={() => setActiveTab("lever1")}
-            className={activeTab === "lever1" ? "bg-red-600 hover:bg-red-700 text-white font-bold" : "border-red-900/50 text-red-300 hover:bg-red-950/50 text-xs"}
+            className={activeTab === "lever1" ? "bg-rose-600 hover:bg-rose-700 text-white font-bold" : "border-rose-200 bg-white text-rose-700 hover:bg-rose-50 text-xs"}
           >
-            ⚡ Lever 1: Competitor Purge (Atul & TCR)
+            ⚡ Lever 1: Competitor Purge
           </Button>
           <Button
             size="sm"
             variant={activeTab === "lever2" ? "default" : "outline"}
             onClick={() => setActiveTab("lever2")}
-            className={activeTab === "lever2" ? "bg-amber-600 hover:bg-amber-700 text-white font-bold" : "border-amber-900/50 text-amber-300 hover:bg-amber-950/50 text-xs"}
+            className={activeTab === "lever2" ? "bg-amber-600 hover:bg-amber-700 text-white font-bold" : "border-amber-200 bg-white text-amber-700 hover:bg-amber-50 text-xs"}
           >
             ⭐ Lever 2: Photo Reviews (35-50)
           </Button>
@@ -173,7 +173,7 @@ export function Gbp10DaySprint({
             size="sm"
             variant={activeTab === "lever3" ? "default" : "outline"}
             onClick={() => setActiveTab("lever3")}
-            className={activeTab === "lever3" ? "bg-blue-600 hover:bg-blue-700 text-white font-bold" : "border-blue-900/50 text-blue-300 hover:bg-blue-950/50 text-xs"}
+            className={activeTab === "lever3" ? "bg-blue-600 hover:bg-blue-700 text-white font-bold" : "border-blue-200 bg-white text-blue-700 hover:bg-blue-50 text-xs"}
           >
             📍 Lever 3: Directions CTR
           </Button>
@@ -181,7 +181,7 @@ export function Gbp10DaySprint({
             size="sm"
             variant={activeTab === "lever4" ? "default" : "outline"}
             onClick={() => setActiveTab("lever4")}
-            className={activeTab === "lever4" ? "bg-emerald-600 hover:bg-emerald-700 text-white font-bold" : "border-emerald-900/50 text-emerald-300 hover:bg-emerald-950/50 text-xs"}
+            className={activeTab === "lever4" ? "bg-emerald-600 hover:bg-emerald-700 text-white font-bold" : "border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-50 text-xs"}
           >
             ✅ Lever 4: Profile Saturation
           </Button>
@@ -193,114 +193,114 @@ export function Gbp10DaySprint({
         {activeTab === "overview" && (
           <div className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <div className="bg-slate-950/60 border border-red-500/30 p-3.5 rounded-xl">
-                <div className="text-[11px] font-bold text-red-400 flex items-center gap-1.5">
+              <div className="bg-rose-50/50 border border-rose-200 p-3.5 rounded-xl">
+                <div className="text-[11px] font-bold text-rose-700 flex items-center gap-1.5">
                   <ShieldAlert className="w-3.5 h-3.5" /> LEVER 1
                 </div>
-                <div className="text-white font-bold text-sm mt-1">Competitor Redressal</div>
-                <div className="text-slate-400 text-xs mt-0.5">Spam keywords stripped from Atul Bakery & The Chocolate Room (Day 1-5)</div>
+                <div className="text-slate-900 font-bold text-sm mt-1">Competitor Redressal</div>
+                <div className="text-slate-600 text-xs mt-0.5">Spam keywords stripped from Atul Bakery &amp; The Chocolate Room (Day 1-5)</div>
               </div>
 
-              <div className="bg-slate-950/60 border border-amber-500/30 p-3.5 rounded-xl">
-                <div className="text-[11px] font-bold text-amber-400 flex items-center gap-1.5">
+              <div className="bg-amber-50/50 border border-amber-200 p-3.5 rounded-xl">
+                <div className="text-[11px] font-bold text-amber-700 flex items-center gap-1.5">
                   <Award className="w-3.5 h-3.5" /> LEVER 2
                 </div>
-                <div className="text-white font-bold text-sm mt-1">Review Velocity</div>
-                <div className="text-slate-400 text-xs mt-0.5">35-50 fresh real cake photo reviews via WhatsApp Bonus Stamp (Day 1-10)</div>
+                <div className="text-slate-900 font-bold text-sm mt-1">Review Velocity</div>
+                <div className="text-slate-600 text-xs mt-0.5">35-50 fresh real cake photo reviews via WhatsApp Bonus Stamp (Day 1-10)</div>
               </div>
 
-              <div className="bg-slate-950/60 border border-blue-500/30 p-3.5 rounded-xl">
-                <div className="text-[11px] font-bold text-blue-400 flex items-center gap-1.5">
+              <div className="bg-blue-50/50 border border-blue-200 p-3.5 rounded-xl">
+                <div className="text-[11px] font-bold text-blue-700 flex items-center gap-1.5">
                   <Navigation className="w-3.5 h-3.5" /> LEVER 3
                 </div>
-                <div className="text-white font-bold text-sm mt-1">Local Directions CTR</div>
-                <div className="text-slate-400 text-xs mt-0.5">50+ Google Maps direction requests from local users visiting Eva Mall (Day 3-8)</div>
+                <div className="text-slate-900 font-bold text-sm mt-1">Local Directions CTR</div>
+                <div className="text-slate-600 text-xs mt-0.5">50+ Google Maps direction requests from local users visiting Eva Mall (Day 3-8)</div>
               </div>
 
-              <div className="bg-slate-950/60 border border-emerald-500/30 p-3.5 rounded-xl">
-                <div className="text-[11px] font-bold text-emerald-400 flex items-center gap-1.5">
+              <div className="bg-emerald-50/50 border border-emerald-200 p-3.5 rounded-xl">
+                <div className="text-[11px] font-bold text-emerald-700 flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5" /> LEVER 4
                 </div>
-                <div className="text-white font-bold text-sm mt-1">Profile Saturation</div>
-                <div className="text-slate-400 text-xs mt-0.5">20 cake catalog items, 4 categories, attributes, and 3 weekly posts (Day 1)</div>
+                <div className="text-slate-900 font-bold text-sm mt-1">Profile Saturation</div>
+                <div className="text-slate-600 text-xs mt-0.5">20 cake catalog items, 4 categories, attributes, and 3 weekly posts (Day 1)</div>
               </div>
             </div>
 
             {/* Daily Execution Timeline Table */}
-            <div className="border border-slate-800 rounded-xl overflow-hidden bg-slate-950/40">
-              <div className="bg-slate-950 px-4 py-3 border-b border-slate-800 font-bold text-sm text-white flex items-center justify-between">
+            <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+              <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 font-bold text-sm text-slate-900 flex items-center justify-between">
                 <span>10-Day Step-by-Step Tactical Roadmap</span>
-                <Badge className="bg-indigo-500/10 text-indigo-400 border-indigo-500/30 text-[10px]">
+                <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-[10px] font-bold">
                   Daily Sprints
                 </Badge>
               </div>
 
-              <div className="divide-y divide-slate-800/60 text-xs">
+              <div className="divide-y divide-slate-100 text-xs">
                 {[
                   {
                     day: "Day 1 (Today)",
                     action: "Submit Google Business Redressal complaints against Atul Bakery & The Chocolate Room + Complete Profile Saturation",
                     owner: "Operator + Field Boy",
                     status: "ACTIVE / IN PROGRESS",
-                    statusColor: "text-amber-400 bg-amber-500/10 border-amber-500/30",
+                    statusColor: "text-amber-800 bg-amber-50 border-amber-200",
                   },
                   {
                     day: "Day 2",
                     action: "Trigger WhatsApp Loyalty Bonus Stamp campaign to past 200 customers (Honest Review with photo = 1 Bonus Stamp)",
                     owner: "CustomerPilot Auto Engine",
                     status: "READY TO LAUNCH",
-                    statusColor: "text-blue-400 bg-blue-500/10 border-blue-500/30",
+                    statusColor: "text-blue-700 bg-blue-50 border-blue-200",
                   },
                   {
                     day: "Day 3",
                     action: "First SEO Google Post live (Artisanal Chocolate Truffle at Eva The Mall) + Sync 20 Products catalog",
                     owner: "Weekly 3-Post Engine",
                     status: "SCHEDULED",
-                    statusColor: "text-slate-400 bg-slate-800 border-slate-700",
+                    statusColor: "text-slate-600 bg-slate-100 border-slate-200",
                   },
                   {
                     day: "Day 4 - 5",
                     action: "Collect first 15-20 photo reviews. AI Owner Replies posted within 60 mins injecting 'Manjalpur' & 'Eva Mall' landmarks",
                     owner: "AI Review Auto-Reply",
                     status: "SCHEDULED",
-                    statusColor: "text-slate-400 bg-slate-800 border-slate-700",
+                    statusColor: "text-slate-600 bg-slate-100 border-slate-200",
                   },
                   {
                     day: "Day 6 - 7",
                     action: "Broadcast 'Get Directions to Eva Mall Store & Claim 10% Off' link via WhatsApp (50+ real Maps direction signals)",
                     owner: "CustomerPilot Map Traffic",
                     status: "SCHEDULED",
-                    statusColor: "text-slate-400 bg-slate-800 border-slate-700",
+                    statusColor: "text-slate-600 bg-slate-100 border-slate-200",
                   },
                   {
                     day: "Day 8",
                     action: "Google spam redressal takes effect: Atul Bakery & TCR lose keyword stuffing. Organic rank jumps #10 ➔ #5/#6",
                     owner: "Google Team Verification",
                     status: "PENDING REDRESSAL",
-                    statusColor: "text-purple-400 bg-purple-500/10 border-purple-500/30",
+                    statusColor: "text-purple-700 bg-purple-50 border-purple-200",
                   },
                   {
                     day: "Day 9",
                     action: "Publish Weekend Offer Post on GBP ('WEEKENDVIP') + review count hits 35+ with high keyword density",
                     owner: "CustomerPilot Engine",
                     status: "SCHEDULED",
-                    statusColor: "text-slate-400 bg-slate-800 border-slate-700",
+                    statusColor: "text-slate-600 bg-slate-100 border-slate-200",
                   },
                   {
                     day: "Day 10",
                     action: "Re-run 100-Point Diagnostic Audit & Local 3-Pack Verification on live Google Places API. Confirm Top 3 entry!",
                     owner: "CustomerPilot Audit Engine",
                     status: "FINAL AUDIT",
-                    statusColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+                    statusColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
                   },
                 ].map((row, idx) => (
-                  <div key={idx} className="p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-2 hover:bg-slate-900/40">
+                  <div key={idx} className="p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-2 hover:bg-slate-50/70 transition">
                     <div className="flex items-start gap-3">
-                      <span className="font-extrabold text-white w-28 shrink-0">{row.day}</span>
-                      <span className="text-slate-300 leading-relaxed">{row.action}</span>
+                      <span className="font-extrabold text-slate-900 w-28 shrink-0">{row.day}</span>
+                      <span className="text-slate-600 leading-relaxed font-medium">{row.action}</span>
                     </div>
                     <div className="flex items-center gap-2.5 shrink-0 self-start md:self-auto pl-31 md:pl-0">
-                      <span className="text-[11px] text-slate-500">{row.owner}</span>
+                      <span className="text-[11px] text-slate-400 font-semibold">{row.owner}</span>
                       <Badge className={`text-[10px] border px-2 py-0.5 font-bold ${row.statusColor}`}>
                         {row.status}
                       </Badge>
@@ -315,19 +315,19 @@ export function Gbp10DaySprint({
         {/* TAB 2: LEVER 1 - COMPETITOR REDRESSAL PURGE */}
         {activeTab === "lever1" && (
           <div className="space-y-5">
-            <div className="bg-red-950/20 border border-red-500/30 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div>
-                <h3 className="text-red-400 font-extrabold text-sm flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4" />
+                <h3 className="text-rose-800 font-extrabold text-sm flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4 text-rose-600" />
                   Google Business Redressal Complaint Dossiers (Ready to Submit)
                 </h3>
-                <p className="text-xs text-slate-300 mt-1">
+                <p className="text-xs text-slate-600 mt-1">
                   Atul Bakery aur The Chocolate Room fake keywords ke sahare Top 5 me baithe hain. Inka redressal submit karne se 3-5 din me inka spam hatega aur Cake Connection automatically upar jump karega.
                 </p>
               </div>
               <Button
                 asChild
-                className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs shrink-0"
+                className="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shrink-0 shadow-xs"
               >
                 <a
                   href="https://support.google.com/business/contact/business_redressal_form"
@@ -344,41 +344,41 @@ export function Gbp10DaySprint({
               {dossiers.map((dossier, i) => {
                 const isFiled = filedComplaints[dossier.competitorName]
                 return (
-                  <Card key={i} className="bg-slate-950/80 border-slate-800 overflow-hidden">
-                    <CardHeader className="bg-slate-900/60 pb-3 border-b border-slate-800">
+                  <Card key={i} className="bg-white border-slate-200 overflow-hidden shadow-xs">
+                    <CardHeader className="bg-slate-50 pb-3 border-b border-slate-100">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+                        <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
                           #{i + 1}: {dossier.competitorName}
                         </CardTitle>
-                        <Badge className="bg-red-500/10 text-red-400 border-red-500/30 text-[10px]">
+                        <Badge className="bg-rose-50 text-rose-700 border-rose-200 text-[10px] font-bold">
                           {dossier.violationType}
                         </Badge>
                       </div>
                     </CardHeader>
                     <CardContent className="p-4 space-y-3.5 text-xs">
                       <div>
-                        <div className="text-slate-400 font-semibold text-[11px]">Maps Stuffed Title:</div>
-                        <div className="text-red-300 font-mono text-[11px] bg-red-950/30 p-2 rounded border border-red-900/40 mt-1">
+                        <div className="text-slate-500 font-semibold text-[11px]">Maps Stuffed Title:</div>
+                        <div className="text-rose-700 font-mono text-[11px] bg-rose-50 p-2 rounded border border-rose-200 mt-1">
                           "{dossier.googleMapsTitle}"
                         </div>
                       </div>
 
                       <div>
-                        <div className="text-slate-400 font-semibold text-[11px]">Actual Signboard Reads:</div>
-                        <div className="text-emerald-400 font-bold bg-emerald-950/20 p-2 rounded border border-emerald-900/40 mt-1">
+                        <div className="text-slate-500 font-semibold text-[11px]">Actual Signboard Reads:</div>
+                        <div className="text-emerald-700 font-bold bg-emerald-50 p-2 rounded border border-emerald-200 mt-1">
                           "{dossier.actualStorefrontName}"
                         </div>
                       </div>
 
-                      <div className="text-slate-300 text-[11px]">
+                      <div className="text-slate-600 text-[11px]">
                         <strong>Impact:</strong> {dossier.impactOnRank}
                       </div>
 
                       {/* Prefilled Form Content */}
-                      <div className="space-y-2 pt-2 border-t border-slate-800">
-                        <div className="text-slate-400 font-bold text-[11px]">Prefilled Redressal Complaint Text:</div>
+                      <div className="space-y-2 pt-2 border-t border-slate-100">
+                        <div className="text-slate-700 font-bold text-[11px]">Prefilled Redressal Complaint Text:</div>
                         
-                        <div className="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-slate-300 text-[11px] leading-relaxed">
+                        <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-slate-700 text-[11px] leading-relaxed">
                           {dossier.prefilledFormFields.issueDescriptionEnglish}
                         </div>
 
@@ -387,9 +387,9 @@ export function Gbp10DaySprint({
                             size="sm"
                             variant="secondary"
                             onClick={() => copyToClipboard(dossier.prefilledFormFields.issueDescriptionEnglish, `en-${i}`)}
-                            className="w-full text-xs font-semibold flex items-center justify-center gap-1.5"
+                            className="w-full text-xs font-semibold flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800"
                           >
-                            {copiedKey === `en-${i}` ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                            {copiedKey === `en-${i}` ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
                             {copiedKey === `en-${i}` ? "Copied English Text!" : "Copy English Text"}
                           </Button>
 
@@ -397,24 +397,24 @@ export function Gbp10DaySprint({
                             size="sm"
                             variant="outline"
                             onClick={() => copyToClipboard(dossier.prefilledFormFields.issueDescriptionHinglish, `hi-${i}`)}
-                            className="w-full text-xs border-slate-700 text-slate-300 hover:bg-slate-800 flex items-center justify-center gap-1.5"
+                            className="w-full text-xs border-slate-200 text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5"
                           >
-                            {copiedKey === `hi-${i}` ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                            {copiedKey === `hi-${i}` ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
                             {copiedKey === `hi-${i}` ? "Copied Hindi!" : "Copy Hindi Text"}
                           </Button>
                         </div>
                       </div>
 
                       {/* Complaint Status Checkbox */}
-                      <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
+                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                         <label className="flex items-center gap-2 cursor-pointer">
                           <input
                             type="checkbox"
                             checked={!!isFiled}
                             onChange={() => toggleComplaintFiled(dossier.competitorName)}
-                            className="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 w-4 h-4"
+                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
                           />
-                          <span className={`text-xs font-semibold ${isFiled ? "text-emerald-400" : "text-slate-400"}`}>
+                          <span className={`text-xs font-semibold ${isFiled ? "text-emerald-700" : "text-slate-500"}`}>
                             {isFiled ? "✅ Redressal Submitted to Google" : "Mark as Submitted by Operator"}
                           </span>
                         </label>
@@ -431,30 +431,30 @@ export function Gbp10DaySprint({
         {activeTab === "lever2" && (
           <div className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                <div className="text-slate-400 text-xs font-medium">Sprint Target Reviews</div>
-                <div className="text-2xl font-black text-amber-400 mt-1">35 - 50</div>
-                <div className="text-[11px] text-slate-500 mt-0.5">3-5 fresh photo reviews/day</div>
+              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                <div className="text-slate-500 text-xs font-semibold">Sprint Target Reviews</div>
+                <div className="text-2xl font-black text-amber-600 mt-1">35 - 50</div>
+                <div className="text-[11px] text-slate-400 mt-0.5">3-5 fresh photo reviews/day</div>
               </div>
 
-              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                <div className="text-slate-400 text-xs font-medium">Loyalty Incentive</div>
-                <div className="text-2xl font-black text-emerald-400 mt-1">+1 Bonus Stamp</div>
-                <div className="text-[11px] text-slate-500 mt-0.5">Auto-credited per verified photo review</div>
+              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                <div className="text-slate-500 text-xs font-semibold">Loyalty Incentive</div>
+                <div className="text-2xl font-black text-emerald-600 mt-1">+1 Bonus Stamp</div>
+                <div className="text-[11px] text-slate-400 mt-0.5">Auto-credited per verified photo review</div>
               </div>
 
-              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                <div className="text-slate-400 text-xs font-medium">Policy Guardrail</div>
-                <div className="text-2xl font-black text-blue-400 mt-1">Zero-Ban Safe</div>
-                <div className="text-[11px] text-slate-500 mt-0.5">No 5-star gating, 'HELP' fallback included</div>
+              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                <div className="text-slate-500 text-xs font-semibold">Policy Guardrail</div>
+                <div className="text-2xl font-black text-blue-600 mt-1">Zero-Ban Safe</div>
+                <div className="text-[11px] text-slate-400 mt-0.5">No 5-star gating, 'HELP' fallback included</div>
               </div>
             </div>
 
             {/* Target Keywords Injection Grid */}
-            <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800 space-y-3">
-              <div className="text-white font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
-                <Award className="w-3.5 h-3.5 text-amber-400" />
-                Target Keywords to Inject into Customer Reviews & AI Auto-Replies:
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <div className="text-slate-800 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
+                <Award className="w-3.5 h-3.5 text-amber-500" />
+                Target Keywords to Inject into Customer Reviews &amp; AI Auto-Replies:
               </div>
               <div className="flex flex-wrap gap-2">
                 {[
@@ -465,7 +465,7 @@ export function Gbp10DaySprint({
                   "Live bakery counter Vadodara",
                   "Cake Connection Eva Mall",
                 ].map((kw, i) => (
-                  <Badge key={i} className="bg-indigo-950/60 text-indigo-300 border-indigo-700/50 text-xs px-3 py-1 font-semibold">
+                  <Badge key={i} className="bg-white text-blue-700 border-blue-200 text-xs px-3 py-1 font-semibold shadow-2xs">
                     🔑 {kw}
                   </Badge>
                 ))}
@@ -473,15 +473,15 @@ export function Gbp10DaySprint({
             </div>
 
             {/* WhatsApp Campaign Preview */}
-            <Card className="bg-slate-950/90 border-slate-800">
-              <CardHeader className="pb-3 border-b border-slate-800">
-                <CardTitle className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-emerald-400" />
+            <Card className="bg-white border-slate-200 shadow-xs">
+              <CardHeader className="pb-3 border-b border-slate-100">
+                <CardTitle className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-emerald-600" />
                   Live WhatsApp Review Campaign Message Preview
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-3 text-xs">
-                <div className="bg-emerald-950/20 border border-emerald-900/50 p-3.5 rounded-xl text-emerald-200 font-sans leading-relaxed whitespace-pre-line">
+                <div className="bg-emerald-50/60 border border-emerald-200 p-3.5 rounded-xl text-emerald-900 font-sans leading-relaxed whitespace-pre-line">
                   {`Hi {Customer Name} ❤️
 
 Hope you loved your visit to *Cake Connection (Eva The Mall, Manjalpur)*! 🎂✨
@@ -491,10 +491,10 @@ Share your honest Google review with a cake photo to unlock a 🎁 *Bonus Loyalt
 Order me koi dikkat thi? Yahan *HELP* likh kar reply karein taaki maalik aapse seedha baat kar sakein.`}
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
                   <span>Engine: <strong>CustomerPilot Zero-Ban Loyalty Review Dispatcher</strong></span>
-                  <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
-                    Active & Automated ✅
+                  <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 font-bold">
+                    Active &amp; Automated ✅
                   </Badge>
                 </div>
               </CardContent>
@@ -505,19 +505,19 @@ Order me koi dikkat thi? Yahan *HELP* likh kar reply karein taaki maalik aapse s
         {/* TAB 4: LEVER 3 - LOCAL CTR & DIRECTIONS */}
         {activeTab === "lever3" && (
           <div className="space-y-5">
-            <div className="bg-blue-950/20 border border-blue-500/30 rounded-xl p-4 space-y-2">
-              <h3 className="text-blue-400 font-extrabold text-sm flex items-center gap-2">
-                <Navigation className="w-4 h-4" />
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-2">
+              <h3 className="text-blue-900 font-extrabold text-sm flex items-center gap-2">
+                <Navigation className="w-4 h-4 text-blue-600" />
                 Google Maps Directions Click-Through Signal Generator
               </h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 Google local algorithm ranks businesses heavily based on how many people search and click <strong>"Directions"</strong> to visit the physical store. We trigger this by sending an in-store tasting invite to past customers with a 1-click direction link to Eva The Mall.
               </p>
             </div>
 
-            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 text-xs">
-              <div className="text-slate-400 font-semibold">Live Google Maps Directions URL:</div>
-              <div className="bg-slate-900 p-2.5 rounded border border-slate-800 text-blue-300 font-mono text-[11px] break-all">
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-3 text-xs">
+              <div className="text-slate-600 font-semibold">Live Google Maps Directions URL:</div>
+              <div className="bg-slate-50 p-2.5 rounded border border-slate-200 text-blue-700 font-mono text-[11px] break-all">
                 {directionsUrl}
               </div>
 
@@ -525,7 +525,7 @@ Order me koi dikkat thi? Yahan *HELP* likh kar reply karein taaki maalik aapse s
                 <Button
                   size="sm"
                   asChild
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs"
                 >
                   <a href={directionsUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
                     Test Google Maps Directions Link <ExternalLink className="w-3.5 h-3.5" />
@@ -536,31 +536,31 @@ Order me koi dikkat thi? Yahan *HELP* likh kar reply karein taaki maalik aapse s
                   size="sm"
                   variant="outline"
                   onClick={() => copyToClipboard(directionsUrl, "dir-url")}
-                  className="border-slate-700 text-slate-300 hover:bg-slate-800 text-xs"
+                  className="border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-xs font-semibold"
                 >
-                  {copiedKey === "dir-url" ? <Check className="w-3.5 h-3.5 text-emerald-400 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+                  {copiedKey === "dir-url" ? <Check className="w-3.5 h-3.5 text-emerald-600 mr-1" /> : <Copy className="w-3.5 h-3.5 text-slate-400 mr-1" />}
                   {copiedKey === "dir-url" ? "Copied!" : "Copy Directions Link"}
                 </Button>
               </div>
             </div>
 
             {/* Broadcast Trigger */}
-            <Card className="bg-slate-950/90 border-slate-800">
-              <CardHeader className="pb-3 border-b border-slate-800">
-                <CardTitle className="text-xs font-bold text-white uppercase tracking-wider flex items-center justify-between">
+            <Card className="bg-white border-slate-200 shadow-xs">
+              <CardHeader className="pb-3 border-b border-slate-100">
+                <CardTitle className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
                   <span>Weekend Map Traffic Broadcast (Throttled 50/hour)</span>
-                  <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/30 text-[10px]">
+                  <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-[10px] font-bold">
                     Track B Feature
                   </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-3 text-xs">
-                <div className="text-slate-300 leading-relaxed">
-                  Broadcasts an in-store tasting & discount invite to past customers with the direct Google Maps Directions link. Automatically throttled to 50 WhatsApp messages per hour to protect WhatsApp health.
+                <div className="text-slate-600 leading-relaxed">
+                  Broadcasts an in-store tasting &amp; discount invite to past customers with the direct Google Maps Directions link. Automatically throttled to 50 WhatsApp messages per hour to protect WhatsApp health.
                 </div>
 
                 {broadcastMessage && (
-                  <div className="p-3 rounded-lg bg-indigo-950/40 border border-indigo-500/30 text-indigo-300 text-xs">
+                  <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-xs">
                     {broadcastMessage}
                   </div>
                 )}
@@ -568,7 +568,7 @@ Order me koi dikkat thi? Yahan *HELP* likh kar reply karein taaki maalik aapse s
                 <Button
                   onClick={handleTriggerDirectionsBroadcast}
                   disabled={broadcastLoading}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs"
                 >
                   {broadcastLoading ? <Sparkles className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
                   {broadcastLoading ? "Queueing Broadcast..." : "Queue Weekend Map Directions Broadcast"}
@@ -581,12 +581,12 @@ Order me koi dikkat thi? Yahan *HELP* likh kar reply karein taaki maalik aapse s
         {/* TAB 5: LEVER 4 - PROFILE SATURATION */}
         {activeTab === "lever4" && (
           <div className="space-y-4 text-xs">
-            <div className="bg-emerald-950/20 border border-emerald-500/30 rounded-xl p-4">
-              <h3 className="text-emerald-400 font-extrabold text-sm flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4" />
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+              <h3 className="text-emerald-800 font-extrabold text-sm flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 GBP Core Profile Saturation Checklist (Immediate 30 Mins)
               </h3>
-              <p className="text-slate-300 mt-1">
+              <p className="text-slate-600 mt-1">
                 Ensures 100% algorithm density across categories, products catalog, and hidden AEO voice search attributes.
               </p>
             </div>
@@ -597,33 +597,33 @@ Order me koi dikkat thi? Yahan *HELP* likh kar reply karein taaki maalik aapse s
                   title: "1. Primary & Secondary Categories",
                   detail: "Primary: Bakery | Secondary: Cake Shop, Pastry Shop, Dessert Shop, Wedding Bakery",
                   status: "Configured ✅",
-                  badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+                  badgeColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
                 },
                 {
                   title: "2. 20-Item Products Catalog",
                   detail: "Belgian Truffle, Dutch Almond, Red Velvet, Fresh Fruit with photo, price & WhatsApp order link",
                   status: "Synced & Live ✅",
-                  badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+                  badgeColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
                 },
                 {
                   title: "3. Hidden AEO Voice Attributes",
                   detail: "Delivery: YES | Takeaway: YES | Wheelchair Accessible: YES | Same-Day Delivery: YES | UPI: YES",
                   status: "Toggled ON ✅",
-                  badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+                  badgeColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
                 },
                 {
                   title: "4. Advance Weekly 3-Post Engine",
                   detail: "Tue: Product Spotlight | Thu: Social Proof Review | Sat: Weekend 15% VIP Deal",
                   status: "Active & Queued ✅",
-                  badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+                  badgeColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
                 },
               ].map((item, i) => (
-                <div key={i} className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1.5">
+                <div key={i} className="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1.5 shadow-2xs">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-white text-xs">{item.title}</span>
-                    <Badge className={`text-[10px] border px-2 py-0.5 ${item.badgeColor}`}>{item.status}</Badge>
+                    <span className="font-bold text-slate-900 text-xs">{item.title}</span>
+                    <Badge className={`text-[10px] border px-2 py-0.5 font-bold ${item.badgeColor}`}>{item.status}</Badge>
                   </div>
-                  <p className="text-slate-400 text-[11px] leading-relaxed">{item.detail}</p>
+                  <p className="text-slate-500 text-[11px] leading-relaxed">{item.detail}</p>
                 </div>
               ))}
             </div>

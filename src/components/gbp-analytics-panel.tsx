@@ -43,9 +43,9 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
 
   if (loading && !data) {
     return (
-      <div className="py-12 flex flex-col items-center justify-center gap-3">
-        <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
-        <p className="text-xs text-slate-400 font-medium">Loading Real-Time Keyword Positions &amp; Geo-Grid Radar...</p>
+      <div className="py-12 flex flex-col items-center justify-center gap-3 bg-white rounded-2xl border border-slate-200 shadow-xs">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+        <p className="text-xs text-slate-500 font-medium">Loading Real-Time Keyword Positions &amp; Geo-Grid Radar...</p>
       </div>
     );
   }
@@ -55,22 +55,22 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
   const { keywords, geoGrid, telemetry, locality } = data;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 text-slate-800">
       {/* Top Banner & Refresh */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/60 to-slate-900 border border-indigo-500/30">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400">
+          <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-100 text-blue-600">
             <Compass className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-extrabold text-sm text-white">Google Maps Real-Time Telemetry &amp; Keyword Radar</h3>
-              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px] font-black">
+              <h3 className="font-extrabold text-sm text-slate-900">Google Maps Real-Time Telemetry &amp; Keyword Radar</h3>
+              <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
                 LIVE CRAWLER ACTIVE
               </Badge>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Target Locality: <strong className="text-slate-200">{locality}</strong> • Synced daily at 06:00 AM IST
+            <p className="text-xs text-slate-500 mt-0.5">
+              Target Locality: <strong className="text-slate-800">{locality}</strong> • Synced daily at 06:00 AM IST
             </p>
           </div>
         </div>
@@ -83,7 +83,7 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
             fetchAnalytics();
           }}
           disabled={refreshing}
-          className="border-slate-700 bg-slate-900 text-slate-200 hover:text-white text-xs h-8"
+          className="border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs h-8 shadow-2xs font-semibold"
         >
           <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${refreshing ? "animate-spin" : ""}`} />
           {refreshing ? "Scanning..." : "Refresh Position Scan"}
@@ -99,9 +99,9 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
             growth: `+${telemetry.interactionsGrowthPct}% MoM`,
             sub: "Calls, Directions & Clicks",
             icon: Activity,
-            color: "text-indigo-400",
-            bg: "from-indigo-500/20 to-purple-500/5",
-            border: "border-indigo-500/30",
+            color: "text-blue-600",
+            bg: "bg-blue-50/50",
+            border: "border-blue-200",
           },
           {
             label: "Google Maps Phone Calls",
@@ -109,9 +109,9 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
             growth: "+28.4% MoM",
             sub: "Direct click-to-call orders",
             icon: Phone,
-            color: "text-emerald-400",
-            bg: "from-emerald-500/20 to-teal-500/5",
-            border: "border-emerald-500/30",
+            color: "text-emerald-600",
+            bg: "bg-emerald-50/50",
+            border: "border-emerald-200",
           },
           {
             label: "Driving Directions",
@@ -119,9 +119,9 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
             growth: "+36.1% MoM",
             sub: "Navigations to storefront",
             icon: Navigation,
-            color: "text-amber-400",
-            bg: "from-amber-500/20 to-orange-500/5",
-            border: "border-amber-500/30",
+            color: "text-amber-600",
+            bg: "bg-amber-50/50",
+            border: "border-amber-200",
           },
           {
             label: "Website & WhatsApp Orders",
@@ -129,23 +129,22 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
             growth: "+41.2% MoM",
             sub: "Order online CTA clicks",
             icon: ExternalLink,
-            color: "text-sky-400",
-            bg: "from-sky-500/20 to-blue-500/5",
-            border: "border-sky-500/30",
+            color: "text-sky-600",
+            bg: "bg-sky-50/50",
+            border: "border-sky-200",
           },
         ].map((stat, i) => (
-          <Card key={i} className={`bg-slate-900/80 border ${stat.border} relative overflow-hidden`}>
-            <div className={`absolute -right-6 -bottom-6 w-16 h-16 bg-gradient-to-br ${stat.bg} rounded-full blur-xl pointer-events-none`} />
+          <Card key={i} className={`bg-white border ${stat.border} shadow-xs relative overflow-hidden`}>
             <CardContent className="p-4 space-y-1">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-slate-400">{stat.label}</span>
-                <stat.icon className={`w-3.5 h-3.5 ${stat.color}`} />
+                <span className="text-[11px] font-semibold text-slate-500">{stat.label}</span>
+                <stat.icon className={`w-4 h-4 ${stat.color}`} />
               </div>
               <div className="flex items-baseline gap-2 mt-1">
-                <span className={`text-2xl font-black ${stat.color}`}>{stat.value}</span>
-                <span className="text-[10px] font-bold text-emerald-400">{stat.growth}</span>
+                <span className={`text-2xl font-black text-slate-900`}>{stat.value}</span>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">{stat.growth}</span>
               </div>
-              <p className="text-[10px] text-slate-500 mt-0.5">{stat.sub}</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">{stat.sub}</p>
             </CardContent>
           </Card>
         ))}
@@ -154,18 +153,18 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
       {/* Grid View: 9-Point Geo-Grid Proximity Radar & Search Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Left: 9-Point Geo-Grid Local Radar (7 Cols) */}
-        <Card className="lg:col-span-7 bg-slate-900/70 border-slate-800">
-          <CardHeader className="pb-3 border-b border-slate-800/80">
+        <Card className="lg:col-span-7 bg-white border-slate-200 shadow-xs">
+          <CardHeader className="pb-3 border-b border-slate-100">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
-                <Compass className="w-4 h-4 text-emerald-400" />
+              <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Compass className="w-4 h-4 text-emerald-600" />
                 9-Point Local Geo-Grid (3km x 3km Proximity Map)
               </CardTitle>
-              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs font-black">
+              <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs font-bold">
                 {geoGrid.top3Count}/9 in Top 3 ({geoGrid.gridScorePct}% Dominance)
               </Badge>
             </div>
-            <p className="text-slate-400 text-xs mt-1">
+            <p className="text-slate-500 text-xs mt-1">
               Real-time Google Maps ranking measured at 9 GPS coordinates surrounding the business address.
             </p>
           </CardHeader>
@@ -180,46 +179,48 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
                     key={idx}
                     className={`p-3 rounded-xl border flex flex-col items-center justify-center text-center transition-all ${
                       pt.isCenter
-                        ? "bg-indigo-950/70 border-indigo-500/50 shadow-lg shadow-indigo-500/20 ring-2 ring-indigo-500/30"
+                        ? "bg-blue-600 border-blue-700 text-white shadow-xs ring-2 ring-blue-300"
                         : isRank1
-                        ? "bg-emerald-950/50 border-emerald-500/40"
+                        ? "bg-emerald-50 border-emerald-300 text-emerald-900 font-bold"
                         : isTop3
-                        ? "bg-slate-900/90 border-emerald-500/30"
-                        : "bg-slate-900/60 border-amber-500/30"
+                        ? "bg-emerald-50/70 border-emerald-200 text-emerald-800"
+                        : "bg-amber-50 border-amber-200 text-amber-800"
                     }`}
                   >
                     <div className="flex items-center gap-1">
-                      <span className="text-[10px] font-black text-slate-400 uppercase">{pt.point}</span>
-                      {pt.isCenter && <span className="text-[9px] bg-indigo-500/30 text-indigo-300 px-1 rounded font-bold">STORE</span>}
+                      <span className={`text-[10px] font-black uppercase ${pt.isCenter ? "text-blue-100" : "text-slate-500"}`}>{pt.point}</span>
+                      {pt.isCenter && <span className="text-[9px] bg-white text-blue-700 px-1 rounded font-bold">STORE</span>}
                     </div>
 
                     <div
-                      className={`w-9 h-9 rounded-full flex items-center justify-center my-1.5 font-black text-sm shadow-md ${
-                        isRank1
-                          ? "bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-emerald-500/30"
+                      className={`w-9 h-9 rounded-full flex items-center justify-center my-1.5 font-black text-sm shadow-2xs ${
+                        pt.isCenter
+                          ? "bg-white text-blue-700"
+                          : isRank1
+                          ? "bg-emerald-600 text-white"
                           : isTop3
-                          ? "bg-emerald-600/30 text-emerald-300 border border-emerald-500/50"
-                          : "bg-amber-600/30 text-amber-300 border border-amber-500/50"
+                          ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                          : "bg-amber-100 text-amber-800 border border-amber-300"
                       }`}
                     >
                       #{pt.rank}
                     </div>
 
-                    <p className="text-[10px] font-bold text-white line-clamp-1">{pt.area}</p>
-                    <p className="text-[9px] text-slate-400 mt-0.5">{pt.distance}</p>
+                    <p className={`text-[10px] font-bold line-clamp-1 ${pt.isCenter ? "text-white" : "text-slate-800"}`}>{pt.area}</p>
+                    <p className={`text-[9px] mt-0.5 ${pt.isCenter ? "text-blue-200" : "text-slate-400"}`}>{pt.distance}</p>
                   </div>
                 );
               })}
             </div>
 
-            <div className="flex items-center justify-between text-xs text-slate-400 mt-3 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-between text-xs text-slate-500 mt-3 pt-3 border-t border-slate-100">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                <span className="text-[11px]">Rank #1 - #3 (Top 3 Pack)</span>
+                <span className="text-[11px] font-semibold text-slate-700">Rank #1 - #3 (Top 3 Pack)</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                <span className="text-[11px]">Rank #4 - #9 (Nearby)</span>
+                <span className="text-[11px] font-semibold text-slate-700">Rank #4 - #9 (Nearby)</span>
               </div>
               <div className="text-[11px] font-mono text-slate-400">Center: Eva Mall / Manjalpur</div>
             </div>
@@ -227,45 +228,45 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
         </Card>
 
         {/* Right: Search Console Query Breakdown & Platform Share (5 Cols) */}
-        <Card className="lg:col-span-5 bg-slate-900/70 border-slate-800 flex flex-col justify-between">
-          <CardHeader className="pb-3 border-b border-slate-800/80">
-            <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
-              <Globe className="w-4 h-4 text-sky-400" />
+        <Card className="lg:col-span-5 bg-white border-slate-200 shadow-xs flex flex-col justify-between">
+          <CardHeader className="pb-3 border-b border-slate-100">
+            <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Globe className="w-4 h-4 text-blue-600" />
               Search Console Discovery Telemetry
             </CardTitle>
-            <p className="text-slate-400 text-xs mt-1">
+            <p className="text-slate-500 text-xs mt-1">
               Google Maps vs Google Search impressions &amp; customer intent split.
             </p>
           </CardHeader>
           <CardContent className="p-4 space-y-4">
             {/* Total Impressions */}
-            <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
               <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-400 font-medium">Total Profile Impressions</span>
-                <span className="text-emerald-400 font-bold">+{telemetry.impressionsGrowthPct}%</span>
+                <span className="text-slate-500 font-semibold">Total Profile Impressions</span>
+                <span className="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">+{telemetry.impressionsGrowthPct}%</span>
               </div>
-              <div className="text-2xl font-black text-white mt-1">
+              <div className="text-2xl font-black text-slate-900 mt-1">
                 {telemetry.totalImpressions.toLocaleString("en-IN")}
               </div>
-              <p className="text-[10px] text-slate-500 mt-0.5">Times your profile was viewed on Google in the last 30 days</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">Times your profile was viewed on Google in the last 30 days</p>
             </div>
 
             {/* Discovery vs Direct Searches */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-300 font-semibold flex items-center gap-1.5">
-                  <Search className="w-3.5 h-3.5 text-indigo-400" />
+                <span className="text-slate-700 font-semibold flex items-center gap-1.5">
+                  <Search className="w-3.5 h-3.5 text-blue-600" />
                   Discovery Searches
                 </span>
-                <span className="font-extrabold text-indigo-400">{telemetry.searchQueries.discoveryPct}%</span>
+                <span className="font-extrabold text-blue-600">{telemetry.searchQueries.discoveryPct}%</span>
               </div>
-              <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+              <div className="h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                 <div
-                  className="h-full bg-gradient-to-r from-indigo-500 to-sky-400 rounded-full"
+                  className="h-full bg-blue-600 rounded-full"
                   style={{ width: `${telemetry.searchQueries.discoveryPct}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[10px] text-slate-500">
+              <div className="flex justify-between text-[10px] text-slate-400">
                 <span>Customers searching for category / products</span>
                 <span>Direct branded: {telemetry.searchQueries.directPct}%</span>
               </div>
@@ -274,19 +275,19 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
             {/* Google Maps vs Google Search Platforms */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-300 font-semibold flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-slate-700 font-semibold flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-emerald-600" />
                   Google Maps App &amp; Web
                 </span>
-                <span className="font-extrabold text-emerald-400">{telemetry.platforms.googleMapsPct}%</span>
+                <span className="font-extrabold text-emerald-600">{telemetry.platforms.googleMapsPct}%</span>
               </div>
-              <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+              <div className="h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                 <div
-                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
+                  className="h-full bg-emerald-500 rounded-full"
                   style={{ width: `${telemetry.platforms.googleMapsPct}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[10px] text-slate-500">
+              <div className="flex justify-between text-[10px] text-slate-400">
                 <span>Direct navigation &amp; location browsing</span>
                 <span>Google Web Search: {telemetry.platforms.googleSearchPct}%</span>
               </div>
@@ -296,19 +297,19 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
       </div>
 
       {/* Daily Captured Keyword Ranking Table */}
-      <Card className="bg-slate-900/70 border-slate-800">
-        <CardHeader className="pb-3 border-b border-slate-800/80">
+      <Card className="bg-white border-slate-200 shadow-xs overflow-hidden">
+        <CardHeader className="pb-3 border-b border-slate-100">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-amber-400" />
+              <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-amber-500" />
                 Target Keywords &amp; Daily Captured Ranking Report
               </CardTitle>
-              <p className="text-slate-400 text-xs mt-1">
+              <p className="text-slate-500 text-xs mt-1">
                 Real-time organic ranking positions for high-intent commercial &amp; transactional buyer queries.
               </p>
             </div>
-            <Badge className="bg-indigo-500/10 text-indigo-300 border-indigo-500/30 text-[10px] self-start sm:self-auto">
+            <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-[10px] self-start sm:self-auto font-bold">
               {keywords.length} Tracked Keywords
             </Badge>
           </div>
@@ -316,34 +317,34 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-950/80 text-slate-400 border-b border-slate-800 text-[11px] uppercase">
+              <thead className="bg-slate-50 text-slate-500 border-b border-slate-100 text-[11px] uppercase font-bold">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">Target Keyword</th>
-                  <th className="px-4 py-3 font-semibold text-center">Current Rank</th>
-                  <th className="px-4 py-3 font-semibold text-center">24h Movement</th>
-                  <th className="px-4 py-3 font-semibold text-center">Monthly Search Volume</th>
-                  <th className="px-4 py-3 font-semibold text-center">Query Intent</th>
-                  <th className="px-4 py-3 font-semibold text-right">Status</th>
+                  <th className="px-4 py-3">Target Keyword</th>
+                  <th className="px-4 py-3 text-center">Current Rank</th>
+                  <th className="px-4 py-3 text-center">24h Movement</th>
+                  <th className="px-4 py-3 text-center">Monthly Search Volume</th>
+                  <th className="px-4 py-3 text-center">Query Intent</th>
+                  <th className="px-4 py-3 text-right">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-slate-100 font-medium">
                 {keywords.map((kw: any, idx: number) => {
                   const isRank1 = kw.currentRank === 1;
                   const isTop3 = kw.currentRank <= 3;
                   return (
-                    <tr key={idx} className="hover:bg-slate-800/30 transition-colors">
-                      <td className="px-4 py-3 font-bold text-white flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                    <tr key={idx} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="px-4 py-3 font-bold text-slate-900 flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                         {kw.keyword}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full font-black text-xs ${
                             isRank1
-                              ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                              ? "bg-amber-50 text-amber-700 border border-amber-300"
                               : isTop3
-                              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
-                              : "bg-slate-800 text-slate-300 border border-slate-700"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                              : "bg-slate-100 text-slate-700 border border-slate-200"
                           }`}
                         >
                           {isRank1 ? "🏆 #1" : isTop3 ? `🥇 #${kw.currentRank}` : `#${kw.currentRank}`}
@@ -351,27 +352,27 @@ export function GbpAnalyticsPanel({ merchantId }: GbpAnalyticsPanelProps) {
                       </td>
                       <td className="px-4 py-3 text-center">
                         {kw.change > 0 ? (
-                          <span className="text-emerald-400 font-bold inline-flex items-center gap-0.5">
+                          <span className="text-emerald-700 font-bold inline-flex items-center gap-0.5">
                             ▲ +{kw.change}
                           </span>
                         ) : kw.change < 0 ? (
-                          <span className="text-red-400 font-bold inline-flex items-center gap-0.5">
+                          <span className="text-rose-600 font-bold inline-flex items-center gap-0.5">
                             ▼ {kw.change}
                           </span>
                         ) : (
-                          <span className="text-slate-500 font-medium">▬ Steady</span>
+                          <span className="text-slate-400 font-medium">▬ Steady</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-center font-mono font-bold text-slate-300">
+                      <td className="px-4 py-3 text-center font-mono font-bold text-slate-700">
                         {kw.searchVolume.toLocaleString("en-IN")} / mo
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <Badge variant="outline" className="text-[10px] border-slate-800 text-slate-400">
+                        <Badge variant="outline" className="text-[10px] border-slate-200 text-slate-600 bg-slate-50 font-semibold">
                           {kw.intent}
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/40">
+                        <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                           ✓ Verified Active
                         </span>
                       </td>

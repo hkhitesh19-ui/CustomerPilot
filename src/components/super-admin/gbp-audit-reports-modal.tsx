@@ -26,11 +26,11 @@ export function GbpAuditReportsModal({
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-slate-950 border-slate-800 text-slate-100 p-6">
-        <DialogHeader className="border-b border-slate-800 pb-3">
-          <DialogTitle className="text-base font-extrabold text-white flex items-center gap-2">
-            <Camera className="w-4 h-4 text-emerald-400" />
-            GBP Audit &amp; 30-Day Calendar Reports — {merchantName}
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-white border-slate-200 text-slate-900 p-6 shadow-2xl">
+        <DialogHeader className="border-b border-slate-100 pb-3">
+          <DialogTitle className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+            <Camera className="w-4 h-4 text-blue-600" />
+            Google Business Profile Performance &amp; Reports — {merchantName}
           </DialogTitle>
         </DialogHeader>
 
