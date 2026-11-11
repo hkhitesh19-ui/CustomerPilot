@@ -8,19 +8,20 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 12f5f3d (UI & Seed Synchronized)
+Active Git Commit : 61e5286 (Google Search Console Light Theme & Multi-Line Performance Graph)
+Full SHA          : 61e52864f30bb06d883ceb91b4dd8a4e84824b00
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 11 Nov 2026, 10:45 PM IST
+Deployment Date   : 11 Nov 2026, 11:35 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(gbp-ui): wire Tab 4 button in merchant gbp dashboard and modal in superadmin, enable all modules for customerpilot and seed real baseline reports
+Commit Title      : feat(gbp-ui): replace blackish theme with Google Search Console light theme and add interactive multi-line performance graph
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
-1. https://customerpilot.in/dashboard/gbp-status         -> HTTP 200 (Tab 4: 📸 4. Audit & Monthly Reports Button Live)
-2. https://customerpilot.in/super-admin                  -> HTTP 200 (📸 Audit & 30-Day Reports Modal in JSX Live)
+1. https://customerpilot.in/dashboard/gbp-status         -> HTTP 200 (Google Search Console Light Theme & Performance Graph Live)
+2. https://customerpilot.in/super-admin                  -> HTTP 200 (Audit Modal in Light Mode Live)
 3. https://customerpilot.in                              -> HTTP 200 (Homepage)
 4. https://cakeconnection.in                             -> HTTP 200 (Bakery Portal)
 5. http://187.127.170.36:8080                            -> HTTP 200 (Evolution API Manager v2.2.2)
