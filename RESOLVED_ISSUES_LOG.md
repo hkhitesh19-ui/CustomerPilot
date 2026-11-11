@@ -4,6 +4,38 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [12 Nov 2026] Issue: SERP & GEO Tracking Engine with Daily 09:00 AM IST Crawl, Multi-Line Progression Graph, and CSV Export
+- **Symptom**: Merchants and SuperAdmin lacked real-time visibility and historical progression graphs for their 10 to 30 most searchable, high-demand keywords across GEO (hyper-local/landmarks), SEO (high-volume organic search), and AEO (AI engine optimization & voice search). Daily 09:00 AM IST ranking positions and 24h movements were not persistently logged or exportable via CSV.
+- **Root Cause**: Database lacked a dedicated daily historical telemetry table (GbpKeywordDailyRank), and there was no automated 09:00 AM IST crawl engine, multi-line inverted-axis time-series visualization, or consolidated CSV exporter.
+- **Resolution**:
+  1. **Prisma Database Architecture (prisma/schema.prisma)**:
+     - Added GbpKeywordDailyRank model with fields: merchantId, keyword, keywordType (GEO | SEO | AEO), rankPosition, previousRank, searchVolume, locality, targetCity, serpFeature (LOCAL_3PACK | ORGANIC | AI_OVERVIEW | KNOWLEDGE_PANEL), snapshotDate (YYYY-MM-DD), and capturedAt.
+     - Added compound unique constraint @@unique([merchantId, keyword, snapshotDate]) and compound indexes @@index([merchantId, snapshotDate]) and @@index([merchantId, keywordType]).
+     - Ran npx prisma db push and npx prisma generate to synchronize local SQLite database.
+  2. **Domain Keyword Bank & Taxonomy (src/lib/gbp/keyword-bank.ts)**:
+     - Curated 26 high-demand keywords for Cake Connection (cmtymavfx0002kx008lbfvp57): 10 GEO (Manjalpur, Eva Mall, Kalali Rd, Darbar Chokdi, Tarsali), 10 SEO (online cake delivery, pure eggless, belgian truffle), and 6 AEO (AI Overview voice prompts).
+     - Curated 20 keywords for CustomerPilot (cmw1vwviv06f3kvwlkx62ghap & customerpilot-hq): 8 GEO, 8 SEO, and 6 AEO keywords.
+     - Implemented dynamic 16-keyword auto-generator for any newly onboarded merchant based on category, locality, and city.
+  3. **Daily 09:00 AM IST Crawl Engine (src/app/api/cron/gbp-daily-serp/route.ts)**:
+     - Automated cron route executing daily at 09:00 AM IST.
+     - Persistently logs today's rank snapshot and auto-seeds 14-day historical progression curves for new stores.
+  4. **Telemetry & Progression APIs (src/app/api/gbp/daily-serp/route.ts, src/app/api/gbp/daily-serp/export/route.ts)**:
+     - GET /api/gbp/daily-serp: Returns 4 Google-style metric scorecards (Top 3 Share %, Top 10 Coverage, Avg Rank, Search Demand), filtered keywords with 24h deltas, and time-series points.
+     - GET /api/gbp/daily-serp/export: Streams formatted CSV reports with columns: Date, Merchant, Keyword, Category, Rank, Previous Rank, 24h Movement, Volume, Locality, Feature, IST Timestamp.
+  5. **Visual Telemetry & Time-Series Graph Component (src/components/gbp-daily-serp-tracker.tsx)**:
+     - Google Console light theme with 4 scorecards.
+     - Inverted Y-axis SVG curve graph (Rank #1 at top, Rank #15 at bottom) with interactive Category Averages and Keyword Comparison modes.
+     - Responsive hover crosshair and date-specific rank tooltip.
+     - Comprehensive telemetry table with 24h shifts, Day-0 vs current comparison, and SVG sparklines.
+  6. **Merchant & SuperAdmin Dashboard Integration**:
+     - Merchant Dashboard (src/app/dashboard/gbp-status/page.tsx): Embedded into Tab 3 labeled '3. SERP & GEO Ranking Tracker'.
+     - SuperAdmin Dashboard (src/components/super-admin/gbp-operations-dashboard.tsx): Embedded cross-merchant studio with store selector, 'Trigger 09:00 AM Scan (All Stores)' button, and consolidated all-stores CSV export.
+  7. **Adversarial Red-Team & TypeScript Ratchet Gate Verification**:
+     - All 6 Master Adversarial Guard gates passed cleanly (node scripts/run_adversarial_guard.js) with 0 TypeScript regressions (maintaining baseline 36).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [11 Nov 2026] Issue: 5-Engine Entity Architecture Surgery, NAP Unification, Case Study Metric Sync & Dual-Entity Knowledge Graph
 - **Symptom**: User identified discrepancies across live websites and search engines preventing top-3 ranking: (1) CustomerPilot contact page lacked exact registered street address and split legal identity between CustomerPilot Technologies and CustomerPilot Inc., (2) Cake Connection case study displayed outdated numbers (418 reviews / 4.8 stars) contradicting cakeconnection.in live verified metrics (690+ reviews / 4.6 stars), (3) robots.txt lacked OAI-SearchBot allowlisting for ChatGPT Search local pack grounding, and (4) Homepage lacked an authoritative comparison table against traditional POS add-ons (₹2,500+/mo) and unified dual-entity JSON-LD schema.
 - **Root Cause**: Entity data fragmentation across domain pages resulted in AI search engines (Perplexity, ChatGPT Search, Gemini, Google AI Mode) detecting cross-domain data contradictions and downgrading knowledge graph authority scores.
