@@ -1,5 +1,5 @@
-import { GbpAuditReportsTab } from "@/components/gbp-audit-reports-tab";
 "use client";
+import { GbpAuditReportsTab } from "@/components/gbp-audit-reports-tab";
 
 
 

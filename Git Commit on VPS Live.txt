@@ -8,28 +8,22 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 87ed4bd
-Full Commit Hash  : 87ed4bd887039ca4fdce0aae8d6dc68604ac1812
+Active Git Commit : 30e0a2a
+Full Commit Hash  : 30e0a2a7fe76d5e855091f9c9d2aabefbe59c6b9
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 11 Nov 2026, 12:25 PM IST
+Deployment Date   : 11 Nov 2026, 09:00 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(rankpilot): remove ai search visibility and generative search claims across landing page
+Commit Title      : feat(gbp): automated day-0 baseline audit and 30-day recurring calendar reports with real-time screenshots
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
-- Domain URL        : https://customerpilot.in (HTTP/2 200 OK)
-- RankPilot Landing : https://customerpilot.in/rankpilot (GMBPro-inspired Light Mode, Continuous 3D Kinetic Hero Flipper, 100% Moneyback Guarantee above SERP Showcase, HTTP/2 200 OK)
-- RankPilot Alias   : https://customerpilot.in/rankpilot-ai (Permanent Redirect to /rankpilot, HTTP 307/308)
-- Master Playbook   : /var/www/CustomerPilot/RANKPILOT_AI_TOP3_LOCAL_DOMINATION_PLAYBOOK.md (Active, Verified)
-- Revenue Leak Calc : https://customerpilot.in/google-business-profile-ranking (Live AOV & Volume Slider, HTTP/2 200 OK)
-- Review Verifier   : https://customerpilot.in/api/webhooks/whatsapp-review (Fraud-Proof Vision OCR Webhook Active)
-- SSR Micro-Page    : https://customerpilot.in/vadodara/cake-connection (Triple Schema: LocalBusiness + FAQPage + OfferCatalog)
-- Dynamic Review    : https://customerpilot.in/review (Hero Chips & Category Isolation)
-- Settings Studio   : https://customerpilot.in/dashboard/settings (2-Column Offered/Excluded Keyword Control)
-- SuperAdmin GMB    : https://customerpilot.in/super-admin?tab=gmb-optimization (GMB Optimization PRO link active)
-- Merchant GMB      : https://customerpilot.in/dashboard/gbp-status (GMB Optimization PRO link active for Cake Connection)
-- SQLite Database   : /var/www/CustomerPilot/prisma/dev.db (ReviewVerificationLog Table Active, Seeded)
-==========================================================
+1. https://customerpilot.in                 -> HTTP 200 (Homepage with Schema & POS Comparison)
+2. https://customerpilot.in/contact         -> HTTP 200 (Contact Page with Unified Vadodara NAP)
+3. https://customerpilot.in/case-studies/cake-connection -> HTTP 200 (Synced 690+ Reviews, 4.6 Stars)
+4. https://customerpilot.in/dashboard/gbp-status         -> HTTP 200 (Tab 4: Day-0 & 30-Day Audit Reports)
+5. https://customerpilot.in/super-admin                  -> HTTP 200 (1-Click Audit & 30-Day Reports Modal)
+6. https://cakeconnection.in                -> HTTP 200 (Live Bakery & Cake Delivery Portal)
+7. http://187.127.170.36:8080               -> HTTP 200 (Evolution API Manager v2.2.2)
