@@ -60,7 +60,15 @@ export default function robots(): MetadataRoute.Robots {
         disallow: privateDisallowedRoutes,
       },
       {
-        userAgent: ["GPTBot", "ChatGPT-User", "Google-Extended", "AnthropicBot", "PerplexityBot", "ClaudeBot"],
+        userAgent: [
+          "GPTBot",
+          "ChatGPT-User",
+          "OAI-SearchBot",
+          "Google-Extended",
+          "AnthropicBot",
+          "PerplexityBot",
+          "ClaudeBot"
+        ],
         allow: publicAllowedRoutes,
         disallow: privateDisallowedRoutes,
       },

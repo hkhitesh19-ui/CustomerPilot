@@ -68,8 +68,13 @@ export default function ContactPage() {
               <MapPin className="w-5 h-5" />
             </div>
             <h3 className="font-extrabold text-slate-900 text-lg">Headquarters</h3>
-            <p className="text-xs text-slate-500">CustomerPilot Technologies</p>
-            <p className="text-sm font-bold text-slate-800">Vadodara, Gujarat, India 🇮🇳</p>
+            <p className="text-xs text-slate-500 font-semibold">CustomerPilot</p>
+            <p className="text-sm font-bold text-slate-800">
+              Manjalpur / Kalali Road, Vadodara, Gujarat 390011, India 🇮🇳
+            </p>
+            <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+              Vadodara B2B Operations: WhatsApp Customer Retention Software &amp; AI Google Review Automation
+            </p>
           </div>
 
           <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-xl transition-all space-y-3">
@@ -93,7 +98,7 @@ export default function ContactPage() {
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-slate-50 py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <div>© {new Date().getFullYear()} CustomerPilot Inc. · Autonomous Merchant Retention SaaS · support@customerpilot.in</div>
+          <div>© {new Date().getFullYear()} CustomerPilot · Autonomous Merchant Retention SaaS · support@customerpilot.in</div>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="hover:text-slate-900 transition">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-slate-900 transition">Terms of Service</Link>

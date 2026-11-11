@@ -4,8 +4,8 @@ import { ArrowRight, TrendingUp, Star, Users, Award, CheckCircle2, ArrowUpRight 
 import { BrandLogo } from "@/components/brand-logo"
 
 export const metadata: Metadata = {
-  title: "Case Study: Cake Connection Vadodara — 895% Google Review Growth in 90 Days | CustomerPilot",
-  description: "How Cake Connection bakery in Vadodara grew Google reviews from 42 to 418 (+895%), improved rating from 4.1 to 4.8 stars, and achieved 31.4% repeat visit rate in just 90 days using CustomerPilot.",
+  title: "Case Study: Cake Connection Vadodara — 42 to 690+ Verified Reviews | CustomerPilot",
+  description: "How Cake Connection bakery in Vadodara grew Google reviews from 42 to 690+ verified reviews (+1,540%), maintaining a 4.6-star rating, and achieved 31.4% repeat visit rate using CustomerPilot.",
   keywords: [
     "CustomerPilot case study",
     "bakery loyalty program results",
@@ -16,16 +16,16 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "/case-studies/cake-connection" },
   openGraph: {
-    title: "Cake Connection: 895% More Google Reviews in 90 Days — CustomerPilot Case Study",
-    description: "Real numbers from a real bakery. See how CustomerPilot turned 42 Google reviews into 418 and doubled repeat customers.",
+    title: "Cake Connection: 42 to 690+ Verified Google Reviews — CustomerPilot Case Study",
+    description: "Real numbers from a real bakery. See how CustomerPilot turned 42 Google reviews into 690+ verified reviews and doubled repeat customers.",
     url: "https://customerpilot.in/case-studies/cake-connection",
     type: "article"
   }
 }
 
 const METRICS = [
-  { label: "Google Reviews", before: "42 reviews", after: "418 reviews", growth: "+895%", icon: Star, color: "from-amber-400 to-orange-400", bgColor: "bg-amber-50", textColor: "text-amber-800", borderColor: "border-amber-200" },
-  { label: "Average Star Rating", before: "4.1 Stars", after: "4.8 Stars", growth: "+0.7 Stars", icon: TrendingUp, color: "from-emerald-400 to-teal-400", bgColor: "bg-emerald-50", textColor: "text-emerald-800", borderColor: "border-emerald-200" },
+  { label: "Google Reviews", before: "42 reviews", after: "690+ verified reviews", growth: "+1,540%", icon: Star, color: "from-amber-400 to-orange-400", bgColor: "bg-amber-50", textColor: "text-amber-800", borderColor: "border-amber-200" },
+  { label: "Average Star Rating", before: "4.1 Stars", after: "4.6 Stars", growth: "+0.5 Stars (690+ Vol)", icon: TrendingUp, color: "from-emerald-400 to-teal-400", bgColor: "bg-emerald-50", textColor: "text-emerald-800", borderColor: "border-emerald-200" },
   { label: "Customer Profiles Captured", before: "0 (Lost Traffic)", after: "2,840 Profiles", growth: "100% Owned CRM", icon: Users, color: "from-blue-400 to-indigo-400", bgColor: "bg-blue-50", textColor: "text-blue-800", borderColor: "border-blue-200" },
   { label: "Repeat Visit Rate (30-Day)", before: "14%", after: "31.4%", growth: "+124% Lift", icon: Award, color: "from-violet-400 to-purple-400", bgColor: "bg-violet-50", textColor: "text-violet-800", borderColor: "border-violet-200" },
   { label: "Monthly Revenue (Reminders)", before: "₹0", after: "₹42,600/mo", growth: "Direct ROI", icon: TrendingUp, color: "from-rose-400 to-pink-400", bgColor: "bg-rose-50", textColor: "text-rose-800", borderColor: "border-rose-200" }
@@ -59,7 +59,7 @@ export default function CakeConnectionCaseStudy() {
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
               Cake Connection Grew Google Reviews
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-amber-400 mt-2">
-                42 → 418 Reviews in 90 Days
+                42 → 690+ Verified Reviews (4.6★)
               </span>
             </h1>
             <p className="mt-6 text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
@@ -128,8 +128,8 @@ export default function CakeConnectionCaseStudy() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {[
-                    ["Total Google Reviews", "42 reviews", "418 reviews", "+895% 🚀"],
-                    ["Average Google Star Rating", "4.1 Stars", "4.8 Stars", "+0.7 Star Jump ⭐"],
+                    ["Total Google Reviews", "42 reviews", "690+ verified reviews", "+1,540% 🚀"],
+                    ["Average Google Star Rating", "4.1 Stars", "4.6 Stars", "+0.5 Star Jump (690+ Vol) ⭐"],
                     ["Customer Phone Numbers (CRM)", "0 (Lost traffic)", "2,840 verified profiles", "100% Owned CRM 📱"],
                     ["Repeat Visit Rate (30 Days)", "14%", "31.4%", "+124% Repeat Lift 🔄"],
                     ["Monthly Revenue from Reminders", "₹0", "₹42,600", "Direct ROI 💰"],
@@ -208,8 +208,8 @@ export default function CakeConnectionCaseStudy() {
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4 mt-4">
                   {[
-                    { metric: "+895%", label: "Google Review Growth (42 → 418)", emoji: "🚀" },
-                    { metric: "4.8 ⭐", label: "New Average Rating (was 4.1)", emoji: "⭐" },
+                    { metric: "+1,540%", label: "Google Review Growth (42 → 690+ Verified)", emoji: "🚀" },
+                    { metric: "4.6 ⭐", label: "Verified Rating across 690+ Reviews (was 4.1)", emoji: "⭐" },
                     { metric: "2,840", label: "Customer Profiles Owned (was 0)", emoji: "📱" },
                     { metric: "₹42,600", label: "Monthly Revenue from Reminders", emoji: "💰" },
                   ].map(item => (

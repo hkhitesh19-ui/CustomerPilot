@@ -48,6 +48,12 @@ export function SoftwareApplicationJsonLd() {
         "description": "Gemini AI-powered auto-responder for Google Business Profile reviews. Automatically generates professional, empathetic owner replies to all reviews."
       },
       {
+        "@type": "SoftwareApplication",
+        "name": "RankLocal AI — Autonomous GBP Optimization",
+        "url": "https://customerpilot.in/rankpilot",
+        "description": "Autonomous Google Business Profile 30-day ranking engine, AI review generation, competitor intelligence and automated GBP posts for retail."
+      },
+      {
         "@type": "WebApplication",
         "name": "Free AI Google Review Generator",
         "url": "https://customerpilot.in/free-ai-google-review-generator",
@@ -59,7 +65,7 @@ export function SoftwareApplicationJsonLd() {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }}
     />
   )
 }
@@ -68,24 +74,56 @@ export function OrganizationJsonLd() {
   const schema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "CustomerPilot Inc.",
+    "@id": "https://customerpilot.in/#organization",
+    "name": "CustomerPilot",
+    "legalName": "CustomerPilot",
     "url": "https://customerpilot.in",
     "logo": "https://customerpilot.in/cplogo_horizontal.png",
+    "description": "Autonomous WhatsApp Customer Loyalty & Google Review Reputation Management Platform for Retail, Bakeries, Salons & Restaurants.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Manjalpur / Kalali Road",
+      "addressLocality": "Vadodara",
+      "addressRegion": "Gujarat",
+      "postalCode": "390011",
+      "addressCountry": "IN"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "22.2687",
+      "longitude": "73.1956"
+    },
     "sameAs": [
       "https://twitter.com/customerpilot",
       "https://linkedin.com/company/customerpilot"
     ],
     "contactPoint": {
       "@type": "ContactPoint",
+      "telephone": "+91-90333-04707",
       "email": "support@customerpilot.in",
-      "contactType": "customer service"
-    }
+      "contactType": "customer service",
+      "areaServed": "IN",
+      "availableLanguage": ["en", "hi", "gu"]
+    },
+    "subjectOf": [
+      {
+        "@type": "CaseStudy",
+        "name": "Cake Connection Vadodara Review & Retention Growth Case Study",
+        "url": "https://customerpilot.in/case-studies/cake-connection",
+        "about": {
+          "@type": "Bakery",
+          "name": "Cake Connection",
+          "url": "https://cakeconnection.in",
+          "address": "GF9 RutuPlatina Complex, Besides Duliram Pendawala, Eva Mall Rd, Manjalpur, Vadodara, Gujarat 390011"
+        }
+      }
+    ]
   }
 
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }}
     />
   )
 }

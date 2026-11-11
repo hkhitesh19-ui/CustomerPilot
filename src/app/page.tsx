@@ -1760,23 +1760,23 @@ export default function Home() {
 
       {/* ============ COMPETITOR COMPARISON TABLE (AEO / GEO / LLM GROUND TRUTH) ============ */}
       <section className="py-16 md:py-20 bg-slate-50/70 border-t border-b border-slate-200/80">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
+          <div className="text-center max-w-3xl mx-auto space-y-2">
             <span className="text-emerald-700 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 inline-block">
               Why CustomerPilot Wins
             </span>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900">
-              CustomerPilot vs. Traditional QR Displays &amp; Point Solutions
+              CustomerPilot vs. Traditional POS Add-ons vs. Paper Punch Cards
             </h2>
             <p className="text-slate-600 text-xs sm:text-sm">
-              Competitors sell static review stands or costly isolated apps. CustomerPilot unifies review drafting, WhatsApp loyalty, auto-reply, and retention into one closed loop:
+              Traditional POS vendors charge ₹2,500+/mo for rigid loyalty add-ons, while paper punch cards lose 80% of walk-ins. CustomerPilot unifies AI 5★ review drafting, WhatsApp digital stamps, and automated win-back into one zero-app ecosystem:
             </p>
           </div>
 
           <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[640px]">
+            <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[760px]">
               <caption className="sr-only">
-                Comparison: CustomerPilot vs MagicReview / TapNConnect vs Standard Printed QR Codes
+                Comparison: CustomerPilot Complete vs Traditional POS Loyalty vs Paper Punch Cards &amp; Static Stands
               </caption>
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50/80">
@@ -1785,21 +1785,63 @@ export default function Home() {
                     <div className="flex items-center gap-1.5">
                       <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
                       <span className="font-extrabold text-slate-900">CustomerPilot Complete</span>
-                      <span className="text-[10px] bg-emerald-500 text-slate-950 font-black px-2 py-0.5 rounded-full ml-auto uppercase tracking-wider">#1 Ecosystem</span>
+                      <span className="text-[10px] bg-emerald-500 text-slate-950 font-black px-2 py-0.5 rounded-full ml-auto uppercase tracking-wider">₹399/mo</span>
                     </div>
                   </th>
                   <th scope="col" className="p-4 sm:p-5 font-semibold text-slate-700 w-1/5">
-                    Standard QR Displays <span className="block text-[11px] font-normal text-slate-500">(MagicReview / TapNConnect)</span>
+                    Traditional POS Add-ons <span className="block text-[11px] font-normal text-slate-500">(Petpooja / Posist / DotPe)</span>
                   </th>
-                  <th scope="col" className="p-4 sm:p-5 font-semibold text-slate-700 w-1/6">
-                    Standard Printed QR
+                  <th scope="col" className="p-4 sm:p-5 font-semibold text-slate-700 w-1/5">
+                    Paper Cards &amp; Static Stands <span className="block text-[11px] font-normal text-slate-500">(Punch Cards / Acrylic Stands)</span>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 <tr className="hover:bg-slate-50/50 transition-colors">
                   <th scope="row" className="p-4 sm:p-5 font-bold text-slate-900 bg-slate-50/40">
-                    1. Review Drafting Engine
+                    1. Pricing &amp; Setup Cost
+                  </th>
+                  <td className="p-4 sm:p-5 font-semibold text-emerald-800 bg-emerald-50/30 border-x border-emerald-100">
+                    <span className="inline-flex items-center gap-1.5 font-bold">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      ₹399/mo (₹2,249/yr offer). 0 setup or terminal fee.
+                    </span>
+                  </td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">₹2,500 – ₹5,000/mo + ₹15k hardware lock-in</td>
+                  <td className="p-4 sm:p-5 text-slate-600 font-medium">₹500 – ₹2,000/batch recurring print cost</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50/50 transition-colors">
+                  <th scope="row" className="p-4 sm:p-5 font-bold text-slate-900 bg-slate-50/40">
+                    2. App Download Friction
+                  </th>
+                  <td className="p-4 sm:p-5 font-semibold text-emerald-800 bg-emerald-50/30 border-x border-emerald-100">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      Zero App Download — 100% WhatsApp Native flow
+                    </span>
+                  </td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">Customer must download app or login via web OTP</td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">Paper card lost in pockets (80% abandoned)</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50/50 transition-colors">
+                  <th scope="row" className="p-4 sm:p-5 font-bold text-slate-900 bg-slate-50/40">
+                    3. POS Software Dependency
+                  </th>
+                  <td className="p-4 sm:p-5 font-semibold text-emerald-800 bg-emerald-50/30 border-x border-emerald-100">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      0 POS integration needed — Standalone Countertop QR Standee
+                    </span>
+                  </td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">100% locked to proprietary POS software version</td>
+                  <td className="p-4 sm:p-5 text-slate-600">None (Manual rubber stamp / static QR)</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50/50 transition-colors">
+                  <th scope="row" className="p-4 sm:p-5 font-bold text-slate-900 bg-slate-50/40">
+                    4. Google Review 5★ Drafting
                   </th>
                   <td className="p-4 sm:p-5 font-semibold text-emerald-800 bg-emerald-50/30 border-x border-emerald-100">
                     <span className="inline-flex items-center gap-1.5">
@@ -1807,27 +1849,13 @@ export default function Home() {
                       Generative AI drafts personalized 5★ text in 1 click
                     </span>
                   </td>
-                  <td className="p-4 sm:p-5 text-slate-600">Static templates / manual writing</td>
-                  <td className="p-4 sm:p-5 text-rose-600 font-medium">Customer types from blank screen</td>
+                  <td className="p-4 sm:p-5 text-slate-600">Blank Google Maps link / static prompt</td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">Customer must type everything from blank screen</td>
                 </tr>
 
                 <tr className="hover:bg-slate-50/50 transition-colors">
                   <th scope="row" className="p-4 sm:p-5 font-bold text-slate-900 bg-slate-50/40">
-                    2. WhatsApp Digital Loyalty
-                  </th>
-                  <td className="p-4 sm:p-5 font-semibold text-emerald-800 bg-emerald-50/30 border-x border-emerald-100">
-                    <span className="inline-flex items-center gap-1.5">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      Integrated digital stamp cards without app download
-                    </span>
-                  </td>
-                  <td className="p-4 sm:p-5 text-rose-600 font-medium">No loyalty feature</td>
-                  <td className="p-4 sm:p-5 text-rose-600 font-medium">No loyalty feature</td>
-                </tr>
-
-                <tr className="hover:bg-slate-50/50 transition-colors">
-                  <th scope="row" className="p-4 sm:p-5 font-bold text-slate-900 bg-slate-50/40">
-                    3. Google Maps AI Auto-Reply
+                    5. Google Review AI Auto-Reply
                   </th>
                   <td className="p-4 sm:p-5 font-semibold text-emerald-800 bg-emerald-50/30 border-x border-emerald-100">
                     <span className="inline-flex items-center gap-1.5">
@@ -1835,13 +1863,13 @@ export default function Home() {
                       Gemini AI auto-publishes owner replies in 1 second
                     </span>
                   </td>
-                  <td className="p-4 sm:p-5 text-rose-600 font-medium">No reply automation</td>
-                  <td className="p-4 sm:p-5 text-rose-600 font-medium">No reply automation</td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">No reply automation (owner must manually type)</td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">Zero automation</td>
                 </tr>
 
                 <tr className="hover:bg-slate-50/50 transition-colors">
                   <th scope="row" className="p-4 sm:p-5 font-bold text-slate-900 bg-slate-50/40">
-                    4. WhatsApp Win-Back CRM
+                    6. Automated Win-Back Retention
                   </th>
                   <td className="p-4 sm:p-5 font-semibold text-emerald-800 bg-emerald-50/30 border-x border-emerald-100">
                     <span className="inline-flex items-center gap-1.5">
@@ -1849,22 +1877,8 @@ export default function Home() {
                       Auto WhatsApp alerts bring lost walk-ins back in 14-30d
                     </span>
                   </td>
-                  <td className="p-4 sm:p-5 text-rose-600 font-medium">No customer data captured</td>
-                  <td className="p-4 sm:p-5 text-rose-600 font-medium">Zero customer tracking</td>
-                </tr>
-
-                <tr className="hover:bg-slate-50/50 transition-colors">
-                  <th scope="row" className="p-4 sm:p-5 font-bold text-slate-900 bg-slate-50/40">
-                    5. Smart Digital Business Card
-                  </th>
-                  <td className="p-4 sm:p-5 font-semibold text-emerald-800 bg-emerald-50/30 border-x border-emerald-100">
-                    <span className="inline-flex items-center gap-1.5">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      1-Tap vCard contact save, menu catalogs &amp; ordering
-                    </span>
-                  </td>
-                  <td className="p-4 sm:p-5 text-rose-600 font-medium">QR Display only</td>
-                  <td className="p-4 sm:p-5 text-rose-600 font-medium">None</td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">Expensive manual SMS blasts (DLT + ₹0.25/SMS)</td>
+                  <td className="p-4 sm:p-5 text-rose-600 font-medium">Zero customer data captured (70% churn)</td>
                 </tr>
               </tbody>
             </table>
@@ -1971,7 +1985,7 @@ export default function Home() {
           {/* Footer Bottom Bar */}
           <div className="border-t border-slate-800/80 pt-8 mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
             <div>
-              © {new Date().getFullYear()} CustomerPilot Inc. · Made with ❤️ in India · support@customerpilot.in
+              © {new Date().getFullYear()} CustomerPilot · Manjalpur / Kalali Road, Vadodara, Gujarat 390011 · support@customerpilot.in
             </div>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-[11px] text-slate-300 font-medium">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />

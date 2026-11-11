@@ -57,8 +57,8 @@ export const metadata: Metadata = {
     "Restaurant Live Queue"
   ],
   authors: [{ name: "CustomerPilot Growth Team" }],
-  creator: "CustomerPilot Inc.",
-  publisher: "CustomerPilot SaaS",
+  creator: "CustomerPilot",
+  publisher: "CustomerPilot",
   formatDetection: {
     email: false,
     address: false,

@@ -18,6 +18,7 @@ import { MerchantGbpPostQueue } from "./merchant-gbp-post-queue"
 import { QuickGbpQrModal } from "./quick-gbp-qr-modal"
 import { GbpCategoriesModal } from "./gbp-categories-modal"
 import { CustomerPilotSelfGbpModal } from "./customerpilot-self-gbp-modal"
+import { LlmQuotaMonitor } from "./llm-quota-monitor"
 
 type ChecklistItem = {
   id: string
@@ -254,6 +255,9 @@ export function GbpOperationsDashboard() {
           </div>
         </div>
       )}
+
+      {/* Real-Time RankLocal AI LLM Fleet Quota & Token Countdown Monitor */}
+      <LlmQuotaMonitor />
 
       {/* Rapid GBP Review QR & Categories Studio Banner */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-indigo-950/80 via-slate-900 to-emerald-950/80 border border-indigo-500/30 shadow-lg">
