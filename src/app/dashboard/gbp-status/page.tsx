@@ -507,6 +507,28 @@ export default function GbpStatusPage() {
 
           </button>
 
+          <button
+
+            onClick={() => setActiveTab("reports")}
+
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+
+              activeTab === "reports"
+
+                ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+
+                : "text-slate-400 hover:text-white"
+
+            }`}
+
+          >
+
+            <Camera className="w-3.5 h-3.5" />
+
+            📸 4. Audit &amp; Monthly Reports
+
+          </button>
+
         </div>
 
       </div>

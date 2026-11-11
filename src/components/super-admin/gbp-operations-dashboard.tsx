@@ -617,6 +617,12 @@ export function GbpOperationsDashboard() {
       <QuickGbpQrModal open={quickQrOpen} onOpenChange={setQuickQrOpen} />
       <GbpCategoriesModal open={categoriesOpen} onOpenChange={setCategoriesOpen} />
       <CustomerPilotSelfGbpModal open={selfGbpOpen} onOpenChange={setSelfGbpOpen} />
+      <GbpAuditReportsModal
+        merchantId={reportsModalMerchant?.id || null}
+        merchantName={reportsModalMerchant?.name || ""}
+        open={!!reportsModalMerchant}
+        onClose={() => setReportsModalMerchant(null)}
+      />
     </div>
   )
 }
