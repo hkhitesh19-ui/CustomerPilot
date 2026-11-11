@@ -8,12 +8,12 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 227e5ca
-Full Commit Hash  : 227e5ca651b51dbf002b4f23746750f42f826dab
+Active Git Commit : 87ed4bd
+Full Commit Hash  : 87ed4bd887039ca4fdce0aae8d6dc68604ac1812
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 10 Nov 2026, 10:45 AM IST
+Deployment Date   : 11 Nov 2026, 12:25 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(rankpilot): redesign landing page with UI/UX Pro Max intelligence, interactive geo-radar grid & verified domain mockups
+Commit Title      : feat(rankpilot): remove ai search visibility and generative search claims across landing page
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -21,7 +21,7 @@ Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 O
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
 - Domain URL        : https://customerpilot.in (HTTP/2 200 OK)
-- RankPilot Landing : https://customerpilot.in/rankpilot (UI/UX Pro Max Redesign with Interactive 3x3 Geo-Radar Grid, HTTP/2 200 OK)
+- RankPilot Landing : https://customerpilot.in/rankpilot (GMBPro-inspired Light Mode, Continuous 3D Kinetic Hero Flipper, 100% Moneyback Guarantee above SERP Showcase, HTTP/2 200 OK)
 - RankPilot Alias   : https://customerpilot.in/rankpilot-ai (Permanent Redirect to /rankpilot, HTTP 307/308)
 - Master Playbook   : /var/www/CustomerPilot/RANKPILOT_AI_TOP3_LOCAL_DOMINATION_PLAYBOOK.md (Active, Verified)
 - Revenue Leak Calc : https://customerpilot.in/google-business-profile-ranking (Live AOV & Volume Slider, HTTP/2 200 OK)
