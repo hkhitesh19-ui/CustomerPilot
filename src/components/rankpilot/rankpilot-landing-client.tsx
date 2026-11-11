@@ -45,7 +45,6 @@ import {
   ShieldAlert,
   Target,
   BarChart3,
-  Bot,
   XCircle,
   Coffee,
   Dumbbell,
@@ -383,32 +382,6 @@ const FIX_SHOWCASE_DATA = {
       "Result: 74+ additional walk-in appointments booked every month"
     ]
   },
-  ai: {
-    id: "ai",
-    title: "AI Search Visibility (ChatGPT & Gemini)",
-    sub: "Recommended by conversational AI assistants and search bots",
-    icon: Bot,
-    merchant: "Apex Smile Dental Studio (Vadodara)",
-    category: "Dental Clinic & Implant Studio",
-    beforeScore: "0% AI Share",
-    beforeLabel: "Completely Invisible to AI Agents",
-    beforePoints: [
-      "ChatGPT and Perplexity cite zero information about clinic services",
-      "Google SGE (Search Generative Experience) summaries omit business",
-      "Zero structured JSON-LD schemas linking clinic to local knowledge graph",
-      "Patients asking voice assistants get directed to competing corporate chains",
-      "Result: Complete loss of next-gen high-ticket dental implant queries"
-    ],
-    afterScore: "#1 Recommended",
-    afterLabel: "Top Recommended Provider Across AI Engines",
-    afterPoints: [
-      "Hyper-local SSR Micro-Page live with Triple Schema (LocalBusiness + FAQ + ItemList)",
-      "500m neighborhood landmarks embedded into entity knowledge graph",
-      "ChatGPT, Gemini, and Google SGE cite clinic as top authority for root canals",
-      "Voice search optimization captures 'painless dental implant near me' queries",
-      "Result: High-margin patients directed straight to WhatsApp consultation"
-    ]
-  },
   reviews: {
     id: "reviews",
     title: "Review Flywheel & Vision OCR",
@@ -659,13 +632,13 @@ export function RankPilotLandingClient() {
   }, [])
 
   // Custom reading durations per card matching GMBPro:
-  // Card 0 (Maps Rank): 7.5s, Card 1 (AI Reviews): 7.5s, Card 2 (Zero-Gap Posts): 6.5s, Card 3 (AI Search GEO): 8.5s
+  // Card 0 (Maps Rank): 7.5s, Card 1 (AI Reviews): 7.5s, Card 2 (Zero-Gap Posts): 6.5s
   useEffect(() => {
     if (isFlipperPaused) return
-    const durations = [7500, 7500, 6500, 8500]
+    const durations = [7500, 7500, 6500]
     const currentDuration = durations[activeFlipperCard] || 7500
     const timer = setTimeout(() => {
-      const next = (activeFlipperCard + 1) % 4
+      const next = (activeFlipperCard + 1) % 3
       flipTo(next)
     }, currentDuration)
     return () => clearTimeout(timer)
@@ -902,8 +875,7 @@ export function RankPilotLandingClient() {
                       {[
                         { idx: 0, label: "Maps 3-Pack" },
                         { idx: 1, label: "AI Review Vision" },
-                        { idx: 2, label: "Zero-Gap Posts" },
-                        { idx: 3, label: "AI Search (GEO)" }
+                        { idx: 2, label: "Zero-Gap Posts" }
                       ].map((dot) => (
                         <button
                           key={dot.idx}
@@ -1154,72 +1126,7 @@ export function RankPilotLandingClient() {
                           <span className="text-blue-700 font-bold">100% Automated</span>
                         </div>
                       </div>
-
-                      {/* ── CARD 3: AI SEARCH VISIBILITY (GEO/AEO) ── */}
-                      <div
-                        className={`flip-card ${activeFlipperCard === 3 ? "active" : exitingFlipperCard === 3 ? "exiting" : ""}`}
-                        data-fi="3"
-                      >
-                        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-800 font-bold text-[11px] uppercase tracking-wider border border-purple-200">
-                            <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-ping" />
-                            AI Search Visibility (GEO & AEO)
-                          </span>
-                          <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-900 font-bold text-[10px]">● LIVE</span>
-                        </div>
-
-                        <div className="flex items-center justify-between py-1.5">
-                          <div>
-                            <div className="text-xs font-bold text-slate-900">Recommended by AI Assistants</div>
-                            <div className="text-[11px] text-slate-500">ChatGPT · Gemini · Perplexity</div>
-                          </div>
-                        </div>
-
-                        <div className="p-2 rounded-xl bg-purple-50/60 border border-purple-200 flex items-center justify-between gap-2 text-xs my-1">
-                          <div className="flex items-center gap-2 truncate">
-                            <Bot className="w-4 h-4 text-purple-600 shrink-0" />
-                            <span className="text-[11px] text-slate-800 font-medium truncate">best pure veg cake shop in vadodara</span>
-                          </div>
-                          <span className="px-2 py-0.5 rounded bg-purple-600 text-white font-bold text-[10px] shrink-0">Ask AI</span>
-                        </div>
-
-                        <div className="p-3 rounded-xl bg-purple-50/40 border border-purple-200 text-slate-900 space-y-2 my-1">
-                          <div className="flex items-center justify-between text-xs pb-1 border-b border-purple-100">
-                            <span className="text-[11px] text-purple-900 font-semibold flex items-center gap-1">
-                              <Sparkles className="w-3 h-3 text-purple-600" /> AI Answer
-                            </span>
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] border border-emerald-300">
-                              ✔ Top Pick
-                            </span>
-                          </div>
-
-                          <p className="text-[11px] text-slate-700 leading-relaxed">
-                            I recommend <strong className="text-blue-700 font-bold">Cake Connection</strong> (Manjalpur, Vadodara) — rated 4.9★ with 384 verified reviews. Renowned for pure veg Belgian truffle cakes, custom themes, and fast midnight delivery.
-                          </p>
-
-                          <div className="pt-1.5 border-t border-purple-100 space-y-1">
-                            <div className="text-[9px] font-mono text-purple-900 font-bold uppercase">CITED ACROSS AI ENGINES:</div>
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="px-2 py-0.5 rounded-md bg-white text-slate-700 text-[10px] flex items-center gap-1 border border-slate-200 shadow-2xs font-medium">
-                                <Bot className="w-3 h-3 text-emerald-600" /> ChatGPT
-                              </span>
-                              <span className="px-2 py-0.5 rounded-md bg-white text-slate-700 text-[10px] flex items-center gap-1 border border-slate-200 shadow-2xs font-medium">
-                                <Sparkles className="w-3 h-3 text-blue-600" /> Google Gemini
-                              </span>
-                              <span className="px-2 py-0.5 rounded-md bg-white text-slate-700 text-[10px] flex items-center gap-1 border border-slate-200 shadow-2xs font-medium">
-                                <Search className="w-3 h-3 text-teal-600" /> Perplexity
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500 font-medium">
-                          <span>Triple Schema JSON-LD Injection</span>
-                          <span className="text-purple-700 font-bold">Knowledge Graph Verified</span>
-                        </div>
-                      </div>
-
-                    </div>
+</div>
                   </div>
                 </div>
 
@@ -2161,7 +2068,7 @@ export function RankPilotLandingClient() {
                   title: "SSR Micro-Pages, Zero-Gap Posts & Map CTR Surge",
                   deliverables: [
                     "Hyper-local SSR Micro-Page (/[city]/[slug]) live with Triple Schema",
-                    "500m nearby landmarks embedded to trigger Google SGE and ChatGPT AEO cards",
+                    "500m nearby landmarks embedded to trigger Google Maps local justifications",
                     "Zero-Gap weekly posts (Spotlight, Review proof, Weekend VIP deal)",
                     "Weekend directions & call requests surge locks in Top 3 Local Pack status"
                   ],

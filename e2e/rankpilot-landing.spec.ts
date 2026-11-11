@@ -50,7 +50,7 @@ test.describe('RankPilot AI Dedicated Landing Page E2E Suite', () => {
     }
   });
 
-  test('Kinetic 3D Hero Card Flipper renders 4 dynamic cards and interactive dots', async ({ page }) => {
+  test('Kinetic 3D Hero Card Flipper renders 3 dynamic cards and interactive dots', async ({ page }) => {
     await page.goto('/rankpilot', { waitUntil: 'domcontentloaded' });
 
     const flipper = page.locator('#heroFlipper');
@@ -58,11 +58,11 @@ test.describe('RankPilot AI Dedicated Landing Page E2E Suite', () => {
 
     // Verify cards inside hero flipper
     const cards = flipper.locator('.flip-card');
-    await expect(cards).toHaveCount(4);
+    await expect(cards).toHaveCount(3);
 
     // Verify dot navigation exists
     const dots = page.locator('#flipperDots .flipper-dot');
-    await expect(dots).toHaveCount(4);
+    await expect(dots).toHaveCount(3);
 
     // Check first card is active initially with real merchant example
     await expect(page.locator('.flip-card[data-fi="0"]')).toBeVisible();

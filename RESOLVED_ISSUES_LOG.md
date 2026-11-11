@@ -4,6 +4,30 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [11 Nov 2026] Issue: Complete Removal of "AI Search Visibility (ChatGPT & Gemini)" and Associated Generative Search References across RankPilot
+- **Symptom**: User requested complete removal of "AI Search Visibility (ChatGPT & Gemini)" and all related mentions/cards ("isko and iske related sab remove karo"). Specifically, the third tab in the "Google Business Profile Management — See Exactly What We Fix" showcase (`#audit-showcase`) and Card 3 in the Kinetic 3D Hero Card Flipper (`#heroFlipper`) promoted ChatGPT/Gemini/Perplexity AI search recommendations and AEO citations, which deviated from CustomerPilot's strict Google Maps / GBP Local 3-Pack core value proposition.
+- **Root Cause**: The landing page previously carried experimental AEO/GEO listicle and generative AI bot recommendation claims (`ChatGPT · Gemini · Perplexity`) that caused brand dilution and confusing messaging for local store owners seeking pure Google Maps ranking and customer review growth.
+- **Resolution**:
+  1. **Audit Showcase Tab Removal (`src/components/rankpilot/rankpilot-landing-client.tsx`)**:
+     - Completely removed the `ai` tab (`title: "AI Search Visibility (ChatGPT & Gemini)"`, Apex Smile Dental Studio AEO before/after case study) from `FIX_SHOWCASE_DATA`.
+     - Remaining tabs are now 100% focused on direct Google Business Profile disciplines: Profile & Entity Optimization, 3x3 Geo-Grid Rank Tracking, Review Flywheel & Vision OCR, Zero-Gap Google Business Posts, and Suspension Recovery & Defense.
+  2. **Kinetic 3D Hero Card Flipper Streamlining (`#heroFlipper`)**:
+     - Completely excised Card 3 (`AI Search Visibility (GEO & AEO)`, `ChatGPT · Gemini · Perplexity` citations).
+     - Reduced `flipper-dots` navigation from 4 to 3 active dots: `Maps 3-Pack`, `AI Review Vision`, and `Zero-Gap Posts`.
+     - Updated rotation timer `durations` array to `[7500, 7500, 6500]` and changed modulo cycling to `(activeFlipperCard + 1) % 3`.
+  3. **Roadmap & Icon Cleanliness**:
+     - Removed unused `Bot` icon import from `lucide-react`.
+     - Updated Stage 3 roadmap deliverable from `"500m nearby landmarks embedded to trigger Google SGE and ChatGPT AEO cards"` to `"500m nearby landmarks embedded to trigger Google Maps local justifications"`.
+  4. **Adversarial Red-Team & Autonomous QA Verification**:
+     - Updated `e2e/rankpilot-landing.spec.ts` test assertion for 3 dynamic flipper cards and 3 dots.
+     - All 6 Master Adversarial Red-Team Guard gates passed cleanly (`node scripts/run_adversarial_guard.js`).
+     - Playwright autonomous QA suite passed 12/12 tests with 0 unwhitelisted console errors (`node scripts/run_autonomous_qa.js e2e/rankpilot-landing.spec.ts`).
+     - Captured visual proofs in artifacts directory (`rankpilot_hero_clean_3cards.png`, `rankpilot_audit_tabs_clean.png`).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
+
 ## [11 Nov 2026] Issue: RankPilot AI Heroic 100% Moneyback Guarantee Elevation Above SERP Showcase, Synchronized 5-Column Homepage Footer, and Standalone GBP Optimization Service on Main Homepage
 - **Symptom**:
   1. The "Our Ironclad 100% Moneyback Guarantee" was previously rendered as an unobtrusive companion box below the pricing grid on `/rankpilot`. Because this is CustomerPilot's single highest-stakes commitment and primary sales objection crusher, user requested transforming it into a high-trust, pro-grade, large-typography card positioned prominently **above** the "What Google Displays on Customers' Phones" section (SERP Before/After showcase).
