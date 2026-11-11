@@ -630,13 +630,6 @@ export function RankPilotLandingClient() {
   const [aov, setAov] = useState<number>(500)
   const [currentRank, setCurrentRank] = useState<number>(18)
 
-  // Geo-Grid Interactive Radar State
-  const [radarSprintMode, setRadarSprintMode] = useState<"before" | "after">("before")
-  const [selectedGridPin, setSelectedGridPin] = useState<GridNode>(GEO_GRID_NODES[4])
-
-  // Vertical Switcher State
-  const [activeVertical, setActiveVertical] = useState<keyof typeof VERTICAL_DATA>("bakery")
-  const selectedVertical = VERTICAL_DATA[activeVertical]
 
   // Post Engine Active Cadence Tab
   const [activeCadence, setActiveCadence] = useState<"tue" | "thu" | "sat">("sat")
@@ -724,31 +717,25 @@ export function RankPilotLandingClient() {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-5 text-xs font-semibold text-slate-600">
-            <a href="#audit-showcase" className="hover:text-blue-600 transition-colors">
+            <a href="#audit-showcase" className="hover:text-[#0566E8] transition-colors">
               What We Fix
             </a>
-            <a href="#nearby-search" className="hover:text-blue-600 transition-colors">
+            <a href="#nearby-search" className="hover:text-[#0566E8] transition-colors">
               Nearby Search
             </a>
-            <a href="#geo-grid" className="hover:text-blue-600 transition-colors">
-              Radar Grid
-            </a>
-            <a href="#revenue-leak" className="hover:text-blue-600 transition-colors">
+            <a href="#revenue-leak" className="hover:text-[#0566E8] transition-colors">
               Revenue Leak
             </a>
-            <a href="#features" className="hover:text-blue-600 transition-colors">
-              10+10 Matrix
-            </a>
-            <a href="#reviews" className="hover:text-blue-600 transition-colors">
+            <a href="#reviews" className="hover:text-[#0566E8] transition-colors">
               Client Proof
             </a>
-            <a href="#roadmap" className="hover:text-blue-600 transition-colors">
+            <a href="#roadmap" className="hover:text-[#0566E8] transition-colors">
               Guaranteed SLA
             </a>
-            <a href="#pricing" className="text-blue-600 font-bold hover:text-blue-700 transition-colors">
+            <a href="#pricing" className="bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] bg-clip-text text-transparent font-black hover:opacity-80 transition-opacity">
               Pricing & Offer
             </a>
-            <a href="#faq" className="hover:text-blue-600 transition-colors">
+            <a href="#faq" className="hover:text-[#0566E8] transition-colors">
               FAQ
             </a>
           </nav>
@@ -760,7 +747,7 @@ export function RankPilotLandingClient() {
               </Button>
             </Link>
             <a href="#pricing">
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 h-9 shadow-sm gap-1.5 group">
+              <Button size="sm" className="bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] hover:from-[#0450B8] hover:via-[#0270A8] hover:to-[#04D4C5] text-white font-bold text-xs px-4 h-9 shadow-md shadow-blue-500/20 gap-1.5 group cursor-pointer">
                 Claim ₹6,999 Offer
                 <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
               </Button>
@@ -842,7 +829,7 @@ export function RankPilotLandingClient() {
                   </div>
                   <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
                     Move Your Store from Page 10 to{" "}
-                    <span className="text-blue-600 underline decoration-blue-200 decoration-wavy underline-offset-4">
+                    <span className="bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] bg-clip-text text-transparent font-black underline decoration-cyan-300 decoration-wavy underline-offset-4">
                       Google Maps Top 3
                     </span>{" "}
                     in 45–90 Days.
@@ -864,14 +851,14 @@ export function RankPilotLandingClient() {
                     <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Algorithmic Sprint</div>
                   </div>
                   <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                    <div className="text-xl sm:text-2xl font-black text-blue-600">0% Risk</div>
+                    <div className="text-xl sm:text-2xl font-black bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] bg-clip-text text-transparent">0% Risk</div>
                     <div className="text-[11px] font-semibold text-slate-500 mt-0.5">DBA Signboard Proof</div>
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-4">
                   <a href="#pricing">
-                    <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-6 h-12 shadow-sm gap-2 group">
+                    <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] hover:from-[#0450B8] hover:via-[#0270A8] hover:to-[#04D4C5] text-white font-bold text-sm px-7 h-12 shadow-lg shadow-blue-500/25 gap-2 group cursor-pointer">
                       Claim ₹6,999 Launch Offer
                       <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </Button>
@@ -1365,159 +1352,6 @@ export function RankPilotLandingClient() {
           </div>
         </section>
 
-        {/* 3.1. INTERACTIVE 3X3 GEO-RANK RADAR GRID */}
-        <section id="geo-grid" className="py-16 lg:py-20 bg-slate-50 border-b border-slate-200/80">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-10 space-y-3">
-              <Badge variant="outline" className="text-blue-700 bg-blue-50 border-blue-200 text-xs px-3.5 py-1 font-semibold">
-                Multi-Coordinate Geo-Grid Probes
-              </Badge>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
-                3x3 Geo-Rank Radar Grid —{" "}
-                <span className="text-blue-600">Simulate Day 1 vs Day 30</span>
-              </h2>
-              <p className="text-sm sm:text-base text-slate-600">
-                Google Maps rankings vary dramatically depending on where the customer is standing. Toggle between Day 1 and Day 30 to see how our <strong>RankLocal AI™</strong> system transforms obscure red coordinates across your city into dominant green Local 3-Pack spots.
-              </p>
-            </div>
-
-            <div className="max-w-4xl mx-auto bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden">
-              {/* Radar Control Bar */}
-              <div className="p-4 sm:p-5 bg-slate-100 text-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200">
-                <div className="flex items-center gap-2.5">
-                  <Compass className="w-5 h-5 text-blue-600 animate-spin" style={{ animationDuration: '8s' }} />
-                  <div>
-                    <span className="text-sm font-bold tracking-wide text-slate-900">3x3 Geo-Rank Radar Grid</span>
-                    <span className="block text-[11px] text-slate-500">Hub: Cake Connection, Manjalpur (Vadodara)</span>
-                  </div>
-                </div>
-                <div className="flex items-center bg-slate-200/80 p-1 rounded-xl border border-slate-300 text-xs self-start sm:self-auto">
-                  <button
-                    onClick={() => setRadarSprintMode("before")}
-                    className={`px-3.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
-                      radarSprintMode === "before"
-                        ? "bg-rose-600 text-white shadow-xs"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    Day 1 (Lost on Page 2)
-                  </button>
-                  <button
-                    onClick={() => setRadarSprintMode("after")}
-                    className={`px-3.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
-                      radarSprintMode === "after"
-                        ? "bg-emerald-600 text-white shadow-xs"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    Day 30 (Top 3 Locked)
-                  </button>
-                </div>
-              </div>
-
-              {/* 3x3 Coordinate Map Canvas */}
-              <div className="p-5 sm:p-7 bg-radial from-slate-50 via-slate-100/50 to-slate-200/40 relative">
-                <div className="text-xs font-semibold text-slate-500 mb-4 flex items-center justify-between">
-                  <span>9 Grid Nodes Across Vadodara</span>
-                  <span className="font-mono text-slate-400">Coverage Radius: 5.0 km</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {GEO_GRID_NODES.map((node) => {
-                    const rank = radarSprintMode === "before" ? node.rankBefore : node.rankAfter
-                    const isTop3 = rank <= 3
-                    const isSelected = selectedGridPin.id === node.id
-
-                    return (
-                      <button
-                        key={node.id}
-                        onClick={() => setSelectedGridPin(node)}
-                        className={`p-3.5 rounded-2xl border text-left transition-all relative flex flex-col justify-between min-h-[90px] cursor-pointer ${
-                          isSelected
-                            ? "ring-2 ring-blue-600 shadow-md scale-102"
-                            : "hover:border-slate-300"
-                        } ${
-                          isTop3
-                            ? "bg-emerald-50/90 border-emerald-300 text-emerald-950"
-                            : "bg-rose-50/80 border-rose-300 text-rose-950"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between w-full">
-                          <span
-                            className={`w-7 h-7 rounded-full flex items-center justify-center font-black text-xs ${
-                              isTop3
-                                ? "bg-emerald-600 text-white shadow-xs"
-                                : "bg-rose-600 text-white shadow-xs"
-                            }`}
-                          >
-                            #{rank}
-                          </span>
-                          <span className="text-[10px] font-mono text-slate-500 font-bold">
-                            {node.distanceKm}
-                          </span>
-                        </div>
-                        <div className="text-xs font-bold truncate leading-tight mt-1.5">
-                          {node.neighborhood}
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-
-                {/* Active Pin Inspection Card */}
-                <div className="mt-5 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-2">
-                  <div className="flex items-center justify-between text-xs font-semibold text-slate-500 pb-2 border-b border-slate-100">
-                    <span className="flex items-center gap-2 text-slate-900 font-bold">
-                      <MapPin className="w-4 h-4 text-blue-600" />
-                      {selectedGridPin.neighborhood} ({selectedGridPin.distanceKm} from store)
-                    </span>
-                    <span className={`font-mono font-black px-2.5 py-0.5 rounded-full text-xs ${
-                      (radarSprintMode === "before" ? selectedGridPin.rankBefore : selectedGridPin.rankAfter) <= 3
-                        ? "bg-emerald-100 text-emerald-800"
-                        : "bg-rose-100 text-rose-800"
-                    }`}>
-                      Google Rank: #{radarSprintMode === "before" ? selectedGridPin.rankBefore : selectedGridPin.rankAfter}
-                    </span>
-                  </div>
-                  <div className="pt-1 text-xs space-y-1.5">
-                    <div className="text-slate-700">
-                      Search Query Tested: <span className="font-bold text-slate-900">"{selectedGridPin.query}"</span>
-                    </div>
-                    <div className="text-slate-600 flex items-center gap-1.5">
-                      <span>Google Justification:</span>
-                      <span className={`font-bold ${radarSprintMode === "before" ? "text-rose-600" : "text-emerald-700"}`}>
-                        {radarSprintMode === "before" ? "None (Buried on Page 2)" : `✔ ${selectedGridPin.justification}`}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Radar Footer Status */}
-              <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-                <div>
-                  {radarSprintMode === "before" ? (
-                    <span className="text-rose-700 font-bold flex items-center gap-1.5">
-                      <AlertTriangle className="w-4 h-4 shrink-0" />
-                      Day 1 State: Average Rank #18 across 9 zones • Bleeding ~₹37,000 monthly revenue to competitors
-                    </span>
-                  ) : (
-                    <span className="text-emerald-700 font-bold flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 shrink-0" />
-                      Day 30 State: Top 3 locked across all 9 zones • Capturing 16.0% local search click volume
-                    </span>
-                  )}
-                </div>
-                <a href="#pricing">
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs h-8 px-3.5 shadow-xs">
-                    Lock My Top 3 Rank
-                  </Button>
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* 3.5. WHAT WE FIX SHOWCASE: BEFORE vs AFTER (Inspired by GMBPro) */}
         <section id="audit-showcase" className="py-16 lg:py-24 bg-white text-slate-900 relative overflow-hidden border-b border-slate-200">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50/50 via-white to-slate-50/50 pointer-events-none" />
@@ -1549,7 +1383,7 @@ export function RankPilotLandingClient() {
                     onClick={() => setActiveFixTab(tabKey)}
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shrink-0 border cursor-pointer ${
                       isActive
-                        ? "bg-blue-600 text-white border-blue-600 shadow-md scale-102"
+                        ? "bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] text-white border-transparent shadow-md shadow-blue-500/20 scale-102 font-bold"
                         : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900 shadow-2xs"
                     }`}
                   >
@@ -1650,7 +1484,7 @@ export function RankPilotLandingClient() {
                   <span>All fixes verified against official Google Business Profile 2026 Core Guidelines.</span>
                 </div>
                 <a href="#pricing">
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 h-8 shadow-sm gap-1.5 cursor-pointer">
+                  <Button size="sm" className="bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] hover:from-[#0450B8] hover:via-[#0270A8] hover:to-[#04D4C5] text-white font-bold text-xs px-4 h-8 shadow-md shadow-blue-500/20 gap-1.5 cursor-pointer">
                     <span>Fix My Profile for ₹6,999</span>
                     <ArrowRight className="w-3 h-3" />
                   </Button>
@@ -1740,7 +1574,7 @@ export function RankPilotLandingClient() {
                         onClick={() => setCurrentRank(opt.rank)}
                         className={`p-2 rounded-lg border text-center transition-all cursor-pointer ${
                           currentRank === opt.rank
-                            ? "bg-blue-600 border-blue-600 text-white font-bold shadow-xs"
+                            ? "bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] border-transparent text-white font-black shadow-md shadow-blue-500/20"
                             : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
                         }`}
                       >
@@ -1817,129 +1651,6 @@ export function RankPilotLandingClient() {
                   <Link href="/onboarding" className="text-blue-600 hover:text-blue-700 font-bold underline inline-flex items-center gap-1">
                     Deploy 30-Day Recovery Sprint <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 5. THE 10+10 DUAL BESTSELLER ENTITY MATRIX */}
-        <section id="features" className="py-16 lg:py-24 bg-white border-b border-slate-200/80">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-              <Badge variant="outline" className="text-blue-700 bg-blue-50 border-blue-200 text-xs px-3 py-1 font-semibold">
-                Algorithmic Weight: 32% Category & Entity Wire
-              </Badge>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
-                The 10+10 Dual Bestseller Entity Matrix
-              </h2>
-              <p className="text-sm sm:text-base text-slate-600">
-                Google doesn't rank arbitrary keywords. It ranks <strong>Knowledge Graph Entities</strong> confirmed through 3 sources: your profile menu, verified customer photo reviews, and SSR structured schema.
-              </p>
-            </div>
-
-            {/* Vertical Switcher Tabs */}
-            <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
-              {(Object.keys(VERTICAL_DATA) as Array<keyof typeof VERTICAL_DATA>).map((key) => {
-                const item = VERTICAL_DATA[key]
-                const IconComponent = item.icon
-                const isActive = activeVertical === key
-
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setActiveVertical(key)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all ${
-                      isActive
-                        ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/20"
-                        : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
-                    }`}
-                  >
-                    <IconComponent className="w-4 h-4" />
-                    <span>{item.name}</span>
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* Store & Category Overview Bar */}
-            <div className="max-w-5xl mx-auto mb-6 p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-3">
-              <div className="flex items-center gap-2">
-                <Store className="w-4 h-4 text-blue-600" />
-                <span className="font-bold text-slate-900">{selectedVertical.exampleMerchant}</span>
-                <span className="text-slate-400">•</span>
-                <span className="text-slate-600">{selectedVertical.city}</span>
-              </div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-slate-500 font-medium">Mapped Categories:</span>
-                <Badge variant="secondary" className="text-[10px] font-semibold bg-blue-100 text-blue-800">
-                  {selectedVertical.primaryCategory}
-                </Badge>
-                {selectedVertical.secondaryCategories.map((cat, idx) => (
-                  <Badge key={idx} variant="outline" className="text-[10px] text-slate-600 border-slate-200">
-                    {cat}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            {/* Split Matrix Columns: 10 Products vs 10 Services */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
-              {/* TOP 10 PRODUCTS */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-                <div className="p-4 bg-slate-100 text-slate-900 border-b border-slate-200 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <UtensilsCrossed className="w-4 h-4 text-amber-600" />
-                    <span className="font-bold text-xs uppercase tracking-wide text-slate-900">Top 10 High-Intent Products</span>
-                  </div>
-                  <Badge className="bg-amber-500 text-slate-950 font-bold text-[10px]">
-                    "Sold Here" Triggers
-                  </Badge>
-                </div>
-                <div className="divide-y divide-slate-100">
-                  {selectedVertical.products.map((prod, idx) => (
-                    <div key={idx} className="p-3.5 hover:bg-slate-50 transition-colors flex items-center justify-between gap-3 text-xs">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-mono font-bold text-[10px] shrink-0">
-                          {idx + 1}
-                        </span>
-                        <div className="truncate">
-                          <span className="font-semibold text-slate-900">{prod.name}</span>
-                          <span className="block text-[11px] text-emerald-700 font-medium">{prod.justification}</span>
-                        </div>
-                      </div>
-                      <span className="font-mono text-[11px] text-slate-500 font-bold shrink-0">{prod.volume}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* TOP 10 SERVICES */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-                <div className="p-4 bg-slate-100 text-slate-900 border-b border-slate-200 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-blue-600" />
-                    <span className="font-bold text-xs uppercase tracking-wide text-slate-900">Top 10 High-Intent Services</span>
-                  </div>
-                  <Badge className="bg-blue-500 text-white font-bold text-[10px]">
-                    "Provides Service" Triggers
-                  </Badge>
-                </div>
-                <div className="divide-y divide-slate-100">
-                  {selectedVertical.services.map((serv, idx) => (
-                    <div key={idx} className="p-3.5 hover:bg-slate-50 transition-colors flex items-center justify-between gap-3 text-xs">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-mono font-bold text-[10px] shrink-0">
-                          {idx + 1}
-                        </span>
-                        <div className="truncate">
-                          <span className="font-semibold text-slate-900">{serv.name}</span>
-                          <span className="block text-[11px] text-blue-700 font-medium">{serv.justification}</span>
-                        </div>
-                      </div>
-                      <span className="font-mono text-[11px] text-slate-500 font-bold shrink-0">{serv.volume}</span>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
@@ -2137,7 +1848,7 @@ export function RankPilotLandingClient() {
                       <span>Price: ₹650 / 500g</span>
                       <span className="text-emerald-600 font-bold">In Stock Today</span>
                     </div>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold h-10 gap-1.5">
+                    <Button className="w-full bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] hover:from-[#0450B8] hover:via-[#0270A8] hover:to-[#04D4C5] text-white text-xs font-bold h-10 gap-1.5 shadow-sm shadow-blue-500/20 cursor-pointer">
                       Order Online via WhatsApp <ArrowRight className="w-3.5 h-3.5" />
                     </Button>
                   </div>
@@ -2160,7 +1871,7 @@ export function RankPilotLandingClient() {
                     <div className="text-[11px] text-slate-500 font-medium">
                       — Verified Customer Review via Google Maps (Photo Verified by Gemini 2.5 Vision)
                     </div>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold h-10 gap-1.5">
+                    <Button className="w-full bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] hover:from-[#0450B8] hover:via-[#0270A8] hover:to-[#04D4C5] text-white text-xs font-bold h-10 gap-1.5 shadow-sm shadow-blue-500/20 cursor-pointer">
                       Read 384+ Customer Reviews on Google <ExternalLink className="w-3.5 h-3.5" />
                     </Button>
                   </div>
@@ -2183,7 +1894,7 @@ export function RankPilotLandingClient() {
                       </span>
                       <span className="text-[11px] text-amber-800 font-mono">Auto-renews Monday 10:00 AM</span>
                     </div>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold h-10 gap-1.5">
+                    <Button className="w-full bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] hover:from-[#0450B8] hover:via-[#0270A8] hover:to-[#04D4C5] text-white text-xs font-bold h-10 gap-1.5 shadow-sm shadow-blue-500/20 cursor-pointer">
                       Claim VIP Weekend Deal on WhatsApp <ArrowRight className="w-3.5 h-3.5" />
                     </Button>
                   </div>
@@ -2446,7 +2157,7 @@ export function RankPilotLandingClient() {
               </span>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
                 Unbeatable Google Business Profile Management{" "}
-                <span className="text-blue-600">Pricing</span> — Find Your Perfect Plan Now
+                <span className="bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] bg-clip-text text-transparent font-black">Pricing</span> — Find Your Perfect Plan Now
               </h2>
               <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
                 Simple, transparent pricing to boost your local SEO visibility and attract more customers.
@@ -2456,25 +2167,25 @@ export function RankPilotLandingClient() {
             {/* 4 Trust Badges Under Header (Matching GMBPro Screenshot 3) */}
             <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 pb-12 text-slate-600 text-xs font-bold">
               <div className="flex items-center gap-2">
-                <span className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-50 to-cyan-50 text-[#0566E8] flex items-center justify-center border border-blue-200/80 shadow-2xs">
                   <Zap className="w-4 h-4" />
                 </span>
                 <span>Premium Tools</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-50 to-cyan-50 text-[#0566E8] flex items-center justify-center border border-blue-200/80 shadow-2xs">
                   <Phone className="w-4 h-4" />
                 </span>
                 <span>Expert Support</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-50 to-cyan-50 text-[#0566E8] flex items-center justify-center border border-blue-200/80 shadow-2xs">
                   <TrendingUp className="w-4 h-4" />
                 </span>
                 <span>Real Results</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-50 to-cyan-50 text-[#0566E8] flex items-center justify-center border border-blue-200/80 shadow-2xs">
                   <ShieldCheck className="w-4 h-4" />
                 </span>
                 <span>No Hidden Charges</span>
@@ -2549,12 +2260,12 @@ export function RankPilotLandingClient() {
                     rel="noopener noreferrer"
                     className="block"
                   >
-                    <button className="w-full h-13 px-6 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-700 border-2 border-blue-600 font-bold text-sm sm:text-base flex items-center justify-between shadow-xs transition-all cursor-pointer group">
-                      <span>Subscribe to 3-Month Pilot</span>
-                      <span className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center transition-transform group-hover:translate-x-1">
-                        <ArrowRight className="w-4 h-4" />
-                      </span>
-                    </button>
+                    <button className="w-full h-13 px-6 rounded-full bg-gradient-to-r from-blue-50 via-sky-50 to-cyan-50 hover:from-blue-100 hover:to-cyan-100 text-[#0566E8] border-2 border-[#0566E8] font-bold text-sm sm:text-base flex items-center justify-between shadow-sm transition-all cursor-pointer group">
+                        <span>Subscribe to 3-Month Pilot</span>
+                        <span className="w-8 h-8 rounded-full bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] text-white flex items-center justify-center transition-transform group-hover:translate-x-1 shadow-md shadow-blue-500/25">
+                          <ArrowRight className="w-4 h-4 text-white" />
+                        </span>
+                      </button>
                   </a>
                   <p className="text-[11px] text-center text-slate-500 mt-2">
                     🔒 Instant WhatsApp Activation • Standee Dispatched in 48h
@@ -2562,26 +2273,50 @@ export function RankPilotLandingClient() {
                 </div>
               </div>
 
-              {/* CARD 2: YEARLY DOMINANCE (Elevated with CustomerPilot Brand Gradient: #1D4ED8 to #2563EB to #0D9488) */}
-              <div className="relative rounded-3xl bg-gradient-to-br from-[#1D4ED8] via-[#2563EB] to-[#0D9488] text-white shadow-2xl shadow-blue-600/30 ring-4 ring-blue-500/20 p-7 sm:p-9 flex flex-col justify-between transition-all">
-                {/* Gold MOST POPULAR Ribbon (Matching Screenshot 3) */}
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md">
-                    👑 MOST POPULAR
+              {/* CARD 2: YEARLY DOMINANCE (CustomerPilot Signature Logo Gradient with Luxury Ambient Sheens) */}
+              <div
+                className="relative rounded-3xl text-white shadow-2xl p-7 sm:p-9 flex flex-col justify-between transform hover:-translate-y-1.5 transition-all duration-300 overflow-hidden"
+                style={{
+                  background: 'linear-gradient(145deg, #031B41 0%, #043878 22%, #0566E8 52%, #0284C7 80%, #05EDDD 100%)',
+                  border: '1.5px solid rgba(5, 237, 221, 0.45)',
+                  boxShadow: '0 25px 60px -15px rgba(5, 102, 232, 0.45), 0 0 35px -5px rgba(5, 237, 221, 0.35)'
+                }}
+              >
+                {/* Glowing ambient radial sheens inside card */}
+                <div
+                  className="absolute -top-24 -right-24 w-72 h-72 rounded-full pointer-events-none blur-3xl opacity-40"
+                  style={{ background: 'radial-gradient(circle, #05EDDD 0%, rgba(5, 237, 221, 0) 70%)' }}
+                />
+                <div
+                  className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full pointer-events-none blur-3xl opacity-50"
+                  style={{ background: 'radial-gradient(circle, #031B41 0%, rgba(3, 27, 65, 0) 70%)' }}
+                />
+                <div
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full pointer-events-none blur-3xl opacity-25"
+                  style={{ background: 'radial-gradient(circle, #06B6FB 0%, rgba(6, 182, 251, 0) 70%)' }}
+                />
+
+                {/* Gold Pinned Badge */}
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20">
+                  <span className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg border border-amber-200">
+                    👑 MOST POPULAR • 100% MONEYBACK
                   </span>
                 </div>
 
-                <div className="space-y-6 pt-2">
+                <div className="relative z-10 space-y-6 pt-2">
                   <div>
-                    <div className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                      Yearly Dominance
+                    <div className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center justify-between">
+                      <span>Yearly Dominance</span>
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/20 text-cyan-200 border border-white/30 backdrop-blur-xs">
+                        365-Day Lock
+                      </span>
                     </div>
-                    <div className="text-xs text-blue-100 font-medium mt-1">
-                      Best value for long-term category monopoly & defense
+                    <div className="text-xs text-cyan-100 font-medium mt-1">
+                      Best value for long-term category monopoly & algorithmic defense
                     </div>
                   </div>
 
-                  {/* 10+ Deliverables Checklist with Crisp White Checks */}
+                  {/* 12 Deliverables Checklist with Crisp Cyan Checks */}
                   <ul className="space-y-3 text-xs sm:text-sm text-white/95">
                     {[
                       "Google Business Profile Optimization",
@@ -2598,7 +2333,7 @@ export function RankPilotLandingClient() {
                       "Algorithmic Core Update & Competitor Poach Shield"
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-2.5">
-                        <span className="w-4 h-4 rounded-full bg-white/20 text-white flex items-center justify-center shrink-0 mt-0.5 border border-white/40">
+                        <span className="w-4 h-4 rounded-full bg-white/20 text-cyan-200 flex items-center justify-center shrink-0 mt-0.5 border border-cyan-200/40 shadow-2xs">
                           <Check className="w-3 h-3 stroke-[3]" />
                         </span>
                         <span className="leading-snug">{item}</span>
@@ -2609,8 +2344,8 @@ export function RankPilotLandingClient() {
                   {/* Pricing Details */}
                   <div className="pt-4 border-t border-white/20 space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono text-blue-200 line-through">₹39,000</span>
-                      <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black">
+                      <span className="text-xs font-mono text-cyan-200/80 line-through">₹39,000</span>
+                      <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 text-[10px] font-black shadow-xs">
                         SAVE 25%
                       </span>
                     </div>
@@ -2618,32 +2353,32 @@ export function RankPilotLandingClient() {
                       <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">
                         ₹29,000
                       </span>
-                      <span className="text-xs sm:text-sm text-blue-100 font-semibold">
+                      <span className="text-xs sm:text-sm text-cyan-100 font-semibold">
                         / Year
                       </span>
                     </div>
-                    <div className="text-[11px] text-emerald-200 font-bold">
+                    <div className="text-[11px] text-cyan-200 font-bold">
                       Just ₹2,416 / month • Complete 365-Day Ranking Defense
                     </div>
                   </div>
                 </div>
 
-                {/* Pill CTA Button with Dark Circle Arrow (Matching Screenshot 3) */}
-                <div className="pt-8">
+                {/* Pill CTA Button with Logo Gradient Circle Arrow */}
+                <div className="relative z-10 pt-8">
                   <a
                     href="https://wa.me/919033304707?text=Hi%20CustomerPilot,%20I%20want%20to%20subscribe%20to%20the%20RankLocal%20Ai%20Yearly%20Dominance%20Plan%20with%20100%25%20Moneyback%20Guarantee!"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block"
                   >
-                    <button className="w-full h-13 px-6 rounded-full bg-white hover:bg-slate-50 text-slate-950 font-black text-sm sm:text-base flex items-center justify-between shadow-xl transition-all cursor-pointer group">
+                    <button className="w-full h-13 px-6 rounded-full bg-white hover:bg-slate-50 text-slate-950 font-black text-sm sm:text-base flex items-center justify-between shadow-2xl transition-all cursor-pointer group">
                       <span>Subscribe to Yearly</span>
-                      <span className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center transition-transform group-hover:translate-x-1 shadow-sm">
+                      <span className="w-8 h-8 rounded-full bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] text-white flex items-center justify-center transition-transform group-hover:translate-x-1 shadow-md shadow-blue-600/30">
                         <ArrowRight className="w-4 h-4 text-white" />
                       </span>
                     </button>
                   </a>
-                  <p className="text-[11px] text-center text-blue-100 mt-2">
+                  <p className="text-[11px] text-center text-cyan-100 mt-2">
                     🛡️ Official Invoice with GST Credit • 100% Moneyback Guarantee
                   </p>
                 </div>
@@ -2726,7 +2461,7 @@ export function RankPilotLandingClient() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               <a href="#pricing" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm h-12 px-8 shadow-md gap-2 group cursor-pointer">
+                <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-[#0566E8] via-[#0284C7] to-[#05EDDD] hover:from-[#0450B8] hover:via-[#0270A8] hover:to-[#04D4C5] text-white font-bold text-sm h-12 px-8 shadow-lg shadow-blue-500/25 gap-2 group cursor-pointer">
                   Claim 3-Month Offer (₹6,999)
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Button>

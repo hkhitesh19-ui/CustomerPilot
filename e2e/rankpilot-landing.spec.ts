@@ -50,23 +50,23 @@ test.describe('RankPilot AI Dedicated Landing Page E2E Suite', () => {
     }
   });
 
-  test('10+10 Dual Matrix Showcase switches verticals cleanly', async ({ page }) => {
+  test('Kinetic 3D Hero Card Flipper renders 4 dynamic cards and interactive dots', async ({ page }) => {
     await page.goto('/rankpilot', { waitUntil: 'domcontentloaded' });
 
-    const matrixSection = page.locator('#features');
-    await expect(matrixSection).toBeVisible();
+    const flipper = page.locator('#heroFlipper');
+    await expect(flipper).toBeVisible();
 
-    // Verify Products & Services columns
-    await expect(page.locator('text=Top 10 High-Intent Products').first()).toBeVisible();
-    await expect(page.locator('text=Top 10 High-Intent Services').first()).toBeVisible();
+    // Verify cards inside hero flipper
+    const cards = flipper.locator('.flip-card');
+    await expect(cards).toHaveCount(4);
 
-    // Click Pet Clinic vertical tab
-    const petClinicTab = page.locator('button:has-text("Pet Clinic & Vet")');
-    if (await petClinicTab.count() > 0) {
-      await petClinicTab.click();
-      await page.waitForTimeout(300);
-      await expect(page.locator('text=Pet Clinic @ Manjalpur').first()).toBeVisible();
-    }
+    // Verify dot navigation exists
+    const dots = page.locator('#flipperDots .flipper-dot');
+    await expect(dots).toHaveCount(4);
+
+    // Check first card is active initially with real merchant example
+    await expect(page.locator('.flip-card[data-fi="0"]')).toBeVisible();
+    await expect(page.locator('text=Cake Connection').first()).toBeVisible();
   });
 
   test('Post Dominance Engine tabs toggle weekly cadence templates', async ({ page }) => {
