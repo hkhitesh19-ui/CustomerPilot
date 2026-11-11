@@ -8,10 +8,10 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 30e0a2a
-Full Commit Hash  : 30e0a2a7fe76d5e855091f9c9d2aabefbe59c6b9
+Active Git Commit : 2073f6e (Parent: 30e0a2a)
+Full Commit Hash  : 2073f6e6aafe82c125a072da3cf632ecfecb893a
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 11 Nov 2026, 09:00 PM IST
+Deployment Date   : 11 Nov 2026, 09:07 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
 Commit Title      : feat(gbp): automated day-0 baseline audit and 30-day recurring calendar reports with real-time screenshots
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
@@ -23,7 +23,7 @@ Verified Endpoints on Live VPS:
 1. https://customerpilot.in                 -> HTTP 200 (Homepage with Schema & POS Comparison)
 2. https://customerpilot.in/contact         -> HTTP 200 (Contact Page with Unified Vadodara NAP)
 3. https://customerpilot.in/case-studies/cake-connection -> HTTP 200 (Synced 690+ Reviews, 4.6 Stars)
-4. https://customerpilot.in/dashboard/gbp-status         -> HTTP 200 (Tab 4: Day-0 & 30-Day Audit Reports)
-5. https://customerpilot.in/super-admin                  -> HTTP 200 (1-Click Audit & 30-Day Reports Modal)
+4. https://customerpilot.in/dashboard/gbp-status         -> HTTP 307/200 (Tab 4: Day-0 & 30-Day Audit Reports)
+5. https://customerpilot.in/super-admin                  -> HTTP 307/200 (1-Click Audit & 30-Day Reports Modal)
 6. https://cakeconnection.in                -> HTTP 200 (Live Bakery & Cake Delivery Portal)
 7. http://187.127.170.36:8080               -> HTTP 200 (Evolution API Manager v2.2.2)
