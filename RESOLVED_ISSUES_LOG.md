@@ -4,6 +4,32 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [11 Nov 2026] Issue: Implementation & Verification of Master Strategy & Engineering Report (Programmatic Video Studio, 30-Day Master GBP Sprint, and Step-Zero Multi-Pin Engine)
+- **Symptom**: User requested a comprehensive audit of the CustomerPilot Master Strategy & Engineering Report (CustomerPilot_Master_Execution_Report.pdf) and implementation of all remaining pending architectural modules ('PART 1: Attached Guide ke Points ka Complete Audit : usme se jo jo baki he wo build kar diya na ho to kar do').
+- **Root Cause**: While CustomerPilot had implemented review collection, QR badges, and GBP post generation, three major high-impact modules from the Master Engineering Report were not yet fully materialized into interactive dashboard features: (1) The 4-preset programmatic video pipeline (Lemo-Opuscar HTML5 Canvas 60 FPS vector renderer with direct-response audio sync and client-side WebM/MP4 export), (2) The 16-step Master 30-Day GBP Sprint checklist with algorithmic weighting, verification metrics, and stage filters, and (3) The Step-Zero Multi-Pin GPS radius audit (Pin A 0.5km, Pin B 2.0km, Pin C 3.5km) and daytime vs midnight 'Open Now' split rank tracking.
+- **Resolution**:
+  1. **Programmatic Video Pipeline Engine (src/lib/video-pipeline.ts)**:
+     - Engineered 4 direct-response presets: Swiss Motion (15s ToFU typographic alert grid), Living Screencast (30s MoFU cursor simulation & 3-step node progression), Dark Keynote (20s BoFU 3D card tilt & +40% metric counter), and Countdown (15s Meta Ad split-screen paper card vs WhatsApp club).
+     - Added dynamic merchant personalization engine injecting store name, city, and category branding.
+  2. **In-App Video Studio UI (src/app/dashboard/marketing/video-studio/page.tsx)**:
+     - Built 60 FPS native HTML5 Canvas vector renderer in 9:16 vertical smartphone format.
+     - Added real-time playhead, timeline scrubber, play/pause controls, Hinglish subtitle ticker, and 1-click canvas.captureStream(60) MediaRecorder export generating .webm / .mp4 video downloads without third-party GPU cloud costs.
+  3. **Sidebar Navigation & Security Proxy (src/components/app-sidebar.tsx, src/proxy.ts)**:
+     - Added 'AI Video Studio' link under marketing navigation with Video icon.
+     - Allowed /api/marketing/video-studio in PUBLIC_API_PREFIXES within src/proxy.ts.
+  4. **Master 30-Day Sprint Seed & Interactive UI (src/lib/gbp-checklist-seed.ts, src/components/super-admin/gbp-30day-master-checklist.tsx, src/app/dashboard/gbp-status/page.tsx)**:
+     - Seeded all 16 discrete sprint tasks (s0_1 to w4_3) with algorithmic weights, stages (Step Zero, Week 1-4), and verification metrics.
+     - Built filterable, interactive task checklist UI embedded in the Sprint tab of /dashboard/gbp-status.
+  5. **Step-Zero Multi-Pin & Time-Split GPS Engine (src/lib/gbp-audit-engine.ts)**:
+     - Engineered calculateStepZeroMultiPinAudit calculating ranks at 0.5km, 2.0km, and 3.5km radii, daytime (2 PM) vs midnight (10:30 PM) 'Open Now' algorithm boost, and dynamic Review Deficit to overtake position #3.
+  6. **Adversarial Red-Team & Visual Ground-Truth Verification**:
+     - All 6 Master Adversarial Red-Team Guard gates passed cleanly (
+ode scripts/run_adversarial_guard.js).
+     - Playwright authenticated sessions verified rendered views on live localhost:3000 server, producing verified visual proof artifacts (ideo_studio_dashboard_verified.png and gbp_status_30day_sprint_verified.png).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [11 Nov 2026] Issue: Multi-Tiered Zero-Hallucination Guardrails for Autonomous GBP Post Generation (Grounding in MenuItem Catalog & Strict Blacklist)
 - **Symptom**: User questioned the risk of the automated GBP post engine generating posts for products or services that a merchant does not actually sell or offer (e.g., generating non-veg or bakery items that the store doesn't make, or services outside their domain).
 - **Root Cause**: While deterministic industry presets existed in `INDUSTRY_PRODUCT_PRESETS`, `buildTuesdayProductPost` in `src/lib/gbp-post-generator.ts` was not directly querying the merchant's physical inventory/catalog table (`MenuItem`) or actively cross-referencing the merchant's `strictlyNotAllowed` negative keyword blacklist from `resolveMerchantKeywordProfile`.

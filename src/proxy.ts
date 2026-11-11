@@ -110,6 +110,7 @@ export async function proxy(request: NextRequest) {
     '/api/digital-card',
     '/api/gbp/audit',
     '/api/gbp/posts/card',
+    '/api/marketing/video-studio',
     '/api/gbp/agent',
     '/api/menu',
     // SECURITY FIX: /api/payments/ removed from public — payments require merchant auth

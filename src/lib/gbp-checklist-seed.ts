@@ -59,3 +59,166 @@ export const TRACK_B_CHECKLIST: ChecklistTemplate[] = [
   { week: 3, taskKey: "TRAFFIC_BROADCAST_2", taskLabel: "Day 38: Second weekend broadcast (Month-end offer) send karo" },
   { week: 3, taskKey: "TOP3_CONFIRMED", taskLabel: "Day 45: Map grid screenshot lo — Top 3 me hai? GBP status 'TOP3_LOCKED' karo" },
 ]
+
+
+export interface MasterChecklistItem {
+  stage: "STEP_ZERO" | "WEEK_1" | "WEEK_2" | "WEEK_3" | "WEEK_4";
+  stageName: string;
+  id: string; // e.g. "s0_1", "w1_1"
+  actionItem: string;
+  verificationMetric: string;
+  algorithmWeight: string;
+  daysRange: string;
+}
+
+export const MASTER_30DAY_SPRINT_CHECKLIST: MasterChecklistItem[] = [
+  // Step Zero (Day 0)
+  {
+    stage: "STEP_ZERO",
+    stageName: "Step Zero: Baseline & Competitor Gap Audit",
+    id: "s0_1",
+    actionItem: "Audit current GBP rank across Top 5 keywords from 3 GPS pins.",
+    verificationMetric: "Log Pin A (0.5km), B (2.0km), and C (3.5km) positions at 2 PM and 10:30 PM.",
+    algorithmWeight: "Baseline Protocol",
+    daysRange: "Day 0"
+  },
+  {
+    stage: "STEP_ZERO",
+    stageName: "Step Zero: Baseline & Competitor Gap Audit",
+    id: "s0_2",
+    actionItem: "Record current Top 3 competitors for each target keyword.",
+    verificationMetric: "Document Primary Category, total reviews, and distance.",
+    algorithmWeight: "Intelligence Gathering",
+    daysRange: "Day 0"
+  },
+  {
+    stage: "STEP_ZERO",
+    stageName: "Step Zero: Baseline & Competitor Gap Audit",
+    id: "s0_3",
+    actionItem: "Calculate review volume and 'Mentioned in' keyword gaps.",
+    verificationMetric: "Determine exact deficit to overtake position #3.",
+    algorithmWeight: "Gap Quantification",
+    daysRange: "Day 0"
+  },
+  // Week 1 (Days 1–7)
+  {
+    stage: "WEEK_1",
+    stageName: "Week 1: Keyword Architecture & On-Page Foundations",
+    id: "w1_1",
+    actionItem: "Lock Top 5 high-intent transactional local keywords.",
+    verificationMetric: "3 Core Categories + 2 High-Margin Niches approved.",
+    algorithmWeight: "51% Algorithmic Weight",
+    daysRange: "Days 1–7"
+  },
+  {
+    stage: "WEEK_1",
+    stageName: "Week 1: Keyword Architecture & On-Page Foundations",
+    id: "w1_2",
+    actionItem: "Synchronize Primary Category and 3–4 Secondary Categories.",
+    verificationMetric: "Profile completeness marked 100% in dashboard.",
+    algorithmWeight: "32% GBP Core Signals",
+    daysRange: "Days 1–7"
+  },
+  {
+    stage: "WEEK_1",
+    stageName: "Week 1: Keyword Architecture & On-Page Foundations",
+    id: "w1_3",
+    actionItem: "Populate Products & Services with 300-char localized copy.",
+    verificationMetric: "All top items linked with pricing and photos.",
+    algorithmWeight: "On-Page Signals",
+    daysRange: "Days 1–7"
+  },
+  {
+    stage: "WEEK_1",
+    stageName: "Week 1: Keyword Architecture & On-Page Foundations",
+    id: "w1_4",
+    actionItem: "Deploy LocalBusiness JSON-LD schema on merchant website.",
+    verificationMetric: "Schema Validator confirms zero errors/warnings.",
+    algorithmWeight: "19% On-Page Signals",
+    daysRange: "Days 1–7"
+  },
+  // Week 2 (Days 8–15)
+  {
+    stage: "WEEK_2",
+    stageName: "Week 2: Review Velocity & Semantic Seeding Engine",
+    id: "w2_1",
+    actionItem: "Deploy Smart QR Review Standee at billing counter.",
+    verificationMetric: "Velocity established: 1–2 fresh reviews daily.",
+    algorithmWeight: "16% Review Velocity",
+    daysRange: "Days 8–15"
+  },
+  {
+    stage: "WEEK_2",
+    stageName: "Week 2: Review Velocity & Semantic Seeding Engine",
+    id: "w2_2",
+    actionItem: "Enforce Mobile Data Rule and seed user photo attachments.",
+    verificationMetric: "≥10 photo reviews published without IP flag.",
+    algorithmWeight: "Anti-Ban Protection",
+    daysRange: "Days 8–15"
+  },
+  {
+    stage: "WEEK_2",
+    stageName: "Week 2: Review Velocity & Semantic Seeding Engine",
+    id: "w2_3",
+    actionItem: "Execute 100% Owner responses within 24 hours.",
+    verificationMetric: "All responses incorporate secondary SEO context.",
+    algorithmWeight: "Google Activity Signal",
+    daysRange: "Days 8–15"
+  },
+  // Week 3 (Days 16–22)
+  {
+    stage: "WEEK_3",
+    stageName: "Week 3: Directory Authority & Media Freshness",
+    id: "w3_1",
+    actionItem: "Submit and verify NAP across Tier-1 directories.",
+    verificationMetric: "Exact character match across 30+ platforms.",
+    algorithmWeight: "7% Citation Signals",
+    daysRange: "Days 16–22"
+  },
+  {
+    stage: "WEEK_3",
+    stageName: "Week 3: Directory Authority & Media Freshness",
+    id: "w3_2",
+    actionItem: "Pre-seed 5 local keyword queries in the GBP Q&A section.",
+    verificationMetric: "Official answers posted by verified Owner badge.",
+    algorithmWeight: "AEO & Justifications",
+    daysRange: "Days 16–22"
+  },
+  {
+    stage: "WEEK_3",
+    stageName: "Week 3: Directory Authority & Media Freshness",
+    id: "w3_3",
+    actionItem: "Upload 15+ authentic smartphone photos and 2 vertical videos.",
+    verificationMetric: "Signage, interior, and counter indexed by Google Vision.",
+    algorithmWeight: "Media Freshness & Vision AI",
+    daysRange: "Days 16–22"
+  },
+  // Week 4 (Days 23–30)
+  {
+    stage: "WEEK_4",
+    stageName: "Week 4: Behavioral Signals & Day-30 Geo-Grid Audit",
+    id: "w4_1",
+    actionItem: "Publish bi-weekly GBP Offer Posts (Tuesday and Friday).",
+    verificationMetric: "High CTR CTA button configured and tracked.",
+    algorithmWeight: "Zero-Gap Freshness",
+    daysRange: "Days 23–30"
+  },
+  {
+    stage: "WEEK_4",
+    stageName: "Week 4: Behavioral Signals & Day-30 Geo-Grid Audit",
+    id: "w4_2",
+    actionItem: "Broadcast WhatsApp VIP Club offer linking to Maps listing.",
+    verificationMetric: "Surge in direction requests and mobile calls logged.",
+    algorithmWeight: "8% Behavioral Signals",
+    daysRange: "Days 23–30"
+  },
+  {
+    stage: "WEEK_4",
+    stageName: "Week 4: Behavioral Signals & Day-30 Geo-Grid Audit",
+    id: "w4_3",
+    actionItem: "Execute Day-30 Geo-Grid Scan across 5 km × 5 km area.",
+    verificationMetric: "Verify Top 3 Local Pack ranking against Day 0 logs.",
+    algorithmWeight: "Final Verification",
+    daysRange: "Days 23–30"
+  }
+];
