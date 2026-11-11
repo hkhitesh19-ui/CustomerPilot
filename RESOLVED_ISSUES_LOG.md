@@ -4,6 +4,30 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [11 Nov 2026] Issue: RankPilot AI Light Mode Conversion & Continuous 3D Kinetic Hero Card Flipper Inspired by GMBPro
+- **Symptom**: User requested two strict design upgrades for `https://customerpilot.in/rankpilot`: (1) Completely eliminate all dark colors ("Dark colour mujhe nahi chahiye, ye remove karo")—specifically dark navy/black background sections for `#audit-showcase` ("Google Business Profile Management — See Exactly What We Fix"), `#revenue-leak` ("The 60-Second Reality Check"), `#geo-grid` radar control bar, 10+10 table headers, and bottom conversion CTA, converting them to an executive-grade, airy light aesthetic matching `https://gmbpro.in/`; and (2) Upgrade the hero section card flipper from a flat 2D element into the continuous, kinetic 3D mechanical card flipper (`hero-visual`, `.card-flipper` with `perspective: 1200px`, `transform: rotateX(10deg) rotateY(-8deg) rotateZ(1.5deg)`, continuous floating levitation `heroFloat`, glow aura, vertical `.flipper-dots`, 3D mechanical transitions between `.active` and `.exiting` cards, and custom per-card durations: 7.5s, 7.5s, 6.5s, 8.5s with hover pause).
+- **Root Cause**: The landing page previously utilized heavy dark `#0F172A`/`bg-slate-900` sections that clashed with the clean, high-trust white SaaS aesthetic of `gmbpro.in`. Additionally, the hero card flipper lacked true 3D perspective transforms and continuous mechanical transitions because cards were conditionally mounted/unmounted rather than simultaneously preserved in the 3D CSS transform-style space.
+- **Resolution**:
+  1. **Complete Light Mode Transformation**:
+     - Converted `#audit-showcase` from `bg-slate-900 text-white` to `bg-white text-slate-900 border-b border-slate-200` with light tabs, clean light metadata chassis (`bg-slate-50/90 border border-slate-200`), white comparative Before/After cards with soft rose/emerald borders, and clear slate typography.
+     - Converted `#revenue-leak` from `bg-slate-900 text-white` to `bg-slate-50/70 text-slate-900 border-b border-slate-200` with white sliders card (`bg-white border-slate-200 shadow-sm`), light metric cards, and a high-contrast rose/white loss card (`bg-gradient-to-br from-rose-50 via-red-50/50 to-white border-2 border-rose-300`).
+     - Converted `#geo-grid` control bar from `bg-slate-900` to `bg-slate-100 text-slate-900 border-b border-slate-200` with clean Day 1 vs Day 30 toggle styling.
+     - Converted 10+10 Dual Matrix table headers to clean `bg-slate-100 text-slate-900 border-b border-slate-200` with amber/blue category icons.
+     - Converted bottom conversion CTA from `bg-slate-900 text-white` to `bg-gradient-to-br from-blue-50/80 via-white to-sky-50 text-slate-900 border-t border-b border-slate-200` and footer to `bg-slate-100 text-slate-600 border-t border-slate-200`.
+  2. **Kinetic 3D Hero Card Flipper (`#heroFlipper`)**:
+     - Implemented 3D perspective wrapper `.hero-visual` (`perspective: 1200px`) and `.card-flipper` container with 3D tilt (`rotateX(10deg) rotateY(-8deg) rotateZ(1.5deg)`), continuous levitation (`@keyframes heroFloat 6s ease-in-out infinite`), and soft multi-color glow aura (`.card-flipper::before`).
+     - Simultaneously mounted all 4 dynamic cards (Google Maps Ranking, AI Review Management & Vision OCR, Zero-Gap GBP Posts, AI Search Visibility GEO/AEO) with real CustomerPilot merchant examples (Cake Connection, Manjalpur; Dr. Kunal Shah Pet Clinic).
+     - Applied exact mechanical 3D transitions: active card smoothly enters at `rotateX(0deg) translateY(0) scale(1)`, while outgoing card exits with `rotateX(-50deg) translateY(-50px) scale(0.88)` and fades over 850ms.
+     - Integrated vertical `.flipper-dots` with continuous transition indicators and hover-pause mechanics.
+  3. **Verification & Testing**:
+     - All 6 Master Adversarial Red-Team Guard gates passed cleanly (`node scripts/run_adversarial_guard.js`).
+     - Full 12-test Playwright autonomous QA suite passed with 0 unwhitelisted errors (`node scripts/run_autonomous_qa.js e2e/rankpilot-landing.spec.ts`).
+     - Captured high-resolution proofs in artifact directory (`rankpilot_light_hero_3d_flipper.png`, `rankpilot_light_audit_showcase.png`, `rankpilot_light_revenue_leak.png`, `rankpilot_light_fullpage.png`).
+     - Launched `http://localhost:3000/rankpilot` in local browser for direct visual review.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ---
 
 ---
