@@ -21,7 +21,8 @@ import { CustomerPilotSelfGbpModal } from "./customerpilot-self-gbp-modal"
 import { LlmQuotaMonitor } from "./llm-quota-monitor"
 import { GbpAuditReportsModal } from "./gbp-audit-reports-modal"
 import { GbpDailySerpTracker } from "@/components/gbp-daily-serp-tracker"
-import { Camera, FileSpreadsheet } from "lucide-react"
+import { ManageTrackedKeywordsModal } from "./manage-tracked-keywords-modal"
+import { Camera, FileSpreadsheet, Sliders } from "lucide-react"
 
 type ChecklistItem = {
   id: string
@@ -106,6 +107,7 @@ export function GbpOperationsDashboard() {
   const [selfGbpOpen, setSelfGbpOpen] = useState(false)
   const [selectedSerpMerchantId, setSelectedSerpMerchantId] = useState<string>("cmtymavfx0002kx008lbfvp57")
   const [batchScanning, setBatchScanning] = useState(false)
+  const [manageKeywordsOpen, setManageKeywordsOpen] = useState(false)
 
   const handleRunBatchSerpScan = async () => {
     try {
@@ -365,6 +367,16 @@ export function GbpOperationsDashboard() {
                 )}
               </select>
             </div>
+
+            {/* Manage Keywords Button */}
+            <Button
+              size="sm"
+              onClick={() => setManageKeywordsOpen(true)}
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md shadow-blue-600/30 gap-1.5"
+            >
+              <Sliders className="w-3.5 h-3.5" />
+              Manage Keywords
+            </Button>
 
             {/* Run Batch Scan for All Merchants */}
             <Button
@@ -726,6 +738,15 @@ export function GbpOperationsDashboard() {
         merchantName={reportsModalMerchant?.name || ""}
         open={!!reportsModalMerchant}
         onClose={() => setReportsModalMerchant(null)}
+      />
+      <ManageTrackedKeywordsModal
+        open={manageKeywordsOpen}
+        onOpenChange={setManageKeywordsOpen}
+        merchantId={selectedSerpMerchantId}
+        merchantName={merchants.find((m) => m.id === selectedSerpMerchantId)?.name || "Selected Merchant"}
+        onKeywordsUpdated={() => {
+          // Keywords updated
+        }}
       />
     </div>
   )

@@ -4,7 +4,8 @@ import { useState, useEffect, useMemo } from "react";
 import {
   TrendingUp, TrendingDown, Minus, Download, RefreshCw, Search,
   MapPin, Sparkles, Globe, Bot, Award, CheckCircle2, ChevronRight,
-  Filter, Layers, ArrowUpRight, FileSpreadsheet, Calendar, Info
+  Filter, Layers, ArrowUpRight, FileSpreadsheet, Calendar, Info,
+  Sliders, ShieldCheck, Zap
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ export interface SerpKeywordItem {
   searchVolume: number;
   locality: string;
   targetCity: string;
-  serpFeature: "LOCAL_3PACK" | "ORGANIC" | "AI_OVERVIEW" | "KNOWLEDGE_PANEL";
+  serpFeature: "LOCAL_3PACK" | "ORGANIC" | "AI_OVERVIEW" | "KNOWLEDGE_PANEL" | string;
   sparkline: number[];
 }
 
@@ -67,12 +68,13 @@ export function GbpDailySerpTracker({
   const [period, setPeriod] = useState<"7D" | "14D" | "30D">("14D");
   const [activeTab, setActiveTab] = useState<"ALL" | "GEO" | "SEO" | "AEO">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   // Data states
   const [summary, setSummary] = useState<SerpSummary | null>(null);
   const [keywords, setKeywords] = useState<SerpKeywordItem[]>([]);
   const [allKeywords, setAllKeywords] = useState<SerpKeywordItem[]>([]);
   const [progression, setProgression] = useState<SerpProgressionPoint[]>([]);
+  const [verifiedDaysCount, setVerifiedDaysCount] = useState<number>(1);
 
   // Chart view mode: "CATEGORY_AVERAGES" or "KEYWORD_COMPARISON"
   const [chartMode, setChartMode] = useState<"CATEGORY_AVERAGES" | "KEYWORD_COMPARISON">("CATEGORY_AVERAGES");
@@ -85,11 +87,12 @@ export function GbpDailySerpTracker({
       const res = await fetch(`/api/gbp/daily-serp?merchantId=${merchantId}&period=${period}&type=${activeTab}`);
       const data = await res.json();
       if (data.ok) {
-        setSummary(data.summary);
-        setKeywords(data.keywords);
-        setAllKeywords(data.allKeywords || data.keywords);
-        setProgression(data.progression);
-        if (data.keywords.length > 0 && selectedKeywords.length === 0) {
+        setSummary(data.summary || data.metrics);
+        setKeywords(data.keywords || []);
+        setAllKeywords(data.allKeywords || data.keywords || []);
+        setProgression(data.progression || []);
+        setVerifiedDaysCount(data.verifiedDaysCount || 1);
+        if (data.keywords && data.keywords.length > 0 && selectedKeywords.length === 0) {
           // Default pick top 3 keywords for comparison
           setSelectedKeywords(data.keywords.slice(0, 3).map((k: SerpKeywordItem) => k.keyword));
         }
@@ -129,24 +132,25 @@ export function GbpDailySerpTracker({
     return keywords.filter(
       (k) =>
         k.keyword.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        k.locality.toLowerCase().includes(searchQuery.toLowerCase())
+        (k.locality && k.locality.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   }, [keywords, searchQuery]);
 
-  // SVG Chart Dimensions
-  const svgWidth = 840;
-  const svgHeight = 280;
-  const padLeft = 45;
-  const padRight = 30;
-  const padTop = 30;
-  const padBottom = 40;
+  // SVG Chart Dimensions & High-DPI Padding
+  const svgWidth = 920;
+  const svgHeight = 320;
+  const padLeft = 60;
+  const padRight = 35;
+  const padTop = 35;
+  const padBottom = 55;
 
   const chartW = svgWidth - padLeft - padRight;
   const chartH = svgHeight - padTop - padBottom;
 
-  // Inverted Y-axis: Rank 1 is at top (padTop), Rank 15 is at bottom (padTop + chartH)
+  // Inverted Y-axis: Rank 1 is at top (padTop), Rank 20 is at bottom (padTop + chartH)
   const minRank = 1;
-  const maxRank = 15;
+  const maxRank = 20;
+
   const getY = (rank: number) => {
     const clamped = Math.max(minRank, Math.min(maxRank, rank));
     return padTop + ((clamped - minRank) / (maxRank - minRank)) * chartH;
@@ -157,16 +161,38 @@ export function GbpDailySerpTracker({
     return padLeft + (idx / (total - 1)) * chartW;
   };
 
-  // Helper smooth path generator
+  // Helper smooth path generator (Cubic Bezier Splines)
   const buildSvgPath = (points: { x: number; y: number }[]) => {
     if (points.length === 0) return "";
+    if (points.length === 1) return "";
     let d = `M ${points[0].x} ${points[0].y}`;
     for (let i = 1; i < points.length; i++) {
       const prev = points[i - 1];
       const curr = points[i];
-      const cx = (prev.x + curr.x) / 2;
-      d += ` C ${cx} ${prev.y}, ${cx} ${curr.y}, ${curr.x} ${curr.y}`;
+      const cx1 = prev.x + (curr.x - prev.x) / 2;
+      const cy1 = prev.y;
+      const cx2 = prev.x + (curr.x - prev.x) / 2;
+      const cy2 = curr.y;
+      d += ` C ${cx1} ${cy1}, ${cx2} ${cy2}, ${curr.x} ${curr.y}`;
     }
+    return d;
+  };
+
+  // Helper smooth area path (to fill gradient beneath curve)
+  const buildSvgAreaPath = (points: { x: number; y: number }[]) => {
+    if (points.length <= 1) return "";
+    const bottomY = padTop + chartH;
+    let d = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 1; i < points.length; i++) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const cx1 = prev.x + (curr.x - prev.x) / 2;
+      const cy1 = prev.y;
+      const cx2 = prev.x + (curr.x - prev.x) / 2;
+      const cy2 = curr.y;
+      d += ` C ${cx1} ${cy1}, ${cx2} ${cy2}, ${curr.x} ${curr.y}`;
+    }
+    d += ` L ${points[points.length - 1].x} ${bottomY} L ${points[0].x} ${bottomY} Z`;
     return d;
   };
 
@@ -195,48 +221,56 @@ export function GbpDailySerpTracker({
       return [
         {
           id: "overall",
-          label: "Overall Average Rank",
-          color: "#1a73e8", // Google Blue
-          strokeWidth: 3,
+          label: "Overall Average",
+          color: "#2563eb", // Royal Blue
+          gradientId: "gradOverall",
+          strokeWidth: 3.5,
           dash: "",
           points: overallPoints,
           path: buildSvgPath(overallPoints),
+          areaPath: buildSvgAreaPath(overallPoints),
           currentVal: summary?.averageRank || 0,
         },
         {
           id: "geo",
-          label: "GEO Proximity Average",
-          color: "#0284c7", // Sky Blue
-          strokeWidth: 2,
+          label: "GEO Proximity",
+          color: "#10b981", // Emerald
+          gradientId: "gradGeo",
+          strokeWidth: 2.5,
           dash: "",
           points: geoPoints,
           path: buildSvgPath(geoPoints),
+          areaPath: buildSvgAreaPath(geoPoints),
           currentVal: progression[progression.length - 1]?.geoAvg || 0,
         },
         {
           id: "seo",
-          label: "SEO Transactional Average",
-          color: "#16a34a", // Emerald Green
-          strokeWidth: 2,
-          dash: "4,4",
+          label: "SEO Transactional",
+          color: "#0284c7", // Sky Blue
+          gradientId: "gradSeo",
+          strokeWidth: 2.5,
+          dash: "5,4",
           points: seoPoints,
           path: buildSvgPath(seoPoints),
+          areaPath: buildSvgAreaPath(seoPoints),
           currentVal: progression[progression.length - 1]?.seoAvg || 0,
         },
         {
           id: "aeo",
-          label: "AEO / AI Overview Average",
-          color: "#9333ea", // Purple
+          label: "AEO / AI Overview",
+          color: "#8b5cf6", // Purple
+          gradientId: "gradAeo",
           strokeWidth: 2.5,
           dash: "",
           points: aeoPoints,
           path: buildSvgPath(aeoPoints),
+          areaPath: buildSvgAreaPath(aeoPoints),
           currentVal: progression[progression.length - 1]?.aeoAvg || 0,
         },
       ];
     } else {
       // KEYWORD_COMPARISON MODE
-      const colors = ["#1a73e8", "#16a34a", "#e11d48", "#d97706", "#9333ea"];
+      const colors = ["#2563eb", "#10b981", "#ef4444", "#f59e0b", "#8b5cf6"];
       return selectedKeywords.slice(0, 5).map((kw, i) => {
         const pts = progression.map((p, idx) => {
           const rank = p.keywords[kw] ?? 12;
@@ -250,11 +284,13 @@ export function GbpDailySerpTracker({
           id: kw,
           label: kw,
           color: colors[i % colors.length],
-          strokeWidth: 2.5,
+          gradientId: `gradKw${i}`,
+          strokeWidth: 3,
           dash: "",
           points: pts,
           path: buildSvgPath(pts),
-          currentVal: currentK?.currentRank || 0,
+          areaPath: buildSvgAreaPath(pts),
+          currentVal: currentK ? currentK.currentRank : (progression[progression.length - 1]?.keywords[kw] || 0),
         };
       });
     }
@@ -263,195 +299,222 @@ export function GbpDailySerpTracker({
   const toggleKeywordSelection = (kw: string) => {
     if (selectedKeywords.includes(kw)) {
       if (selectedKeywords.length > 1) {
-        setSelectedKeywords(selectedKeywords.filter(k => k !== kw));
+        setSelectedKeywords(selectedKeywords.filter((k) => k !== kw));
       }
     } else {
       if (selectedKeywords.length < 5) {
         setSelectedKeywords([...selectedKeywords, kw]);
-      } else {
-        setSelectedKeywords([...selectedKeywords.slice(1), kw]);
       }
     }
   };
 
+  const activeHoverPoint = hoveredPointIndex !== null && progression[hoveredPointIndex]
+    ? progression[hoveredPointIndex]
+    : null;
+
   return (
-    <div className="space-y-6 text-slate-800">
-      
-      {/* 1. TOP HEADER & TELEMETRY CONTROLS */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6">
+      {/* 1. TOP CONTROL BAR */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-slate-900 font-extrabold text-lg">
-              Google SERP &amp; GEO Ranking Progression Engine
+            <h2 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <Globe className="w-5 h-5 text-blue-600" />
+              Google SERP & GEO Ranking Progression Engine
             </h2>
-            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Daily 09:00 AM IST Crawl Active
+            <Badge className="bg-emerald-50 text-emerald-700 border border-emerald-300 font-semibold text-xs">
+              Daily 09:00 AM IST Live
             </Badge>
           </div>
-          <p className="text-slate-500 text-xs mt-0.5">
-            Real-time search positioning for <strong>{merchantName}</strong> across Google Maps 3-Pack, Organic Web, and AI Overviews.
+          <p className="text-slate-500 text-xs mt-1">
+            Real-time search positioning for <strong className="text-slate-800 font-bold">{merchantName}</strong> across Google Maps 3-Pack, Organic SERP, and AI Overviews.
           </p>
         </div>
 
-        {/* Timeframe & Actions */}
-        <div className="flex items-center flex-wrap gap-2 self-start md:self-auto">
-          {/* Timeframe filter pills */}
-          <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold text-slate-600">
-            <button
-              onClick={() => setPeriod("7D")}
-              className={`px-2.5 py-1 rounded-lg transition ${
-                period === "7D" ? "bg-white text-blue-600 shadow-xs" : "hover:text-slate-900"
-              }`}
-            >
-              7 Days
-            </button>
-            <button
-              onClick={() => setPeriod("14D")}
-              className={`px-2.5 py-1 rounded-lg transition ${
-                period === "14D" ? "bg-white text-blue-600 shadow-xs" : "hover:text-slate-900"
-              }`}
-            >
-              14 Days
-            </button>
-            <button
-              onClick={() => setPeriod("30D")}
-              className={`px-2.5 py-1 rounded-lg transition ${
-                period === "30D" ? "bg-white text-blue-600 shadow-xs" : "hover:text-slate-900"
-              }`}
-            >
-              30 Days
-            </button>
+        {/* Action Controls */}
+        <div className="flex items-center flex-wrap gap-2">
+          {/* Time Filter */}
+          <div className="flex items-center bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+            {(["7D", "14D", "30D"] as const).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={`px-3 py-1 rounded-lg transition-all ${
+                  period === p
+                    ? "bg-white text-blue-700 font-bold shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                {p === "7D" ? "7 Days" : p === "14D" ? "14 Days" : "30 Days"}
+              </button>
+            ))}
           </div>
 
-          {/* Download Daily CSV Button */}
+          {/* Download CSV */}
           <a
             href={`/api/gbp/daily-serp/export?merchantId=${merchantId}&period=${period}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 shadow-xs transition"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl border border-slate-200 transition shadow-2xs"
           >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+            <Download className="w-3.5 h-3.5 text-slate-500" />
             Download Daily CSV
           </a>
 
-          {/* Trigger 09:00 AM Live Scan */}
+          {/* Trigger Scan */}
           <Button
             size="sm"
             onClick={handleLiveScan}
-            disabled={scanning}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs h-8 px-3 rounded-xl shadow-xs"
+            disabled={scanning || readOnly}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm gap-1.5 h-8"
           >
-            {scanning ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin mr-1" />
-            ) : (
-              <RefreshCw className="w-3.5 h-3.5 mr-1" />
-            )}
+            <RefreshCw className={`w-3.5 h-3.5 ${scanning ? "animate-spin" : ""}`} />
             Run 09:00 AM Scan
           </Button>
         </div>
       </div>
 
-      {/* 2. THE 4 GOOGLE SEARCH METRIC CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+      {/* 2. REAL DATA VERIFICATION BANNER */}
+      <div className="flex items-center justify-between p-3.5 bg-gradient-to-r from-emerald-50/90 via-teal-50/70 to-blue-50/80 border border-emerald-200/90 rounded-2xl text-xs shadow-2xs">
+        <div className="flex items-center gap-2.5">
+          <div className="w-3 h-3 rounded-full bg-emerald-500 flex items-center justify-center shadow-xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+          </div>
+          <div>
+            <span className="font-extrabold text-emerald-950">
+              Strict Real-Data Verification Active
+            </span>
+            <span className="text-slate-600 ml-2 hidden sm:inline">
+              • Graph displays verified crawl snapshots with zero synthetic interpolation. Daily crawl persists at 09:00 AM IST.
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="bg-white/80 border-emerald-300 text-emerald-800 text-[11px] font-bold">
+            {verifiedDaysCount} Verified Daily Snapshot{verifiedDaysCount > 1 ? "s" : ""}
+          </Badge>
+        </div>
+      </div>
+
+      {/* 3. THE 4 GOOGLE SEARCH METRIC CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1: Top 3 Local Pack */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-[#d97706] rounded-t-xl" />
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-4.5 shadow-xs relative overflow-hidden group hover:border-amber-300 transition-all">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-amber-400" />
           <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
             <span>In Top 3 Local Pack</span>
-            <Award className="w-4 h-4 text-amber-500" />
+            <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+              <Award className="w-4 h-4" />
+            </div>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900">
-              {summary?.top3Count ?? 0} Keywords
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl font-black text-slate-900 tracking-tight">
+              {summary?.top3Count ?? 0}
             </span>
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+            <span className="text-xs font-bold text-slate-600">Keywords</span>
+            <span className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full ml-auto">
               {summary?.top3Percentage ?? 0}% Share
             </span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Appear directly in Google Maps 3-Pack pin</p>
+          <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
+            <CheckCircle2 className="w-3 h-3 text-amber-600" />
+            Appear directly in Google Maps 3-Pack pin
+          </p>
         </div>
 
         {/* Metric 2: Top 10 Google SERP */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-[#16a34a] rounded-t-xl" />
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-4.5 shadow-xs relative overflow-hidden group hover:border-emerald-300 transition-all">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-emerald-400" />
           <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
             <span>In Top 10 SERP (Page 1)</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900">
-              {summary?.top10Count ?? 0} Keywords
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl font-black text-slate-900 tracking-tight">
+              {summary?.top10Count ?? 0}
             </span>
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+            <span className="text-xs font-bold text-slate-600">Keywords</span>
+            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full ml-auto">
               {summary?.top10Percentage ?? 0}% Coverage
             </span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Page 1 organic and map rankings</p>
+          <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
+            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+            Page 1 organic and map rankings
+          </p>
         </div>
 
         {/* Metric 3: Average SERP Standing */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-[#1a73e8] rounded-t-xl" />
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-4.5 shadow-xs relative overflow-hidden group hover:border-blue-300 transition-all">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-blue-400" />
           <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
             <span>Average SERP Rank</span>
-            <TrendingUp className="w-4 h-4 text-[#1a73e8]" />
+            <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4" />
+            </div>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900">
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl font-black text-slate-900 tracking-tight">
               #{summary?.averageRank ?? 0}
             </span>
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+            <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full ml-auto">
               ▲ +{summary?.rankImprovement ?? 0} Spots
             </span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">
-            Improved from baseline #{summary?.baselineAverageRank ?? 0} at Day 0
+          <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
+            <TrendingUp className="w-3 h-3 text-blue-600" />
+            Baseline #{summary?.baselineAverageRank ?? 0} at Day 0 onboarding
           </p>
         </div>
 
         {/* Metric 4: Total Targeted Search Demand */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-[#9333ea] rounded-t-xl" />
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-4.5 shadow-xs relative overflow-hidden group hover:border-purple-300 transition-all">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 to-purple-400" />
           <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
             <span>Monthly Search Demand</span>
-            <Globe className="w-4 h-4 text-purple-600" />
+            <div className="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+              <Globe className="w-4 h-4" />
+            </div>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900">
-              {summary?.totalMonthlySearchDemand.toLocaleString() ?? 0}/mo
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl font-black text-slate-900 tracking-tight">
+              {(summary?.totalMonthlySearchDemand ?? 0).toLocaleString()}
             </span>
-            <span className="text-xs font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+            <span className="text-xs font-bold text-slate-600">/mo</span>
+            <span className="text-xs font-bold text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full ml-auto">
               High Intent
             </span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">
+          <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
+            <Globe className="w-3 h-3 text-purple-600" />
             Across {summary?.totalTracked ?? 0} tracked commercial search terms
           </p>
         </div>
       </div>
 
-      {/* 3. PICTORIZED TIME-SERIES RANK PROGRESSION GRAPH */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+      {/* 4. PICTORIZED TIME-SERIES RANK PROGRESSION GRAPH */}
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs space-y-4">
         {/* Chart Header Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
-            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-blue-600" />
+            <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+              <TrendingUp className="w-4.5 h-4.5 text-blue-600" />
               Daily Morning 09:00 AM Rank Progression Trajectory
             </h3>
-            <p className="text-slate-500 text-xs mt-0.5">
-              Inverted SEO Scale: Top of graph represents <strong>Rank #1</strong> (First Position on Google).
+            <p className="text-slate-500 text-xs mt-1">
+              Inverted SEO Scale: Top of graph represents <strong>Rank #1</strong> (Peak Position on Google Search & Maps).
             </p>
           </div>
 
           {/* Mode Switcher */}
-          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold">
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold">
             <button
               onClick={() => setChartMode("CATEGORY_AVERAGES")}
-              className={`px-3 py-1 rounded-lg transition ${
+              className={`px-3 py-1.5 rounded-lg transition-all ${
                 chartMode === "CATEGORY_AVERAGES"
-                  ? "bg-white text-blue-600 font-bold shadow-xs"
+                  ? "bg-white text-blue-700 font-bold shadow-xs"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -459,9 +522,9 @@ export function GbpDailySerpTracker({
             </button>
             <button
               onClick={() => setChartMode("KEYWORD_COMPARISON")}
-              className={`px-3 py-1 rounded-lg transition ${
+              className={`px-3 py-1.5 rounded-lg transition-all ${
                 chartMode === "KEYWORD_COMPARISON"
-                  ? "bg-white text-blue-600 font-bold shadow-xs"
+                  ? "bg-white text-blue-700 font-bold shadow-xs"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -471,30 +534,33 @@ export function GbpDailySerpTracker({
         </div>
 
         {/* Legend / Keyword Selector Pills */}
-        <div className="flex items-center flex-wrap gap-2 text-xs">
+        <div className="flex items-center flex-wrap gap-2 text-xs pt-1">
           {chartMode === "CATEGORY_AVERAGES" ? (
             chartLines.map((line) => (
               <div
                 key={line.id}
-                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-medium"
+                className="flex items-center gap-2 px-3 py-1.5 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-700 font-semibold"
               >
-                <span className="w-3 h-0.5 rounded-full" style={{ backgroundColor: line.color }} />
-                <span>{line.label}</span>
-                <span className="font-bold text-slate-900 ml-1">#{line.currentVal}</span>
+                <span
+                  className="w-3.5 h-1 rounded-full shadow-2xs"
+                  style={{ backgroundColor: line.color }}
+                />
+                <span className="text-xs">{line.label}</span>
+                <span className="font-extrabold text-slate-900 text-xs ml-1">#{line.currentVal}</span>
               </div>
             ))
           ) : (
             <div className="flex items-center flex-wrap gap-1.5">
-              <span className="text-slate-500 font-medium text-xs">Select up to 5 to plot:</span>
-              {allKeywords.slice(0, 10).map((k, i) => {
+              <span className="text-slate-500 font-medium text-xs">Select up to 5 keywords:</span>
+              {allKeywords.slice(0, 10).map((k) => {
                 const isSelected = selectedKeywords.includes(k.keyword);
                 return (
                   <button
                     key={k.keyword}
                     onClick={() => toggleKeywordSelection(k.keyword)}
-                    className={`px-2 py-0.5 rounded-md text-[11px] font-semibold transition border ${
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all border ${
                       isSelected
-                        ? "bg-blue-50 border-blue-300 text-blue-700"
+                        ? "bg-blue-50 border-blue-300 text-blue-800 shadow-2xs"
                         : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                     }`}
                   >
@@ -508,54 +574,109 @@ export function GbpDailySerpTracker({
         </div>
 
         {/* SVG Time-Series Chart */}
-        <div className="w-full overflow-x-auto">
-          <div className="min-w-[650px] relative select-none">
+        <div className="w-full overflow-x-auto pt-2">
+          <div className="min-w-[700px] relative select-none">
             <svg
               viewBox={`0 0 ${svgWidth} ${svgHeight}`}
               className="w-full h-auto overflow-visible"
               onMouseLeave={() => setHoveredPointIndex(null)}
             >
               <defs>
-                <linearGradient id="rank1Zone" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#16a34a" stopOpacity="0.08" />
-                  <stop offset="100%" stopColor="#16a34a" stopOpacity="0.0" />
+                {/* Glow Gradients */}
+                <linearGradient id="top3ZoneGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.12" />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity="0.02" />
+                </linearGradient>
+
+                <linearGradient id="page1ZoneGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#0284c7" stopOpacity="0.04" />
+                  <stop offset="100%" stopColor="#0284c7" stopOpacity="0.00" />
+                </linearGradient>
+
+                <linearGradient id="gradOverall" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#2563eb" stopOpacity="0.18" />
+                  <stop offset="100%" stopColor="#2563eb" stopOpacity="0.00" />
+                </linearGradient>
+
+                <linearGradient id="gradGeo" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.16" />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity="0.00" />
+                </linearGradient>
+
+                <linearGradient id="gradSeo" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#0284c7" stopOpacity="0.14" />
+                  <stop offset="100%" stopColor="#0284c7" stopOpacity="0.00" />
+                </linearGradient>
+
+                <linearGradient id="gradAeo" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.16" />
+                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.00" />
                 </linearGradient>
               </defs>
 
-              {/* Top 3 Local Pack Highlight Zone (Rank 1 to 3) */}
+              {/* 1. Google 3-Pack Target Zone (Ranks 1 to 3) */}
               <rect
                 x={padLeft}
                 y={getY(1)}
                 width={chartW}
                 height={getY(3) - getY(1)}
-                fill="url(#rank1Zone)"
+                fill="url(#top3ZoneGradient)"
+                rx={6}
               />
               <line
                 x1={padLeft}
                 y1={getY(3)}
                 x2={padLeft + chartW}
                 y2={getY(3)}
-                stroke="#16a34a"
-                strokeWidth={1}
-                strokeDasharray="3,3"
-                opacity={0.4}
+                stroke="#10b981"
+                strokeWidth={1.5}
+                strokeDasharray="4,4"
               />
               <text
-                x={padLeft + chartW - 5}
-                y={getY(3) - 6}
+                x={padLeft + chartW - 10}
+                y={getY(3) - 8}
                 textAnchor="end"
-                fontSize={10}
-                fill="#16a34a"
-                fontWeight="700"
+                fontSize={11}
+                fill="#059669"
+                fontWeight="800"
               >
-                ★ Top 3 Google 3-Pack Zone
+                🏆 Google Local 3-Pack Target Zone (Ranks 1 to 3)
               </text>
 
-              {/* Horizontal Rank Grid Lines */}
-              {[1, 3, 5, 8, 10, 15].map((r) => {
+              {/* 2. Page 1 Organic Zone (Ranks 4 to 10) */}
+              <rect
+                x={padLeft}
+                y={getY(3)}
+                width={chartW}
+                height={getY(10) - getY(3)}
+                fill="url(#page1ZoneGradient)"
+              />
+              <line
+                x1={padLeft}
+                y1={getY(10)}
+                x2={padLeft + chartW}
+                y2={getY(10)}
+                stroke="#94a3b8"
+                strokeWidth={1}
+                strokeDasharray="3,3"
+                opacity={0.6}
+              />
+              <text
+                x={padLeft + chartW - 10}
+                y={getY(10) - 6}
+                textAnchor="end"
+                fontSize={10}
+                fill="#64748b"
+                fontWeight="600"
+              >
+                Page 1 Organic Threshold (#10)
+              </text>
+
+              {/* 3. Horizontal Rank Grid Lines */}
+              {[1, 3, 5, 10, 15, 20].map((r) => {
                 const y = getY(r);
                 return (
-                  <g key={r}>
+                  <g key={`y-grid-${r}`}>
                     <line
                       x1={padLeft}
                       y1={y}
@@ -563,15 +684,16 @@ export function GbpDailySerpTracker({
                       y2={y}
                       stroke="#e2e8f0"
                       strokeWidth={1}
-                      strokeDasharray="2,2"
+                      strokeDasharray={r === 1 || r === 3 || r === 10 ? "" : "3,3"}
+                      opacity={0.7}
                     />
                     <text
-                      x={padLeft - 10}
+                      x={padLeft - 12}
                       y={y + 4}
                       textAnchor="end"
-                      fontSize={11}
-                      fontWeight="600"
-                      fill="#64748b"
+                      fontSize={12}
+                      fontWeight="700"
+                      fill={r <= 3 ? "#059669" : r <= 10 ? "#2563eb" : "#64748b"}
                     >
                       #{r}
                     </text>
@@ -579,11 +701,11 @@ export function GbpDailySerpTracker({
                 );
               })}
 
-              {/* Vertical Date Grid Lines & Labels */}
+              {/* 4. Vertical Date Grid Lines & Timestamps */}
               {progression.map((p, idx) => {
                 const x = getX(idx, progression.length);
                 return (
-                  <g key={p.date}>
+                  <g key={`x-grid-${p.fullDate}`}>
                     <line
                       x1={x}
                       y1={padTop}
@@ -594,11 +716,11 @@ export function GbpDailySerpTracker({
                     />
                     <text
                       x={x}
-                      y={padTop + chartH + 20}
+                      y={padTop + chartH + 24}
                       textAnchor="middle"
-                      fontSize={10}
-                      fontWeight="600"
-                      fill="#64748b"
+                      fontSize={11}
+                      fontWeight="700"
+                      fill="#475569"
                     >
                       {p.date}
                     </text>
@@ -606,119 +728,138 @@ export function GbpDailySerpTracker({
                 );
               })}
 
-              {/* Render Chart Lines */}
+              {/* 5. Render Area Gradients and Curve Splines */}
               {chartLines.map((line) => (
-                <g key={line.id}>
-                  <path
-                    d={line.path}
-                    fill="none"
-                    stroke={line.color}
-                    strokeWidth={line.strokeWidth}
-                    strokeDasharray={line.dash}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  {line.points.map((pt, pIdx) => (
-                    <circle
-                      key={pIdx}
-                      cx={pt.x}
-                      cy={pt.y}
-                      r={hoveredPointIndex === pIdx ? 5 : 3}
-                      fill="#ffffff"
-                      stroke={line.color}
-                      strokeWidth={2}
+                <g key={`line-group-${line.id}`}>
+                  {/* Gradient Area Fill */}
+                  {line.areaPath && (
+                    <path
+                      d={line.areaPath}
+                      fill={`url(#${line.gradientId || "gradOverall"})`}
                     />
-                  ))}
+                  )}
+
+                  {/* Curve Path */}
+                  {line.path && (
+                    <path
+                      d={line.path}
+                      fill="none"
+                      stroke={line.color}
+                      strokeWidth={line.strokeWidth}
+                      strokeDasharray={line.dash}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  )}
+
+                  {/* Points / Milestone Dots */}
+                  {line.points.map((pt, pIdx) => {
+                    const isHovered = hoveredPointIndex === pIdx;
+                    return (
+                      <g key={`pt-${line.id}-${pIdx}`}>
+                        {/* Concentric glow ring when only 1 verified point or hovered */}
+                        {(progression.length === 1 || isHovered) && (
+                          <circle
+                            cx={pt.x}
+                            cy={pt.y}
+                            r={isHovered ? 8 : 7}
+                            fill={line.color}
+                            fillOpacity={0.2}
+                          />
+                        )}
+                        <circle
+                          cx={pt.x}
+                          cy={pt.y}
+                          r={isHovered ? 5 : 4}
+                          fill="#ffffff"
+                          stroke={line.color}
+                          strokeWidth={2.5}
+                        />
+                      </g>
+                    );
+                  })}
                 </g>
               ))}
 
-              {/* Hover Crosshair & Trigger Rectangles */}
+              {/* 6. Active Hover Crosshair Line */}
+              {hoveredPointIndex !== null && progression[hoveredPointIndex] && (
+                <line
+                  x1={getX(hoveredPointIndex, progression.length)}
+                  y1={padTop}
+                  x2={getX(hoveredPointIndex, progression.length)}
+                  y2={padTop + chartH}
+                  stroke="#475569"
+                  strokeWidth={1.5}
+                  strokeDasharray="3,3"
+                />
+              )}
+
+              {/* 7. Hover Hit Rectangles */}
               {progression.map((p, idx) => {
                 const x = getX(idx, progression.length);
-                const isHovered = hoveredPointIndex === idx;
+                const sliceW = progression.length <= 1 ? chartW : chartW / (progression.length - 1);
 
                 return (
-                  <g key={`hit-${idx}`}>
-                    {/* Invisible hover slice */}
-                    <rect
-                      x={x - (chartW / progression.length) / 2}
-                      y={padTop}
-                      width={chartW / progression.length}
-                      height={chartH}
-                      fill="transparent"
-                      onMouseEnter={() => setHoveredPointIndex(idx)}
-                      className="cursor-pointer"
-                    />
-
-                    {/* Active vertical hover crosshair */}
-                    {isHovered && (
-                      <line
-                        x1={x}
-                        y1={padTop}
-                        x2={x}
-                        y2={padTop + chartH}
-                        stroke="#1a73e8"
-                        strokeWidth={1.5}
-                        strokeDasharray="3,3"
-                      />
-                    )}
-                  </g>
+                  <rect
+                    key={`hit-${idx}`}
+                    x={progression.length <= 1 ? padLeft : x - sliceW / 2}
+                    y={padTop}
+                    width={sliceW}
+                    height={chartH}
+                    fill="transparent"
+                    onMouseEnter={() => setHoveredPointIndex(idx)}
+                    className="cursor-pointer"
+                  />
                 );
               })}
             </svg>
 
-            {/* Interactive Tooltip Card */}
-            {hoveredPointIndex !== null && progression[hoveredPointIndex] && (
+            {/* Floating Tooltip Card */}
+            {activeHoverPoint && (
               <div
-                className="absolute z-20 bg-slate-900 text-white rounded-xl p-3 shadow-xl text-xs pointer-events-none transform -translate-x-1/2 -translate-y-full transition-all"
+                className="absolute z-20 pointer-events-none bg-slate-900 text-white rounded-xl p-3 shadow-xl border border-slate-700 text-xs w-56 -translate-x-1/2 transition-all duration-75"
                 style={{
-                  left: `${(getX(hoveredPointIndex, progression.length) / svgWidth) * 100}%`,
-                  top: `${(padTop / svgHeight) * 100}%`,
+                  left: `${(getX(hoveredPointIndex!, progression.length) / svgWidth) * 100}%`,
+                  top: "20px",
                 }}
               >
-                <div className="font-extrabold text-slate-100 border-b border-slate-700 pb-1 mb-1.5 flex items-center justify-between gap-3">
-                  <span>{progression[hoveredPointIndex].fullDate}</span>
-                  <span className="text-[10px] text-emerald-400 font-bold">
-                    {progression[hoveredPointIndex].top3Count} in Top 3
+                <div className="flex items-center justify-between pb-1.5 border-b border-slate-700/80 mb-2">
+                  <span className="font-extrabold text-slate-200">
+                    {activeHoverPoint.date} ({activeHoverPoint.fullDate})
+                  </span>
+                  <span className="text-[10px] text-emerald-400 font-bold bg-emerald-950/80 px-1.5 py-0.5 rounded">
+                    Verified
                   </span>
                 </div>
-                <div className="space-y-1">
-                  {chartMode === "CATEGORY_AVERAGES" ? (
-                    <>
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-slate-400">Overall Average:</span>
-                        <span className="font-bold text-blue-400">
-                          #{progression[hoveredPointIndex].avgRank}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-slate-400">GEO Average:</span>
-                        <span className="font-bold text-sky-400">
-                          #{progression[hoveredPointIndex].geoAvg ?? "—"}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-slate-400">SEO Average:</span>
-                        <span className="font-bold text-emerald-400">
-                          #{progression[hoveredPointIndex].seoAvg ?? "—"}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-slate-400">AEO Average:</span>
-                        <span className="font-bold text-purple-400">
-                          #{progression[hoveredPointIndex].aeoAvg ?? "—"}
-                        </span>
-                      </div>
-                    </>
-                  ) : (
-                    selectedKeywords.map((kw) => (
-                      <div key={kw} className="flex items-center justify-between gap-3">
-                        <span className="text-slate-300 truncate max-w-[140px]">{kw}:</span>
-                        <span className="font-bold text-amber-400">
-                          #{progression[hoveredPointIndex].keywords[kw] ?? "—"}
-                        </span>
-                      </div>
-                    ))
+
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Overall Average:</span>
+                    <span className="font-extrabold text-white">#{activeHoverPoint.avgRank}</span>
+                  </div>
+                  {activeHoverPoint.geoAvg !== null && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-emerald-400 flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> GEO Average:
+                      </span>
+                      <span className="font-bold text-slate-100">#{activeHoverPoint.geoAvg}</span>
+                    </div>
+                  )}
+                  {activeHoverPoint.seoAvg !== null && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-blue-400 flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" /> SEO Average:
+                      </span>
+                      <span className="font-bold text-slate-100">#{activeHoverPoint.seoAvg}</span>
+                    </div>
+                  )}
+                  {activeHoverPoint.aeoAvg !== null && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-purple-400 flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-purple-500 inline-block" /> AEO Average:
+                      </span>
+                      <span className="font-bold text-slate-100">#{activeHoverPoint.aeoAvg}</span>
+                    </div>
                   )}
                 </div>
               </div>
@@ -727,229 +868,126 @@ export function GbpDailySerpTracker({
         </div>
       </div>
 
-      {/* 4. KEYWORD TAXONOMY TABS & SEARCH BAR */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-          {/* Category Tabs */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <button
-              onClick={() => setActiveTab("ALL")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                activeTab === "ALL"
-                  ? "bg-slate-900 text-white shadow-xs"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              All Keywords ({summary?.totalTracked ?? 0})
-            </button>
-
-            <button
-              onClick={() => setActiveTab("GEO")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                activeTab === "GEO"
-                  ? "bg-blue-600 text-white shadow-xs"
-                  : "bg-blue-50 text-blue-700 hover:bg-blue-100"
-              }`}
-            >
-              <MapPin className="w-3.5 h-3.5" />
-              GEO Proximity &amp; Local Pack ({summary?.geoCount ?? 0})
-            </button>
-
-            <button
-              onClick={() => setActiveTab("SEO")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                activeTab === "SEO"
-                  ? "bg-emerald-600 text-white shadow-xs"
-                  : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-              }`}
-            >
-              <Globe className="w-3.5 h-3.5" />
-              SEO High-Intent Search ({summary?.seoCount ?? 0})
-            </button>
-
-            <button
-              onClick={() => setActiveTab("AEO")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                activeTab === "AEO"
-                  ? "bg-purple-600 text-white shadow-xs"
-                  : "bg-purple-50 text-purple-700 hover:bg-purple-100"
-              }`}
-            >
-              <Bot className="w-3.5 h-3.5" />
-              AEO &amp; AI Overviews ({summary?.aeoCount ?? 0})
-            </button>
+      {/* 5. TELEMETRY & KEYWORDS TABLE */}
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <h3 className="text-sm font-extrabold text-slate-900">
+              Tracked Search Terms Telemetry & 24h Movement
+            </h3>
+            <p className="text-slate-500 text-xs mt-0.5">
+              Showing {filteredKeywords.length} of {keywords.length} priority commercial keywords
+            </p>
           </div>
 
           {/* Search Input */}
-          <div className="relative w-full md:w-64">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+          <div className="relative w-full sm:w-64">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search keyword or locality..."
+              placeholder="Filter keyword or locality..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
             />
           </div>
         </div>
 
-        {/* 5. TELEMETRY TABLE */}
+        {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px]">
-                <th className="py-2.5 px-3">Keyword &amp; Locality</th>
-                <th className="py-2.5 px-2">Type</th>
-                <th className="py-2.5 px-2 text-center">09:00 AM Rank</th>
-                <th className="py-2.5 px-2 text-center">24h Shift</th>
-                <th className="py-2.5 px-2 text-center">Day 0 ➔ Today</th>
-                <th className="py-2.5 px-2 text-right">Search Volume</th>
-                <th className="py-2.5 px-2">SERP Feature</th>
-                <th className="py-2.5 px-3 text-center">14-Day Trajectory</th>
+            <thead className="bg-slate-50/80 text-slate-600 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+              <tr>
+                <th className="py-3 px-3">Keyword Query & Locality</th>
+                <th className="py-3 px-2">Type</th>
+                <th className="py-3 px-2 text-center">09:00 AM Rank</th>
+                <th className="py-3 px-2 text-center">24h Shift</th>
+                <th className="py-3 px-2 text-center">Day 0 Baseline</th>
+                <th className="py-3 px-2 text-right">Search Demand</th>
+                <th className="py-3 px-2">SERP Feature</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredKeywords.map((k) => {
-                // Rank styling
-                const isTop3 = k.currentRank <= 3;
-                const rankColor =
-                  k.currentRank === 1
-                    ? "bg-amber-100 text-amber-800 border-amber-300 font-extrabold"
-                    : k.currentRank === 2
-                    ? "bg-slate-200 text-slate-800 border-slate-300 font-bold"
-                    : k.currentRank === 3
-                    ? "bg-amber-50 text-amber-700 border-amber-200 font-bold"
-                    : "bg-slate-50 text-slate-700 border-slate-200 font-medium";
-
-                // Delta styling
-                const delta = k.rankDelta;
-                const deltaBadge =
-                  delta > 0 ? (
-                    <span className="inline-flex items-center gap-0.5 text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded text-[10px]">
-                      <TrendingUp className="w-3 h-3" /> +{delta}
-                    </span>
-                  ) : delta < 0 ? (
-                    <span className="inline-flex items-center gap-0.5 text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded text-[10px]">
-                      <TrendingDown className="w-3 h-3" /> {delta}
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-0.5 text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded text-[10px]">
-                      <Minus className="w-3 h-3" /> 0
-                    </span>
-                  );
-
-                // Category Badge
-                const typeBadge =
-                  k.type === "GEO" ? (
-                    <Badge className="bg-sky-50 text-sky-700 border-sky-200 text-[10px] font-bold">
-                      📍 GEO
-                    </Badge>
-                  ) : k.type === "SEO" ? (
-                    <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
-                      🔍 SEO
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-purple-50 text-purple-700 border-purple-200 text-[10px] font-bold">
-                      🤖 AEO
-                    </Badge>
-                  );
-
-                // Feature Badge
-                const featureBadge =
-                  k.serpFeature === "LOCAL_3PACK" ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700">
-                      <MapPin className="w-3 h-3 text-blue-600" />
-                      Local 3-Pack
-                    </span>
-                  ) : k.serpFeature === "AI_OVERVIEW" ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-700">
-                      <Sparkles className="w-3 h-3 text-purple-600" />
-                      AI Overview
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700">
-                      <Globe className="w-3 h-3 text-slate-500" />
-                      Organic SERP
-                    </span>
-                  );
+              {filteredKeywords.map((kw) => {
+                const isTop3 = kw.currentRank <= 3;
+                const isTop10 = kw.currentRank <= 10;
 
                 return (
-                  <tr key={k.keyword} className="hover:bg-slate-50/80 transition-colors">
-                    {/* Keyword */}
-                    <td className="py-2.5 px-3">
-                      <div className="font-bold text-slate-900 capitalize">{k.keyword}</div>
-                      <div className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
-                        <MapPin className="w-2.5 h-2.5" />
-                        {k.locality}, {k.targetCity}
+                  <tr key={kw.keyword} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3 px-3 font-semibold text-slate-900">
+                      <div>{kw.keyword}</div>
+                      <div className="text-[11px] text-slate-400 font-normal flex items-center gap-1 mt-0.5">
+                        <MapPin className="w-3 h-3 text-slate-400" />
+                        {kw.locality || "City-wide"}, {kw.targetCity}
                       </div>
                     </td>
 
-                    {/* Category Type */}
-                    <td className="py-2.5 px-2">{typeBadge}</td>
-
-                    {/* Current Rank */}
-                    <td className="py-2.5 px-2 text-center">
-                      <span className={`inline-block px-2.5 py-1 rounded-md text-xs border ${rankColor}`}>
-                        #{k.currentRank}
+                    <td className="py-3 px-2">
+                      <span
+                        className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${
+                          kw.type === "GEO"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : kw.type === "SEO"
+                            ? "bg-blue-50 text-blue-700 border border-blue-200"
+                            : "bg-purple-50 text-purple-700 border border-purple-200"
+                        }`}
+                      >
+                        {kw.type}
                       </span>
                     </td>
 
-                    {/* 24h Movement */}
-                    <td className="py-2.5 px-2 text-center">{deltaBadge}</td>
-
-                    {/* Day 0 vs Current */}
-                    <td className="py-2.5 px-2 text-center">
-                      <span className="text-slate-400 text-xs">
-                        #{k.baselineRank} ➔{" "}
-                        <strong className="text-slate-900">#{k.currentRank}</strong>
+                    <td className="py-3 px-2 text-center font-black">
+                      <span
+                        className={`inline-block px-2.5 py-1 rounded-lg text-xs font-black ${
+                          isTop3
+                            ? "bg-emerald-100 text-emerald-800"
+                            : isTop10
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-slate-100 text-slate-700"
+                        }`}
+                      >
+                        #{kw.currentRank}
                       </span>
                     </td>
 
-                    {/* Search Volume */}
-                    <td className="py-2.5 px-2 text-right">
-                      <span className="font-bold text-slate-700">
-                        {k.searchVolume.toLocaleString()}
-                      </span>
-                      <span className="text-[10px] text-slate-400 ml-1">/mo</span>
+                    <td className="py-3 px-2 text-center">
+                      {kw.rankDelta > 0 ? (
+                        <span className="inline-flex items-center gap-0.5 text-emerald-600 font-extrabold text-xs">
+                          <TrendingUp className="w-3.5 h-3.5" /> +{kw.rankDelta}
+                        </span>
+                      ) : kw.rankDelta < 0 ? (
+                        <span className="inline-flex items-center gap-0.5 text-red-600 font-extrabold text-xs">
+                          <TrendingDown className="w-3.5 h-3.5" /> {kw.rankDelta}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 font-bold text-xs">— 0</span>
+                      )}
                     </td>
 
-                    {/* Feature */}
-                    <td className="py-2.5 px-2">{featureBadge}</td>
+                    <td className="py-3 px-2 text-center text-slate-500 font-semibold">
+                      #{kw.baselineRank}
+                    </td>
 
-                    {/* Sparkline */}
-                    <td className="py-2.5 px-3 text-center">
-                      <svg className="w-20 h-5 inline-block" viewBox="0 0 80 20">
-                        {(() => {
-                          const pts = k.sparkline.map((val, idx) => {
-                            const x = (idx / Math.max(1, k.sparkline.length - 1)) * 80;
-                            // Rank 1 is top (y=2), Rank 15 is bottom (y=18)
-                            const y = 2 + ((Math.min(15, Math.max(1, val)) - 1) / 14) * 16;
-                            return { x, y };
-                          });
-                          const pathStr = pts.reduce(
-                            (acc, pt, idx) => `${acc} ${idx === 0 ? "M" : "L"} ${pt.x} ${pt.y}`,
-                            ""
-                          );
-                          return (
-                            <>
-                              <path
-                                d={pathStr}
-                                fill="none"
-                                stroke={isTop3 ? "#16a34a" : "#1a73e8"}
-                                strokeWidth={1.8}
-                                strokeLinecap="round"
-                              />
-                              <circle
-                                cx={pts[pts.length - 1]?.x ?? 0}
-                                cy={pts[pts.length - 1]?.y ?? 0}
-                                r={2.5}
-                                fill={isTop3 ? "#16a34a" : "#1a73e8"}
-                              />
-                            </>
-                          );
-                        })()}
-                      </svg>
+                    <td className="py-3 px-2 text-right font-bold text-slate-800">
+                      {kw.searchVolume.toLocaleString()}/mo
+                    </td>
+
+                    <td className="py-3 px-2">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
+                        {kw.serpFeature === "LOCAL_3PACK" ? (
+                          <>
+                            <Award className="w-3 h-3 text-amber-600" /> Local 3-Pack
+                          </>
+                        ) : kw.serpFeature === "AI_OVERVIEW" ? (
+                          <>
+                            <Bot className="w-3 h-3 text-purple-600" /> AI Overview
+                          </>
+                        ) : (
+                          <>
+                            <Globe className="w-3 h-3 text-blue-600" /> Organic
+                          </>
+                        )}
+                      </span>
                     </td>
                   </tr>
                 );

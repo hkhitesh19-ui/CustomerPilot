@@ -86,7 +86,8 @@ model Merchant {
   gbpChecklistItems         GbpChecklistItem[]
   gbpPosts                  GbpPost[]
   gbpAuditReports           GbpAuditReport[]
-  gbpKeywordDailyRanks      GbpKeywordDailyRank[]
+  gbpKeywordDailyRanks      GbpKeywordDailyRank[]
+  trackedKeywords           MerchantTrackedKeyword[]
   // Smart Keyword Control Engine & Grounding JSON Profile
   keywordProfile            String?
   // ---
@@ -1047,6 +1048,27 @@ model GbpKeywordDailyRank {
 
   @@unique([merchantId, keyword, snapshotDate])
   @@index([merchantId, snapshotDate])
+  @@index([merchantId, keywordType])
+}
+
+model MerchantTrackedKeyword {
+  id             String   @id @default(cuid())
+  merchantId     String
+  keyword        String
+  keywordType    String   @default("SEO") // "GEO" | "SEO" | "AEO"
+  targetLocality String?                  // e.g. "Manjalpur", "Eva Mall"
+  targetCity     String   @default("Vadodara")
+  searchVolume   Int      @default(500)
+  serpFeature    String   @default("LOCAL_3PACK") // "LOCAL_3PACK" | "ORGANIC" | "AI_OVERVIEW" | "KNOWLEDGE_PANEL"
+  baselineRank   Int      @default(10)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  merchant       Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@unique([merchantId, keyword])
+  @@index([merchantId, isActive])
   @@index([merchantId, keywordType])
 }
 

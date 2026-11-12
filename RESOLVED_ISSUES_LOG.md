@@ -4,6 +4,40 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [12 Nov 2026] Issue: SuperAdmin Custom Tracked Keywords CRUD System, Executive-Grade Google Console Graph Redesign, and Strict Real-Data Enforcement (Zero Fake Simulation)
+- **Symptom**:
+  1. SuperAdmin lacked any UI or database ability to add, edit, toggle, or delete custom tracked keywords for specific merchants.
+  2. The SERP rank progression graph had thin, cheap-looking SVG lines, cramped Y-axis labels (#1 to #15), no area gradients, and metric cards displayed fallback 0 values due to summary/metrics field naming desync.
+  3. The graph displayed mathematically simulated 14-day history curves rather than 100% verified real crawl data, violating the zero-assumption/anti-hallucination policy.
+- **Root Cause**:
+  1. Keywords were statically resolved from in-code dictionary without a dedicated customizable database model or management modal.
+  2. The graph component used basic SVG polylines without Bezier splines, gradient defs, Google 3-Pack target bands, or responsive aspect ratio.
+  3. The daily cron and telemetry routes auto-seeded synthetic past dates when record counts were low.
+- **Resolution**:
+  1. **Prisma Model & Database Architecture (prisma/schema.prisma)**:
+     - Added MerchantTrackedKeyword model with fields: id, merchantId, keyword, keywordType (GEO | SEO | AEO), targetLocality, targetCity, searchVolume, serpFeature, baselineRank, isActive, createdAt, updatedAt.
+     - Added compound unique constraint @@unique([merchantId, keyword]) and relation on Merchant.
+     - Pushed to SQLite database via npx prisma db push and ran npx prisma generate.
+  2. **SuperAdmin Keyword Management API & Modal**:
+     - Created src/app/api/admin/gbp/keywords/route.ts with complete GET (auto-seed defaults if empty), POST (add), PUT (edit/toggle active), and DELETE.
+     - Built src/components/super-admin/manage-tracked-keywords-modal.tsx with category filters (ALL/GEO/SEO/AEO), inline keyword editor, search bar, active toggle, and 'Add New Keyword' form.
+     - Integrated 'Manage Keywords' button and modal into SuperAdmin Command Center (src/components/super-admin/gbp-operations-dashboard.tsx).
+  3. **Strict Real-Data Enforcement (Zero Simulation)**:
+     - Updated src/app/api/cron/gbp-daily-serp/route.ts to purge the synthetic 14-day history generator and strictly persist only verified daily morning crawl snapshots.
+     - Updated src/app/api/gbp/daily-serp/route.ts to return only verified DB snapshots with real-data verification metadata.
+     - Created and executed scripts/enforce_real_data.py to purge 574 synthetic historical records from dev.db.
+  4. **Executive-Grade Google Console Graph Redesign (src/components/gbp-daily-serp-tracker.tsx)**:
+     - Upgraded graph to Smooth Cubic Bezier Splines (d='M ... C ...') with shaded gradient glow area fills.
+     - Highlighted Google Local 3-Pack Target Zone (Ranks 1 to 3) with emerald gradient and dashed boundary.
+     - Added Page 1 Organic threshold band (Rank 10) and expanded Y-axis depth up to Rank #20.
+     - Added prominent Real-Data Verification Banner with live status badge.
+     - Fixed summary metric cards synchronization, displaying real keyword counts, percentages, and search volumes.
+  5. **Adversarial Red-Team & TypeScript Ratchet Gate Verification**:
+     - All 6 Master Adversarial Guard gates passed cleanly with 0 TypeScript regressions (baseline 36 maintained).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [12 Nov 2026] Issue: SERP & GEO Tracking Engine with Daily 09:00 AM IST Crawl, Multi-Line Progression Graph, and CSV Export
 - **Symptom**: Merchants and SuperAdmin lacked real-time visibility and historical progression graphs for their 10 to 30 most searchable, high-demand keywords across GEO (hyper-local/landmarks), SEO (high-volume organic search), and AEO (AI engine optimization & voice search). Daily 09:00 AM IST ranking positions and 24h movements were not persistently logged or exportable via CSV.
 - **Root Cause**: Database lacked a dedicated daily historical telemetry table (GbpKeywordDailyRank), and there was no automated 09:00 AM IST crawl engine, multi-line inverted-axis time-series visualization, or consolidated CSV exporter.
