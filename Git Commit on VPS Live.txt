@@ -8,22 +8,23 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : b19fef5 (Daily 09:00 AM SERP & GEO Ranking Tracker Engine + Docs)
-Full SHA          : b19fef53b320a43abd8d1f7bc2c3011ec4af2c86
-Parent Commit     : beb7dbce0cee94b9162251f50e11b138ee8489da (SERP & GEO Multi-Line Progression Graph Engine)
+Active Git Commit : 8c02de5 (SuperAdmin Keywords CRUD, Google Console Graph Redesign & Real-Data Enforcement)
+Full SHA          : 8c02de58bbe6169eb60fd25cd6dc114a6f0e7de1
+Parent Commit     : d04fdce (docs: record live vps deployment of b19fef5)
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 12 Nov 2026, 01:31 AM IST
+Deployment Date   : 12 Nov 2026, 09:01 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : docs: append SERP and GEO tracking engine resolution to RESOLVED_ISSUES_LOG.md
+Commit Title      : feat(gbp): add SuperAdmin keywords CRUD modal, executive-grade Google Console graph redesign, and strict real-data crawl enforcement
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
-1. https://customerpilot.in/dashboard/gbp-status         -> HTTP 200/307 (SERP & GEO Daily Ranking Tracker Live)
-2. https://customerpilot.in/api/cron/gbp-daily-serp       -> HTTP 200 (444 keywords updated across 26 merchants)
-3. https://customerpilot.in/super-admin                  -> HTTP 200/307 (Consolidated SERP Scan & CSV Export Live)
-4. https://customerpilot.in                              -> HTTP 200 (Homepage)
-5. https://cakeconnection.in                             -> HTTP 200 (Bakery Portal)
-6. http://187.127.170.36:8080                            -> HTTP 200 (Evolution API Manager v2.2.2)
+1. https://customerpilot.in/dashboard/gbp-status         -> HTTP 200/307 (Executive Google Console Graph, 3-Pack Band & Real Data Live)
+2. https://customerpilot.in/super-admin                  -> HTTP 200/307 (Manage Keywords CRUD Modal Live)
+3. https://customerpilot.in/api/cron/gbp-daily-serp       -> HTTP 200 (Real 09:00 AM Scan, 0 fake history)
+4. https://customerpilot.in/api/admin/gbp/keywords       -> HTTP 200/401 (Keywords CRUD API Live)
+5. https://customerpilot.in                              -> HTTP 200 (Homepage)
+6. https://cakeconnection.in                             -> HTTP 200 (Bakery Portal)
+7. http://187.127.170.36:8080                            -> HTTP 200 (Evolution API Manager v2.2.2)
