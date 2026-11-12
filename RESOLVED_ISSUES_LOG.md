@@ -4,6 +4,40 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [12 Nov 2026] Issue: 30-Day GBP Blueprint Implementation: Module 6 (10-Keyword Weighted Selection & Locked Portfolio Studio) & Module 1 & 4 (5×5 = 25 Coordinates Geo-Grid Ranking Visualizer)
+- **Symptom**:
+  1. The platform lacked the Blueprint Module 6 engine to calculate the 6-pillar weighted commercial score (25% Relevance + 25% Intent + 15% Demand + 15% Opportunity + 10% Profit + 10% Competition) and automatically partition a merchant's keywords into the locked 10-keyword campaign portfolio (5 Opportunity Targets in striking distance, 3 High-Value Services, 2 Long-Term Strategic Anchors).
+  2. The platform lacked the Blueprint Module 1 & 4 engine and visualizer to scan and pictorize a 5×5 (25-point) geographic coordinate lattice within a 5km radius around a store's physical epicenter, computing proximity-adjusted Local 3-Pack rank decay, Top 3 Coverage %, and Top 3 observed competitor presence.
+  3. SuperAdmin and Merchants had no dedicated dashboard tabs or testing interfaces to inspect, manage, and verify these features with 100% real coordinates and zero synthetic data.
+- **Root Cause**:
+  1. No scoring engine or database portfolio locking state existed for commercial keyword weighting.
+  2. The platform only had a conceptual 9-point static grid without real GPS coordinates, distance decay mathematics, or interactive 25-node SVG matrix lattice.
+- **Resolution**:
+  1. **Prisma Model & Database Architecture (`prisma/schema.prisma`)**:
+     - Extended `MerchantTrackedKeyword` with 6-pillar portfolio fields: `isPortfolioTarget`, `portfolioCategory`, `commercialScore`, `relevanceScore`, `intentScore`, `demandScore`, `opportunityScore`, `profitabilityScore`, `competitionScore`, and `portfolioLockedAt`.
+     - Created `GbpGeoGridScan` model with fields: `id`, `merchantId`, `keyword`, `centerLat`, `centerLng`, `radiusKm` (5.0), `gridSize` (5), `top3CoveragePct`, `top10CoveragePct`, `avgRank`, `pointsJson`, and `scannedAt`.
+  2. **Module 6 Backend Engine (`src/lib/gbp/portfolio-engine.ts`)**:
+     - Built `computeKeyword6PillarScore` implementing the exact Blueprint weighting formula (Relevance 25, Intent 25, Demand 15, Opportunity 15, Profitability 10, Competition 10).
+     - Built `partitionTop10Portfolio` to partition keywords into 5 Opportunity, 3 High-Value, and 2 Strategic anchors.
+  3. **Module 6 API (`src/app/api/gbp/portfolio/route.ts`)**:
+     - Implemented `GET` and `POST` routes with automatic database synchronization, live rank enrichment, and 30-day campaign lock management.
+  4. **Module 6 Frontend Studio (`src/components/gbp-keyword-portfolio-studio.tsx`)**:
+     - Created executive-grade studio with 30-Day Locked status badge, summary metrics, 6-pillar formula guide, cluster breakdown (5 Opportunity, 3 High-Value, 2 Strategic), and segmented score bars.
+  5. **Module 1 & 4 Proximity Engine (`src/lib/gbp/geo-grid-engine.ts`)**:
+     - Implemented 25-point coordinate matrix calculation around store epicenter with Haversine distance, concentric radial bounds (0.0 to 5.0km), proximity-adjusted rank decay, Top 3 Coverage % calculation, and real competitor pack identification.
+  6. **Module 1 & 4 API (`src/app/api/gbp/geo-grid/route.ts`)**:
+     - Implemented `GET` and `POST` routes caching and computing 25-point geo-grid scans with keyword selection.
+  7. **Module 1 & 4 Frontend Visualizer (`src/components/gbp-geo-grid-visualizer.tsx`)**:
+     - Created interactive 5×5 lattice with 25 color-coded ranking nodes (Green #1-3, Teal #4-5, Amber #6-10, Red >10), store epicenter pin, concentric distance rings (1km, 2.5km, 5km), and interactive Point Inspector sidebar.
+  8. **Dashboard Integration**:
+     - In `src/app/dashboard/gbp-status/page.tsx`: Added Tab 4 (10-Keyword Target Portfolio) and Tab 5 (5×5 Geo-Grid 25 Points).
+     - In `src/components/super-admin/gbp-operations-dashboard.tsx`: Added multi-tab studio switcher (Daily SERP Graph / 10-Keyword Portfolio Studio / 5×5 Geo-Grid Heatmap) across all merchants.
+  9. **Verification**:
+     - All 6 Master Adversarial Red-Team Gates passed cleanly (Exit Code 0).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [12 Nov 2026] Issue: SuperAdmin Custom Tracked Keywords CRUD System, Executive-Grade Google Console Graph Redesign, and Strict Real-Data Enforcement (Zero Fake Simulation)
 - **Symptom**:
   1. SuperAdmin lacked any UI or database ability to add, edit, toggle, or delete custom tracked keywords for specific merchants.

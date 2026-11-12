@@ -21,8 +21,10 @@ import { CustomerPilotSelfGbpModal } from "./customerpilot-self-gbp-modal"
 import { LlmQuotaMonitor } from "./llm-quota-monitor"
 import { GbpAuditReportsModal } from "./gbp-audit-reports-modal"
 import { GbpDailySerpTracker } from "@/components/gbp-daily-serp-tracker"
+import { GbpKeywordPortfolioStudio } from "@/components/gbp-keyword-portfolio-studio"
+import { GbpGeoGridVisualizer } from "@/components/gbp-geo-grid-visualizer"
 import { ManageTrackedKeywordsModal } from "./manage-tracked-keywords-modal"
-import { Camera, FileSpreadsheet, Sliders } from "lucide-react"
+import { Camera, FileSpreadsheet, Sliders, Target, Crosshair } from "lucide-react"
 
 type ChecklistItem = {
   id: string
@@ -106,6 +108,7 @@ export function GbpOperationsDashboard() {
   const [categoriesOpen, setCategoriesOpen] = useState(false)
   const [selfGbpOpen, setSelfGbpOpen] = useState(false)
   const [selectedSerpMerchantId, setSelectedSerpMerchantId] = useState<string>("cmtymavfx0002kx008lbfvp57")
+  const [serpViewMode, setSerpViewMode] = useState<"SERP_GRAPH" | "PORTFOLIO" | "GEOGRID">("SERP_GRAPH")
   const [batchScanning, setBatchScanning] = useState(false)
   const [manageKeywordsOpen, setManageKeywordsOpen] = useState(false)
 
@@ -406,15 +409,76 @@ export function GbpOperationsDashboard() {
           </div>
         </div>
 
-        {/* Embedded Live SERP Tracker for Selected Merchant */}
+        {/* SuperAdmin View Switcher: Graph vs Portfolio Studio vs 5x5 Geo-Grid */}
+        <div className="flex items-center gap-2 border-b border-slate-800 pb-3 flex-wrap">
+          <button
+            onClick={() => setSerpViewMode("SERP_GRAPH")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              serpViewMode === "SERP_GRAPH"
+                ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                : "text-slate-400 hover:text-white hover:bg-slate-800"
+            }`}
+          >
+            <BarChart3 className="w-3.5 h-3.5" />
+            1. Daily SERP Progression Graph
+          </button>
+
+          <button
+            onClick={() => setSerpViewMode("PORTFOLIO")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              serpViewMode === "PORTFOLIO"
+                ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                : "text-slate-400 hover:text-white hover:bg-slate-800"
+            }`}
+          >
+            <Target className="w-3.5 h-3.5 text-amber-400" />
+            2. 10-Keyword Target Portfolio Studio (Module 6)
+          </button>
+
+          <button
+            onClick={() => setSerpViewMode("GEOGRID")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              serpViewMode === "GEOGRID"
+                ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30"
+                : "text-slate-400 hover:text-white hover:bg-slate-800"
+            }`}
+          >
+            <Crosshair className="w-3.5 h-3.5 text-emerald-400" />
+            3. 5×5 Geo-Grid Heatmap (25 Points) (Module 1 &amp; 4)
+          </button>
+        </div>
+
+        {/* Embedded Live Studio for Selected Merchant */}
         <div className="bg-white rounded-xl p-4 shadow-inner">
-          <GbpDailySerpTracker
-            merchantId={selectedSerpMerchantId}
-            merchantName={
-              merchants.find((m) => m.id === selectedSerpMerchantId)?.name ||
-              "Cake Connection"
-            }
-          />
+          {serpViewMode === "SERP_GRAPH" && (
+            <GbpDailySerpTracker
+              merchantId={selectedSerpMerchantId}
+              merchantName={
+                merchants.find((m) => m.id === selectedSerpMerchantId)?.name ||
+                "Cake Connection"
+              }
+            />
+          )}
+
+          {serpViewMode === "PORTFOLIO" && (
+            <GbpKeywordPortfolioStudio
+              merchantId={selectedSerpMerchantId}
+              merchantName={
+                merchants.find((m) => m.id === selectedSerpMerchantId)?.name ||
+                "Cake Connection"
+              }
+            />
+          )}
+
+          {serpViewMode === "GEOGRID" && (
+            <GbpGeoGridVisualizer
+              merchantId={selectedSerpMerchantId}
+              merchantName={
+                merchants.find((m) => m.id === selectedSerpMerchantId)?.name ||
+                "Cake Connection"
+              }
+            />
+          )}
         </div>
       </div>
 

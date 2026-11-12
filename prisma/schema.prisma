@@ -87,7 +87,8 @@ model Merchant {
   gbpPosts                  GbpPost[]
   gbpAuditReports           GbpAuditReport[]
   gbpKeywordDailyRanks      GbpKeywordDailyRank[]
-  trackedKeywords           MerchantTrackedKeyword[]
+  trackedKeywords           MerchantTrackedKeyword[]
+  geoGridScans              GbpGeoGridScan[]
   // Smart Keyword Control Engine & Grounding JSON Profile
   keywordProfile            String?
   // ---
@@ -1052,24 +1053,56 @@ model GbpKeywordDailyRank {
 }
 
 model MerchantTrackedKeyword {
-  id             String   @id @default(cuid())
-  merchantId     String
-  keyword        String
-  keywordType    String   @default("SEO") // "GEO" | "SEO" | "AEO"
-  targetLocality String?                  // e.g. "Manjalpur", "Eva Mall"
-  targetCity     String   @default("Vadodara")
-  searchVolume   Int      @default(500)
-  serpFeature    String   @default("LOCAL_3PACK") // "LOCAL_3PACK" | "ORGANIC" | "AI_OVERVIEW" | "KNOWLEDGE_PANEL"
-  baselineRank   Int      @default(10)
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                 String    @id @default(cuid())
+  merchantId         String
+  keyword            String
+  keywordType        String    @default("SEO") // "GEO" | "SEO" | "AEO"
+  targetLocality     String?                   // e.g. "Manjalpur", "Eva Mall"
+  targetCity         String    @default("Vadodara")
+  searchVolume       Int       @default(500)
+  serpFeature        String    @default("LOCAL_3PACK") // "LOCAL_3PACK" | "ORGANIC" | "AI_OVERVIEW" | "KNOWLEDGE_PANEL"
+  baselineRank       Int       @default(10)
+  isActive           Boolean   @default(true)
+  // Module 6: 10-Keyword Weighted Portfolio
+  isPortfolioTarget  Boolean   @default(false)
+  portfolioCategory  String?   // "OPPORTUNITY" | "HIGH_VALUE" | "STRATEGIC"
+  commercialScore    Float     @default(0) // 0 to 100
+  relevanceScore     Int       @default(25) // 0-25 (25%)
+  intentScore        Int       @default(25) // 0-25 (25%)
+  demandScore        Int       @default(15) // 0-15 (15%)
+  opportunityScore   Int       @default(15) // 0-15 (15%)
+  profitabilityScore Int       @default(10) // 0-10 (10%)
+  competitionScore   Int       @default(10) // 0-10 (10%)
+  portfolioLockedAt  DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
-  merchant       Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  merchant           Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
 
   @@unique([merchantId, keyword])
   @@index([merchantId, isActive])
   @@index([merchantId, keywordType])
+  @@index([merchantId, isPortfolioTarget])
+}
+
+model GbpGeoGridScan {
+  id               String   @id @default(cuid())
+  merchantId       String
+  keyword          String
+  centerLat        Float    @default(22.2785)
+  centerLng        Float    @default(73.1950)
+  radiusKm         Float    @default(5.0)
+  gridSize         Int      @default(5) // 5x5 = 25 points
+  top3CoveragePct  Float    @default(0) // e.g. 64%
+  top10CoveragePct Float    @default(0) // e.g. 88%
+  avgRank          Float    @default(0)
+  pointsJson       String   // JSON array string of 25 coordinate points
+  scannedAt        DateTime @default(now())
+
+  merchant         Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@index([merchantId, keyword])
+  @@index([merchantId, scannedAt])
 }
 
 model ReviewVerificationLog {

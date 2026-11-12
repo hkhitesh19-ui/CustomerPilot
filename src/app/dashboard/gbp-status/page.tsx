@@ -6,7 +6,7 @@ import {
   MapPin, TrendingUp, Rocket, CheckCircle2, Circle, Clock,
   AlertTriangle, Star, Zap, BarChart3, Loader2, ArrowUpRight,
   Shield, Phone, Navigation, Sparkles, Calendar, Edit3, RotateCcw,
-  Check, X, Compass, Palette, Camera
+  Check, X, Compass, Palette, Camera, Target, Crosshair
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +17,8 @@ import { GbpPostCardItem } from "@/components/gbp-post-card-item";
 import { Gbp30DayMasterChecklist } from "@/components/super-admin/gbp-30day-master-checklist";
 import { GbpAuditReportsTab } from "@/components/gbp-audit-reports-tab";
 import { GbpDailySerpTracker } from "@/components/gbp-daily-serp-tracker";
+import { GbpKeywordPortfolioStudio } from "@/components/gbp-keyword-portfolio-studio";
+import { GbpGeoGridVisualizer } from "@/components/gbp-geo-grid-visualizer";
 
 type GbpStatus = {
   merchant: {
@@ -87,7 +89,7 @@ export default function GbpStatusPage() {
   const [report, setReport] = useState<GbpStatus["report"] | null>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"posts" | "analytics" | "sprint" | "reports">("reports");
+  const [activeTab, setActiveTab] = useState<"posts" | "analytics" | "portfolio" | "geogrid" | "sprint" | "reports">("reports");
   const router = useRouter();
 
   const reloadPosts = async (merchantId: string) => {
@@ -257,6 +259,30 @@ export default function GbpStatusPage() {
           </button>
 
           <button
+            onClick={() => setActiveTab("portfolio")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              activeTab === "portfolio"
+                ? "bg-white text-blue-600 shadow-xs border border-slate-200/80"
+                : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+            }`}
+          >
+            <Target className="w-3.5 h-3.5" />
+            4. 10-Keyword Target Portfolio
+          </button>
+
+          <button
+            onClick={() => setActiveTab("geogrid")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              activeTab === "geogrid"
+                ? "bg-white text-blue-600 shadow-xs border border-slate-200/80"
+                : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+            }`}
+          >
+            <Crosshair className="w-3.5 h-3.5" />
+            5. 5×5 Geo-Grid (25 Points)
+          </button>
+
+          <button
             onClick={() => setActiveTab("sprint")}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
               activeTab === "sprint"
@@ -265,7 +291,7 @@ export default function GbpStatusPage() {
             }`}
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
-            4. Sprint &amp; Checklist
+            6. Sprint &amp; Checklist
           </button>
         </div>
       </div>
@@ -329,7 +355,23 @@ export default function GbpStatusPage() {
         </div>
       )}
 
-      {/* TAB 4: 10-Day Sprint & SOP Checklist */}
+      {/* TAB 4: 10-Keyword Weighted Selection & Locked Portfolio Studio (Module 6) */}
+      {activeTab === "portfolio" && (
+        <GbpKeywordPortfolioStudio
+          merchantId={merchant.id}
+          merchantName={merchant.name}
+        />
+      )}
+
+      {/* TAB 5: 5x5 Geo-Grid 25 Coordinates Ranking Visualizer (Module 1 & 4) */}
+      {activeTab === "geogrid" && (
+        <GbpGeoGridVisualizer
+          merchantId={merchant.id}
+          merchantName={merchant.name}
+        />
+      )}
+
+      {/* TAB 6: 10-Day Sprint & SOP Checklist */}
       {activeTab === "sprint" && (
         <div className="space-y-5">
           {/* 30-Day Master Execution Sprint Checklist */}
