@@ -4,6 +4,31 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [12 Nov 2026] Issue: Google Analytics (GA4/GTM-TDR2SKTL) Container Script & Google Search Console Meta Verification Integration
+- **Symptom**: 
+  1. Google Analytics setup wizard on `analytics.google.com` was pending manual installation for Google tag container `GTM-TDR2SKTL` (bundling GA4 measurement ID `G-7MQSBHPXL1`).
+  2. While Google Search Console was verified for domain `customerpilot.in` via DNS TXT record (`google-site-verification=3GA2acCHJSCk7exs73s6teQ6MCcR88yMYwU5sWaw1YU`), the site lacked HTML verification meta tags and GTM container integration in root layout.
+  3. Strict Content-Security-Policy (CSP) in `next.config.ts` blocked external scripts and connections from `googletagmanager.com` and `google-analytics.com`.
+- **Root Cause**: 
+  1. `src/app/layout.tsx` did not include Google tag container script (`gtm.js?id=GTM-TDR2SKTL`), inline dataLayer/gtag config, nor `<noscript>` iframe.
+  2. Next.js metadata lacked `verification.google` entry matching the domain's TXT verification token.
+  3. `next.config.ts` CSP lacked whitelisting for Google Tag Manager and Google Analytics domains across `script-src`, `connect-src`, `img-src`, and `frame-src`.
+- **Resolution**:
+  1. **Content Security Policy (`next.config.ts`)**:
+     - Whitelisted `https://www.googletagmanager.com`, `https://*.googletagmanager.com`, and `https://*.google-analytics.com` across `script-src`.
+     - Whitelisted `https://*.google-analytics.com`, `https://*.analytics.google.com`, and `https://*.googletagmanager.com` across `connect-src`.
+     - Whitelisted `https://*.google-analytics.com` and `https://*.googletagmanager.com` in `img-src` and `frame-src`.
+  2. **Root Layout Integration (`src/app/layout.tsx`)**:
+     - Added `NEXT_PUBLIC_GTM_ID || "GTM-TDR2SKTL"` and `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "3GA2acCHJSCk7exs73s6teQ6MCcR88yMYwU5sWaw1YU"`.
+     - Added `verification: { google: GOOGLE_VERIFICATION_TOKEN }` into Next.js `metadata`.
+     - Inserted official Google tag async script and inline `dataLayer`/`gtag` initialization into `<head>`.
+     - Added `<noscript>` GTM fallback iframe into `<body>`.
+  3. **Verification**:
+     - All 6 Master Adversarial Red-Team Gates passed cleanly (Exit Code 0).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [12 Nov 2026] Issue: 30-Day GBP Blueprint Implementation: Module 6 (10-Keyword Weighted Selection & Locked Portfolio Studio) & Module 1 & 4 (5×5 = 25 Coordinates Geo-Grid Ranking Visualizer)
 - **Symptom**:
   1. The platform lacked the Blueprint Module 6 engine to calculate the 6-pillar weighted commercial score (25% Relevance + 25% Intent + 15% Demand + 15% Opportunity + 10% Profit + 10% Competition) and automatically partition a merchant's keywords into the locked 10-keyword campaign portfolio (5 Opportunity Targets in striking distance, 3 High-Value Services, 2 Long-Term Strategic Anchors).

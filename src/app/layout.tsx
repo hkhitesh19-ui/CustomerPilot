@@ -11,6 +11,8 @@ const inter = {
 };
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.in";
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "GTM-TDR2SKTL";
+const GOOGLE_VERIFICATION_TOKEN = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "3GA2acCHJSCk7exs73s6teQ6MCcR88yMYwU5sWaw1YU";
 
 export const viewport = {
   themeColor: "#ffffff",
@@ -24,6 +26,9 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   manifest: "/manifest.json",
+  verification: {
+    google: GOOGLE_VERIFICATION_TOKEN,
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -115,10 +120,34 @@ export default function RootLayout({
       <head>
         <SoftwareApplicationJsonLd />
         <OrganizationJsonLd />
+        {/* Google Tag (Google Analytics GA4 & Google Tag Manager) */}
+        <script
+          async
+          src={`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`}
+        />
+        <script
+          id="google-tag-manager"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${GTM_ID}');
+            `,
+          }}
+        />
       </head>
       <body
         className={`${inter.variable} ${inter.className} font-sans antialiased bg-background text-foreground`}
       >
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
         <Providers>
           {children}
           <WhatsAppFloatingWidget />
