@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : e4d6355 (Google Analytics GA4/GTM-TDR2SKTL & GSC Meta Verification + CSP Update)
-Full SHA          : e4d6355c4de4a20b5c3115eb166710f19bb6e1ee
-Parent Commit     : 7759d7a (Module 6 10-Keyword Portfolio Studio & Module 1 & 4 5x5 Geo-Grid Heatmap)
+Active Git Commit : 2933176 (Google Post Live Publishing & Creative Fix + OAuth Optimization)
+Full SHA          : 2933176000d8c74ce643a66e743d23fbc9b0837a
+Parent Commit     : d514197 (Google OAuth Resolution & 1st Live Google Post Publishing)
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 12 Nov 2026, 10:37 AM IST
+Deployment Date   : 13 Nov 2026, 11:05 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(seo): integrate Google Analytics (GTM-TDR2SKTL / GA4) container, GSC meta verification tag, and update CSP headers
+Commit Title      : docs: document creative replacement on live google posts
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -22,10 +22,10 @@ Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 O
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
 1. https://customerpilot.in/                                 -> HTTP 200 (Google Tag GTM-TDR2SKTL, GA4 G-7MQSBHPXL1, GSC Verification Meta, CSP Whitelist)
-2. https://customerpilot.in/dashboard/gbp-status             -> HTTP 200/307 (Tab 4: 10-Keyword Portfolio Studio & Tab 5: 5x5 Geo-Grid 25 Points)
-3. https://customerpilot.in/super-admin                      -> HTTP 200/307 (Cross-Merchant Studio: Graph / Portfolio Studio / 5x5 Geo-Grid)
-4. https://customerpilot.in/api/gbp/portfolio                -> HTTP 200 (6-Pillar Weighted Portfolio Engine & 30-Day Lock API)
-5. https://customerpilot.in/api/gbp/geo-grid                 -> HTTP 200 (25-Point Proximity Geo-Grid & Competitor Pack API)
-6. https://customerpilot.in/sitemap.xml                      -> HTTP 200 (Sitemap Index)
-7. https://customerpilot.in/robots.txt                       -> HTTP 200 (Robots Rules)
+2. https://customerpilot.in/dashboard/gbp-status             -> HTTP 200/307 (Step 0 Agency Manager Access Banner, 1-Click OAuth, 4-Post Queue)
+3. https://customerpilot.in/super-admin                      -> HTTP 200/307 (GBP Operations Dashboard, WhatsApp Reminder Dispatch)
+4. https://customerpilot.in/api/google-business/oauth        -> HTTP 302/200 (Google Business Profile OAuth with consent prompt)
+5. https://customerpilot.in/api/gbp/send-access-reminder     -> HTTP 200 (Central WhatsApp Agency Reminder)
+6. https://customerpilot.in/cake_connection_friday_post.png  -> HTTP 200 (Live Belgian Chocolate Truffle Cake Creative)
+7. https://customerpilot.in/customerpilot_review_standee_tabletop.png -> HTTP 200 (Live AI Review Standee Creative)
 8. http://187.127.170.36:8080                                -> HTTP 200 (Evolution API Manager v2.2.2)
