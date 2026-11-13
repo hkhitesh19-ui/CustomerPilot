@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 06407b7 (feat(qr-booster): create /whatsapp-group-booster landing page, update slug to /dashboard/DynamicQRStudio, add sidebar links, and auto-provision QR)
-Full SHA          : 06407b7a12c04e4e459aef9abee891d660b88f4e
-Parent Commit     : 438d13d
+Active Git Commit : 9f324e6 (feat(qr-studio-booster): overhaul Dynamic QR Studio with 4-tab merchant suite, resolve wg slug mismatch, add booster leads CRM, and public wg route)
+Full SHA          : 9f324e62e7e7441d76694e912c39eb5dbfe463d8
+Parent Commit     : fdc0e2c
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 13 Nov 2026, 10:28 PM IST
+Deployment Date   : 14 Nov 2026, 03:35 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(qr-booster): create /whatsapp-group-booster landing page, update slug to /dashboard/DynamicQRStudio, add sidebar links, and auto-provision QR
+Commit Title      : feat(qr-studio-booster): overhaul Dynamic QR Studio with 4-tab merchant suite, resolve wg slug mismatch, add booster leads CRM, and public wg route
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -23,11 +23,11 @@ Verified Endpoints on Live VPS:
 ----------------------------------------------------------
 1. https://customerpilot.in/                                 -> HTTP 200 (Homepage navbar links to /whatsapp-group-booster & /dashboard/DynamicQRStudio)
 2. https://customerpilot.in/whatsapp-group-booster           -> HTTP 200 (Dedicated High-Converting Product Landing Page, Verified)
-3. https://customerpilot.in/dashboard/DynamicQRStudio        -> HTTP 200 (Dynamic QR Studio & WhatsApp Group Engine with active QR image, verified)
+3. https://customerpilot.in/dashboard/DynamicQRStudio        -> HTTP 200 (Dynamic QR Studio with 4-tab merchant suite: Standee preview, Mode switch, Leads CRM, Decision guide)
 4. https://customerpilot.in/dashboard/qr-manager             -> HTTP 307/308 Redirect (Auto-redirects to /dashboard/DynamicQRStudio)
-5. https://customerpilot.in/dashboard/billing                -> HTTP 200 (Smart POS Billing & WhatsApp Invoicing Interface)
-6. https://customerpilot.in/wg/cake-connection               -> HTTP 200 (Customer Lead Capture Form & Group Booster Redirect)
-7. https://customerpilot.in/pricing                          -> HTTP 200 (Pricing Studio with 6 New Canonical Plans)
-8. https://customerpilot.in/api/qr-codes                     -> HTTP 200 (Dynamic QR CRUD & Auto-provisioning API)
-9. https://customerpilot.in/api/invoices                     -> HTTP 200 (POS Smart Invoicing API)
+5. https://customerpilot.in/dashboard/billing                -> HTTP 200 (Smart POS Billing & WhatsApp Invoicing Interface with 1-click fallback)
+6. https://customerpilot.in/wg/cake-connection               -> HTTP 200 (Cake Connection VIP Community Lead Capture Form, verified)
+7. https://customerpilot.in/api/wg/cake-connection           -> HTTP 302 / JSON (Multi-tier slug resolution & scan tracking, public route)
+8. https://customerpilot.in/api/wg/cake-connection/register  -> HTTP 200 (Public walk-in customer lead capture to CRM)
+9. https://customerpilot.in/api/qr-codes/leads               -> HTTP 200 (Booster CRM leads list & CSV export API)
 10. http://187.127.170.36:8080                               -> HTTP 200 (Evolution API Manager v2.2.2)

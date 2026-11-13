@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast"
 import {
   QrCode as QrIcon, Download, ExternalLink, RefreshCw, Smartphone, Monitor,
   Share2, CheckCircle2, AlertCircle, Sparkles, Edit3, Save, Copy, Eye, Zap,
-  ShieldCheck, Printer, Users, HelpCircle, FileSpreadsheet, ArrowRight, MessageSquare, Check, Layers
+  ShieldCheck, Printer, Users, HelpCircle, FileSpreadsheet, ArrowRight, MessageSquare, Check, Layers, Store
 } from "lucide-react"
 
 export default function DynamicQRStudioPage() {
