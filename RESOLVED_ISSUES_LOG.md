@@ -4,6 +4,32 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [13 Nov 2026] Issue: Client-Side Hydration Crash (Error Boundary) on Homepage & VPS Database Column Sync
+- **Symptom**: 
+  - Opening `https://customerpilot.in/` displayed the Next.js Error Boundary screen: `"Something went wrong - The page encountered an unexpected issue while loading data. Please try reloading or head over to settings."` with Reload, Settings, and Dashboard buttons.
+  - Background PM2 logs on live VPS (`187.127.170.36`) showed recurring Prisma errors: `"The column main.WhatsAppMessage.invoiceId does not exist in the current database."`
+- **Root Cause**: 
+  1. In `src/app/page.tsx`, `<QrCode ... />` and `<Users ... />` icons were rendered in the newly added Dynamic QR and WhatsApp Group Booster navigation/cards. However, `Users` was not imported from `lucide-react`, and `QrCode` was imported as an alias `QrIcon` (`import { ..., QrCode as QrIcon } from "lucide-react"`). During client-side hydration, React encountered `React.createElement(undefined)` for both components and threw `Element type is invalid: expected a string or class/function but got: undefined`, which triggered `src/app/error.tsx`.
+  2. On the VPS SQLite database (`/var/www/CustomerPilot/prisma/dev.db`), `npx prisma db push` had not been executed after adding the new `Invoice` relation (`WhatsAppMessage.invoiceId`) and new models (`Invoice`, `QrCode`, etc.), causing background automation cron jobs to throw `P2022` database column errors.
+- **Resolution**:
+  1. **Fixed Icon Imports in `src/app/page.tsx`**:
+     - Added `Users` to the `lucide-react` import statement.
+     - Changed `<QrCode className=... />` to `<QrIcon className=... />` matching the existing import alias.
+     - Verified zero missing JSX identifiers across the entire codebase.
+  2. **VPS Database & Client Synchronization**:
+     - Created an automatic timestamped backup of the VPS SQLite database (`dev.db.backup_<timestamp>`).
+     - Executed `npx prisma db push` on the VPS to add `WhatsAppMessage.invoiceId` and create all 6 new database tables (`Invoice`, `InvoiceItem`, `QrCode`, `QrDestination`, `QrScanEvent`, `CustomerConsent`) with zero data loss.
+     - Regenerated Prisma Client on VPS via `npx prisma generate`.
+     - Built Next.js standalone on VPS via `npm run build` and synced static assets.
+     - Flushed PM2 logs and reloaded `customerpilot-web`.
+  3. **Verification**:
+     - Ran Playwright headless browser check on `https://customerpilot.in/`, `https://customerpilot.in/pricing`, and `https://customerpilot.in/wg/cake-connection` - all returned HTTP 200 with `Has Error Boundary: false`.
+     - Confirmed live homepage screenshot rendering cleanly with 0 error overlays.
+     - Verified VPS PM2 logs show 0 Prisma errors and cron automation running smoothly.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [13 Nov 2026] Feature Implementation: 3 New Services Suite — Dynamic QR Studio, WhatsApp Group Booster & Smart POS Invoicing Pro
 - **Symptom**: 
   1. The platform lacked self-hosted dynamic QR generation for WhatsApp group community growth, forcing reliance on paid 3rd-party services (QR Tiger, ME-QR).

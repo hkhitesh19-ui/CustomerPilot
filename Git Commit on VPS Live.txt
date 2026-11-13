@@ -8,24 +8,25 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 9b84c9c (3 New Services Suite: Dynamic QR Studio, WhatsApp Group Booster & Smart POS Invoicing Pro)
-Full SHA          : 9b84c9c07cd9a4edcc9bb8a846a81aba9811110a
-Parent Commit     : 5bfc09c
+Active Git Commit : d8f18fc (fix(homepage): resolve undefined QrCode and Users icon imports causing client error boundary crash)
+Full SHA          : d8f18fcc9cc6701b0a88c45a08da8e6d7de70257
+Parent Commit     : 3897e93
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 13 Nov 2026, 09:30 PM IST
+Deployment Date   : 13 Nov 2026, 09:52 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat: 3 new services suite - Dynamic QR Studio, WhatsApp Group Booster & Smart POS Billing Pro
+Commit Title      : fix(homepage): resolve undefined QrCode and Users icon imports causing client error boundary crash
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
-1. https://customerpilot.in/                                 -> HTTP 200 (Homepage with 3 New Services in Navbar, Mobile Menu, Features Grid, Footer)
+1. https://customerpilot.in/                                 -> HTTP 200 (Homepage live & healthy, Error Boundary eliminated, Playwright verified)
 2. https://customerpilot.in/pricing                          -> HTTP 200 (Pricing Studio with 6 New Canonical Plans)
 3. https://customerpilot.in/dashboard/qr-manager             -> HTTP 200/307 (Dynamic QR Studio Dashboard & Destination Controller)
 4. https://customerpilot.in/dashboard/billing                -> HTTP 200/307 (Smart POS Billing & WhatsApp Invoicing Interface)
-5. https://customerpilot.in/api/qr-codes                     -> HTTP 200 (Dynamic QR CRUD API)
-6. https://customerpilot.in/api/invoices                     -> HTTP 200 (POS Smart Invoicing API)
-7. https://customerpilot.in/super-admin                      -> HTTP 200/307 (SuperAdmin Subscriptions & Fleet Operations)
-8. http://187.127.170.36:8080                                -> HTTP 200 (Evolution API Manager v2.2.2)
+5. https://customerpilot.in/wg/cake-connection               -> HTTP 200 (WhatsApp Community Booster & Consent Capture)
+6. https://customerpilot.in/api/qr-codes                     -> HTTP 200 (Dynamic QR CRUD API)
+7. https://customerpilot.in/api/invoices                     -> HTTP 200 (POS Smart Invoicing API)
+8. https://customerpilot.in/super-admin                      -> HTTP 200/307 (SuperAdmin Subscriptions & Fleet Operations)
+9. http://187.127.170.36:8080                                -> HTTP 200 (Evolution API Manager v2.2.2)
