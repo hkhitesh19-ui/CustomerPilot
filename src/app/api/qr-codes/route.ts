@@ -2,10 +2,15 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { generateSlug } from "@/lib/qr-engine"
 import { generateBrandedQRDataUrl } from "@/lib/branded-qr"
+import { getAuthenticatedMerchant } from "@/lib/api"
 
 export async function GET(req: NextRequest) {
   try {
-    const merchantId = req.headers.get("x-merchant-id") || req.nextUrl.searchParams.get("merchantId")
+    let merchantId = req.headers.get("x-merchant-id") || req.nextUrl.searchParams.get("merchantId")
+    if (!merchantId) {
+      const authM = await getAuthenticatedMerchant()
+      merchantId = authM?.id || null
+    }
     if (!merchantId) {
       return NextResponse.json({ error: "Unauthorized: Merchant ID required" }, { status: 401 })
     }
@@ -75,7 +80,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const merchantId = req.headers.get("x-merchant-id")
+    let merchantId = req.headers.get("x-merchant-id")
+    if (!merchantId) {
+      const authM = await getAuthenticatedMerchant()
+      merchantId = authM?.id || null
+    }
     if (!merchantId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }

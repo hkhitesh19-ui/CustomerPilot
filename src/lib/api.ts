@@ -1,13 +1,28 @@
 // CustomerPilot V5 — API helpers
 import { db } from "@/lib/db"
-
-import { headers } from "next/headers"
+import { headers, cookies } from "next/headers"
+import { jwtVerify } from "jose"
+import { getJwtSecret } from "@/lib/jwt-secret"
 
 export async function getAuthenticatedMerchant() {
   try {
     const headerStore = await headers()
     let merchantId = headerStore.get('x-merchant-id')
-    const userRole = headerStore.get('x-user-role')
+    let userRole = headerStore.get('x-user-role')
+
+    if (!merchantId) {
+      try {
+        const cookieStore = await cookies()
+        const token = cookieStore.get('token')?.value
+        if (token) {
+          const { payload } = await jwtVerify(token, new TextEncoder().encode(getJwtSecret()))
+          merchantId = (payload.merchantId as string) || null
+          userRole = (payload.role as string) || null
+        }
+      } catch {
+        // Token invalid or absent
+      }
+    }
 
     if (merchantId && merchantId !== 'admin_merchant') {
       const merchant = await db.merchant.findUnique({ where: { id: merchantId } })

@@ -468,7 +468,7 @@ export default function Home() {
 
                   {/* Utility: Free Tool */}
                   {/* Service 6: Dynamic QR Studio */}
-                  <Link href="/dashboard/qr-manager" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                  <Link href="/dashboard/DynamicQRStudio" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
                     <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
                       <span className="flex items-center gap-1.5"><QrIcon className="w-3.5 h-3.5 text-emerald-600" /> Dynamic QR Studio</span>
                       <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">₹100/mo</span>
@@ -477,7 +477,7 @@ export default function Home() {
                   </Link>
 
                   {/* Service 7: WhatsApp Group Booster */}
-                  <Link href="/pricing" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                  <Link href="/whatsapp-group-booster" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
                     <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
                       <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-teal-600" /> WhatsApp Group Booster</span>
                       <span className="text-[10px] bg-teal-50 text-teal-700 font-bold px-1.5 py-0.5 rounded-md">₹299/mo</span>
@@ -615,13 +615,13 @@ export default function Home() {
 
               {/* Utility: Free Tool */}
               {/* Service 6: Dynamic QR Studio */}
-                <Link href="/dashboard/qr-manager" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                <Link href="/dashboard/DynamicQRStudio" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
                   <span className="flex items-center gap-2"><QrIcon className="w-4 h-4 text-emerald-600" /> Dynamic QR Studio</span>
                   <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">₹100/mo</span>
                 </Link>
 
                 {/* Service 7: WhatsApp Group Booster */}
-                <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                <Link href="/whatsapp-group-booster" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
                   <span className="flex items-center gap-2"><Users className="w-4 h-4 text-teal-600" /> WhatsApp Group Booster</span>
                   <span className="text-[10px] bg-teal-50 text-teal-700 font-bold px-1.5 py-0.5 rounded-md">₹299/mo</span>
                 </Link>
@@ -1484,7 +1484,7 @@ export default function Home() {
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> PNG, SVG &amp; Print-Ready PDF Downloads</li>
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Daily &amp; Monthly Scan Analytics</li>
               </ul>
-              <Link href="/dashboard/qr-manager" className="mt-5 w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+              <Link href="/dashboard/DynamicQRStudio" className="mt-5 w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
                 <span>Manage Dynamic QRs</span> <span>→</span>
               </Link>
             </div>
@@ -1510,7 +1510,7 @@ export default function Home() {
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 95%+ Community Join Conversion</li>
                 <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Integrated Customer Spend Ledger</li>
               </ul>
-              <Link href="/pricing" className="mt-5 w-full py-3 px-4 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+              <Link href="/whatsapp-group-booster" className="mt-5 w-full py-3 px-4 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
                 <span>Explore Group Booster</span> <span>→</span>
               </Link>
             </div>
@@ -2060,8 +2060,8 @@ export default function Home() {
             <div className="space-y-3">
               <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Product Services</h4>
               <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
-                <li><Link href="/dashboard/qr-manager" className="hover:text-emerald-400 transition-colors">🔲 Dynamic QR Studio (Self-Hosted)</Link></li>
-                  <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">👥 WhatsApp Group Booster & Lead Capture</Link></li>
+                <li><Link href="/dashboard/DynamicQRStudio" className="hover:text-emerald-400 transition-colors">🔲 Dynamic QR Studio (Self-Hosted)</Link></li>
+                  <li><Link href="/whatsapp-group-booster" className="hover:text-emerald-400 transition-colors">👥 WhatsApp Group Booster & Lead Capture</Link></li>
                   <li><Link href="/dashboard/billing" className="hover:text-emerald-400 transition-colors">🧾 Smart POS Billing & WhatsApp Invoices</Link></li>
                   <li><Link href="/smart-digital-business-card" className="hover:text-emerald-400 transition-colors">🪪 Smart Digital Business Card</Link></li>
                 <li><Link href="/whatsapp-digital-loyalty-card" className="hover:text-emerald-400 transition-colors">🎁 Digital Loyalty &amp; Stamps</Link></li>
