@@ -6492,3 +6492,18 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   4. **Adversarial Red-Team Gate Verification**:
      - Ran `node scripts/run_adversarial_guard.js` — all 6 security and mathematical gates passed cleanly.
 - **Status**: ✅ Resolved and Verified Locally.
+
+---
+## [13 Nov 2026] Issue: Google Cloud OAuth 400 Access Blocked & 1st Live Google Post Auto-Publishing Unblocked
+- **Symptom**: Merchants and Admin attempting to connect Google Business Profile via OAuth were encountering Google Error 400 (Malformed Request / Access Blocked) screen, and background zero-touch auto-publishing of Google Posts was stalled.
+- **Root Cause**: 
+  1. Google Cloud OAuth Consent Screen was configured in "In production" mode without formal App Verification for sensitive scope `https://www.googleapis.com/auth/business.manage`, hiding the Test Users list and causing Google's auth servers to reject consent.
+  2. The OAuth initiation query parameter had `prompt=consent+select_account` instead of standard `prompt=consent`.
+  3. Google Post text content policy strictly prohibits phone numbers inside the post summary (violators receive HTTP 400 INVALID_ARGUMENT or State: REJECTED).
+- **Resolution**:
+  1. Switched Google Cloud Console OAuth Publishing status from "In production" back to "Testing" mode.
+  2. Added test user whitelist accounts (`customerpilot1@gmail.com` and `order.cakeconnection@gmail.com`) under Audience > Test users.
+  3. Refined OAuth prompt parameter in `src/app/api/google-business/oauth/route.ts` to `prompt: "consent"`.
+  4. Successfully executed live token exchange; obtained official access and refresh tokens, discovering live Google locations for Cake Connection (`locations/9875374650197271242`) and CustomerPilot (`locations/4702053894702959517`).
+  5. Successfully published the 1st Live Google Post for Cake Connection (Post ID: `3540944855157272612`, State: `LIVE`) and CustomerPilot (Post ID: `7209882460197791767`, State: `LIVE`) via official Google Business Profile API `https://mybusiness.googleapis.com/v4/accounts/{accountId}/locations/{locationId}/localPosts`.
+- **Status**: ✅ Resolved and Verified with Live Google Business Profile API Payloads.
