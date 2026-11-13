@@ -4,6 +4,39 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [13 Nov 2026] Feature Implementation: 3 New Services Suite — Dynamic QR Studio, WhatsApp Group Booster & Smart POS Invoicing Pro
+- **Symptom**: 
+  1. The platform lacked self-hosted dynamic QR generation for WhatsApp group community growth, forcing reliance on paid 3rd-party services (QR Tiger, ME-QR).
+  2. Merchants lacked an automated way to capture customer contact data & legal consent when customers joined their WhatsApp groups.
+  3. No lightweight mobile POS billing existed with automated 1-click thermal printing and instant Evolution API WhatsApp PDF invoice delivery.
+- **Root Cause**: 
+  1. Need for a 2-tier modular architecture: Tier 1 (0-friction direct QR redirect @ ₹100/mo or ₹699/yr) and Tier 2 (Lead capture + Smart POS Billing @ ₹599/mo or ₹4,999/yr).
+  2. Database lacked models for `QrCode`, `QrDestination`, `QrScanEvent`, `Invoice`, `InvoiceItem`, and `CustomerConsent`.
+  3. Homepage, Pricing Studio, and SuperAdmin lacked configuration and showcase for these 3 services.
+- **Resolution**:
+  1. **Prisma Database Schema**:
+     - Added `QrCode`, `QrDestination`, `QrScanEvent`, `Invoice`, `InvoiceItem`, and `CustomerConsent` models with full multi-tenant relations.
+  2. **Core Backend APIs & Engines**:
+     - `src/lib/qr-engine.ts`: Built slug generation, user-agent parsing, privacy-safe IP hashing, and async scan logging.
+     - `src/lib/whatsapp-media.ts`: Integrated Evolution API `sendMedia` for document PDF delivery with idempotency guards.
+     - `src/app/api/wg/[slug]/route.ts`: Public dynamic QR redirection handler supporting both DIRECT (0-sec redirect) and FORM_CAPTURE modes.
+     - `src/app/api/wg/[slug]/register/route.ts`: Lead capture API upserting CRM customer and logging consent.
+     - `src/app/wg/[slug]/page.tsx`: Lightweight, branded mobile registration form.
+     - `src/app/api/invoices/route.ts` & `src/app/api/invoices/[id]/send-whatsapp/route.ts`: POS invoice creation, Pure-JS PDF generation, and idempotent WhatsApp delivery.
+  3. **Merchant Dashboards**:
+     - `src/app/dashboard/qr-manager/page.tsx`: Dynamic QR Studio dashboard with QR downloads, destination updater, and scan analytics.
+     - `src/app/dashboard/billing/page.tsx`: Mobile Smart POS Billing interface with auto GST, 1-click Print + WhatsApp PDF dispatch, and delivery receipt logs.
+  4. **Commercial Pricing & Homepage Showcase**:
+     - Updated `src/lib/master-plans.ts` with 6 canonical plans for the 3 services.
+     - Updated `src/components/pricing/pricing-studio.tsx` with all 3 standalone services.
+     - Updated `src/app/page.tsx` with navbar dropdown links, mobile menu items, 3 feature showcase cards, and footer links.
+  5. **Verification**:
+     - All 6 Master Adversarial Red-Team Gates passed cleanly (Exit Code 0).
+     - End-to-end integration test suite passed cleanly.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [13 Nov 2026] Issue & Enhancement: Step 0 GBP Agency Manager Access Authorization, WhatsApp Auto-Reminder, and 1st Google Post Live Publishing
 - **Symptom**: 
   1. The platform lacked an explicit onboarding / setup 'Step 0' asking merchants to grant Google Business Profile Manager Access to agency email 'customerpilot1@gmail.com'.

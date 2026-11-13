@@ -88,7 +88,8 @@ model Merchant {
   gbpAuditReports           GbpAuditReport[]
   gbpKeywordDailyRanks      GbpKeywordDailyRank[]
   trackedKeywords           MerchantTrackedKeyword[]
-  geoGridScans              GbpGeoGridScan[]
+  geoGridScans              GbpGeoGridScan[]
+
   // Smart Keyword Control Engine & Grounding JSON Profile
   keywordProfile            String?
   // ---
@@ -134,6 +135,9 @@ model Merchant {
   menuItems                 MenuItem[]
   orders                    Order[]
   digitalBusinessCard       DigitalBusinessCard?
+  qrCodes                   QrCode[]
+  invoices                  Invoice[]
+  customerConsents          CustomerConsent[]
 }
 
 model Incident {
@@ -219,6 +223,8 @@ model Customer {
   whatsAppMessages    WhatsAppMessage[]
   winBackEscalations  WinBackEscalation[]
   orders              Order[]
+  invoices            Invoice[]
+  customerConsents    CustomerConsent[]
 
   @@unique([merchantId, phone])
   @@index([merchantId])
@@ -396,6 +402,9 @@ model WhatsAppMessage {
   scheduledFor  DateTime?
   customer      Customer? @relation(fields: [customerId], references: [id])
   merchant      Merchant  @relation(fields: [merchantId], references: [id])
+  invoiceId     String?
+  idempotencyKey String?   @unique
+  invoice       Invoice?  @relation("InvoiceWAMessages", fields: [invoiceId], references: [id])
 
   @@index([merchantId])
   @@index([merchantId, toPhone])
@@ -1195,4 +1204,134 @@ model OrderItem {
 
   @@index([orderId])
   @@index([menuItemId])
+}
+
+
+// =============================================================
+// MODULE 1 & 2: DYNAMIC QR CODE ENGINE & LEAD CAPTURE
+// =============================================================
+
+model QrCode {
+  id           String          @id @default(cuid())
+  merchantId   String
+  slug         String          @unique
+  label        String?         @default("Counter QR")
+  currentDest  String
+  redirectMode String          @default("DIRECT") // "DIRECT" (Module 1) | "FORM_CAPTURE" (Module 2)
+  tier         String          @default("LITE")   // "LITE" (Rs 100/mo) | "PRO" (Rs 599/mo)
+  isActive     Boolean         @default(true)
+  totalScans   Int             @default(0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  merchant     Merchant        @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  destinations QrDestination[]
+  scanEvents   QrScanEvent[]
+
+  @@index([merchantId])
+  @@index([slug])
+}
+
+model QrDestination {
+  id          String   @id @default(cuid())
+  qrCodeId    String
+  destination String
+  changedBy   String   @default("merchant")
+  note        String?
+  changedAt   DateTime @default(now())
+  qrCode      QrCode   @relation(fields: [qrCodeId], references: [id], onDelete: Cascade)
+
+  @@index([qrCodeId])
+  @@index([qrCodeId, changedAt])
+}
+
+model QrScanEvent {
+  id                   String   @id @default(cuid())
+  qrCodeId             String
+  merchantId           String
+  scannedAt            DateTime @default(now())
+  deviceType           String?
+  os                   String?
+  browser              String?
+  referrer             String?
+  ipHash               String?
+  isBot                Boolean  @default(false)
+  registeredCustomerId String?
+  qrCode               QrCode   @relation(fields: [qrCodeId], references: [id], onDelete: Cascade)
+
+  @@index([qrCodeId])
+  @@index([merchantId, scannedAt])
+}
+
+// =============================================================
+// MODULE 3: SMART POS BILLING & WHATSAPP INVOICING
+// =============================================================
+
+model Invoice {
+  id              String            @id @default(cuid())
+  merchantId      String
+  customerId      String?
+  billId          String?
+  invoiceNumber   String            @unique
+  customerName    String?
+  customerPhone   String?
+  paymentMode     String            @default("CASH")
+  paymentStatus   String            @default("PAID")
+  subtotal        Float             @default(0)
+  discountAmount  Float             @default(0)
+  discountType    String?           @default("flat")
+  taxableAmount   Float             @default(0)
+  gstRate         Float             @default(0)
+  gstType         String            @default("CGST_SGST")
+  cgst            Float             @default(0)
+  sgst            Float             @default(0)
+  igst            Float             @default(0)
+  grandTotal      Float
+  notes           String?
+  pdfUrl          String?
+  pdfGeneratedAt  DateTime?
+  printedAt       DateTime?
+  waStatus        String            @default("NOT_SENT")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  items           InvoiceItem[]
+  waMessages      WhatsAppMessage[] @relation("InvoiceWAMessages")
+  merchant        Merchant          @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  customer        Customer?         @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@index([merchantId])
+  @@index([merchantId, createdAt])
+  @@index([merchantId, waStatus])
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  name        String
+  category    String?
+  quantity    Int      @default(1)
+  unitPrice   Float
+  discountAmt Float    @default(0)
+  taxRate     Float    @default(0)
+  taxAmount   Float    @default(0)
+  totalPrice  Float
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+}
+
+model CustomerConsent {
+  id          String    @id @default(cuid())
+  customerId  String
+  merchantId  String
+  consentType String    @default("transactional")
+  status      String    @default("opted_in")
+  source      String    @default("qr_form")
+  ipHash      String?
+  consentedAt DateTime  @default(now())
+  revokedAt   DateTime?
+  customer    Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  merchant    Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@index([customerId, merchantId])
+  @@index([merchantId, consentType])
 }

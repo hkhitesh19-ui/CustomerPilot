@@ -466,6 +466,34 @@ export default function Home() {
                   </Link>
 
                   {/* Utility: Free Tool */}
+                  {/* Service 6: Dynamic QR Studio */}
+                  <Link href="/dashboard/qr-manager" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                    <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5"><QrCode className="w-3.5 h-3.5 text-emerald-600" /> Dynamic QR Studio</span>
+                      <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">₹100/mo</span>
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Self-hosted dynamic QR, zero paid APIs, update link anytime</span>
+                  </Link>
+
+                  {/* Service 7: WhatsApp Group Booster */}
+                  <Link href="/pricing" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                    <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-teal-600" /> WhatsApp Group Booster</span>
+                      <span className="text-[10px] bg-teal-50 text-teal-700 font-bold px-1.5 py-0.5 rounded-md">₹299/mo</span>
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Pre-redirect customer name & phone capture before group join</span>
+                  </Link>
+
+                  {/* Service 8: Smart POS Billing & WhatsApp Invoicing */}
+                  <Link href="/dashboard/billing" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
+                    <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5 text-indigo-600" /> Smart POS & WA Invoices</span>
+                      <span className="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">₹599/mo</span>
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">Mobile POS billing, auto GST & 1-click print + WhatsApp PDF bill</span>
+                  </Link>
+
+                  {/* Utility: Free Tool */}
                   <Link href="/free-ai-google-review-generator" className="flex flex-col p-2 rounded-xl hover:bg-slate-50 transition bg-amber-50/40 mt-1">
                     <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
                       <span className="flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5 text-amber-600" /> Free AI Review Generator</span>
@@ -585,7 +613,26 @@ export default function Home() {
               </Link>
 
               {/* Utility: Free Tool */}
-              <Link href="/free-ai-google-review-generator" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50 bg-amber-50/50">
+              {/* Service 6: Dynamic QR Studio */}
+                <Link href="/dashboard/qr-manager" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                  <span className="flex items-center gap-2"><QrCode className="w-4 h-4 text-emerald-600" /> Dynamic QR Studio</span>
+                  <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">₹100/mo</span>
+                </Link>
+
+                {/* Service 7: WhatsApp Group Booster */}
+                <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                  <span className="flex items-center gap-2"><Users className="w-4 h-4 text-teal-600" /> WhatsApp Group Booster</span>
+                  <span className="text-[10px] bg-teal-50 text-teal-700 font-bold px-1.5 py-0.5 rounded-md">₹299/mo</span>
+                </Link>
+
+                {/* Service 8: Smart POS & WhatsApp Invoices */}
+                <Link href="/dashboard/billing" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
+                  <span className="flex items-center gap-2"><CreditCard className="w-4 h-4 text-indigo-600" /> Smart POS & WA Invoices</span>
+                  <span className="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">₹599/mo</span>
+                </Link>
+
+                {/* Utility: Free Tool */}
+                <Link href="/free-ai-google-review-generator" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50 bg-amber-50/50">
                 <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-amber-600" /> Free AI Review Generator</span>
                 <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded-md">Free Tool</span>
               </Link>
@@ -1415,6 +1462,84 @@ export default function Home() {
               </Link>
             </div>
             </StaggerItem>
+
+            {/* Service 6: Dynamic QR Studio (Self-Hosted QR Tiger Alternative) */}
+            <StaggerItem variant="fadeUp" className="h-full flex flex-col">
+            <div className="fcard h-full flex flex-col bg-white border-2 border-emerald-200 shadow-sm hover:border-emerald-300 transition">
+              <div className="flex items-center justify-between">
+                <div className="ico em">🔲</div>
+                <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 font-extrabold px-2.5 py-1 rounded-full">
+                  ₹100/mo · Permanent QR
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">Dynamic QR Studio</h3>
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                Self-hosted dynamic QR engine. Print once on your counter, change destination to WhatsApp groups, menus, or reviews anytime. Zero paid API fees!
+              </p>
+              <ul className="space-y-1.5 mt-4 text-xs text-slate-700 flex-1">
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 100% Self-Hosted (No QR Tiger / ME-QR APIs)</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Life-Time Permanent Counter QR</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Instant Zero-Second Direct Redirect</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> PNG, SVG &amp; Print-Ready PDF Downloads</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Daily &amp; Monthly Scan Analytics</li>
+              </ul>
+              <Link href="/dashboard/qr-manager" className="mt-5 w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+                <span>Manage Dynamic QRs</span> <span>→</span>
+              </Link>
+            </div>
+            </StaggerItem>
+
+            {/* Service 7: WhatsApp Community Booster & Lead Capture */}
+            <StaggerItem variant="fadeUp" className="h-full flex flex-col">
+            <div className="fcard h-full flex flex-col bg-white border-2 border-teal-200 shadow-sm hover:border-teal-300 transition">
+              <div className="flex items-center justify-between">
+                <div className="ico ind">👥</div>
+                <span className="text-[10px] bg-teal-50 text-teal-800 border border-teal-200 font-extrabold px-2.5 py-1 rounded-full">
+                  ₹299/mo · Lead Capture
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">WhatsApp Group Booster</h3>
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                Grow your WhatsApp community while building a verified customer database. Pre-redirect mini form captures names and phone numbers before group join.
+              </p>
+              <ul className="space-y-1.5 mt-4 text-xs text-slate-700 flex-1">
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Mobile Pre-Redirect Customer Form</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Capture Name + WhatsApp Number to CRM</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Official Transactional Consent Recorded</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 95%+ Community Join Conversion</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Integrated Customer Spend Ledger</li>
+              </ul>
+              <Link href="/pricing" className="mt-5 w-full py-3 px-4 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+                <span>Explore Group Booster</span> <span>→</span>
+              </Link>
+            </div>
+            </StaggerItem>
+
+            {/* Service 8: Smart POS Billing & WhatsApp Invoicing Pro */}
+            <StaggerItem variant="fadeUp" className="h-full flex flex-col md:col-span-2 lg:col-span-1">
+            <div className="fcard h-full flex flex-col bg-white border-2 border-indigo-200 shadow-sm hover:border-indigo-300 transition">
+              <div className="flex items-center justify-between">
+                <div className="ico ind">🧾</div>
+                <span className="text-[10px] bg-indigo-50 text-indigo-800 border border-indigo-200 font-extrabold px-2.5 py-1 rounded-full">
+                  ₹599/mo · Smart POS
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mt-4">Smart POS &amp; WA Invoicing</h3>
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                Your entire billing counter inside your phone. Automatic GST calculation, 1-click physical thermal print, and automatic instant WhatsApp PDF bill delivery.
+              </p>
+              <ul className="space-y-1.5 mt-4 text-xs text-slate-700 flex-1">
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Fast Mobile POS (No heavy hardware needed)</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Auto GST Calculation (CGST/SGST/IGST)</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> 1-Click Dual Action: Thermal Print + WhatsApp</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Evolution API Automated PDF Document Delivery</li>
+                <li className="flex items-center gap-2"><span className="c text-emerald-500 font-bold">✓</span> Customer Search Auto-Suggest &amp; Resend Button</li>
+              </ul>
+              <Link href="/dashboard/billing" className="mt-5 w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+                <span>Open Smart POS Billing</span> <span>→</span>
+              </Link>
+            </div>
+            </StaggerItem>
           </StaggerContainer>
         </div>
       </section>
@@ -1934,7 +2059,10 @@ export default function Home() {
             <div className="space-y-3">
               <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Product Services</h4>
               <ul className="space-y-2.5 text-xs text-slate-400 list-none p-0 m-0">
-                <li><Link href="/smart-digital-business-card" className="hover:text-emerald-400 transition-colors">🪪 Smart Digital Business Card</Link></li>
+                <li><Link href="/dashboard/qr-manager" className="hover:text-emerald-400 transition-colors">🔲 Dynamic QR Studio (Self-Hosted)</Link></li>
+                  <li><Link href="/pricing" className="hover:text-emerald-400 transition-colors">👥 WhatsApp Group Booster & Lead Capture</Link></li>
+                  <li><Link href="/dashboard/billing" className="hover:text-emerald-400 transition-colors">🧾 Smart POS Billing & WhatsApp Invoices</Link></li>
+                  <li><Link href="/smart-digital-business-card" className="hover:text-emerald-400 transition-colors">🪪 Smart Digital Business Card</Link></li>
                 <li><Link href="/whatsapp-digital-loyalty-card" className="hover:text-emerald-400 transition-colors">🎁 Digital Loyalty &amp; Stamps</Link></li>
                 <li><Link href="/ai-google-review-qr-generator" className="hover:text-emerald-400 transition-colors">⭐ Smart AI Google Reviews</Link></li>
                 <li><Link href="/ai-google-review-autoreply" className="hover:text-emerald-400 transition-colors">⚡ 1-Click AI AutoReply</Link></li>

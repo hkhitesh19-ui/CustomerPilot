@@ -191,6 +191,36 @@ export const STANDALONE_SERVICES = [
     planKeyLt: "card_lifetime",
     iconBg: "bg-indigo-600",
     colorText: "text-indigo-600 dark:text-indigo-400"
+  },
+  {
+    i: "qr_lite",
+    n: "Dynamic QR Studio (QR Tiger Alternative)",
+    t: "Self-hosted permanent dynamic QR with unlimited destination updates, 0 paid APIs, and scan analytics.",
+    planKey6Mo: "qr_lite_monthly",
+    planKey1Yr: "qr_lite_yearly",
+    p: { 180: [499, 999], 365: [699, 1499] } as Record<number, [number, number]>,
+    iconBg: "bg-emerald-600",
+    colorText: "text-emerald-600 dark:text-emerald-400"
+  },
+  {
+    i: "wa_booster",
+    n: "WhatsApp Group Booster & Lead Capture",
+    t: "Dynamic QR with pre-redirect customer registration form, capturing Name + WhatsApp into CRM.",
+    planKey6Mo: "wa_booster_monthly",
+    planKey1Yr: "wa_booster_yearly",
+    p: { 180: [1499, 2999], 365: [2499, 4999] } as Record<number, [number, number]>,
+    iconBg: "bg-teal-600",
+    colorText: "text-teal-600 dark:text-teal-400"
+  },
+  {
+    i: "smart_billing",
+    n: "Smart POS Billing & WhatsApp Invoicing Pro",
+    t: "Mobile POS billing with auto GST, 1-click thermal print + automated WhatsApp PDF invoice delivery.",
+    planKey6Mo: "smart_billing_monthly",
+    planKey1Yr: "smart_billing_yearly",
+    p: { 180: [2999, 5999], 365: [4999, 9999] } as Record<number, [number, number]>,
+    iconBg: "bg-indigo-600",
+    colorText: "text-indigo-600 dark:text-indigo-400"
   }
 ]
 
@@ -381,7 +411,7 @@ export function PricingStudio({
         originalPrice: s.p[d][1],
         days: d,
         features: [s.t],
-        enabledModules: s.i === "loyalty" ? "LOYALTY" : s.i === "star" ? "REVIEWS" : s.i === "chat" ? "AUTOREPLY" : s.i === "card" ? "DIGITAL_CARD" : s.i
+        enabledModules: s.i === "loyalty" ? "LOYALTY" : s.i === "star" ? "REVIEWS" : s.i === "chat" ? "AUTOREPLY" : s.i === "card" ? "DIGITAL_CARD" : s.i === "qr_lite" ? "DYNAMIC_QR" : s.i === "wa_booster" ? "DYNAMIC_QR,LEAD_CAPTURE" : s.i === "smart_billing" ? "DYNAMIC_QR,LEAD_CAPTURE,SMART_BILLING" : s.i
       }
       onSelectPlan(p)
     } else if (selectedList.length > 1) {

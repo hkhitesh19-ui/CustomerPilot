@@ -391,6 +391,136 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     ],
     enabledModules: "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD",
     active: true
+  },
+  // ─── Module 1: Dynamic QR Studio (Self-Hosted QR Tiger Alternative) ───
+  {
+    planKey: "qr_lite_monthly",
+    name: "Dynamic QR Studio — Monthly",
+    description: "Self-hosted permanent dynamic QR with unlimited destination updates & scan analytics.",
+    days: 30,
+    price: 100,
+    originalPrice: 299,
+    discountPercent: 66,
+    badge: "Dynamic QR",
+    popular: false,
+    features: [
+      "Permanent Counter QR Code",
+      "Change WhatsApp Group/Link Anytime",
+      "Zero Paid QR API Dependency",
+      "PNG, SVG & Print PDF Download",
+      "Daily & Monthly Scan Analytics"
+    ],
+    enabledModules: "DYNAMIC_QR",
+    active: true
+  },
+  {
+    planKey: "qr_lite_yearly",
+    name: "Dynamic QR Studio — 1 Year Pro",
+    description: "1 Full Year of self-hosted dynamic QR (₹1.91/day). Never reprint counter QRs.",
+    days: 365,
+    price: 699,
+    originalPrice: 1499,
+    discountPercent: 53,
+    badge: "Best Value QR",
+    popular: true,
+    features: [
+      "Permanent Counter QR Code",
+      "Unlimited Destination Updates",
+      "Zero Paid QR API Dependency",
+      "Direct WhatsApp Group Redirection",
+      "PNG, SVG & Print PDF Download",
+      "Device & Scan Trend Analytics"
+    ],
+    enabledModules: "DYNAMIC_QR",
+    active: true
+  },
+
+  // ─── Module 2: WhatsApp Group Booster with Lead Capture ───
+  {
+    planKey: "wa_booster_monthly",
+    name: "WhatsApp Group Booster — Monthly",
+    description: "Dynamic QR with Pre-Redirect Mini Registration Form + CRM lead capture.",
+    days: 30,
+    price: 299,
+    originalPrice: 599,
+    discountPercent: 50,
+    badge: "Lead Capture",
+    popular: false,
+    features: [
+      "Dynamic WhatsApp Group QR",
+      "Pre-Redirect Customer Form",
+      "Name & WhatsApp Number Capture",
+      "Customer CRM & Consent Ledger",
+      "Direct Redirect to WhatsApp Group"
+    ],
+    enabledModules: "DYNAMIC_QR,LEAD_CAPTURE",
+    active: true
+  },
+  {
+    planKey: "wa_booster_yearly",
+    name: "WhatsApp Group Booster — 1 Year Pro",
+    description: "1 Full Year of WhatsApp Community Growth & Customer Data Capture.",
+    days: 365,
+    price: 2499,
+    originalPrice: 4999,
+    discountPercent: 50,
+    badge: "Growth Pro",
+    popular: true,
+    features: [
+      "Dynamic WhatsApp Group QR",
+      "Pre-Redirect Customer Form",
+      "Name & WhatsApp Number Capture",
+      "Full Customer CRM Database",
+      "Unlimited Group Destination Updates",
+      "Device & Conversion Analytics"
+    ],
+    enabledModules: "DYNAMIC_QR,LEAD_CAPTURE",
+    active: true
+  },
+
+  // ─── Module 3: Smart POS Billing & WhatsApp Invoicing Pro ───
+  {
+    planKey: "smart_billing_monthly",
+    name: "Smart POS Billing & WA Invoicing — Monthly",
+    description: "Mobile POS billing with auto GST & 1-click Print + WhatsApp PDF delivery.",
+    days: 30,
+    price: 599,
+    originalPrice: 1199,
+    discountPercent: 50,
+    badge: "Smart POS",
+    popular: false,
+    features: [
+      "Mobile POS Billing Screen",
+      "Automatic GST Calculation (CGST/SGST/IGST)",
+      "1-Click Physical Print + WhatsApp PDF",
+      "Automated Evolution API Delivery",
+      "Customer Search & Auto-Suggestions",
+      "Delivery Receipts & 1-Click Resend"
+    ],
+    enabledModules: "DYNAMIC_QR,LEAD_CAPTURE,SMART_BILLING",
+    active: true
+  },
+  {
+    planKey: "smart_billing_yearly",
+    name: "Smart POS Billing & WA Invoicing — 1 Year Pro",
+    description: "Complete Mobile POS, WhatsApp PDF Invoicing & Dynamic QR Suite for 1 Year.",
+    days: 365,
+    price: 4999,
+    originalPrice: 9999,
+    discountPercent: 50,
+    badge: "All-in-One POS",
+    popular: true,
+    features: [
+      "Everything in Dynamic QR & Group Booster",
+      "Fast Mobile POS Billing Interface",
+      "Automated GST & Discount Breakdown",
+      "Dual-Action Print (Thermal + WhatsApp PDF)",
+      "Instant Evolution API Document Delivery",
+      "Complete Customer CRM & Spend History",
+      "Invoice Ledger with Delivery Receipts & Resend"
+    ],
+    enabledModules: "DYNAMIC_QR,LEAD_CAPTURE,SMART_BILLING",
+    active: true
   }
 ]
 
