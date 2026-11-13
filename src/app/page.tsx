@@ -10,7 +10,8 @@ import {
   Check, ArrowRight, ArrowLeft, Loader2, UserCheck,
   Printer, AlertCircle, CircleDot, Star, Rocket, X, Shield,
   Menu, ChevronDown, Calculator, TrendingUp, Sparkles, Phone,
-  Clock, Target, Camera, Compass, Layers, Flame, Coins, Repeat, CreditCard
+  Clock, Target, Camera, Compass, Layers, Flame, Coins, Repeat, CreditCard,
+  Users
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -469,7 +470,7 @@ export default function Home() {
                   {/* Service 6: Dynamic QR Studio */}
                   <Link href="/dashboard/qr-manager" className="flex flex-col p-2.5 rounded-xl hover:bg-slate-50 transition">
                     <span className="text-xs font-bold text-slate-900 flex items-center justify-between">
-                      <span className="flex items-center gap-1.5"><QrCode className="w-3.5 h-3.5 text-emerald-600" /> Dynamic QR Studio</span>
+                      <span className="flex items-center gap-1.5"><QrIcon className="w-3.5 h-3.5 text-emerald-600" /> Dynamic QR Studio</span>
                       <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">₹100/mo</span>
                     </span>
                     <span className="text-[11px] text-slate-500 mt-0.5">Self-hosted dynamic QR, zero paid APIs, update link anytime</span>
@@ -615,7 +616,7 @@ export default function Home() {
               {/* Utility: Free Tool */}
               {/* Service 6: Dynamic QR Studio */}
                 <Link href="/dashboard/qr-manager" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between px-2 py-2 text-sm font-medium text-slate-800 rounded-lg hover:bg-slate-50">
-                  <span className="flex items-center gap-2"><QrCode className="w-4 h-4 text-emerald-600" /> Dynamic QR Studio</span>
+                  <span className="flex items-center gap-2"><QrIcon className="w-4 h-4 text-emerald-600" /> Dynamic QR Studio</span>
                   <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-md">₹100/mo</span>
                 </Link>
 
