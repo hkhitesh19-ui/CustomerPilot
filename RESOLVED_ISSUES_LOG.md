@@ -4,6 +4,36 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [13 Nov 2026] Issue & Enhancement: WhatsApp Group Booster Dedicated Product Landing Page & Dynamic QR Studio Slug Alignment
+- **Symptom**: 
+  1. Clicking "WhatsApp Group Booster" in the homepage navbar, mobile menu, or feature cards redirected users to the generic `/pricing` page instead of a dedicated product explanation page.
+  2. The Dynamic QR Studio dashboard was located at `/dashboard/qr-manager` rather than matching the product branding slug `/dashboard/DynamicQRStudio`.
+  3. When an authenticated merchant accessed the QR studio, it initially showed "No QR codes found." because browser cookie-based JWT authentication was not evaluated in `getAuthenticatedMerchant()` and default counter QR auto-provisioning was missing.
+  4. Neither `Dynamic QR Studio` nor `Smart POS Billing` appeared in the main dashboard sidebar navigation.
+- **Root Cause**: 
+  1. A dedicated landing page `/whatsapp-group-booster` had not been created, so temporary fallback links pointed to `/pricing`.
+  2. The route folder was named `qr-manager` instead of `DynamicQRStudio`.
+  3. `src/lib/api.ts` `getAuthenticatedMerchant()` only checked `headers.get('x-merchant-id')` rather than inspecting `cookies().get('token')` using `jwtVerify`.
+  4. `src/components/app-sidebar.tsx` lacked entries for the two new modules.
+- **Resolution**:
+  1. **Built Dedicated Product Page (`src/app/whatsapp-group-booster/page.tsx`)**:
+     - Complete SaaS landing page with Before/After comparison (Blind Group Link vs Group Booster), 3-step workflow, pricing card (₹299/mo · ₹2,499/yr), and 1-click live demo link (`/wg/cake-connection`).
+     - Replaced all `/pricing` links in `src/app/page.tsx` for WhatsApp Group Booster with `/whatsapp-group-booster`.
+  2. **Aligned Slug to `/dashboard/DynamicQRStudio`**:
+     - Created `src/app/dashboard/DynamicQRStudio/page.tsx` with branded QR preview, destination control center (Direct vs Lead Capture), test destination button, PNG download, and scan analytics.
+     - Configured `src/app/dashboard/qr-manager/page.tsx` to automatically redirect to `/dashboard/DynamicQRStudio`.
+     - Added `Dynamic QR Studio` and `Smart POS Billing` to `src/components/app-sidebar.tsx`.
+  3. **Hardened Authentication & Auto-Provisioning**:
+     - Updated `getAuthenticatedMerchant()` in `src/lib/api.ts` to decode cookie-based JWT tokens (`token` cookie) via `jwtVerify`, falling back cleanly to the primary/active merchant for Super Admin.
+     - Enhanced `GET /api/qr-codes` to auto-provision a default "Main Counter QR" if no QR exists for the merchant.
+     - Added an instant "✨ Generate My Counter Dynamic QR" action card in the UI.
+  4. **Verification & Deployment**:
+     - Built standalone Next.js bundle on live VPS and reloaded PM2.
+     - Playwright verified: `/whatsapp-group-booster` (HTTP 200), `/dashboard/DynamicQRStudio` (HTTP 200, active QR rendered), `/dashboard/qr-manager` (Redirect 307/308), and navbar links.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [13 Nov 2026] Issue: Client-Side Hydration Crash (Error Boundary) on Homepage & VPS Database Column Sync
 - **Symptom**: 
   - Opening `https://customerpilot.in/` displayed the Next.js Error Boundary screen: `"Something went wrong - The page encountered an unexpected issue while loading data. Please try reloading or head over to settings."` with Reload, Settings, and Dashboard buttons.
