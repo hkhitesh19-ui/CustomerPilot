@@ -8,24 +8,24 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 2933176 (Google Post Live Publishing & Creative Fix + OAuth Optimization)
-Full SHA          : 2933176000d8c74ce643a66e743d23fbc9b0837a
-Parent Commit     : d514197 (Google OAuth Resolution & 1st Live Google Post Publishing)
+Active Git Commit : 9b84c9c (3 New Services Suite: Dynamic QR Studio, WhatsApp Group Booster & Smart POS Invoicing Pro)
+Full SHA          : 9b84c9c07cd9a4edcc9bb8a846a81aba9811110a
+Parent Commit     : 5bfc09c
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 13 Nov 2026, 11:05 AM IST
+Deployment Date   : 13 Nov 2026, 09:30 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : docs: document creative replacement on live google posts
+Commit Title      : feat: 3 new services suite - Dynamic QR Studio, WhatsApp Group Booster & Smart POS Billing Pro
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
-1. https://customerpilot.in/                                 -> HTTP 200 (Google Tag GTM-TDR2SKTL, GA4 G-7MQSBHPXL1, GSC Verification Meta, CSP Whitelist)
-2. https://customerpilot.in/dashboard/gbp-status             -> HTTP 200/307 (Step 0 Agency Manager Access Banner, 1-Click OAuth, 4-Post Queue)
-3. https://customerpilot.in/super-admin                      -> HTTP 200/307 (GBP Operations Dashboard, WhatsApp Reminder Dispatch)
-4. https://customerpilot.in/api/google-business/oauth        -> HTTP 302/200 (Google Business Profile OAuth with consent prompt)
-5. https://customerpilot.in/api/gbp/send-access-reminder     -> HTTP 200 (Central WhatsApp Agency Reminder)
-6. https://customerpilot.in/cake_connection_friday_post.png  -> HTTP 200 (Live Belgian Chocolate Truffle Cake Creative)
-7. https://customerpilot.in/customerpilot_review_standee_tabletop.png -> HTTP 200 (Live AI Review Standee Creative)
+1. https://customerpilot.in/                                 -> HTTP 200 (Homepage with 3 New Services in Navbar, Mobile Menu, Features Grid, Footer)
+2. https://customerpilot.in/pricing                          -> HTTP 200 (Pricing Studio with 6 New Canonical Plans)
+3. https://customerpilot.in/dashboard/qr-manager             -> HTTP 200/307 (Dynamic QR Studio Dashboard & Destination Controller)
+4. https://customerpilot.in/dashboard/billing                -> HTTP 200/307 (Smart POS Billing & WhatsApp Invoicing Interface)
+5. https://customerpilot.in/api/qr-codes                     -> HTTP 200 (Dynamic QR CRUD API)
+6. https://customerpilot.in/api/invoices                     -> HTTP 200 (POS Smart Invoicing API)
+7. https://customerpilot.in/super-admin                      -> HTTP 200/307 (SuperAdmin Subscriptions & Fleet Operations)
 8. http://187.127.170.36:8080                                -> HTTP 200 (Evolution API Manager v2.2.2)
