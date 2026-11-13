@@ -6507,3 +6507,16 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   4. Successfully executed live token exchange; obtained official access and refresh tokens, discovering live Google locations for Cake Connection (`locations/9875374650197271242`) and CustomerPilot (`locations/4702053894702959517`).
   5. Successfully published the 1st Live Google Post for Cake Connection (Post ID: `3540944855157272612`, State: `LIVE`) and CustomerPilot (Post ID: `7209882460197791767`, State: `LIVE`) via official Google Business Profile API `https://mybusiness.googleapis.com/v4/accounts/{accountId}/locations/{locationId}/localPosts`.
 - **Status**: ✅ Resolved and Verified with Live Google Business Profile API Payloads.
+
+---
+## [13 Nov 2026] Issue: Google Post Creative Image Displayed Store Logo Instead of Product Creatives
+- **Symptom**: 1st Google Posts on Google Maps showed the store logo (Cake Connection logo) instead of actual product/service creatives for both Cake Connection and CustomerPilot.
+- **Root Cause**: 
+  1. The API payload in `scripts/create_google_post.py` and `scripts/create_cp_compliant_post.py` used `cake_connection_official_logo.png` as fallback because custom high-res creatives were not yet hosted on the public standalone server.
+  2. In Next.js standalone mode on VPS, newly added public files in `/public` required copying to `.next/standalone/public` and restarting `customerpilot-web`.
+- **Resolution**:
+  1. Deployed high-res product creative `cake_connection_friday_post.png` (Belgian Chocolate Truffle Cake) and SaaS product creative `customerpilot_review_standee_tabletop.png` (Smart Review QR Standee) to both `/var/www/CustomerPilot/public` and `.next/standalone/public/`.
+  2. Safely deleted the old logo posts via Google API (`localPosts.delete`).
+  3. Re-published both posts with the dedicated high-converting product creatives via official Google Business Profile API (`localPosts.create`).
+  4. Both posts confirmed `State: LIVE` with Google-cached high-res creative image URLs.
+- **Status**: ✅ Resolved and Verified with Live Google Business Profile API Payloads.
