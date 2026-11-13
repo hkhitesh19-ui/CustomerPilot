@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import {
   Printer, Smartphone, Plus, Trash2, Search, CheckCircle2,
-  RefreshCw, FileText, Send, Sparkles, AlertCircle, ShoppingBag, CreditCard
+  RefreshCw, FileText, Send, Sparkles, AlertCircle, ShoppingBag, CreditCard, MessageCircle
 } from "lucide-react"
 
 interface LineItem {
@@ -451,17 +451,28 @@ export default function SmartBillingPage() {
                           {inv.waStatus}
                         </Badge>
                       </td>
-                      <td className="p-3 text-right space-x-1.5">
+                      <td className="p-3 text-right space-x-1.5 flex items-center justify-end">
                         {inv.customerPhone && (
-                          <Button
-                            onClick={() => handleResendWhatsApp(inv.id)}
-                            disabled={resendingId === inv.id}
-                            size="sm"
-                            variant="ghost"
-                            className="h-7 text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg"
-                          >
-                            <Send className="w-3 h-3 mr-1" /> Resend WA
-                          </Button>
+                          <>
+                            <a
+                              href={`https://wa.me/91${inv.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`🧾 Official Tax Invoice from Cake Connection\nInvoice No: ${inv.invoiceNumber}\nAmount: ₹${inv.grandTotal}\nThank you for shopping with us! 🙏`)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center h-7 px-2 text-[11px] text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition font-medium"
+                              title="Open direct WhatsApp chat with customer"
+                            >
+                              <MessageCircle className="w-3 h-3 mr-1" /> Open WA
+                            </a>
+                            <Button
+                              onClick={() => handleResendWhatsApp(inv.id)}
+                              disabled={resendingId === inv.id}
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg"
+                            >
+                              <Send className="w-3 h-3 mr-1" /> Resend
+                            </Button>
+                          </>
                         )}
                       </td>
                     </tr>

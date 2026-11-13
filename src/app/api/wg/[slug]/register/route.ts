@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { normalizePhone } from "@/lib/utils"
-import { hashIpAddress } from "@/lib/qr-engine"
+import { hashIpAddress, resolveQrBySlug } from "@/lib/qr-engine"
 
 export async function POST(
   req: NextRequest,
@@ -16,9 +16,7 @@ export async function POST(
       return NextResponse.json({ error: "Name and Phone number are required." }, { status: 400 })
     }
 
-    const qrCode = await db.qrCode.findUnique({
-      where: { slug }
-    })
+    const qrCode = await resolveQrBySlug(slug)
 
     if (!qrCode || !qrCode.isActive) {
       return NextResponse.json({ error: "QR code not found or inactive." }, { status: 404 })

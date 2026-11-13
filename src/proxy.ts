@@ -99,6 +99,7 @@ export async function proxy(request: NextRequest) {
     '/api/queue/reserve',
     '/api/queue/validate-amount',
     '/api/qr/',
+    '/api/wg/', // Dynamic QR scanning and customer lead registration MUST be public
     '/api/seed',
     '/api/cron/',
     '/api/pricing/',

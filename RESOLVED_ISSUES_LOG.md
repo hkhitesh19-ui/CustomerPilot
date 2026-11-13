@@ -4,6 +4,38 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [14 Nov 2026] Issue & Enhancement: Dynamic QR Studio UX Overhaul, WhatsApp Group Booster Live Demo & Leads CRM
+- **Symptom**:
+  1. Visiting `https://customerpilot.in/wg/cake-connection` displayed the error banner `"QR code not found or inactive."` upon submitting customer details.
+  2. The Dynamic QR Studio dashboard felt like an abstract developer form with no merchant mental model, missing physical counter standee preview, and no guidance on how a store owner prints and uses it.
+  3. Merchants had no dedicated dashboard view to inspect, filter, or export the customer leads captured via the WhatsApp Group Booster QR form.
+  4. Decision confusion: Merchants and sales partners lacked clear clarity on which of the 3 modules to buy (Method 1: Dynamic QR Studio vs Method 2: WhatsApp Group Booster vs Method 3: Smart POS Billing).
+  5. In Smart POS Billing, if the automated WhatsApp bot was offline or phone was invalid, delivery showed FAILED without a 1-click fallback.
+- **Root Cause**:
+  1. In `src/proxy.ts`, `/api/wg/` was omitted from `PUBLIC_API_PREFIXES`, causing unauthenticated customer form submissions to trigger a 401 Unauthorized block.
+  2. In the database, the Cake Connection QR code was auto-provisioned with the full 60-character business name slug (`cake-connection-live-cake-online-cake-delivery-in-vadodara`), while the public landing page demo was hardcoded to `/wg/cake-connection`. Strict `findUnique({ where: { slug } })` queries failed to resolve the canonical slug.
+  3. `src/app/wg/[slug]/page.tsx` was a generic unbranded form that did not display the merchant's store name, logo, or VIP benefits.
+  4. No leads endpoint (`/api/qr-codes/leads`) or CRM table existed in `Dynamic QR Studio` for merchants to view registered contacts.
+- **Resolution**:
+  1. **Public Route White-listing**: Added `'/api/wg/'` to `PUBLIC_API_PREFIXES` in `src/proxy.ts`.
+  2. **Multi-Tier Robust Slug Resolution**:
+     - Implemented `resolveQrBySlug(slug)` in `src/lib/qr-engine.ts` with exact slug match, prefix match, and brand keyword fallback.
+     - Updated `src/app/api/wg/[slug]/route.ts` and `src/app/api/wg/[slug]/register/route.ts` to use `resolveQrBySlug`.
+     - Standardized Cake Connection's QR code slug to `cake-connection` in both local and VPS databases.
+  3. **Branded VIP Group Experience (`src/app/wg/[slug]/page.tsx`)**:
+     - Dynamic merchant metadata fetching (`?info=true`), displaying real store name ("Cake Connection VIP Club"), store logo, and clear benefit pills (Secret VIP Discounts & Instant WhatsApp Bills).
+     - Verified 10-digit Indian phone validation and transactional + marketing consent capture.
+  4. **Dynamic QR Studio 4-Tab Merchant Dashboard (`src/app/dashboard/DynamicQRStudio/page.tsx`)**:
+     - **Tab 1: 🪧 Counter Standee & Tabletop Studio**: Realistic Tabletop Acrylic Tent Card Mockup, 1-Click Print A4/A5 Standee, High-Res PNG download, and physical printing guide.
+     - **Tab 2: ⚙️ Destination & Mode Switcher**: Live toggle between Direct 0-Sec Redirect and Lead Capture Form.
+     - **Tab 3: 👥 WhatsApp Group Booster Leads CRM**: Real-time table of all registered walk-in customers with consent badges, 1-click WhatsApp Web chat (`wa.me`), and CSV export.
+     - **Tab 4: 💡 Decision Guide**: Clear comparative breakdown of Method 1 (₹100/mo), Method 2 (₹299/mo), and Method 3 (₹599/mo).
+  5. **Smart POS Billing 1-Click Fallback**: Added a direct 1-click "Open WA" deep link in `src/app/dashboard/billing/page.tsx` so bills can always be sent manually even if automated bots are offline.
+  6. **Security & Quality Verification**: All 6 Master Adversarial Gates passed cleanly (`node scripts/run_adversarial_guard.js`).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [13 Nov 2026] Issue & Enhancement: WhatsApp Group Booster Dedicated Product Landing Page & Dynamic QR Studio Slug Alignment
 - **Symptom**: 
   1. Clicking "WhatsApp Group Booster" in the homepage navbar, mobile menu, or feature cards redirected users to the generic `/pricing` page instead of a dedicated product explanation page.

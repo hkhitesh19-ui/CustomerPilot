@@ -101,3 +101,56 @@ export async function logQrScanEvent(qrCodeId: string, merchantId: string, req: 
     console.error("[QR Engine] Failed to log scan event:", err)
   }
 }
+
+/**
+ * Robust multi-tier QR resolution by slug.
+ * Supports exact match, prefix match, and merchant name keyword match.
+ */
+export async function resolveQrBySlug(slug: string) {
+  if (!slug) return null
+
+  // 1. Exact slug match
+  let qr = await db.qrCode.findUnique({
+    where: { slug },
+    include: {
+      merchant: {
+        select: { id: true, name: true, logoUrl: true, category: true, status: true, communityUrl: true, whatsappPhone: true }
+      }
+    }
+  })
+  if (qr) return qr
+
+  // 2. StartsWith slug match (e.g. "cake-connection" matches "cake-connection-live-cake-online-cake-delivery-in-vadodara")
+  qr = await db.qrCode.findFirst({
+    where: {
+      slug: { startsWith: slug }
+    },
+    include: {
+      merchant: {
+        select: { id: true, name: true, logoUrl: true, category: true, status: true, communityUrl: true, whatsappPhone: true }
+      }
+    }
+  })
+  if (qr) return qr
+
+  // 3. Fallback: Check if requested slug starts with an existing QR slug or search by brand keyword
+  const brandKeyword = slug.split("-").slice(0, 2).join(" ").trim()
+  if (brandKeyword.length >= 3) {
+    qr = await db.qrCode.findFirst({
+      where: {
+        OR: [
+          { merchant: { name: { contains: brandKeyword } } },
+          { slug: { contains: brandKeyword.replace(/\s+/g, "-") } }
+        ]
+      },
+      include: {
+        merchant: {
+          select: { id: true, name: true, logoUrl: true, category: true, status: true, communityUrl: true, whatsappPhone: true }
+        }
+      }
+    })
+    if (qr) return qr
+  }
+
+  return null
+}
