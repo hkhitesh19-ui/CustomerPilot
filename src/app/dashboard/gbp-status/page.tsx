@@ -19,6 +19,7 @@ import { GbpAuditReportsTab } from "@/components/gbp-audit-reports-tab";
 import { GbpDailySerpTracker } from "@/components/gbp-daily-serp-tracker";
 import { GbpKeywordPortfolioStudio } from "@/components/gbp-keyword-portfolio-studio";
 import { GbpGeoGridVisualizer } from "@/components/gbp-geo-grid-visualizer";
+import { GbpStepZeroAccessBanner } from "@/components/gbp-step-zero-access-banner";
 
 type GbpStatus = {
   merchant: {
@@ -32,6 +33,7 @@ type GbpStatus = {
     gbpTrackStartedAt: string | null;
     address?: string | null;
     city?: string | null;
+    whatsappPhone?: string | null;
   };
   checklist: Array<{
     id: string;
@@ -295,6 +297,13 @@ export default function GbpStatusPage() {
           </button>
         </div>
       </div>
+
+      {/* STEP 0: Google Business Profile Agency Manager Access Authorization Banner */}
+      <GbpStepZeroAccessBanner
+        merchantId={merchant.id}
+        merchantName={merchant.name}
+        merchantPhone={merchant.whatsappPhone || null}
+      />
 
       {/* TAB 1 (PRIMARY): Google Console Performance Reports (Day 0 & 30-Day Multi-Line Chart) */}
       {activeTab === "reports" && (

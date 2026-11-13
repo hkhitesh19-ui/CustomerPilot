@@ -24,6 +24,7 @@ import { GbpDailySerpTracker } from "@/components/gbp-daily-serp-tracker"
 import { GbpKeywordPortfolioStudio } from "@/components/gbp-keyword-portfolio-studio"
 import { GbpGeoGridVisualizer } from "@/components/gbp-geo-grid-visualizer"
 import { ManageTrackedKeywordsModal } from "./manage-tracked-keywords-modal"
+import { GbpStepZeroAccessBanner } from "@/components/gbp-step-zero-access-banner"
 import { Camera, FileSpreadsheet, Sliders, Target, Crosshair } from "lucide-react"
 
 type ChecklistItem = {
@@ -447,6 +448,15 @@ export function GbpOperationsDashboard() {
             3. 5×5 Geo-Grid Heatmap (25 Points) (Module 1 &amp; 4)
           </button>
         </div>
+
+        {/* Step 0 Agency Manager Access Authorization Banner */}
+        <GbpStepZeroAccessBanner
+          merchantId={selectedSerpMerchantId}
+          merchantName={
+            merchants.find((m) => m.id === selectedSerpMerchantId)?.name ||
+            "Cake Connection"
+          }
+        />
 
         {/* Embedded Live Studio for Selected Merchant */}
         <div className="bg-white rounded-xl p-4 shadow-inner">
