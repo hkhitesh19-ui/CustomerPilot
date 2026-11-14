@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 7d51157 (docs(resolved-log): document WhatsApp Group Booster and Dynamic QR Studio 4-tab overhaul)
-Full SHA          : 7d51157b76b7f4ab71d9917aed88d8501e868dd2
-Parent Commit     : ebbdaa3
+Active Git Commit : 25800f4 (feat(pos-and-chatbot): upgrade Smart POS Billing & Invoicing per PRD and build AI WhatsApp ChatBot standalone service)
+Full SHA          : 25800f40320b0c3b131f5d86bcfa86683c8d15fc
+Parent Commit     : e65bb9d
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 14 Nov 2026, 08:08 AM IST
+Deployment Date   : 14 Nov 2026, 09:30 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : docs(resolved-log): document WhatsApp Group Booster and Dynamic QR Studio 4-tab overhaul
+Commit Title      : feat(pos-and-chatbot): upgrade Smart POS Billing & Invoicing per PRD and build AI WhatsApp ChatBot standalone service
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -24,10 +24,10 @@ Verified Endpoints on Live VPS:
 1. https://customerpilot.in/                                 -> HTTP 200 (Homepage navbar links to /whatsapp-group-booster & /dashboard/DynamicQRStudio)
 2. https://customerpilot.in/whatsapp-group-booster           -> HTTP 200 (Dedicated High-Converting Product Landing Page, Verified)
 3. https://customerpilot.in/dashboard/DynamicQRStudio        -> HTTP 200 (Dynamic QR Studio with 4-tab merchant suite: Standee preview, Mode switch, Leads CRM, Decision guide)
-4. https://customerpilot.in/dashboard/qr-manager             -> HTTP 307/308 Redirect (Auto-redirects to /dashboard/DynamicQRStudio)
-5. https://customerpilot.in/dashboard/billing                -> HTTP 200 (Smart POS Billing & WhatsApp Invoicing Interface with 1-click fallback)
-6. https://customerpilot.in/wg/cake-connection               -> HTTP 200 (Cake Connection VIP Community Lead Capture Form, verified)
-7. https://customerpilot.in/api/wg/cake-connection           -> HTTP 302 / JSON (Multi-tier slug resolution & scan tracking, public route)
-8. https://customerpilot.in/api/wg/cake-connection/register  -> HTTP 200 (Public walk-in customer lead capture to CRM)
-9. https://customerpilot.in/api/qr-codes/leads               -> HTTP 200 (Booster CRM leads list & CSV export API)
+4. https://customerpilot.in/dashboard/billing                -> HTTP 200 (Upgraded Smart POS Billing with GST/Bill of Supply/Sales Receipt, 1-tap presets, cash calculator, thermal print)
+5. https://customerpilot.in/dashboard/chatbot                -> HTTP 200 (AI WhatsApp ChatBot Builder Standalone Console with 6 tabs, emulator, persona, knowledge center)
+6. https://customerpilot.in/dashboard/WAGroupBooster         -> HTTP 200 (WhatsApp Group Booster Standalone Mode A Console)
+7. https://customerpilot.in/dashboard/WAGroupBoosterPro      -> HTTP 200 (WhatsApp Group Booster Pro Standalone Mode B Console)
+8. https://customerpilot.in/wg/cake-connection               -> HTTP 200 (Cake Connection VIP Community Lead Capture Form, verified)
+9. https://customerpilot.in/api/chatbot/config               -> HTTP 200 (ChatBot Bot configuration API)
 10. http://187.127.170.36:8080                               -> HTTP 200 (Evolution API Manager v2.2.2)

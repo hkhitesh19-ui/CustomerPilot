@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 
 import { useState, useEffect } from "react"
 
-import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, ChevronRight, TrendingUp, BarChart3, FileText, Image, Share2, UserPlus, ChevronDown, BookOpen, Star, Smartphone, MapPin, ShoppingBag, UtensilsCrossed, Video, QrCode, CreditCard, MessageSquare, Zap } from "lucide-react"
+import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, ChevronRight, TrendingUp, BarChart3, FileText, Image, Share2, UserPlus, ChevronDown, BookOpen, Star, Smartphone, MapPin, ShoppingBag, UtensilsCrossed, Video, QrCode, CreditCard, MessageSquare, Zap, Bot } from "lucide-react"
 
 import { BrandLogo } from "@/components/brand-logo"
 
