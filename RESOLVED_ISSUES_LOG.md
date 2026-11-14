@@ -5,6 +5,33 @@ This document serves as a historical record of all major bugs, configuration iss
 ---
 
 ---
+---
+## [14 Nov 2026] Feature & Upgrade: Smart POS Billing & Invoicing Upgrade & AI WhatsApp ChatBot Builder Standalone Service
+- **Symptom**:
+  1. Smart POS Billing lacked complete tax document selection (GST Tax Invoice vs Bill of Supply vs Non-GST Sales Receipt), quick 1-tap product category shortcuts, cash change calculation, and dedicated 58mm/80mm thermal receipt print mode.
+  2. Merchants needed a self-service AI WhatsApp ChatBot to answer customer queries 24/7 in English, Hindi & Hinglish, capture verified customer leads, and hand over sensitive inquiries to human staff without hallucinating or manipulating loyalty stamps.
+- **Root Cause**:
+  1. POS billing previously supported only basic GST rate calculation without explicit document classification or cash tendered/change due workflow.
+  2. No dedicated AI ChatBot service or grounded conversation simulator existed in the codebase.
+- **Resolution**:
+  1. **Smart POS Billing & Invoicing Upgrade (`/dashboard/billing`)**:
+     - Supported 3 document types: Regular GST Tax Invoice, Composition Scheme Bill of Supply, and Non-GST Sales Receipt per PRD Section 8.
+     - Added 1-tap Quick Catalogue presets across Cakes, Pastries, and Beverages.
+     - Built cash change calculation workflow (`Change Due = Amount Received - Grand Total`).
+     - Added UPI Transaction / UTR reference capture.
+     - Implemented Thermal Receipt Console with 58mm & 80mm roll format toggles and 1-click browser printing.
+     - Enhanced `src/lib/invoice-pdf-generator.ts` to output compliant document headers.
+  2. **AI WhatsApp ChatBot Builder (`/dashboard/chatbot`)**:
+     - Built standalone service adhering to PRD v2.0 with 6 interactive tabs: Live Playground Emulator, Bot Persona Settings, Knowledge Center, WhatsApp & Channels, Live Inbox & Handover, and Captured Leads CRM.
+     - Implemented strict safety rules & hard prohibitions: AI cannot issue or modify loyalty stamps or approve discounts.
+     - Mandatory AI disclosure included in greetings.
+     - Multilingual & Hinglish grounded test engine via `/api/chatbot/test-chat`.
+     - Inbound webhook handler via `/api/webhooks/chatbot`.
+     - Added `WhatsApp ChatBot` with `AI BOT` badge to sidebar navigation.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [14 Nov 2026] Architectural Separation: 4 Standalone Modules for Dynamic QR Studio, WA Group Booster Simple, WA Booster Pro Leads & Smart POS
 - **Symptom**: Previously, Dynamic QR Studio and WhatsApp Group Booster were combined inside a single tabbed dashboard (`/dashboard/DynamicQRStudio`), causing conceptual confusion for merchants between general-purpose dynamic QR creation (any URL), direct 0-second WhatsApp group redirection (Tier 1), and VIP form lead capture (Tier 2).
 - **Root Cause**: All scan behaviors (DIRECT redirect vs FORM_CAPTURE), standee generation, destination configuration, and CRM leads table were grouped as tabs on one page, and sidebar navigation lacked distinct standalone entry points for the different commercial tiers.

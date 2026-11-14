@@ -81,6 +81,7 @@ const mainNav: MainNavItem[] = [
   { name: "WA Group Booster (Fast)", href: "/dashboard/WAGroupBooster", icon: Zap, badge: "₹100/mo" },
   { name: "WA Booster + VIP Leads", href: "/dashboard/WAGroupBoosterPro", icon: MessageSquare, badge: "₹299/mo" },
   { name: "Smart POS Billing", href: "/dashboard/billing", icon: CreditCard, badge: "₹599/mo" },
+  { name: "WhatsApp ChatBot", href: "/dashboard/chatbot", icon: Bot, badge: "AI BOT" },
 
   { name: "Customers CRM", href: "/dashboard/customers", icon: Users },
 

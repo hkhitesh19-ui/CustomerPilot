@@ -11,6 +11,7 @@ export interface InvoicePdfItem {
 }
 
 export interface InvoicePdfData {
+  documentType?: "GST_TAX_INVOICE" | "BILL_OF_SUPPLY" | "NON_GST_RECEIPT"
   orderNo: string
   date: string
   merchantName: string
@@ -116,8 +117,15 @@ export function generateInvoicePdf(data: InvoicePdfData): Buffer {
   }
 
   // Invoice Pill on right
-  const hasGstin = Boolean(data.gstin && data.gstin.trim())
-  const docTitle = hasGstin ? "TAX INVOICE" : "INVOICE"
+// Invoice Pill on right
+  let docTitle = "TAX INVOICE"
+  if (data.documentType === "BILL_OF_SUPPLY") {
+    docTitle = "BILL OF SUPPLY"
+  } else if (data.documentType === "NON_GST_RECEIPT") {
+    docTitle = "SALES RECEIPT"
+  } else if (!data.gstin || !data.gstin.trim()) {
+    docTitle = "SALES RECEIPT"
+  }
   pdf.addRect(410, 750, 135, 45, true, true, 0.90, 0.94, 0.99)
   pdf.addText("F2", 12, 420, 778, docTitle)
   pdf.addText("F1", 10, 420, 764, `#${data.orderNo}`)

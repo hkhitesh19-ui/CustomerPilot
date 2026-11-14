@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
       customerPhone,
       items,
       paymentMode = "CASH",
+      documentType = "GST_TAX_INVOICE",
       discountAmount = 0,
       discountType = "flat",
       gstRate = 0,
@@ -142,6 +143,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Generate PDF Buffer
     const pdfData: InvoicePdfData = {
+      documentType: documentType as any,
       orderNo: invoiceNumber,
       date: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
       merchantName: merchant.name,

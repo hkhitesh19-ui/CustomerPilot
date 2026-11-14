@@ -402,6 +402,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   ├── WAGroupBooster/page.tsx # WhatsApp Group Booster (Simple & Fast Mode): Direct 0-Sec Redirection (Tier 1: ₹100/mo / ₹699/yr)
 │   │   │   ├── WAGroupBoosterPro/page.tsx # WhatsApp Group Booster Pro: 5-Sec VIP Form Lead Capture & CRM (Tier 2: ₹299/mo / ₹2,499/yr)
 │   │   │   ├── billing/page.tsx       # Smart POS Billing & WhatsApp Invoicing Pro (Tier 3: ₹599/mo / ₹4,999/yr)
+│   │   │   ├── chatbot/page.tsx       # AI WhatsApp ChatBot Builder: 24/7 Store Assistant, Grounded Knowledge Base, Live Emulator & Leads CRM
 │   │   ├── guide/                          # Step-by-Step Interactive Guides & Infographics
 │   │   │   ├── 5-minute-setup-guide/page.tsx # 5-Minute Complete Setup Guide (Fast-Track Onboarding Blueprint)
 │   │   │   ├── operations/page.tsx         # Live Counter Operations Manual (Merchant & Customer Daily Journeys, Stepper & Matrix)
