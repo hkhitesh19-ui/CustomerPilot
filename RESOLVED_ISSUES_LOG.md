@@ -6641,3 +6641,25 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   3. Re-published both posts with the dedicated high-converting product creatives via official Google Business Profile API (`localPosts.create`).
   4. Both posts confirmed `State: LIVE` with Google-cached high-res creative image URLs.
 - **Status**: ✅ Resolved and Verified with Live Google Business Profile API Payloads.
+
+---
+## [14 Nov 2026] Issue: WhatsApp Group Booster Lead Capture Decoupling, Slug Whitelisting & 4-Tab Dynamic QR Suite
+- **Symptom**:
+  1. Walk-in customers opening `https://customerpilot.in/wg/cake-connection` experienced "QR code not found or inactive" or were redirected to login due to middleware blocking public `/api/wg/` endpoints.
+  2. Merchant dashboard lacked clear visibility into WhatsApp Group Booster leads and counter standee previews.
+  3. Merchants were confused why Dynamic QR (₹100/mo) and WhatsApp Group Booster (₹299/mo) existed, how they functioned, and whether they required two separate counter standees.
+- **Root Cause**:
+  1. `src/proxy.ts` middleware whitelisted `/api/qr/` but omitted `'/api/wg/'`, causing the registration endpoint to reject unauthenticated walk-in guests.
+  2. The slug matching logic in `src/app/api/wg/[slug]/route.ts` was doing a strict case-sensitive match against `merchant.slug` instead of a multi-tier fallback resolving `qrCode.shortCode`, `merchant.slug`, and name prefix match.
+  3. `src/components/app-sidebar.tsx` lacked a dedicated direct link to WhatsApp Group Booster leads.
+- **Resolution**:
+  1. **Public Route Whitelist (`src/proxy.ts`)**: Added `'/api/wg/'` to `PUBLIC_API_PREFIXES` allowing friction-free access for counter walk-ins.
+  2. **Multi-Tier Slug Engine (`src/lib/qr-engine.ts`)**: Built `resolveQrBySlug(slug)` supporting exact slug, lowercase match, prefix matching, and primary counter QR fallback.
+  3. **4-Tab Dynamic QR & Booster Suite (`src/app/dashboard/DynamicQRStudio/page.tsx`)**:
+     - *Tab 1: Counter Standee & Tabletop Studio*: Real-time Acrylic Tent Card preview, print specifications (A5 Acrylic, A4 Standee, 3x3" Sticker Decal), and live scan analytics.
+     - *Tab 2: Destination & Mode Switcher*: 1-click toggle between "Direct 0-Second Redirect" (₹100/mo) and "WhatsApp Group Booster Form" (₹299/mo).
+     - *Tab 3: WhatsApp Group Booster Leads*: Real-time CRM table of walk-in leads with Name, WhatsApp Mobile Number, verified consent timestamp, and CSV export.
+     - *Tab 4: Decision Guide (Which Plan to Choose?)*: Side-by-side transparent matrix comparing Method 1 (Direct QR ₹100/mo), Method 2 (Booster Form ₹299/mo), and Method 3 (Smart POS ₹599/mo).
+  4. **Dedicated Sidebar Navigation (`src/components/app-sidebar.tsx`)**: Added `WhatsApp Group Booster` item linking to `/dashboard/DynamicQRStudio?tab=leads`.
+  5. **Adversarial Master Guard Verification**: All 6 security and mathematical gates passed cleanly.
+- **Status**: ✅ Resolved, Verified with Playwright, and Committed Locally.
