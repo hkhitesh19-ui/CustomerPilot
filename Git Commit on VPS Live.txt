@@ -8,26 +8,25 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 25800f4 (feat(pos-and-chatbot): upgrade Smart POS Billing & Invoicing per PRD and build AI WhatsApp ChatBot standalone service)
-Full SHA          : 25800f40320b0c3b131f5d86bcfa86683c8d15fc
-Parent Commit     : e65bb9d
+Active Git Commit : 54dd765 (fix(super-admin): sanitize whatsappPhone empty string to null to prevent unique constraint violation on merchant profile updates)
+Full SHA          : 54dd76544709d8e39251acd79b287724fda472be
+Parent Commit     : ea350a2
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 14 Nov 2026, 09:30 AM IST
+Deployment Date   : 14 Nov 2026, 11:03 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(pos-and-chatbot): upgrade Smart POS Billing & Invoicing per PRD and build AI WhatsApp ChatBot standalone service
+Commit Title      : fix(super-admin): sanitize whatsappPhone empty string to null to prevent unique constraint violation on merchant profile updates
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
-PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
+PM2 Services      : customerpilot-web (Online, :3000, PID: 415048), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
-Verified Endpoints on Live VPS:
+Verified Live Outcomes:
 ----------------------------------------------------------
-1. https://customerpilot.in/                                 -> HTTP 200 (Homepage navbar links to /whatsapp-group-booster & /dashboard/DynamicQRStudio)
-2. https://customerpilot.in/whatsapp-group-booster           -> HTTP 200 (Dedicated High-Converting Product Landing Page, Verified)
-3. https://customerpilot.in/dashboard/DynamicQRStudio        -> HTTP 200 (Dynamic QR Studio with 4-tab merchant suite: Standee preview, Mode switch, Leads CRM, Decision guide)
-4. https://customerpilot.in/dashboard/billing                -> HTTP 200 (Upgraded Smart POS Billing with GST/Bill of Supply/Sales Receipt, 1-tap presets, cash calculator, thermal print)
-5. https://customerpilot.in/dashboard/chatbot                -> HTTP 200 (AI WhatsApp ChatBot Builder Standalone Console with 6 tabs, emulator, persona, knowledge center)
-6. https://customerpilot.in/dashboard/WAGroupBooster         -> HTTP 200 (WhatsApp Group Booster Standalone Mode A Console)
-7. https://customerpilot.in/dashboard/WAGroupBoosterPro      -> HTTP 200 (WhatsApp Group Booster Pro Standalone Mode B Console)
-8. https://customerpilot.in/wg/cake-connection               -> HTTP 200 (Cake Connection VIP Community Lead Capture Form, verified)
-9. https://customerpilot.in/api/chatbot/config               -> HTTP 200 (ChatBot Bot configuration API)
-10. http://187.127.170.36:8080                               -> HTTP 200 (Evolution API Manager v2.2.2)
+1. https://customerpilot.in/                                 -> HTTP 200 (Homepage live & healthy)
+2. https://customerpilot.in/super-admin                      -> HTTP 307 (Auth redirect to login, operational)
+3. https://customerpilot.in/review?m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (Cake Connection genuine GBP review link restored: ChIJc7ija2zFXzkR8DbOxXEfaM4)
+4. Merchant Trial Extensions Verified on VPS:
+   - SSV Saloon and academy (cmw0dloss0s9ckvfcvb1lbpff): Active till 16 Nov 2026 03:00 PM IST (Epoch: 1794821400000)
+   - PET CLINIC @ MANJALPUR (cmw60b1in1jsckv9d3wwc0cb6): Active till 16 Nov 2026 03:00 PM IST (Epoch: 1794821400000)
+5. SuperAdmin Profile Update Unique Constraint Fix:
+   - Backend API & Frontend form coerce empty whatsappPhone/email to null
+   - Resolves "Unique constraint failed on fields: ('whatsappPhone')" permanently
