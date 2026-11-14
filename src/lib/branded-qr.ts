@@ -99,38 +99,7 @@ export async function generateBrandedQRDataUrl(
     }
   }
 
-  // Fallback or Reviews mode: Embed CustomerPilot Square Icon Logo Badge
-  const iconLogoPath = path.join(process.cwd(), "public", "cplogo_icon.png")
-  const fullLogoPath = path.join(process.cwd(), "public", "cplogo_notagline.png")
-  const cpLogoPathToUse = fs.existsSync(iconLogoPath) ? iconLogoPath : fullLogoPath
-
-  if (!fs.existsSync(cpLogoPathToUse)) {
-    return `data:image/png;base64,${qrBuffer.toString("base64")}`
-  }
-
-  const badgeSize = Math.round(qrSize * 0.26)
-  const logoInnerSize = Math.round(badgeSize * 0.70)
-
-  const resizedLogo = await sharp(cpLogoPathToUse)
-    .resize({ width: logoInnerSize, height: logoInnerSize, fit: "inside" })
-    .png()
-    .toBuffer()
-
-  const badgeSvg = Buffer.from(
-    `<svg width="${badgeSize}" height="${badgeSize}">
-      <rect x="0" y="0" width="${badgeSize}" height="${badgeSize}" rx="18" ry="18" fill="#ffffff" stroke="#e2e8f0" stroke-width="3"/>
-    </svg>`
-  )
-
-  const badgeWithLogo = await sharp(badgeSvg)
-    .composite([{ input: resizedLogo, gravity: "center" }])
-    .png()
-    .toBuffer()
-
-  const finalQRBuffer = await sharp(qrBuffer)
-    .composite([{ input: badgeWithLogo, gravity: "center" }])
-    .png()
-    .toBuffer()
-
-  return `data:image/png;base64,${finalQRBuffer.toString("base64")}`
+  // No merchant logo and no explicit request for logo: return clean QR (no CP branding in center)
+  // This keeps the QR code clean and scannable — merchant's brand identity preserved
+  return `data:image/png;base64,${qrBuffer.toString("base64")}`
 }

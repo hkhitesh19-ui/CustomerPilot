@@ -6,21 +6,30 @@ import { ok, err } from "@/lib/api"
 export const dynamic = "force-dynamic"
 
 function extractCityFromAddress(address?: string | null): string {
-  if (!address) return "Vadodara"
+  if (!address) return ""
   const parts = address.split(",").map(p => p.trim()).filter(Boolean)
-  // Usually address looks like: "Street, Area, City, State Pincode, Country"
-  if (parts.length >= 3) {
-    // Check parts from end: Country, State Pincode, City
-    const candidate = parts[parts.length - 3]
-    if (candidate && !/\d/.test(candidate) && candidate.length > 2) {
-      return candidate
-    }
+
+  // Skip known non-city tail values: country names, state+pincode combos
+  const SKIP_TOKENS = ["india", "gujarat", "maharashtra", "rajasthan", "karnataka", "kerala", "tamil nadu",
+    "andhra pradesh", "telangana", "west bengal", "uttar pradesh", "madhya pradesh", "bihar", "jharkhand",
+    "odisha", "assam", "punjab", "haryana", "himachal pradesh", "uttarakhand", "goa", "chhattisgarh",
+    "tripura", "meghalaya", "manipur", "nagaland", "arunachal pradesh", "mizoram", "sikkim",
+    "jammu & kashmir", "jammu and kashmir", "ladakh", "delhi", "chandigarh", "puducherry"]
+
+  // Walk from end towards start, skip: Country, State, Pincode combos
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const p = parts[i]
+    const lower = p.toLowerCase().replace(/\s+/g, " ").trim()
+    // Skip purely numeric (pincodes)
+    if (/^\d+$/.test(p)) continue
+    // Skip parts that are ONLY a known state/country name
+    if (SKIP_TOKENS.some(tok => lower === tok)) continue
+    // Skip "State Pincode" combos like "Gujarat 390011"
+    if (SKIP_TOKENS.some(tok => lower.startsWith(tok + " ")) && /\d/.test(p)) continue
+    // This is likely the city
+    return p.replace(/\b\d{5,6}\b/g, "").trim()
   }
-  if (parts.length >= 2) {
-    const candidate = parts[parts.length - 2]
-    return candidate.replace(/\b\d{5,6}\b/g, "").trim() || "Vadodara"
-  }
-  return parts[0] || "Vadodara"
+  return ""
 }
 
 export async function POST(req: NextRequest) {
@@ -57,9 +66,14 @@ export async function POST(req: NextRequest) {
     }
 
     const reviewUrl = `https://search.google.com/local/writereview?placeid=${topMatch.placeId}`
-    const detectedCity = merchant.city && merchant.city !== "Vadodara" && merchant.city !== "N/A"
-      ? merchant.city
-      : extractCityFromAddress(topMatch.formattedAddress)
+
+    // Determine best city: skip "India", "N/A", blank — prefer Places API-derived city
+    const INVALID_CITY_VALUES = ["india", "n/a", "", "vadodara"]
+    const currentCityLower = (merchant.city || "").trim().toLowerCase()
+    const shouldOverrideCity = INVALID_CITY_VALUES.includes(currentCityLower)
+    const detectedCity = shouldOverrideCity
+      ? (extractCityFromAddress(topMatch.formattedAddress) || merchant.city || "")
+      : merchant.city
 
     // 1. Update Merchant record
     const updatedMerchant = await db.merchant.update({

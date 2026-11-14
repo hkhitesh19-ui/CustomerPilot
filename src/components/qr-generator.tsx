@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { QrCode, Download, Printer, Copy, CheckCircle2, Sparkles, RefreshCw, Star, Smartphone, Gift, Layers } from "lucide-react"
+import { QrCode, Download, Printer, Copy, CheckCircle2, Sparkles, RefreshCw, Star, Smartphone, Gift, Layers, Upload, Trash2, Image as ImageIcon } from "lucide-react"
 
 export type StandeeDesignType = "review" | "card" | "combo" | "master"
 
@@ -22,6 +22,9 @@ export function QRGenerator({
   const [downloadingPoster, setDownloadingPoster] = useState(false)
   const [printingPoster, setPrintingPoster] = useState(false)
   const [selectedDesign, setSelectedDesign] = useState<StandeeDesignType>(initialDesign || "master")
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [standeeKey, setStandeeKey] = useState(0) // force re-render of standee preview after logo change
+  const logoInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     let isMounted = true
@@ -74,6 +77,68 @@ export function QRGenerator({
   const targetUrl = qrData?.targetUrl || ""
   const enabledModules = (qrData?.merchant?.enabledModules as string) || "LOYALTY,REVIEWS,AUTOREPLY"
   const isLoyaltyOpted = enabledModules.includes("LOYALTY")
+
+  const hasCustomLogo = Boolean(
+    qrData?.merchant?.logoUrl &&
+    !qrData.merchant.logoUrl.includes("cplogo") &&
+    !qrData.merchant.logoUrl.includes("placeholder")
+  )
+
+  // ── Logo Upload for Standee ──────────────────────────────────────────────
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Please upload an image under 5MB.", variant: "destructive" })
+      return
+    }
+    setUploadingLogo(true)
+    try {
+      const fd = new FormData()
+      fd.append("file", file)
+      fd.append("type", "logo")
+      const res = await fetch("/api/merchant/upload-brand", {
+        method: "POST",
+        headers: { "x-merchant-id": merchantId },
+        body: fd,
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.error || "Upload failed")
+      const uploadedUrl = json.data?.url || json.url
+      if (uploadedUrl) {
+        setQrData((prev: any) => ({
+          ...prev,
+          merchant: { ...prev?.merchant, logoUrl: uploadedUrl },
+        }))
+        setStandeeKey(k => k + 1) // force standee preview refresh
+        toast({ title: "Logo Updated ✅", description: "Your business logo is now on the VIP Standee." })
+      }
+    } catch (err: any) {
+      toast({ title: "Upload Failed", description: err.message || "Could not upload logo", variant: "destructive" })
+    } finally {
+      setUploadingLogo(false)
+      if (logoInputRef.current) logoInputRef.current.value = ""
+    }
+  }
+
+  const handleRemoveLogo = async () => {
+    try {
+      const res = await fetch("/api/merchant/update", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "x-merchant-id": merchantId },
+        body: JSON.stringify({ logoUrl: null }),
+      })
+      if (!res.ok) throw new Error("Failed to remove logo")
+      setQrData((prev: any) => ({
+        ...prev,
+        merchant: { ...prev?.merchant, logoUrl: null },
+      }))
+      setStandeeKey(k => k + 1)
+      toast({ title: "Logo Removed", description: "Standee will display your store name typographically." })
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" })
+    }
+  }
 
   // Copy WhatsApp link
   const handleCopyLink = () => {
@@ -412,12 +477,90 @@ export function QRGenerator({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-4">
+
+            {/* ══════════════════════════════════════════════════════════════════ */}
+            {/* LOGO UPLOAD SECTION (Loyalty Standee Branding)                    */}
+            {/* ══════════════════════════════════════════════════════════════════ */}
+            <div className="w-full max-w-sm mb-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/50 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Your Business Logo on Standee</span>
+                  {hasCustomLogo && (
+                    <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                      Custom Logo Active
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Logo Preview Box */}
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 flex items-center justify-center overflow-hidden shrink-0">
+                  {hasCustomLogo ? (
+                    <img src={qrData.merchant.logoUrl} alt="Logo" className="max-w-full max-h-full object-contain" />
+                  ) : (
+                    <div className="flex flex-col items-center text-slate-400">
+                      <ImageIcon className="w-5 h-5" />
+                      <span className="text-[8px] font-bold uppercase mt-0.5">No Logo</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">
+                    {hasCustomLogo ? "Active Store Logo" : "Clean Typographic Badge Active"}
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    {hasCustomLogo
+                      ? "Logo is rendered in Ultra HD on the tabletop standee."
+                      : "Upload your store's PNG or JPG logo to show it on the standee."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Upload / Remove Actions */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  className="hidden"
+                  onChange={handleLogoUpload}
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={uploadingLogo}
+                  onClick={() => logoInputRef.current?.click()}
+                  className="rounded-xl border-amber-300 bg-amber-50/60 hover:bg-amber-100 text-amber-900 font-bold text-xs"
+                >
+                  <Upload className="w-3.5 h-3.5 mr-1 text-amber-600" />
+                  {uploadingLogo ? "Uploading..." : (hasCustomLogo ? "Change Logo" : "Upload Logo")}
+                </Button>
+                {hasCustomLogo && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={handleRemoveLogo}
+                    title="Remove custom logo and display clean store typography"
+                    className="rounded-xl border-rose-300 bg-rose-50/60 hover:bg-rose-100 text-rose-700 font-bold text-xs"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 mr-1" />
+                    Remove
+                  </Button>
+                )}
+              </div>
+            </div>
+
             {/* ══════════════════════════════════════════════════════════════════ */}
             {/* LIVE DYNAMIC STANDEE PREVIEW                                      */}
             {/* ══════════════════════════════════════════════════════════════════ */}
             <div className="w-full max-w-sm flex flex-col items-center relative">
               <img
-                src={`/api/qr/standee?design=${selectedDesign}&m=${merchantId}`}
+                key={standeeKey}
+                src={`/api/qr/standee?design=${selectedDesign}&m=${merchantId}&_t=${standeeKey}`}
                 alt={`${storeName} ${selectedDesign} Standee Artwork`}
                 className="w-full h-auto rounded-[24px] shadow-2xl border-2 border-slate-900 object-contain transition-all"
               />

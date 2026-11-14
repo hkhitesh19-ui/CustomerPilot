@@ -4,10 +4,13 @@ export interface ClientBrandedQROptions {
   width?: number
   darkColor?: string
   lightColor?: string
+  merchantLogoUrl?: string | null
 }
 
 /**
- * Generates a QR Code as Data URL with CustomerPilot logo & name (without tagline) in the center.
+ * Generates a QR Code as Data URL.
+ * If merchantLogoUrl is provided, embeds the merchant's business logo in the center.
+ * If not, returns a clean QR code with no center logo (CP logo removed).
  * Uses browser HTML5 Canvas.
  */
 export async function createBrandedClientQR(
@@ -26,12 +29,17 @@ export async function createBrandedClientQR(
     color: { dark: darkColor, light: lightColor }
   })
 
+  // If no merchant logo, return clean QR (no center badge)
+  if (!options?.merchantLogoUrl) {
+    return baseQrDataUrl
+  }
+
   // If running in SSR / non-browser, return base QR directly
   if (typeof window === "undefined" || typeof document === "undefined") {
     return baseQrDataUrl
   }
 
-  // 2. Load into HTML5 Canvas to composite center badge
+  // 2. Load into HTML5 Canvas to composite merchant logo in center
   return new Promise((resolve) => {
     const qrImg = new Image()
     qrImg.crossOrigin = "anonymous"
@@ -45,16 +53,15 @@ export async function createBrandedClientQR(
       // Draw base QR
       ctx.drawImage(qrImg, 0, 0, width, width)
 
-      // Load CustomerPilot logo (no tagline)
+      // Load Merchant logo
       const logoImg = new Image()
       logoImg.crossOrigin = "anonymous"
       logoImg.onload = () => {
-        // Badge dimensions (occupies ~4% of QR area, well below 30% tolerance)
-        const badgeW = Math.round(width * 0.40)
-        const badgeH = Math.round(badgeW * 0.28)
-        const badgeX = Math.round((width - badgeW) / 2)
-        const badgeY = Math.round((width - badgeH) / 2)
-        const radius = 14
+        // Badge dimensions (occupies ~20% of QR area, within 30% error correction tolerance)
+        const badgeSize = Math.round(width * 0.22)
+        const badgeX = Math.round((width - badgeSize) / 2)
+        const badgeY = Math.round((width - badgeSize) / 2)
+        const radius = 10
 
         // Draw white rounded background badge
         ctx.fillStyle = "#ffffff"
@@ -62,25 +69,24 @@ export async function createBrandedClientQR(
         ctx.lineWidth = 2
         ctx.beginPath()
         if (typeof ctx.roundRect === "function") {
-          ctx.roundRect(badgeX, badgeY, badgeW, badgeH, radius)
+          ctx.roundRect(badgeX, badgeY, badgeSize, badgeSize, radius)
         } else {
-          ctx.rect(badgeX, badgeY, badgeW, badgeH)
+          ctx.rect(badgeX, badgeY, badgeSize, badgeSize)
         }
         ctx.fill()
         ctx.stroke()
 
         // Draw logo centered inside badge with padding
-        const logoPadding = 8
-        const logoW = badgeW - logoPadding * 2
-        const logoH = logoW * (logoImg.height / logoImg.width)
+        const logoPadding = 6
+        const logoSize = badgeSize - logoPadding * 2
         const logoX = badgeX + logoPadding
-        const logoY = badgeY + (badgeH - logoH) / 2
+        const logoY = badgeY + logoPadding
 
-        ctx.drawImage(logoImg, logoX, logoY, logoW, logoH)
+        ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize)
         resolve(canvas.toDataURL("image/png"))
       }
       logoImg.onerror = () => resolve(baseQrDataUrl)
-      logoImg.src = "/cplogo_notagline.png"
+      logoImg.src = options.merchantLogoUrl as string
     }
     qrImg.onerror = () => resolve(baseQrDataUrl)
     qrImg.src = baseQrDataUrl
