@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 9f324e6 (feat(qr-studio-booster): overhaul Dynamic QR Studio with 4-tab merchant suite, resolve wg slug mismatch, add booster leads CRM, and public wg route)
-Full SHA          : 9f324e62e7e7441d76694e912c39eb5dbfe463d8
-Parent Commit     : fdc0e2c
+Active Git Commit : 2949239 (fix(DynamicQRStudio): import missing Store icon and sync live vps tracker)
+Full SHA          : 2949239e248b11c9bb759ea79a957827e7f6074a
+Parent Commit     : 9f324e6
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 14 Nov 2026, 03:35 AM IST
+Deployment Date   : 14 Nov 2026, 03:45 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(qr-studio-booster): overhaul Dynamic QR Studio with 4-tab merchant suite, resolve wg slug mismatch, add booster leads CRM, and public wg route
+Commit Title      : fix(DynamicQRStudio): import missing Store icon and sync live vps tracker
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)

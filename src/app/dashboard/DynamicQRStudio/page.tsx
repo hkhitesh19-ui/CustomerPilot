@@ -30,8 +30,16 @@ export default function DynamicQRStudioPage() {
   const [loadingLeads, setLoadingLeads] = useState(false)
   const [activeTab, setActiveTab] = useState<"standee" | "destination" | "leads" | "guide">("standee")
 
-  // 1. Fetch current authenticated merchant on mount
+  // 1. Fetch current authenticated merchant on mount & read tab param
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const tab = params.get("tab")
+      if (tab === "leads" || tab === "destination" || tab === "guide" || tab === "standee") {
+        setActiveTab(tab)
+      }
+    }
+
     async function initAuth() {
       try {
         const res = await fetch("/api/auth/me")
