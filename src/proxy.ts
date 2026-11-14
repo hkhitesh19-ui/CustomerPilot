@@ -93,6 +93,7 @@ export async function proxy(request: NextRequest) {
   const PUBLIC_API_PREFIXES = [
     '/api/auth/',
     '/api/webhook/',
+    '/api/webhooks/',
     '/api/reviews/',
     '/api/queue/join',
     '/api/queue/claim',
