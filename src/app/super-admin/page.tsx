@@ -972,13 +972,18 @@ function MerchantManagement() {
     setSavingProfile(true)
     setProfileSaveSuccess(false)
     try {
+      const sanitizedForm = {
+        ...profileEditForm,
+        whatsappPhone: profileEditForm.whatsappPhone?.trim() || null,
+        email: profileEditForm.email?.trim() || null
+      }
       const res = await fetch("/api/admin/merchants", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "update_profile",
           merchantId: profileModalMerchant.id,
-          ...profileEditForm
+          ...sanitizedForm
         })
       })
       const data = await res.json()

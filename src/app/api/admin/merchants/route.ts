@@ -179,8 +179,12 @@ export async function POST(req: Request) {
         data: {
           ...(name !== undefined && { name }),
           ...(ownerName !== undefined && { ownerName }),
-          ...(whatsappPhone !== undefined && { whatsappPhone }),
-          ...(email !== undefined && { email }),
+          ...(whatsappPhone !== undefined && {
+            whatsappPhone: typeof whatsappPhone === 'string' && whatsappPhone.trim() ? whatsappPhone.trim() : null
+          }),
+          ...(email !== undefined && {
+            email: typeof email === 'string' && email.trim() ? email.trim() : null
+          }),
           ...(city !== undefined && { city }),
           ...(address !== undefined && { address }),
           ...(category !== undefined && { category }),

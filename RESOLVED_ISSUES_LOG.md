@@ -6730,3 +6730,20 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
      - Confirmed SuperAdmin WhatsApp requires scanning QR code to pair `cp_default` in Evolution API.
   3. **Permission Prompt Remedy Documented**: Provided 3-step configuration in Antigravity Settings (Auto-approve workspace commands) and switched agent tool protocol to dedicated tools to eliminate modal interruptions.
 - **Status**: ✅ Resolved and Verified with Live Payloads.
+
+
+---
+## [14 Nov 2026] Issue: SuperAdmin Merchant Profile Update Failed with Unique Constraint on whatsappPhone & Trial Extension Blocked
+- **Symptom**: When attempting to edit merchant profiles or extend trial periods in the SuperAdmin dashboard (`/super-admin?tab=merchants`), saving failed with `Invalid prisma.merchant.update() invocation: Unique constraint failed on the fields: ('whatsappPhone')`. Trial periods for SSV Saloon and academy and PET CLINIC @ MANJALPUR could not be saved.
+- **Root Cause**:
+  1. In `prisma/schema.prisma`, `Merchant.whatsappPhone` carries a `@unique` constraint.
+  2. In `src/app/super-admin/page.tsx`, `handleOpenProfileEdit` coerced `null` phone numbers to empty string (`""`).
+  3. An existing merchant (`Hitesh Kumar`) had an empty string `""` saved in `whatsappPhone`. In SQL databases, multiple rows may hold `NULL` without violating uniqueness, but multiple rows cannot hold empty string `""`.
+  4. Saving any merchant without a phone attempted to write `whatsappPhone: ""` to the database, colliding with the existing empty-string row and triggering the unique constraint violation.
+- **Resolution**:
+  1. **VPS Database Sanitation**: Executed `UPDATE Merchant SET whatsappPhone = NULL WHERE whatsappPhone = '' OR whatsappPhone = ' ';` on `/var/www/CustomerPilot/prisma/dev.db` to remove duplicate empty-string values.
+  2. **Trial Periods Extended**: Updated both `SSV Saloon and academy` (`cmw0dloss0s9ckvfcvb1lbpff`) and `PET CLINIC @ MANJALPUR` (`cmw60b1in1jsckv9d3wwc0cb6`) to `trialEndsAt: 1794821400000` (`16 Nov 2026 03:00 PM IST`), setting `plan: "trial"` and `status: "active"`.
+  3. **Backend API Defensive Coercion (`src/app/api/admin/merchants/route.ts`)**: Coerced `whatsappPhone` and `email` to `null` if given as empty strings or whitespace.
+  4. **Frontend Form Sanitization (`src/app/super-admin/page.tsx`)**: Sanitized payload in `handleSaveProfile` so empty strings are automatically converted to `null` before dispatch.
+  5. **Verification**: Executed Master Adversarial Guard (`node scripts/run_adversarial_guard.js`) with all 6 security and mathematical gates passing cleanly.
+- **Status**: ✅ Resolved, Verified, and Committed Locally.
