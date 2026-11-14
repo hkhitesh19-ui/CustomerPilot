@@ -177,6 +177,9 @@ export default function SmartBillingPage() {
               <Printer className="w-5 h-5" />
             </span>
             <h1 className="text-2xl font-bold text-slate-900">Smart POS Billing &amp; WhatsApp Invoicing</h1>
+            <Badge className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-2.5 py-0.5">
+              Standalone Service • ₹599/mo (₹4,999/yr)
+            </Badge>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Fast mobile billing, automatic GST calculation, 1-click thermal print &amp; instant WhatsApp PDF bill delivery.

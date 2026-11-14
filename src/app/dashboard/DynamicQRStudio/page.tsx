@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast"
 import {
   QrCode as QrIcon, Download, ExternalLink, RefreshCw, Smartphone, Monitor,
   Share2, CheckCircle2, AlertCircle, Sparkles, Edit3, Save, Copy, Eye, Zap,
-  ShieldCheck, Printer, Users, HelpCircle, FileSpreadsheet, ArrowRight, MessageSquare, Check, Layers, Store
+  ShieldCheck, Printer, Trash2, Globe, Plus, ArrowRight, Check, Image as ImageIcon
 } from "lucide-react"
 
 export default function DynamicQRStudioPage() {
@@ -19,28 +19,25 @@ export default function DynamicQRStudioPage() {
   const [merchantProfile, setMerchantProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [qrCodes, setQrCodes] = useState<any[]>([])
-  const [activeQr, setActiveQr] = useState<any>(null)
-  const [editDest, setEditDest] = useState("")
-  const [editMode, setEditMode] = useState<"DIRECT" | "FORM_CAPTURE">("DIRECT")
-  const [saving, setSaving] = useState(false)
+  const [selectedQr, setSelectedQr] = useState<any>(null)
+
+  // Creation State
+  const [newLabel, setNewLabel] = useState("")
+  const [newDestUrl, setNewDestUrl] = useState("")
+  const [logoChoice, setLogoChoice] = useState<"store_logo" | "no_logo">("store_logo")
+  const [customLogoUrl, setCustomLogoUrl] = useState("")
   const [creating, setCreating] = useState(false)
+  const [previewQrDataUrl, setPreviewQrDataUrl] = useState<string | null>(null)
+  const [previewLoading, setPreviewLoading] = useState(false)
 
-  // Booster Leads State
-  const [leads, setLeads] = useState<any[]>([])
-  const [loadingLeads, setLoadingLeads] = useState(false)
-  const [activeTab, setActiveTab] = useState<"standee" | "destination" | "leads" | "guide">("standee")
+  // In-line Edit Destination State
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editUrl, setEditUrl] = useState("")
+  const [savingEdit, setSavingEdit] = useState(false)
 
-  // 1. Fetch current authenticated merchant on mount & read tab param
+  // 1. Fetch current merchant and all dynamic QRs
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search)
-      const tab = params.get("tab")
-      if (tab === "leads" || tab === "destination" || tab === "guide" || tab === "standee") {
-        setActiveTab(tab)
-      }
-    }
-
-    async function initAuth() {
+    async function init() {
       try {
         const res = await fetch("/api/auth/me")
         const data = await res.json()
@@ -48,7 +45,6 @@ export default function DynamicQRStudioPage() {
           setMerchantId(data.merchant.id)
           setMerchantProfile(data.merchant)
           fetchQrs(data.merchant.id)
-          fetchLeads(data.merchant.id)
         } else {
           fetchQrs()
         }
@@ -56,7 +52,7 @@ export default function DynamicQRStudioPage() {
         fetchQrs()
       }
     }
-    initAuth()
+    init()
   }, [])
 
   const fetchQrs = async (mId?: string) => {
@@ -69,14 +65,11 @@ export default function DynamicQRStudioPage() {
       const url = targetMId ? `/api/qr-codes?merchantId=${targetMId}` : "/api/qr-codes"
       const res = await fetch(url, { headers })
       const data = await res.json()
-      if (data.success && data.qrCodes?.length > 0) {
+      if (data.success && data.qrCodes) {
         setQrCodes(data.qrCodes)
-        setActiveQr(data.qrCodes[0])
-        setEditDest(data.qrCodes[0].currentDest)
-        setEditMode(data.qrCodes[0].redirectMode || "DIRECT")
-      } else {
-        setQrCodes([])
-        setActiveQr(null)
+        if (data.qrCodes.length > 0 && !selectedQr) {
+          setSelectedQr(data.qrCodes[0])
+        }
       }
     } catch {
       toast({ title: "Notice", description: "Loading QR codes...", variant: "default" })
@@ -85,27 +78,44 @@ export default function DynamicQRStudioPage() {
     }
   }
 
-  const fetchLeads = async (mId?: string) => {
-    setLoadingLeads(true)
-    const targetMId = mId || merchantId
+  // 2. Generate Live Preview on the fly
+  const handleGeneratePreview = async () => {
+    if (!newDestUrl.trim()) {
+      toast({ title: "URL Required", description: "Please enter any destination URL first.", variant: "destructive" })
+      return
+    }
+    setPreviewLoading(true)
     try {
-      const headers: Record<string, string> = {}
-      if (targetMId) headers["x-merchant-id"] = targetMId
-
-      const url = targetMId ? `/api/qr-codes/leads?merchantId=${targetMId}` : "/api/qr-codes/leads"
-      const res = await fetch(url, { headers })
+      const res = await fetch("/api/qr-codes/preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: newDestUrl.trim(),
+          noLogo: logoChoice === "no_logo",
+          customLogoUrl: customLogoUrl.trim() || undefined
+        })
+      })
       const data = await res.json()
-      if (data.success && data.leads) {
-        setLeads(data.leads)
+      if (data.success && data.qrDataUrl) {
+        setPreviewQrDataUrl(data.qrDataUrl)
+        toast({ title: "Preview Generated!", description: "High-resolution QR code preview rendered." })
+      } else {
+        toast({ title: "Error", description: data.error || "Failed to generate preview", variant: "destructive" })
       }
     } catch {
-      console.warn("Failed to load leads")
+      toast({ title: "Error", description: "Failed to generate QR preview", variant: "destructive" })
     } finally {
-      setLoadingLeads(false)
+      setPreviewLoading(false)
     }
   }
 
-  const handleCreateCounterQr = async () => {
+  // 3. Create & Save New Dynamic QR
+  const handleCreateQr = async () => {
+    if (!newDestUrl.trim()) {
+      toast({ title: "Destination URL Required", description: "Enter any valid URL (Website, Google Review, Instagram, Menu, etc.)", variant: "destructive" })
+      return
+    }
+
     setCreating(true)
     try {
       const headers: Record<string, string> = { "Content-Type": "application/json" }
@@ -115,664 +125,506 @@ export default function DynamicQRStudioPage() {
         method: "POST",
         headers,
         body: JSON.stringify({
-          label: "Main Counter QR",
-          currentDest: "https://chat.whatsapp.com/",
-          redirectMode: "DIRECT"
+          label: newLabel.trim() || "Dynamic QR",
+          currentDest: newDestUrl.trim(),
+          redirectMode: "DIRECT",
+          noLogo: logoChoice === "no_logo"
         })
       })
       const data = await res.json()
-      if (res.ok && data.success) {
-        toast({ title: "Generated!", description: "Your permanent Dynamic QR code is ready." })
-        fetchQrs()
+      if (data.success && data.qrCode) {
+        toast({ title: "Dynamic QR Created! 🚀", description: "Permanent self-hosted QR code is ready to print and use." })
+        setNewLabel("")
+        setNewDestUrl("")
+        setPreviewQrDataUrl(null)
+        await fetchQrs()
       } else {
-        toast({ title: "Error", description: data.error || "Failed to create QR code", variant: "destructive" })
+        toast({ title: "Creation Failed", description: data.error || "Could not create QR code", variant: "destructive" })
       }
     } catch {
-      toast({ title: "Error", description: "Network error", variant: "destructive" })
+      toast({ title: "Error", description: "Failed to create QR code", variant: "destructive" })
     } finally {
       setCreating(false)
     }
   }
 
-  const handleSaveDestination = async () => {
-    if (!activeQr) return
-    if (!editDest || !editDest.trim()) {
+  // 4. Update Destination URL for an existing Dynamic QR
+  const handleSaveDestination = async (qrId: string, destUrl: string) => {
+    if (!destUrl.trim()) {
       toast({ title: "Invalid URL", description: "Destination URL cannot be empty.", variant: "destructive" })
       return
     }
-    setSaving(true)
+    setSavingEdit(true)
     try {
       const headers: Record<string, string> = { "Content-Type": "application/json" }
       if (merchantId) headers["x-merchant-id"] = merchantId
 
-      const res = await fetch(`/api/qr-codes/${activeQr.id}/destination`, {
+      const res = await fetch(`/api/qr-codes/${qrId}/destination`, {
         method: "PUT",
         headers,
         body: JSON.stringify({
-          destination: editDest.trim(),
-          redirectMode: editMode
+          destination: destUrl.trim(),
+          note: "Updated from Dynamic QR Studio"
         })
       })
       const data = await res.json()
-      if (res.ok) {
-        toast({ title: "Updated!", description: "Destination link updated successfully. Your printed QR remains unchanged!" })
+      if (data.success) {
+        toast({ title: "Destination Updated! ✅", description: "Your printed QR code will now immediately redirect to this new URL." })
+        setEditingId(null)
         fetchQrs()
       } else {
-        toast({ title: "Error", description: data.error || "Update failed", variant: "destructive" })
+        toast({ title: "Update Failed", description: data.error || "Failed to update", variant: "destructive" })
       }
     } catch {
-      toast({ title: "Error", description: "Network error", variant: "destructive" })
+      toast({ title: "Error", description: "Failed to update destination", variant: "destructive" })
     } finally {
-      setSaving(false)
+      setSavingEdit(false)
     }
   }
 
-  const handleDownloadImage = () => {
-    if (!activeQr?.qrDataUrl) return
-    const link = document.createElement("a")
-    link.href = activeQr.qrDataUrl
-    link.download = `${activeQr.slug || "counter"}-dynamic-qr.png`
-    link.click()
-    toast({ title: "Downloaded!", description: "High-resolution QR code image saved." })
-  }
+  // 5. Delete Dynamic QR
+  const handleDeleteQr = async (qrId: string) => {
+    if (!confirm("Are you sure you want to delete this Dynamic QR code? Printed copies will stop redirecting.")) return
+    try {
+      const headers: Record<string, string> = {}
+      if (merchantId) headers["x-merchant-id"] = merchantId
 
-  const handlePrintStandee = () => {
-    window.print()
-  }
-
-  const handleExportCsv = () => {
-    if (leads.length === 0) {
-      toast({ title: "No Leads", description: "No registered leads found to export." })
-      return
+      const res = await fetch(`/api/qr-codes/${qrId}`, {
+        method: "DELETE",
+        headers
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast({ title: "Deleted", description: "Dynamic QR code removed." })
+        fetchQrs()
+      }
+    } catch {
+      toast({ title: "Error", description: "Failed to delete QR code", variant: "destructive" })
     }
-    const headers = ["Name", "WhatsApp Phone", "Joined Date", "Transactional Consent", "Marketing VIP Consent"]
-    const rows = leads.map(l => [
-      `"${l.name || ""}"`,
-      `"${l.phone || ""}"`,
-      `"${new Date(l.joinedAt).toLocaleString("en-IN")}"`,
-      l.hasTransactionalConsent ? "Yes" : "No",
-      l.hasMarketingConsent ? "Yes" : "No"
-    ])
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n")
-    const encodedUri = encodeURI(csvContent)
-    const link = document.createElement("a")
-    link.setAttribute("href", encodedUri)
-    link.setAttribute("download", `whatsapp-group-leads-${activeQr?.slug || "store"}.csv`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    toast({ title: "Exported!", description: "Customer leads downloaded as CSV." })
   }
 
-  const storeName = merchantProfile?.name
-    ? merchantProfile.name.split("-")[0].split(":")[0].trim()
-    : "Our Store"
+  // Helper download
+  const downloadDataUrl = (dataUrl: string, filename: string) => {
+    const a = document.createElement("a")
+    a.href = dataUrl
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }
 
   return (
-    <div className="p-4 sm:p-8 max-w-6xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-8 font-sans">
+      {/* 1. Page Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-emerald-100 text-emerald-800">
+            <span className="p-2 rounded-xl bg-teal-100 text-teal-800">
               <QrIcon className="w-5 h-5" />
             </span>
-            <h1 className="text-2xl font-bold text-slate-900">Dynamic QR Studio &amp; WhatsApp Group Engine</h1>
+            <h1 className="text-2xl font-bold text-slate-900">Dynamic QR Studio</h1>
+            <Badge className="bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs px-2.5 py-0.5">
+              Self-Hosted Dynamic QR Engine
+            </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Permanent self-hosted dynamic QR codes. Print once on your counter standee, change destination anytime!
+          <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-3xl leading-relaxed">
+            Generate permanent dynamic QR codes for <strong>ANY link</strong> (Website, Google Reviews, Instagram, PDF Menu, Offers).
+            Print once on counter standees, table cards, or packaging — <strong>change the destination URL anytime</strong> without ever re-printing!
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={() => { fetchQrs(); fetchLeads(); }} variant="outline" size="sm" className="rounded-xl gap-1.5">
+          <Button onClick={() => fetchQrs()} variant="outline" size="sm" className="rounded-xl gap-1.5 text-xs text-slate-600">
             <RefreshCw className="w-3.5 h-3.5" /> Refresh
           </Button>
-          {activeQr && (
-            <Button onClick={handlePrintStandee} size="sm" className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl gap-1.5">
-              <Printer className="w-3.5 h-3.5" /> Print Standee (A4/A5)
-            </Button>
-          )}
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
-        <button
-          onClick={() => setActiveTab("standee")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
-            activeTab === "standee"
-              ? "bg-emerald-600 text-white shadow-sm"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-          }`}
-        >
-          <Printer className="w-3.5 h-3.5" /> 1. Counter Standee &amp; Tabletop Studio
-        </button>
-
-        <button
-          onClick={() => setActiveTab("destination")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
-            activeTab === "destination"
-              ? "bg-emerald-600 text-white shadow-sm"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-          }`}
-        >
-          <Zap className="w-3.5 h-3.5" /> 2. Destination &amp; Mode Switcher
-        </button>
-
-        <button
-          onClick={() => setActiveTab("leads")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
-            activeTab === "leads"
-              ? "bg-emerald-600 text-white shadow-sm"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-          }`}
-        >
-          <Users className="w-3.5 h-3.5" /> 3. WhatsApp Group Booster Leads ({leads.length})
-        </button>
-
-        <button
-          onClick={() => setActiveTab("guide")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
-            activeTab === "guide"
-              ? "bg-emerald-600 text-white shadow-sm"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-          }`}
-        >
-          <HelpCircle className="w-3.5 h-3.5" /> 4. Decision Guide: Which Plan to Choose?
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="py-20 text-center text-slate-400 text-sm flex flex-col items-center justify-center gap-3">
-          <RefreshCw className="w-6 h-6 animate-spin text-emerald-600" />
-          <span>Loading Dynamic QR Engine...</span>
-        </div>
-      ) : !activeQr ? (
-        <Card className="p-10 text-center border-2 border-dashed border-emerald-200 bg-emerald-50/30 rounded-3xl space-y-4">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 shadow-sm">
-            <QrIcon className="w-8 h-8" />
-          </div>
-          <div className="max-w-md mx-auto space-y-1">
-            <h3 className="text-lg font-bold text-slate-900">No Counter QR Generated Yet</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Generate your permanent self-hosted dynamic QR code. Print it once for your cash counter, tabletop, or standee and update its destination URL anytime!
-            </p>
-          </div>
-          <div className="pt-2">
-            <Button
-              onClick={handleCreateCounterQr}
-              disabled={creating}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl px-6 py-2.5 shadow-md shadow-emerald-600/20"
-            >
-              {creating ? "Generating..." : "✨ Generate My Counter Dynamic QR"}
-            </Button>
-          </div>
-        </Card>
-      ) : (
-        <div>
-          {/* TAB 1: Standee & Physical Preview */}
-          {activeTab === "standee" && (
-            <div className="space-y-6">
-              {/* Merchant Guidance Card */}
-              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-emerald-900">
-                <div className="space-y-1">
-                  <div className="font-bold flex items-center gap-1.5 text-sm">
-                    <Sparkles className="w-4 h-4 text-emerald-600" />
-                    How Dynamic QR Works for Your Store
-                  </div>
-                  <p className="text-emerald-800 leading-relaxed">
-                    Print this QR code on an <strong>Acrylic Tent Card</strong> or <strong>Cash Counter Standee</strong>. When customers scan it, they reach your WhatsApp Community or Google Review. If your group gets full (1024 members) or you change offers, simply update the link in Tab 2. <strong>Your printed standee never goes to waste!</strong>
-                  </p>
-                </div>
-                <Button onClick={handlePrintStandee} size="sm" className="bg-emerald-700 hover:bg-emerald-800 text-white shrink-0 rounded-xl">
-                  <Printer className="w-3.5 h-3.5 mr-1" /> Print Tent Card
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Column 1: Acrylic Counter Standee Realistic Mockup */}
-                <Card className="border-slate-200 shadow-md rounded-3xl overflow-hidden bg-white">
-                  <CardHeader className="bg-slate-900 text-white p-4">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-bold flex items-center gap-2">
-                        <Store className="w-4 h-4 text-emerald-400" />
-                        Counter Standee Preview
-                      </CardTitle>
-                      <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-400/30 text-[10px]">
-                        READY TO PRINT
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-                    {/* Realistic Acrylic Standee Card Container */}
-                    <div className="w-full max-w-[260px] p-5 rounded-2xl bg-gradient-to-b from-slate-50 via-white to-slate-100 border-4 border-slate-800 shadow-2xl relative text-center space-y-3">
-                      {/* Top Header Badge */}
-                      <div className="space-y-1">
-                        <div className="font-extrabold text-sm text-slate-900 tracking-tight">{storeName}</div>
-                        <div className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider bg-emerald-50 py-0.5 px-2 rounded-full inline-block">
-                          Official VIP Community
-                        </div>
-                      </div>
-
-                      {/* Branded QR Box */}
-                      <div className="p-3 bg-white rounded-2xl border-2 border-emerald-100 shadow-md mx-auto inline-block">
-                        {activeQr.qrDataUrl ? (
-                          <img
-                            src={activeQr.qrDataUrl}
-                            alt="Dynamic Counter QR"
-                            className="w-40 h-40 object-contain mx-auto"
-                          />
-                        ) : (
-                          <div className="w-40 h-40 bg-slate-100 rounded-xl flex items-center justify-center text-xs text-slate-400">
-                            QR Generating...
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Standee Call-to-Action */}
-                      <div className="space-y-0.5">
-                        <div className="text-xs font-bold text-slate-900">SCAN WITH ANY CAMERA</div>
-                        <div className="text-[10px] text-slate-500">
-                          {activeQr.redirectMode === "FORM_CAPTURE"
-                            ? "Get Secret VIP Discounts & Digital Bill"
-                            : "Join Our WhatsApp Community Instantly"}
-                        </div>
-                      </div>
-
-                      <div className="pt-1 text-[9px] text-slate-400 font-mono">
-                        Powered by CustomerPilot
-                      </div>
-                    </div>
-
-                    {/* Quick Action Buttons */}
-                    <div className="w-full space-y-2 pt-2">
-                      <div className="text-[11px] font-mono text-slate-500 bg-slate-50 p-2 rounded-xl break-all select-all border border-slate-200">
-                        {activeQr.publicUrl}
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button
-                          onClick={handleDownloadImage}
-                          variant="outline"
-                          size="sm"
-                          className="rounded-xl text-xs font-semibold"
-                        >
-                          <Download className="w-3.5 h-3.5 mr-1" /> PNG
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            if (activeQr?.publicUrl) {
-                              navigator.clipboard.writeText(activeQr.publicUrl)
-                              toast({ title: "Copied!", description: "Permanent QR URL copied." })
-                            }
-                          }}
-                          variant="outline"
-                          size="sm"
-                          className="rounded-xl text-xs font-semibold"
-                        >
-                          <Copy className="w-3.5 h-3.5 mr-1" /> Copy Link
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Column 2 & 3: Standee Printing Specs & Live Scan Health */}
-                <div className="lg:col-span-2 space-y-6">
-                  {/* Printing Specification Card */}
-                  <Card className="border-slate-200 shadow-sm rounded-2xl bg-white">
-                    <CardHeader className="p-5 border-b border-slate-100">
-                      <CardTitle className="text-base font-bold text-slate-900">Physical Print Specifications</CardTitle>
-                      <CardDescription className="text-xs text-slate-500">
-                        Recommended sizes for placing on cash counters, dining tables, or reception desks.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-5 space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                          <div className="font-bold text-xs text-slate-900">A5 Acrylic Tent Card</div>
-                          <div className="text-[11px] text-slate-500">Best for restaurant tables &amp; billing counters (5.8 × 8.3 in).</div>
-                          <Badge variant="outline" className="text-[10px] mt-1 bg-emerald-50 text-emerald-700">Most Popular</Badge>
-                        </div>
-                        <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                          <div className="font-bold text-xs text-slate-900">A4 Counter Standee</div>
-                          <div className="text-[11px] text-slate-500">Best for store entrance, bakery display, or checkout desk.</div>
-                          <Badge variant="outline" className="text-[10px] mt-1">High Visibility</Badge>
-                        </div>
-                        <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                          <div className="font-bold text-xs text-slate-900">Sticker Decal (3×3")</div>
-                          <div className="text-[11px] text-slate-500">Best for delivery cake boxes, pastry bags &amp; carry bags.</div>
-                          <Badge variant="outline" className="text-[10px] mt-1">Takeaway Reach</Badge>
-                        </div>
-                      </div>
-
-                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 flex items-start gap-2.5">
-                        <ShieldCheck className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
-                        <div>
-                          <strong>Lifetime Validity Guarantee:</strong> This QR uses self-hosted URL redirection. There are zero paid third-party API dependencies (no Bitly or Beaconstac timeouts). Your physical prints will work forever.
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Scan Analytics Overview */}
-                  <Card className="border-slate-200 shadow-sm rounded-2xl bg-white">
-                    <CardHeader className="p-5 border-b border-slate-100">
-                      <CardTitle className="text-base font-bold text-slate-900">Scan Analytics &amp; Health</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-5">
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                          <div className="text-xs text-slate-500 font-medium">Total Scans</div>
-                          <div className="text-xl font-bold text-slate-900 mt-1">{activeQr._count?.scanEvents || activeQr.totalScans || 0}</div>
-                        </div>
-                        <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-                          <div className="text-xs text-emerald-700 font-medium">Booster Leads</div>
-                          <div className="text-xl font-bold text-emerald-800 mt-1">{leads.length}</div>
-                        </div>
-                        <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
-                          <div className="text-xs text-blue-700 font-medium">Mobile Traffic</div>
-                          <div className="text-xl font-bold text-blue-800 mt-1">96%</div>
-                        </div>
-                        <div className="p-3 bg-purple-50 rounded-xl border border-purple-100">
-                          <div className="text-xs text-purple-700 font-medium">Engine Health</div>
-                          <div className="text-sm font-bold text-purple-800 mt-2">100% HEALTHY</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: Destination & Mode Switcher */}
-          {activeTab === "destination" && (
-            <div className="max-w-3xl space-y-6">
-              <Card className="border-slate-200 shadow-sm rounded-2xl bg-white">
-                <CardHeader className="p-5 border-b border-slate-100">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-base font-bold text-slate-900">Destination Control Center</CardTitle>
-                      <CardDescription className="text-xs text-slate-500">
-                        Update where customers land when they scan your printed counter QR.
-                      </CardDescription>
-                    </div>
-                    {editDest && (
-                      <a
-                        href={editDest}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg hover:bg-emerald-100 transition"
-                      >
-                        <ExternalLink className="w-3 h-3" /> Test Destination
-                      </a>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="p-5 space-y-5">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-slate-700">
-                      Destination Link (WhatsApp Group Invite URL, Google Review Link, or Menu)
-                    </Label>
-                    <Input
-                      value={editDest}
-                      onChange={(e) => setEditDest(e.target.value)}
-                      placeholder="https://chat.whatsapp.com/..."
-                      className="rounded-xl border-slate-200 font-mono text-xs"
-                    />
-                    <p className="text-[11px] text-slate-400">
-                      Whenever your WhatsApp Group gets full, just paste the new invite link here and click Save. Your printed counter QR never changes.
-                    </p>
-                  </div>
-
-                  <div className="space-y-2 pt-2 border-t border-slate-100">
-                    <Label className="text-xs font-semibold text-slate-700">Choose Scan Experience Mode</Label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div
-                        onClick={() => setEditMode("DIRECT")}
-                        className={`p-3.5 rounded-xl border-2 cursor-pointer transition ${
-                          editMode === "DIRECT"
-                            ? "border-emerald-600 bg-emerald-50/50 shadow-sm"
-                            : "border-slate-200 hover:border-slate-300"
-                        }`}
-                      >
-                        <div className="font-bold text-xs text-slate-900 flex items-center justify-between">
-                          <span>🟢 Direct 0-Second Redirect</span>
-                          {editMode === "DIRECT" && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
-                        </div>
-                        <p className="text-[11px] text-slate-500 mt-1">
-                          Zero friction. Customer immediately reaches your WhatsApp group. Maximum join conversion (95%+).
-                        </p>
-                      </div>
-
-                      <div
-                        onClick={() => setEditMode("FORM_CAPTURE")}
-                        className={`p-3.5 rounded-xl border-2 cursor-pointer transition ${
-                          editMode === "FORM_CAPTURE"
-                            ? "border-emerald-600 bg-emerald-50/50 shadow-sm"
-                            : "border-slate-200 hover:border-slate-300"
-                        }`}
-                      >
-                        <div className="font-bold text-xs text-slate-900 flex items-center justify-between">
-                          <span>🔵 WhatsApp Group Booster (Form)</span>
-                          {editMode === "FORM_CAPTURE" && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
-                        </div>
-                        <p className="text-[11px] text-slate-500 mt-1">
-                          Customer enters Name &amp; Phone number before joining. Builds your CRM database for WhatsApp billing and VIP offers.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center pt-2">
-                    <a
-                      href={`/wg/${activeQr.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs font-medium text-emerald-600 hover:underline flex items-center gap-1"
-                    >
-                      <Eye className="w-3.5 h-3.5" /> Preview Live Customer Form
-                    </a>
-                    <Button
-                      onClick={handleSaveDestination}
-                      disabled={saving}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs px-5 shadow-sm"
-                    >
-                      {saving ? "Saving..." : "Save Destination Changes"}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* TAB 3: WhatsApp Group Booster Leads CRM */}
-          {activeTab === "leads" && (
-            <div className="space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* 2. Top Section: Creator Console + Live Dynamic Preview */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Creator Console (7 cols) */}
+        <div className="lg:col-span-7 space-y-6">
+          <Card className="border-slate-200 shadow-sm rounded-2xl bg-white overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-teal-50/70 via-slate-50 to-white border-b border-slate-100 p-5">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg font-bold text-slate-900">WhatsApp Group Booster Leads</h2>
-                  <p className="text-xs text-slate-500">
-                    Customers who scanned your counter QR standee and registered their Name &amp; WhatsApp number.
-                  </p>
+                  <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-teal-600" />
+                    <span>Create New Dynamic QR Code</span>
+                  </CardTitle>
+                  <CardDescription className="text-xs text-slate-500 mt-0.5">
+                    Enter any website, document, social profile, or review link below.
+                  </CardDescription>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button onClick={() => fetchLeads()} variant="outline" size="sm" className="rounded-xl gap-1">
-                    <RefreshCw className="w-3.5 h-3.5" /> Refresh
-                  </Button>
-                  <Button onClick={handleExportCsv} size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl gap-1">
-                    <FileSpreadsheet className="w-3.5 h-3.5" /> Export to CSV ({leads.length})
-                  </Button>
-                </div>
+                <Badge variant="outline" className="border-teal-300 text-teal-700 bg-teal-50 text-[10px] font-bold">
+                  Zero Third-Party APIs
+                </Badge>
+              </div>
+            </CardHeader>
+
+            <CardContent className="p-6 space-y-5">
+              {/* Field 1: Campaign / QR Label */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-700">QR Name / Campaign Label</Label>
+                <Input
+                  placeholder="e.g. Counter Google Review Standee, Table 4 Menu, Summer Promo"
+                  value={newLabel}
+                  onChange={(e) => setNewLabel(e.target.value)}
+                  className="rounded-xl border-slate-200 text-xs py-2.5 focus:border-teal-500"
+                />
               </div>
 
-              {loadingLeads ? (
-                <div className="py-12 text-center text-slate-400 text-xs">Loading leads...</div>
-              ) : leads.length === 0 ? (
-                <Card className="p-10 text-center rounded-2xl border-dashed border-2 border-slate-200">
-                  <Users className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                  <h3 className="font-bold text-slate-800 text-sm">No Booster Leads Yet</h3>
-                  <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
-                    When customers scan your counter QR in "WhatsApp Group Booster" mode, their verified Name and Phone number will appear right here.
-                  </p>
-                  <Button
-                    onClick={() => { setActiveTab("destination"); setEditMode("FORM_CAPTURE"); }}
-                    size="sm"
-                    className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs"
-                  >
-                    Enable WhatsApp Group Booster Mode
-                  </Button>
-                </Card>
-              ) : (
-                <Card className="border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs border-collapse">
-                      <thead>
-                        <tr className="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold">
-                          <th className="p-3.5">Customer Name</th>
-                          <th className="p-3.5">WhatsApp Mobile</th>
-                          <th className="p-3.5">Joined At</th>
-                          <th className="p-3.5">Opt-In Consent</th>
-                          <th className="p-3.5 text-right">Quick Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {leads.map((lead) => (
-                          <tr key={lead.id} className="hover:bg-slate-50/50 transition">
-                            <td className="p-3.5 font-bold text-slate-900">{lead.name || "Anonymous Walk-in"}</td>
-                            <td className="p-3.5 font-mono text-slate-600">+91 {lead.phone}</td>
-                            <td className="p-3.5 text-slate-400 text-[11px]">
-                              {new Date(lead.joinedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
-                            </td>
-                            <td className="p-3.5">
-                              <div className="flex gap-1.5 flex-wrap">
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                  <Check className="w-2.5 h-2.5" /> Bills
-                                </span>
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
-                                  <Sparkles className="w-2.5 h-2.5" /> VIP Club
-                                </span>
-                              </div>
-                            </td>
-                            <td className="p-3.5 text-right">
-                              <a
-                                href={`https://wa.me/91${lead.phone}?text=Hi%20${encodeURIComponent(lead.name || "")},%20welcome%20to%20${encodeURIComponent(storeName)}!`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl hover:bg-emerald-100 transition"
-                              >
-                                <MessageSquare className="w-3 h-3" /> WhatsApp Chat
-                              </a>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </Card>
-              )}
-            </div>
-          )}
-
-          {/* TAB 4: Decision Guide (Which Method to Choose?) */}
-          {activeTab === "guide" && (
-            <div className="space-y-6">
-              <div className="p-4 bg-slate-900 text-white rounded-2xl space-y-1">
-                <h3 className="font-bold text-base flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-emerald-400" />
-                  Merchant Decision Framework: Which Plan is Right for Your Business?
-                </h3>
-                <p className="text-slate-300 text-xs leading-relaxed">
-                  Har merchant ki zaroorat alag hoti hai. Niche diye gaye 3 plans ko padhiye aur apne store ke hisaab se choose karein:
+              {/* Field 2: Target Destination URL (Core Edit Box) */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <Globe className="w-3.5 h-3.5 text-teal-600" />
+                    <span>Destination URL (Edit Box)</span>
+                  </Label>
+                  <span className="text-[11px] text-slate-400">Can be changed anytime later</span>
+                </div>
+                <Input
+                  placeholder="https://maps.app.goo.gl/... or https://yourstore.com/menu.pdf"
+                  value={newDestUrl}
+                  onChange={(e) => setNewDestUrl(e.target.value)}
+                  className="rounded-xl border-slate-200 text-xs py-2.5 font-mono focus:border-teal-500"
+                />
+                <p className="text-[11px] text-slate-500">
+                  Tip: Paste your Google Maps review link, Instagram page, food menu PDF, or WhatsApp chat link.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                {/* Method 1 */}
-                <Card className="border-slate-200 rounded-2xl p-5 space-y-4 hover:shadow-md transition">
-                  <div className="space-y-1">
-                    <Badge className="bg-emerald-100 text-emerald-800 text-[10px] font-bold">METHOD 1 — SIMPLE</Badge>
-                    <h4 className="font-bold text-slate-900 text-base">Dynamic QR Studio</h4>
-                    <div className="text-xl font-extrabold text-slate-900">₹100 <span className="text-xs font-normal text-slate-400">/ month</span></div>
-                    <div className="text-[11px] text-emerald-600 font-medium">Yearly: ₹699 / year</div>
-                  </div>
-                  <ul className="text-xs text-slate-600 space-y-2">
-                    <li className="flex items-start gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
-                      <span>Permanent Acrylic Counter Standee QR.</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
-                      <span>Zero-friction 0-second redirect to WhatsApp Group or Google Review.</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
-                      <span>Update destination anytime without reprinting standee.</span>
-                    </li>
-                  </ul>
-                  <div className="p-3 bg-slate-50 rounded-xl text-[11px] text-slate-500">
-                    <strong>Best for:</strong> Stores who just want customers to join their WhatsApp community fast without asking for phone numbers.
-                  </div>
-                </Card>
+              {/* Field 3: Logo Style (With Logo vs Without Logo) */}
+              <div className="space-y-2.5 pt-2 border-t border-slate-100">
+                <Label className="text-xs font-bold text-slate-700">Center Logo Style</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setLogoChoice("store_logo")}
+                    className={`p-3.5 rounded-xl border text-left flex items-start gap-3 transition-all ${
+                      logoChoice === "store_logo"
+                        ? "border-teal-500 bg-teal-50/50 shadow-sm"
+                        : "border-slate-200 hover:border-slate-300 bg-white"
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg ${logoChoice === "store_logo" ? "bg-teal-600 text-white" : "bg-slate-100 text-slate-600"}`}>
+                      <ImageIcon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-900">With Store Logo</div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">Embeds your business logo in QR center for high trust</div>
+                    </div>
+                  </button>
 
-                {/* Method 2 */}
-                <Card className="border-2 border-emerald-500 rounded-2xl p-5 space-y-4 shadow-md bg-emerald-50/10 relative">
-                  <div className="space-y-1">
-                    <Badge className="bg-emerald-600 text-white text-[10px] font-bold">METHOD 2 — RECOMMENDED</Badge>
-                    <h4 className="font-bold text-slate-900 text-base">WhatsApp Group Booster</h4>
-                    <div className="text-xl font-extrabold text-slate-900">₹299 <span className="text-xs font-normal text-slate-400">/ month</span></div>
-                    <div className="text-[11px] text-emerald-600 font-medium">Yearly: ₹2,499 / year</div>
-                  </div>
-                  <ul className="text-xs text-slate-600 space-y-2">
-                    <li className="flex items-start gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
-                      <span>Everything in Method 1 (Counter Standee + Dynamic QR).</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
-                      <span><strong>5-Sec Lead Capture Form:</strong> Customer enters Name &amp; Phone before entering the group.</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
-                      <span>Legal opt-in for WhatsApp bills &amp; VIP marketing saved to CRM.</span>
-                    </li>
-                  </ul>
-                  <div className="p-3 bg-emerald-50 rounded-xl text-[11px] text-emerald-900 font-medium">
-                    <strong>Best for:</strong> Retailers who want to OWN their customer data instead of anonymous WhatsApp group members.
-                  </div>
-                </Card>
-
-                {/* Method 3 */}
-                <Card className="border-slate-200 rounded-2xl p-5 space-y-4 hover:shadow-md transition">
-                  <div className="space-y-1">
-                    <Badge className="bg-indigo-100 text-indigo-800 text-[10px] font-bold">METHOD 3 — COMPLETE</Badge>
-                    <h4 className="font-bold text-slate-900 text-base">Smart POS &amp; WA Invoicing</h4>
-                    <div className="text-xl font-extrabold text-slate-900">₹599 <span className="text-xs font-normal text-slate-400">/ month</span></div>
-                    <div className="text-[11px] text-indigo-600 font-medium">Yearly: ₹4,999 / year</div>
-                  </div>
-                  <ul className="text-xs text-slate-600 space-y-2">
-                    <li className="flex items-start gap-2">
-                      <Check className="w-3.5 h-3.5 text-indigo-600 mt-0.5 shrink-0" />
-                      <span>Everything in Method 1 &amp; Method 2.</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-3.5 h-3.5 text-indigo-600 mt-0.5 shrink-0" />
-                      <span>Fast mobile cash-counter POS with automatic GST calculation.</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-3.5 h-3.5 text-indigo-600 mt-0.5 shrink-0" />
-                      <span>1-Click Thermal Print + Automatic WhatsApp PDF Tax Invoice delivery.</span>
-                    </li>
-                  </ul>
-                  <div className="p-3 bg-slate-50 rounded-xl text-[11px] text-slate-500">
-                    <strong>Best for:</strong> Bakeries, boutiques, and retail shops looking to replace bulky billing machines with fast mobile WhatsApp billing.
-                  </div>
-                </Card>
+                  <button
+                    type="button"
+                    onClick={() => setLogoChoice("no_logo")}
+                    className={`p-3.5 rounded-xl border text-left flex items-start gap-3 transition-all ${
+                      logoChoice === "no_logo"
+                        ? "border-teal-500 bg-teal-50/50 shadow-sm"
+                        : "border-slate-200 hover:border-slate-300 bg-white"
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg ${logoChoice === "no_logo" ? "bg-teal-600 text-white" : "bg-slate-100 text-slate-600"}`}>
+                      <QrIcon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-900">Without Logo (Clean)</div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">Pure, high-density black &amp; white dynamic QR code</div>
+                    </div>
+                  </button>
+                </div>
               </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row items-center gap-3 pt-3">
+                <Button
+                  onClick={handleGeneratePreview}
+                  disabled={previewLoading || !newDestUrl.trim()}
+                  variant="outline"
+                  className="w-full sm:w-auto rounded-xl text-xs font-bold border-slate-300 text-slate-700 hover:bg-slate-50 gap-1.5"
+                >
+                  <Eye className="w-3.5 h-3.5 text-teal-600" />
+                  <span>{previewLoading ? "Generating..." : "Generate Live Preview"}</span>
+                </Button>
+
+                <Button
+                  onClick={handleCreateQr}
+                  disabled={creating || !newDestUrl.trim()}
+                  className="w-full sm:flex-1 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white shadow-md shadow-teal-600/20 gap-1.5"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>{creating ? "Creating Dynamic QR..." : "Create & Save Dynamic QR"}</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Live Dynamic Preview Card (5 cols) */}
+        <div className="lg:col-span-5">
+          <Card className="border-slate-200 shadow-sm rounded-2xl bg-white overflow-hidden sticky top-6">
+            <CardHeader className="p-4 border-b border-slate-100 bg-slate-50/70 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-sm font-bold text-slate-900">Active QR Preview</CardTitle>
+                <CardDescription className="text-[11px] text-slate-500">
+                  {previewQrDataUrl ? "Instant Preview (Unsaved)" : selectedQr?.label || "Select or create a QR"}
+                </CardDescription>
+              </div>
+              <Badge className="bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 text-[10px] font-bold">
+                100% Dynamic
+              </Badge>
+            </CardHeader>
+
+            <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
+              {/* QR Image Display */}
+              <div className="p-5 bg-white rounded-2xl border-2 border-slate-200 shadow-md flex items-center justify-center">
+                {previewQrDataUrl ? (
+                  <img src={previewQrDataUrl} alt="Preview QR" className="w-48 h-48 sm:w-56 sm:h-56 object-contain" />
+                ) : selectedQr?.qrDataUrl ? (
+                  <img src={selectedQr.qrDataUrl} alt={selectedQr.label} className="w-48 h-48 sm:w-56 sm:h-56 object-contain" />
+                ) : (
+                  <div className="w-48 h-48 sm:w-56 sm:h-56 flex flex-col items-center justify-center text-slate-400 gap-2 border border-dashed border-slate-300 rounded-xl">
+                    <QrIcon className="w-10 h-10 opacity-40" />
+                    <span className="text-xs">No QR Code Selected</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Dynamic URL badge */}
+              <div className="w-full bg-slate-50 rounded-xl p-3 border border-slate-200 text-left space-y-1.5">
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Dynamic Redirect Endpoint</div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-xs text-teal-700 font-semibold truncate">
+                    {selectedQr?.publicUrl || (previewQrDataUrl ? "Preview (Save to activate URL)" : "—")}
+                  </span>
+                  {selectedQr?.publicUrl && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        navigator.clipboard.writeText(selectedQr.publicUrl)
+                        toast({ title: "Copied!", description: "Dynamic URL copied to clipboard." })
+                      }}
+                      className="h-7 px-2 text-[11px] text-slate-600 hover:text-teal-700"
+                    >
+                      <Copy className="w-3 h-3 mr-1" /> Copy
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Target Destination display */}
+              <div className="w-full bg-slate-50 rounded-xl p-3 border border-slate-200 text-left space-y-1">
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Current Target Destination</div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-slate-800 font-medium truncate">
+                    {previewQrDataUrl ? newDestUrl : selectedQr?.currentDest || "—"}
+                  </span>
+                  {(selectedQr?.currentDest || newDestUrl) && (
+                    <a
+                      href={previewQrDataUrl ? newDestUrl : selectedQr?.currentDest}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-teal-600 hover:text-teal-700 text-xs flex items-center shrink-0"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Download Buttons */}
+              <div className="grid grid-cols-2 gap-2 w-full pt-2">
+                <Button
+                  onClick={() => {
+                    const imgUrl = previewQrDataUrl || selectedQr?.qrDataUrl
+                    if (imgUrl) downloadDataUrl(imgUrl, `${selectedQr?.slug || "dynamic-qr"}.png`)
+                  }}
+                  disabled={!previewQrDataUrl && !selectedQr?.qrDataUrl}
+                  className="rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white gap-1.5"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download PNG</span>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => window.print()}
+                  className="rounded-xl text-xs font-bold border-slate-300 text-slate-700 hover:bg-slate-50 gap-1.5"
+                >
+                  <Printer className="w-3.5 h-3.5 text-slate-600" />
+                  <span>Print Standee</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* 3. Merchant's Dynamic QR Library (Table / Manager) */}
+      <Card className="border-slate-200 shadow-sm rounded-2xl bg-white overflow-hidden">
+        <CardHeader className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+          <div>
+            <CardTitle className="text-base font-bold text-slate-900">Your Dynamic QR Library</CardTitle>
+            <CardDescription className="text-xs text-slate-500 mt-0.5">
+              All permanent dynamic QR codes created for your business. Update destinations in real-time.
+            </CardDescription>
+          </div>
+          <Badge variant="outline" className="border-slate-300 text-slate-700 text-xs">
+            {qrCodes.length} {qrCodes.length === 1 ? "QR Code" : "QR Codes"}
+          </Badge>
+        </CardHeader>
+
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="p-8 text-center text-xs text-slate-500">Loading dynamic QR codes...</div>
+          ) : qrCodes.length === 0 ? (
+            <div className="p-12 text-center space-y-3">
+              <QrIcon className="w-10 h-10 text-slate-300 mx-auto" />
+              <div className="text-sm font-bold text-slate-800">No Dynamic QR Codes Yet</div>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                Use the console above to create your first self-hosted dynamic QR code for any website, review link, or menu.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100 overflow-x-auto">
+              {qrCodes.map((qr) => {
+                const isSelected = selectedQr?.id === qr.id
+                const isEditing = editingId === qr.id
+                const isNoLogo = qr.label?.startsWith("[NO_LOGO]") || false
+                const cleanLabel = qr.label?.replace(/^\[NO_LOGO\]\s*/, "") || "Dynamic QR"
+
+                return (
+                  <div
+                    key={qr.id}
+                    className={`p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 transition-colors ${
+                      isSelected ? "bg-teal-50/30" : "hover:bg-slate-50/50"
+                    }`}
+                  >
+                    {/* Left: Thumbnail + Info */}
+                    <div className="flex items-center gap-4 min-w-[280px]">
+                      {qr.qrDataUrl ? (
+                        <img
+                          src={qr.qrDataUrl}
+                          alt={cleanLabel}
+                          onClick={() => setSelectedQr(qr)}
+                          className="w-14 h-14 rounded-xl border border-slate-200 p-1 bg-white cursor-pointer hover:shadow-sm shrink-0"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                          <QrIcon className="w-6 h-6 text-slate-400" />
+                        </div>
+                      )}
+
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-sm text-slate-900 cursor-pointer" onClick={() => setSelectedQr(qr)}>
+                            {cleanLabel}
+                          </span>
+                          {isNoLogo ? (
+                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-slate-300 text-slate-500">
+                              Clean QR
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-teal-100 text-teal-800 text-[9px] px-1.5 py-0">
+                              With Logo
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-[11px] font-mono text-teal-700 flex items-center gap-1">
+                          <span>{qr.publicUrl || `/api/wg/${qr.slug}`}</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400">
+                          Scans: <strong>{qr._count?.scanEvents || qr.totalScans || 0}</strong> • Created: {new Date(qr.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Middle: Destination URL Editor */}
+                    <div className="flex-1 max-w-xl">
+                      {isEditing ? (
+                        <div className="flex items-center gap-2">
+                          <Input
+                            value={editUrl}
+                            onChange={(e) => setEditUrl(e.target.value)}
+                            placeholder="Enter new destination URL"
+                            className="text-xs rounded-xl font-mono border-teal-500"
+                          />
+                          <Button
+                            size="sm"
+                            disabled={savingEdit}
+                            onClick={() => handleSaveDestination(qr.id, editUrl)}
+                            className="rounded-xl text-xs bg-teal-600 hover:bg-teal-500 text-white shrink-0"
+                          >
+                            <Save className="w-3.5 h-3.5 mr-1" />
+                            {savingEdit ? "Saving..." : "Save"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setEditingId(null)}
+                            className="rounded-xl text-xs text-slate-500 shrink-0"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2 border border-slate-200">
+                          <div className="flex items-center gap-2 truncate">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">Target:</span>
+                            <span className="text-xs text-slate-700 font-mono truncate">{qr.currentDest}</span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setEditingId(qr.id)
+                              setEditUrl(qr.currentDest)
+                            }}
+                            className="text-xs text-teal-600 hover:text-teal-700 font-semibold flex items-center gap-1 shrink-0 ml-2"
+                          >
+                            <Edit3 className="w-3 h-3" /> Change
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right: Actions */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setSelectedQr(qr)}
+                        className={`rounded-xl text-xs ${isSelected ? "border-teal-500 text-teal-700 bg-teal-50" : "border-slate-200 text-slate-700"}`}
+                      >
+                        <Eye className="w-3.5 h-3.5 mr-1" /> Preview
+                      </Button>
+
+                      {qr.qrDataUrl && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => downloadDataUrl(qr.qrDataUrl, `${qr.slug}.png`)}
+                          className="rounded-xl text-xs text-slate-600 hover:text-slate-900"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDeleteQr(qr.id)}
+                        className="rounded-xl text-xs text-slate-400 hover:text-red-600"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           )}
-        </div>
-      )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

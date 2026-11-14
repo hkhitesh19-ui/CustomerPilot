@@ -4,6 +4,20 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+---
+## [14 Nov 2026] Architectural Separation: 4 Standalone Modules for Dynamic QR Studio, WA Group Booster Simple, WA Booster Pro Leads & Smart POS
+- **Symptom**: Previously, Dynamic QR Studio and WhatsApp Group Booster were combined inside a single tabbed dashboard (`/dashboard/DynamicQRStudio`), causing conceptual confusion for merchants between general-purpose dynamic QR creation (any URL), direct 0-second WhatsApp group redirection (Tier 1), and VIP form lead capture (Tier 2).
+- **Root Cause**: All scan behaviors (DIRECT redirect vs FORM_CAPTURE), standee generation, destination configuration, and CRM leads table were grouped as tabs on one page, and sidebar navigation lacked distinct standalone entry points for the different commercial tiers.
+- **Resolution**:
+  1. **Dynamic QR Studio (`/dashboard/DynamicQRStudio`)**: Transformed into a standalone, general-purpose Self-Hosted Dynamic QR Engine. Merchants can enter ANY target URL (website, Google review, Instagram, PDF menu, catalog), choose center logo style ("With Store Logo" vs "Without Logo - Clean QR"), generate instant previews via `/api/qr-codes/preview`, download PNG/SVG, and manage their Dynamic QR library with real-time destination editing.
+  2. **WhatsApp Group Booster - Simple & Fast Mode (`/dashboard/WAGroupBooster`)**: Created dedicated standalone dashboard for Tier 1 (₹100/mo / ₹699/yr). Pure Direct 0-Second Redirection to WhatsApp group invite. Displays acrylic tabletop counter standee mockup, 1-click A4/A5 print, and scan analytics.
+  3. **WhatsApp Group Booster Pro - Lead Capture Mode (`/dashboard/WAGroupBoosterPro`)**: Created dedicated standalone dashboard for Tier 2 (₹299/mo / ₹2,499/yr). Features 5-second branded VIP registration form before WhatsApp join, Verified Leads CRM table with WhatsApp click-to-chat, 1-click CSV export, and live customer demo link (`/wg/[slug]`).
+  4. **Smart POS Billing & WhatsApp Invoicing Pro (`/dashboard/billing`)**: Clarified standalone tier identity with prominent badge: Tier 3 (₹599/mo / ₹4,999/yr).
+  5. **Sidebar Navigation (`src/components/app-sidebar.tsx`)**: Split into 4 distinct, clearly labeled sidebar entries with relevant icons and price badges.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [14 Nov 2026] Issue & Enhancement: Dynamic QR Studio UX Overhaul, WhatsApp Group Booster Live Demo & Leads CRM
 - **Symptom**:
   1. Visiting `https://customerpilot.in/wg/cake-connection` displayed the error banner `"QR code not found or inactive."` upon submitting customer details.

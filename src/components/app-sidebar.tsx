@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 
 import { useState, useEffect } from "react"
 
-import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, ChevronRight, TrendingUp, BarChart3, FileText, Image, Share2, UserPlus, ChevronDown, BookOpen, Star, Smartphone, MapPin, ShoppingBag, UtensilsCrossed, Video, QrCode, CreditCard, MessageSquare } from "lucide-react"
+import { LayoutDashboard, Users, Settings, LogOut, Gift, Clock, Crown, ChevronRight, TrendingUp, BarChart3, FileText, Image, Share2, UserPlus, ChevronDown, BookOpen, Star, Smartphone, MapPin, ShoppingBag, UtensilsCrossed, Video, QrCode, CreditCard, MessageSquare, Zap } from "lucide-react"
 
 import { BrandLogo } from "@/components/brand-logo"
 
@@ -78,8 +78,9 @@ const mainNav: MainNavItem[] = [
 
   { name: "Rewards", href: "/dashboard/rewards", icon: Gift, module: "LOYALTY" as Module },
   { name: "Dynamic QR Studio", href: "/dashboard/DynamicQRStudio", icon: QrCode },
-  { name: "WhatsApp Group Booster", href: "/dashboard/DynamicQRStudio?tab=leads", icon: MessageSquare },
-  { name: "Smart POS Billing", href: "/dashboard/billing", icon: CreditCard },
+  { name: "WA Group Booster (Fast)", href: "/dashboard/WAGroupBooster", icon: Zap, badge: "₹100/mo" },
+  { name: "WA Booster + VIP Leads", href: "/dashboard/WAGroupBoosterPro", icon: MessageSquare, badge: "₹299/mo" },
+  { name: "Smart POS Billing", href: "/dashboard/billing", icon: CreditCard, badge: "₹599/mo" },
 
   { name: "Customers CRM", href: "/dashboard/customers", icon: Users },
 

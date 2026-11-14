@@ -8,6 +8,7 @@ export interface BrandedQROptions {
   darkColor?: string
   lightColor?: string
   merchantLogoUrl?: string | null
+  noLogo?: boolean
 }
 
 /**
@@ -29,6 +30,11 @@ export async function generateBrandedQRDataUrl(
     width: qrSize,
     color: { dark: darkColor, light: lightColor }
   })
+
+  // If clean QR (no logo in center) requested
+  if (options?.noLogo) {
+    return `data:image/png;base64,${qrBuffer.toString("base64")}`
+  }
 
   // Try to load Merchant Business Logo if provided
   let merchantLogoBuffer: Buffer | null = null

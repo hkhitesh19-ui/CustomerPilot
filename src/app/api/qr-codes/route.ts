@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
     let qrCodes = await db.qrCode.findMany({
       where: { merchantId },
       include: {
+        merchant: { select: { id: true, name: true, logoUrl: true } },
         destinations: { orderBy: { changedAt: "desc" }, take: 5 },
         _count: { select: { scanEvents: true } }
       },
@@ -47,6 +48,7 @@ export async function GET(req: NextRequest) {
             tier: "LITE"
           },
           include: {
+            merchant: { select: { id: true, name: true, logoUrl: true } },
             destinations: true,
             _count: { select: { scanEvents: true } }
           }
@@ -62,7 +64,13 @@ export async function GET(req: NextRequest) {
     const enhanced = await Promise.all(
       qrCodes.map(async (qr) => {
         const fullUrl = `${protocol}://${host}/api/wg/${qr.slug}`
-        const qrImage = await generateBrandedQRDataUrl(fullUrl, { width: 500 }).catch(() => "")
+        const isNoLogo = qr.label?.startsWith("[NO_LOGO]") || false
+        const logoToUse = isNoLogo ? null : (qr.merchant?.logoUrl || null)
+        const qrImage = await generateBrandedQRDataUrl(fullUrl, {
+          width: 500,
+          merchantLogoUrl: logoToUse,
+          noLogo: isNoLogo
+        }).catch(() => "")
         return {
           ...qr,
           publicUrl: fullUrl,
@@ -90,7 +98,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { label, currentDest, redirectMode, customSlug } = body
+    const { label, currentDest, redirectMode, customSlug, noLogo } = body
 
     if (!currentDest) {
       return NextResponse.json({ error: "Destination URL is required" }, { status: 400 })
@@ -101,18 +109,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Merchant not found" }, { status: 404 })
     }
 
-    const baseSlug = customSlug ? generateSlug(customSlug) : generateSlug(merchant.name)
+    const baseSlug = customSlug ? generateSlug(customSlug) : generateSlug(label || merchant.name)
     let uniqueSlug = baseSlug
     let count = 1
     while (await db.qrCode.findUnique({ where: { slug: uniqueSlug } })) {
       uniqueSlug = `${baseSlug}-${count++}`
     }
 
+    let finalLabel = (label || "Dynamic QR").trim()
+    if (noLogo && !finalLabel.startsWith("[NO_LOGO]")) {
+      finalLabel = `[NO_LOGO] ${finalLabel}`
+    }
+
     const qr = await db.qrCode.create({
       data: {
         merchantId,
         slug: uniqueSlug,
-        label: label || "Store QR",
+        label: finalLabel,
         currentDest: currentDest.trim(),
         redirectMode: redirectMode === "FORM_CAPTURE" ? "FORM_CAPTURE" : "DIRECT",
         tier: redirectMode === "FORM_CAPTURE" ? "PRO" : "LITE"
