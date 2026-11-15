@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { sanitizeDestinationUrl } from "@/lib/url-sanitizer"
 
 export async function PUT(
   req: NextRequest,
@@ -31,18 +32,40 @@ export async function PUT(
     if (redirectMode !== undefined) updateData.redirectMode = redirectMode
     if (isActive !== undefined) updateData.isActive = Boolean(isActive)
 
-    if (destination && destination.trim() !== qr.currentDest) {
-      updateData.currentDest = destination.trim()
+    if (destination) {
+      const isWhatsAppContext = 
+        Boolean(note?.toLowerCase().includes("whatsapp")) || 
+        destination.toLowerCase().includes("whatsapp") || 
+        destination.toLowerCase().includes("wa.me")
 
-      // Record destination change in history table
-      await db.qrDestination.create({
-        data: {
-          qrCodeId: qr.id,
-          destination: destination.trim(),
-          changedBy: merchantId || "merchant",
-          note: note || "Dashboard update"
-        }
+      const sanitized = sanitizeDestinationUrl(destination, {
+        requireWhatsApp: isWhatsAppContext
       })
+
+      if (!sanitized.isValid) {
+        return NextResponse.json(
+          { error: sanitized.error || "Invalid destination URL." },
+          { status: 400 }
+        )
+      }
+
+      const finalDest = sanitized.cleanUrl
+
+      if (finalDest !== qr.currentDest) {
+        updateData.currentDest = finalDest
+
+        // Record destination change in history table
+        await db.qrDestination.create({
+          data: {
+            qrCodeId: qr.id,
+            destination: finalDest,
+            changedBy: merchantId || "merchant",
+            note: sanitized.hadMultipleUrls
+              ? `[Auto-sanitized concatenated link] ${note || "Dashboard update"}`
+              : (note || "Dashboard update")
+          }
+        })
+      }
     }
 
     const updated = await db.qrCode.update({

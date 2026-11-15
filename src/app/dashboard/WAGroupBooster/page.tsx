@@ -9,10 +9,10 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import {
-  Zap, QrCode as QrIcon, Download, ExternalLink, RefreshCw, Smartphone, Monitor,
-  Share2, CheckCircle2, AlertCircle, Sparkles, Edit3, Save, Copy, Eye,
-  ShieldCheck, Printer, ArrowRight, Store, ArrowUpRight
+  Zap, QrCode as QrIcon, Download, ExternalLink, RefreshCw,
+  Save, Copy, Printer, ArrowRight, Store, X, Wand2, AlertTriangle
 } from "lucide-react"
+import { sanitizeDestinationUrl, detectMultipleUrls } from "@/lib/url-sanitizer"
 
 export default function WAGroupBoosterSimplePage() {
   const { toast } = useToast()
@@ -54,10 +54,11 @@ export default function WAGroupBoosterSimplePage() {
       const res = await fetch(url, { headers })
       const data = await res.json()
       if (data.success && data.qrCodes?.length > 0) {
-        // Find first counter or direct QR
         const found = data.qrCodes[0]
         setQrCode(found)
-        setDestUrl(found.currentDest || "https://chat.whatsapp.com/")
+        // Clean URL before setting state to avoid propagating historical concatenations
+        const cleaned = sanitizeDestinationUrl(found.currentDest || "https://chat.whatsapp.com/", { requireWhatsApp: true })
+        setDestUrl(cleaned.isValid ? cleaned.cleanUrl : found.currentDest)
       }
     } catch {
       toast({ title: "Notice", description: "Loading WhatsApp booster QR...", variant: "default" })
@@ -66,13 +67,43 @@ export default function WAGroupBoosterSimplePage() {
     }
   }
 
-  // 2. Save Destination URL (locked to DIRECT mode)
+  // 2. Smart Paste Handler (Prevents accidental concatenation)
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedText = e.clipboardData.getData("text")
+    if (pastedText && (pastedText.includes("http://") || pastedText.includes("https://") || pastedText.includes("chat.whatsapp.com"))) {
+      e.preventDefault()
+      const sanitized = sanitizeDestinationUrl(pastedText, { requireWhatsApp: true })
+      const finalUrl = sanitized.isValid ? sanitized.cleanUrl : pastedText.trim()
+      setDestUrl(finalUrl)
+      if (sanitized.hadMultipleUrls) {
+        toast({
+          title: "Clean Link Pasted! ✨",
+          description: "Detected multiple pasted links — automatically extracted the clean WhatsApp invite link."
+        })
+      }
+    }
+  }
+
+  // 3. Save Destination URL (locked to DIRECT mode)
   const handleSaveDestination = async () => {
     if (!qrCode?.id) return
     if (!destUrl.trim()) {
       toast({ title: "Invalid URL", description: "WhatsApp Group Invite link is required.", variant: "destructive" })
       return
     }
+
+    const validation = sanitizeDestinationUrl(destUrl, { requireWhatsApp: true })
+    if (!validation.isValid) {
+      toast({
+        title: "Invalid WhatsApp Link",
+        description: validation.error || "Please enter a valid WhatsApp Group link (e.g. https://chat.whatsapp.com/...)",
+        variant: "destructive"
+      })
+      return
+    }
+
+    const cleanDest = validation.cleanUrl
+    setDestUrl(cleanDest) // auto-update UI
 
     setSaving(true)
     try {
@@ -83,14 +114,19 @@ export default function WAGroupBoosterSimplePage() {
         method: "PUT",
         headers,
         body: JSON.stringify({
-          destination: destUrl.trim(),
+          destination: cleanDest,
           redirectMode: "DIRECT",
           note: "Updated WhatsApp Group Booster Simple Mode"
         })
       })
       const data = await res.json()
       if (data.success) {
-        toast({ title: "Saved! ✅", description: "WhatsApp group link updated. Counter QR now redirects directly to this group." })
+        toast({
+          title: "Saved! ✅",
+          description: validation.hadMultipleUrls
+            ? "Cleaned duplicate links & updated. Counter QR now redirects directly to this group."
+            : "WhatsApp group link updated. Counter QR now redirects directly to this group."
+        })
         fetchCounterQr()
       } else {
         toast({ title: "Error", description: data.error || "Failed to update link", variant: "destructive" })
@@ -99,6 +135,17 @@ export default function WAGroupBoosterSimplePage() {
       toast({ title: "Error", description: "Failed to update WhatsApp link", variant: "destructive" })
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleAutoClean = () => {
+    const sanitized = sanitizeDestinationUrl(destUrl, { requireWhatsApp: true })
+    if (sanitized.cleanUrl) {
+      setDestUrl(sanitized.cleanUrl)
+      toast({
+        title: "URL Cleaned! ✨",
+        description: `Cleaned to: ${sanitized.cleanUrl}`
+      })
     }
   }
 
@@ -113,6 +160,8 @@ export default function WAGroupBoosterSimplePage() {
   }
 
   const storeName = merchantProfile?.name || "Your Store"
+  const hasMultiple = detectMultipleUrls(destUrl)
+  const validation = sanitizeDestinationUrl(destUrl, { requireWhatsApp: true })
 
   return (
     <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-8 font-sans">
@@ -261,7 +310,7 @@ export default function WAGroupBoosterSimplePage() {
                 </CardDescription>
               </div>
               <a
-                href={destUrl}
+                href={validation.cleanUrl || destUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs font-bold text-teal-600 hover:text-teal-700 flex items-center gap-1 border border-teal-200 bg-teal-50 px-2.5 py-1 rounded-xl"
@@ -272,15 +321,65 @@ export default function WAGroupBoosterSimplePage() {
 
             <CardContent className="p-6 space-y-5">
               <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-slate-700">
-                  WhatsApp Group Invite URL
-                </Label>
-                <Input
-                  value={destUrl}
-                  onChange={(e) => setDestUrl(e.target.value)}
-                  placeholder="https://chat.whatsapp.com/..."
-                  className="rounded-xl border-slate-200 font-mono text-xs py-2.5 focus:border-teal-500"
-                />
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-bold text-slate-700">
+                    WhatsApp Group Invite URL
+                  </Label>
+                  {destUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setDestUrl("")}
+                      className="text-[11px] font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-0.5"
+                    >
+                      <X className="w-3 h-3" /> Clear Field
+                    </button>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <Input
+                    value={destUrl}
+                    onChange={(e) => setDestUrl(e.target.value)}
+                    onPaste={handlePaste}
+                    placeholder="https://chat.whatsapp.com/..."
+                    className={`rounded-xl font-mono text-xs py-2.5 pr-8 transition-colors ${
+                      hasMultiple
+                        ? "border-amber-400 bg-amber-50/40 text-amber-950 focus:border-amber-500"
+                        : "border-slate-200 focus:border-teal-500"
+                    }`}
+                  />
+                  {destUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setDestUrl("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full"
+                      title="Clear field"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Multiple URLs Warning Banner & 1-Click Auto-Clean */}
+                {hasMultiple && (
+                  <div className="p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>
+                        <strong>Multiple URLs detected:</strong> Two links appear to be glued together.
+                      </span>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={handleAutoClean}
+                      className="rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] h-7 gap-1 shrink-0"
+                    >
+                      <Wand2 className="w-3 h-3" /> Auto-Clean to Latest Link
+                    </Button>
+                  </div>
+                )}
+
                 <p className="text-[11px] text-slate-500">
                   Whenever your WhatsApp Group gets full (1024 members) or you change community links, paste the new invite link here and click Save. Your printed counter QR never goes to waste!
                 </p>

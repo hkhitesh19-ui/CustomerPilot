@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { logQrScanEvent, resolveQrBySlug } from "@/lib/qr-engine"
+import { sanitizeDestinationUrl } from "@/lib/url-sanitizer"
 
 export async function GET(
   req: NextRequest,
@@ -37,13 +38,14 @@ export async function GET(
 
     // Metadata JSON API endpoint for /wg/[slug] frontend rendering
     if (req.nextUrl.searchParams.get("info") === "true") {
+      const sanitized = sanitizeDestinationUrl(qrCode.currentDest)
       return NextResponse.json({
         success: true,
         qrCode: {
           id: qrCode.id,
           slug: qrCode.slug,
           label: qrCode.label,
-          currentDest: qrCode.currentDest,
+          currentDest: sanitized.isValid ? sanitized.cleanUrl : qrCode.currentDest,
           redirectMode: qrCode.redirectMode
         },
         merchant: {
@@ -60,7 +62,9 @@ export async function GET(
 
     // Mode A: Direct Redirection (Tier 1: Zero-Friction 0-second redirect)
     if (qrCode.redirectMode === "DIRECT") {
-      let targetUrl = qrCode.currentDest.trim()
+      const isWa = qrCode.currentDest.toLowerCase().includes("whatsapp") || qrCode.slug.includes("whatsapp")
+      const sanitized = sanitizeDestinationUrl(qrCode.currentDest, { requireWhatsApp: isWa })
+      let targetUrl = (sanitized.isValid ? sanitized.cleanUrl : qrCode.currentDest).trim()
       if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
         targetUrl = `https://${targetUrl}`
       }

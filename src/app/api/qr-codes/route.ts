@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { generateSlug } from "@/lib/qr-engine"
 import { generateBrandedQRDataUrl } from "@/lib/branded-qr"
 import { getAuthenticatedMerchant } from "@/lib/api"
+import { sanitizeDestinationUrl } from "@/lib/url-sanitizer"
 
 export async function GET(req: NextRequest) {
   try {
@@ -104,6 +105,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Destination URL is required" }, { status: 400 })
     }
 
+    const sanitized = sanitizeDestinationUrl(currentDest)
+    if (!sanitized.isValid) {
+      return NextResponse.json(
+        { error: sanitized.error || "Invalid destination URL." },
+        { status: 400 }
+      )
+    }
+
     const merchant = await db.merchant.findUnique({ where: { id: merchantId } })
     if (!merchant) {
       return NextResponse.json({ error: "Merchant not found" }, { status: 404 })
@@ -126,7 +135,7 @@ export async function POST(req: NextRequest) {
         merchantId,
         slug: uniqueSlug,
         label: finalLabel,
-        currentDest: currentDest.trim(),
+        currentDest: sanitized.cleanUrl,
         redirectMode: redirectMode === "FORM_CAPTURE" ? "FORM_CAPTURE" : "DIRECT",
         tier: redirectMode === "FORM_CAPTURE" ? "PRO" : "LITE"
       }

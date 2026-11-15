@@ -4,6 +4,34 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [15 Nov 2026] Fix & Hardening: WhatsApp Booster Concatenated URL Elimination, 1-Click Clear & Multi-Link Auto-Sanitization
+- **Symptom**:
+  1. Scanning Cake Connection's WhatsApp Booster QR code or visiting `/api/wg/cake-connection` landed on a WhatsApp 404 error page: *"404. This page doesn't exist. You've reached a 404 page"*.
+  2. In `/dashboard/WAGroupBooster`, the Destination Control Center input box displayed two concatenated WhatsApp group URLs merged together: `https://chat.whatsapp.com/HDIqDkVYITQGomcU8Nbz65https://chat.whatsapp.com/KQVLHbVIFru9AGI39oPYxT?s=cl&p=a&iam=2`.
+- **Root Cause**:
+  1. The user pasted a new WhatsApp group invite link (`Temp2`: `...KQVLHbVIFru9AGI39oPYxT`) without first clearing the existing input field (`Temp1`: `...HDIqDkVYITQGomcU8Nbz65`), causing the two URLs to concatenate.
+  2. Neither frontend inputs (`WAGroupBooster`, `WAGroupBoosterPro`, `DynamicQRStudio`) nor backend APIs (`/api/qr-codes/[id]/destination`, `/api/qr-codes`, `/api/wg/[slug]`) had URL concatenation detection, regex validation, or automatic sanitization. The raw concatenated string was saved directly to the database, causing WhatsApp to treat the entire combined string as a non-existent group invite token.
+- **Resolution**:
+  1. **Immediate VPS Database Correction**:
+     - Updated Cake Connection's active QR code (`cmwf7afc100f7kvt7oy35tpzx`) on VPS to the single, valid `Temp2` link (`https://chat.whatsapp.com/KQVLHbVIFru9AGI39oPYxT`).
+     - Verified via VPS curl that `http://localhost:3000/api/wg/cake-connection` immediately returns HTTP 302 redirecting to `https://chat.whatsapp.com/KQVLHbVIFru9AGI39oPYxT`, which resolves to active WhatsApp group "Temp2" (HTTP 200).
+  2. **Universal URL Sanitization Utility (`src/lib/url-sanitizer.ts`)**:
+     - Built `detectMultipleUrls()` to identify duplicate protocols (`https://`) and repeated domains (`chat.whatsapp.com`).
+     - Built `sanitizeDestinationUrl()`: automatically splits concatenated URLs, isolates the most recently pasted candidate, validates protocol and domain, strips tracking junk, and returns the canonical clean link with a `hadMultipleUrls` alert flag.
+  3. **Backend API Hardening**:
+     - Hardened `PUT /api/qr-codes/[id]/destination` and `POST /api/qr-codes`: validates and auto-cleans destination URLs before saving; rejects invalid strings with 400.
+     - Hardened `GET /api/wg/[slug]`: applies runtime sanitization before issuing 302 redirects as a defense-in-depth guarantee.
+  4. **Frontend UI Hardening (`WAGroupBooster`, `WAGroupBoosterPro`, `DynamicQRStudio`)**:
+     - Added smart paste handler (`onPaste`): intercepts pastes containing URLs, automatically cleans them, and prevents accidental appending.
+     - Added 1-Click `[X Clear Field]` button directly in the URL input.
+     - Added real-time warning alert if multiple URLs are detected with a 1-click `[Auto-Clean to Latest Link]` action.
+  5. **Verification**:
+     - All 6 Master Adversarial Red-Team Gates passed cleanly (`node scripts/run_adversarial_guard.js`).
+     - Ran unit & integration assertions (`npx tsx scripts/verify_qr_url_hardening.js`) with 100% pass rate.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [15 Nov 2026] Pricing & Plans Overhaul: 6 Official Gear Combos, Fixed Flat Pricing & Complete Removal of Postpaid and 50% Discount Banners
 - **Symptom**:
   1. Pricing and subscription pages contained outdated promotional clutter ("FLAT DISCOUNT 50% OFF", "Limited Time 50% Discount Offer", strike-through MRPs e.g. "Main Price: ₹6,998" vs "Offer Price: ₹3,499").

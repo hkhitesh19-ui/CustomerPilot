@@ -10,8 +10,10 @@ import { useToast } from "@/hooks/use-toast"
 import {
   QrCode as QrIcon, Download, ExternalLink, RefreshCw, Smartphone, Monitor,
   Share2, CheckCircle2, AlertCircle, Sparkles, Edit3, Save, Copy, Eye, Zap,
-  ShieldCheck, Printer, Trash2, Globe, Plus, ArrowRight, Check, Image as ImageIcon
+  ShieldCheck, Printer, Trash2, Globe, Plus, ArrowRight, Check, Image as ImageIcon,
+  X, Wand2, AlertTriangle
 } from "lucide-react"
+import { sanitizeDestinationUrl, detectMultipleUrls } from "@/lib/url-sanitizer"
 
 export default function DynamicQRStudioPage() {
   const { toast } = useToast()
@@ -109,12 +111,53 @@ export default function DynamicQRStudioPage() {
     }
   }
 
-  // 3. Create & Save New Dynamic QR
+  // 3. Smart Paste & Auto-Clean Handlers
+  const handlePasteNewDest = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedText = e.clipboardData.getData("text")
+    if (pastedText && (pastedText.includes("http://") || pastedText.includes("https://"))) {
+      e.preventDefault()
+      const sanitized = sanitizeDestinationUrl(pastedText)
+      const finalUrl = sanitized.isValid ? sanitized.cleanUrl : pastedText.trim()
+      setNewDestUrl(finalUrl)
+      if (sanitized.hadMultipleUrls) {
+        toast({
+          title: "Clean Link Pasted! ✨",
+          description: "Detected multiple pasted links — automatically cleaned to single valid destination URL."
+        })
+      }
+    }
+  }
+
+  const handleAutoCleanNewDest = () => {
+    const sanitized = sanitizeDestinationUrl(newDestUrl)
+    if (sanitized.cleanUrl) {
+      setNewDestUrl(sanitized.cleanUrl)
+      toast({
+        title: "URL Cleaned! ✨",
+        description: `Cleaned to: ${sanitized.cleanUrl}`
+      })
+    }
+  }
+
+  // 4. Create & Save New Dynamic QR
   const handleCreateQr = async () => {
     if (!newDestUrl.trim()) {
       toast({ title: "Destination URL Required", description: "Enter any valid URL (Website, Google Review, Instagram, Menu, etc.)", variant: "destructive" })
       return
     }
+
+    const validation = sanitizeDestinationUrl(newDestUrl)
+    if (!validation.isValid) {
+      toast({
+        title: "Invalid Destination URL",
+        description: validation.error || "Please enter a valid web URL (e.g. https://...)",
+        variant: "destructive"
+      })
+      return
+    }
+
+    const cleanDest = validation.cleanUrl
+    setNewDestUrl(cleanDest)
 
     setCreating(true)
     try {
@@ -126,7 +169,7 @@ export default function DynamicQRStudioPage() {
         headers,
         body: JSON.stringify({
           label: newLabel.trim() || "Dynamic QR",
-          currentDest: newDestUrl.trim(),
+          currentDest: cleanDest,
           redirectMode: "DIRECT",
           noLogo: logoChoice === "no_logo"
         })
@@ -148,12 +191,25 @@ export default function DynamicQRStudioPage() {
     }
   }
 
-  // 4. Update Destination URL for an existing Dynamic QR
+  // 5. Update Destination URL for an existing Dynamic QR
   const handleSaveDestination = async (qrId: string, destUrl: string) => {
     if (!destUrl.trim()) {
       toast({ title: "Invalid URL", description: "Destination URL cannot be empty.", variant: "destructive" })
       return
     }
+
+    const validation = sanitizeDestinationUrl(destUrl)
+    if (!validation.isValid) {
+      toast({
+        title: "Invalid Destination URL",
+        description: validation.error || "Please enter a valid web URL.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    const cleanDest = validation.cleanUrl
+
     setSavingEdit(true)
     try {
       const headers: Record<string, string> = { "Content-Type": "application/json" }
@@ -163,7 +219,7 @@ export default function DynamicQRStudioPage() {
         method: "PUT",
         headers,
         body: JSON.stringify({
-          destination: destUrl.trim(),
+          destination: cleanDest,
           note: "Updated from Dynamic QR Studio"
         })
       })
@@ -280,14 +336,64 @@ export default function DynamicQRStudioPage() {
                     <Globe className="w-3.5 h-3.5 text-teal-600" />
                     <span>Destination URL (Edit Box)</span>
                   </Label>
-                  <span className="text-[11px] text-slate-400">Can be changed anytime later</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-slate-400">Can be changed anytime later</span>
+                    {newDestUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setNewDestUrl("")}
+                        className="text-[11px] font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-0.5"
+                      >
+                        <X className="w-3 h-3" /> Clear
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <Input
-                  placeholder="https://maps.app.goo.gl/... or https://yourstore.com/menu.pdf"
-                  value={newDestUrl}
-                  onChange={(e) => setNewDestUrl(e.target.value)}
-                  className="rounded-xl border-slate-200 text-xs py-2.5 font-mono focus:border-teal-500"
-                />
+
+                <div className="relative">
+                  <Input
+                    placeholder="https://maps.app.goo.gl/... or https://yourstore.com/menu.pdf"
+                    value={newDestUrl}
+                    onChange={(e) => setNewDestUrl(e.target.value)}
+                    onPaste={handlePasteNewDest}
+                    className={`rounded-xl text-xs py-2.5 font-mono pr-8 transition-colors ${
+                      detectMultipleUrls(newDestUrl)
+                        ? "border-amber-400 bg-amber-50/40 text-amber-950 focus:border-amber-500"
+                        : "border-slate-200 focus:border-teal-500"
+                    }`}
+                  />
+                  {newDestUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setNewDestUrl("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full"
+                      title="Clear input"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Multiple URLs Warning Banner & 1-Click Auto-Clean */}
+                {detectMultipleUrls(newDestUrl) && (
+                  <div className="p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>
+                        <strong>Multiple URLs detected:</strong> Two links appear to be glued together.
+                      </span>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={handleAutoCleanNewDest}
+                      className="rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] h-7 gap-1 shrink-0"
+                    >
+                      <Wand2 className="w-3 h-3" /> Auto-Clean URL
+                    </Button>
+                  </div>
+                )}
+
                 <p className="text-[11px] text-slate-500">
                   Tip: Paste your Google Maps review link, Instagram page, food menu PDF, or WhatsApp chat link.
                 </p>
