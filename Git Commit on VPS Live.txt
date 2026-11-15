@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 094e046 (feat(pricing): establish 6 official gear combos with fixed flat pricing and remove postpaid 0.3% fee and 50% discount banners)
-Full SHA          : 094e046409edcf6c55a105401f03f13ccc6f5c4e
-Parent Commit     : 2d119ca
+Active Git Commit : e15ce6a (feat(categories): add pet_shop preset, subcategories, and ground Maw & Paw dashboard with 10 high-intent SEO keywords)
+Full SHA          : e15ce6a0aab561a2a18ae30995e167b9935278e2
+Parent Commit     : 875f6fd
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 15 Nov 2026, 10:45 AM IST
+Deployment Date   : 15 Nov 2026, 10:25 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(pricing): establish 6 official gear combos with fixed flat pricing and remove postpaid 0.3% fee and 50% discount banners
+Commit Title      : feat(categories): add pet_shop preset, subcategories, and ground Maw & Paw dashboard with 10 high-intent SEO keywords
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -22,11 +22,12 @@ Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 O
 Verified Live Outcomes:
 ----------------------------------------------------------
 1. https://customerpilot.in/                                 -> HTTP 200 (Homepage live & healthy)
-2. https://customerpilot.in/pricing                          -> HTTP 200 (6 Official Gear Combos Live with Fixed Flat Pricing, Zero 0.3% Fee, Zero Fake 50% Discounts)
-3. https://customerpilot.in/dashboard/subscription           -> HTTP 200 (Subscription pricing matched with clean flat plans)
+2. https://customerpilot.in/pricing                          -> HTTP 200 (6 Official Gear Combos Live with Fixed Flat Pricing)
+3. https://customerpilot.in/dashboard/settings               -> HTTP 200 (Maw & Paw Pet Shop category, 48 SEO entities, 10 Hero Products, 10 Hero Services verified)
 4. https://customerpilot.in/super-admin                      -> HTTP 307 (Auth redirect to login, operational)
-5. Clean QR Code Generation:
-   - CP logo fallback removed from center of QR codes
-   - Dedicated "Your Business Logo on Standee" upload studio active in Loyalty settings
+5. Clean Categories & SEO Grounding:
+   - Added canonical pet_shop preset, pet_grooming subcategory, and pet_cafe lounge subcategory.
+   - Maw & Paw dashboard grounded with all 10 requested high-intent Google SEO keywords.
+   - Live rating and reviews synchronized with Google Maps ground truth: 4.4 rating, 241 reviews.
 6. Adversarial Red-Team Safety Gates:
    - All 6 automated gates passed cleanly (AST import linter, full-app TS ratchet <= 36, sensitive token redactions, 12 mathematical boundaries, payments regression, 0 tracked DBs)
