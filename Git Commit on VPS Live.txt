@@ -8,25 +8,25 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 54dd765 (fix(super-admin): sanitize whatsappPhone empty string to null to prevent unique constraint violation on merchant profile updates)
-Full SHA          : 54dd76544709d8e39251acd79b287724fda472be
-Parent Commit     : ea350a2
+Active Git Commit : 094e046 (feat(pricing): establish 6 official gear combos with fixed flat pricing and remove postpaid 0.3% fee and 50% discount banners)
+Full SHA          : 094e046409edcf6c55a105401f03f13ccc6f5c4e
+Parent Commit     : 2d119ca
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 14 Nov 2026, 11:03 AM IST
+Deployment Date   : 15 Nov 2026, 10:45 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(super-admin): sanitize whatsappPhone empty string to null to prevent unique constraint violation on merchant profile updates
+Commit Title      : feat(pricing): establish 6 official gear combos with fixed flat pricing and remove postpaid 0.3% fee and 50% discount banners
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
-PM2 Services      : customerpilot-web (Online, :3000, PID: 415048), customerpilot-cron (Online), cakeconnection (Online, :3001)
+PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Live Outcomes:
 ----------------------------------------------------------
 1. https://customerpilot.in/                                 -> HTTP 200 (Homepage live & healthy)
-2. https://customerpilot.in/super-admin                      -> HTTP 307 (Auth redirect to login, operational)
-3. https://customerpilot.in/review?m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (Cake Connection genuine GBP review link restored: ChIJc7ija2zFXzkR8DbOxXEfaM4)
-4. Merchant Trial Extensions Verified on VPS:
-   - SSV Saloon and academy (cmw0dloss0s9ckvfcvb1lbpff): Active till 16 Nov 2026 03:00 PM IST (Epoch: 1794821400000)
-   - PET CLINIC @ MANJALPUR (cmw60b1in1jsckv9d3wwc0cb6): Active till 16 Nov 2026 03:00 PM IST (Epoch: 1794821400000)
-5. SuperAdmin Profile Update Unique Constraint Fix:
-   - Backend API & Frontend form coerce empty whatsappPhone/email to null
-   - Resolves "Unique constraint failed on fields: ('whatsappPhone')" permanently
+2. https://customerpilot.in/pricing                          -> HTTP 200 (6 Official Gear Combos Live with Fixed Flat Pricing, Zero 0.3% Fee, Zero Fake 50% Discounts)
+3. https://customerpilot.in/dashboard/subscription           -> HTTP 200 (Subscription pricing matched with clean flat plans)
+4. https://customerpilot.in/super-admin                      -> HTTP 307 (Auth redirect to login, operational)
+5. Clean QR Code Generation:
+   - CP logo fallback removed from center of QR codes
+   - Dedicated "Your Business Logo on Standee" upload studio active in Loyalty settings
+6. Adversarial Red-Team Safety Gates:
+   - All 6 automated gates passed cleanly (AST import linter, full-app TS ratchet <= 36, sensitive token redactions, 12 mathematical boundaries, payments regression, 0 tracked DBs)
