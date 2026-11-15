@@ -550,9 +550,9 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     name: "Track B: Top 3 Rank Accelerator (Setup)",
     description: "One-time 90-minute GBP surgery: categories, 20 products, 15 Q&As, fake competitor removal, citations fix.",
     days: 30,
-    price: 4999,
-    originalPrice: 7999,
-    discountPercent: 38,
+    price: 27000,
+    originalPrice: 27000,
+    discountPercent: 0,
     badge: "Track B Setup",
     popular: true,
     features: [
