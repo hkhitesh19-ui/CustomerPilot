@@ -60,6 +60,7 @@ export const MAIN_CATEGORY_GROUPS: MainCategoryGroupItem[] = [
       { id: "sweet_shop", label: "Sweet Shop / Mithai & Farsan", icon: "🍬" },
       { id: "ice_cream", label: "Ice Cream & Dessert Parlour", icon: "🍨" },
       { id: "cloud_kitchen", label: "Cloud Kitchen & Delivery Hub", icon: "🥡" },
+      { id: "pet_cafe", label: "Pet Cafe & Dog/Cat Lounge", icon: "🐱" },
       { id: "other_food", label: "➕ Other Food & Restaurant Business", icon: "🍴" },
     ]
   },
@@ -123,7 +124,8 @@ export const MAIN_CATEGORY_GROUPS: MainCategoryGroupItem[] = [
       { id: "footwear_store", label: "Footwear & Shoe Store", icon: "👟" },
       { id: "electronics_mobile", label: "Mobile & Electronics Shop", icon: "📱" },
       { id: "furniture_decor", label: "Furniture & Home Decor Store", icon: "🛋️" },
-      { id: "pet_shop", label: "Pet Shop & Supplies", icon: "🐾" },
+      { id: "pet_shop", label: "Pet Shop, Grooming & Pet Supplies", icon: "🐾" },
+      { id: "pet_grooming", label: "Pet Grooming Salon & Spa", icon: "✂️" },
       { id: "retail_other", label: "General Retail & Variety Store", icon: "🛍️" },
       { id: "other_retail", label: "➕ Other Retail / Specialty Store", icon: "🏪" },
     ]
@@ -565,13 +567,33 @@ export const OFFICIAL_GBP_CATEGORIES: GbpCategoryItem[] = [
   },
   {
     id: "pet_shop",
-    label: "Pet Shop & Supplies",
+    label: "Pet Shop, Grooming & Pet Supplies",
     group: "Retail & Shopping",
     groupId: "retail_shopping",
     icon: "🐾",
     googleType: "pet_store",
-    reviewKeywords: ["premium pet food", "gentle puppy grooming", "vet consultation", "pet toys variety"],
+    reviewKeywords: ["best pet shop near me", "pet store near me", "pet food shop near me", "dog food near me", "pet accessories near me", "best pet shop in vadodara"],
     defaultLoyaltyRule: { stamps: 4, reward: "Free Pet Treats Hamper or Grooming Discount", value: 250 }
+  },
+  {
+    id: "pet_grooming",
+    label: "Pet Grooming Salon & Spa",
+    group: "Retail & Shopping",
+    groupId: "retail_shopping",
+    icon: "✂️",
+    googleType: "pet_groomer",
+    reviewKeywords: ["pet grooming near me", "dog grooming near me", "medicated dog bath", "cat grooming", "painless nail trimming"],
+    defaultLoyaltyRule: { stamps: 4, reward: "Free Pet Spa Wash or 20% Off Next Grooming", value: 300 }
+  },
+  {
+    id: "pet_cafe",
+    label: "Pet Cafe & Dog/Cat Lounge",
+    group: "Food & Dining",
+    groupId: "food_dining",
+    icon: "🐱",
+    googleType: "cat_cafe",
+    reviewKeywords: ["pet cafe near me", "dog cafe near me", "cat cuddle lounge", "pet friendly cafe", "pet birthday celebration"],
+    defaultLoyaltyRule: { stamps: 3, reward: "Free Puppuccino & Coffee for Pet Parent", value: 200 }
   },
   {
     id: "retail_other",

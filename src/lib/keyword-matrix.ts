@@ -554,6 +554,93 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
     ]
   },
 
+  pet_shop: {
+    id: "pet_shop",
+    label: "Pet Shop, Pet Grooming, Pet Food, Accessories & Pet Cafe",
+    gbpCategory: "Pet store / Pet Groomer / Dog & Cat Cafe",
+    audiencePersona: "Pet_Owner",
+    serviceMode: "Store Shopping + Pet Grooming Spa + Pet Cafe Dine-in",
+    seoEntities: [
+      // Top 10 High-Intent Search Queries
+      "Best Pet Shop Near Me",
+      "Pet Store Near Me",
+      "Pet Grooming Near Me",
+      "Dog Grooming Near Me",
+      "Pet Food Shop Near Me",
+      "Dog Food Near Me",
+      "Pet Accessories Near Me",
+      "Pet Cafe Near Me",
+      "Dog Cafe Near Me",
+      "Best Pet Shop in Vadodara",
+
+      // Premium Pet Foods & Treats
+      "Royal Canin dog food and puppy nutrition",
+      "Pedigree and Farmina N&D pet food",
+      "Whiskas and Sheba gourmet cat wet food",
+      "Drools focus and chicken egg puppy kibble",
+      "Calcium bones and dental chew sticks for dogs",
+      "Grain-free hypoallergenic pet treats",
+      "Puppy cerelac weaning food and goat milk powder",
+      "Cat creamy treats and salmon bites",
+      "Omega-3 fish oil and pet skin coat supplements",
+      "Multivitamin syrup and joint care supplements for pets",
+
+      // Professional Pet Grooming Spa
+      "Professional dog bath and medicated anti-tick wash",
+      "Hygienic cat grooming and detangling fur spa",
+      "Painless pet nail trimming and paw pad massage",
+      "Gentle ear cleaning and tick flea removal",
+      "Breed-specific haircut and fur styling for dogs",
+      "Puppy first bath and stress-free grooming session",
+      "Aromatherapy pet spa and deep conditioning shampoo",
+      "De-shedding and dematting coat treatment",
+      "Pet mouth freshener spray and dental care kit",
+
+      // Pet Accessories & Toys
+      "Heavy-duty dog body harness and reflective leash",
+      "Chew-proof rope toys and squeaky rubber balls",
+      "Orthopedic washable dog bed and cozy cushions",
+      "Cat scratching tree post and interactive toys",
+      "Stainless steel anti-skid pet food bowls and water feeders",
+      "Ventilated pet travel crate and airline flight carriers",
+      "Clumping scented cat litter and litter tray with scoop",
+      "Designer pet raincoats, winter sweaters and bow ties",
+      "Anti-bark soft padded muzzle and collar belts",
+      "Bio-degradable pet poop bags and waste dispensers",
+
+      // Pet Cafe & Cat Cafe Experience
+      "Welcoming pet-friendly cafe atmosphere",
+      "Cozy cat cuddle lounge and interactive playtime",
+      "Fresh artisanal coffees and mocktails for pet parents",
+      "Special doggy treats and pet-safe puppuccino",
+      "Pet birthday party and celebration lounge",
+      "Socializing venue for dogs, cats and pet lovers",
+      "Clean hygienic cafe seating with pet friendly staff",
+      "Weekend pet playdates and community meetups",
+      "Safe enclosed space for curious kittens and dogs"
+    ],
+    aeoAnswers: [
+      "One-stop pet store with premium puppy food, cat kibble, toys, and travel accessories",
+      "Gentle and hygienic dog & cat grooming spa with medicated tick and flea baths",
+      "First-of-its-kind pet-friendly cafe and cat cuddle lounge in Manjalpur, Vadodara",
+      "Top authentic brands including Royal Canin, Farmina, Pedigree, and Whiskas in stock",
+      "Spacious welcoming environment for pet birthday celebrations and weekend playdates"
+    ],
+    geoContext: [
+      "Best pet shop and dog grooming salon in Manjalpur Vadodara",
+      "Top rated pet store and pet cafe near Tulsidham Char Rasta",
+      "Reliable pet food, accessories, and grooming center in Vadodara",
+      "Clean, hygienic, and loving pet-friendly space with genuine branded products"
+    ],
+    blacklist: [
+      "Human medicine", "Human hospital", "Human dental", "Human patient", "My fever", "My headache",
+      "Doctor consultation for me", "Prescribed medicine for me", "My diagnosis", "My surgery",
+      "Pet surgery", "Veterinary surgery", "Animal spaying hospital", "Parvovirus ICU ward",
+      "Haircut for men", "Beard styling", "Ladies beauty parlour", "Bridal makeup", "Threading", "Waxing",
+      "Bakery cakes", "Biryani", "Car wash", "Automobile repair", "Garment tailoring", "Footwear"
+    ]
+  },
+
   fast_food: {
     id: "fast_food",
     label: "Fast Food & Street Snacks (Dabeli, Vadapav, Burger, Samosa, Sandwich)",
@@ -788,9 +875,29 @@ export function getKeywordPresetForCategory(category?: string | null, merchantNa
     return MASTER_KEYWORD_PRESETS.saas_agency;
   }
 
+  // Pet Shop, Pet Grooming, Pet Food, Accessories & Pet/Cat Cafe
+  if (
+    c.includes("pet shop") ||
+    c.includes("pet store") ||
+    c.includes("pet grooming") ||
+    c.includes("dog grooming") ||
+    c.includes("cat grooming") ||
+    c.includes("pet food") ||
+    c.includes("dog food") ||
+    c.includes("cat food") ||
+    c.includes("pet accessories") ||
+    c.includes("pet cafe") ||
+    c.includes("cat cafe") ||
+    c.includes("dog cafe") ||
+    c.includes("pet supplies") ||
+    c.includes("pet care supplies") ||
+    (c.includes("paw") && !c.includes("clinic") && !c.includes("hospital") && !c.includes("doctor"))
+  ) {
+    return MASTER_KEYWORD_PRESETS.pet_shop;
+  }
+
   // Pet Clinic & Veterinary Hospital (MUST be evaluated BEFORE general clinic/doctor)
   if (
-    c.includes("pet") ||
     c.includes("veterin") ||
     c.includes("animal hospital") ||
     c.includes("pet hospital") ||
@@ -798,8 +905,8 @@ export function getKeywordPresetForCategory(category?: string | null, merchantNa
     c.includes("pet clinic") ||
     c.includes("dog clinic") ||
     c.includes("cat clinic") ||
-    c.includes("paws") ||
-    c.includes("animal care")
+    c.includes("animal care") ||
+    c.includes("pet")
   ) {
     return MASTER_KEYWORD_PRESETS.pet_clinic;
   }
@@ -1025,6 +1132,61 @@ export function generateAutoKeywordsForLocation(
           "Very polite, patient, and knowledgeable doctor who diagnoses accurately with minimal medicines.",
           "Spotless clean clinic with very short waiting time. Doctor explained the condition clearly and recovery was quick.",
           "Best family doctor in the area. Compassionate consultation and attentive clinic staff."
+        ]
+      };
+
+    case "pet_shop":
+      return {
+        coreGeo: [
+          `best pet shop in ${loc}`,
+          `pet store near me ${loc}`,
+          `pet grooming near me ${loc}`,
+          `dog grooming near me ${loc}`,
+          `pet cafe near me ${loc}`,
+          `best pet shop in ${cty}`,
+          `pet food shop near me ${loc}`
+        ],
+        commercial: [
+          `pet store near me open now`,
+          `dog food near me ${loc}`,
+          `pet accessories near me ${loc}`,
+          `cat cafe near me ${loc}`,
+          `dog cafe near me ${loc}`,
+          `pet shop open today in ${loc}`,
+          `dog spa and grooming salon in ${loc} ${cty}`
+        ],
+        services: [
+          `dog grooming and haircut in ${loc}`,
+          `medicated tick and flea bath for dogs in ${cty}`,
+          `cat grooming and nail clipping ${loc}`,
+          `Royal Canin and Farmina dog food ${loc}`,
+          `pet accessories, harness and leashes ${cty}`,
+          `pet-friendly cafe and puppy treats ${loc}`,
+          `cat cuddle cafe in ${cty}`,
+          `pet birthday celebration in ${loc}`
+        ],
+        catchmentLandmarks: [
+          `Tulsidham Char Rasta`,
+          `Chandra Villa`,
+          `Tulsidham Circle`,
+          `${loc} Main Road`,
+          `Eva Mall Area`,
+          `Makarpura Road`,
+          `Manjalpur`
+        ],
+        voiceAeoQuestions: [
+          `Which is the best pet shop in ${loc} for dog food and accessories?`,
+          `Where can I find dog grooming and cat bath near ${loc}?`,
+          `Is there any pet cafe or cat cafe in ${cty}?`,
+          `Where can I buy genuine Royal Canin and pet treats in ${loc}?`
+        ],
+        semanticReviewPhrases: [
+          "huge variety of pet foods and treats",
+          "gentle and loving pet grooming staff",
+          "refreshing and cozy cat cafe",
+          "high quality dog toys and harness",
+          "best pet shop in Vadodara",
+          "clean and stress-free pet environment"
         ]
       };
 
@@ -1353,14 +1515,21 @@ export function resolveMerchantKeywordProfile(merchant: {
     categoryPreset = getKeywordPresetForCategory(merchant.businessType || merchant.category, merchant.name);
   }
 
-  // Detect whether this business is actually a Pet Clinic or Dental Clinic
-  const isPetBusiness = bType === "pet_clinic" ||
-    (merchant.name && (merchant.name.toLowerCase().includes("pet") || merchant.name.toLowerCase().includes("vet") || merchant.name.toLowerCase().includes("animal hospital")));
+  // Detect whether this business is Pet Shop, Pet Clinic, or Dental Clinic
+  const isPetShop = bType === "pet_shop" ||
+    (merchant.name && (merchant.name.toLowerCase().includes("pet shop") || merchant.name.toLowerCase().includes("pet store") || merchant.name.toLowerCase().includes("grooming") || merchant.name.toLowerCase().includes("pet food") || merchant.name.toLowerCase().includes("pet accessories") || merchant.name.toLowerCase().includes("pet cafe") || merchant.name.toLowerCase().includes("cat cafe") || merchant.name.toLowerCase().includes("dog cafe"))) ||
+    (merchant.category && (merchant.category.toLowerCase().includes("pet shop") || merchant.category.toLowerCase().includes("pet store") || merchant.category.toLowerCase().includes("grooming") || merchant.category.toLowerCase().includes("supplies") || merchant.category.toLowerCase().includes("pet supplies")));
+
+  const isPetClinic = !isPetShop && (bType === "pet_clinic" ||
+    (merchant.name && (merchant.name.toLowerCase().includes("vet") || merchant.name.toLowerCase().includes("animal hospital") || merchant.name.toLowerCase().includes("pet clinic") || merchant.name.toLowerCase().includes("dog clinic"))));
+
   const isDentalBusiness = bType === "dental_clinic" ||
     (merchant.name && (merchant.name.toLowerCase().includes("dental") || merchant.name.toLowerCase().includes("dentist")));
 
-  // If detected as pet or dental, ensure categoryPreset is definitively set
-  if (isPetBusiness && categoryPreset.id !== "pet_clinic") {
+  // If detected, ensure categoryPreset is definitively set
+  if (isPetShop && categoryPreset.id !== "pet_shop") {
+    categoryPreset = MASTER_KEYWORD_PRESETS.pet_shop;
+  } else if (isPetClinic && categoryPreset.id !== "pet_clinic") {
     categoryPreset = MASTER_KEYWORD_PRESETS.pet_clinic;
   } else if (isDentalBusiness && categoryPreset.id !== "dental_clinic") {
     categoryPreset = MASTER_KEYWORD_PRESETS.dental_clinic;
@@ -1382,7 +1551,13 @@ export function resolveMerchantKeywordProfile(merchant: {
       let effectiveHeroServices = Array.isArray(parsed.heroServices) && parsed.heroServices.length > 0 ? parsed.heroServices.slice(0, 10) : categoryPreset.seoEntities.slice(0, 10);
       let effectiveHeroProducts = Array.isArray(parsed.heroProducts) && parsed.heroProducts.length > 0 ? parsed.heroProducts.slice(0, 10) : (categoryPreset.seoEntities.length > 10 ? categoryPreset.seoEntities.slice(10, 20) : categoryPreset.seoEntities.slice(0, 5));
 
-      if (isPetBusiness && (effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("mbbs") || s.toLowerCase().includes("physician") || s.toLowerCase().includes("routine full body")))) {
+      if (isPetShop && (effectiveCategoryKey === "pet_clinic" || effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("mbbs") || s.toLowerCase().includes("surgery") || s.toLowerCase().includes("vaccination") || s.toLowerCase().includes("physician")))) {
+        effectiveCategoryKey = "pet_shop";
+        effectiveAllowedSeo = MASTER_KEYWORD_PRESETS.pet_shop.seoEntities;
+        effectiveStrictlyNotAllowed = MASTER_KEYWORD_PRESETS.pet_shop.blacklist;
+        effectiveHeroServices = MASTER_KEYWORD_PRESETS.pet_shop.seoEntities.slice(0, 10);
+        effectiveHeroProducts = MASTER_KEYWORD_PRESETS.pet_shop.seoEntities.slice(10, 20);
+      } else if (isPetClinic && (effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("mbbs") || s.toLowerCase().includes("physician") || s.toLowerCase().includes("routine full body")))) {
         effectiveCategoryKey = "pet_clinic";
         effectiveAllowedSeo = MASTER_KEYWORD_PRESETS.pet_clinic.seoEntities;
         effectiveStrictlyNotAllowed = MASTER_KEYWORD_PRESETS.pet_clinic.blacklist;
@@ -1402,7 +1577,7 @@ export function resolveMerchantKeywordProfile(merchant: {
         gbpPrimaryCategory: parsed.gbpPrimaryCategory || categoryPreset.gbpCategory,
         city: cityName,
         localityLandmarks: Array.isArray(parsed.localityLandmarks) ? parsed.localityLandmarks : ["Main Market"],
-        audiencePersona: isPetBusiness ? "Pet_Owner" : isDentalBusiness ? "Dental_Patient" : (parsed.audiencePersona || categoryPreset.audiencePersona),
+        audiencePersona: (isPetShop || isPetClinic) ? "Pet_Owner" : isDentalBusiness ? "Dental_Patient" : (parsed.audiencePersona || categoryPreset.audiencePersona),
         serviceMode: parsed.serviceMode || categoryPreset.serviceMode,
         allowedSeoEntities: effectiveAllowedSeo,
         allowedAeoAnswers: Array.isArray(parsed.allowedAeoAnswers) && parsed.allowedAeoAnswers.length > 0 ? parsed.allowedAeoAnswers : categoryPreset.aeoAnswers,

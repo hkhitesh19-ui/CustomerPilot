@@ -6886,3 +6886,22 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   4. **Frontend Form Sanitization (`src/app/super-admin/page.tsx`)**: Sanitized payload in `handleSaveProfile` so empty strings are automatically converted to `null` before dispatch.
   5. **Verification**: Executed Master Adversarial Guard (`node scripts/run_adversarial_guard.js`) with all 6 security and mathematical gates passing cleanly.
 - **Status**: ✅ Resolved, Verified, and Committed Locally.
+
+---
+## [15 Nov 2026] Issue: Maw & Paw Pet Shop Category Taxonomy, Subcategories, and 48-Entity Grounding Profile Setup
+- **Symptom**:
+  1. Maw & Paw (Best Pet Shop, Pet Grooming, Pets Food and Accessories, Pets Cafe) in Manjalpur, Vadodara was misclassified under `pet_clinic` (Veterinary Clinic) with irrelevant medical/surgical keywords (surgery, parvovirus ICU, canine rabies vaccine, MBBS).
+  2. The platform lacked distinct business category presets for `pet_shop` (Retail Pet Store & Accessories), `pet_grooming` (Pet Grooming Salon & Spa), and `pet_cafe` (Dog/Cat Cafe & Lounge) under official Google Business Profile taxonomy.
+  3. Merchant's city in dashboard was unpopulated/misconfigured, and Google baseline reviews were outdated (4.5 rating, 127 reviews instead of live Google Maps ground truth: 4.4 rating, 241 reviews).
+- **Root Cause**:
+  1. `src/lib/keyword-matrix.ts` previously had a generic regex check `c.includes("pet") || c.includes("paws")` that routed all pet-related businesses to `pet_clinic` (Veterinary Hospital).
+  2. `src/lib/gbp-categories.ts` lacked granular subcategories for `pet_grooming` and `pet_cafe`.
+  3. Baseline Google Places metrics had not been synchronized with live Google Maps data for this merchant.
+- **Resolution**:
+  1. **Canonical GBP & Preset Taxonomy (`src/lib/gbp-categories.ts`, `src/lib/keyword-matrix.ts`)**: Added canonical `pet_shop`, `pet_grooming`, and `pet_cafe` categories and presets across the codebase.
+  2. **48 High-Intent SEO Entities**: Added curated SEO entities including all 10 user-requested queries: "Best Pet Shop Near Me", "Pet Store Near Me", "Pet Grooming Near Me", "Dog Grooming Near Me", "Pet Food Shop Near Me", "Dog Food Near Me", "Pet Accessories Near Me", "Pet Cafe Near Me", "Dog Cafe Near Me", "Best Pet Shop in Vadodara".
+  3. **Dual Bestseller Hero Products & Services**: Configured 10 retail hero products and 10 grooming/cafe hero services for 1-tap review chip generation.
+  4. **Live & Local Database Synchronization**: Updated Maw & Paw database records across localhost and live VPS (`187.127.170.36`) with city: "Vadodara", baselineRating: 4.4, baselineReviewCount: 241, and synchronized Google connection.
+  5. **Adversarial Master Guard Verification**: All 6 security and mathematical gates passed cleanly (`node scripts/run_adversarial_guard.js`).
+  6. **Visual Ground-Truth Capture**: Verified with Playwright screenshot on live production VPS (`https://customerpilot.in/dashboard/settings`).
+- **Status**: ✅ Resolved, Verified with Playwright, and Committed Locally.
