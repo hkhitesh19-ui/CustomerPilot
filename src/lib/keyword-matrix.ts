@@ -561,7 +561,12 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
     audiencePersona: "Pet_Owner",
     serviceMode: "Store Shopping + Pet Grooming Spa + Pet Cafe Dine-in",
     seoEntities: [
-      // Top 10 High-Intent Search Queries
+      // Top High-Intent Search Queries in Vadodara
+      "Pet Shop in Vadodara",
+      "Best Pet Store in Vadodara",
+      "Pet Grooming in Vadodara",
+      "Puppies for Sale in Vadodara",
+      "Pet Food Shop in Vadodara Pet Store",
       "Best Pet Shop Near Me",
       "Pet Store Near Me",
       "Pet Grooming Near Me",
@@ -572,6 +577,17 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
       "Pet Cafe Near Me",
       "Dog Cafe Near Me",
       "Best Pet Shop in Vadodara",
+
+      // Products & Services
+      "Pet Grooming",
+      "Dog",
+      "Cat",
+      "Birds",
+      "Dog Food",
+      "Cat Food",
+      "Fish Food",
+      "Dog Biscuits",
+      "Cat biscuit",
 
       // Premium Pet Foods & Treats
       "Royal Canin dog food and puppy nutrition",
@@ -1555,8 +1571,30 @@ export function resolveMerchantKeywordProfile(merchant: {
         effectiveCategoryKey = "pet_shop";
         effectiveAllowedSeo = MASTER_KEYWORD_PRESETS.pet_shop.seoEntities;
         effectiveStrictlyNotAllowed = MASTER_KEYWORD_PRESETS.pet_shop.blacklist;
-        effectiveHeroServices = MASTER_KEYWORD_PRESETS.pet_shop.seoEntities.slice(0, 10);
-        effectiveHeroProducts = MASTER_KEYWORD_PRESETS.pet_shop.seoEntities.slice(10, 20);
+        effectiveHeroServices = [
+          "Pet Grooming",
+          "Pet Grooming in Vadodara",
+          "Pet Shop in Vadodara",
+          "Best Pet Store in Vadodara",
+          "Puppies for Sale in Vadodara",
+          "Professional dog bath and medicated anti-tick wash",
+          "Hygienic cat grooming and detangling fur spa",
+          "Painless pet nail trimming and paw pad massage",
+          "Welcoming pet-friendly cafe atmosphere",
+          "Cozy cat cuddle lounge and interactive playtime"
+        ];
+        effectiveHeroProducts = [
+          "Dog Food",
+          "Cat Food",
+          "Fish Food",
+          "Dog Biscuits",
+          "Cat biscuit",
+          "Birds",
+          "Dog",
+          "Cat",
+          "Pet Food Shop in Vadodara Pet Store",
+          "Royal Canin dog food and puppy nutrition"
+        ];
       } else if (isPetClinic && (effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("mbbs") || s.toLowerCase().includes("physician") || s.toLowerCase().includes("routine full body")))) {
         effectiveCategoryKey = "pet_clinic";
         effectiveAllowedSeo = MASTER_KEYWORD_PRESETS.pet_clinic.seoEntities;

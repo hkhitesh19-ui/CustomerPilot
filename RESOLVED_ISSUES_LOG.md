@@ -6905,3 +6905,26 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   5. **Adversarial Master Guard Verification**: All 6 security and mathematical gates passed cleanly (`node scripts/run_adversarial_guard.js`).
   6. **Visual Ground-Truth Capture**: Verified with Playwright screenshot on live production VPS (`https://customerpilot.in/dashboard/settings`).
 - **Status**: ✅ Resolved, Verified with Playwright, and Committed Locally.
+
+
+---
+## [15 Nov 2026] Feature & Grounding: Maw & Paw Pet Store Top Keywords & Full Products/Services Catalog Setup
+- **Symptom**:
+  1. Maw & Paw required configuration of specific high-intent Vadodara pet store keywords ("Pet Shop in Vadodara", "Best Pet Store in Vadodara", "Pet Grooming in Vadodara", "Puppies for Sale in Vadodara", "Pet Food Shop in Vadodara Pet Store").
+  2. Merchant required specific core products and services setup across their review grounding profile and online store catalog: Pet Grooming, Dog, Cat, Birds, Dog Food, Cat Food, Fish Food, Dog Biscuits, and Cat biscuit.
+  3. The `/dashboard/menu` online catalog route on live VPS was missing `/api/menu/items/route.ts`, resulting in 404 HTML errors on live menu loading.
+- **Root Cause**:
+  1. The default category presets in `src/lib/keyword-matrix.ts` and `src/lib/gbp-categories.ts` had generic near-me queries without these 5 localized high-volume Vadodara queries.
+  2. The merchant's `MenuItem` table had 0 items seeded, leaving their online catalog unpopulated.
+  3. `src/app/api/menu/items/route.ts` was not previously mirrored to the production VPS server.
+- **Resolution**:
+  1. **Keyword Matrix & Review Preset Updates (`src/lib/keyword-matrix.ts`, `src/lib/gbp-categories.ts`)**: Injected all 5 targeted Vadodara search queries and 9 products & services into `MASTER_KEYWORD_PRESETS.pet_shop`, `reviewKeywords`, and auto-heal fallback routines.
+  2. **Grounding Studio Profile Configuration (`Merchant.keywordProfile`)**:
+     - *Top 10 Hero Services*: Pet Grooming, Pet Grooming in Vadodara, Pet Shop in Vadodara, Best Pet Store in Vadodara, Puppies for Sale in Vadodara, plus specialized grooming & cafe services.
+     - *Top 10 Hero Products*: Dog Food, Cat Food, Fish Food, Dog Biscuits, Cat biscuit, Birds, Dog, Cat, Pet Food Shop in Vadodara Pet Store, and Royal Canin nutrition.
+     - *Allowed SEO Whitelist*: Expanded to 62 targeted pet entities starting with all user queries.
+  3. **Online Catalog Seeding (`MenuItem` Table)**: Seeded 10 complete items across Aquarium & Fish, Birds & Small Pets, Cat Food & Treats, Dog Food & Treats, Pet Grooming & Services, and Pets & Supplies with standard INR pricing, descriptions, and tags.
+  4. **VPS Route Restoration & Standalone Rebuild**: Uploaded `src/app/api/menu/items/route.ts` to VPS, rebuilt Next.js standalone bundle, reloaded PM2, and verified HTTP 200 on `/api/menu/items`.
+  5. **Adversarial Master Guard Verification**: All 6 security and mathematical gates passed cleanly (`node scripts/run_adversarial_guard.js`).
+  6. **Visual Ground-Truth Capture**: Captured verified live screenshots of `/dashboard/settings` (Step D) and `/dashboard/menu` confirming full rendering.
+- **Status**: ✅ Resolved, Verified with Playwright, and Committed Locally.

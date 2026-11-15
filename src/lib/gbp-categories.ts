@@ -572,7 +572,19 @@ export const OFFICIAL_GBP_CATEGORIES: GbpCategoryItem[] = [
     groupId: "retail_shopping",
     icon: "🐾",
     googleType: "pet_store",
-    reviewKeywords: ["best pet shop near me", "pet store near me", "pet food shop near me", "dog food near me", "pet accessories near me", "best pet shop in vadodara"],
+    reviewKeywords: [
+      "pet shop in vadodara",
+      "best pet store in vadodara",
+      "pet grooming in vadodara",
+      "puppies for sale in vadodara",
+      "pet food shop in vadodara pet store",
+      "pet grooming",
+      "dog food",
+      "cat food",
+      "fish food",
+      "dog biscuits",
+      "cat biscuit"
+    ],
     defaultLoyaltyRule: { stamps: 4, reward: "Free Pet Treats Hamper or Grooming Discount", value: 250 }
   },
   {
