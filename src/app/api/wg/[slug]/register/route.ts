@@ -18,11 +18,14 @@ export async function POST(
 
     const qrCode = await resolveQrBySlug(slug)
 
-    if (!qrCode || !qrCode.isActive) {
+    if (!qrCode || !qrCode.isActive || !qrCode.merchantId) {
       return NextResponse.json({ error: "QR code not found or inactive." }, { status: 404 })
     }
 
     const normalizedPhone = normalizePhone(phone)
+    if (!normalizedPhone) {
+      return NextResponse.json({ error: "Valid 10-digit mobile number required." }, { status: 400 })
+    }
     const rawIp = req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || "127.0.0.1"
     const ipHash = hashIpAddress(rawIp)
 

@@ -23,30 +23,32 @@ export async function GET(req: NextRequest) {
         name: true,
         phone: true,
         createdAt: true,
-        whatsappOptIn: true,
-        consents: {
-          select: {
-            consentType: true,
-            status: true,
-            createdAt: true
-          }
-        }
+        whatsappOptIn: true
       },
       orderBy: { createdAt: "desc" }
+    })
+
+    const leadIds = leads.map(l => l.id)
+    const consents = await db.customerConsent.findMany({
+      where: { customerId: { in: leadIds } },
+      select: { customerId: true, consentType: true, status: true }
     })
 
     return NextResponse.json({
       success: true,
       totalLeads: leads.length,
-      leads: leads.map(l => ({
-        id: l.id,
-        name: l.name,
-        phone: l.phone,
-        joinedAt: l.createdAt,
-        whatsappOptIn: l.whatsappOptIn,
-        hasTransactionalConsent: l.consents.some(c => c.consentType === "transactional" && c.status === "opted_in"),
-        hasMarketingConsent: l.consents.some(c => c.consentType === "marketing" && c.status === "opted_in")
-      }))
+      leads: leads.map(l => {
+        const userConsents = consents.filter(c => c.customerId === l.id)
+        return {
+          id: l.id,
+          name: l.name,
+          phone: l.phone,
+          joinedAt: l.createdAt,
+          whatsappOptIn: l.whatsappOptIn,
+          hasTransactionalConsent: userConsents.some(c => c.consentType === "transactional" && c.status === "opted_in"),
+          hasMarketingConsent: userConsents.some(c => c.consentType === "marketing" && c.status === "opted_in")
+        }
+      })
     })
   } catch (err: any) {
     console.error("[QR Leads GET Error]:", err)

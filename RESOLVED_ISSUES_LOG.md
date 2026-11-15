@@ -4,6 +4,37 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [15 Nov 2026] Pricing & Plans Overhaul: 6 Official Gear Combos, Fixed Flat Pricing & Complete Removal of Postpaid and 50% Discount Banners
+- **Symptom**:
+  1. Pricing and subscription pages contained outdated promotional clutter ("FLAT DISCOUNT 50% OFF", "Limited Time 50% Discount Offer", strike-through MRPs e.g. "Main Price: ₹6,998" vs "Offer Price: ₹3,499").
+  2. Confusing Postpaid pricing model ("Upfront Activation: ₹0", "Postpaid Fee: 0.3% of monthly store sales") was present on `/pricing`.
+  3. Plans were not aligned with the 6 official customer-demanded Gear combos with flat transparent pricing.
+  4. Next.js App Router build threw `TypeError: Cannot read properties of undefined (reading 'planKey')` during `/pricing` static prerendering due to an out-of-bounds index lookup.
+- **Root Cause**:
+  1. `src/components/pricing/pricing-studio.tsx` retained the legacy Postpaid Section 1 calculation cards and 50% promotional hero banners.
+  2. `COMPLETE_TIERS` was reduced from 3 items to 2 items (6M and 12M), but `activePrepaidIndex` defaulted to `2`, causing static prerender crashes.
+  3. `src/lib/feature-gate.ts` and `src/lib/master-plans.ts` lacked canonical definitions and module gate mappings for all 6 Gears (`gear1` through `gear6`).
+- **Resolution**:
+  1. **Canonical 6 Gear Combos Established with Exact Flat Pricing (Zero Gimmicks / No Strike-Through MRPs)**:
+     - **Gear 1**: Smart AI Google Review System → 6 Months: ₹749, 1 Year: ₹999
+     - **Gear 2**: Smart Digital Business Card + Smart AI Google Review System → 6 Months: ₹899, 1 Year: ₹1,249
+     - **Gear 3**: Smart Digital Business Card + WhatsApp Digital Loyalty System → 6 Months: ₹999, 1 Year: ₹1,349
+     - **Gear 4**: Smart Digital Business Card + WhatsApp Digital Loyalty + Smart AI Google Review System → 6 Months: ₹1,399, 1 Year: ₹1,899
+     - **Gear 5**: CustomerPilot Complete (All 4 Core Engines - Gear 4 + 1-Click AI AutoReply of GoogleReview) → 6 Months: ₹2,499, 1 Year: ₹3,499
+     - **Gear 6**: CustomerPilot All-in-One Enterprise (Gear 5 + WhatsApp Group Booster + Smart POS Billing & Invoicing + 24/7 AI WhatsApp ChatBot) → Monthly: ₹999 / month (30 Days)
+  2. **100% Removal of Postpaid and Discount Banners**:
+     - Removed Postpaid 0.3% fee cards, ₹0 upfront fee badges, and sales break-even comparison bars from `pricing-studio.tsx`.
+     - Removed "FLAT DISCOUNT 50% OFF" and "Limited Time 50% Discount Offer" banners from both `/pricing` and `/dashboard/subscription`.
+     - Removed strike-through prices, showing solely the clean flat price for every combo.
+  3. **Engine & DB Synchronization**:
+     - Updated `PLAN_MODULE_MAP` in `src/lib/feature-gate.ts` to map `gear1`..`gear6` to their respective platform modules.
+     - Registered master plans in `src/lib/master-plans.ts` and synchronized active SQLite database records via `ensureMasterPlans(db)`.
+  4. **Fixed Prerender Crash**:
+     - Corrected `activePrepaidIndex` default from `2` to `1` in `pricing-studio.tsx` with fallback guards, enabling clean static prerendering (`245/245 static pages`).
+  5. **Automated Verification**:
+     - Ran Playwright headless verification (`scripts/verify_pricing_gears_truth.js`) confirming all 6 Gear titles and flat prices in rendered HTML, zero prohibited strings, and captured ground-truth screenshot `public/pricing_gears_ground_truth.png`.
+- **Status**: ✅ Resolved and Verified.
+
 ---
 
 ## [15 Nov 2026] Fix & Feature: Clean QR without CP Center Logo, Loyalty Standee Logo Uploader & Smart City Detection for Fleet
@@ -561,6 +592,37 @@ ode scripts/run_adversarial_guard.js).
 
 ---
 
+## [15 Nov 2026] Pricing & Plans Overhaul: 6 Official Gear Combos, Fixed Flat Pricing & Complete Removal of Postpaid and 50% Discount Banners
+- **Symptom**:
+  1. Pricing and subscription pages contained outdated promotional clutter ("FLAT DISCOUNT 50% OFF", "Limited Time 50% Discount Offer", strike-through MRPs e.g. "Main Price: ₹6,998" vs "Offer Price: ₹3,499").
+  2. Confusing Postpaid pricing model ("Upfront Activation: ₹0", "Postpaid Fee: 0.3% of monthly store sales") was present on `/pricing`.
+  3. Plans were not aligned with the 6 official customer-demanded Gear combos with flat transparent pricing.
+  4. Next.js App Router build threw `TypeError: Cannot read properties of undefined (reading 'planKey')` during `/pricing` static prerendering due to an out-of-bounds index lookup.
+- **Root Cause**:
+  1. `src/components/pricing/pricing-studio.tsx` retained the legacy Postpaid Section 1 calculation cards and 50% promotional hero banners.
+  2. `COMPLETE_TIERS` was reduced from 3 items to 2 items (6M and 12M), but `activePrepaidIndex` defaulted to `2`, causing static prerender crashes.
+  3. `src/lib/feature-gate.ts` and `src/lib/master-plans.ts` lacked canonical definitions and module gate mappings for all 6 Gears (`gear1` through `gear6`).
+- **Resolution**:
+  1. **Canonical 6 Gear Combos Established with Exact Flat Pricing (Zero Gimmicks / No Strike-Through MRPs)**:
+     - **Gear 1**: Smart AI Google Review System → 6 Months: ₹749, 1 Year: ₹999
+     - **Gear 2**: Smart Digital Business Card + Smart AI Google Review System → 6 Months: ₹899, 1 Year: ₹1,249
+     - **Gear 3**: Smart Digital Business Card + WhatsApp Digital Loyalty System → 6 Months: ₹999, 1 Year: ₹1,349
+     - **Gear 4**: Smart Digital Business Card + WhatsApp Digital Loyalty + Smart AI Google Review System → 6 Months: ₹1,399, 1 Year: ₹1,899
+     - **Gear 5**: CustomerPilot Complete (All 4 Core Engines - Gear 4 + 1-Click AI AutoReply of GoogleReview) → 6 Months: ₹2,499, 1 Year: ₹3,499
+     - **Gear 6**: CustomerPilot All-in-One Enterprise (Gear 5 + WhatsApp Group Booster + Smart POS Billing & Invoicing + 24/7 AI WhatsApp ChatBot) → Monthly: ₹999 / month (30 Days)
+  2. **100% Removal of Postpaid and Discount Banners**:
+     - Removed Postpaid 0.3% fee cards, ₹0 upfront fee badges, and sales break-even comparison bars from `pricing-studio.tsx`.
+     - Removed "FLAT DISCOUNT 50% OFF" and "Limited Time 50% Discount Offer" banners from both `/pricing` and `/dashboard/subscription`.
+     - Removed strike-through prices, showing solely the clean flat price for every combo.
+  3. **Engine & DB Synchronization**:
+     - Updated `PLAN_MODULE_MAP` in `src/lib/feature-gate.ts` to map `gear1`..`gear6` to their respective platform modules.
+     - Registered master plans in `src/lib/master-plans.ts` and synchronized active SQLite database records via `ensureMasterPlans(db)`.
+  4. **Fixed Prerender Crash**:
+     - Corrected `activePrepaidIndex` default from `2` to `1` in `pricing-studio.tsx` with fallback guards, enabling clean static prerendering (`245/245 static pages`).
+  5. **Automated Verification**:
+     - Ran Playwright headless verification (`scripts/verify_pricing_gears_truth.js`) confirming all 6 Gear titles and flat prices in rendered HTML, zero prohibited strings, and captured ground-truth screenshot `public/pricing_gears_ground_truth.png`.
+- **Status**: ✅ Resolved and Verified.
+
 ---
 
 ---
@@ -757,6 +819,37 @@ ode scripts/run_adversarial_guard.js).
 - **Status**: ✅ Resolved and Verified.
 
 ---
+
+## [15 Nov 2026] Pricing & Plans Overhaul: 6 Official Gear Combos, Fixed Flat Pricing & Complete Removal of Postpaid and 50% Discount Banners
+- **Symptom**:
+  1. Pricing and subscription pages contained outdated promotional clutter ("FLAT DISCOUNT 50% OFF", "Limited Time 50% Discount Offer", strike-through MRPs e.g. "Main Price: ₹6,998" vs "Offer Price: ₹3,499").
+  2. Confusing Postpaid pricing model ("Upfront Activation: ₹0", "Postpaid Fee: 0.3% of monthly store sales") was present on `/pricing`.
+  3. Plans were not aligned with the 6 official customer-demanded Gear combos with flat transparent pricing.
+  4. Next.js App Router build threw `TypeError: Cannot read properties of undefined (reading 'planKey')` during `/pricing` static prerendering due to an out-of-bounds index lookup.
+- **Root Cause**:
+  1. `src/components/pricing/pricing-studio.tsx` retained the legacy Postpaid Section 1 calculation cards and 50% promotional hero banners.
+  2. `COMPLETE_TIERS` was reduced from 3 items to 2 items (6M and 12M), but `activePrepaidIndex` defaulted to `2`, causing static prerender crashes.
+  3. `src/lib/feature-gate.ts` and `src/lib/master-plans.ts` lacked canonical definitions and module gate mappings for all 6 Gears (`gear1` through `gear6`).
+- **Resolution**:
+  1. **Canonical 6 Gear Combos Established with Exact Flat Pricing (Zero Gimmicks / No Strike-Through MRPs)**:
+     - **Gear 1**: Smart AI Google Review System → 6 Months: ₹749, 1 Year: ₹999
+     - **Gear 2**: Smart Digital Business Card + Smart AI Google Review System → 6 Months: ₹899, 1 Year: ₹1,249
+     - **Gear 3**: Smart Digital Business Card + WhatsApp Digital Loyalty System → 6 Months: ₹999, 1 Year: ₹1,349
+     - **Gear 4**: Smart Digital Business Card + WhatsApp Digital Loyalty + Smart AI Google Review System → 6 Months: ₹1,399, 1 Year: ₹1,899
+     - **Gear 5**: CustomerPilot Complete (All 4 Core Engines - Gear 4 + 1-Click AI AutoReply of GoogleReview) → 6 Months: ₹2,499, 1 Year: ₹3,499
+     - **Gear 6**: CustomerPilot All-in-One Enterprise (Gear 5 + WhatsApp Group Booster + Smart POS Billing & Invoicing + 24/7 AI WhatsApp ChatBot) → Monthly: ₹999 / month (30 Days)
+  2. **100% Removal of Postpaid and Discount Banners**:
+     - Removed Postpaid 0.3% fee cards, ₹0 upfront fee badges, and sales break-even comparison bars from `pricing-studio.tsx`.
+     - Removed "FLAT DISCOUNT 50% OFF" and "Limited Time 50% Discount Offer" banners from both `/pricing` and `/dashboard/subscription`.
+     - Removed strike-through prices, showing solely the clean flat price for every combo.
+  3. **Engine & DB Synchronization**:
+     - Updated `PLAN_MODULE_MAP` in `src/lib/feature-gate.ts` to map `gear1`..`gear6` to their respective platform modules.
+     - Registered master plans in `src/lib/master-plans.ts` and synchronized active SQLite database records via `ensureMasterPlans(db)`.
+  4. **Fixed Prerender Crash**:
+     - Corrected `activePrepaidIndex` default from `2` to `1` in `pricing-studio.tsx` with fallback guards, enabling clean static prerendering (`245/245 static pages`).
+  5. **Automated Verification**:
+     - Ran Playwright headless verification (`scripts/verify_pricing_gears_truth.js`) confirming all 6 Gear titles and flat prices in rendered HTML, zero prohibited strings, and captured ground-truth screenshot `public/pricing_gears_ground_truth.png`.
+- **Status**: ✅ Resolved and Verified.
 
 ---
 

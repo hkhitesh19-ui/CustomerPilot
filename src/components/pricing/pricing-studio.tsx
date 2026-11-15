@@ -50,27 +50,11 @@ export interface PricingStudioProps {
   isExpired?: boolean
 }
 
-// ─── SOURCE OF TRUTH FROM CustomerPilot_Pricing.html ───
-// C: Complete plans (Postpaid Monthly 0.3%, 6 Months ₹1,999, 12 Months ₹3,499)
+// ─── CANONICAL GEAR TIERS ───
 export const COMPLETE_TIERS = [
-  { t: "Postpaid · Monthly", d: 30, s: 0, m: 0, planKey: "complete_postpaid", badge: "Zero Upfront", isPostpaid: true },
-  { t: "6 Months", d: 180, s: 1999, m: 3998, planKey: "growth_180", badge: "Popular", isPostpaid: false },
-  { t: "12 Months", d: 365, s: 3499, m: 7000, planKey: "enterprise_365", badge: "Best Value", isPostpaid: false }
+  { t: "6 Months", d: 180, s: 2499, m: 2499, planKey: "growth_180", badge: "6 Months", isPostpaid: false },
+  { t: "12 Months", d: 365, s: 3499, m: 3499, planKey: "enterprise_365", badge: "Best Value", isPostpaid: false }
 ]
-
-// Postpaid Configuration (Placeholders kept for billing extensions)
-export const POSTPAID_CONFIG = {
-  salesPercent: 0.3,
-  salesRateMultiplier: 0.003,
-  upfrontFee: 0,
-  exampleSales: 500000,
-  exampleFee: 1500,
-  breakEvenSalesMonthly: 194000, // Monthly sales above which 12M prepaid (₹3,499 / 12 = ~₹583/mo) is more economical
-  // Hidden placeholder constants (not displayed in UI as per requirements)
-  MIN_FEE: 0,
-  GST_NOTE: "exclusive of GST",
-  CAP: null as number | null
-}
 
 // Gear Combos Configuration
 export interface GearComboDefinition {
@@ -80,64 +64,91 @@ export interface GearComboDefinition {
   badge: string
   iconBg: string
   modulesIncluded: string[] // keys matching standalone services
+  isMonthly?: boolean
   tenures: {
-    180: { offer: number; regular: number; planKey: string }
-    365: { offer: number; regular: number; planKey: string }
+    30?: { offer: number; regular: number; planKey: string }
+    180?: { offer: number; regular: number; planKey: string }
+    365?: { offer: number; regular: number; planKey: string }
   }
 }
 
 export const GEAR_COMBOS: GearComboDefinition[] = [
   {
+    gearKey: "gear_1",
+    name: "Gear 1 : Smart AI Google Review System",
+    subtitle: "Autonomous WhatsApp review collection, AI-drafted 5-star customer reviews, and direct Google Maps deep link.",
+    badge: "⭐ Gear 1 · Smart Reviews",
+    iconBg: "bg-amber-500",
+    modulesIncluded: ["star"],
+    tenures: {
+      180: { offer: 749, regular: 749, planKey: "gear1_6mo" },
+      365: { offer: 999, regular: 999, planKey: "gear1_yearly" }
+    }
+  },
+  {
     gearKey: "gear_2",
     name: "Gear 2 : Smart Digital Business Card + Smart AI Google Review System",
     subtitle: "Instant digital card branding plus autonomous Google review acceleration for local stores.",
-    badge: "⭐ Gear 2 · Review Accelerator",
+    badge: "🚀 Gear 2 · Review Accelerator",
     iconBg: "bg-emerald-600",
     modulesIncluded: ["card", "star"],
     tenures: {
-      180: { offer: 799, regular: 1598, planKey: "gear2_6mo" },
-      365: { offer: 1149, regular: 2298, planKey: "gear2_yearly" }
+      180: { offer: 899, regular: 899, planKey: "gear2_6mo" },
+      365: { offer: 1249, regular: 1249, planKey: "gear2_yearly" }
     }
   },
   {
     gearKey: "gear_3",
-    name: "Gear 3 : WhatsApp Digital Loyalty System + Smart AI Google Review System",
-    subtitle: "High-retention combo: WhatsApp automated loyalty stamps plus smart AI Google reviews.",
-    badge: "🔥 Gear 3 · Loyalty & Reviews",
-    iconBg: "bg-amber-600",
-    modulesIncluded: ["loyalty", "star"],
+    name: "Gear 3 : Smart Digital Business Card + WhatsApp Digital Loyalty System",
+    subtitle: "High-retention combo: WhatsApp automated loyalty stamps plus interactive digital business card.",
+    badge: "🎁 Gear 3 · Loyalty & Card",
+    iconBg: "bg-purple-600",
+    modulesIncluded: ["card", "loyalty"],
     tenures: {
-      180: { offer: 1249, regular: 2498, planKey: "gear3_6mo" },
-      365: { offer: 1899, regular: 3798, planKey: "gear3_yearly" }
+      180: { offer: 999, regular: 999, planKey: "gear3_6mo" },
+      365: { offer: 1349, regular: 1349, planKey: "gear3_yearly" }
     }
   },
   {
     gearKey: "gear_4",
-    name: "Gear 4 : Card + Loyalty + Smart AI Google Review System",
-    subtitle: "Trio retention suite: Digital NFC card, WhatsApp loyalty stamps, and smart AI Google reviews.",
-    badge: "🚀 Gear 4 · Power Trio",
-    iconBg: "bg-purple-600",
+    name: "Gear 4 : Smart Digital Business Card + WhatsApp Digital Loyalty + Smart AI Google Review System",
+    subtitle: "Trio retention suite: Digital card, WhatsApp loyalty stamps, and smart AI Google reviews.",
+    badge: "⚡ Gear 4 · Power Trio",
+    iconBg: "bg-blue-600",
     modulesIncluded: ["card", "loyalty", "star"],
     tenures: {
-      180: { offer: 1499, regular: 2998, planKey: "gear4_6mo" },
-      365: { offer: 2499, regular: 4998, planKey: "gear4_yearly" }
+      180: { offer: 1399, regular: 1399, planKey: "gear4_6mo" },
+      365: { offer: 1899, regular: 1899, planKey: "gear4_yearly" }
     }
   },
   {
     gearKey: "gear_5",
-    name: "Gear 5 : CustomerPilot Complete",
-    subtitle: "All 4 flagship engines: Smart Card, Loyalty Stamps, Smart AI Reviews, and 1-Click AI AutoReply.",
-    badge: "👑 Gear 5 · CustomerPilot Complete",
+    name: "Gear 5 : CustomerPilot Complete (All 4 Core Engines)",
+    subtitle: "All 4 flagship engines: Smart Card, Loyalty Stamps, Smart AI Reviews, and 1-Click AI AutoReply to Google Reviews.",
+    badge: "👑 Gear 5 · Complete Suite",
     iconBg: "bg-indigo-600",
     modulesIncluded: ["card", "loyalty", "star", "chat"],
     tenures: {
-      180: { offer: 1999, regular: 3998, planKey: "growth_180" },
-      365: { offer: 3499, regular: 7000, planKey: "enterprise_365" }
+      180: { offer: 2499, regular: 2499, planKey: "growth_180" },
+      365: { offer: 3499, regular: 3499, planKey: "enterprise_365" }
+    }
+  },
+  {
+    gearKey: "gear_6",
+    name: "Gear 6 : CustomerPilot All-in-One Enterprise",
+    subtitle: "Gear 5 Complete Suite + WhatsApp Group Booster + Smart POS Billing & Invoicing + 24/7 AI WhatsApp ChatBot.",
+    badge: "💎 Gear 6 · All-in-One Enterprise",
+    iconBg: "bg-rose-600",
+    modulesIncluded: ["card", "loyalty", "star", "chat", "qr_lite", "wa_booster", "smart_billing", "chatbot"],
+    isMonthly: true,
+    tenures: {
+      30: { offer: 999, regular: 999, planKey: "gear6_monthly" }
     }
   }
 ]
 
 export const getGearSavings1Yr = (combo: GearComboDefinition, getPlanByKeyFn?: (key: string) => PlanItem | undefined) => {
+  if (!combo.tenures[365]) return 0
   const standalone1YrSum = combo.modulesIncluded.reduce((acc, modKey) => {
     const serv = STANDALONE_SERVICES.find((s) => s.i === modKey)
     if (!serv) return acc
@@ -221,6 +232,16 @@ export const STANDALONE_SERVICES = [
     p: { 180: [2999, 5999], 365: [4999, 9999] } as Record<number, [number, number]>,
     iconBg: "bg-indigo-600",
     colorText: "text-indigo-600 dark:text-indigo-400"
+  },
+  {
+    i: "chatbot",
+    n: "24/7 AI WhatsApp ChatBot",
+    t: "Multilingual AI assistant answering customer queries, qualifying leads, and routing inquiries 24/7.",
+    planKey6Mo: "gear6_monthly",
+    planKey1Yr: "gear6_monthly",
+    p: { 180: [999, 999], 365: [999, 999] } as Record<number, [number, number]>,
+    iconBg: "bg-rose-600",
+    colorText: "text-rose-600 dark:text-rose-400"
   }
 ]
 
@@ -252,8 +273,8 @@ export function PricingStudio({
   const [savingPlans, setSavingPlans] = useState(false)
   const [adminEditMode, setAdminEditMode] = useState(false)
 
-  // Interactive tenure tab for CustomerPilot Complete Prepaid: 1=6 Months, 2=12 Months (Default 12 Months)
-  const [activePrepaidIndex, setActivePrepaidIndex] = useState<number>(2)
+  // Interactive tenure tab for CustomerPilot Complete Prepaid: 0=6 Months, 1=12 Months (Default 12 Months)
+  const [activePrepaidIndex, setActivePrepaidIndex] = useState<number>(1)
 
   // Standalone selected modules map: { [serviceId]: tenureDays (180 or 365) }
   const [selectedStandalone, setSelectedStandalone] = useState<Record<string, number>>({})
@@ -315,29 +336,11 @@ export function PricingStudio({
   }
 
   // Active prepaid complete tier
-  const activePrepaidTier = COMPLETE_TIERS[activePrepaidIndex]
-  const prepaidDbPlan = getPlanByKey(activePrepaidTier.planKey)
-  const prepaidPrice = prepaidDbPlan?.price || activePrepaidTier.s
-  const prepaidMrp = prepaidDbPlan?.originalPrice || activePrepaidTier.m
-  const prepaidDays = activePrepaidTier.d
-
-  // Postpaid tier shortcut
-  const postpaidTier = COMPLETE_TIERS[0]
-
-  // Effective monthly costs calculation for progress bars
-  const effectiveMonthlyCosts = useMemo(() => {
-    return COMPLETE_TIERS.map((tier) => {
-      const dbP = getPlanByKey(tier.planKey)
-      const p = dbP?.price || tier.s
-      const perMonth = tier.d > 0 ? p / (tier.d / 30) : 0
-      return perMonth
-    })
-  }, [plans])
-
-  const maxMonthlyCost = Math.max(effectiveMonthlyCosts[1] || 333, effectiveMonthlyCosts[2] || 292)
-  const yearlyCheaperPercent = Math.round(
-    (1 - (effectiveMonthlyCosts[2] || 292) / (effectiveMonthlyCosts[1] || 333)) * 100
-  )
+  const activePrepaidTier = COMPLETE_TIERS[activePrepaidIndex] || COMPLETE_TIERS[0]
+  const prepaidDbPlan = activePrepaidTier ? getPlanByKey(activePrepaidTier.planKey) : undefined
+  const prepaidPrice = prepaidDbPlan?.price || activePrepaidTier?.s || 3499
+  const prepaidMrp = prepaidDbPlan?.originalPrice || activePrepaidTier?.m || 3499
+  const prepaidDays = activePrepaidTier?.d || 365
 
   // Standalone total calculations
   const standaloneTot = (days: 180 | 365) =>
@@ -440,9 +443,10 @@ export function PricingStudio({
     setSelectedStandalone({})
   }
 
-  // Handle Combo plan checkout (Gear 2, Gear 3, Gear 4)
-  const handleSelectGearCombo = (combo: GearComboDefinition, tenureDays: 180 | 365) => {
+  // Handle Combo plan checkout (Gear 1 through Gear 6)
+  const handleSelectGearCombo = (combo: GearComboDefinition, tenureDays: 30 | 180 | 365) => {
     const tenureData = combo.tenures[tenureDays]
+    if (!tenureData) return
     const dbP = getPlanByKey(tenureData.planKey)
     const price = dbP?.price || tenureData.offer
     const originalPrice = dbP?.originalPrice || tenureData.regular
@@ -451,15 +455,20 @@ export function PricingStudio({
       card: "DIGITAL_CARD",
       star: "REVIEWS",
       loyalty: "LOYALTY",
-      chat: "AUTOREPLY"
+      chat: "AUTOREPLY",
+      qr_lite: "DYNAMIC_QR",
+      wa_booster: "LEAD_CAPTURE",
+      smart_billing: "SMART_BILLING",
+      chatbot: "CHATBOT"
     }
     const enabledModules = combo.modulesIncluded.map((m) => moduleMapping[m] || m).join(",")
+    const tenureLabel = tenureDays === 30 ? "Monthly" : tenureDays === 180 ? "6 Months" : "1 Year"
 
     if (mode === "merchant" && onCheckout) {
       const p: PlanItem = dbP || {
         id: tenureData.planKey,
         planKey: tenureData.planKey,
-        name: `${combo.name} (${tenureDays === 180 ? "6 Months" : "1 Year"})`,
+        name: `${combo.name} (${tenureLabel})`,
         price,
         originalPrice,
         days: tenureDays,
@@ -473,7 +482,7 @@ export function PricingStudio({
 
     const item: SelectedCheckoutItem = {
       id: tenureData.planKey,
-      name: `${combo.name} (${tenureDays === 180 ? "6 Months" : "1 Year"})`,
+      name: `${combo.name} (${tenureLabel})`,
       tenureDays,
       price,
       originalPrice,
@@ -490,7 +499,7 @@ export function PricingStudio({
 
   // Handle plan purchase
   const handleSelectComplete = (tierIndex: number) => {
-    const tier = COMPLETE_TIERS[tierIndex]
+    const tier = COMPLETE_TIERS[tierIndex] || COMPLETE_TIERS[0]
     const dbP = getPlanByKey(tier.planKey)
     const p: PlanItem = dbP || {
       id: tier.planKey,
@@ -514,7 +523,7 @@ export function PricingStudio({
 
   // Handle Complete tier checkout in public mode
   const handleSelectCompletePublic = (tierIndex: number) => {
-    const tier = COMPLETE_TIERS[tierIndex]
+    const tier = COMPLETE_TIERS[tierIndex] || COMPLETE_TIERS[0]
     const dbP = getPlanByKey(tier.planKey)
     const item: SelectedCheckoutItem = {
       id: "complete_" + tier.d,
@@ -652,52 +661,20 @@ export function PricingStudio({
     <div className={`w-full transition-colors duration-200 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
       {/* ─── Hero Section ─── */}
       <section className="text-center py-6 sm:py-10 relative">
-        {/* Big High-Impact 50% OFF Discount Banner Card (Matches Dashboard Subscription Screenshot) */}
-        {mode !== "merchant" && (
-          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-indigo-500/10 border-2 border-amber-400/60 p-5 sm:p-7 shadow-sm mb-8 sm:mb-10 text-left">
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-              {/* Left text & details */}
-              <div className="flex items-start sm:items-center gap-4 text-left flex-1">
-                <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-amber-100 border border-amber-300 items-center justify-center flex-shrink-0 text-amber-600 shadow-xs">
-                  <Flame className="w-8 h-8 text-amber-600 animate-pulse" />
-                </div>
-                <div>
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-xs font-black uppercase tracking-widest mb-2">
-                    <Flame className="w-3.5 h-3.5 text-amber-600 animate-pulse" /> Limited Time 50% Discount Offer
-                  </div>
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
-                    All Plans Locked at Flat Half Price!
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-xl leading-relaxed">
-                    Complete WhatsApp Loyalty, Smart AI Google Reviews &amp; 1-Click AutoReply.{" "}
-                    <span className="font-extrabold text-slate-700 dark:text-slate-200">Main Price:</span> <span className="font-extrabold text-slate-500 dark:text-slate-400 line-through decoration-rose-500 decoration-2">₹6,998/yr</span> ➔ <span className="text-emerald-700 dark:text-emerald-400 font-extrabold">Offer Price: ₹3,499/yr</span> (₹9.59/day). Standalone <span className="font-extrabold text-slate-500 dark:text-slate-400 line-through decoration-rose-500 decoration-2">₹1,199/yr</span> ➔ <span className="text-amber-700 dark:text-amber-400 font-extrabold">₹499/yr</span> (₹1.37/day).
-                  </p>
-                </div>
-              </div>
-
-              {/* Right Biggest Font Highlight */}
-              <div className="w-full md:w-auto flex-shrink-0 flex flex-col items-center justify-center px-8 py-5 rounded-2xl bg-white/95 dark:bg-slate-900/95 border-2 border-amber-400 shadow-md text-center">
-                <span className="text-xs font-black uppercase tracking-widest text-amber-700 dark:text-amber-400">FLAT DISCOUNT</span>
-                <div className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600 drop-shadow-xs">
-                  50% OFF
-                </div>
-                <div className="mt-1.5 inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-[10px] font-extrabold tracking-wide">
-                  ⚡ INSTANT SAVINGS LOCKED
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-black uppercase tracking-wider mb-4">
+          <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+          Transparent, Flat Pricing · Zero Hidden Fees
+        </div>
 
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight leading-[1.08] max-w-4xl mx-auto">
           Simple, Flexible{" "}
           <span className="bg-gradient-to-r from-cyan-600 via-sky-600 to-indigo-600 bg-clip-text text-transparent">
-            Pricing
+            Growth Gears
           </span>
         </h1>
 
         <p className="text-slate-500 dark:text-slate-400 text-base sm:text-xl max-w-2xl mx-auto mt-4 leading-relaxed font-medium">
-          One platform or one tool at a time. Every price comes with its true daily cost, so you always know what you pay.
+          Choose the exact capability stack your business needs. 100% transparent pricing with zero commission cuts or percentage fees.
         </p>
 
         {/* Admin toggle if enabled */}
@@ -725,440 +702,92 @@ export function PricingStudio({
         )}
       </section>
 
-      {/* ─── SECTION 1: CustomerPilot Complete (Prepaid & Postpaid Showcase) ─── */}
-      <section className="space-y-6 mb-14">
-        <div className="pb-2">
-          <span className="text-xs font-bold uppercase tracking-widest text-cyan-600 dark:text-cyan-400">
-            All-in-one Platform
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 dark:text-white mt-1">
-            Gear 5 : CustomerPilot Complete
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            All 4 flagship engines in one unified subscription: Smart Digital Business Card, Smart AI Google Reviews, 1-Click AI AutoReply, and Whatsapp Digital Loyalty Stamps & VIP Club.
-          </p>
-        </div>
-
-        {/* 2 Dedicated Cards Side-by-Side: Prepaid Complete (6M / 12M) vs Dedicated Postpaid Complete */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          {/* ══════ CARD 1: COMPLETE PREPAID PLANS (6M & 12M) ══════ */}
-          <div
-            className="rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/10 border border-cyan-400/30"
-            style={{
-              background: "radial-gradient(600px 320px at 90% 10%, rgba(255,255,255,0.22), transparent 70%), linear-gradient(135deg, #0284c7 0%, #0369a1 25%, #1e40af 70%, #4338ca 100%)"
-            }}
-          >
-            <div className="absolute -top-24 -right-24 w-72 h-72 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="relative z-10">
-              {/* Prepaid Header & Tenure Selector */}
-              <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-white text-[11px] font-black uppercase tracking-wider">
-                  <Flame className="w-3.5 h-3.5 text-amber-300" /> Gear 5 : Prepaid Plans (Flat 50% OFF)
-                </div>
-
-                {/* Tenure Switcher Tabs (6 Months vs 12 Months) */}
-                <div className="inline-flex bg-slate-950/30 backdrop-blur-md rounded-2xl p-1 border border-white/15 shadow-inner">
-                  {[COMPLETE_TIERS[1], COMPLETE_TIERS[2]].map((tier, localIdx) => {
-                    const globalIdx = localIdx + 1
-                    const isActive = activePrepaidIndex === globalIdx
-                    return (
-                      <button
-                        key={tier.t}
-                        type="button"
-                        onClick={() => setActivePrepaidIndex(globalIdx)}
-                        className={`font-bold text-xs px-3.5 py-1.5 rounded-xl transition-all duration-200 cursor-pointer select-none flex items-center gap-1.5 ${
-                          isActive
-                            ? "bg-white text-slate-950 shadow-md shadow-slate-950/20 scale-[1.02]"
-                            : "text-white/85 hover:text-white hover:bg-white/15"
-                        }`}
-                      >
-                        <span>{tier.t}</span>
-                        {tier.badge && (
-                          <span
-                            className={`text-[9px] font-black uppercase px-1.5 py-0.2 rounded tracking-wider ${
-                              isActive ? "bg-cyan-100 text-cyan-800" : "bg-white/20 text-white"
-                            }`}
-                          >
-                            {tier.badge}
-                          </span>
-                        )}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Pricing Display */}
-              <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 bg-slate-950/35 border border-white/20 rounded-xl px-3.5 py-1.5 backdrop-blur-xs">
-                  <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-amber-300">
-                    Main Price:
-                  </span>
-                  <span className="text-lg sm:text-xl font-extrabold text-white/90 line-through decoration-rose-400 decoration-2">
-                    {inr(prepaidMrp)}
-                  </span>
-                  <span className="text-xs font-semibold text-white/75">
-                    {dy(prepaidMrp, prepaidDays)}
-                  </span>
-                </div>
-
-                <div className="flex items-baseline gap-2.5 flex-wrap">
-                  <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-300 bg-emerald-950/50 border border-emerald-400/40 px-2.5 py-1 rounded-lg self-center">
-                    Offer Price:
-                  </span>
-                  <span className="text-4xl sm:text-6xl font-black tracking-tight drop-shadow-sm text-white">
-                    {inr(prepaidPrice)}
-                  </span>
-                  <span className="text-sm sm:text-base font-semibold text-cyan-100/95">
-                    {dy(prepaidPrice, prepaidDays)}
-                  </span>
-                </div>
-
-                {/* MRP & Savings Strip */}
-                <div className="flex items-center gap-2.5 flex-wrap mt-2.5 text-xs sm:text-sm">
-                  <span className="bg-emerald-400 text-slate-950 font-black text-xs rounded-full px-3 py-0.5 shadow-xs">
-                    FLAT {off(prepaidPrice, prepaidMrp)}% OFF
-                  </span>
-                  <span className="text-white font-bold bg-white/15 px-3 py-0.5 rounded-full">
-                    Instant Savings: {inr(prepaidMrp - prepaidPrice)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Included Items 2x2 Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 my-6 text-xs sm:text-sm">
-                {[
-                  "Whatsapp Digital Loyalty Stamps & VIP Club",
-                  "Smart AI Google Reviews",
-                  "1-Click AI AutoReply",
-                  "Smart Digital Business Card"
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-2 bg-white/10 backdrop-blur-xs rounded-xl px-3 py-2 border border-white/10">
-                    <div className="w-5 h-5 rounded-full bg-cyan-400/30 text-white flex items-center justify-center shrink-0">
-                      <Check className="w-3.5 h-3.5 stroke-[3]" />
-                    </div>
-                    <span className="font-semibold text-white/95">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Action Button */}
-            <div className="pt-2 relative z-10">
-              {mode === "public" ? (
-                <button
-                  type="button"
-                  onClick={() => handleSelectCompletePublic(activePrepaidIndex)}
-                  className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <span>Choose Gear 5 {activePrepaidTier.t} Prepaid Plan</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              ) : mode === "merchant" ? (
-                <button
-                  type="button"
-                  onClick={() => handleSelectComplete(activePrepaidIndex)}
-                  className="w-full bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <span>Choose Gear 5 {activePrepaidTier.t} Prepaid Plan</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="w-full bg-white text-slate-950 font-bold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-md"
-                >
-                  Active Plan Preview
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* ══════ CARD 2: DEDICATED POSTPAID MONTHLY CARD ══════ */}
-          <div
-            className="rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 border-2 border-emerald-400/60 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950"
-          >
-            <div className="absolute -top-24 -right-24 w-72 h-72 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="relative z-10">
-              {/* Postpaid Header Badges */}
-              <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[11px] font-black uppercase tracking-wider">
-                  <Zap className="w-3.5 h-3.5 text-emerald-400" /> Gear 5 : Performance Postpaid · Zero Upfront
-                </div>
-                <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700">
-                  Billed at Month-End
-                </span>
-              </div>
-
-              {/* Pricing Display */}
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-2 bg-slate-950/60 border border-emerald-400/30 rounded-xl px-3.5 py-1.5 backdrop-blur-xs">
-                  <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-300">
-                    Upfront Activation:
-                  </span>
-                  <span className="text-base sm:text-lg font-black text-emerald-300">
-                    ₹0 (Zero Upfront Fee)
-                  </span>
-                </div>
-
-                <div className="flex items-baseline gap-2.5 flex-wrap">
-                  <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-300 bg-emerald-950/80 border border-emerald-400/40 px-2.5 py-1 rounded-lg self-center">
-                    Postpaid Fee:
-                  </span>
-                  <span className="text-4xl sm:text-6xl font-black tracking-tight drop-shadow-sm text-white">
-                    0.3%
-                  </span>
-                  <span className="text-sm sm:text-base font-semibold text-emerald-200/90">
-                    of monthly store sales
-                  </span>
-                </div>
-
-                {/* Example calculation box */}
-                <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-emerald-400/20 space-y-1.5 text-xs">
-                  <div className="flex items-center gap-2 text-white font-bold">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                    <span>Example: ₹5,00,000 monthly sales = ₹1,500/month</span>
-                  </div>
-                  <div className="text-slate-300 text-[11px] leading-relaxed">
-                    Pay nothing upfront. Billed monthly based on store sales entered in your merchant dashboard.
-                  </div>
-                </div>
-
-                {/* Break-even note */}
-                <div className="p-2.5 rounded-xl bg-slate-800/60 border border-slate-700 text-[11px] text-slate-200 leading-relaxed">
-                  <strong className="text-amber-300">Approx. Estimate:</strong> For monthly store sales above ₹1,94,000, our 12-Month plan (₹3,499/year ≈ ₹583/month) is more economical.
-                </div>
-              </div>
-
-              {/* Included Items 2x2 Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 my-6 text-xs sm:text-sm">
-                {[
-                  "Whatsapp Digital Loyalty Stamps & VIP Club",
-                  "Smart AI Google Reviews",
-                  "1-Click AI AutoReply",
-                  "Smart Digital Business Card"
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-2 bg-slate-800/40 backdrop-blur-xs rounded-xl px-3 py-2 border border-emerald-400/20">
-                    <div className="w-5 h-5 rounded-full bg-emerald-400/20 text-emerald-300 flex items-center justify-center shrink-0">
-                      <Check className="w-3.5 h-3.5 stroke-[3]" />
-                    </div>
-                    <span className="font-semibold text-white/95">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Action Button */}
-            <div className="pt-2 relative z-10">
-              {mode === "public" ? (
-                <button
-                  type="button"
-                  onClick={() => handleSelectCompletePublic(0)}
-                  className="w-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-emerald-950/30 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <span>Choose Gear 5 Postpaid Plan (0.3% of sales)</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              ) : mode === "merchant" ? (
-                <button
-                  type="button"
-                  onClick={() => handleSelectComplete(0)}
-                  className="w-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-lg shadow-emerald-950/30 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <span>Choose Gear 5 Postpaid Plan (0.3% of sales)</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="w-full bg-emerald-400 text-slate-950 font-bold text-sm sm:text-base rounded-xl py-3.5 px-6 shadow-md"
-                >
-                  Active Plan Preview
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ══════ EFFECTIVE MONTHLY COST & TENURE COMPARISON BAR ══════ */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-xs">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-5">
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                Effective Monthly Cost &amp; Billing Comparison
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                Compare per-month equivalent pricing across prepaid tenures and zero-upfront postpaid.
-              </p>
-            </div>
-            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 self-start md:self-center">
-              Complete Suite Breakdown
-            </span>
-          </div>
-
-          {/* Progress Bars */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* 12 Months */}
-            <div className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
-              <div className="flex justify-between items-center text-xs sm:text-sm">
-                <span className="font-bold text-slate-900 dark:text-white">
-                  12 Months (Prepaid)
-                </span>
-                <span className="text-xs font-bold text-slate-400 line-through decoration-rose-500">
-                  ₹583/mo
-                </span>
-              </div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-xl font-black text-indigo-600 dark:text-indigo-400">
-                  ₹292
-                </span>
-                <span className="text-xs font-semibold text-slate-500">/ month</span>
-                <span className="ml-auto text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
-                  Best Value
-                </span>
-              </div>
-              <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                <div className="h-full rounded-full bg-indigo-600" style={{ width: "88%" }} />
-              </div>
-            </div>
-
-            {/* 6 Months */}
-            <div className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
-              <div className="flex justify-between items-center text-xs sm:text-sm">
-                <span className="font-bold text-slate-900 dark:text-white">
-                  6 Months (Prepaid)
-                </span>
-                <span className="text-xs font-bold text-slate-400 line-through decoration-rose-500">
-                  ₹666/mo
-                </span>
-              </div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-xl font-black text-sky-600 dark:text-sky-400">
-                  ₹333
-                </span>
-                <span className="text-xs font-semibold text-slate-500">/ month</span>
-                <span className="ml-auto text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300">
-                  Popular
-                </span>
-              </div>
-              <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                <div className="h-full rounded-full bg-sky-500" style={{ width: "100%" }} />
-              </div>
-            </div>
-
-            {/* Postpaid */}
-            <div className="p-3.5 rounded-2xl border-2 border-emerald-500/40 bg-emerald-50/20 dark:bg-emerald-950/20 space-y-2">
-              <div className="flex justify-between items-center text-xs sm:text-sm">
-                <span className="font-bold text-emerald-900 dark:text-emerald-300">
-                  Postpaid · Monthly
-                </span>
-                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                  ₹0 Upfront
-                </span>
-              </div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">
-                  0.3%
-                </span>
-                <span className="text-xs font-semibold text-slate-500">of sales</span>
-                <span className="ml-auto text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200">
-                  Zero Upfront
-                </span>
-              </div>
-              <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                <div className="h-full rounded-full bg-emerald-500" style={{ width: "100%" }} />
-              </div>
-            </div>
-          </div>
-
-          {/* Footnote */}
-          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex flex-col sm:flex-row justify-between gap-2">
-            <span>
-              12 Months works out <strong className="text-emerald-600 dark:text-emerald-400 font-bold">{yearlyCheaperPercent}% lower cost</strong> than 6 Months.
-            </span>
-            <span>
-              Postpaid fee is ₹0 upfront, billed 0.3% of sales at month-end.
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── SECTION 2: GEAR GROWTH COMBOS (Gear 2, Gear 3, Gear 4) ─── */}
+      {/* ─── OFFICIAL GEAR COMBOS (Gear 1 to Gear 6) ─── */}
       <section className="space-y-6 mb-16">
         <div className="text-center max-w-2xl mx-auto space-y-2 pb-2">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-emerald-500/10 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-black uppercase tracking-wider">
-            <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> Growth Packs &amp; Combos
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Pre-Configured Retention Engines
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
-            Pre-Configured Gear Combos
+            Official Gear Combos
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Engineered bundles designed for maximum retention velocity. Save up to 50% compared to standalone pricing.
+            Engineered bundles designed for maximum retention velocity and Google Maps domination.
           </p>
         </div>
 
         {/* 3-Column Responsive Modern Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch pt-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch pt-2">
           {GEAR_COMBOS.map((combo) => {
-            const dbPlan6 = getPlanByKey(combo.tenures[180].planKey)
-            const dbPlan1 = getPlanByKey(combo.tenures[365].planKey)
+            const isMonthly = combo.isMonthly || !combo.tenures[365]
 
-            const p180 = dbPlan6?.price || combo.tenures[180].offer
-            const m180 = dbPlan6?.originalPrice || combo.tenures[180].regular
+            // 1 Year Plan
+            const tenure1Y = combo.tenures[365]
+            const dbPlan1Y = tenure1Y ? getPlanByKey(tenure1Y.planKey) : undefined
+            const p365 = dbPlan1Y?.price || tenure1Y?.offer || 0
 
-            const p365 = dbPlan1?.price || combo.tenures[365].offer
-            const m365 = dbPlan1?.originalPrice || combo.tenures[365].regular
+            // 6 Months Plan
+            const tenure6M = combo.tenures[180]
+            const dbPlan6M = tenure6M ? getPlanByKey(tenure6M.planKey) : undefined
+            const p180 = dbPlan6M?.price || tenure6M?.offer || 0
 
-            const isGear5 = combo.gearKey === "gear_5"
-            const isGear4 = combo.gearKey === "gear_4"
-            const isGear3 = combo.gearKey === "gear_3"
-            const isGear2 = combo.gearKey === "gear_2"
+            // Monthly Plan (Gear 6)
+            const tenureMonthly = combo.tenures[30]
+            const dbPlanMonthly = tenureMonthly ? getPlanByKey(tenureMonthly.planKey) : undefined
+            const p30 = dbPlanMonthly?.price || tenureMonthly?.offer || 999
 
-            // Standalone total comparison
-            const standalone1YrSum = combo.modulesIncluded.reduce((acc, modKey) => {
-              const serv = STANDALONE_SERVICES.find((s) => s.i === modKey)
-              if (!serv) return acc
-              const sDbP = getPlanByKey(serv.planKey1Yr)
-              return acc + (sDbP?.price || serv.p[365][0])
-            }, 0)
-            const savings1YrVsStandalone = Math.max(0, standalone1YrSum - p365)
+            // Card thematic design styles
+            const cardBorder =
+              combo.gearKey === "gear_6"
+                ? "border-2 border-rose-500/60 dark:border-rose-500/70 shadow-md hover:shadow-xl hover:shadow-rose-500/10"
+                : combo.gearKey === "gear_5"
+                ? "border-2 border-indigo-600 dark:border-indigo-500 shadow-md hover:shadow-xl hover:shadow-indigo-500/10"
+                : combo.gearKey === "gear_4"
+                ? "border-2 border-blue-500/50 dark:border-blue-600/70 shadow-sm hover:shadow-lg hover:shadow-blue-500/10"
+                : combo.gearKey === "gear_3"
+                ? "border-2 border-purple-500/50 dark:border-purple-600/70 shadow-sm hover:shadow-lg hover:shadow-purple-500/10"
+                : combo.gearKey === "gear_2"
+                ? "border-2 border-emerald-500/50 dark:border-emerald-600/70 shadow-sm hover:shadow-lg hover:shadow-emerald-500/10"
+                : "border-2 border-amber-500/50 dark:border-amber-600/70 shadow-sm hover:shadow-lg hover:shadow-amber-500/10"
 
-            // Card thematic design styles - clean, high-contrast, fully aligned
-            const cardBorder = isGear5
-              ? "border-2 border-indigo-600 dark:border-indigo-500 shadow-md hover:shadow-xl hover:shadow-indigo-500/10"
-              : isGear4
-              ? "border-2 border-purple-500/50 dark:border-purple-600/70 shadow-sm hover:shadow-lg hover:shadow-purple-500/10"
-              : isGear3
-              ? "border-2 border-amber-500/50 dark:border-amber-600/70 shadow-sm hover:shadow-lg hover:shadow-amber-500/10"
-              : "border-2 border-emerald-500/50 dark:border-emerald-600/70 shadow-sm hover:shadow-lg hover:shadow-emerald-500/10"
+            const badgeTheme =
+              combo.gearKey === "gear_6"
+                ? "bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800"
+                : combo.gearKey === "gear_5"
+                ? "bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/70 dark:text-indigo-300 dark:border-indigo-800"
+                : combo.gearKey === "gear_4"
+                ? "bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-800"
+                : combo.gearKey === "gear_3"
+                ? "bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/70 dark:text-purple-300 dark:border-purple-800"
+                : combo.gearKey === "gear_2"
+                ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800"
+                : "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800"
 
-            const badgeTheme = isGear5
-              ? "bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/70 dark:text-indigo-300 dark:border-indigo-800"
-              : isGear4
-              ? "bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/70 dark:text-purple-300 dark:border-purple-800"
-              : isGear3
-              ? "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800"
-              : "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800"
+            const primaryBtnTheme =
+              combo.gearKey === "gear_6"
+                ? "bg-rose-600 hover:bg-rose-700 text-white shadow-rose-600/20"
+                : combo.gearKey === "gear_5"
+                ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20"
+                : combo.gearKey === "gear_4"
+                ? "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/20"
+                : combo.gearKey === "gear_3"
+                ? "bg-purple-600 hover:bg-purple-700 text-white shadow-purple-600/20"
+                : combo.gearKey === "gear_2"
+                ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20"
+                : "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/20"
 
-            const primaryBtnTheme = isGear5
-              ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20"
-              : isGear4
-              ? "bg-purple-600 hover:bg-purple-700 text-white shadow-purple-600/20"
-              : isGear3
-              ? "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/20"
-              : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20"
-
-            const primaryBoxBg = isGear5
-              ? "bg-indigo-50/50 border-indigo-200 dark:bg-indigo-950/30 dark:border-indigo-800/60"
-              : isGear4
-              ? "bg-purple-50/50 border-purple-200 dark:bg-purple-950/30 dark:border-purple-800/60"
-              : isGear3
-              ? "bg-amber-50/50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800/60"
-              : "bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800/60"
+            const primaryBoxBg =
+              combo.gearKey === "gear_6"
+                ? "bg-rose-50/50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800/60"
+                : combo.gearKey === "gear_5"
+                ? "bg-indigo-50/50 border-indigo-200 dark:bg-indigo-950/30 dark:border-indigo-800/60"
+                : combo.gearKey === "gear_4"
+                ? "bg-blue-50/50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800/60"
+                : combo.gearKey === "gear_3"
+                ? "bg-purple-50/50 border-purple-200 dark:bg-purple-950/30 dark:border-purple-800/60"
+                : combo.gearKey === "gear_2"
+                ? "bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800/60"
+                : "bg-amber-50/50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800/60"
 
             return (
               <div
@@ -1166,13 +795,13 @@ export function PricingStudio({
                 className={`bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 flex flex-col justify-between h-full transition-all duration-300 relative overflow-hidden ${cardBorder}`}
               >
                 <div>
-                  {/* Top Badge & Discount Header */}
+                  {/* Top Badge Header */}
                   <div className="flex items-center justify-between gap-1.5 mb-3.5">
                     <span className={`text-[10.5px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full truncate ${badgeTheme}`}>
                       {combo.badge}
                     </span>
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-800">
-                      50% OFF
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                      {isMonthly ? "Monthly" : "Prepaid"}
                     </span>
                   </div>
 
@@ -1186,7 +815,7 @@ export function PricingStudio({
                     {combo.subtitle}
                   </p>
 
-                  {/* Included Engines Checklist with min-height */}
+                  {/* Included Engines Checklist */}
                   <div className="mb-5">
                     <span className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-2">
                       Included Modules:
@@ -1209,639 +838,106 @@ export function PricingStudio({
 
                 {/* Pricing Tiers Section */}
                 <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-                  {/* ─── 1 Year Plan (Featured Primary Offer) ─── */}
-                  <div className={`p-4 rounded-2xl border transition-all ${primaryBoxBg}`}>
-                    <div className="flex items-center justify-between gap-1 mb-1.5">
-                      <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                        1 Year Plan
-                      </span>
-                      {savings1YrVsStandalone > 0 ? (
-                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs">
-                          Save {inr(savings1YrVsStandalone)}
+                  {isMonthly ? (
+                    /* ─── Gear 6 Monthly Plan ─── */
+                    <div className={`p-4 rounded-2xl border transition-all ${primaryBoxBg}`}>
+                      <div className="flex items-center justify-between gap-1 mb-1.5">
+                        <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                          Monthly Subscription
                         </span>
-                      ) : (
-                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-900 text-white dark:bg-slate-700">
-                          Best Value
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Price Line */}
-                    <div className="flex items-baseline gap-2 mt-1">
-                      <span className="text-2xl font-black text-slate-900 dark:text-white">
-                        {inr(p365)}
-                      </span>
-                      <span className="text-xs font-semibold text-slate-400 line-through decoration-rose-500">
-                        {inr(m365)}
-                      </span>
-                      <span className="text-xs font-bold text-slate-600 dark:text-slate-400 ml-auto">
-                        {dy(p365, 365)}
-                      </span>
-                    </div>
-
-                    {/* Full-Width 1Y Action Button (Never clipped) */}
-                    <button
-                      type="button"
-                      onClick={() => handleSelectGearCombo(combo, 365)}
-                      className={`w-full mt-3 py-2.5 px-4 rounded-xl text-xs font-black shadow-xs transition-all duration-150 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-1.5 ${primaryBtnTheme}`}
-                    >
-                      <span>Choose 1 Year Plan</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  {/* ─── 6 Months Plan (Secondary Option) ─── */}
-                  <div className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold text-slate-600 dark:text-slate-400">
-                        6 Months Plan
-                      </span>
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-sm font-black text-slate-900 dark:text-white">
-                          {inr(p180)}
-                        </span>
-                        <span className="text-[10px] font-semibold text-slate-400 line-through decoration-rose-500">
-                          {inr(m180)}
-                        </span>
-                        <span className="text-[10px] font-semibold text-slate-500">
-                          {dy(p180, 180)}
+                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-600 text-white shadow-xs">
+                          30 Days
                         </span>
                       </div>
+
+                      {/* Price Line */}
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <span className="text-2xl font-black text-slate-900 dark:text-white">
+                          {inr(p30)}
+                        </span>
+                        <span className="text-xs font-bold text-slate-500">
+                          / month
+                        </span>
+                        <span className="text-xs font-bold text-slate-600 dark:text-slate-400 ml-auto">
+                          {dy(p30, 30)}
+                        </span>
+                      </div>
+
+                      {/* Action Button */}
+                      <button
+                        type="button"
+                        onClick={() => handleSelectGearCombo(combo, 30)}
+                        className={`w-full mt-3 py-2.5 px-4 rounded-xl text-xs font-black shadow-xs transition-all duration-150 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-1.5 ${primaryBtnTheme}`}
+                      >
+                        <span>Choose Monthly Plan ({inr(p30)}/mo)</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-
-                    {/* Full-Width 6M Action Button (Never clipped) */}
-                    <button
-                      type="button"
-                      onClick={() => handleSelectGearCombo(combo, 180)}
-                      className="w-full mt-2.5 py-2 px-3 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-750 transition cursor-pointer flex items-center justify-center gap-1"
-                    >
-                      <span>Choose 6 Months Plan</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-
-      </section>
-
-      {/* ─── SECTION 3: MODULAR STANDALONE TOOLS & BUILD-YOUR-OWN BUNDLE ─── */}
-      <section className="space-y-4 mb-16">
-        <div className="pb-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-black uppercase tracking-wider mb-2">
-            <CreditCard className="w-3.5 h-3.5 text-slate-600" /> Modular Retention Tools
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-            Or Choose Exactly What You Need
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Add any individual engine for 6 Months or 1 Year, or combine them to craft your bespoke retention stack.
-          </p>
-        </div>
-
-        {/* Responsive Table Container */}
-        <div className="hidden md:block bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xs">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left min-w-[700px] border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200 dark:border-slate-800 text-[11.5px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold bg-slate-50/60 dark:bg-slate-950/40">
-                  <th className="py-4 px-6 w-[43%]">Standalone Engine</th>
-                  <th className="py-4 px-6 w-[28.5%]">6 Months (Main vs Offer Price)</th>
-                  <th className="py-4 px-6 w-[28.5%]">1 Year (Main vs Offer Price)</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
-                {STANDALONE_SERVICES.map((s) => {
-                  const dbPlan6 = getPlanByKey(s.planKey6Mo)
-                  const dbPlan1 = getPlanByKey(s.planKey1Yr)
-
-                  const p180 = dbPlan6?.price || s.p[180][0]
-                  const m180 = dbPlan6?.originalPrice || s.p[180][1]
-
-                  const p365 = dbPlan1?.price || s.p[365][0]
-                  const m365 = dbPlan1?.originalPrice || s.p[365][1]
-
-                  const isAdded180 = selectedStandalone[s.i] === 180
-                  const isAdded365 = selectedStandalone[s.i] === 365
-
-                  return (
-                    <tr key={s.i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition">
-                      {/* Service Info */}
-                      <td className="py-5 px-6 align-top">
-                        <div className="flex items-start gap-3.5">
-                          {/* Vibrant Icon Box */}
-                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${s.iconBg}`}>
-                            {s.i === "loyalty" && <Gift className="w-5 h-5" />}
-                            {s.i === "star" && <Star className="w-5 h-5" />}
-                            {s.i === "chat" && <MessageSquare className="w-5 h-5" />}
-                            {s.i === "card" && <CreditCard className="w-5 h-5" />}
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-snug">
-                              {s.n}
-                            </h4>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-                              {s.t}
-                            </p>
-                          </div>
+                  ) : (
+                    <>
+                      {/* ─── 1 Year Plan (Featured Primary Offer) ─── */}
+                      <div className={`p-4 rounded-2xl border transition-all ${primaryBoxBg}`}>
+                        <div className="flex items-center justify-between gap-1 mb-1.5">
+                          <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                            1 Year Plan
+                          </span>
+                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-900 text-white dark:bg-slate-700">
+                            365 Days
+                          </span>
                         </div>
-                      </td>
 
-                      {/* 6 Months Cell */}
-                      <td className="py-5 px-6 align-top">
-                        <div className="space-y-1.5">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                              Main Price:
-                            </span>
-                            <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
-                              {inr(m180)}
-                            </span>
-                            <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
-                              {off(p180, m180)}% OFF
-                            </span>
-                          </div>
+                        {/* Price Line */}
+                        <div className="flex items-baseline gap-2 mt-1">
+                          <span className="text-2xl font-black text-slate-900 dark:text-white">
+                            {inr(p365)}
+                          </span>
+                          <span className="text-xs font-bold text-slate-600 dark:text-slate-400 ml-auto">
+                            {dy(p365, 365)}
+                          </span>
+                        </div>
+
+                        {/* Action Button */}
+                        <button
+                          type="button"
+                          onClick={() => handleSelectGearCombo(combo, 365)}
+                          className={`w-full mt-3 py-2.5 px-4 rounded-xl text-xs font-black shadow-xs transition-all duration-150 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-1.5 ${primaryBtnTheme}`}
+                        >
+                          <span>Choose 1 Year Plan ({inr(p365)})</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* ─── 6 Months Plan (Secondary Option) ─── */}
+                      <div className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-semibold text-slate-600 dark:text-slate-400">
+                            6 Months Plan
+                          </span>
                           <div className="flex items-baseline gap-1.5">
-                            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                              Offer:
-                            </span>
-                            <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                            <span className="text-sm font-black text-slate-900 dark:text-white">
                               {inr(p180)}
                             </span>
-                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                            <span className="text-[10px] font-semibold text-slate-500">
                               {dy(p180, 180)}
                             </span>
                           </div>
-                          <div className="pt-1.5">
-                            <button
-                              type="button"
-                              onClick={() => handleToggleStandalone(s.i, 180)}
-                              className={`text-xs font-semibold px-4 py-1.5 rounded-lg border transition cursor-pointer ${
-                                isAdded180
-                                  ? "bg-indigo-600 border-indigo-600 text-white shadow-xs"
-                                  : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600"
-                              }`}
-                            >
-                              {isAdded180 ? "✓ Added" : "Add"}
-                            </button>
-                          </div>
                         </div>
-                      </td>
 
-                      {/* 1 Year Cell */}
-                      <td className="py-5 px-6 align-top">
-                        <div className="space-y-1.5">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                              Main Price:
-                            </span>
-                            <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
-                              {inr(m365)}
-                            </span>
-                            <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-extrabold text-[11px] px-2 py-0.5 rounded-full">
-                              {off(p365, m365)}% OFF
-                            </span>
-                          </div>
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                              Offer:
-                            </span>
-                            <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                              {inr(p365)}
-                            </span>
-                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                              {dy(p365, 365)}
-                            </span>
-                          </div>
-                          <div className="pt-1.5">
-                            <button
-                              type="button"
-                              onClick={() => handleToggleStandalone(s.i, 365)}
-                              className={`text-xs font-semibold px-4 py-1.5 rounded-lg border transition cursor-pointer ${
-                                isAdded365
-                                  ? "bg-indigo-600 border-indigo-600 text-white shadow-xs"
-                                  : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600"
-                              }`}
-                            >
-                              {isAdded365 ? "✓ Added" : "Add"}
-                            </button>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-
-                {/* ─── ROW 5: TOTAL (4 Standalone Services) ─── */}
-                <tr className="bg-slate-50 dark:bg-slate-950/60 font-semibold border-t-2 border-slate-200 dark:border-slate-800">
-                  <td className="py-5 px-6">
-                    <div className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">
-                      Total · 4 Standalone Engines
-                    </div>
-                  </td>
-                  <td className="py-5 px-6 space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[11px] font-bold uppercase text-slate-500">Main Total:</span>
-                      <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
-                        {inr(standaloneMrpTot(180))}
-                      </span>
-                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.5 rounded-full">
-                        Save {inr(standaloneMrpTot(180) - standaloneTot(180))}
-                      </span>
-                    </div>
-                    <div className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
-                      Offer: {inr(standaloneTot(180))} <span className="text-xs font-normal text-slate-500">{dy(standaloneTot(180), 180)}</span>
-                    </div>
-                  </td>
-                  <td className="py-5 px-6 space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[11px] font-bold uppercase text-slate-500">Main Total:</span>
-                      <span className="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
-                        {inr(standaloneMrpTot(365))}
-                      </span>
-                      <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.5 rounded-full">
-                        Save {inr(standaloneMrpTot(365) - standaloneTot(365))}
-                      </span>
-                    </div>
-                    <div className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
-                      Offer: {inr(standaloneTot(365))} <span className="text-xs font-normal text-slate-500">{dy(standaloneTot(365), 365)}</span>
-                    </div>
-                  </td>
-                </tr>
-
-                {/* ─── GEAR COMBOS ROWS (Gear 2, 3, 4, 5) ─── */}
-                {GEAR_COMBOS.map((combo) => {
-                  const dbPlan6 = getPlanByKey(combo.tenures[180].planKey)
-                  const dbPlan1 = getPlanByKey(combo.tenures[365].planKey)
-
-                  const p180 = dbPlan6?.price || combo.tenures[180].offer
-                  const m180 = dbPlan6?.originalPrice || combo.tenures[180].regular
-
-                  const p365 = dbPlan1?.price || combo.tenures[365].offer
-                  const m365 = dbPlan1?.originalPrice || combo.tenures[365].regular
-
-                  const savings1Yr = getGearSavings1Yr(combo, getPlanByKey)
-
-                  return (
-                    <tr key={combo.gearKey} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition border-t border-slate-200 dark:border-slate-800">
-                      <td className="py-5 px-6 align-top">
-                        <div className="flex items-start gap-3.5">
-                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${combo.iconBg}`}>
-                            <Zap className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 flex-wrap mb-1">
-                              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                                {combo.badge}
-                              </span>
-                              <span className="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
-                                50% OFF
-                              </span>
-                            </div>
-                            <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-snug">
-                              {combo.name}
-                            </h4>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                              {combo.subtitle}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-5 px-6 align-top">
-                        <div className="space-y-1">
-                          <div className="flex items-baseline gap-1.5 flex-wrap">
-                            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
-                              {inr(p180)}
-                            </span>
-                            <span className="text-xs font-semibold text-slate-400 line-through decoration-rose-500 decoration-1.5">
-                              {inr(m180)}
-                            </span>
-                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                              {dy(p180, 180)}
-                            </span>
-                          </div>
-                          <div className="pt-1.5">
-                            <button
-                              type="button"
-                              onClick={() => handleSelectGearCombo(combo, 180)}
-                              className="text-xs font-semibold px-4 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600 transition cursor-pointer"
-                            >
-                              Choose 6M
-                            </button>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-5 px-6 align-top">
-                        <div className="space-y-1">
-                          <div className="flex items-baseline gap-1.5 flex-wrap">
-                            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
-                              {inr(p365)}
-                            </span>
-                            <span className="text-xs font-semibold text-slate-400 line-through decoration-rose-500 decoration-1.5">
-                              {inr(m365)}
-                            </span>
-                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                              {dy(p365, 365)}
-                            </span>
-                          </div>
-                          {savings1Yr > 0 && (
-                            <div>
-                              <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[10px] px-2 py-0.5 rounded-full inline-block">
-                                Save {inr(savings1Yr)} vs Standalone
-                              </span>
-                            </div>
-                          )}
-                          <div className="pt-1.5">
-                            <button
-                              type="button"
-                              onClick={() => handleSelectGearCombo(combo, 365)}
-                              className="text-xs font-semibold px-4 py-1.5 rounded-lg border border-indigo-600 bg-indigo-600 text-white hover:bg-indigo-700 shadow-xs transition cursor-pointer"
-                            >
-                              Choose 1Y
-                            </button>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* ─── Mobile Vertical Cards (Zero Horizontal Scroll - Direct Pricing) ─── */}
-        <div className="block md:hidden space-y-3.5">
-          {STANDALONE_SERVICES.map((s) => {
-            const dbPlan6 = getPlanByKey(s.planKey6Mo)
-            const dbPlan1 = getPlanByKey(s.planKey1Yr)
-
-            const p180 = dbPlan6?.price || s.p[180][0]
-            const m180 = dbPlan6?.originalPrice || s.p[180][1]
-
-            const p365 = dbPlan1?.price || s.p[365][0]
-            const m365 = dbPlan1?.originalPrice || s.p[365][1]
-
-            const isAdded180 = selectedStandalone[s.i] === 180
-            const isAdded365 = selectedStandalone[s.i] === 365
-
-            return (
-              <div
-                key={s.i}
-                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-3"
-              >
-                {/* Header: Icon + Name + Description */}
-                <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${s.iconBg}`}>
-                    {s.i === "loyalty" && <Gift className="w-5 h-5" />}
-                    {s.i === "star" && <Star className="w-5 h-5" />}
-                    {s.i === "chat" && <MessageSquare className="w-5 h-5" />}
-                    {s.i === "card" && <CreditCard className="w-5 h-5" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-snug">
-                      {s.n}
-                    </h4>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-                      {s.t}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Direct Pricing Options Grid: 6 Months & 1 Year */}
-                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100 dark:border-slate-800">
-                  {/* 6 Months Box */}
-                  <div className={`rounded-xl p-2.5 border flex flex-col justify-between transition ${
-                    isAdded180
-                      ? "bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-500/60 ring-1 ring-indigo-500/40"
-                      : "bg-slate-50/60 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800"
-                  }`}>
-                    <div>
-                      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-500 mb-0.5">
-                        <span>6 Months</span>
-                        <span className="text-emerald-700 dark:text-emerald-300 font-extrabold bg-emerald-100 dark:bg-emerald-950/80 px-1 py-0.2 rounded">
-                          {off(p180, m180)}%
-                        </span>
+                        {/* Action Button */}
+                        <button
+                          type="button"
+                          onClick={() => handleSelectGearCombo(combo, 180)}
+                          className="w-full mt-2.5 py-2 px-3 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-750 transition cursor-pointer flex items-center justify-center gap-1"
+                        >
+                          <span>Choose 6 Months Plan ({inr(p180)})</span>
+                        </button>
                       </div>
-                      <div className="text-xs text-slate-500 line-through decoration-rose-500">
-                        {inr(m180)}
-                      </div>
-                      <div className="text-base font-black text-slate-900 dark:text-white leading-tight">
-                        {inr(p180)}
-                      </div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                        {dy(p180, 180)}
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleToggleStandalone(s.i, 180)}
-                      className={`w-full mt-2 text-xs font-bold py-1.5 rounded-lg border transition cursor-pointer text-center ${
-                        isAdded180
-                          ? "bg-indigo-600 border-indigo-600 text-white shadow-xs"
-                          : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600"
-                      }`}
-                    >
-                      {isAdded180 ? "✓ Added" : "+ Add 6M"}
-                    </button>
-                  </div>
-
-                  {/* 1 Year Box */}
-                  <div className={`rounded-xl p-2.5 border flex flex-col justify-between transition ${
-                    isAdded365
-                      ? "bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-500/60 ring-1 ring-indigo-500/40"
-                      : "bg-slate-50/60 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800"
-                  }`}>
-                    <div>
-                      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-500 mb-0.5">
-                        <span>1 Year</span>
-                        <span className="text-emerald-700 dark:text-emerald-300 font-extrabold bg-emerald-100 dark:bg-emerald-950/80 px-1 py-0.2 rounded">
-                          {off(p365, m365)}%
-                        </span>
-                      </div>
-                      <div className="text-xs text-slate-500 line-through decoration-rose-500">
-                        {inr(m365)}
-                      </div>
-                      <div className="text-base font-black text-slate-900 dark:text-white leading-tight">
-                        {inr(p365)}
-                      </div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                        {dy(p365, 365)}
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleToggleStandalone(s.i, 365)}
-                      className={`w-full mt-2 text-xs font-bold py-1.5 rounded-lg border transition cursor-pointer text-center ${
-                        isAdded365
-                          ? "bg-indigo-600 border-indigo-600 text-white shadow-xs"
-                          : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600"
-                      }`}
-                    >
-                      {isAdded365 ? "✓ Added" : "+ Add 1Y"}
-                    </button>
-                  </div>
+                    </>
+                  )}
                 </div>
               </div>
             )
           })}
-
-          {/* Mobile Total Row Card */}
-          <div className="bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-3">
-            <div className="font-extrabold text-slate-900 dark:text-white text-sm">
-              Total · 4 Standalone Engines
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                <div className="text-[10px] font-bold text-slate-500 uppercase">6 Months Total</div>
-                <div className="text-slate-500 line-through text-[11px] mt-0.5">{inr(standaloneMrpTot(180))}</div>
-                <div className="text-base font-black text-slate-900 dark:text-white">{inr(standaloneTot(180))}</div>
-                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
-                  Save {inr(standaloneMrpTot(180) - standaloneTot(180))}
-                </div>
-              </div>
-              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                <div className="text-[10px] font-bold text-slate-500 uppercase">1 Year Total</div>
-                <div className="text-slate-500 line-through text-[11px] mt-0.5">{inr(standaloneMrpTot(365))}</div>
-                <div className="text-base font-black text-slate-900 dark:text-white">{inr(standaloneTot(365))}</div>
-                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
-                  Save {inr(standaloneMrpTot(365) - standaloneTot(365))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile Gear Combos Cards (Gear 2, 3, 4, 5) */}
-          {GEAR_COMBOS.map((combo) => {
-            const dbPlan6 = getPlanByKey(combo.tenures[180].planKey)
-            const dbPlan1 = getPlanByKey(combo.tenures[365].planKey)
-
-            const p180 = dbPlan6?.price || combo.tenures[180].offer
-            const m180 = dbPlan6?.originalPrice || combo.tenures[180].regular
-
-            const p365 = dbPlan1?.price || combo.tenures[365].offer
-            const m365 = dbPlan1?.originalPrice || combo.tenures[365].regular
-
-            const savings1Yr = getGearSavings1Yr(combo, getPlanByKey)
-
-            return (
-              <div
-                key={combo.gearKey}
-                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-3"
-              >
-                <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${combo.iconBg}`}>
-                    <Zap className="w-5 h-5" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap mb-1">
-                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                        {combo.badge}
-                      </span>
-                      <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
-                        50% OFF
-                      </span>
-                    </div>
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-snug">
-                      {combo.name}
-                    </h4>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                      {combo.subtitle}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Direct Pricing Options Grid */}
-                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100 dark:border-slate-800">
-                  {/* 6M Combo Box */}
-                  <div className="rounded-xl p-2.5 border bg-slate-50/60 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 flex flex-col justify-between">
-                    <div>
-                      <div className="text-[10px] font-black uppercase text-slate-500 mb-0.5">6 Months</div>
-                      <div className="text-xs text-slate-500 line-through decoration-rose-500">{inr(m180)}</div>
-                      <div className="text-base font-black text-slate-900 dark:text-white leading-tight">{inr(p180)}</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400">{dy(p180, 180)}</div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleSelectGearCombo(combo, 180)}
-                      className="w-full mt-2 text-xs font-semibold py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-600 hover:text-indigo-600 transition cursor-pointer text-center"
-                    >
-                      Choose 6M
-                    </button>
-                  </div>
-
-                  {/* 1Y Combo Box */}
-                  <div className="rounded-xl p-2.5 border bg-slate-50/60 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 flex flex-col justify-between">
-                    <div>
-                      <div className="text-[10px] font-black uppercase text-slate-500 mb-0.5">1 Year</div>
-                      <div className="text-xs text-slate-500 line-through decoration-rose-500">{inr(m365)}</div>
-                      <div className="text-base font-black text-slate-900 dark:text-white leading-tight">{inr(p365)}</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400">{dy(p365, 365)}</div>
-                      {savings1Yr > 0 && (
-                        <div className="text-[9px] text-emerald-700 dark:text-emerald-300 font-bold mt-0.5">
-                          Save {inr(savings1Yr)}
-                        </div>
-                      )}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleSelectGearCombo(combo, 365)}
-                      className="w-full mt-2 text-xs font-semibold py-1.5 rounded-lg border border-indigo-600 bg-indigo-600 text-white hover:bg-indigo-700 shadow-xs transition cursor-pointer text-center"
-                    >
-                      Choose 1Y
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* ─── Lifetime Deal Card (Smart Digital Business Card) ─── */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
-          <div className="flex items-center gap-3.5 text-left w-full sm:w-auto">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-xs">
-              <CreditCard className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-[10px] font-black uppercase tracking-wider mb-1">
-                Permanent Cloud Ownership
-              </div>
-              <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
-                Smart Digital Business Card · Lifetime Deal
-              </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Pay once. Zero renewal fees forever. Includes permanent cloud hosting and counter QR kit.
-              </p>
-            </div>
-          </div>
-          <div className="text-right w-full sm:w-auto flex flex-col sm:flex-row items-center sm:items-center justify-between sm:justify-end gap-4">
-            <div className="flex flex-col items-end justify-center w-full sm:w-auto space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Main Price:
-                </span>
-                <span className="text-base sm:text-lg font-extrabold text-slate-600 dark:text-slate-300 line-through decoration-rose-500 decoration-2">
-                  {inr(3999)}
-                </span>
-                <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px] px-2 py-0.5 rounded-full">
-                  62% OFF
-                </span>
-              </div>
-              <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                Offer: <span className="text-indigo-600 dark:text-indigo-400">{inr(1499)}</span>{" "}
-                <span className="text-xs font-normal text-slate-500 dark:text-slate-400">({dy(1499, 3650)})</span>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={handleSelectLifetimeDeal}
-              className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm py-2.5 px-6 rounded-xl shadow-xs transition shrink-0 cursor-pointer"
-            >
-              Get Lifetime Deal →
-            </button>
-          </div>
         </div>
       </section>
 
@@ -1862,10 +958,10 @@ export function PricingStudio({
               Ready to turn Walk-in Customers into Repeat and Loyal ?
             </h2>
             <p className="text-cyan-100/90 text-sm sm:text-lg max-w-xl mx-auto leading-relaxed font-medium">
-              Start with one module, upgrade to Complete anytime. Transparent ROI from Day 1.
+              Start with any growth gear, upgrade anytime. Transparent ROI from Day 1.
             </p>
             <div className="pt-2">
-              <Link href={selectedList.length > 0 ? `/signup?module=${selectedList.map(s => s.i === "star" ? "reviews" : s.i === "chat" ? "autoreply" : s.i).join(",")}` : "/signup"}>
+              <Link href="/signup">
                 <button
                   type="button"
                   className="bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm sm:text-base rounded-xl py-4 px-9 shadow-lg shadow-slate-950/20 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer inline-flex items-center gap-2"
@@ -1881,64 +977,8 @@ export function PricingStudio({
 
       {/* Footnote */}
       <div className="text-center text-xs text-slate-400 pb-16">
-        All prices in INR. Per-day cost = price ÷ plan days (Lifetime: 3,650 days).
+        All prices in INR. Per-day cost = price ÷ plan days. Transparent flat pricing with zero hidden fees.
       </div>
-
-      {/* ─── Sticky Floating Bottom Selection Bar ─── */}
-      <AnimatePresence>
-        {selectedList.length > 0 && (
-          <motion.div
-            initial={{ y: 80, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 80, opacity: 0 }}
-            className="fixed left-0 right-0 bottom-0 z-[60] p-3 sm:p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 shadow-2xl"
-          >
-            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:pr-20">
-              <div className="flex items-center gap-2.5 flex-wrap text-sm text-slate-700 dark:text-slate-300">
-                <span className="font-bold text-slate-900 dark:text-white">
-                  {selectedList.length} selected
-                </span>
-                <span>·</span>
-                <span className="text-xs font-bold uppercase text-slate-500">
-                  Main Price:
-                </span>
-                <span className="text-sm sm:text-base font-extrabold text-slate-500 dark:text-slate-400 line-through decoration-rose-500 decoration-2">
-                  {inr(selectedOriginalSum)}
-                </span>
-                <span className="text-xs font-bold uppercase text-emerald-700 dark:text-emerald-400">
-                  Offer:
-                </span>
-                <span className="text-lg sm:text-xl font-extrabold text-indigo-600 dark:text-indigo-400">
-                  {inr(selectedTotalSum)}
-                </span>
-                <span className="text-xs text-slate-500">
-                  (₹{selectedPerDaySum.toFixed(2)}/day)
-                </span>
-                <span className="text-[11px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 px-2 py-0.5 rounded-full">
-                  Save {inr(selectedOriginalSum - selectedTotalSum)}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
-                <button
-                  type="button"
-                  onClick={handleClearStandalone}
-                  className="text-xs font-semibold px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                >
-                  Clear
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCheckoutStandalone}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md transition cursor-pointer flex items-center gap-1.5"
-                >
-                  <span>Continue →</span>
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ─── Checkout & Instant Account Activation Modal ─── */}
       <CheckoutActivationModal

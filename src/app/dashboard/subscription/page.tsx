@@ -349,40 +349,7 @@ export default function SubscriptionPage() {
         </div>
       ) : (
         <div className="space-y-8">
-          {/* Limited Time 50% Discount Offer Banner - Prominent Light Version */}
-          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-indigo-500/10 border-2 border-amber-400/60 p-5 sm:p-7 shadow-xs">
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-              {/* Left text & details */}
-              <div className="flex items-start sm:items-center gap-4 text-left flex-1">
-                <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-amber-100 border border-amber-300 items-center justify-center flex-shrink-0 text-amber-600 shadow-xs">
-                  <Flame className="w-8 h-8 text-amber-600 animate-pulse" />
-                </div>
-                <div>
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-xs font-black uppercase tracking-widest mb-2">
-                    <Flame className="w-3.5 h-3.5 text-amber-600 animate-pulse" /> Limited Time 50% Discount Offer
-                  </div>
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
-                    All Plans Locked at Flat Half Price!
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl leading-relaxed">
-                    Complete WhatsApp Loyalty, Smart AI Google Reviews &amp; 1-Click AutoReply.{" "}
-                    <span className="font-extrabold text-slate-700">Main Price:</span> <span className="font-extrabold text-slate-500 line-through decoration-rose-500 decoration-2">₹6,998/yr</span> ➔ <span className="text-emerald-700 font-extrabold">Offer Price: ₹3,499/yr</span> (₹9.59/day). Standalone <span className="font-extrabold text-slate-500 line-through decoration-rose-500 decoration-2">₹1,199/yr</span> ➔ <span className="text-amber-700 font-extrabold">₹499/yr</span> (₹1.37/day).
-                  </p>
-                </div>
-              </div>
 
-              {/* Right Biggest Font Highlight */}
-              <div className="w-full md:w-auto flex-shrink-0 flex flex-col items-center justify-center px-8 py-5 rounded-2xl bg-white/95 border-2 border-amber-400 shadow-md text-center">
-                <span className="text-xs font-black uppercase tracking-widest text-amber-700">FLAT DISCOUNT</span>
-                <div className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600 drop-shadow-xs">
-                  50% OFF
-                </div>
-                <div className="mt-1.5 inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 text-[10px] font-extrabold tracking-wide">
-                  ⚡ INSTANT SAVINGS LOCKED
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Plan Selection Experience Switcher */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
@@ -421,13 +388,8 @@ export default function SubscriptionPage() {
               <div className="text-xs text-emerald-800 font-bold flex items-center gap-1.5 flex-wrap bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>Selected: {selectedPlan.name}</span>
-                {selectedPlan.originalPrice && selectedPlan.originalPrice > selectedPlan.price && (
-                  <span className="text-slate-500 line-through decoration-rose-500 decoration-2 font-extrabold ml-1">
-                    Main Price: ₹{selectedPlan.originalPrice.toLocaleString("en-IN")}
-                  </span>
-                )}
                 <span className="text-emerald-900 font-black ml-1">
-                  Offer Price: ₹{selectedPlan.price.toLocaleString("en-IN")}
+                  Price: ₹{selectedPlan.price.toLocaleString("en-IN")}
                 </span>
               </div>
             )}
@@ -568,20 +530,7 @@ export default function SubscriptionPage() {
 
                       {/* Price Section */}
                       <div className="mb-6 pb-6 border-b border-slate-200 space-y-1.5">
-                        {plan.originalPrice && plan.originalPrice > effectivePrice && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                              Main Price:
-                            </span>
-                            <span className="text-base sm:text-lg font-extrabold text-slate-500 line-through decoration-rose-500 decoration-2">
-                              ₹{plan.originalPrice.toLocaleString("en-IN")}
-                            </span>
-                          </div>
-                        )}
                         <div className="flex items-baseline gap-2">
-                          <span className="text-xs font-bold uppercase text-emerald-700">
-                            Offer Price:
-                          </span>
                           <span className="text-4xl font-black text-slate-900 tracking-tight">
                             ₹{effectivePrice.toLocaleString("en-IN")}
                           </span>
@@ -591,11 +540,6 @@ export default function SubscriptionPage() {
                           <span className="text-xs text-slate-600 font-medium bg-slate-100 px-2 py-0.5 rounded">
                             {plan.days} Days Validity
                           </span>
-                          {plan.discountPercent && plan.discountPercent > 0 && (
-                            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
-                              {plan.discountPercent}% OFF
-                            </span>
-                          )}
                         </div>
                       </div>
 

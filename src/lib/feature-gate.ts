@@ -69,7 +69,14 @@ export const PLAN_MODULE_MAP: Record<string, Module[]> = {
   card: ["DIGITAL_CARD"],
   digital_card: ["DIGITAL_CARD"],
   gbp: ["GBP_OPERATIONS"],
-  // Combined plans (existing + new combos)
+  // Gear Combos
+  gear1: ["REVIEWS"],
+  gear2: ["DIGITAL_CARD", "REVIEWS"],
+  gear3: ["DIGITAL_CARD", "LOYALTY"],
+  gear4: ["DIGITAL_CARD", "LOYALTY", "REVIEWS"],
+  gear5: ["DIGITAL_CARD", "LOYALTY", "REVIEWS", "AUTOREPLY"],
+  gear6: ALL_MODULES,
+  // Combined plans (existing legacy aliases)
   starter: ALL_MODULES,
   growth: ALL_MODULES,
   enterprise: ALL_MODULES,
