@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 8ea426a (feat(pet-store): set Maw & Paw top Vadodara keywords, products and services across grounding studio and store catalog)
-Full SHA          : 8ea426a5d78479a10cacaa7d318cd3cb5cc6ef1f
-Parent Commit     : 077bd7c
+Active Git Commit : 67df548 (feat(pricing): establish 5 canonical gear combos and updated standalone service pricing across platform)
+Full SHA          : 67df5485c82413b9ad6806ec3add72b082b81e63
+Parent Commit     : 322ade5
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 16 Nov 2026, 12:05 AM IST
+Deployment Date   : 16 Nov 2026, 09:20 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(pet-store): set Maw & Paw top Vadodara keywords, products and services across grounding studio and store catalog
+Commit Title      : feat(pricing): establish 5 canonical gear combos and updated standalone service pricing across platform
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -22,14 +22,19 @@ Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 O
 Verified Live Outcomes:
 ----------------------------------------------------------
 1. https://customerpilot.in/                                 -> HTTP 200 (Homepage live & healthy)
-2. https://customerpilot.in/pricing                          -> HTTP 200 (6 Official Gear Combos Live with Fixed Flat Pricing)
-3. https://customerpilot.in/dashboard/settings               -> HTTP 200 (Maw & Paw 5 Top Vadodara keywords + 9 Products & Services pinned in Step D Studio)
-4. https://customerpilot.in/dashboard/menu                   -> HTTP 200 (10 Store Catalog items seeded and live with INR pricing)
+2. https://customerpilot.in/pricing                          -> HTTP 200 (5 Official Canonical Gear Combos Live with Fixed Flat Pricing + 4 Standalone Services)
+3. https://customerpilot.in/dashboard/settings               -> HTTP 200 (Settings studio live with pinned Vadodara keywords and catalog)
+4. https://customerpilot.in/dashboard/subscription           -> HTTP 200 (Active plans synchronized with 6 Months and 1 Year filters)
 5. https://customerpilot.in/super-admin                      -> HTTP 307 (Auth redirect to login, operational)
-6. Clean Categories & SEO Grounding:
-   - Configured 5 Top Vadodara search queries: Pet Shop in Vadodara, Best Pet Store in Vadodara, Pet Grooming in Vadodara, Puppies for Sale in Vadodara, Pet Food Shop in Vadodara Pet Store.
-   - Grounded Products & Services: Pet Grooming, Dog, Cat, Birds, Dog Food, Cat Food, Fish Food, Dog Biscuits, Cat biscuit.
-   - Total 62 allowed SEO entities in whitelist for Maw & Paw.
-   - Synchronized /api/menu/items route to VPS for full catalog visibility.
+6. 5 Canonical Gear Combos & Standalone Architecture:
+   - Gear 1: Smart Digital Business Card + Smart AI Google Review System (₹1,249/yr)
+   - Gear 2: Smart Digital Business Card + WhatsApp Digital Loyalty System (₹2,249/yr)
+   - Gear 3: WhatsApp Digital Loyalty + Smart AI Google Review System + Smart Digital Business Card (₹2,499/yr)
+   - Gear 4: Smart Digital Business Card + WhatsApp Digital Loyalty + Smart AI Google Review System + AutoReply to GoogleReview (₹2,499/yr)
+   - Gear 5: CustomerPilot All-in-One Enterprise (All 8 retail modules) (₹999/mo or ₹9,999/yr)
+   - Standalone 1: Smart AI Google Review System (₹999/yr)
+   - Standalone 2: WhatsApp Digital Loyalty Membership Club (₹1,999/yr)
+   - Standalone 3: Smart Digital Business Card (₹549/yr)
+   - Standalone 4: AutoReply to GoogleReview (₹999/yr)
 7. Adversarial Red-Team Safety Gates:
    - All 6 automated gates passed cleanly (AST import linter, full-app TS ratchet <= 36, sensitive token redactions, 12 mathematical boundaries, payments regression, 0 tracked DBs)
