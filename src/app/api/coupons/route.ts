@@ -1,14 +1,31 @@
 import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
 import { ok, err } from "@/lib/api"
+import { ensureMasterPlans } from "@/lib/master-plans"
 
 export const dynamic = "force-dynamic"
 
 export async function GET(req: NextRequest) {
   try {
-    const coupons = await db.coupon.findMany({
+    const { searchParams } = new URL(req.url)
+    const shouldSync = searchParams.get("sync") === "true"
+
+    if (shouldSync) {
+      await ensureMasterPlans(db)
+    }
+
+    let coupons = await db.coupon.findMany({
       orderBy: { createdAt: "desc" }
     })
+
+    // Auto-seed canonical coupons (CPA100, CPA350, CP99, etc.) if table is empty
+    if (!coupons || coupons.length === 0) {
+      await ensureMasterPlans(db)
+      coupons = await db.coupon.findMany({
+        orderBy: { createdAt: "desc" }
+      })
+    }
+
     return ok({ coupons })
   } catch (error: any) {
     return err(error.message || "Failed to fetch coupons", 500)

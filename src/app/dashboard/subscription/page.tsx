@@ -602,6 +602,41 @@ export default function SubscriptionPage() {
                   </Button>
                 </div>
 
+                {/* Quick Promo Suggestion Chips */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[11px] font-semibold text-slate-500">Quick Codes:</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCouponCode("CPA100")
+                      handleApplyCoupon("CPA100")
+                    }}
+                    className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition cursor-pointer"
+                  >
+                    🏷️ CPA100 (-₹100)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCouponCode("CPA350")
+                      handleApplyCoupon("CPA350")
+                    }}
+                    className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 transition cursor-pointer"
+                  >
+                    🏷️ CPA350 (-₹350)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCouponCode("CP99")
+                      handleApplyCoupon("CP99")
+                    }}
+                    className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition cursor-pointer"
+                  >
+                    🏷️ CP99 (Special ₹99)
+                  </button>
+                </div>
+
                 {appliedCoupon && (
                   <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-300 px-4 py-2 rounded-xl text-xs font-bold text-emerald-800">
                     <Sparkles className="w-4 h-4 text-emerald-600" />

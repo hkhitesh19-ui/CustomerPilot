@@ -91,6 +91,26 @@ export function SubscriptionPlansManager() {
     }
   }
 
+  // Force sync canonical coupons (CPA100, CPA350, CP99, etc.)
+  const handleSyncCoupons = async () => {
+    setLoadingCoupons(true)
+    try {
+      const res = await fetch("/api/coupons?sync=true")
+      const data = await res.json()
+      if (data.ok && Array.isArray(data.data?.coupons)) {
+        setCoupons(data.data.coupons)
+        toast({
+          title: "Coupons Synchronized",
+          description: "Canonical coupons (CPA100, CPA350, CP99, etc.) are active in database."
+        })
+      }
+    } catch (e) {
+      toast({ title: "Sync Failed", description: "Failed to sync coupons", variant: "destructive" })
+    } finally {
+      setLoadingCoupons(false)
+    }
+  }
+
   // Fetch terms
   const fetchTerms = async () => {
     setLoadingTerms(true)
@@ -568,7 +588,19 @@ export function SubscriptionPlansManager() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-bold flex items-center justify-between">
                   <span>Active & Promotional Coupons</span>
-                  <Badge variant="outline" className="text-xs">{coupons.length} Active</Badge>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSyncCoupons}
+                      disabled={loadingCoupons}
+                      className="h-7 text-[11px] font-semibold flex items-center gap-1 cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3 h-3 ${loadingCoupons ? "animate-spin" : ""}`} />
+                      <span>Sync Canonical (CPA100, CPA350)</span>
+                    </Button>
+                    <Badge variant="outline" className="text-xs">{coupons.length} Active</Badge>
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent>

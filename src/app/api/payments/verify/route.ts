@@ -63,6 +63,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ─── 3. Gateway Order Details & Amount Verification ───
+    let verifiedCouponCode: string | null = null;
     if (process.env.RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET) {
       try {
         const razorpay = new Razorpay({
@@ -73,6 +74,11 @@ export async function POST(req: NextRequest) {
         const order = await razorpay.orders.fetch(razorpay_order_id);
         if (!order) {
           return err("Order not found on payment gateway", 400);
+        }
+
+        // Capture applied coupon if present
+        if (order.notes?.couponCode && order.notes.couponCode !== "NONE") {
+          verifiedCouponCode = String(order.notes.couponCode).trim().toUpperCase();
         }
 
         // Verify status
@@ -171,6 +177,18 @@ export async function POST(req: NextRequest) {
         enabledModules,
       },
     });
+
+    // ─── 6b. Track Coupon Redemption Count ───
+    if (verifiedCouponCode) {
+      try {
+        await db.coupon.update({
+          where: { code: verifiedCouponCode },
+          data: { timesUsed: { increment: 1 } },
+        });
+      } catch {
+        // Silently continue if coupon was removed or untracked
+      }
+    }
 
     // ─── 7. Growth Engine: Reward Merchant Referral ───
     try {

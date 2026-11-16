@@ -760,6 +760,24 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
 
 export const MASTER_COUPONS: MasterCouponDefinition[] = [
   {
+    code: "CPA100",
+    description: "Special Superadmin Flat ₹100 Discount",
+    discountType: "fixed",
+    discountValue: 100,
+    minOrderAmount: 100,
+    maxUses: 10000,
+    active: true
+  },
+  {
+    code: "CPA350",
+    description: "Special Superadmin Flat ₹350 Discount",
+    discountType: "fixed",
+    discountValue: 350,
+    minOrderAmount: 350,
+    maxUses: 10000,
+    active: true
+  },
+  {
     code: "CP99",
     description: "Special ₹99 Founder Test Pass (Pay only ₹99)",
     discountType: "fixed",
@@ -844,7 +862,7 @@ export async function ensureMasterPlans(prismaClient: any): Promise<{ seededPlan
       }
     }
 
-    // Also ensure canonical coupons (including CP99) exist
+    // Also ensure canonical coupons (including CPA100, CPA350, CP99) exist and stay up to date
     for (const c of MASTER_COUPONS) {
       const existingCoupon = await prismaClient.coupon.findUnique({
         where: { code: c.code }
@@ -861,6 +879,19 @@ export async function ensureMasterPlans(prismaClient: any): Promise<{ seededPlan
             maxDiscount: c.maxDiscount,
             maxUses: c.maxUses,
             active: c.active
+          }
+        })
+        seededCoupons++
+      } else {
+        await prismaClient.coupon.update({
+          where: { code: c.code },
+          data: {
+            description: c.description,
+            discountType: c.discountType,
+            discountValue: c.discountValue,
+            minOrderAmount: c.minOrderAmount,
+            maxDiscount: c.maxDiscount,
+            active: true
           }
         })
         seededCoupons++

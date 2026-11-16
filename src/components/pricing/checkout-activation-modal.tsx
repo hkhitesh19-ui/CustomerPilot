@@ -27,7 +27,9 @@ import {
   Phone,
   Mail,
   Building2,
-  AlertCircle
+  AlertCircle,
+  Tag,
+  X
 } from "lucide-react"
 
 export interface SelectedCheckoutItem {
@@ -94,9 +96,74 @@ export function CheckoutActivationModal({
   const [loginEmail, setLoginEmail] = useState("")
   const [loginPassword, setLoginPassword] = useState("")
 
+  // Coupon & Promo Code State
+  const [couponCode, setCouponCode] = useState("")
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string
+    discountAmount: number
+    finalAmount: number
+    description?: string
+  } | null>(null)
+  const [validatingCoupon, setValidatingCoupon] = useState(false)
+  const [couponError, setCouponError] = useState("")
+
+  const effectiveTotalAmount = appliedCoupon 
+    ? Math.max(1, totalAmount - appliedCoupon.discountAmount)
+    : totalAmount
+
+  const handleApplyCoupon = async (codeToApply?: string) => {
+    const code = (codeToApply || couponCode).trim().toUpperCase()
+    if (!code) return
+    setValidatingCoupon(true)
+    setCouponError("")
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, amount: totalAmount })
+      })
+      const data = await res.json()
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || "Invalid or inactive coupon code")
+      }
+      setAppliedCoupon({
+        code: data.data.code,
+        discountAmount: data.data.discountAmount,
+        finalAmount: data.data.finalAmount,
+        description: data.data.description
+      })
+      setCouponCode(data.data.code)
+      toast({
+        title: "Coupon Applied!",
+        description: `Saved ₹${data.data.discountAmount} with code ${data.data.code}.`
+      })
+    } catch (e: any) {
+      setCouponError(e.message || "Failed to apply coupon")
+      setAppliedCoupon(null)
+      toast({
+        title: "Coupon Error",
+        description: e.message || "Failed to apply coupon",
+        variant: "destructive"
+      })
+    } finally {
+      setValidatingCoupon(false)
+    }
+  }
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null)
+    setCouponCode("")
+    setCouponError("")
+  }
+
   // Check active merchant session when modal opens
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) {
+      setAppliedCoupon(null)
+      setCouponCode("")
+      setCouponError("")
+      return
+    }
     let isMounted = true
 
     async function checkSession() {
@@ -168,6 +235,7 @@ export function CheckoutActivationModal({
       body: JSON.stringify({
         planId: primaryPlanKey,
         amount: totalAmount,
+        couponCode: appliedCoupon?.code || undefined,
         durationDays: maxDays,
         merchantId: effectiveMerchantId,
         enabledModules
@@ -434,21 +502,108 @@ export function CheckoutActivationModal({
             </div>
 
             {/* Total Row */}
-            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-baseline justify-between">
-              <div>
-                <span className="font-black text-base text-slate-900 dark:text-white">
-                  Total Payable Amount
-                </span>
-                <div className="text-[11px] text-slate-500">All taxes included · No hidden charges</div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight">
-                  ₹{totalAmount.toLocaleString("en-IN")}
-                </div>
-                {savingsAmount > 0 && (
-                  <span className="text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 font-bold text-[11px] px-2 py-0.5 rounded-full inline-block mt-0.5">
-                    Save ₹{savingsAmount.toLocaleString("en-IN")} ({savingsPercent}% OFF)
+            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
+              <div className="flex items-baseline justify-between">
+                <div>
+                  <span className="font-black text-base text-slate-900 dark:text-white">
+                    Total Payable Amount
                   </span>
+                  <div className="text-[11px] text-slate-500">All taxes included · No hidden charges</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight">
+                    ₹{effectiveTotalAmount.toLocaleString("en-IN")}
+                  </div>
+                  {appliedCoupon && (
+                    <span className="text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 font-bold text-[11px] px-2 py-0.5 rounded-full inline-block mt-0.5">
+                      Coupon "{appliedCoupon.code}" Applied: -₹{appliedCoupon.discountAmount}
+                    </span>
+                  )}
+                  {!appliedCoupon && savingsAmount > 0 && (
+                    <span className="text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 font-bold text-[11px] px-2 py-0.5 rounded-full inline-block mt-0.5">
+                      Save ₹{savingsAmount.toLocaleString("en-IN")} ({savingsPercent}% OFF)
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Promo Code / Discount Code Input Section */}
+              <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                    <Tag className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Have a Promo or Discount Code?</span>
+                  </div>
+                  {appliedCoupon && (
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+                      ✓ ₹{appliedCoupon.discountAmount} Discount Applied
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Input
+                    placeholder="ENTER CODE (CPA100, CPA350)"
+                    value={couponCode}
+                    onChange={(e) => {
+                      setCouponCode(e.target.value.toUpperCase())
+                      setCouponError("")
+                    }}
+                    className="h-8 text-xs font-mono uppercase tracking-wider bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => handleApplyCoupon()}
+                    disabled={validatingCoupon || !couponCode.trim()}
+                    className="h-8 px-3 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 cursor-pointer"
+                  >
+                    {validatingCoupon ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Apply"}
+                  </Button>
+                  {appliedCoupon && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRemoveCoupon}
+                      className="h-8 px-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/50 cursor-pointer"
+                      title="Remove coupon"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </div>
+
+                {/* Quick Promo Codes Chips */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                  <span className="text-[10px] text-slate-500 font-medium">Quick Codes:</span>
+                  <button
+                    type="button"
+                    onClick={() => handleApplyCoupon("CPA100")}
+                    className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900 cursor-pointer transition"
+                  >
+                    🏷️ CPA100 (-₹100)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleApplyCoupon("CPA350")}
+                    className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900 cursor-pointer transition"
+                  >
+                    🏷️ CPA350 (-₹350)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleApplyCoupon("CP99")}
+                    className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900 cursor-pointer transition"
+                  >
+                    🏷️ CP99 (Special ₹99)
+                  </button>
+                </div>
+
+                {couponError && (
+                  <div className="text-[11px] text-rose-600 dark:text-rose-400 font-medium">
+                    {couponError}
+                  </div>
                 )}
               </div>
             </div>
@@ -499,7 +654,7 @@ export function CheckoutActivationModal({
                   </>
                 ) : (
                   <>
-                    <span>Proceed to Pay ₹{totalAmount.toLocaleString("en-IN")} via Razorpay</span>
+                    <span>Proceed to Pay ₹{effectiveTotalAmount.toLocaleString("en-IN")} via Razorpay</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -628,7 +783,7 @@ export function CheckoutActivationModal({
                       </>
                     ) : (
                       <>
-                        <span>Pay ₹{totalAmount.toLocaleString("en-IN")} via Razorpay &amp; Open Account</span>
+                        <span>Pay ₹{effectiveTotalAmount.toLocaleString("en-IN")} via Razorpay &amp; Open Account</span>
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}
@@ -690,7 +845,7 @@ export function CheckoutActivationModal({
                       </>
                     ) : (
                       <>
-                        <span>Sign In &amp; Pay ₹{totalAmount.toLocaleString("en-IN")}</span>
+                        <span>Sign In &amp; Pay ₹{effectiveTotalAmount.toLocaleString("en-IN")}</span>
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}

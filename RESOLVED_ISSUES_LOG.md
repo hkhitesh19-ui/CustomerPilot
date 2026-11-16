@@ -4,6 +4,39 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [16 Nov 2026] Feature & Enhancement: Superadmin & Checkout Discount Codes CPA100 (-₹100) and CPA350 (-₹350)
+- **Symptom**: 
+  1. Superadmin and merchants needed the ability to apply specific discount codes (`CPA100` for ₹100 discount, `CPA350` for ₹350 discount) during subscription plans checkout and activation.
+  2. In `CheckoutActivationModal` (triggered from Pricing Studio `/pricing` and `/super-admin`), there was no input field to apply promotional discount codes before launching the Razorpay gateway.
+  3. Canonical database coupons lacked definitions for `CPA100` and `CPA350`, and Superadmin had no 1-click mechanism in `/super-admin?tab=subscriptions` to synchronize canonical promotional codes.
+- **Root Cause**:
+  1. `src/lib/master-plans.ts` only contained default coupons (`CP99`, `WELCOME20`, `LAUNCH50`, `FLAT500`).
+  2. `CheckoutActivationModal` (`src/components/pricing/checkout-activation-modal.tsx`) only displayed the static base price and lacked coupon validation logic, state, and quick suggestion chips.
+  3. `ensureMasterPlans` was only inserting missing coupons if they did not exist, without upserting canonical fields.
+- **Resolution**:
+  1. **Canonical Coupon Definitions (`src/lib/master-plans.ts`)**:
+     - Added `CPA100` (`discountType: "fixed"`, `discountValue: 100`, `minOrderAmount: 100`, `maxUses: 10000`, `active: true`).
+     - Added `CPA350` (`discountType: "fixed"`, `discountValue: 350`, `minOrderAmount: 350`, `maxUses: 10000`, `active: true`).
+     - Enhanced `ensureMasterPlans` to upsert/update existing canonical coupons so definitions stay synchronized in SQLite.
+  2. **Superadmin Sync Action & API Endpoint (`src/app/api/coupons/route.ts` & `src/components/super-admin/subscription-plans-manager.tsx`)**:
+     - Updated `GET /api/coupons` to auto-seed if table is empty or trigger `ensureMasterPlans` when `?sync=true` is passed.
+     - Added `Sync Canonical (CPA100, CPA350)` 1-click button to the Active Coupons header in the Superadmin Subscriptions manager.
+  3. **Universal Promo Code Input & Quick Chips in Checkout (`src/components/pricing/checkout-activation-modal.tsx`)**:
+     - Added coupon validation state, real-time discount calculation, and error/success messaging.
+     - Provided quick 1-click suggestion chips: `🏷️ CPA100 (-₹100)`, `🏷️ CPA350 (-₹350)`, and `🏷️ CP99`.
+     - Wired discounted `effectiveTotalAmount` and `couponCode` directly to `/api/payments/create-order` and Razorpay checkout modal buttons.
+  4. **Merchant Subscription Dashboard Quick Chips (`src/app/dashboard/subscription/page.tsx`)**:
+     - Added `CPA100 (-₹100)` and `CPA350 (-₹350)` quick suggestion chips below the promo code input.
+  5. **Payment Verification Coupon Tracking (`src/app/api/payments/verify/route.ts`)**:
+     - Added coupon redemption tracking: upon verified order completion, `db.coupon.update` increments `timesUsed` for the applied code.
+  6. **Seeding & Verification**:
+     - Seeded SQLite database with 34 plans and canonical coupons (`CPA100`, `CPA350`, `CP99`, `WELCOME20`, `LAUNCH50`, `FLAT500`).
+     - Created `scripts/verify_cpa_coupons.ts` verifying all 5 gears and discount math.
+     - Executed Master Adversarial Red-Team Guard (`node scripts/run_adversarial_guard.js`): All 6 gates passed cleanly.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [16 Nov 2026] Issue: WhatsApp Group Booster (Fast Mode) Scan Friction Elimination - Direct 0-Second Redirect
 - **Symptom**:
   1. When scanning the Shreenath Rajwadi Silk Palace counter standee or opening `customerpilot.in/wg/shreenath-rajwadi-silk-palace`, users were presented with an extra registration form ("VIP Club - Join our official WhatsApp community") requiring "Your Full Name" and "WhatsApp Mobile Number".

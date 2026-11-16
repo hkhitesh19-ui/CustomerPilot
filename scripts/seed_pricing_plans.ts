@@ -1,10 +1,17 @@
-import "dotenv/config";
+import path from "path";
 import { PrismaClient } from "@prisma/client";
 import { ensureMasterPlans } from "../src/lib/master-plans";
 
-process.env.DATABASE_URL = process.env.DATABASE_URL || "file:../prisma/dev.db";
+const absoluteDbPath = path.resolve(__dirname, "../prisma/dev.db").replace(/\\/g, "/");
+process.env.DATABASE_URL = `file:${absoluteDbPath}`;
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: `file:${absoluteDbPath}`
+    }
+  }
+});
 
 async function main() {
   console.log("Seeding canonical Master Plans into local SQLite DB...");
