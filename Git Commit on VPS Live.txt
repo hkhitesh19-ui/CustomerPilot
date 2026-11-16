@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 00211d6 / 39a621e (fix(wg-booster): eliminate scan friction in Fast Mode with instant 0-second direct redirect)
-Full SHA          : 00211d6d2c49925232d30805fc1da8db7b3f9474
-Parent Commit     : 322170d (Parent feat: 39a621e)
+Active Git Commit : 5f2ce88 (feat(booster): add store logo upload, scan scanner rename, and standardized standee footer)
+Full SHA          : 5f2ce88a1c022f3485fc7701c6b397c0f9062ab6
+Parent Commit     : 3aa01bf
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 16 Nov 2026, 11:20 AM IST
+Deployment Date   : 17 Nov 2026, 12:15 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(wg-booster): eliminate scan friction in Fast Mode with instant 0-second direct redirect
+Commit Title      : feat(booster): add store logo upload, scan scanner rename, and standardized standee footer
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -22,23 +22,8 @@ Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 O
 Verified Live Outcomes:
 ----------------------------------------------------------
 1. https://customerpilot.in/                                 -> HTTP 200 (Homepage live & healthy)
-2. https://customerpilot.in/dashboard/WAGroupBooster        -> HTTP 200 (WAGroupBooster Fast Mode with Direct 0-second redirect)
-3. https://customerpilot.in/dashboard/WAGroupBoosterPro     -> HTTP 200 (WhatsApp Group Booster Pro with multi-store switcher & QR logo/clean toggle)
-4. https://customerpilot.in/wg/shreenath-rajwadi-silk-palace -> HTTP 307 / 302 Instant Direct Redirection to WhatsApp Group: https://chat.whatsapp.com/JkoU8GisR6mJVkZoNEzE60?s=cl&p=i&iam=2 (Zero friction, no forms, no delays)
-5. https://customerpilot.in/api/wg/shreenath-rajwadi-silk-palace?info=true -> HTTP 200 (Live Dynamic QR Metadata API)
-6. Merchant Profile Seeding:
-   - Name: Shreenath Rajwadi Silk Palace (Pethapur Vala)
-   - Merchant ID: cmwit83kx0002uwuo4dxlxkc1
-   - Owner: Vasu Kumawat (KumawatVasu92@gmail.com)
-   - Phone: +91 9898909032
-   - Plan: Gear 6 All-in-One Enterprise
-   - Mode: DIRECT (Fast Mode 0-second redirect)
-7. Standee Posters & QR Artwork Live:
-   - /standees/shreenath_rajwadi_whatsapp_standee.png (With WhatsApp Logo, 1200x1800 px)
-   - /standees/shreenath_rajwadi_clean_standee.png (Clean Without Logo, 1200x1800 px)
-   - /qrcodes/shreenath_booster_whatsapp_logo_qr.png
-   - /qrcodes/shreenath_booster_clean_qr.png
-   - /qrcodes/shreenath_direct_whatsapp_logo_qr.png
-   - /qrcodes/shreenath_direct_clean_qr.png
-8. Adversarial Red-Team Safety Gates:
-   - All 6 automated gates passed cleanly (AST import linter, full-app TS ratchet <= 36, sensitive token redactions, 12 mathematical boundaries, payments regression, 0 tracked DBs)
+2. https://customerpilot.in/dashboard/WAGroupBooster        -> HTTP 200 (Store Logo Upload, Scan with any scanner, Standardized Powered By footer)
+3. https://customerpilot.in/dashboard/WAGroupBoosterPro     -> HTTP 200 (Store Logo Upload, Scan with any scanner, Standardized Powered By footer, Lead Capture)
+4. https://customerpilot.in/api/qr-codes                    -> HTTP 200 (Multi-style QR generator: WhatsApp logo, store logo, clean)
+5. Adversarial Red-Team Safety Gates:
+   - All 6 automated gates passed cleanly (AST import linter, full-app TS ratchet 0 errors, sensitive token redactions, 12 mathematical boundaries, payments regression, 0 tracked DBs)
