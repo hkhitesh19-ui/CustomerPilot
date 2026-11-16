@@ -68,24 +68,31 @@ export async function GET(req: NextRequest) {
         const isNoLogo = qr.label?.startsWith("[NO_LOGO]") || false
         const isWhatsApp = qr.label?.toLowerCase().includes("whatsapp") || qr.currentDest?.toLowerCase().includes("whatsapp") || req.nextUrl.searchParams.get("icon") === "whatsapp"
         const logoToUse = isNoLogo ? null : (qr.merchant?.logoUrl || null)
-        const centerIconToUse = isNoLogo ? "none" : (logoToUse ? "merchant" : (isWhatsApp ? "whatsapp" : "none"))
 
-        const qrImage = await generateBrandedQRDataUrl(fullUrl, {
+        const waQrImage = await generateBrandedQRDataUrl(fullUrl, {
+          width: 500,
+          centerIcon: "whatsapp"
+        }).catch(() => "")
+
+        const storeLogoQrImage = logoToUse ? await generateBrandedQRDataUrl(fullUrl, {
           width: 500,
           merchantLogoUrl: logoToUse,
-          centerIcon: centerIconToUse,
-          noLogo: isNoLogo
-        }).catch(() => "")
+          centerIcon: "merchant"
+        }).catch(() => "") : waQrImage
 
         const cleanQrImage = await generateBrandedQRDataUrl(fullUrl, {
           width: 500,
           noLogo: true
         }).catch(() => "")
 
+        const defaultQrImage = isNoLogo ? cleanQrImage : (isWhatsApp ? waQrImage : (logoToUse ? storeLogoQrImage : cleanQrImage))
+
         return {
           ...qr,
           publicUrl: fullUrl,
-          qrDataUrl: qrImage,
+          qrDataUrl: defaultQrImage,
+          waQrDataUrl: waQrImage,
+          storeLogoQrDataUrl: storeLogoQrImage,
           cleanQrDataUrl: cleanQrImage
         }
       })

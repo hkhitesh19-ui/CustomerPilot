@@ -4,6 +4,32 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [16 Nov 2026] Feature & Enhancement: WAGroupBooster & WAGroupBoosterPro Store Logo Upload & Standee Standardization
+- **Symptom**:
+  1. On both `/dashboard/WAGroupBooster` (Tier 1) and `/dashboard/WAGroupBoosterPro` (Tier 2), merchants had no option to upload their store logo directly to customize their acrylic tabletop standee and QR code.
+  2. The counter standee mockup displayed the phrase "SCAN WITH ANY CAMERA", which needed to be updated to "SCAN WITH ANY SCANNER".
+  3. The standee footer was not standardized to match the rest of CustomerPilot's counter standees ("Powered by CustomerPilot.in : +91 9033304707" with WhatsApp logo icon).
+- **Root Cause**:
+  1. The standee mockup header only rendered the store name as text and lacked a file uploader widget wired to `/api/merchant/upload-brand`.
+  2. The API route `/api/qr-codes` only generated a WhatsApp logo QR and a clean QR, but did not generate a store logo QR (`storeLogoQrDataUrl`) when a merchant logo was present.
+  3. The standee callout and footer elements in both pages used outdated text strings and lacked the unified branding and WhatsApp clean icon.
+- **Resolution**:
+  1. **QR Code Engine Enhancement (`src/app/api/qr-codes/route.ts`)**:
+     - Added generation of `storeLogoQrDataUrl` in addition to `waQrDataUrl` and `cleanQrDataUrl`, embedding the merchant's custom store logo inside the QR code center when available.
+  2. **Store Logo Upload & Removal in WAGroupBooster & WAGroupBoosterPro**:
+     - Integrated a Store Logo uploader bar directly above the Acrylic Counter Standee preview in both `src/app/dashboard/WAGroupBooster/page.tsx` and `src/app/dashboard/WAGroupBoosterPro/page.tsx`.
+     - Wired up `handleLogoUpload` using `FormData` with `POST /api/merchant/upload-brand` (`type: "logo"`), with instant state update and toast feedback.
+     - Added `handleRemoveLogo` using `PATCH /api/merchant/update` (`{ logoUrl: null }`) with 1-click removal.
+     - Added 3-way QR style selector: `[WhatsApp Logo]`, `[Store Logo]` (active when logo exists), and `[Without Logo (Clean)]`.
+  3. **Counter Standee Standardization**:
+     - Rendered the merchant's brand logo (`merchantProfile?.logoUrl`) directly in the header of the Acrylic Tabletop Mockup.
+     - Renamed `"SCAN WITH ANY CAMERA"` to `"SCAN WITH ANY SCANNER"`.
+     - Standardized the footer to: `"Powered by CustomerPilot.in :"` with the official WhatsApp icon (`/whatsapp_clean_icon.png`) and helpline `+91 9033304707`.
+     - Added a dedicated high-resolution A4/A5 print engine (`handlePrintStandee()`) in both pages that prints a crisp acrylic tabletop display card with cut-guides instead of printing the browser window.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [16 Nov 2026] Issue: SuperAdmin Pricing Standardization to 10 Canonical Plans & Gear 3 Price Update (₹3,499)
 - **Symptom**:
   1. The Superadmin Subscriptions page (`/super-admin?tab=subscriptions`) displayed an overwhelming grid of 34 raw pricing cards, cluttered with legacy/redundant tiers, internal tracks, and unneeded variants.

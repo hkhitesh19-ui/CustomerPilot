@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -10,20 +10,23 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import {
   Zap, QrCode as QrIcon, Download, ExternalLink, RefreshCw,
-  Save, Copy, Printer, ArrowRight, Store, X, Wand2, AlertTriangle
+  Save, Copy, Printer, ArrowRight, Store, X, Wand2, AlertTriangle,
+  Upload, Trash2
 } from "lucide-react"
 import { sanitizeDestinationUrl, detectMultipleUrls } from "@/lib/url-sanitizer"
 
 export default function WAGroupBoosterSimplePage() {
   const { toast } = useToast()
+  const logoInputRef = useRef<HTMLInputElement>(null)
   const [merchantId, setMerchantId] = useState<string | null>(null)
   const [merchantProfile, setMerchantProfile] = useState<any>(null)
   const [merchantsList, setMerchantsList] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
   const [qrCode, setQrCode] = useState<any>(null)
   const [destUrl, setDestUrl] = useState("")
   const [saving, setSaving] = useState(false)
-  const [qrStyle, setQrStyle] = useState<"whatsapp" | "clean">("whatsapp")
+  const [qrStyle, setQrStyle] = useState<"whatsapp" | "store_logo" | "clean">("whatsapp")
   const [standeeMessage, setStandeeMessage] = useState("Scan n Join Whatsapp Group")
 
   // 1. Fetch current merchant and counter QR
@@ -73,7 +76,10 @@ export default function WAGroupBoosterSimplePage() {
     fetchCounterQr(newMId)
   }
 
-  const activeQrDataUrl = (qrStyle === "clean" && qrCode?.cleanQrDataUrl) ? qrCode.cleanQrDataUrl : qrCode?.qrDataUrl
+  const activeQrDataUrl =
+    qrStyle === "clean" ? qrCode?.cleanQrDataUrl :
+    qrStyle === "store_logo" ? (qrCode?.storeLogoQrDataUrl || qrCode?.qrDataUrl) :
+    (qrCode?.waQrDataUrl || qrCode?.qrDataUrl)
 
   const downloadQrImage = () => {
     if (!activeQrDataUrl) return
@@ -98,6 +104,9 @@ export default function WAGroupBoosterSimplePage() {
       if (data.success && data.qrCodes?.length > 0) {
         const found = data.qrCodes[0]
         setQrCode(found)
+        if (found.merchant) {
+          setMerchantProfile((prev: any) => ({ ...prev, ...found.merchant }))
+        }
         // Clean URL before setting state to avoid propagating historical concatenations
         const cleaned = sanitizeDestinationUrl(found.currentDest || "https://chat.whatsapp.com/", { requireWhatsApp: true })
         setDestUrl(cleaned.isValid ? cleaned.cleanUrl : found.currentDest)
@@ -106,6 +115,234 @@ export default function WAGroupBoosterSimplePage() {
       toast({ title: "Notice", description: "Loading WhatsApp booster QR...", variant: "default" })
     } finally {
       setLoading(false)
+    }
+  }
+
+  // ── Logo Upload & Removal ──────────────────────────────────────────────────
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Please upload an image under 5MB.", variant: "destructive" })
+      return
+    }
+    setUploadingLogo(true)
+    try {
+      const fd = new FormData()
+      fd.append("file", file)
+      fd.append("type", "logo")
+      const targetMId = merchantId
+      const headers: Record<string, string> = {}
+      if (targetMId) headers["x-merchant-id"] = targetMId
+
+      const res = await fetch("/api/merchant/upload-brand", {
+        method: "POST",
+        headers,
+        body: fd
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.error || "Upload failed")
+      const uploadedUrl = json.data?.url || json.url
+      if (uploadedUrl) {
+        setMerchantProfile((prev: any) => ({ ...prev, logoUrl: uploadedUrl }))
+        toast({ title: "Store Logo Uploaded! ✅", description: "Your logo is now displayed on the counter standee." })
+        await fetchCounterQr(targetMId || undefined)
+      }
+    } catch (err: any) {
+      toast({ title: "Upload Failed", description: err.message || "Could not upload logo", variant: "destructive" })
+    } finally {
+      setUploadingLogo(false)
+      if (logoInputRef.current) logoInputRef.current.value = ""
+    }
+  }
+
+  const handleRemoveLogo = async () => {
+    setUploadingLogo(true)
+    try {
+      const targetMId = merchantId
+      const headers: Record<string, string> = { "Content-Type": "application/json" }
+      if (targetMId) headers["x-merchant-id"] = targetMId
+
+      const res = await fetch("/api/merchant/update", {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ logoUrl: null })
+      })
+      if (!res.ok) throw new Error("Failed to remove logo")
+      setMerchantProfile((prev: any) => ({ ...prev, logoUrl: null }))
+      if (qrStyle === "store_logo") setQrStyle("whatsapp")
+      toast({ title: "Logo Removed", description: "Standee will display store name typographically." })
+      await fetchCounterQr(targetMId || undefined)
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" })
+    } finally {
+      setUploadingLogo(false)
+    }
+  }
+
+  // ── High-Res Standee Print ─────────────────────────────────────────────────
+  const handlePrintStandee = () => {
+    if (!activeQrDataUrl) {
+      toast({ title: "QR Not Ready", description: "Standee QR code is still loading.", variant: "destructive" })
+      return
+    }
+
+    const logoHtml = merchantProfile?.logoUrl
+      ? `<div style="text-align:center;margin-bottom:8px;"><img src="${merchantProfile.logoUrl}" style="max-height:48px;max-width:160px;object-fit:contain;" /></div>`
+      : ""
+
+    const printHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${storeName} - Counter Standee</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color: #0f172a;
+    }
+    .print-sheet {
+      width: 210mm;
+      height: 297mm;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10mm;
+      position: relative;
+    }
+    @media print {
+      body { background: #ffffff; }
+      .print-sheet { box-shadow: none; width: 100vw; height: 100vh; }
+    }
+    .standee-card {
+      width: 130mm;
+      background: #ffffff;
+      border: 4px solid #0f172a;
+      border-radius: 28px;
+      padding: 12mm 10mm;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .store-name {
+      font-size: 16pt;
+      font-weight: 900;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      background: #059669;
+      color: #ffffff;
+      border-radius: 9999px;
+      font-size: 9pt;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .qr-box {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 12px;
+      display: inline-block;
+      margin: 6px 0;
+    }
+    .qr-box img {
+      width: 62mm;
+      height: 62mm;
+      display: block;
+    }
+    .scan-header {
+      font-size: 11pt;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: 0.5px;
+    }
+    .scan-sub {
+      font-size: 9pt;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .footer {
+      width: 100%;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 10px;
+      margin-top: 6px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .cut-guide {
+      position: absolute;
+      bottom: 6mm;
+      font-size: 8pt;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="print-sheet">
+    <div class="standee-card">
+      ${logoHtml}
+      <div class="store-name">${storeName}</div>
+      <div><span class="badge">${standeeMessage}</span></div>
+      <div class="qr-box">
+        <img src="${activeQrDataUrl}" alt="QR" />
+      </div>
+      <div>
+        <div class="scan-header">SCAN WITH ANY SCANNER</div>
+        <div class="scan-sub">Scan to join our official WhatsApp Community</div>
+      </div>
+      <div class="footer">
+        <span>Powered by <strong>CustomerPilot.in :</strong></span>
+        <img src="${typeof window !== "undefined" ? window.location.origin : ""}/whatsapp_clean_icon.png" style="width:14px;height:14px;border-radius:50%;vertical-align:middle;margin:0 2px;" />
+        <strong style="color:#0f172a;">+91 9033304707</strong>
+      </div>
+    </div>
+    <div class="cut-guide">CustomerPilot High-Resolution A4/A5 Standee &bull; Cut along border for Acrylic Counter Display</div>
+  </div>
+  <script>
+    window.onload = function() {
+      setTimeout(function() { window.print(); }, 400);
+    };
+  </script>
+</body>
+</html>`
+
+    const printWin = window.open("", "_blank")
+    if (printWin) {
+      printWin.document.open()
+      printWin.document.write(printHtml)
+      printWin.document.close()
     }
   }
 
@@ -235,7 +472,7 @@ export default function WAGroupBoosterSimplePage() {
           <Button onClick={() => fetchCounterQr()} variant="outline" size="sm" className="rounded-xl gap-1.5 text-xs text-slate-600">
             <RefreshCw className="w-3.5 h-3.5" /> Refresh
           </Button>
-          <Button onClick={() => window.print()} className="rounded-xl gap-1.5 text-xs bg-slate-900 hover:bg-slate-800 text-white font-bold">
+          <Button onClick={handlePrintStandee} className="rounded-xl gap-1.5 text-xs bg-slate-900 hover:bg-slate-800 text-white font-bold">
             <Printer className="w-3.5 h-3.5" /> Print Standee (A4/A5)
           </Button>
         </div>
@@ -277,11 +514,78 @@ export default function WAGroupBoosterSimplePage() {
             </CardHeader>
 
             <CardContent className="p-6 flex flex-col items-center">
+              {/* Store Logo Uploader Bar */}
+              <div className="w-full max-w-[290px] bg-slate-50 border border-slate-200 rounded-2xl p-2.5 flex items-center justify-between gap-2 shadow-xs mb-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  {merchantProfile?.logoUrl ? (
+                    <img
+                      src={merchantProfile.logoUrl}
+                      alt="Store Logo"
+                      className="w-8 h-8 rounded-lg object-contain border border-slate-200 bg-white p-0.5 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-lg bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shrink-0">
+                      <Store className="w-4 h-4" />
+                    </div>
+                  )}
+                  <div className="min-w-0 text-left">
+                    <div className="text-[11px] font-bold text-slate-900 truncate">
+                      {merchantProfile?.logoUrl ? "Store Logo Active" : "Store Logo"}
+                    </div>
+                    <div className="text-[9px] text-slate-500 truncate">
+                      {merchantProfile?.logoUrl ? "Rendered on standee" : "Upload logo for standee"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1 shrink-0">
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                    className="hidden"
+                    onChange={handleLogoUpload}
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={uploadingLogo}
+                    onClick={() => logoInputRef.current?.click()}
+                    className="h-6 px-2 rounded-lg text-[10px] font-bold bg-teal-600 hover:bg-teal-700 text-white gap-1 shadow-xs"
+                  >
+                    <Upload className="w-2.5 h-2.5" />
+                    <span>{uploadingLogo ? "..." : (merchantProfile?.logoUrl ? "Change" : "Upload")}</span>
+                  </Button>
+                  {merchantProfile?.logoUrl && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      disabled={uploadingLogo}
+                      onClick={handleRemoveLogo}
+                      title="Remove custom logo"
+                      className="h-6 w-6 p-0 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+
               {/* Acrylic Tabletop Mockup */}
-              <div className="w-full max-w-[290px] bg-white rounded-3xl p-6 border-4 border-slate-900 shadow-2xl space-y-4 text-center relative">
-                {/* Store Header */}
-                <div className="space-y-1.5">
-                  <div className="text-base font-black text-slate-900 uppercase tracking-tight">{storeName}</div>
+              <div className="w-full max-w-[290px] bg-white rounded-3xl p-6 border-4 border-slate-900 shadow-2xl space-y-3.5 text-center relative">
+                {/* Store Header with Logo */}
+                <div className="space-y-1.5 flex flex-col items-center">
+                  {merchantProfile?.logoUrl && (
+                    <div className="flex justify-center py-0.5">
+                      <img
+                        src={merchantProfile.logoUrl}
+                        alt={storeName}
+                        className="h-10 max-w-[130px] object-contain drop-shadow-sm"
+                      />
+                    </div>
+                  )}
+                  <div className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">{storeName}</div>
                   <div className="inline-block px-3 py-1 rounded-full bg-emerald-600 text-white text-[10px] font-black tracking-wide shadow-sm">
                     {standeeMessage}
                   </div>
@@ -299,13 +603,25 @@ export default function WAGroupBoosterSimplePage() {
                 </div>
 
                 {/* Callout Footer */}
-                <div className="space-y-1">
-                  <div className="text-xs font-black text-slate-900 tracking-tight">SCAN WITH ANY CAMERA</div>
+                <div className="space-y-0.5">
+                  <div className="text-xs font-black text-slate-900 tracking-tight">SCAN WITH ANY SCANNER</div>
                   <div className="text-[10px] text-slate-500">Scan to join our official WhatsApp Community</div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-100 text-[9px] font-medium text-slate-400">
-                  CustomerPilot VIP Standee • A5 Tabletop Acrylic
+                {/* Standardized Powered By Footer with WhatsApp icon & Support phone */}
+                <div className="pt-2.5 border-t border-slate-200/80 flex items-center justify-center gap-1.5 text-[9px] font-bold text-slate-600">
+                  <span className="text-slate-500 font-medium">Powered by</span>
+                  <span className="text-slate-900 font-extrabold">CustomerPilot.in :</span>
+                  <div className="inline-flex items-center gap-1">
+                    <img
+                      src="/whatsapp_clean_icon.png"
+                      alt="WhatsApp"
+                      className="w-3.5 h-3.5 rounded-full object-contain shrink-0"
+                    />
+                    <span className="font-extrabold text-slate-900 tracking-tight">
+                      +91 9033304707
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -323,6 +639,17 @@ export default function WAGroupBoosterSimplePage() {
                     >
                       WhatsApp Logo
                     </button>
+                    {merchantProfile?.logoUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setQrStyle("store_logo")}
+                        className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
+                          qrStyle === "store_logo" ? "bg-teal-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"
+                        }`}
+                      >
+                        Store Logo
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => setQrStyle("clean")}
@@ -364,20 +691,15 @@ export default function WAGroupBoosterSimplePage() {
                     <span>Download QR</span>
                   </Button>
 
-                  <a
-                    href={qrCode?.slug === "shreenath-rajwadi-silk-palace" ? (qrStyle === "whatsapp" ? "/standees/shreenath_rajwadi_whatsapp_standee.png" : "/standees/shreenath_rajwadi_clean_standee.png") : "#"}
-                    download={`${qrCode?.slug || "standee"}-poster.png`}
-                    onClick={(e) => {
-                      if (qrCode?.slug !== "shreenath-rajwadi-silk-palace") {
-                        e.preventDefault()
-                        window.print()
-                      }
-                    }}
-                    className="inline-flex items-center justify-center rounded-xl text-xs font-bold border border-slate-300 text-slate-700 hover:bg-slate-50 gap-1.5 px-3 py-2 cursor-pointer shadow-sm"
+                  <Button
+                    variant="outline"
+                    onClick={handlePrintStandee}
+                    disabled={!activeQrDataUrl}
+                    className="rounded-xl text-xs font-bold border-slate-300 text-slate-700 hover:bg-slate-50 gap-1.5 shadow-sm"
                   >
                     <Printer className="w-3.5 h-3.5 text-slate-600" />
                     <span>Download Standee</span>
-                  </a>
+                  </Button>
                 </div>
               </div>
             </CardContent>
