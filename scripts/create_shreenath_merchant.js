@@ -1,6 +1,8 @@
 const path = require('path');
-const root = 'F:\\HITESH\\CustomerPilot_GLM_Agent_July2026';
-process.env.DATABASE_URL = 'file:' + path.join(root, 'prisma', 'dev.db');
+const root = process.env.ROOT_DIR || path.join(__dirname, '..');
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = 'file:' + path.join(root, 'prisma', 'dev.db');
+}
 const { PrismaClient } = require(path.join(root, 'node_modules', '@prisma', 'client'));
 const prisma = new PrismaClient();
 
