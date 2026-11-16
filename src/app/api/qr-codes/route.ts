@@ -66,16 +66,27 @@ export async function GET(req: NextRequest) {
       qrCodes.map(async (qr) => {
         const fullUrl = `${protocol}://${host}/api/wg/${qr.slug}`
         const isNoLogo = qr.label?.startsWith("[NO_LOGO]") || false
+        const isWhatsApp = qr.label?.toLowerCase().includes("whatsapp") || qr.currentDest?.toLowerCase().includes("whatsapp") || req.nextUrl.searchParams.get("icon") === "whatsapp"
         const logoToUse = isNoLogo ? null : (qr.merchant?.logoUrl || null)
+        const centerIconToUse = isNoLogo ? "none" : (logoToUse ? "merchant" : (isWhatsApp ? "whatsapp" : "none"))
+
         const qrImage = await generateBrandedQRDataUrl(fullUrl, {
           width: 500,
           merchantLogoUrl: logoToUse,
+          centerIcon: centerIconToUse,
           noLogo: isNoLogo
         }).catch(() => "")
+
+        const cleanQrImage = await generateBrandedQRDataUrl(fullUrl, {
+          width: 500,
+          noLogo: true
+        }).catch(() => "")
+
         return {
           ...qr,
           publicUrl: fullUrl,
-          qrDataUrl: qrImage
+          qrDataUrl: qrImage,
+          cleanQrDataUrl: cleanQrImage
         }
       })
     )

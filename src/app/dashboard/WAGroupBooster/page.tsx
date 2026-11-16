@@ -18,30 +18,72 @@ export default function WAGroupBoosterSimplePage() {
   const { toast } = useToast()
   const [merchantId, setMerchantId] = useState<string | null>(null)
   const [merchantProfile, setMerchantProfile] = useState<any>(null)
+  const [merchantsList, setMerchantsList] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [qrCode, setQrCode] = useState<any>(null)
   const [destUrl, setDestUrl] = useState("")
   const [saving, setSaving] = useState(false)
+  const [qrStyle, setQrStyle] = useState<"whatsapp" | "clean">("whatsapp")
+  const [standeeMessage, setStandeeMessage] = useState("Scan n Join Whatsapp Group")
 
   // 1. Fetch current merchant and counter QR
   useEffect(() => {
     async function init() {
       try {
+        const queryMId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("merchantId") : null
         const res = await fetch("/api/auth/me")
         const data = await res.json()
-        if (data.authenticated && data.merchant) {
-          setMerchantId(data.merchant.id)
+
+        let targetId = queryMId
+        if (!targetId && data.authenticated && data.merchant) {
+          targetId = data.merchant.id
           setMerchantProfile(data.merchant)
-          fetchCounterQr(data.merchant.id)
+        }
+
+        if (targetId) {
+          setMerchantId(targetId)
+          fetchCounterQr(targetId)
         } else {
           fetchCounterQr()
         }
+
+        // Fetch merchant list for admin selector
+        try {
+          const allRes = await fetch("/api/admin/merchants")
+          const allData = await allRes.json()
+          if (allData.merchants && allData.merchants.length > 0) {
+            setMerchantsList(allData.merchants)
+            if (targetId) {
+              const matched = allData.merchants.find((m: any) => m.id === targetId)
+              if (matched) setMerchantProfile(matched)
+            }
+          }
+        } catch {}
       } catch {
         fetchCounterQr()
       }
     }
     init()
   }, [])
+
+  const handleMerchantSwitch = (newMId: string) => {
+    setMerchantId(newMId)
+    const selected = merchantsList.find(m => m.id === newMId)
+    if (selected) setMerchantProfile(selected)
+    fetchCounterQr(newMId)
+  }
+
+  const activeQrDataUrl = (qrStyle === "clean" && qrCode?.cleanQrDataUrl) ? qrCode.cleanQrDataUrl : qrCode?.qrDataUrl
+
+  const downloadQrImage = () => {
+    if (!activeQrDataUrl) return
+    const a = document.createElement("a")
+    a.href = activeQrDataUrl
+    a.download = `${qrCode?.slug || "whatsapp-booster"}-${qrStyle}-qr.png`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }
 
   const fetchCounterQr = async (mId?: string) => {
     setLoading(true)
@@ -149,16 +191,6 @@ export default function WAGroupBoosterSimplePage() {
     }
   }
 
-  const downloadQrImage = () => {
-    if (!qrCode?.qrDataUrl) return
-    const a = document.createElement("a")
-    a.href = qrCode.qrDataUrl
-    a.download = `${qrCode.slug || "whatsapp-booster"}-qr.png`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-  }
-
   const storeName = merchantProfile?.name || "Your Store"
   const hasMultiple = detectMultipleUrls(destUrl)
   const validation = sanitizeDestinationUrl(destUrl, { requireWhatsApp: true })
@@ -183,7 +215,23 @@ export default function WAGroupBoosterSimplePage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {merchantsList.length > 1 && (
+            <div className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl px-3 py-1.5 transition-colors">
+              <Store className="w-3.5 h-3.5 text-teal-700 shrink-0" />
+              <select
+                value={merchantId || ""}
+                onChange={(e) => handleMerchantSwitch(e.target.value)}
+                className="bg-transparent text-xs font-bold text-slate-800 border-none outline-none cursor-pointer pr-1"
+              >
+                {merchantsList.map((m: any) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name} ({m.city || "Vadodara"})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <Button onClick={() => fetchCounterQr()} variant="outline" size="sm" className="rounded-xl gap-1.5 text-xs text-slate-600">
             <RefreshCw className="w-3.5 h-3.5" /> Refresh
           </Button>
@@ -232,17 +280,17 @@ export default function WAGroupBoosterSimplePage() {
               {/* Acrylic Tabletop Mockup */}
               <div className="w-full max-w-[290px] bg-white rounded-3xl p-6 border-4 border-slate-900 shadow-2xl space-y-4 text-center relative">
                 {/* Store Header */}
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <div className="text-base font-black text-slate-900 uppercase tracking-tight">{storeName}</div>
-                  <div className="inline-block px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-[10px] font-extrabold tracking-wider uppercase">
-                    OFFICIAL VIP COMMUNITY
+                  <div className="inline-block px-3 py-1 rounded-full bg-emerald-600 text-white text-[10px] font-black tracking-wide shadow-sm">
+                    {standeeMessage}
                   </div>
                 </div>
 
                 {/* QR Container */}
                 <div className="p-3 bg-white rounded-2xl border-2 border-slate-100 shadow-inner flex items-center justify-center">
-                  {qrCode?.qrDataUrl ? (
-                    <img src={qrCode.qrDataUrl} alt="Counter QR" className="w-44 h-44 object-contain" />
+                  {activeQrDataUrl ? (
+                    <img src={activeQrDataUrl} alt="Counter QR" className="w-44 h-44 object-contain" />
                   ) : (
                     <div className="w-44 h-44 flex items-center justify-center text-slate-300">
                       <QrIcon className="w-12 h-12" />
@@ -253,16 +301,53 @@ export default function WAGroupBoosterSimplePage() {
                 {/* Callout Footer */}
                 <div className="space-y-1">
                   <div className="text-xs font-black text-slate-900 tracking-tight">SCAN WITH ANY CAMERA</div>
-                  <div className="text-[10px] text-slate-500">Get Secret VIP Discounts &amp; Instant WhatsApp Bills</div>
+                  <div className="text-[10px] text-slate-500">Scan to join our official WhatsApp Community</div>
                 </div>
 
                 <div className="pt-2 border-t border-slate-100 text-[9px] font-medium text-slate-400">
-                  Powered by CustomerPilot
+                  CustomerPilot VIP Standee • A5 Tabletop Acrylic
+                </div>
+              </div>
+
+              {/* QR Style Selector & Standee Message Editor */}
+              <div className="w-full space-y-3 pt-5">
+                <div className="flex items-center justify-between text-xs font-semibold text-slate-700 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                  <span className="text-[11px] font-bold text-slate-600">QR Code Style:</span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setQrStyle("whatsapp")}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
+                        qrStyle === "whatsapp" ? "bg-emerald-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      WhatsApp Logo
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setQrStyle("clean")}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
+                        qrStyle === "clean" ? "bg-slate-900 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      Without Logo (Clean)
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-slate-500">Standee Banner Message:</label>
+                  <Input
+                    value={standeeMessage}
+                    onChange={(e) => setStandeeMessage(e.target.value)}
+                    placeholder="Scan n Join Whatsapp Group"
+                    className="h-8 text-xs font-medium rounded-lg"
+                  />
                 </div>
               </div>
 
               {/* Dynamic URL + Actions */}
-              <div className="w-full space-y-3 pt-6">
+              <div className="w-full space-y-2.5 pt-4">
                 <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-200 text-center">
                   <div className="text-[10px] text-slate-400 font-mono truncate">
                     {qrCode?.publicUrl || "https://customerpilot.in/api/wg/..."}
@@ -272,26 +357,27 @@ export default function WAGroupBoosterSimplePage() {
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     onClick={downloadQrImage}
-                    disabled={!qrCode?.qrDataUrl}
+                    disabled={!activeQrDataUrl}
                     className="rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white gap-1.5"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>Download PNG</span>
+                    <span>Download QR</span>
                   </Button>
 
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      if (qrCode?.publicUrl) {
-                        navigator.clipboard.writeText(qrCode.publicUrl)
-                        toast({ title: "Copied!", description: "Short dynamic QR URL copied." })
+                  <a
+                    href={qrCode?.slug === "shreenath-rajwadi-silk-palace" ? (qrStyle === "whatsapp" ? "/standees/shreenath_rajwadi_whatsapp_standee.png" : "/standees/shreenath_rajwadi_clean_standee.png") : "#"}
+                    download={`${qrCode?.slug || "standee"}-poster.png`}
+                    onClick={(e) => {
+                      if (qrCode?.slug !== "shreenath-rajwadi-silk-palace") {
+                        e.preventDefault()
+                        window.print()
                       }
                     }}
-                    className="rounded-xl text-xs font-bold border-slate-300 text-slate-700 hover:bg-slate-50 gap-1.5"
+                    className="inline-flex items-center justify-center rounded-xl text-xs font-bold border border-slate-300 text-slate-700 hover:bg-slate-50 gap-1.5 px-3 py-2 cursor-pointer shadow-sm"
                   >
-                    <Copy className="w-3.5 h-3.5 text-slate-600" />
-                    <span>Copy Link</span>
-                  </Button>
+                    <Printer className="w-3.5 h-3.5 text-slate-600" />
+                    <span>Download Standee</span>
+                  </a>
                 </div>
               </div>
             </CardContent>

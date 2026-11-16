@@ -9,6 +9,7 @@ export interface BrandedQROptions {
   lightColor?: string
   merchantLogoUrl?: string | null
   noLogo?: boolean
+  centerIcon?: "whatsapp" | "cp" | "merchant" | "none"
 }
 
 /**
@@ -38,7 +39,12 @@ export async function generateBrandedQRDataUrl(
 
   // Try to load Merchant Business Logo if provided
   let merchantLogoBuffer: Buffer | null = null
-  if (options?.merchantLogoUrl) {
+  if (options?.centerIcon === "whatsapp") {
+    const waIconPath = path.join(process.cwd(), "public", "whatsapp_clean_icon.png")
+    if (fs.existsSync(waIconPath)) {
+      merchantLogoBuffer = fs.readFileSync(waIconPath)
+    }
+  } else if (options?.merchantLogoUrl) {
     try {
       const rawUrl = options.merchantLogoUrl.trim()
       if (rawUrl.startsWith("data:")) {

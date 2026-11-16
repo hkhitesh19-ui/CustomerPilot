@@ -4,6 +4,40 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [16 Nov 2026] Onboarding & Feature: Shreenath Rajwadi Silk Palace Profile Creation & WhatsApp Group Booster Pro QR Standee
+- **Symptom**:
+  1. Merchant `Shreenath Rajwadi Silk Palace (Pethapur Vala)` in Manjalpur, Vadodara needed onboarding into CustomerPilot with a complete merchant profile and active QR Code in `WAGroupBoosterPro`.
+  2. The merchant's WhatsApp group invite link (`https://chat.whatsapp.com/JkoU8GisR6mJVkZoNEzE60?s=cl&p=i&iam=2`) needed a dedicated QR code generated with both "WhatsApp Group" logo in the center and a clean version (without logo), rendered onto a luxury acrylic tabletop standee with header `Shreenath Rajwadi Silk Palace` and message `Scan n Join Whatsapp Group`.
+  3. `customerpilot1@gmail.com` needed investigation regarding Google Business Profile manager invite status.
+- **Root Cause**:
+  1. The new merchant entity, associated merchant user, and dynamic `QrCode` record did not yet exist in CustomerPilot's database.
+  2. `src/lib/branded-qr.ts` and `/api/qr-codes` only supported merchant logos or default fallback, lacking dynamic `centerIcon: "whatsapp"` support.
+  3. `WAGroupBoosterPro` did not have an active merchant switcher for multi-merchant management or a style toggle between WhatsApp logo and clean QR formats.
+- **Resolution**:
+  1. **Database Seed & Merchant Entity**:
+     - Created `Merchant` record (`cmwit83kx0002uwuo4dxlxkc1`) for `Shreenath Rajwadi Silk Palace`, Vadodara with plan `gear6`, address, contact (`9898909032`), and email `KumawatVasu92@gmail.com`.
+     - Created `QrCode` record (`shreenath-rajwadi-silk-palace`) mapped to `FORM_CAPTURE` lead capture mode and destination `https://chat.whatsapp.com/JkoU8GisR6mJVkZoNEzE60?s=cl&p=i&iam=2`.
+  2. **WhatsApp Group QR Engine (`src/lib/branded-qr.ts` & `/api/qr-codes`)**:
+     - Added `centerIcon: "whatsapp" | "clean"` in `BrandedQROptions`, automatically compositing `public/whatsapp_clean_icon.png` in a green/white circular badge.
+     - Hardened `/api/qr-codes` to return both `qrDataUrl` (with WhatsApp logo) and `cleanQrDataUrl` (clean without logo).
+  3. **High-Resolution Acrylic Tabletop Standee (`public/standees/shreenath_rajwadi_whatsapp_standee.png`)**:
+     - Rendered a 1200x1800 px luxury acrylic tabletop standee with:
+       - Header: `SHREENATH RAJWADI SILK PALACE • Manjalpur, Vadodara`
+       - Badge: `OFFICIAL VIP COMMUNITY`
+       - Callout Pill: `Scan n Join Whatsapp Group`
+       - Central WhatsApp Logo QR code.
+       - Footer: Store address, phone `9898909032`, and VIP perks.
+  4. **Frontend Hardening (`src/app/dashboard/WAGroupBoosterPro/page.tsx` & `WAGroupBooster/page.tsx`)**:
+     - Added multi-store dropdown switcher for instant store switching.
+     - Added 1-click toggle between `With WhatsApp Logo` and `Without Logo (Clean QR)`.
+     - Added 1-click `Download Standee` and `Download QR` buttons.
+  5. **Verification**:
+     - All 6 Master Adversarial Red-Team Gates passed cleanly (`node scripts/run_adversarial_guard.js`).
+     - Ground-truth asset verification passed with 100% assertions (`node scripts/verify_shreenath_assets.js`).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [16 Nov 2026] Architecture & Pricing Restructure: 5 Official Gear Combos and Updated Standalone Service Pricing Across Platform
 - **Symptom**:
   1. Pricing tiers were split into an outdated 6-gear structure where standalone reviews occupied Gear 1, and the newly requested combos and flat transparent pricing were not reflected.
