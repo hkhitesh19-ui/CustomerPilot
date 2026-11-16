@@ -459,24 +459,23 @@ export default function SubscriptionPage() {
                     type="button"
                     onClick={() => {
                       setBillingCycle("6mo")
-                      const matched = plans.find(p => p.days === 180 && (p.planKey?.startsWith("loyalty_") || p.planKey?.startsWith("reviews_") || p.planKey?.startsWith("autoreply_")))
+                      const matched = plans.find(p => p.days === 180 && (p.planKey?.startsWith("loyalty_") || p.planKey?.startsWith("reviews_") || p.planKey?.startsWith("autoreply_") || p.planKey?.startsWith("card_")))
                       if (matched) setSelectedPlan(matched)
                     }}
                     className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${billingCycle === "6mo" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
                   >
-                    6 Months (₹549)
+                    6 Months
                   </button>
                   <button
                     type="button"
                     onClick={() => {
                       setBillingCycle("1year")
-                      const matched = plans.find(p => p.days === 365 && (p.planKey?.startsWith("loyalty_") || p.planKey?.startsWith("reviews_") || p.planKey?.startsWith("autoreply_")))
+                      const matched = plans.find(p => p.days === 365 && (p.planKey?.startsWith("loyalty_") || p.planKey?.startsWith("reviews_") || p.planKey?.startsWith("autoreply_") || p.planKey?.startsWith("card_")))
                       if (matched) setSelectedPlan(matched)
                     }}
                     className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${billingCycle === "1year" ? "bg-indigo-600 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
                   >
-                    <span>1 Year (₹799)</span>
-                    <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-500 text-white">₹2.2/day</span>
+                    <span>1 Year</span>
                   </button>
                 </div>
               </div>

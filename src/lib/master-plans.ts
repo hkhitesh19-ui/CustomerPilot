@@ -28,106 +28,65 @@ export interface MasterCouponDefinition {
 }
 
 export const MASTER_PLANS: MasterPlanDefinition[] = [
-  // ─── GEAR 1 : Smart AI Google Review System ───
+  // ─── GEAR 1 : Smart Digital Business Card + Smart AI Google Review System ───
   {
     planKey: "gear1_6mo",
-    name: "Gear 1 : Smart AI Google Review System — 6 Months",
-    description: "Autonomous WhatsApp review collection, AI-drafted 5-star customer reviews, and direct Google Maps deep link (6 Months).",
-    days: 180,
-    price: 749,
-    originalPrice: 749,
-    discountPercent: 0,
-    badge: "Gear 1",
-    popular: false,
-    features: [
-      "Smart AI Google Review Collection",
-      "AI-Drafted 5-Star Customer Reviews",
-      "5-Star Quality Filter & Negative Feedback Trap",
-      "Direct Google Maps Deep Link",
-      "High-Resolution Review Counter QR Code",
-      "6 Months Cloud Hosting & Analytics"
-    ],
-    enabledModules: "REVIEWS",
-    active: true
-  },
-  {
-    planKey: "gear1_yearly",
-    name: "Gear 1 : Smart AI Google Review System — 1 Year",
-    description: "Full year of autonomous Google review acceleration with AI-drafted customer reviews (1 Year).",
-    days: 365,
-    price: 999,
-    originalPrice: 999,
-    discountPercent: 0,
-    badge: "Gear 1 · 1 Year",
-    popular: false,
-    features: [
-      "Everything in Gear 1 (6 Months)",
-      "365 Days Unlimited Review Collection",
-      "Gemini AI Dynamic Review Angle Variations",
-      "Printable Counter Standee Artwork (A4/A5)",
-      "Dedicated WhatsApp Support"
-    ],
-    enabledModules: "REVIEWS",
-    active: true
-  },
-
-  // ─── GEAR 2 : Smart Digital Business Card + Smart AI Google Review System ───
-  {
-    planKey: "gear2_6mo",
-    name: "Gear 2 : Smart Digital Business Card + Smart AI Google Review System — 6 Months",
+    name: "Gear 1 : Smart Digital Business Card + Smart AI Google Review System — 6 Months",
     description: "Instant digital card branding plus autonomous Google review acceleration for local stores (6 Months).",
     days: 180,
     price: 899,
     originalPrice: 899,
     discountPercent: 0,
-    badge: "Gear 2",
+    badge: "Gear 1",
     popular: false,
     features: [
-      "Smart Digital Business Card (vCard .vcf Contact Sync)",
-      "Smart AI Google Review Collection Assistant",
+      "Smart Digital Business Card (vCard Contact Sync)",
+      "Smart AI Google Review Collection & 5-Star Filter",
+      "AI-Drafted 5-Star Customer Reviews",
       "Direct Google Maps Review Integration",
       "WhatsApp & Direct Call Buttons",
-      "Counter QR Code Standee Artwork",
-      "6 Months Cloud Hosting with Real-Time Edits"
+      "High-Resolution Review Counter QR Code",
+      "6 Months Cloud Hosting & Analytics"
     ],
     enabledModules: "DIGITAL_CARD,REVIEWS",
     active: true
   },
   {
-    planKey: "gear2_yearly",
-    name: "Gear 2 : Smart Digital Business Card + Smart AI Google Review System — 1 Year",
+    planKey: "gear1_yearly",
+    name: "Gear 1 : Smart Digital Business Card + Smart AI Google Review System — 1 Year",
     description: "Full year interactive digital business card plus autonomous AI Google review acceleration (1 Year).",
     days: 365,
     price: 1249,
     originalPrice: 1249,
     discountPercent: 0,
-    badge: "Gear 2 · 1 Year",
+    badge: "Gear 1 · 1 Year",
     popular: false,
     features: [
-      "Everything in Gear 2 (6 Months)",
+      "Everything in Gear 1 (6 Months)",
       "365 Days Unlimited Review Collection & Card Sync",
+      "Gemini AI Dynamic Review Angle Variations",
       "Online Ordering / Catalog Links Integration",
-      "Social Media Profiles Showcase",
-      "Print-Ready Counter Standee & Table Tents"
+      "Printable Counter Standee Artwork (A4/A5)",
+      "Dedicated WhatsApp Support"
     ],
     enabledModules: "DIGITAL_CARD,REVIEWS",
     active: true
   },
 
-  // ─── GEAR 3 : Smart Digital Business Card + WhatsApp Digital Loyalty System ───
+  // ─── GEAR 2 : Smart Digital Business Card + WhatsApp Digital Loyalty System ───
   {
-    planKey: "gear3_6mo",
-    name: "Gear 3 : Smart Digital Business Card + WhatsApp Digital Loyalty System — 6 Months",
+    planKey: "gear2_6mo",
+    name: "Gear 2 : Smart Digital Business Card + WhatsApp Digital Loyalty System — 6 Months",
     description: "High-retention combo: WhatsApp automated loyalty stamps plus interactive digital business card (6 Months).",
     days: 180,
-    price: 999,
-    originalPrice: 999,
+    price: 1499,
+    originalPrice: 1499,
     discountPercent: 0,
-    badge: "Gear 3",
+    badge: "Gear 2",
     popular: false,
     features: [
       "Smart Digital Business Card (vCard Contact Sync)",
-      "WhatsApp Digital Loyalty Stamp Cards",
+      "WhatsApp Digital Loyalty Stamp Cards & VIP Club",
       "QR Counter Check-in & Stamp Crediting",
       "Automated Milestone Rewards & Customer VIP Tiers",
       "Automated 30/60/90 Day Customer Win-Backs",
@@ -137,17 +96,17 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     active: true
   },
   {
-    planKey: "gear3_yearly",
-    name: "Gear 3 : Smart Digital Business Card + WhatsApp Digital Loyalty System — 1 Year",
+    planKey: "gear2_yearly",
+    name: "Gear 2 : Smart Digital Business Card + WhatsApp Digital Loyalty System — 1 Year",
     description: "Full year WhatsApp digital loyalty automation plus branded digital business card (1 Year).",
     days: 365,
-    price: 1349,
-    originalPrice: 1349,
+    price: 2249,
+    originalPrice: 2249,
     discountPercent: 0,
-    badge: "Gear 3 · 1 Year",
+    badge: "Gear 2 · 1 Year",
     popular: false,
     features: [
-      "Everything in Gear 3 (6 Months)",
+      "Everything in Gear 2 (6 Months)",
       "365 Days Unlimited WhatsApp Stamp Cards",
       "VIP Customer Database & Spend CRM",
       "Custom Store Branding on Acrylic Standees",
@@ -157,16 +116,16 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     active: true
   },
 
-  // ─── GEAR 4 : Smart Digital Business Card + WhatsApp Digital Loyalty + Smart AI Google Review System ───
+  // ─── GEAR 3 : WhatsApp Digital Loyalty + Smart AI Google Review System + Smart Digital Business Card ───
   {
-    planKey: "gear4_6mo",
-    name: "Gear 4 : Smart Digital Business Card + WhatsApp Digital Loyalty + Smart AI Google Review System — 6 Months",
+    planKey: "gear3_6mo",
+    name: "Gear 3 : WhatsApp Digital Loyalty + Smart AI Google Review System + Smart Digital Business Card — 6 Months",
     description: "Trio retention suite: Digital card, WhatsApp loyalty stamps, and smart AI Google reviews (6 Months).",
     days: 180,
-    price: 1399,
-    originalPrice: 1399,
+    price: 1799,
+    originalPrice: 1799,
     discountPercent: 0,
-    badge: "Gear 4",
+    badge: "Gear 3",
     popular: false,
     features: [
       "Smart Digital Business Card (vCard Sync)",
@@ -180,17 +139,17 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     active: true
   },
   {
-    planKey: "gear4_yearly",
-    name: "Gear 4 : Smart Digital Business Card + WhatsApp Digital Loyalty + Smart AI Google Review System — 1 Year",
+    planKey: "gear3_yearly",
+    name: "Gear 3 : WhatsApp Digital Loyalty + Smart AI Google Review System + Smart Digital Business Card — 1 Year",
     description: "Full year trio retention powerhouse: Digital card, WhatsApp loyalty stamps, and smart AI reviews (1 Year).",
     days: 365,
-    price: 1899,
-    originalPrice: 1899,
+    price: 2499,
+    originalPrice: 2499,
     discountPercent: 0,
-    badge: "Gear 4 · 1 Year",
+    badge: "Gear 3 · 1 Year",
     popular: false,
     features: [
-      "Everything in Gear 4 (6 Months)",
+      "Everything in Gear 3 (6 Months)",
       "365 Days Unlimited Retention & Review Acceleration",
       "Customer Spend CRM & Milestone Alerts",
       "Automated WhatsApp Win-Back Campaigns",
@@ -200,16 +159,16 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     active: true
   },
 
-  // ─── GEAR 5 : CustomerPilot Complete (All 4 Engines) ───
+  // ─── GEAR 4 : All 4 Core Engines (Card + Loyalty + Reviews + AutoReply) ───
   {
-    planKey: "growth_180",
-    name: "Gear 5 : CustomerPilot Complete — 6 Months",
+    planKey: "gear4_6mo",
+    name: "Gear 4 : All 4 Core Engines — 6 Months",
     description: "All 4 flagship engines: Card, Loyalty Stamps, Smart AI Reviews, and 1-Click AI AutoReply (6 Months).",
     days: 180,
-    price: 2499,
-    originalPrice: 2499,
+    price: 1899,
+    originalPrice: 1899,
     discountPercent: 0,
-    badge: "Gear 5",
+    badge: "Gear 4",
     popular: false,
     features: [
       "Smart Digital Business Card",
@@ -223,17 +182,58 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     active: true
   },
   {
-    planKey: "enterprise_365",
-    name: "Gear 5 : CustomerPilot Complete — 1 Year",
+    planKey: "growth_180",
+    name: "Gear 4 : CustomerPilot Complete — 6 Months",
+    description: "All 4 flagship engines: Card, Loyalty Stamps, Smart AI Reviews, and 1-Click AI AutoReply (6 Months).",
+    days: 180,
+    price: 1899,
+    originalPrice: 1899,
+    discountPercent: 0,
+    badge: "Gear 4 · 6 Months",
+    popular: false,
+    features: [
+      "Smart Digital Business Card",
+      "WhatsApp Digital Loyalty Stamp Cards & VIP Club",
+      "Smart AI Google Reviews with Keyword Extraction",
+      "1-Click AI AutoReply to Google Maps Reviews",
+      "Automated 30/60/90 Day Customer Win-Backs",
+      "Printable High-Res Counter Standees (A4/A5)"
+    ],
+    enabledModules: "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD",
+    active: true
+  },
+  {
+    planKey: "gear4_yearly",
+    name: "Gear 4 : All 4 Core Engines — 1 Year",
     description: "Full year of all 4 flagship engines: Card, Loyalty, Reviews, and 1-Click AI AutoReply (1 Year).",
     days: 365,
-    price: 3499,
-    originalPrice: 3499,
+    price: 2499,
+    originalPrice: 2499,
     discountPercent: 0,
-    badge: "Gear 5 · 1 Year",
+    badge: "Gear 4 · All 4 Core Engines",
     popular: true,
     features: [
-      "Everything in Gear 5 (6 Months)",
+      "Everything in Gear 4 (6 Months)",
+      "365 Days Unlimited Automation Across All 4 Engines",
+      "AI Review Reply Generator Published via Google OAuth",
+      "VIP Tier Progression & Custom Stamp Milestones",
+      "Priority WhatsApp Helpdesk (+91 90333 04707)"
+    ],
+    enabledModules: "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD",
+    active: true
+  },
+  {
+    planKey: "enterprise_365",
+    name: "Gear 4 : CustomerPilot Complete — 1 Year",
+    description: "Full year of all 4 flagship engines: Card, Loyalty, Reviews, and 1-Click AI AutoReply (1 Year).",
+    days: 365,
+    price: 2499,
+    originalPrice: 2499,
+    discountPercent: 0,
+    badge: "Gear 4 · 1 Year",
+    popular: true,
+    features: [
+      "Everything in Gear 4 (6 Months)",
       "365 Days Unlimited Automation Across All 4 Engines",
       "AI Review Reply Generator Published via Google OAuth",
       "VIP Tier Progression & Custom Stamp Milestones",
@@ -243,29 +243,69 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     active: true
   },
 
-  // ─── GEAR 6 : CustomerPilot All-in-One Enterprise ───
+  // ─── GEAR 5 : CustomerPilot All-in-One Enterprise ───
   {
-    planKey: "gear6_monthly",
-    name: "Gear 6 : CustomerPilot All-in-One Enterprise — Monthly",
-    description: "The complete enterprise retail stack: Gear 5 + WhatsApp Group Booster, Smart POS Billing & Invoicing, and 24/7 AI WhatsApp ChatBot (Monthly).",
+    planKey: "gear5_monthly",
+    name: "Gear 5 : CustomerPilot All-in-One Enterprise — Monthly",
+    description: "The complete enterprise retail stack: Gear 4 + WhatsApp Group Booster, Smart POS Billing & Invoicing, and 24/7 AI WhatsApp ChatBot (Monthly).",
     days: 30,
     price: 999,
     originalPrice: 999,
     discountPercent: 0,
-    badge: "Gear 6 · All-in-One",
+    badge: "Gear 5 · Monthly",
+    popular: false,
+    features: [
+      "Smart Digital Business Card",
+      "WhatsApp Digital Loyalty Stamps & VIP Club",
+      "Smart AI Google Reviews",
+      "AutoReply to GoogleReviews",
+      "Dynamic QR Studio (Permanent QR + Instant Route Updates)",
+      "WhatsApp Group Booster & Lead Capture Form",
+      "Smart POS Billing & WhatsApp Invoicing Pro",
+      "24/7 AI WhatsApp ChatBot (Multilingual AI Assistant)"
+    ],
+    enabledModules: "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD,DYNAMIC_QR,LEAD_CAPTURE,SMART_BILLING,CHATBOT",
+    active: true
+  },
+  {
+    planKey: "gear5_yearly",
+    name: "Gear 5 : CustomerPilot All-in-One Enterprise — 1 Year",
+    description: "Full year of the complete enterprise retail stack with all 8 engines included (1 Year).",
+    days: 365,
+    price: 9999,
+    originalPrice: 9999,
+    discountPercent: 0,
+    badge: "Gear 5 · 1 Year (₹9,999/yr)",
     popular: true,
     features: [
-      "Gear 5 Complete Suite (Card, Loyalty, Reviews, AutoReply)",
-      "WhatsApp Group Booster & Lead Capture QR Engine",
-      "Smart POS Billing & WhatsApp PDF Invoicing Pro",
+      "Everything in Gear 5 Monthly",
+      "365 Days Unlimited Access to All 8 Engines",
+      "Dynamic QR Studio + Unlimited Destination Routing",
+      "WhatsApp Group Booster & Lead Capture CRM",
+      "Smart POS Billing & WhatsApp Invoicing Pro",
       "24/7 AI WhatsApp ChatBot Builder",
-      "Unlimited Destination Updates & CRM Ledger",
+      "Priority WhatsApp Concierge Support (+91 90333 04707)"
+    ],
+    enabledModules: "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD,DYNAMIC_QR,LEAD_CAPTURE,SMART_BILLING,CHATBOT",
+    active: true
+  },
+  {
+    planKey: "gear6_monthly",
+    name: "Gear 5 : CustomerPilot All-in-One Enterprise — Monthly (Alias)",
+    description: "The complete enterprise retail stack (Monthly alias).",
+    days: 30,
+    price: 999,
+    originalPrice: 999,
+    discountPercent: 0,
+    badge: "Gear 5 · Monthly",
+    popular: false,
+    features: [
+      "All 8 Enterprise Retention Engines",
       "Monthly Subscription (₹999/month)"
     ],
     enabledModules: "LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD,DYNAMIC_QR,LEAD_CAPTURE,SMART_BILLING,CHATBOT",
     active: true
   },
-
   // ─── Legacy Capacity & Standalone References (Backward Compatible) ───
   {
     planKey: "complete_monthly",
@@ -338,8 +378,8 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     name: "Digital Loyalty Stamps & VIP Club — 1 Year",
     description: "Full year of loyalty automation (₹4.11/day Billed yearly).",
     days: 365,
-    price: 1499,
-    originalPrice: 2598,
+    price: 1999,
+    originalPrice: 1999,
     discountPercent: 42,
     badge: "Loyalty (1 Year)",
     popular: false,
@@ -381,8 +421,8 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     name: "Smart Ai (SEO Optimized) Google Reviews [upto 2500 Reviews] — 1 Year",
     description: "Full year automated review collection [upto 2500 reviews] (₹2.46/day Billed yearly).",
     days: 365,
-    price: 899,
-    originalPrice: 1599,
+    price: 999,
+    originalPrice: 999,
     discountPercent: 44,
     badge: "Reviews (1 Year)",
     popular: false,
@@ -424,8 +464,8 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     name: "Ai Drafted (SEO Optimized) 1-Click AutoReply to GoogleReviews — 1 Year",
     description: "Full year of AI review replies published in 1-Click to Google Maps (₹2.2/day Billed yearly).",
     days: 365,
-    price: 799,
-    originalPrice: 1599,
+    price: 999,
+    originalPrice: 999,
     discountPercent: 50,
     badge: "AutoReply (1 Year)",
     popular: false,
@@ -466,8 +506,8 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     name: "Smart Digital Business Card — 1 Year",
     description: "Full year interactive digital business card with online ordering links, social profiles, and counter QR codes (~₹41/mo).",
     days: 365,
-    price: 499,
-    originalPrice: 1199,
+    price: 549,
+    originalPrice: 549,
     discountPercent: 58,
     badge: "⭐ Most Popular",
     popular: true,

@@ -4,6 +4,47 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [16 Nov 2026] Architecture & Pricing Restructure: 5 Official Gear Combos and Updated Standalone Service Pricing Across Platform
+- **Symptom**:
+  1. Pricing tiers were split into an outdated 6-gear structure where standalone reviews occupied Gear 1, and the newly requested combos and flat transparent pricing were not reflected.
+  2. Standalone services needed updated 1-year pricing: Smart AI Google Review System at ₹999/yr, WhatsApp Digital Loyalty Membership Club at ₹1,999/yr, Smart Digital Business Card at ₹549/yr, and AutoReply to GoogleReview at ₹999/yr.
+  3. The requested official 5 Gear Combos were needed across the Website Pricing page (`/pricing`), SuperAdmin pricing studio (`/super-admin`), and Merchant Dashboard Subscription page (`/dashboard/subscription`):
+     - Gear 1: Smart Digital Business Card + Smart AI Google Review System (₹1,249/yr)
+     - Gear 2: Smart Digital Business Card + WhatsApp Digital Loyalty System (₹2,249/yr)
+     - Gear 3: WhatsApp Digital Loyalty + Smart AI Google Review System + Smart Digital Business Card (₹2,499/yr)
+     - Gear 4 (All 4 Core Engines): Smart Digital Business Card + WhatsApp Digital Loyalty + Smart AI Google Review System + AutoReply to GoogleReview (₹2,499/yr)
+     - Gear 5: CustomerPilot All-in-One Enterprise (All 8 modules: Card, Loyalty, Reviews, AutoReply, Dynamic QR Studio, WhatsApp Group Booster, Smart POS Billing & Invoicing, 24/7 AI WhatsApp ChatBot) at ₹999/mo (₹9,999/yr).
+- **Root Cause**:
+  1. `src/lib/feature-gate.ts` and `src/lib/master-plans.ts` had previous gear mappings that did not match the user's updated 5-Gear specification.
+  2. `src/components/pricing/pricing-studio.tsx` held the old 6-gear configuration with legacy prices and missing 1-year enterprise option.
+  3. Hardcoded pricing strings (`₹549`, `₹799`) persisted in `src/app/dashboard/subscription/page.tsx` sub-filter buttons.
+- **Resolution**:
+  1. **Feature Gate Synchronization (`src/lib/feature-gate.ts`)**:
+     - Updated `PLAN_MODULE_MAP` for `gear1` (Card + Reviews), `gear2` (Card + Loyalty), `gear3` (Card + Loyalty + Reviews), `gear4` (Card + Loyalty + Reviews + AutoReply), `gear5` (ALL_MODULES), and `gear6` (ALL_MODULES alias).
+  2. **Canonical Master Plans Definition (`src/lib/master-plans.ts`)**:
+     - Configured `gear1_yearly` at ₹1,249 (`DIGITAL_CARD,REVIEWS`).
+     - Configured `gear2_yearly` at ₹2,249 (`DIGITAL_CARD,LOYALTY`).
+     - Configured `gear3_yearly` at ₹2,499 (`DIGITAL_CARD,LOYALTY,REVIEWS`).
+     - Configured `gear4_yearly` & `enterprise_365` at ₹2,499 (`DIGITAL_CARD,LOYALTY,REVIEWS,AUTOREPLY`).
+     - Configured `gear5_monthly` at ₹999/mo and `gear5_yearly` at ₹9,999/yr with all 8 modules (`LOYALTY,REVIEWS,AUTOREPLY,DIGITAL_CARD,DYNAMIC_QR,LEAD_CAPTURE,SMART_BILLING,CHATBOT`).
+     - Updated Standalone plans: `reviews_yearly` (₹999), `loyalty_yearly` (₹1,999), `card_yearly` (₹549), `autoreply_yearly` (₹999).
+  3. **Pricing Studio Component (`src/components/pricing/pricing-studio.tsx`)**:
+     - Redefined `GEAR_COMBOS` with exactly 5 canonical gears with matching modules and flat pricing.
+     - Updated `STANDALONE_SERVICES` with updated 1-year flat prices and descriptions.
+     - Updated card borders, badge themes, primary buttons, and pricing boxes for `gear_1` through `gear_5`.
+     - Added dual-action rendering on Gear 5 for both 1-Year Enterprise (₹9,999/yr) and Monthly Enterprise (₹999/mo).
+  4. **Merchant Subscription Sub-filter Clean-Up (`src/app/dashboard/subscription/page.tsx`)**:
+     - Cleaned sub-filter buttons to clean `6 Months` and `1 Year` without hardcoded legacy prices.
+  5. **Database Reseeding & Self-Healing Sync**:
+     - Executed `ensureMasterPlans(prisma)` via `scripts/seed_pricing_plans.ts`, synchronizing all 34 active plan definitions in `prisma/dev.db`.
+  6. **Automated Verification**:
+     - Ran Master Adversarial Red-Team Guard (`node scripts/run_adversarial_guard.js`) with 100% pass across all 6 gates.
+     - Verified Next.js production build (`npm run build`) with 245/245 static pages cleanly prerendered.
+     - Executed Playwright ground-truth assertion (`node scripts/verify_pricing_gears_truth.js`), verifying all 5 gears and standalone prices in rendered DOM and capturing screenshot `public/pricing_gears_ground_truth.png`.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [15 Nov 2026] Fix & Hardening: WhatsApp Booster Concatenated URL Elimination, 1-Click Clear & Multi-Link Auto-Sanitization
 - **Symptom**:
   1. Scanning Cake Connection's WhatsApp Booster QR code or visiting `/api/wg/cake-connection` landed on a WhatsApp 404 error page: *"404. This page doesn't exist. You've reached a 404 page"*.
