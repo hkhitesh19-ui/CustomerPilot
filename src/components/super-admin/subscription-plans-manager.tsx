@@ -66,7 +66,27 @@ export function SubscriptionPlansManager() {
       const res = await fetch("/api/pricing/plans")
       const data = await res.json()
       if (data.ok && Array.isArray(data.data?.plans)) {
-        setPlans(data.data.plans)
+        const order = [
+          "gear1_yearly",
+          "gear2_yearly",
+          "gear3_yearly",
+          "gear4_yearly",
+          "gear5_monthly",
+          "gear5_yearly",
+          "reviews_yearly",
+          "loyalty_yearly",
+          "card_yearly",
+          "autoreply_yearly"
+        ]
+        const sorted = [...data.data.plans].sort((a, b) => {
+          const idxA = order.indexOf(a.planKey || "")
+          const idxB = order.indexOf(b.planKey || "")
+          if (idxA !== -1 && idxB !== -1) return idxA - idxB
+          if (idxA !== -1) return -1
+          if (idxB !== -1) return 1
+          return 0
+        })
+        setPlans(sorted)
       }
     } catch (e) {
       toast({ title: "Error", description: "Failed to load plans", variant: "destructive" })
@@ -334,12 +354,9 @@ export function SubscriptionPlansManager() {
                   {/* Category Filter Pills */}
                   <div className="flex flex-wrap items-center gap-2 pb-2 border-b border-slate-800/60">
                     {[
-                      { id: "ALL", label: `All Plans (${plans.length})` },
-                      { id: "DIGITAL_CARD", label: `Smart Digital Cards (${plans.filter(p => (p.planKey || '').startsWith('card_') || p.enabledModules === 'DIGITAL_CARD').length})` },
-                      { id: "COMPLETE", label: `CustomerPilot Complete (${plans.filter(p => (p.planKey || '').startsWith('growth_') || (p.planKey || '').startsWith('enterprise_')).length})` },
-                      { id: "LOYALTY", label: `Loyalty Stamps (${plans.filter(p => (p.planKey || '').startsWith('loyalty_') || p.enabledModules === 'LOYALTY').length})` },
-                      { id: "REVIEWS", label: `AI Google Reviews (${plans.filter(p => (p.planKey || '').startsWith('reviews_') || p.enabledModules === 'REVIEWS').length})` },
-                      { id: "AUTOREPLY", label: `AI AutoReply (${plans.filter(p => (p.planKey || '').startsWith('autoreply_') || p.enabledModules === 'AUTOREPLY').length})` },
+                      { id: "ALL", label: `All Active Plans (${plans.length})` },
+                      { id: "GEARS", label: `5 Official Gears (${plans.filter(p => (p.planKey || '').startsWith('gear')).length})` },
+                      { id: "STANDALONE", label: `4 Standalone Services (${plans.filter(p => !(p.planKey || '').startsWith('gear')).length})` },
                     ].map(filter => (
                       <button
                         key={filter.id}
@@ -362,37 +379,73 @@ export function SubscriptionPlansManager() {
                       .filter(p => {
                         if (planCategoryFilter === "ALL") return true
                         const key = p.planKey || ""
-                        if (planCategoryFilter === "DIGITAL_CARD") return key.startsWith("card_") || p.enabledModules === "DIGITAL_CARD"
-                        if (planCategoryFilter === "COMPLETE") return key.startsWith("growth_") || key.startsWith("enterprise_")
-                        if (planCategoryFilter === "LOYALTY") return key.startsWith("loyalty_") || p.enabledModules === "LOYALTY"
-                        if (planCategoryFilter === "REVIEWS") return key.startsWith("reviews_") || p.enabledModules === "REVIEWS"
-                        if (planCategoryFilter === "AUTOREPLY") return key.startsWith("autoreply_") || p.enabledModules === "AUTOREPLY"
+                        if (planCategoryFilter === "GEARS") return key.startsWith("gear")
+                        if (planCategoryFilter === "STANDALONE") return !key.startsWith("gear")
                         return true
                       })
                       .map((p) => {
                         const realIdx = plans.findIndex(item => (item.id && item.id === p.id) || item.planKey === p.planKey)
-                        const isCard = (p.planKey || "").startsWith("card_") || p.enabledModules === "DIGITAL_CARD"
+                        const key = p.planKey || ""
+                        const isGear1 = key === "gear1_yearly"
+                        const isGear2 = key === "gear2_yearly"
+                        const isGear3 = key === "gear3_yearly"
+                        const isGear4 = key === "gear4_yearly" || key === "enterprise_365"
+                        const isGear5 = key.startsWith("gear5")
+                        const isCard = key === "card_yearly"
+                        const isLoyalty = key === "loyalty_yearly"
+                        const isReviews = key === "reviews_yearly"
+                        const isAutoReply = key === "autoreply_yearly"
+
+                        let badgeText = "Custom Plan"
+                        let badgeBorder = "border-slate-800 hover:border-slate-700 bg-slate-950"
+                        let tagClasses = "bg-slate-800 text-slate-300 border-slate-700"
+
+                        if (isGear1) {
+                          badgeText = "⚙️ Gear 1 · Card + Reviews"
+                          tagClasses = "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                          badgeBorder = "border-emerald-500/40 bg-gradient-to-b from-slate-950 to-emerald-950/20"
+                        } else if (isGear2) {
+                          badgeText = "⚙️ Gear 2 · Card + Loyalty"
+                          tagClasses = "bg-purple-500/20 text-purple-300 border-purple-500/40"
+                          badgeBorder = "border-purple-500/40 bg-gradient-to-b from-slate-950 to-purple-950/20"
+                        } else if (isGear3) {
+                          badgeText = "⚡ Gear 3 · Power Trio"
+                          tagClasses = "bg-blue-500/20 text-blue-300 border-blue-500/40"
+                          badgeBorder = "border-blue-500/40 bg-gradient-to-b from-slate-950 to-blue-950/20"
+                        } else if (isGear4) {
+                          badgeText = "👑 Gear 4 · All 4 Core Engines"
+                          tagClasses = "bg-indigo-500/20 text-indigo-300 border-indigo-500/40"
+                          badgeBorder = "border-indigo-500/40 bg-gradient-to-b from-slate-950 to-indigo-950/20"
+                        } else if (isGear5) {
+                          badgeText = p.days === 30 ? "💎 Gear 5 · Enterprise (Monthly)" : "💎 Gear 5 · Enterprise (1 Year)"
+                          tagClasses = "bg-rose-500/20 text-rose-300 border-rose-500/40"
+                          badgeBorder = "border-rose-500/40 bg-gradient-to-b from-slate-950 to-rose-950/20"
+                        } else if (isReviews) {
+                          badgeText = "⭐ Standalone · Smart Reviews"
+                          tagClasses = "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                          badgeBorder = "border-amber-500/40 bg-gradient-to-b from-slate-950 to-amber-950/20"
+                        } else if (isLoyalty) {
+                          badgeText = "🎁 Standalone · Loyalty Club"
+                          tagClasses = "bg-purple-500/20 text-purple-300 border-purple-500/40"
+                          badgeBorder = "border-purple-500/40 bg-gradient-to-b from-slate-950 to-purple-950/20"
+                        } else if (isCard) {
+                          badgeText = "💳 Standalone · Digital Card"
+                          tagClasses = "bg-cyan-500/20 text-cyan-300 border-cyan-500/40"
+                          badgeBorder = "border-cyan-500/40 bg-gradient-to-b from-slate-950 to-cyan-950/20"
+                        } else if (isAutoReply) {
+                          badgeText = "💬 Standalone · AutoReply"
+                          tagClasses = "bg-blue-500/20 text-blue-300 border-blue-500/40"
+                          badgeBorder = "border-blue-500/40 bg-gradient-to-b from-slate-950 to-blue-950/20"
+                        }
 
                         return (
                           <div 
                             key={p.id || p.planKey || realIdx} 
-                            className={`p-5 rounded-2xl border bg-slate-950 space-y-4 shadow-xl transition-all ${
-                              isCard ? "border-cyan-500/40 bg-gradient-to-b from-slate-950 to-cyan-950/20" : "border-slate-800 hover:border-slate-700"
-                            }`}
+                            className={`p-5 rounded-2xl border space-y-4 shadow-xl transition-all ${badgeBorder}`}
                           >
                             <div className="flex items-center justify-between gap-2">
-                              <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${
-                                isCard
-                                  ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40"
-                                  : (p.planKey || "").startsWith("growth_") || (p.planKey || "").startsWith("enterprise_")
-                                    ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
-                                    : (p.planKey || "").startsWith("loyalty_")
-                                      ? "bg-purple-500/20 text-purple-300 border-purple-500/40"
-                                      : (p.planKey || "").startsWith("reviews_")
-                                        ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
-                                        : "bg-blue-500/20 text-blue-300 border-blue-500/40"
-                              }`}>
-                                {isCard ? "Smart Digital Card" : (p.planKey || "").startsWith("growth_") || (p.planKey || "").startsWith("enterprise_") ? "Complete Suite" : (p.planKey || "").startsWith("loyalty_") ? "Loyalty" : (p.planKey || "").startsWith("reviews_") ? "Google Reviews" : "AutoReply"}
+                              <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${tagClasses}`}>
+                                {badgeText}
                               </span>
                               <Badge variant="outline" className="text-[10px] font-mono bg-indigo-500/10 text-indigo-300 border-indigo-500/30">
                                 {p.days} Days

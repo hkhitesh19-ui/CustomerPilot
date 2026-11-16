@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
 import { ok, err } from "@/lib/api"
-import { ensureMasterPlans } from "@/lib/master-plans"
+import { ensureMasterPlans, CANONICAL_ACTIVE_PLAN_KEYS } from "@/lib/master-plans"
 
 export const dynamic = "force-dynamic"
 
@@ -39,6 +39,15 @@ export async function GET(req: NextRequest) {
         ...p,
         features: Array.isArray(parsedFeatures) ? parsedFeatures : []
       }
+    })
+
+    parsedPlans.sort((a, b) => {
+      const idxA = CANONICAL_ACTIVE_PLAN_KEYS.indexOf(a.planKey || "")
+      const idxB = CANONICAL_ACTIVE_PLAN_KEYS.indexOf(b.planKey || "")
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB
+      if (idxA !== -1) return -1
+      if (idxB !== -1) return 1
+      return (a.price || 0) - (b.price || 0)
     })
 
     return ok({ plans: parsedPlans })

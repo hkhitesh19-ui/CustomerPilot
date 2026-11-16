@@ -27,6 +27,19 @@ export interface MasterCouponDefinition {
   active: boolean
 }
 
+export const CANONICAL_ACTIVE_PLAN_KEYS = [
+  "gear1_yearly",
+  "gear2_yearly",
+  "gear3_yearly",
+  "gear4_yearly",
+  "gear5_monthly",
+  "gear5_yearly",
+  "reviews_yearly",
+  "loyalty_yearly",
+  "card_yearly",
+  "autoreply_yearly"
+]
+
 export const MASTER_PLANS: MasterPlanDefinition[] = [
   // ─── GEAR 1 : Smart Digital Business Card + Smart AI Google Review System ───
   {
@@ -143,8 +156,8 @@ export const MASTER_PLANS: MasterPlanDefinition[] = [
     name: "Gear 3 : WhatsApp Digital Loyalty + Smart AI Google Review System + Smart Digital Business Card — 1 Year",
     description: "Full year trio retention powerhouse: Digital card, WhatsApp loyalty stamps, and smart AI reviews (1 Year).",
     days: 365,
-    price: 2499,
-    originalPrice: 2499,
+    price: 3499,
+    originalPrice: 3499,
     discountPercent: 0,
     badge: "Gear 3 · 1 Year",
     popular: false,
@@ -826,6 +839,16 @@ export async function ensureMasterPlans(prismaClient: any): Promise<{ seededPlan
   let seededCoupons = 0
 
   try {
+    // 🛡️ Deactivate any legacy or non-canonical plans so they are removed from SuperAdmin & public APIs
+    await prismaClient.plan.updateMany({
+      where: {
+        planKey: { notIn: CANONICAL_ACTIVE_PLAN_KEYS }
+      },
+      data: {
+        active: false
+      }
+    })
+
     for (const p of MASTER_PLANS) {
       const existing = await prismaClient.plan.findFirst({
         where: { OR: [{ planKey: p.planKey }, { name: p.name }] }
@@ -844,7 +867,7 @@ export async function ensureMasterPlans(prismaClient: any): Promise<{ seededPlan
         currency: "INR",
         features: JSON.stringify(p.features),
         enabledModules: p.enabledModules,
-        active: p.active
+        active: CANONICAL_ACTIVE_PLAN_KEYS.includes(p.planKey)
       }
 
       if (existing) {

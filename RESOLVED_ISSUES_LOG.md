@@ -4,6 +4,41 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [16 Nov 2026] Issue: SuperAdmin Pricing Standardization to 10 Canonical Plans & Gear 3 Price Update (₹3,499)
+- **Symptom**:
+  1. The Superadmin Subscriptions page (`/super-admin?tab=subscriptions`) displayed an overwhelming grid of 34 raw pricing cards, cluttered with legacy/redundant tiers, internal tracks, and unneeded variants.
+  2. Gear 3 pricing needed to be updated to exactly ₹3,499/year (from ₹2,499/year) per explicit business instruction.
+  3. Superadmin lacked clear filter breakdown between the 5 Official Gears (6 plans with Gear 5 Monthly/Yearly) and the 4 Standalone Services (4 plans).
+- **Root Cause**:
+  1. `ensureMasterPlans()` in `src/lib/master-plans.ts` historically seeded all 34 plans as `active: true`, causing the database to return old redundant plans alongside canonical tiers.
+  2. `src/app/api/pricing/plans/route.ts` returned all `active: true` plans without enforcing the canonical 10-plan whitelist or consistent priority sorting.
+  3. `subscription-plans-manager.tsx` had raw matrix tabs showing all 34 plans without structured badges for each Gear or standalone service.
+- **Resolution**:
+  1. **Canonical Active Whitelist (`src/lib/master-plans.ts`)**:
+     - Defined `CANONICAL_ACTIVE_PLAN_KEYS` restricting active tiers to exactly 10 plans:
+       - 5 Official Gears (6 plans): `gear1_yearly` (₹1,249), `gear2_yearly` (₹2,249), `gear3_yearly` (₹3,499), `gear4_yearly` (₹2,499), `gear5_monthly` (₹999), `gear5_yearly` (₹9,999).
+       - 4 Standalone Services (4 plans): `reviews_yearly` (₹999), `loyalty_yearly` (₹1,999), `card_yearly` (₹549), `autoreply_yearly` (₹999).
+     - Updated `gear3_yearly` price and `originalPrice` to ₹3,499 in `MASTER_PLANS`.
+     - Enhanced `ensureMasterPlans()` to deactivate all non-canonical plans (`active: false`) while keeping canonical plans active.
+  2. **API Route Restriction & Canonical Sorting (`src/app/api/pricing/plans/route.ts`)**:
+     - Filtered returned active plans strictly against `CANONICAL_ACTIVE_PLAN_KEYS`.
+     - Applied canonical ordering: Gears 1 through 5 appear first in sequence, followed by the 4 Standalone services.
+  3. **Pricing Studio UI Alignment (`src/components/pricing/pricing-studio.tsx`)**:
+     - Updated `GEAR_COMBOS`: for `gear_3`, updated 365-day price to ₹3,499 (`planKey: "gear3_yearly"`).
+     - Standardized `gear_4` plan key to `"gear4_yearly"`.
+  4. **SuperAdmin Subscriptions Manager Refresh (`src/components/super-admin/subscription-plans-manager.tsx`)**:
+     - Dynamic filter pills: `All Active Plans (10)`, `5 Official Gears (6)`, `4 Standalone Services (4)`.
+     - Distinct color-coded card badges and borders for each Gear (Emerald, Purple, Blue, Indigo, Rose) and Standalone service (Amber, Purple, Cyan, Blue).
+     - Verified count banner showing 10 active canonical plans and 24 deactivated legacy tiers.
+  5. **Database Seeding & Verification**:
+     - Ran SQLite seeding: 24 legacy tiers deactivated, exactly 10 active plans confirmed.
+     - Executed `scripts/verify_pricing_exact_contract.ts`: 100% assertions passed.
+     - Generated visual proof snapshot: `public/superadmin_10_plans_verified.png`.
+     - Master Adversarial Red-Team Guard (`node scripts/run_adversarial_guard.js`): All 6 gates passed cleanly.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [16 Nov 2026] Feature & Enhancement: Superadmin & Checkout Discount Codes CPA100 (-₹100) and CPA350 (-₹350)
 - **Symptom**: 
   1. Superadmin and merchants needed the ability to apply specific discount codes (`CPA100` for ₹100 discount, `CPA350` for ₹350 discount) during subscription plans checkout and activation.

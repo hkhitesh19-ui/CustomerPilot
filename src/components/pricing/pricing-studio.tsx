@@ -52,8 +52,8 @@ export interface PricingStudioProps {
 
 // ─── CANONICAL GEAR TIERS ───
 export const COMPLETE_TIERS = [
-  { t: "6 Months", d: 180, s: 1899, m: 1899, planKey: "growth_180", badge: "6 Months", isPostpaid: false },
-  { t: "12 Months", d: 365, s: 2499, m: 2499, planKey: "enterprise_365", badge: "Best Value", isPostpaid: false }
+  { t: "6 Months", d: 180, s: 1899, m: 1899, planKey: "gear4_6mo", badge: "6 Months", isPostpaid: false },
+  { t: "12 Months", d: 365, s: 2499, m: 2499, planKey: "gear4_yearly", badge: "Best Value", isPostpaid: false }
 ]
 
 // Gear Combos Configuration
@@ -106,7 +106,7 @@ export const GEAR_COMBOS: GearComboDefinition[] = [
     modulesIncluded: ["card", "loyalty", "star"],
     tenures: {
       180: { offer: 1799, regular: 1799, planKey: "gear3_6mo" },
-      365: { offer: 2499, regular: 2499, planKey: "gear3_yearly" }
+      365: { offer: 3499, regular: 3499, planKey: "gear3_yearly" }
     }
   },
   {
@@ -117,8 +117,8 @@ export const GEAR_COMBOS: GearComboDefinition[] = [
     iconBg: "bg-indigo-600",
     modulesIncluded: ["card", "loyalty", "star", "chat"],
     tenures: {
-      180: { offer: 1899, regular: 1899, planKey: "growth_180" },
-      365: { offer: 2499, regular: 2499, planKey: "enterprise_365" }
+      180: { offer: 1899, regular: 1899, planKey: "gear4_6mo" },
+      365: { offer: 2499, regular: 2499, planKey: "gear4_yearly" }
     }
   },
   {
