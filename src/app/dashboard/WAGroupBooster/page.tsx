@@ -515,25 +515,28 @@ export default function WAGroupBoosterSimplePage() {
 
             <CardContent className="p-6 flex flex-col items-center">
               {/* Store Logo Uploader Bar */}
-              <div className="w-full max-w-[290px] bg-slate-50 border border-slate-200 rounded-2xl p-2.5 flex items-center justify-between gap-2 shadow-xs mb-3">
-                <div className="flex items-center gap-2 min-w-0">
+              <div className="w-full max-w-[290px] bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-teal-400/80 rounded-2xl p-3 flex items-center justify-between gap-2 shadow-sm mb-3">
+                <div className="flex items-center gap-2.5 min-w-0">
                   {merchantProfile?.logoUrl ? (
                     <img
                       src={merchantProfile.logoUrl}
                       alt="Store Logo"
-                      className="w-8 h-8 rounded-lg object-contain border border-slate-200 bg-white p-0.5 shrink-0"
+                      className="w-9 h-9 rounded-xl object-contain border border-teal-300 bg-white p-0.5 shrink-0 shadow-xs"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-lg bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs">
                       <Store className="w-4 h-4" />
                     </div>
                   )}
                   <div className="min-w-0 text-left">
-                    <div className="text-[11px] font-bold text-slate-900 truncate">
-                      {merchantProfile?.logoUrl ? "Store Logo Active" : "Store Logo"}
+                    <div className="text-xs font-black text-slate-900 truncate flex items-center gap-1">
+                      <span>Store Brand Logo</span>
+                      {merchantProfile?.logoUrl && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                      )}
                     </div>
-                    <div className="text-[9px] text-slate-500 truncate">
-                      {merchantProfile?.logoUrl ? "Rendered on standee" : "Upload logo for standee"}
+                    <div className="text-[10px] text-teal-800 font-medium truncate">
+                      {merchantProfile?.logoUrl ? "Active on Standee & QR" : "Upload logo for standee"}
                     </div>
                   </div>
                 </div>
@@ -551,9 +554,9 @@ export default function WAGroupBoosterSimplePage() {
                     size="sm"
                     disabled={uploadingLogo}
                     onClick={() => logoInputRef.current?.click()}
-                    className="h-6 px-2 rounded-lg text-[10px] font-bold bg-teal-600 hover:bg-teal-700 text-white gap-1 shadow-xs"
+                    className="h-7 px-3 rounded-xl text-xs font-extrabold bg-teal-600 hover:bg-teal-700 text-white gap-1.5 shadow-sm"
                   >
-                    <Upload className="w-2.5 h-2.5" />
+                    <Upload className="w-3 h-3" />
                     <span>{uploadingLogo ? "..." : (merchantProfile?.logoUrl ? "Change" : "Upload")}</span>
                   </Button>
                   {merchantProfile?.logoUrl && (
@@ -564,9 +567,9 @@ export default function WAGroupBoosterSimplePage() {
                       disabled={uploadingLogo}
                       onClick={handleRemoveLogo}
                       title="Remove custom logo"
-                      className="h-6 w-6 p-0 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                      className="h-7 w-7 p-0 rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-100"
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </Button>
                   )}
                 </div>
@@ -576,14 +579,31 @@ export default function WAGroupBoosterSimplePage() {
               <div className="w-full max-w-[290px] bg-white rounded-3xl p-6 border-4 border-slate-900 shadow-2xl space-y-3.5 text-center relative">
                 {/* Store Header with Logo */}
                 <div className="space-y-1.5 flex flex-col items-center">
-                  {merchantProfile?.logoUrl && (
-                    <div className="flex justify-center py-0.5">
+                  {merchantProfile?.logoUrl ? (
+                    <div
+                      onClick={() => logoInputRef.current?.click()}
+                      className="cursor-pointer group flex flex-col items-center py-0.5"
+                      title="Click to change logo"
+                    >
                       <img
                         src={merchantProfile.logoUrl}
                         alt={storeName}
-                        className="h-10 max-w-[130px] object-contain drop-shadow-sm"
+                        className="h-10 max-w-[130px] object-contain drop-shadow-sm group-hover:opacity-80 transition-opacity"
                       />
+                      <span className="text-[8px] text-teal-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                        Click to change
+                      </span>
                     </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => logoInputRef.current?.click()}
+                      className="cursor-pointer group flex items-center justify-center gap-1.5 py-1 px-3 mb-1 rounded-xl border-2 border-dashed border-teal-400 hover:border-teal-600 bg-teal-50/70 hover:bg-teal-100/70 transition-all text-teal-700 text-[11px] font-bold shadow-xs"
+                      title="Click to upload your store logo"
+                    >
+                      <Upload className="w-3.5 h-3.5 group-hover:scale-110 transition-transform text-teal-600" />
+                      <span>+ Upload Store Logo Here</span>
+                    </button>
                   )}
                   <div className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">{storeName}</div>
                   <div className="inline-block px-3 py-1 rounded-full bg-emerald-600 text-white text-[10px] font-black tracking-wide shadow-sm">
@@ -627,6 +647,28 @@ export default function WAGroupBoosterSimplePage() {
 
               {/* QR Style Selector & Standee Message Editor */}
               <div className="w-full space-y-3 pt-5">
+                {/* Dedicated Store Logo Control Tile */}
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="flex items-center gap-2">
+                    <Store className="w-4 h-4 text-teal-600 shrink-0" />
+                    <div className="text-left">
+                      <div className="text-[11px] font-bold text-slate-800">Store Brand Logo</div>
+                      <div className="text-[9px] text-slate-500">
+                        {merchantProfile?.logoUrl ? "Custom logo rendered on standee" : "No logo uploaded yet"}
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => logoInputRef.current?.click()}
+                    className="h-6 px-2.5 text-[10px] font-bold rounded-lg border-teal-500 text-teal-700 hover:bg-teal-50 gap-1"
+                  >
+                    <Upload className="w-2.5 h-2.5" />
+                    <span>{merchantProfile?.logoUrl ? "Change" : "Upload Logo"}</span>
+                  </Button>
+                </div>
                 <div className="flex items-center justify-between text-xs font-semibold text-slate-700 bg-slate-50 p-2 rounded-xl border border-slate-200">
                   <span className="text-[11px] font-bold text-slate-600">QR Code Style:</span>
                   <div className="flex items-center gap-1">
