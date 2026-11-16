@@ -94,9 +94,9 @@ async function main() {
       data: {
         merchantId: merchant.id,
         slug: slug,
-        label: 'Main Counter QR - WhatsApp Group',
+        label: 'Main Counter QR - WhatsApp Group (Fast Mode)',
         currentDest: destUrl,
-        redirectMode: 'FORM_CAPTURE',
+        redirectMode: 'DIRECT',
         tier: 'PRO',
         isActive: true
       }
@@ -108,7 +108,7 @@ async function main() {
       data: {
         merchantId: merchant.id,
         currentDest: destUrl,
-        redirectMode: 'FORM_CAPTURE',
+        redirectMode: 'DIRECT',
         tier: 'PRO',
         isActive: true
       }

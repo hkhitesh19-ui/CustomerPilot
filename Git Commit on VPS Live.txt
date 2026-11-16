@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 67df548 (feat(pricing): establish 5 canonical gear combos and updated standalone service pricing across platform)
-Full SHA          : 67df5485c82413b9ad6806ec3add72b082b81e63
-Parent Commit     : 322ade5
+Active Git Commit : 39a621e / 322170d (feat(shreenath): onboard Shreenath Rajwadi Silk Palace merchant, WhatsApp Group Booster QR with logo and standee)
+Full SHA          : 322170dfceec44d1872589adbc95ee62dbdc2388
+Parent Commit     : 39a621e17d69da47c69f2983cb7cc610a7e5fd35
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 16 Nov 2026, 09:20 AM IST
+Deployment Date   : 16 Nov 2026, 11:06 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(pricing): establish 5 canonical gear combos and updated standalone service pricing across platform
+Commit Title      : feat(shreenath): onboard Shreenath Rajwadi Silk Palace merchant, WhatsApp Group Booster QR with logo and standee
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -22,19 +22,21 @@ Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 O
 Verified Live Outcomes:
 ----------------------------------------------------------
 1. https://customerpilot.in/                                 -> HTTP 200 (Homepage live & healthy)
-2. https://customerpilot.in/pricing                          -> HTTP 200 (5 Official Canonical Gear Combos Live with Fixed Flat Pricing + 4 Standalone Services)
-3. https://customerpilot.in/dashboard/settings               -> HTTP 200 (Settings studio live with pinned Vadodara keywords and catalog)
-4. https://customerpilot.in/dashboard/subscription           -> HTTP 200 (Active plans synchronized with 6 Months and 1 Year filters)
-5. https://customerpilot.in/super-admin                      -> HTTP 307 (Auth redirect to login, operational)
-6. 5 Canonical Gear Combos & Standalone Architecture:
-   - Gear 1: Smart Digital Business Card + Smart AI Google Review System (₹1,249/yr)
-   - Gear 2: Smart Digital Business Card + WhatsApp Digital Loyalty System (₹2,249/yr)
-   - Gear 3: WhatsApp Digital Loyalty + Smart AI Google Review System + Smart Digital Business Card (₹2,499/yr)
-   - Gear 4: Smart Digital Business Card + WhatsApp Digital Loyalty + Smart AI Google Review System + AutoReply to GoogleReview (₹2,499/yr)
-   - Gear 5: CustomerPilot All-in-One Enterprise (All 8 retail modules) (₹999/mo or ₹9,999/yr)
-   - Standalone 1: Smart AI Google Review System (₹999/yr)
-   - Standalone 2: WhatsApp Digital Loyalty Membership Club (₹1,999/yr)
-   - Standalone 3: Smart Digital Business Card (₹549/yr)
-   - Standalone 4: AutoReply to GoogleReview (₹999/yr)
+2. https://customerpilot.in/dashboard/WAGroupBoosterPro     -> HTTP 200 (WhatsApp Group Booster Pro with multi-store switcher & QR logo/clean toggle)
+3. https://customerpilot.in/wg/shreenath-rajwadi-silk-palace -> HTTP 200 / 302 (Lead capture & redirect to WhatsApp Group: https://chat.whatsapp.com/JkoU8GisR6mJVkZoNEzE60?s=cl&p=i&iam=2)
+4. https://customerpilot.in/api/wg/shreenath-rajwadi-silk-palace?info=true -> HTTP 200 (Live Dynamic QR Metadata API)
+5. Merchant Profile Seeding:
+   - Name: Shreenath Rajwadi Silk Palace (Pethapur Vala)
+   - Merchant ID: cmwit83kx0002uwuo4dxlxkc1
+   - Owner: Vasu Kumawat (KumawatVasu92@gmail.com)
+   - Phone: +91 9898909032
+   - Plan: Gear 6 All-in-One Enterprise
+6. Standee Posters & QR Artwork Live:
+   - /standees/shreenath_rajwadi_whatsapp_standee.png (With WhatsApp Logo, 1200x1800 px)
+   - /standees/shreenath_rajwadi_clean_standee.png (Clean Without Logo, 1200x1800 px)
+   - /qrcodes/shreenath_booster_whatsapp_logo_qr.png
+   - /qrcodes/shreenath_booster_clean_qr.png
+   - /qrcodes/shreenath_direct_whatsapp_logo_qr.png
+   - /qrcodes/shreenath_direct_clean_qr.png
 7. Adversarial Red-Team Safety Gates:
    - All 6 automated gates passed cleanly (AST import linter, full-app TS ratchet <= 36, sensitive token redactions, 12 mathematical boundaries, payments regression, 0 tracked DBs)

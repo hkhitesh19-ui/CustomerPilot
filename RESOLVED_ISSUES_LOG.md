@@ -4,6 +4,29 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [16 Nov 2026] Issue: WhatsApp Group Booster (Fast Mode) Scan Friction Elimination - Direct 0-Second Redirect
+- **Symptom**:
+  1. When scanning the Shreenath Rajwadi Silk Palace counter standee or opening `customerpilot.in/wg/shreenath-rajwadi-silk-palace`, users were presented with an extra registration form ("VIP Club - Join our official WhatsApp community") requiring "Your Full Name" and "WhatsApp Mobile Number".
+  2. Because the merchant was set up for "WAGroupBooster - Fast Mode" (Direct 0-Second Redirect), this registration form introduced unwanted friction, lowering join conversions.
+- **Root Cause**:
+  1. In the initial onboarding script, the QR code `redirectMode` was set to `'FORM_CAPTURE'` instead of `'DIRECT'`.
+  2. In `src/app/wg/[slug]/page.tsx`, the route was a client component that unconditionally rendered the VIP registration form without checking if the QR code's mode was `'DIRECT'`.
+- **Resolution**:
+  1. **Database Mode Update**:
+     - Updated `redirectMode` for `shreenath-rajwadi-silk-palace` (and all Fast Mode QR codes) to `'DIRECT'` in both `scripts/create_shreenath_merchant.js` and SQLite DB.
+  2. **Server-Side Zero-Friction 0-Second Redirection (`src/app/wg/[slug]/page.tsx`)**:
+     - Converted `src/app/wg/[slug]/page.tsx` into an async Next.js Server Component.
+     - Added server-level `redirect(targetUrl)` when `qrCode.redirectMode === 'DIRECT'`.
+     - When a customer scans or clicks the URL, the Next.js server immediately responds with an HTTP redirect directly to WhatsApp (`https://chat.whatsapp.com/JkoU8GisR6mJVkZoNEzE60?s=cl&p=i&iam=2`) with 0 seconds delay, 0 client JavaScript load, and zero form friction.
+  3. **Client Form Extraction & Fallback Guard (`src/app/wg/[slug]/registration-form.tsx`)**:
+     - Extracted the VIP registration form into `registration-form.tsx`, rendered ONLY when `redirectMode === 'FORM_CAPTURE'`.
+     - Added client-side fallback `useEffect` guard that immediately navigates to `currentDest` if accessed in direct mode.
+  4. **Verification**:
+     - Ran Master Adversarial Red-Team Guard (`node scripts/run_adversarial_guard.js`): All 6 gates passed cleanly.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [16 Nov 2026] Onboarding & Feature: Shreenath Rajwadi Silk Palace Profile Creation & WhatsApp Group Booster Pro QR Standee
 - **Symptom**:
   1. Merchant `Shreenath Rajwadi Silk Palace (Pethapur Vala)` in Manjalpur, Vadodara needed onboarding into CustomerPilot with a complete merchant profile and active QR Code in `WAGroupBoosterPro`.
