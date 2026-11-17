@@ -4,6 +4,39 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [17 Nov 2026] Issue & Enhancement: Google Review AutoReply Personalization, Overwrite Protection & 3-Draft Approval Engine
+- **Symptom**:
+  1. For merchant "Cake Connection-Live Cake", an existing 5-star Google Review from customer Nidhi Surti (submitted 5 months ago) had its previously given owner reply overwritten/changed on Google Maps by an automated generic robotic template.
+  2. The automated reply posted to Google Maps was identical across all customer reviews: `"Thank you so much for taking time to leave this review! 🥰 We are thrilled to hear that you love our fresh cakes and pastry in Cake Connection-Live Cake : Online Cake Delivery in Vadodara, delivering the freshest, highest quality baking in Vadodara since generations. All ingredients are made everyday, guaranteed!"`.
+  3. The reply repeatedly dumped the long keyword-stuffed GMB title ("Cake Connection-Live Cake : Online Cake Delivery in Vadodara") instead of the clean short store name ("Cake Connection").
+  4. The replies lacked customer personalization: customer names were not mentioned, specific praised products/experiences (e.g., customized wedding cake, friendly staff, on-time venue delivery, budget pricing) were ignored, and dynamic rotating Local SEO keywords were missing.
+- **Root Cause**:
+  1. `fetchGoogleReviews` in `src/lib/google-reviews-service.ts` omitted parsing `r.reviewReply` from the Google My Business API response payload. Consequently, `syncGoogleReviewsToDb` unconditionally marked all synced reviews as `isReplied: false, status: "pending"`, treating already-replied historical reviews as unreplied.
+  2. The cron job (`/api/cron/google-reviews`) and bulk-reply routes iterated through all `isReplied: false` entries and called `generateAIReviewReply`. Because `GEMINI_API_KEY` was unconfigured on the server and Groq (`AI_API_KEY`) was not wired in `ai-review-reply.ts`, the engine fell back to `buildSeoFallbackReply`, which hardcoded the identical static boilerplate text and inserted the un-sanitized raw business listing name.
+  3. The cron then sent a `PUT` request to Google My Business API via `postReviewReplyToGBP`, overwriting the merchant's live Google Maps reply with the robotic template.
+- **Resolution**:
+  1. **Strict Overwrite Protection (`src/lib/google-reviews-service.ts`, `src/app/api/cron/google-reviews/route.ts`, `src/app/api/reviews/record-google-post/route.ts`)**:
+     - `fetchGoogleReviews` now extracts `r.reviewReply?.comment` directly from Google's API payload.
+     - `syncGoogleReviewsToDb` inspects whether Google already has an owner reply. If a reply exists on Google, the review is saved with `isReplied: true, status: "replied", reviewReply: r.reviewReply`, permanently preventing it from being queued for auto-reply.
+     - Enforced strict locks in DB queries: cron and bulk-reply strictly query `isReplied: false, status: "pending", reviewReply: null`. Any review with an existing reply is 100% protected and immutable to automated overwriting.
+  2. **Short Store Name Sanitizer (`src/lib/ai-review-reply.ts`)**:
+     - Added `getCleanMerchantName()` which strips long GMB directory descriptors and guarantees "Cake Connection" is used exclusively instead of "Cake Connection-Live Cake : Online Cake Delivery in Vadodara".
+  3. **Personalized Contextual AI Generator with Rotating SEO Keywords (`src/lib/ai-review-reply.ts`)**:
+     - Added `extractCustomerFirstName()` to greet reviewers personally by name (e.g., "Dear Nidhi,", "Hi Rohit,").
+     - Added product/experience signal detector that extracts customer feedback details (customized wedding cake, birthday cake, chocolate truffle, on-time venue delivery, polite staff, budget-friendly pricing).
+     - Integrated rotating pool of 14 high-intent Local SEO keywords for Vadodara (`VADODARA_CAKE_SEO_KEYWORDS`) and dynamic assignment so consecutive reviews never share the same keyword chain.
+     - Wired multi-LLM cascade: Gemini (`GEMINI_API_KEY`) ➔ Groq (`AI_API_KEY` / `GROQ_API_KEY`) ➔ Intelligent Rule-Based Personalized Fallback (zero robotic repetition even if external LLM APIs are offline).
+  4. **3-Draft Generator & Merchant Approval Studio (`src/app/dashboard/reviews/page.tsx`, `src/app/api/reviews/generate-ai-reply/route.ts`)**:
+     - Implemented `generateAIReviewReplyDrafts()` which generates 3 distinct, professional draft options per review:
+       - Draft 1: Warm & Personal Experience Focus
+       - Draft 2: Professional Quality & Craftsmanship Focus
+       - Draft 3: Celebratory & Joyful Focus
+     - Updated Review Studio UI with interactive selectable pills (`[✨ Draft 1]`, `[💼 Draft 2]`, `[🎉 Draft 3]`), allowing the merchant to preview, select, edit, and 1-click approve before posting to Google Maps.
+     - Added protection banner on already-replied reviews: `🔒 Live on Google Maps (Protected)`.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [16 Nov 2026] Feature & Enhancement: WAGroupBooster & WAGroupBoosterPro Store Logo Upload & Standee Standardization
 - **Symptom**:
   1. On both `/dashboard/WAGroupBooster` (Tier 1) and `/dashboard/WAGroupBoosterPro` (Tier 2), merchants had no option to upload their store logo directly to customize their acrylic tabletop standee and QR code.

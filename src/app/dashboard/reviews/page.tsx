@@ -34,6 +34,8 @@ export default function ReviewsManagementPage() {
   const [generatingId, setGeneratingId] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [draftReplies, setDraftReplies] = useState<Record<string, string>>({})
+  const [draftOptions, setDraftOptions] = useState<Record<string, string[]>>({})
+  const [selectedDraftIdx, setSelectedDraftIdx] = useState<Record<string, number>>({})
   const [savingId, setSavingId] = useState<string | null>(null)
 
   // Fetch Reviews
@@ -68,11 +70,19 @@ export default function ReviewsManagementPage() {
   }
 
   const generateDefaultAiReply = (name: string, rating: number, comment?: string) => {
-    const firstName = name ? name.split(" ")[0] : "VIP"
+    const firstName = name ? name.split(" ")[0].replace(/[^a-zA-Z]/g, "") : "Valued Customer"
+    const cLower = (comment || "").toLowerCase()
+    let product = "fresh cakes"
+    if (cLower.includes("wedding cake") || cLower.includes("marriage cake")) product = "customized wedding cake"
+    else if (cLower.includes("birthday")) product = "birthday cake"
+    else if (cLower.includes("chocolate") || cLower.includes("truffle")) product = "chocolate truffle cake"
+    else if (cLower.includes("cookie") || cLower.includes("cookies")) product = "freshly baked cookies"
+    else if (cLower.includes("pastry") || cLower.includes("pastries")) product = "artisanal pastries"
+
     if (rating >= 4) {
-      return `Hi ${firstName}! 🌟 Thank you so much for your wonderful 5-star Google review of Cake Connection in Vadodara! We're thrilled you loved our fresh cakes and bakery delicacies. Looking forward to serving you again soon! 🎂❤️`
+      return `Dear ${firstName || "Valued Customer"}, thank you so much for your wonderful 5-star review! 🥰 We are thrilled you loved our ${product} and on-time service at Cake Connection. Delivering the freshest customized designer cakes in Vadodara is our greatest passion. We warmly look forward to baking for you again soon! ✨`
     } else {
-      return `Hi ${firstName}, thank you for your review of Cake Connection Vadodara. We sincerely apologize for not meeting your expectations. Please contact us directly on WhatsApp so we can make this right for you!`
+      return `Hi ${firstName || "Valued Customer"}, thank you for bringing this to our attention. We at Cake Connection sincerely apologize for falling short of your expectations with our ${product}. Please connect with us directly on WhatsApp so we can personally make this right for you!`
     }
   }
 
@@ -86,12 +96,17 @@ export default function ReviewsManagementPage() {
           reviewerName: item.reviewerName,
           rating: item.rating,
           comment: item.comment,
-          merchantId: item.merchantId
+          merchantName: "Cake Connection",
+          locationOrArea: "Vadodara"
         }),
       })
       if (res.ok) {
         const json = await res.json()
-        if (json.reply) {
+        if (json.drafts && Array.isArray(json.drafts) && json.drafts.length >= 3) {
+          setDraftOptions(prev => ({ ...prev, [reviewId]: json.drafts }))
+          setDraftReplies(prev => ({ ...prev, [reviewId]: json.drafts[0] }))
+          setSelectedDraftIdx(prev => ({ ...prev, [reviewId]: 0 }))
+        } else if (json.reply) {
           setDraftReplies(prev => ({ ...prev, [reviewId]: json.reply }))
         }
       }
@@ -370,8 +385,8 @@ export default function ReviewsManagementPage() {
                 )}
 
                 {/* AI Reply Draft Box */}
-                <div className="space-y-2 pt-1">
-                  <div className="flex items-center justify-between">
+                <div className="space-y-2.5 pt-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" /> AI Owner Reply Draft (SEO-Optimized & Editable):
                     </span>
@@ -381,7 +396,7 @@ export default function ReviewsManagementPage() {
                         variant="ghost"
                         onClick={() => handleSaveModifiedReply(item.id)}
                         disabled={savingId === item.id}
-                        className="text-[11px] text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/40 h-6 px-2 font-medium"
+                        className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 h-6 px-2 font-medium"
                       >
                         💾 {savingId === item.id ? "Saving..." : "Save Edits"}
                       </Button>
@@ -390,13 +405,53 @@ export default function ReviewsManagementPage() {
                         variant="ghost"
                         onClick={() => handleGenerateAiReply(item.id, item)}
                         disabled={generatingId === item.id}
-                        className="text-[11px] text-slate-400 hover:text-emerald-300 h-6 px-2"
+                        className="text-[11px] text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-300 h-6 px-2"
                       >
                         <RefreshCw className={`w-3 h-3 mr-1 ${generatingId === item.id ? "animate-spin" : ""}`} />
-                        Regenerate
+                        Regenerate 3 Drafts
                       </Button>
                     </div>
                   </div>
+
+                  {/* 3 AI Draft Selection Pills */}
+                  {draftOptions[item.id] && draftOptions[item.id].length >= 3 && (
+                    <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-slate-50 dark:bg-slate-950/80 rounded-lg border border-slate-200 dark:border-slate-800">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
+                        Select Draft:
+                      </span>
+                      {[
+                        { label: "Draft 1: Warm & Personal", icon: "✨" },
+                        { label: "Draft 2: Professional Quality", icon: "💼" },
+                        { label: "Draft 3: Celebratory", icon: "🎉" }
+                      ].map((d, dIdx) => (
+                        <button
+                          key={dIdx}
+                          type="button"
+                          onClick={() => {
+                            setSelectedDraftIdx(prev => ({ ...prev, [item.id]: dIdx }))
+                            setDraftReplies(prev => ({ ...prev, [item.id]: draftOptions[item.id][dIdx] }))
+                          }}
+                          className={`text-[11px] px-2.5 py-1 rounded-md transition-all font-medium flex items-center gap-1 cursor-pointer ${
+                            (selectedDraftIdx[item.id] ?? 0) === dIdx
+                              ? "bg-emerald-600 text-white font-bold shadow-sm"
+                              : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50"
+                          }`}
+                        >
+                          <span>{d.icon}</span> {d.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Live Google Reply Protection Badge */}
+                  {item.isReplied && (
+                    <div className="flex items-center gap-2 p-2 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-500/30 rounded-lg text-[11px] text-emerald-800 dark:text-emerald-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                      <span>
+                        <strong>🔒 Live on Google Maps (Protected):</strong> This review was already answered on Google. CustomerPilot protects live replies from being overwritten by automation.
+                      </span>
+                    </div>
+                  )}
 
                   <textarea
                     value={draftReplies[item.id] || ""}
@@ -405,7 +460,7 @@ export default function ReviewsManagementPage() {
                     placeholder="AI generating response..."
                   />
                   <p className="text-[11px] text-slate-500 italic">
-                    ✏️ <strong>Owner Edit Mode:</strong> Type directly in the box to customize this reply. Click <strong>"Save Edits"</strong> to store in DB or <strong>"1-Click Copy & Post"</strong> to update on Google.
+                    ✏️ <strong>Owner Approval & Edit:</strong> Review and choose between Draft 1, 2, or 3, or edit directly above. Click <strong>"1-Click Copy & Post"</strong> or <strong>"Test API Push"</strong> to publish.
                   </p>
                 </div>
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { fetchGoogleReviews, syncGoogleReviewsToDb, postReviewReplyToGBP } from "@/lib/google-reviews-service"
-import { generateAIReviewReply } from "@/lib/ai-review-reply"
+import { generateAIReviewReply, getCleanMerchantName } from "@/lib/ai-review-reply"
 import { processPendingReviewPhotoVerifications } from "@/lib/review-photo-verifier"
 
 // Vercel cron configuration (runs every 5 minutes in production)
@@ -41,12 +41,13 @@ export async function GET(req: Request) {
         const newCount = await syncGoogleReviewsToDb(conn.merchantId, latestReviews)
         console.log(`[CRON] Fetched ${newCount} NEW reviews for Merchant ${conn.merchantId}`)
 
-        // 3. Find unreplied reviews in our DB that need an auto-reply
+        // 3. Find unreplied reviews in our DB that need an auto-reply (Strictly exclude already replied reviews)
         const unrepliedReviews = await db.googleBusinessReview.findMany({
           where: {
             merchantId: conn.merchantId,
             isReplied: false,
             status: "pending",
+            reviewReply: null,
             comment: { not: null } // Only reply if they left a text comment
           },
           take: 5 // Process in small batches
@@ -56,17 +57,22 @@ export async function GET(req: Request) {
 
         // 4. Generate & Post Replies
         for (const review of unrepliedReviews) {
+          // Strict race-condition check
+          if (review.isReplied || review.reviewReply) continue
+
           console.log(`[CRON] Generating SEO Auto-Reply for review ${review.gbpReviewId} (${review.rating}⭐)...`)
           
+          const cleanName = getCleanMerchantName(conn.merchant.name)
           const storeLocation = conn.merchant.city || conn.merchant.address || conn.address || "Vadodara"
           const storeCategory = conn.merchant.businessType || conn.merchant.category || "fresh cakes and bakery products"
 
           const replyText = await generateAIReviewReply({
-            merchantName: conn.merchant.name || "Our Store",
+            merchantName: cleanName,
             locationOrArea: storeLocation,
             category: storeCategory,
             customerReview: review.comment || `${review.rating}-Star Rating and wonderful experience!`,
-            rating: review.rating ?? 5
+            rating: review.rating ?? 5,
+            reviewerName: review.reviewerName
           })
 
           const success = await postReviewReplyToGBP(conn.merchantId, review.gbpReviewId, replyText)

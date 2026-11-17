@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { generateAIReviewReply } from '@/lib/ai-review-reply';
+import { generateAIReviewReply, getCleanMerchantName } from '@/lib/ai-review-reply';
 import { postReviewReplyToGBP } from '@/lib/google-reviews-service';
 import { sendCentralWhatsAppMessage } from '@/lib/whatsapp-service';
 import { hasModule } from '@/lib/feature-gate';
@@ -219,18 +219,26 @@ export async function POST(req: Request) {
       });
 
       let gbpReview;
+      const alreadyReplied = Boolean(existingGbpReview && existingGbpReview.isReplied && existingGbpReview.reviewReply);
+
       if (existingGbpReview) {
         gbpReview = await db.googleBusinessReview.update({
           where: { id: existingGbpReview.id },
           data: {
             rating: Number(rating),
             comment: finalReviewText,
-            status: "pending",
-            isReplied: false,
-            reviewReply: null,
-            createdAt: new Date()
+            ...(alreadyReplied ? {} : {
+              status: "pending",
+              isReplied: false,
+              reviewReply: null
+            }),
+            updatedAt: new Date()
           }
         });
+
+        if (alreadyReplied) {
+          replyText = existingGbpReview.reviewReply;
+        }
       } else {
         gbpReview = await db.googleBusinessReview.create({
           data: {
@@ -246,29 +254,33 @@ export async function POST(req: Request) {
         });
       }
 
-      // Generate AI Owner Auto-Reply with Local SEO Keywords
-      const city = merchant.city || merchant.address?.split(',').pop()?.trim() || "Vadodara";
-      const category = merchant.businessType || merchant.category || "fresh cakes and bakery products";
-      replyText = await generateAIReviewReply({
-        merchantName: merchant.name || "Cake Connection",
-        locationOrArea: city,
-        category: category,
-        customerReview: finalReviewText,
-        rating: Number(rating)
-      });
+      // Generate & Post AI Owner Auto-Reply ONLY if review was not already replied
+      if (!alreadyReplied) {
+        const cleanName = getCleanMerchantName(merchant.name);
+        const city = merchant.city || merchant.address?.split(',').pop()?.trim() || "Vadodara";
+        const category = merchant.businessType || merchant.category || "fresh cakes and bakery products";
+        replyText = await generateAIReviewReply({
+          merchantName: cleanName,
+          locationOrArea: city,
+          category: category,
+          customerReview: finalReviewText,
+          rating: Number(rating),
+          reviewerName: customer.name || "VIP Member"
+        });
 
-      // Post AI Owner Auto-Reply back to Google Business Profile API & Update DB
-      const postSuccess = await postReviewReplyToGBP(merchant.id, gbpReview.gbpReviewId, replyText);
+        // Post AI Owner Auto-Reply back to Google Business Profile API & Update DB
+        const postSuccess = await postReviewReplyToGBP(merchant.id, gbpReview.gbpReviewId, replyText);
 
-      await db.googleBusinessReview.update({
-        where: { id: gbpReview.id },
-        data: {
-          isReplied: true,
-          reviewReply: replyText,
-          repliedAt: new Date(),
-          status: postSuccess ? "replied" : "replied"
-        }
-      });
+        await db.googleBusinessReview.update({
+          where: { id: gbpReview.id },
+          data: {
+            isReplied: true,
+            reviewReply: replyText,
+            repliedAt: new Date(),
+            status: postSuccess ? "replied" : "replied"
+          }
+        });
+      }
     }
 
     // Award Bonus Stamps to customer stamp card (If LOYALTY module is enabled and bonus to award > 0)

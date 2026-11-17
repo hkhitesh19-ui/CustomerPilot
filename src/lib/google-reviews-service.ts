@@ -5,6 +5,7 @@ export interface MockReview {
   reviewerName: string
   rating: number
   comment: string
+  reviewReply?: string
   submittedAt: Date
 }
 
@@ -127,6 +128,7 @@ export async function fetchGoogleReviews(merchantId: string, maxLimit: number = 
             reviewerName: r.reviewer?.displayName || "Google User",
             rating: r.starRating === "FIVE" ? 5 : r.starRating === "FOUR" ? 4 : r.starRating === "THREE" ? 3 : r.starRating === "TWO" ? 2 : 1,
             comment: r.comment || "",
+            reviewReply: r.reviewReply?.comment || undefined,
             submittedAt: r.createTime ? new Date(r.createTime) : new Date()
           }))
         }
@@ -198,7 +200,24 @@ export async function syncGoogleReviewsToDb(merchantId: string, reviews: MockRev
       }
     })
 
-    if (!existing) {
+    if (existing) {
+      // STRICT OVERWRITE PROTECTION:
+      // If review is already replied in DB or on Google, NEVER overwrite or reset it!
+      // Only sync if existing was marked unreplied in DB but Google now has a live owner reply
+      if (!existing.isReplied && review.reviewReply) {
+        await db.googleBusinessReview.update({
+          where: { id: existing.id },
+          data: {
+            isReplied: true,
+            reviewReply: review.reviewReply,
+            status: "replied",
+            repliedAt: new Date()
+          }
+        })
+      }
+    } else {
+      // New review being added to DB
+      const hasGoogleReply = Boolean(review.reviewReply && review.reviewReply.trim().length > 0)
       await db.googleBusinessReview.create({
         data: {
           merchantId,
@@ -206,8 +225,11 @@ export async function syncGoogleReviewsToDb(merchantId: string, reviews: MockRev
           reviewerName: review.reviewerName,
           rating: review.rating,
           comment: review.comment,
-          status: "pending",
-          isReplied: false,
+          // CRITICAL: If Google already has an owner reply, mark as replied immediately so auto-reply NEVER overwrites it!
+          status: hasGoogleReply ? "replied" : "pending",
+          isReplied: hasGoogleReply,
+          reviewReply: hasGoogleReply ? review.reviewReply : null,
+          repliedAt: hasGoogleReply ? new Date() : null,
           createdAt: review.submittedAt || new Date()
         }
       })
