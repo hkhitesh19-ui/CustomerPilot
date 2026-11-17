@@ -7120,3 +7120,20 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   5. **Adversarial Master Guard Verification**: All 6 security and mathematical gates passed cleanly (`node scripts/run_adversarial_guard.js`).
   6. **Visual Ground-Truth Capture**: Captured verified live screenshots of `/dashboard/settings` (Step D) and `/dashboard/menu` confirming full rendering.
 - **Status**: ✅ Resolved, Verified with Playwright, and Committed Locally.
+
+---
+## [17 Nov 2026] Issue: WhatsApp Group Booster & Booster Pro Store Logo Size Enlargement & Interactive Scale Controls
+- **Symptom**: In both `/dashboard/WAGroupBooster` and `/dashboard/WAGroupBoosterPro`, the uploaded store logo (e.g. Shreenath Rajwadi Silk Palace) appeared very tiny (`40px x 40px`, with text height inside the emblem reduced to ~3-4px), making the brand name, monogram, and tagline completely unreadable.
+- **Root Cause**: The standee header was styled with `h-10 max-w-[130px]` and constrained within a narrow acrylic container (`max-w-[290px]`). For square and tall aspect ratio logos (`2048x2048`), `h-10` forced the entire image to 40px height. In addition, the redundant store name text was rendered below the logo, further squeezing vertical space on the standee.
+- **Resolution**:
+  1. **Enlarged Logo Display Container**: Replaced the fixed `h-10` constraint with a spacious responsive container: `min-h-[96px] sm:min-h-[112px] bg-slate-50/60 rounded-2xl p-2 border border-slate-100/90 shadow-2xs`.
+  2. **Multi-Size Scale Selector**: Added `logoScale` state (`"md" | "lg" | "xl"`, default `"lg"`):
+     - `md`: `max-h-20 sm:max-h-24 max-w-[220px]` (~80px)
+     - `lg`: `max-h-28 sm:max-h-32 max-w-[260px]` (~112px - default)
+     - `xl`: `max-h-36 sm:max-h-40 max-w-[280px]` (~144px)
+  3. **Interactive Control Pills**: Added 1-click pills below the standee (`Medium 80px`, `Large 110px ✨`, `X-Large 135px 🚀`) along with a toggle for `Store name text below logo: [✓ Showing Text / Logo Only (Clean)]`.
+  4. **Widened Standee Container**: Expanded the acrylic standee mockup card from `max-w-[290px]` to `max-w-[320px] sm:max-w-[340px]` for better visual balance and counter-tabletop proportions.
+  5. **High-Resolution Print Template Synchronization**: Updated `handlePrintStandee()` in both `WAGroupBooster/page.tsx` and `WAGroupBoosterPro/page.tsx` with dynamic print logo height (`22mm` / `28mm` / `34mm`), `min-height:24mm`, and conditional store text for crisp A4/A5 physical printing.
+  6. **Dual-Page Implementation**: Implemented identical high-impact layout and controls across both Simple (`WAGroupBooster`) and Pro (`WAGroupBoosterPro`) modules.
+  7. **Full Verification**: All 6 Master Adversarial Gates passed cleanly (`node scripts/run_adversarial_guard.js`) with 0 TypeScript errors, and visual verification was confirmed via Playwright screenshot (`public/standee_logo_size_comparison.png`).
+- **Status**: ✅ Resolved, Verified with Playwright, and Committed Locally.

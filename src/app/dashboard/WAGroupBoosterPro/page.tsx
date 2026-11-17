@@ -28,6 +28,8 @@ export default function WAGroupBoosterProPage() {
   const [destUrl, setDestUrl] = useState("")
   const [saving, setSaving] = useState(false)
   const [qrStyle, setQrStyle] = useState<"whatsapp" | "store_logo" | "clean">("whatsapp")
+  const [logoScale, setLogoScale] = useState<"md" | "lg" | "xl">("lg")
+  const [showStoreText, setShowStoreText] = useState(false)
   const [standeeMessage, setStandeeMessage] = useState("Scan n Join Whatsapp Group")
 
   // Leads CRM State
@@ -310,8 +312,15 @@ export default function WAGroupBoosterProPage() {
       return
     }
 
+    const printLogoH = logoScale === "xl" ? "34mm" : logoScale === "md" ? "22mm" : "28mm"
     const logoHtml = merchantProfile?.logoUrl
-      ? `<div style="text-align:center;margin-bottom:8px;"><img src="${merchantProfile.logoUrl}" style="max-height:48px;max-width:160px;object-fit:contain;" /></div>`
+      ? `<div style="text-align:center;margin-bottom:6px;min-height:24mm;display:flex;align-items:center;justify-content:center;">
+           <img src="${merchantProfile.logoUrl}" style="max-height:${printLogoH};max-width:96mm;object-fit:contain;" alt="${storeName}" />
+         </div>`
+      : `<div class="store-name">${storeName}</div>`
+
+    const storeTextHtml = (showStoreText && merchantProfile?.logoUrl)
+      ? `<div class="store-name" style="font-size:12pt;margin-top:2px;">${storeName}</div>`
       : ""
 
     const printHtml = `<!DOCTYPE html>
@@ -436,7 +445,7 @@ export default function WAGroupBoosterProPage() {
   <div class="print-sheet">
     <div class="standee-card">
       ${logoHtml}
-      <div class="store-name">${storeName}</div>
+      ${storeTextHtml}
       <div><span class="badge">${standeeMessage}</span></div>
       <div class="qr-box">
         <img src="${activeQrDataUrl}" alt="QR" />
@@ -674,37 +683,52 @@ export default function WAGroupBoosterProPage() {
               </div>
 
               {/* Acrylic Tabletop Mockup */}
-              <div className="w-full max-w-[290px] bg-white rounded-3xl p-6 border-4 border-slate-900 shadow-2xl space-y-3.5 text-center relative">
+              <div className="w-full max-w-[320px] sm:max-w-[340px] bg-white rounded-3xl p-6 border-4 border-slate-900 shadow-2xl space-y-3.5 text-center relative">
                 {/* Store Header with Logo */}
-                <div className="space-y-1.5 flex flex-col items-center">
+                <div className="space-y-2 flex flex-col items-center w-full">
                   {merchantProfile?.logoUrl ? (
                     <div
                       onClick={() => logoInputRef.current?.click()}
-                      className="cursor-pointer group flex flex-col items-center py-0.5"
+                      className="cursor-pointer group flex flex-col items-center justify-center p-1 w-full"
                       title="Click to change logo"
                     >
-                      <img
-                        src={merchantProfile.logoUrl}
-                        alt={storeName}
-                        className="h-10 max-w-[130px] object-contain drop-shadow-sm group-hover:opacity-80 transition-opacity"
-                      />
-                      <span className="text-[8px] text-teal-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                        Click to change
+                      <div className="w-full flex items-center justify-center min-h-[96px] sm:min-h-[112px] bg-slate-50/60 rounded-2xl p-2 border border-slate-100/90 shadow-2xs">
+                        <img
+                          src={merchantProfile.logoUrl}
+                          alt={storeName}
+                          className={`${
+                            logoScale === "xl"
+                              ? "max-h-36 sm:max-h-40 max-w-[280px]"
+                              : logoScale === "md"
+                              ? "max-h-20 sm:max-h-24 max-w-[220px]"
+                              : "max-h-28 sm:max-h-32 max-w-[260px]"
+                          } w-auto h-auto object-contain drop-shadow-sm group-hover:scale-105 transition-all`}
+                        />
+                      </div>
+                      <span className="text-[9px] font-bold text-teal-600 opacity-0 group-hover:opacity-100 transition-opacity mt-1">
+                        Click logo to change image
                       </span>
                     </div>
                   ) : (
                     <button
                       type="button"
                       onClick={() => logoInputRef.current?.click()}
-                      className="cursor-pointer group flex items-center justify-center gap-1.5 py-1 px-3 mb-1 rounded-xl border-2 border-dashed border-teal-400 hover:border-teal-600 bg-teal-50/70 hover:bg-teal-100/70 transition-all text-teal-700 text-[11px] font-bold shadow-xs"
+                      className="cursor-pointer group flex items-center justify-center gap-1.5 py-2 px-4 mb-1 rounded-2xl border-2 border-dashed border-teal-400 hover:border-teal-600 bg-teal-50/70 hover:bg-teal-100/70 transition-all text-teal-700 text-xs font-bold shadow-xs"
                       title="Click to upload your store logo"
                     >
-                      <Upload className="w-3.5 h-3.5 group-hover:scale-110 transition-transform text-teal-600" />
+                      <Upload className="w-4 h-4 group-hover:scale-110 transition-transform text-teal-600" />
                       <span>+ Upload Store Logo Here</span>
                     </button>
                   )}
-                  <div className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">{storeName}</div>
-                  <div className="inline-block px-3 py-1 rounded-full bg-emerald-600 text-white text-[10px] font-black tracking-wide shadow-sm">
+
+                  {/* Store Name Text (Shown if no custom logo, or if user toggled on) */}
+                  {(!merchantProfile?.logoUrl || showStoreText) && (
+                    <div className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">
+                      {storeName}
+                    </div>
+                  )}
+
+                  <div className="inline-block px-3.5 py-1 rounded-full bg-emerald-600 text-white text-[11px] font-black tracking-wide shadow-sm">
                     {standeeMessage}
                   </div>
                 </div>
@@ -745,6 +769,64 @@ export default function WAGroupBoosterProPage() {
 
               {/* QR Style Selector & Standee Message Editor */}
               <div className="w-full space-y-3 pt-5">
+                {/* Logo Display Controls & Sizing */}
+                {merchantProfile?.logoUrl && (
+                  <div className="p-3 rounded-2xl bg-teal-50/70 border border-teal-200/80 space-y-2.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-extrabold text-teal-950 text-[11px]">Logo Display Size:</span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setLogoScale("md")}
+                          className={`px-2 py-1 text-[10px] font-bold rounded-lg transition-all ${
+                            logoScale === "md"
+                              ? "bg-teal-700 text-white shadow-xs font-extrabold"
+                              : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                          }`}
+                        >
+                          Medium (80px)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setLogoScale("lg")}
+                          className={`px-2.5 py-1 text-[10px] font-bold rounded-lg transition-all ${
+                            logoScale === "lg"
+                              ? "bg-teal-700 text-white shadow-xs font-extrabold"
+                              : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                          }`}
+                        >
+                          Large (110px) ✨
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setLogoScale("xl")}
+                          className={`px-2 py-1 text-[10px] font-bold rounded-lg transition-all ${
+                            logoScale === "xl"
+                              ? "bg-teal-700 text-white shadow-xs font-extrabold"
+                              : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                          }`}
+                        >
+                          X-Large (135px) 🚀
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1.5 border-t border-teal-200/50 text-[11px]">
+                      <span className="text-slate-600 font-medium">Store name text below logo:</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowStoreText(!showStoreText)}
+                        className={`px-2.5 py-0.5 text-[10px] font-bold rounded-md border transition-all ${
+                          showStoreText
+                            ? "bg-emerald-600 text-white border-emerald-600 shadow-2xs"
+                            : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
+                        }`}
+                      >
+                        {showStoreText ? "✓ Showing Text" : "Logo Only (Clean)"}
+                      </button>
+                    </div>
+                  </div>
+                )}
                 {/* Dedicated Store Logo Control Tile */}
                 <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
                   <div className="flex items-center gap-2">
