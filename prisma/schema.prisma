@@ -929,6 +929,7 @@ model DigitalBusinessCard {
   // Contact & Social Media Links
   whatsappNumber   String?   // "919876543210"
   phoneNumber      String?   // "+91 98765 43210"
+  email            String?   // Official business email e.g. "mawpaw2323@gmail.com"
   instagramUrl     String?
   facebookUrl      String?
   youtubeUrl       String?

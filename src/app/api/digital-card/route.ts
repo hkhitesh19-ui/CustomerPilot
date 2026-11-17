@@ -45,22 +45,36 @@ export async function GET(req: NextRequest) {
     if (slug) {
       card = await db.digitalBusinessCard.findUnique({
         where: { slug: slug.toLowerCase() },
+        include: { merchant: { select: { email: true, whatsappPhone: true } } },
       })
     } else if (targetMerchantId) {
       card = await db.digitalBusinessCard.findUnique({
         where: { merchantId: targetMerchantId },
+        include: { merchant: { select: { email: true, whatsappPhone: true } } },
       })
       if (!card) {
         card = await getOrCreateDigitalBusinessCard(targetMerchantId)
       }
     } else {
       // Default to first merchant's card
-      card = await db.digitalBusinessCard.findFirst()
+      card = await db.digitalBusinessCard.findFirst({
+        include: { merchant: { select: { email: true, whatsappPhone: true } } },
+      })
     }
 
     if (!card) {
       return NextResponse.json({ success: false, error: "Card not found" }, { status: 404 })
     }
+
+    let parsedThemeMeta: any = {}
+    try {
+      if (card.theme && typeof card.theme === "string" && card.theme.startsWith("{")) {
+        parsedThemeMeta = JSON.parse(card.theme)
+      }
+    } catch {}
+
+    const resolvedEmail = card.email || parsedThemeMeta?.email || card.merchant?.email || null
+    card.email = resolvedEmail
 
     const isVcardFormat = searchParams.get("format") === "vcard" || searchParams.get("vcard") === "true"
     if (isVcardFormat) {
@@ -103,6 +117,11 @@ export async function GET(req: NextRequest) {
       if (cleanWhatsapp) {
         vcardLines.push(`TEL;TYPE=WHATSAPP:${cleanWhatsapp}`)
         vcardLines.push(`X-SOCIALPROFILE;TYPE=whatsapp:https://wa.me/${cleanWhatsapp.replace(/[^0-9]/g, "")}`)
+      }
+
+      if (resolvedEmail) {
+        vcardLines.push(`EMAIL;TYPE=INTERNET,WORK:${resolvedEmail}`)
+        vcardLines.push(`EMAIL;TYPE=PREF,INTERNET:${resolvedEmail}`)
       }
 
       if (card.instagramUrl) {
@@ -163,6 +182,7 @@ export async function POST(req: NextRequest) {
       deliveryInfo,
       whatsappNumber,
       phoneNumber,
+      email,
       instagramUrl,
       facebookUrl,
       youtubeUrl,
@@ -179,6 +199,7 @@ export async function POST(req: NextRequest) {
       theme,
       upiId,
       upiPayeeName,
+      enableFoodDelivery,
     } = body
 
     if (!displayName) {
@@ -236,6 +257,12 @@ export async function POST(req: NextRequest) {
     if (googleReviewLink !== undefined) {
       parsedTheme.googleReviewLink = googleReviewLink ? googleReviewLink.trim() : null
     }
+    if (email !== undefined) {
+      parsedTheme.email = email ? String(email).trim() : null
+    }
+    if (enableFoodDelivery !== undefined) {
+      parsedTheme.enableFoodDelivery = Boolean(enableFoodDelivery)
+    }
     if (upiId !== undefined) {
       parsedTheme.upiId = upiId ? String(upiId).trim() : null
     }
@@ -248,42 +275,80 @@ export async function POST(req: NextRequest) {
     }
     const themeData = JSON.stringify(parsedTheme)
 
+    // Detect if this is a Pet Business (Pet store, clinic, grooming, supplies)
+    const categoryText = `${subCategories || ""} ${displayName || ""}`.toLowerCase()
+    const isPetCategory = categoryText.includes("pet") || categoryText.includes("dog") || categoryText.includes("cat") || categoryText.includes("puppy") || categoryText.includes("animal") || categoryText.includes("vet") || categoryText.includes("grooming")
+    const allowFoodDelivery = Boolean(enableFoodDelivery)
+
     // Construct ordering links
     let finalOrderingLinks = orderingLinks
     if (
       zomatoUrl !== undefined ||
       swiggyUrl !== undefined ||
       websiteUrl !== undefined ||
-      otherOrderUrl !== undefined
+      otherOrderUrl !== undefined ||
+      whatsappNumber !== undefined
     ) {
       const linksArr: Array<{ platform: string; label: string; sublabel?: string; url: string; color?: string }> = []
+      
       if (websiteUrl && websiteUrl.trim()) {
-        linksArr.push({ platform: "website", label: "Website", sublabel: "Order Now", url: websiteUrl.trim(), color: "#2563eb" })
+        linksArr.push({ platform: "website", label: isPetCategory ? "Online Store" : "Website", sublabel: isPetCategory ? "Explore" : "Order Now", url: websiteUrl.trim(), color: "#2563eb" })
       }
       if (whatsappNumber && whatsappNumber.trim()) {
         linksArr.push({
           platform: "whatsapp",
           label: "WhatsApp",
-          sublabel: "Order Now",
-          url: `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(displayName)}%2C%20I%20want%20to%20order`,
+          sublabel: isPetCategory ? "Pet Supplies" : "Order Now",
+          url: `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(displayName)}%2C%20${encodeURIComponent(isPetCategory ? "I want to inquire about pet supplies" : "I want to order")}`,
           color: "#16a34a"
         })
       }
-      if (zomatoUrl && zomatoUrl.trim()) {
-        linksArr.push({ platform: "zomato", label: "Zomato", sublabel: "Order Now", url: zomatoUrl.trim(), color: "#ef4444" })
-      }
-      if (swiggyUrl && swiggyUrl.trim()) {
-        linksArr.push({ platform: "swiggy", label: "Swiggy", sublabel: "Order Now", url: swiggyUrl.trim(), color: "#f97316" })
+      // ONLY add Zomato and Swiggy if NOT a pet category, or if food delivery is explicitly enabled
+      if (!isPetCategory || allowFoodDelivery) {
+        if (zomatoUrl && zomatoUrl.trim()) {
+          linksArr.push({ platform: "zomato", label: "Zomato", sublabel: "Order Now", url: zomatoUrl.trim(), color: "#ef4444" })
+        }
+        if (swiggyUrl && swiggyUrl.trim()) {
+          linksArr.push({ platform: "swiggy", label: "Swiggy", sublabel: "Order Now", url: swiggyUrl.trim(), color: "#f97316" })
+        }
       }
       if (otherOrderUrl && otherOrderUrl.trim()) {
         linksArr.push({
           platform: "easycater",
-          label: otherOrderLabel?.trim() || "Catalog",
+          label: otherOrderLabel?.trim() || (isPetCategory ? "Pet Catalog" : "Catalog"),
           sublabel: "Order Now",
           url: otherOrderUrl.trim(),
           color: "#7c3aed"
         })
       }
+
+      // If pet category and list is empty or minimal, supply pet store action channels
+      if (isPetCategory && linksArr.length === 0) {
+        if (whatsappNumber && whatsappNumber.trim()) {
+          linksArr.push({
+            platform: "whatsapp",
+            label: "WhatsApp",
+            sublabel: "Pet Supplies",
+            url: `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(displayName)}%2C%20I%20have%20an%20inquiry`,
+            color: "#16a34a"
+          })
+        }
+        linksArr.push({
+          platform: "catalog",
+          label: "Pet Food",
+          sublabel: "View All",
+          url: websiteUrl || "#",
+          color: "#7c3aed"
+        })
+        linksArr.push({
+          platform: "grooming",
+          label: "Grooming",
+          sublabel: "Book Spa",
+          url: whatsappNumber ? `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi%2C%20I%20want%20to%20book%20a%20grooming%20session` : "#",
+          color: "#0284c7"
+        })
+      }
+
       finalOrderingLinks = JSON.stringify(linksArr)
     }
 
@@ -302,6 +367,7 @@ export async function POST(req: NextRequest) {
 
     const effectiveGoogleReviewLink = googleReviewLink ? googleReviewLink.trim() : undefined
     const effectiveGoogleMapsUrl = googleMapsUrl ? googleMapsUrl.trim() : (effectiveGoogleReviewLink || undefined)
+    const effectiveEmail = email !== undefined ? (email ? String(email).trim() : null) : undefined
 
     const updatedCard = await db.digitalBusinessCard.upsert({
       where: { merchantId: targetMerchantId },
@@ -316,6 +382,7 @@ export async function POST(req: NextRequest) {
         deliveryInfo: deliveryInfo || "Delivery Available",
         whatsappNumber: whatsappNumber || null,
         phoneNumber: phoneNumber || null,
+        email: effectiveEmail,
         instagramUrl: instagramUrl || null,
         facebookUrl: facebookUrl || null,
         youtubeUrl: youtubeUrl || null,
@@ -339,6 +406,7 @@ export async function POST(req: NextRequest) {
         deliveryInfo: deliveryInfo || "Delivery Available",
         whatsappNumber: whatsappNumber || null,
         phoneNumber: phoneNumber || null,
+        email: effectiveEmail !== undefined ? effectiveEmail : null,
         instagramUrl: instagramUrl || null,
         facebookUrl: facebookUrl || null,
         youtubeUrl: youtubeUrl || null,

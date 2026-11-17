@@ -47,14 +47,27 @@ export async function getOrCreateDigitalBusinessCard(merchantId: string) {
     }
 
     const businessType = (merchant.businessType || "").toLowerCase()
+    const category = (merchant.category || "").toLowerCase()
+    const isPet = businessType.includes("pet") || category.includes("pet") || businessType.includes("animal") || category.includes("animal") || (merchant.name || "").toLowerCase().includes("pet") || (merchant.name || "").toLowerCase().includes("paw")
+    
     const subCategories =
-      businessType.includes("fashion") || businessType.includes("clothing") || businessType.includes("apparel")
+      isPet
+        ? "Pet Shop • Pet Grooming • Pet Food • Accessories • Pet Cafe"
+        : businessType.includes("fashion") || businessType.includes("clothing") || businessType.includes("apparel")
         ? "Ethnic & Western Wear • Designer Collections • Premium Fashion"
         : businessType.includes("bakery") || businessType.includes("cake")
         ? "Cakes • Desserts • Bakery & Confectionery"
         : businessType.includes("restaurant") || businessType.includes("cafe")
         ? "Fine Dining • Multi-Cuisine • Express Delivery"
         : `${merchant.name} • Official VIP Store`
+
+    const defaultOrderingLinks = isPet ? JSON.stringify([
+      { platform: "whatsapp", label: "WhatsApp", sublabel: "Pet Supplies", url: `https://wa.me/${(merchant.whatsappPhone || "").replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(merchant.name)}%2C%20I%20want%20to%20order%20pet%20supplies`, color: "#16a34a" },
+      { platform: "catalog", label: "Pet Food", sublabel: "View All", url: "#", color: "#7c3aed" },
+      { platform: "grooming", label: "Grooming", sublabel: "Book Spa", url: `https://wa.me/${(merchant.whatsappPhone || "").replace(/[^0-9]/g, "")}?text=Hi%2C%20I%20want%20to%20book%20a%20grooming%20session`, color: "#0284c7" },
+      { platform: "website", label: "Website", sublabel: "Store", url: "#", color: "#2563eb" },
+      { platform: "directions", label: "Store Visit", sublabel: "Find Us", url: merchant.googleReviewLink || "#", color: "#d97706" }
+    ]) : "[]"
 
     // 4. Provision fresh DigitalBusinessCard
     return await db.digitalBusinessCard.create({
@@ -65,10 +78,11 @@ export async function getOrCreateDigitalBusinessCard(merchantId: string) {
         subCategories: subCategories,
         logoUrl: merchant.logoUrl || null,
         coverUrl: merchant.coverUrl || null,
-        locationShort: merchant.city || "Kanpur",
-        locationState: merchant.state || "Uttar Pradesh",
+        locationShort: merchant.city || "Vadodara",
+        locationState: merchant.state || "Gujarat, India",
         whatsappNumber: merchant.whatsappPhone || null,
         phoneNumber: merchant.phone || merchant.whatsappPhone || null,
+        email: merchant.email || null,
         instagramUrl: `https://www.instagram.com/${cleanSlug.replace(/-/g, "")}/`,
         facebookUrl: `https://www.facebook.com/${cleanSlug.replace(/-/g, "")}/`,
         googleRating: merchant.baselineRating || 5.0,
@@ -78,11 +92,12 @@ export async function getOrCreateDigitalBusinessCard(merchantId: string) {
         theme: JSON.stringify({
           style: "champagne_luxury",
           googleReviewLink: merchant.googleReviewLink || null,
+          email: merchant.email || null,
         }),
         isActive: true,
-        orderingLinks: "[]",
-        businessHours: "10:30 AM - 09:30 PM",
-        deliveryInfo: "Store Walk-in & Express Delivery Available",
+        orderingLinks: defaultOrderingLinks,
+        businessHours: isPet ? "Open Daily • 10:00 AM – 09:30 PM" : "10:30 AM - 09:30 PM",
+        deliveryInfo: isPet ? "Store Walk-in & Express Home Delivery" : "Store Walk-in & Express Delivery Available",
       },
     })
   } catch (error) {

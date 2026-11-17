@@ -4,6 +4,36 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [17 Nov 2026] Issue & Enhancement: Smart Digital Business Card GBP Auto-Fetch, Category-Aware Ordering Links & Official Business Email Integration
+- **Symptom**:
+  1. On the Smart Digital Business Card editor (`/dashboard/digital-card`), auto-fetching via Google Business Profile (GBP) link for pet stores like "Maw & Paw" failed to extract correct business details (name, category, phone, rating, reviews, hours), leaving fields empty or retaining leftover bakery placeholders (e.g. Cake Connection).
+  2. For Pet Store / Pet Care businesses, the card erroneously displayed food delivery platforms (Zomato and Swiggy links) by default because substring matching matched the word "food" in "Pets Food and Accessories".
+  3. Contact links lacked an official business email option across the dashboard editor, live digital card view, and downloadable vCard (.vcf) address book export.
+  4. Buttons and links were not contextually tailored for pet stores (e.g., Pet Supplies WhatsApp, Pet Food Catalog, Pet Grooming & Spa, Online Store, Store Directions).
+- **Root Cause**:
+  1. `src/app/api/digital-card/fetch-public-gbp/route.ts` returned null/empty fields when parsing raw Google Maps search URLs without resolving redirects or checking existing database merchant records. Empty string overrides left previous bakery form data intact.
+  2. `src/components/digital-card-view.tsx` and `src/lib/digital-card-service.ts` evaluated `subCategories.includes("food")` without checking for pet keywords, misclassifying pet food suppliers as restaurants/bakeries and injecting Zomato/Swiggy order buttons.
+  3. The `DigitalBusinessCard` Prisma model lacked a dedicated `email` column, and the dashboard contact form only offered WhatsApp and Phone number inputs.
+- **Resolution**:
+  1. **Schema & Database (`prisma/schema.prisma`)**:
+     - Added `email String?` to `model DigitalBusinessCard`.
+     - Synchronized database with `prisma db push` and regenerated Prisma Client.
+  2. **Intelligent Category-Aware Resolver (`src/app/api/digital-card/fetch-public-gbp/route.ts`)**:
+     - Added redirect resolution for short Google Maps links (`maps.app.goo.gl`, `goo.gl`, `g.page`).
+     - Added lookup against verified DB merchants (`db.merchant`) by name, place ID, CID, or phone number.
+     - Added `cleanBusinessTitle` to extract the true display name ("Maw & Paw") while transforming keyword-stuffed parentheses into structured subcategories ("Pet Shop • Pet Grooming • Pet Food • Accessories • Pet Cafe").
+     - Added pet category detection (`isPetStore: true`, `enableFoodDelivery: false`) that automatically replaces food delivery platforms with pet-specific catalog/ordering links (WhatsApp Pet Supplies, Pet Food Catalog, Pet Grooming & Spa, Online Store, Store Visit).
+  3. **Official Email Integration (`src/app/api/digital-card/route.ts`, `src/lib/digital-card-service.ts`, `src/components/digital-card-view.tsx`, `src/app/c/[slug]/page.tsx`)**:
+     - Added `email` persistence in GET, POST, and vCard export (`EMAIL;TYPE=INTERNET,WORK:...`, `EMAIL;TYPE=PREF,INTERNET:...`).
+     - Added "Email Us" action button with dedicated Lucide `Mail` icon, direct `mailto:` handler with pre-filled inquiry subject, and responsive styling.
+  4. **Dashboard Editor Enhancement (`src/app/dashboard/digital-card/page.tsx`)**:
+     - Added "Official Business Email (Optional)" input field in Section 4 (Contact Details).
+     - Added "Food Delivery Platforms (Zomato / Swiggy)" toggle switch in Section 5 with intelligent default (disabled for pet stores and retail, enabled for restaurants and bakeries).
+     - Added a visual Pet Care Mode banner: `🐾 Pet Care & Supplies Mode Active — Food delivery platforms (Zomato / Swiggy) are hidden for this business.`
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [17 Nov 2026] Issue & Enhancement: Google Review AutoReply Personalization, Overwrite Protection & 3-Draft Approval Engine
 - **Symptom**:
   1. For merchant "Cake Connection-Live Cake", an existing 5-star Google Review from customer Nidhi Surti (submitted 5 months ago) had its previously given owner reply overwritten/changed on Google Maps by an automated generic robotic template.

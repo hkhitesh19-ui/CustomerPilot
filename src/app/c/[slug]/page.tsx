@@ -36,12 +36,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
   }
 
-  const isFood = (card.subCategories || "").toLowerCase().includes("cake") ||
-                 (card.subCategories || "").toLowerCase().includes("food") ||
-                 (card.subCategories || "").toLowerCase().includes("bakery") ||
-                 (card.subCategories || "").toLowerCase().includes("dessert")
+  const isPet = ((card.subCategories || "") + " " + (card.displayName || "")).toLowerCase().match(/pet|dog|cat|puppy|animal|vet|grooming|paw/) !== null
+  const isFood = !isPet && (
+    (card.subCategories || "").toLowerCase().includes("cake") ||
+    (card.subCategories || "").toLowerCase().includes("food") ||
+    (card.subCategories || "").toLowerCase().includes("bakery") ||
+    (card.subCategories || "").toLowerCase().includes("dessert") ||
+    (card.subCategories || "").toLowerCase().includes("restaurant") ||
+    (card.subCategories || "").toLowerCase().includes("cafe")
+  )
 
-  const actionText = isFood
+  const actionText = isPet
+    ? "Chat on WhatsApp, Browse Pet Food & Supplies Catalog, Book Grooming, or Call Now."
+    : isFood
     ? "Order on Zomato, Swiggy, WhatsApp or Call Now."
     : "Chat on WhatsApp, Browse Official Catalog, Get Directions or Call Now."
 
@@ -138,6 +145,7 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
     deliveryInfo: card.deliveryInfo,
     whatsappNumber: card.whatsappNumber || card.merchant?.whatsappPhone || card.phoneNumber || "",
     phoneNumber: card.phoneNumber,
+    email: card.email || (effectiveTheme && effectiveTheme.startsWith("{") ? (JSON.parse(effectiveTheme).email || null) : null) || card.merchant?.email || null,
     instagramUrl: card.instagramUrl,
     facebookUrl: card.facebookUrl,
     youtubeUrl: card.youtubeUrl,

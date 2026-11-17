@@ -59,7 +59,8 @@ import {
   Copy,
   X,
   CreditCard,
-  IndianRupee
+  IndianRupee,
+  Mail
 } from "lucide-react"
 
 export interface DigitalCardData {
@@ -76,6 +77,7 @@ export interface DigitalCardData {
   deliveryInfo: string | null
   whatsappNumber: string | null
   phoneNumber: string | null
+  email?: string | null
   instagramUrl: string | null
   facebookUrl: string | null
   youtubeUrl: string | null
@@ -223,10 +225,15 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
   // Parse ordering platforms with useMemo to prevent redundant parsing on every keystroke
   const orderingList = useMemo(() => {
     let list: Array<{ platform: string; label: string; sublabel?: string; url: string; color?: string }> = []
-    const isFood = (card.subCategories || "").toLowerCase().includes("cake") || 
-                   (card.subCategories || "").toLowerCase().includes("food") ||
-                   (card.subCategories || "").toLowerCase().includes("bakery") ||
-                   (card.subCategories || "").toLowerCase().includes("dessert")
+    const isPetBusiness = ((card.subCategories || "") + " " + (card.displayName || "")).toLowerCase().match(/pet|dog|cat|puppy|animal|vet|grooming|paw/) !== null
+    const isFood = !isPetBusiness && (
+      (card.subCategories || "").toLowerCase().includes("cake") || 
+      (card.subCategories || "").toLowerCase().includes("food") ||
+      (card.subCategories || "").toLowerCase().includes("bakery") ||
+      (card.subCategories || "").toLowerCase().includes("dessert") ||
+      (card.subCategories || "").toLowerCase().includes("restaurant") ||
+      (card.subCategories || "").toLowerCase().includes("cafe")
+    )
 
     try {
       if (card.orderingLinks) {
@@ -239,7 +246,8 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
             let defaultColor = item.color
 
             if (p === "whatsapp") {
-              defaultLabel = defaultLabel || "WhatsApp"
+              defaultLabel = defaultLabel || (isPetBusiness ? "WhatsApp" : "WhatsApp")
+              defaultSublabel = item.sublabel || (isPetBusiness ? "Pet Supplies" : "Order Now")
               defaultColor = defaultColor || "#16a34a"
             } else if (p === "zomato") {
               defaultLabel = defaultLabel || "Zomato"
@@ -251,8 +259,17 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
               defaultLabel = defaultLabel || "EasyCater"
               defaultColor = defaultColor || "#7c3aed"
             } else if (p === "website" || p === "store") {
-              defaultLabel = defaultLabel || "Website"
+              defaultLabel = defaultLabel || (isPetBusiness ? "Online Store" : "Website")
+              defaultSublabel = item.sublabel || (isPetBusiness ? "Explore" : "Order Now")
               defaultColor = defaultColor || "#2563eb"
+            } else if (p === "grooming") {
+              defaultLabel = defaultLabel || "Grooming"
+              defaultSublabel = item.sublabel || "Book Spa"
+              defaultColor = defaultColor || "#0284c7"
+            } else if (p === "catalog") {
+              defaultLabel = defaultLabel || (isPetBusiness ? "Pet Food" : "Catalog")
+              defaultSublabel = item.sublabel || "View All"
+              defaultColor = defaultColor || "#7c3aed"
             } else if (p === "nikon") {
               defaultLabel = defaultLabel || "Nikon"
               defaultSublabel = item.sublabel || "Mirrorless"
@@ -269,10 +286,6 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
               defaultLabel = defaultLabel || "DJI"
               defaultSublabel = item.sublabel || "Gimbals"
               defaultColor = defaultColor || "#0f766e"
-            } else if (p === "catalog") {
-              defaultLabel = defaultLabel || "Catalog"
-              defaultSublabel = item.sublabel || "View All"
-              defaultColor = defaultColor || "#7c3aed"
             } else if (p === "quotes") {
               defaultLabel = defaultLabel || "Get Quote"
               defaultSublabel = item.sublabel || "Pricing"
@@ -295,6 +308,11 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
       }
     } catch {
       list = []
+    }
+
+    // STRICT: For Pet store, completely filter out Zomato, Swiggy, and EasyCater
+    if (isPetBusiness) {
+      list = list.filter(i => !["zomato", "swiggy", "easycater"].includes(i.platform.toLowerCase()))
     }
 
     // If food card is missing WhatsApp order or Website, ensure complete 5-channel presence
@@ -322,7 +340,15 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
     }
 
     if (list.length === 0) {
-      if (isFood) {
+      if (isPetBusiness) {
+        list = [
+          { platform: "whatsapp", label: "WhatsApp", sublabel: "Pet Supplies", url: card.whatsappNumber ? `https://wa.me/${card.whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(card.displayName)}%2C%20I%20want%20to%20order%20pet%20supplies` : "#", color: "#16a34a" },
+          { platform: "catalog", label: "Pet Food", sublabel: "View All", url: card.websiteUrl || "#", color: "#7c3aed" },
+          { platform: "grooming", label: "Grooming", sublabel: "Book Spa", url: card.whatsappNumber ? `https://wa.me/${card.whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi%2C%20I%20want%20to%20book%20a%20pet%20grooming%20session` : "#", color: "#0284c7" },
+          { platform: "website", label: "Online Store", sublabel: "Explore", url: card.websiteUrl || "#", color: "#2563eb" },
+          { platform: "directions", label: "Store Visit", sublabel: "Find Us", url: card.googleMapsUrl || "#", color: "#d97706" }
+        ]
+      } else if (isFood) {
         list = [
           { platform: "website", label: "Website", sublabel: "Order Now", url: card.websiteUrl || "#", color: "#2563eb" },
           { platform: "whatsapp", label: "WhatsApp", sublabel: "Online Menu", url: `/menu/${card.slug}`, color: "#16a34a" },
@@ -436,6 +462,8 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
         cleanPhone ? `TEL;TYPE=WORK,VOICE:${cleanPhone}` : "",
         cleanWhatsapp ? `TEL;TYPE=WHATSAPP:${cleanWhatsapp}` : "",
         cleanWhatsapp ? `X-SOCIALPROFILE;TYPE=whatsapp:https://wa.me/${cleanWhatsapp.replace(/[^0-9]/g, "")}` : "",
+        card.email ? `EMAIL;TYPE=INTERNET,WORK:${card.email.trim()}` : "",
+        card.email ? `EMAIL;TYPE=PREF,INTERNET:${card.email.trim()}` : "",
         effectiveInstagramUrl ? `X-SOCIALPROFILE;TYPE=instagram:${effectiveInstagramUrl}` : "",
         effectiveFacebookUrl ? `X-SOCIALPROFILE;TYPE=facebook:${effectiveFacebookUrl}` : "",
         (safeLocationShort || safeLocationState) ? `ADR;TYPE=WORK,POSTAL,PARCEL;CHARSET=UTF-8:;;${safeLocationShort};${safeLocationState};;;India` : "",
@@ -743,6 +771,27 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
               </a>
             )}
 
+            {/* 2.5 Email Us Button (Direct Email Action) */}
+            {Boolean(card.email && card.email.trim() !== "") && (
+              <a
+                href={`mailto:${card.email.trim()}?subject=${encodeURIComponent(`Inquiry for ${card.displayName}`)}`}
+                className="p-3 sm:p-3.5 rounded-2xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98]"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0 shadow-xs">
+                    <Mail className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <div className="font-bold text-xs sm:text-[13px] leading-tight text-slate-900">Email Us</div>
+                    <div className="text-[10px] text-slate-500 truncate font-mono">
+                      {card.email.trim()}
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+              </a>
+            )}
+
             {/* 3. Instagram Button — Always Active for All Businesses */}
             <a
               href={effectiveInstagramUrl}
@@ -808,7 +857,7 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
               target="_blank"
               rel="noopener noreferrer"
               className={`p-3 sm:p-3.5 rounded-2xl bg-white/95 hover:bg-white text-slate-900 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center justify-between group active:scale-[0.98] ${
-                Boolean(card.youtubeUrl && card.youtubeUrl.trim() !== "" && card.youtubeUrl !== "https://youtube.com" && card.youtubeUrl !== "https://www.youtube.com") ? "" : "col-span-2"
+                (Boolean(card.email) || Boolean(card.youtubeUrl && card.youtubeUrl.trim() !== "" && card.youtubeUrl !== "https://youtube.com" && card.youtubeUrl !== "https://www.youtube.com")) ? "" : "col-span-2"
               }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
@@ -838,7 +887,9 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
               <div style={timesFont} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-800">
                 <ShoppingBag className="w-3.5 h-3.5 text-amber-600" />
                 <span>
-                  {card.subCategories?.toLowerCase().includes("cake") || card.subCategories?.toLowerCase().includes("food")
+                  {((card.subCategories || "") + " " + (card.displayName || "")).toLowerCase().match(/pet|dog|cat|puppy|animal|vet|grooming|paw/)
+                    ? "Pet Services & Store Catalog"
+                    : ((card.subCategories || "").toLowerCase().includes("cake") || (card.subCategories || "").toLowerCase().includes("food") || (card.subCategories || "").toLowerCase().includes("bakery") || (card.subCategories || "").toLowerCase().includes("restaurant"))
                     ? "Online Ordering Platforms"
                     : "Official Store & Catalog"}
                 </span>

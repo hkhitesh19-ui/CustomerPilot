@@ -29,7 +29,9 @@ import {
   Image as ImageIcon,
   UtensilsCrossed,
   IndianRupee,
-  CreditCard
+  CreditCard,
+  Mail,
+  SlidersHorizontal
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -46,7 +48,9 @@ export default function DigitalCardDashboardPage() {
   const [copied, setCopied] = useState(false)
   const [gbpSearchQuery, setGbpSearchQuery] = useState("")
 
-  // Dedicated Platform Links
+  // Dedicated Platform & Contact Links
+  const [email, setEmail] = useState("")
+  const [enableFoodDelivery, setEnableFoodDelivery] = useState(false)
   const [googleReviewLink, setGoogleReviewLink] = useState("")
   const [zomatoUrl, setZomatoUrl] = useState("")
   const [swiggyUrl, setSwiggyUrl] = useState("")
@@ -67,6 +71,7 @@ export default function DigitalCardDashboardPage() {
     deliveryInfo: "Delivery Available • Vadodara Only",
     whatsappNumber: "917203824012",
     phoneNumber: "+91 72038 24012",
+    email: "order.cakeconnection@gmail.com",
     instagramUrl: "https://www.instagram.com/CakeConnection.in/",
     facebookUrl: "https://www.facebook.com/CakeConnection.in/",
     youtubeUrl: "",
@@ -84,6 +89,9 @@ export default function DigitalCardDashboardPage() {
     googleReviewsCnt: 689,
   })
 
+  // Dynamic category detection
+  const isPetCategory = ((formData.subCategories || "") + " " + (formData.displayName || "")).toLowerCase().match(/pet|dog|cat|puppy|animal|vet|grooming|paw/) !== null
+
   // Synchronize orderingLinks into formData for live interactive phone simulator
   const syncSimulatorLinks = (
     newZomato: string,
@@ -92,39 +100,65 @@ export default function DigitalCardDashboardPage() {
     newOtherL: string,
     newWebsite: string,
     newWhatsapp: string,
-    newReview: string
+    newReview: string,
+    newEmail?: string,
+    foodDeliveryOverride?: boolean,
+    isPetOverride?: boolean
   ) => {
     const list: any[] = []
+    const isPet = isPetOverride !== undefined ? isPetOverride : isPetCategory
+    const allowFood = foodDeliveryOverride !== undefined ? foodDeliveryOverride : enableFoodDelivery
+
     if (newWebsite?.trim()) {
-      list.push({ platform: "website", label: "Website", sublabel: "Order Now", url: newWebsite.trim(), color: "#2563eb" })
+      list.push({ platform: "website", label: isPet ? "Online Store" : "Website", sublabel: isPet ? "Explore" : "Order Now", url: newWebsite.trim(), color: "#2563eb" })
     }
     if (newWhatsapp?.trim()) {
       list.push({
         platform: "whatsapp",
         label: "WhatsApp",
-        sublabel: "Order Now",
-        url: `https://wa.me/${newWhatsapp.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(formData.displayName)}%2C%20I%20want%20to%20order`,
+        sublabel: isPet ? "Pet Supplies" : "Order Now",
+        url: `https://wa.me/${newWhatsapp.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(formData.displayName)}%2C%20${encodeURIComponent(isPet ? "I want to inquire about pet supplies" : "I want to order")}`,
         color: "#16a34a"
       })
     }
-    if (newZomato?.trim()) {
-      list.push({ platform: "zomato", label: "Zomato", sublabel: "Order Now", url: newZomato.trim(), color: "#ef4444" })
-    }
-    if (newSwiggy?.trim()) {
-      list.push({ platform: "swiggy", label: "Swiggy", sublabel: "Order Now", url: newSwiggy.trim(), color: "#f97316" })
+    // Only show Zomato and Swiggy if NOT a pet category, or if food delivery is explicitly enabled
+    if (!isPet || allowFood) {
+      if (newZomato?.trim()) {
+        list.push({ platform: "zomato", label: "Zomato", sublabel: "Order Now", url: newZomato.trim(), color: "#ef4444" })
+      }
+      if (newSwiggy?.trim()) {
+        list.push({ platform: "swiggy", label: "Swiggy", sublabel: "Order Now", url: newSwiggy.trim(), color: "#f97316" })
+      }
     }
     if (newOtherU?.trim()) {
       list.push({
-        platform: "easycater",
-        label: newOtherL?.trim() || "Catalog",
-        sublabel: "Order Now",
+        platform: isPet ? "catalog" : "easycater",
+        label: newOtherL?.trim() || (isPet ? "Pet Catalog" : "Catalog"),
+        sublabel: isPet ? "View All" : "Order Now",
         url: newOtherU.trim(),
         color: "#7c3aed"
+      })
+    }
+    if (isPet && list.length < 5) {
+      list.push({
+        platform: "grooming",
+        label: "Grooming",
+        sublabel: "Book Spa",
+        url: newWhatsapp?.trim() ? `https://wa.me/${newWhatsapp.replace(/[^0-9]/g, "")}?text=Hi%2C%20I%20want%20to%20book%20a%20pet%20grooming%20session` : "#",
+        color: "#0284c7"
+      })
+      list.push({
+        platform: "directions",
+        label: "Store Visit",
+        sublabel: "Find Us",
+        url: formData.googleMapsUrl || "#",
+        color: "#d97706"
       })
     }
 
     setFormData((prev) => ({
       ...prev,
+      email: newEmail !== undefined ? newEmail : (prev.email || email),
       orderingLinks: JSON.stringify(list),
       googleReviewUrl: newReview ? newReview.trim() : prev.googleReviewUrl,
       googlePlaceId: newReview ? newReview.trim() : prev.googlePlaceId
@@ -151,10 +185,10 @@ export default function DigitalCardDashboardPage() {
             if (Array.isArray(arr)) {
               zomato = arr.find((l: any) => l.platform?.toLowerCase() === "zomato")?.url || ""
               swiggy = arr.find((l: any) => l.platform?.toLowerCase() === "swiggy")?.url || ""
-              const o = arr.find((l: any) => l.platform?.toLowerCase() === "easycater" || (!["website", "whatsapp", "zomato", "swiggy"].includes(l.platform?.toLowerCase())))
+              const o = arr.find((l: any) => l.platform?.toLowerCase() === "easycater" || l.platform?.toLowerCase() === "catalog" || (!["website", "whatsapp", "zomato", "swiggy"].includes(l.platform?.toLowerCase())))
               if (o) {
                 otherU = o.url || ""
-                otherL = o.label || "EasyCater / Other"
+                otherL = o.label || "Catalog / Other"
               }
             }
           } catch {}
@@ -162,6 +196,19 @@ export default function DigitalCardDashboardPage() {
           setSwiggyUrl(swiggy)
           setOtherOrderUrl(otherU)
           setOtherOrderLabel(otherL)
+
+          // Extract Email & Theme preferences
+          let cardEmail = c.email || ""
+          let allowFood = false
+          if (c.theme && typeof c.theme === "string" && c.theme.startsWith("{")) {
+            try {
+              const th = JSON.parse(c.theme)
+              if (!cardEmail && th.email) cardEmail = th.email
+              if (th.enableFoodDelivery !== undefined) allowFood = Boolean(th.enableFoodDelivery)
+            } catch {}
+          }
+          setEmail(cardEmail)
+          setEnableFoodDelivery(allowFood)
 
           // Extract Google Review link
           let revLink = c.googleReviewUrl || ""
@@ -216,40 +263,64 @@ export default function DigitalCardDashboardPage() {
 
       if (json.success && json.details) {
         const d = json.details
+        const isPet = Boolean(d.isPetStore) || ((d.subCategories || "") + " " + (d.displayName || "")).toLowerCase().match(/pet|dog|cat|puppy|animal|vet|grooming|paw/) !== null
+
+        if (d.email) setEmail(d.email)
+        if (isPet) {
+          setEnableFoodDelivery(false)
+          setZomatoUrl("")
+          setSwiggyUrl("")
+          setOtherOrderLabel("Pet Catalog")
+        }
+
+        const newSlug = d.slug || (d.displayName ? d.displayName.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") : formData.slug)
+
         setFormData((prev) => ({
           ...prev,
           displayName: (d.displayName && !d.displayName.startsWith("http"))
             ? d.displayName
             : prev.displayName,
+          slug: newSlug || prev.slug,
           subCategories: d.subCategories ? d.subCategories : prev.subCategories,
           locationShort: d.locationShort ? d.locationShort : prev.locationShort,
           locationState: d.locationState ? d.locationState : prev.locationState,
           phoneNumber: d.phoneNumber ? d.phoneNumber : prev.phoneNumber,
+          whatsappNumber: d.whatsappNumber ? d.whatsappNumber : prev.whatsappNumber,
+          email: d.email ? d.email : (email || prev.email),
           googleRating: d.googleRating != null ? d.googleRating : prev.googleRating,
           googleReviewsCnt: d.googleReviewsCnt != null ? d.googleReviewsCnt : prev.googleReviewsCnt,
           googleMapsUrl: (d.googleMapsUrl && d.googleMapsUrl.length > 20)
             ? d.googleMapsUrl
             : prev.googleMapsUrl,
-          websiteUrl: d.websiteUrl ? d.websiteUrl : prev.websiteUrl,
+          websiteUrl: d.websiteUrl !== undefined ? d.websiteUrl : prev.websiteUrl,
           businessHours: d.businessHours ? d.businessHours : prev.businessHours,
           deliveryInfo: d.deliveryInfo ? d.deliveryInfo : prev.deliveryInfo,
+          orderingLinks: d.orderingLinks ? d.orderingLinks : prev.orderingLinks,
         }))
 
-        if (d.googleReviewLink && !googleReviewLink) {
+        if (d.googleReviewLink) {
           setGoogleReviewLink(d.googleReviewLink)
         }
 
-        if (json.partial) {
-          toast({
-            title: "Partial Info Found ⚠️",
-            description: "Business name pre-filled. Please verify and complete remaining details manually before saving.",
-          })
-        } else {
-          toast({
-            title: "GBP Details Auto-Synced! ⚡",
-            description: `${json.source === "google_places_api" ? "Full Google Places data" : "Business details"} fetched successfully.`,
-          })
-        }
+        syncSimulatorLinks(
+          isPet ? "" : zomatoUrl,
+          isPet ? "" : swiggyUrl,
+          otherOrderUrl,
+          isPet ? "Pet Catalog" : otherOrderLabel,
+          d.websiteUrl || formData.websiteUrl || "",
+          d.whatsappNumber || formData.whatsappNumber || "",
+          d.googleReviewLink || googleReviewLink,
+          d.email || email,
+          !isPet,
+          isPet
+        )
+
+        toast({
+          title: isPet ? "🐾 Pet Store Profile Auto-Synced!" : "GBP Details Auto-Synced! ⚡",
+          description: isPet
+            ? `${d.displayName}: Contact details, email and pet catalog active. Zomato & Swiggy food links disabled.`
+            : `${json.source === "google_places_api" ? "Full Google Places data" : "Business details"} fetched successfully.`,
+        })
       }
     } catch (err) {
       toast({
@@ -268,9 +339,11 @@ export default function DigitalCardDashboardPage() {
     try {
       const payload = {
         ...formData,
+        email: email.trim(),
+        enableFoodDelivery,
         googleReviewLink: googleReviewLink.trim(),
-        zomatoUrl: zomatoUrl.trim(),
-        swiggyUrl: swiggyUrl.trim(),
+        zomatoUrl: (enableFoodDelivery || !isPetCategory) ? zomatoUrl.trim() : "",
+        swiggyUrl: (enableFoodDelivery || !isPetCategory) ? swiggyUrl.trim() : "",
         websiteUrl: formData.websiteUrl?.trim() || "",
         otherOrderUrl: otherOrderUrl.trim(),
         otherOrderLabel: otherOrderLabel.trim(),
@@ -317,7 +390,11 @@ export default function DigitalCardDashboardPage() {
   }
 
   const handleWhatsAppShare = () => {
-    const text = `🎂 *${formData.displayName} • Official Digital Business Card* ✨\n📍 ${formData.locationShort || "Vadodara"} | ⭐ ${formData.googleRating || 4.6} (${formData.googleReviewsCnt || 689} Reviews)\n\nHamare contacts, menu, Instagram, Zomato & Swiggy online ordering ke liye tap karein:\n👉 ${publicUrl}`
+    const emoji = isPetCategory ? "🐾" : "🎂"
+    const channels = isPetCategory
+      ? "contacts, services catalog & directions"
+      : "contacts, menu, Instagram, Zomato & Swiggy online ordering"
+    const text = `${emoji} *${formData.displayName} • Official Digital Business Card* ✨\n📍 ${formData.locationShort || "Vadodara"} | ⭐ ${formData.googleRating || 4.6} (${formData.googleReviewsCnt || 689} Reviews)\n\nHamare ${channels} ke liye tap karein:\n👉 ${publicUrl}`
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank")
   }
 
@@ -570,18 +647,18 @@ export default function DigitalCardDashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <Label className="text-xs font-bold flex items-center gap-1.5">
                     <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
-                    WhatsApp Number (with country code)
+                    WhatsApp Number
                   </Label>
                   <Input
                     value={formData.whatsappNumber || ""}
                     onChange={(e) => {
                       const val = e.target.value
                       setFormData({ ...formData, whatsappNumber: val })
-                      syncSimulatorLinks(zomatoUrl, swiggyUrl, otherOrderUrl, otherOrderLabel, formData.websiteUrl || "", val, googleReviewLink)
+                      syncSimulatorLinks(zomatoUrl, swiggyUrl, otherOrderUrl, otherOrderLabel, formData.websiteUrl || "", val, googleReviewLink, email)
                     }}
                     placeholder="919876543210"
                     className="mt-1 rounded-xl text-xs font-mono"
@@ -596,7 +673,25 @@ export default function DigitalCardDashboardPage() {
                     value={formData.phoneNumber || ""}
                     onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                     placeholder="+91 98765 43210"
-                    className="mt-1 rounded-xl text-xs"
+                    className="mt-1 rounded-xl text-xs font-mono"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-bold flex items-center gap-1.5 text-indigo-700 dark:text-indigo-400">
+                    <Mail className="w-3.5 h-3.5 text-indigo-600" />
+                    Official Business Email (Contacts &amp; vCard)
+                  </Label>
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setEmail(val)
+                      setFormData((prev) => ({ ...prev, email: val }))
+                      syncSimulatorLinks(zomatoUrl, swiggyUrl, otherOrderUrl, otherOrderLabel, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink, val)
+                    }}
+                    placeholder="e.g. mawpaw2323@gmail.com"
+                    className="mt-1 rounded-xl text-xs font-mono bg-indigo-50/20 border-indigo-200 dark:border-indigo-800"
                   />
                 </div>
               </div>
@@ -639,70 +734,113 @@ export default function DigitalCardDashboardPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-black flex items-center gap-2">
                   <UtensilsCrossed className="w-4 h-4 text-orange-500" />
-                  Online Ordering Platforms &amp; Store Catalog
+                  {isPetCategory ? "Pet Services & Store Catalog" : "Online Ordering Platforms & Store Catalog"}
                 </CardTitle>
-                <span className="text-[10px] font-black uppercase tracking-wider bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300 px-2.5 py-0.5 rounded-full border border-orange-300">
-                  Instant Buttons
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                    isPetCategory 
+                      ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300"
+                      : "bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300 border-orange-300"
+                  }`}>
+                    {isPetCategory ? "🐾 Pet Store Mode" : "🍔 Food & Dining Mode"}
+                  </span>
+                </div>
               </div>
               <CardDescription className="text-xs">
-                Configure direct ordering and menu catalog links displayed on your live digital business card.
+                {isPetCategory
+                  ? "Configure product catalog, grooming booking, website and WhatsApp inquiry channels for your pet store."
+                  : "Configure direct ordering and menu catalog links displayed on your live digital business card."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Zomato */}
-                <div>
-                  <Label className="text-xs font-bold flex items-center gap-1.5">
-                    <span className="w-4 h-4 rounded-full bg-[#e23744] text-white text-[10px] font-black flex items-center justify-center">z</span>
-                    Zomato Order Link
-                  </Label>
-                  <Input
-                    value={zomatoUrl}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      setZomatoUrl(val)
-                      syncSimulatorLinks(val, swiggyUrl, otherOrderUrl, otherOrderLabel, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink)
+              
+              {/* Pet Store Mode Notice & Food Delivery Toggle */}
+              {isPetCategory && (
+                <div className="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/40 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-lg">🐾</span>
+                    <div>
+                      <div className="font-extrabold text-amber-900 dark:text-amber-300">
+                        Pet Store &amp; Pet Care Profile Active
+                      </div>
+                      <div className="text-[11px] text-amber-800/80 dark:text-amber-400 mt-0.5 leading-snug">
+                        Food delivery links (Zomato &amp; Swiggy) are disabled by default. Contacts, WhatsApp Inquiry &amp; Pet Catalog are enabled.
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const next = !enableFoodDelivery
+                      setEnableFoodDelivery(next)
+                      syncSimulatorLinks(zomatoUrl, swiggyUrl, otherOrderUrl, otherOrderLabel, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink, email, next, isPetCategory)
                     }}
-                    placeholder="https://www.zomato.com/..."
-                    className="mt-1 rounded-xl text-xs"
-                  />
+                    className="rounded-xl border-amber-300 text-xs font-bold text-amber-900 hover:bg-amber-100 dark:hover:bg-amber-900/50 whitespace-nowrap self-start sm:self-center"
+                  >
+                    <SlidersHorizontal className="w-3.5 h-3.5 mr-1" />
+                    {enableFoodDelivery ? "Disable Zomato & Swiggy" : "Enable Food Delivery Links"}
+                  </Button>
                 </div>
+              )}
 
-                {/* Swiggy */}
-                <div>
-                  <Label className="text-xs font-bold flex items-center gap-1.5">
-                    <span className="w-4 h-4 rounded-full bg-[#fc8019] text-white text-[10px] font-black flex items-center justify-center">S</span>
-                    Swiggy Order Link
-                  </Label>
-                  <Input
-                    value={swiggyUrl}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      setSwiggyUrl(val)
-                      syncSimulatorLinks(zomatoUrl, val, otherOrderUrl, otherOrderLabel, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink)
-                    }}
-                    placeholder="https://www.swiggy.com/..."
-                    className="mt-1 rounded-xl text-xs"
-                  />
+              {/* Zomato & Swiggy Links (Visible for Food businesses OR when explicitly enabled) */}
+              {(!isPetCategory || enableFoodDelivery) && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Zomato */}
+                  <div>
+                    <Label className="text-xs font-bold flex items-center gap-1.5">
+                      <span className="w-4 h-4 rounded-full bg-[#e23744] text-white text-[10px] font-black flex items-center justify-center">z</span>
+                      Zomato Order Link
+                    </Label>
+                    <Input
+                      value={zomatoUrl}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        setZomatoUrl(val)
+                        syncSimulatorLinks(val, swiggyUrl, otherOrderUrl, otherOrderLabel, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink, email, enableFoodDelivery, isPetCategory)
+                      }}
+                      placeholder="https://www.zomato.com/..."
+                      className="mt-1 rounded-xl text-xs"
+                    />
+                  </div>
+
+                  {/* Swiggy */}
+                  <div>
+                    <Label className="text-xs font-bold flex items-center gap-1.5">
+                      <span className="w-4 h-4 rounded-full bg-[#fc8019] text-white text-[10px] font-black flex items-center justify-center">S</span>
+                      Swiggy Order Link
+                    </Label>
+                    <Input
+                      value={swiggyUrl}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        setSwiggyUrl(val)
+                        syncSimulatorLinks(zomatoUrl, val, otherOrderUrl, otherOrderLabel, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink, email, enableFoodDelivery, isPetCategory)
+                      }}
+                      placeholder="https://www.swiggy.com/..."
+                      className="mt-1 rounded-xl text-xs"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Website / Online Menu */}
+                {/* Website / Online Menu / Online Store */}
                 <div>
                   <Label className="text-xs font-bold flex items-center gap-1.5">
                     <Globe className="w-3.5 h-3.5 text-blue-600" />
-                    Website / Online Menu Link
+                    {isPetCategory ? "Online Store / Website Link" : "Website / Online Menu Link"}
                   </Label>
                   <Input
                     value={formData.websiteUrl || ""}
                     onChange={(e) => {
                       const val = e.target.value
                       setFormData({ ...formData, websiteUrl: val })
-                      syncSimulatorLinks(zomatoUrl, swiggyUrl, otherOrderUrl, otherOrderLabel, val, formData.whatsappNumber || "", googleReviewLink)
+                      syncSimulatorLinks(zomatoUrl, swiggyUrl, otherOrderUrl, otherOrderLabel, val, formData.whatsappNumber || "", googleReviewLink, email, enableFoodDelivery, isPetCategory)
                     }}
-                    placeholder="https://cakeconnection.in"
+                    placeholder={isPetCategory ? "https://yourpetstore.com" : "https://cakeconnection.in"}
                     className="mt-1 rounded-xl text-xs"
                   />
                 </div>
@@ -712,16 +850,16 @@ export default function DigitalCardDashboardPage() {
                   <div className="flex items-center justify-between">
                     <Label className="text-xs font-bold flex items-center gap-1.5">
                       <ShoppingBag className="w-3.5 h-3.5 text-purple-600" />
-                      Other Platform / Catalog Link
+                      {isPetCategory ? "Pet Food & Supplies Catalog Link" : "Other Platform / Catalog Link"}
                     </Label>
                     <Input
                       value={otherOrderLabel}
                       onChange={(e) => {
                         const val = e.target.value
                         setOtherOrderLabel(val)
-                        syncSimulatorLinks(zomatoUrl, swiggyUrl, otherOrderUrl, val, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink)
+                        syncSimulatorLinks(zomatoUrl, swiggyUrl, otherOrderUrl, val, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink, email, enableFoodDelivery, isPetCategory)
                       }}
-                      placeholder="Label e.g. EasyCater"
+                      placeholder={isPetCategory ? "Pet Catalog" : "Label e.g. EasyCater"}
                       className="h-5 w-28 text-[10px] rounded-md px-1.5 py-0 border-slate-300"
                     />
                   </div>
@@ -730,9 +868,9 @@ export default function DigitalCardDashboardPage() {
                     onChange={(e) => {
                       const val = e.target.value
                       setOtherOrderUrl(val)
-                      syncSimulatorLinks(zomatoUrl, swiggyUrl, val, otherOrderLabel, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink)
+                      syncSimulatorLinks(zomatoUrl, swiggyUrl, val, otherOrderLabel, formData.websiteUrl || "", formData.whatsappNumber || "", googleReviewLink, email, enableFoodDelivery, isPetCategory)
                     }}
-                    placeholder="https://..."
+                    placeholder="https://... (Catalog PDF, Menu, or Google Drive link)"
                     className="mt-1 rounded-xl text-xs"
                   />
                 </div>
