@@ -8,12 +8,12 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 572af2f
-Full SHA          : 572af2fd12f035243fc5ffcf5f90113c9ad4f170
+Active Git Commit : f8e93ba
+Full SHA          : f8e93baf79fa4d4e1a49ae4685407b5411559dc7
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 17 Nov 2026, 11:05 AM IST
+Deployment Date   : 17 Nov 2026, 11:32 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(digital-card): add gbp auto-fetch, pet category links, and email integration
+Commit Title      : feat(branding): universal 2-way logo synchronization across digital card, standees, and qr codes
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -21,9 +21,9 @@ Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 O
 Verified Live Outcomes:
 ----------------------------------------------------------
 1. https://customerpilot.in/                                         -> HTTP 200 (Homepage live & healthy)
-2. https://customerpilot.in/dashboard/digital-card                   -> HTTP 200 (Smart Digital Business Card Studio with GBP Auto-Fetch, Pet Care Mode, & Official Email)
-3. https://customerpilot.in/c/mawpaw                                 -> HTTP 200 (Public Digital Card for Maw & Paw with Pet Services Catalog, WhatsApp, Direct Call, Directions, & Email Us)
-4. https://customerpilot.in/api/digital-card?slug=mawpaw&format=vcard -> HTTP 200 (vCard phonebook download with EMAIL;TYPE=INTERNET,WORK and EMAIL;TYPE=PREF,INTERNET)
-5. https://customerpilot.in/dashboard/reviews                        -> HTTP 200 (1-Click GoogleReview AutoReply Studio with 3-Draft Selector & Overwrite Protection)
+2. https://customerpilot.in/dashboard/digital-card                   -> HTTP 200 (Smart Digital Business Card Studio with Universal 2-Way Logo Sync, 1-Click Upload/Remove, & Live Simulator)
+3. https://customerpilot.in/c/mawpaw                                 -> HTTP 200 (Public Digital Card for Maw & Paw with Active Brand Logo, Services Catalog, WhatsApp, & vCard)
+4. https://customerpilot.in/dashboard/settings                       -> HTTP 200 (Smart Standee Studio & Counter QR with Universal Brand Logo Sync)
+5. https://customerpilot.in/dashboard/reviews                        -> HTTP 200 (Smart AI Review Setup with Synced Brand Logo)
 6. Adversarial Red-Team Safety Gates:
    - All 6 automated gates passed cleanly (AST import linter, full-app TS ratchet 0 errors, sensitive token redactions, 12 mathematical boundaries, payments regression, 0 tracked DBs)
