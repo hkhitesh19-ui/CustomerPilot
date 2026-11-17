@@ -8,22 +8,28 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 5f2ce88 (feat(booster): add store logo upload, scan scanner rename, and standardized standee footer)
-Full SHA          : 5f2ce88a1c022f3485fc7701c6b397c0f9062ab6
-Parent Commit     : 3aa01bf
+Active Git Commit : 4129202 (fix(reviews): google review auto-reply personalization, overwrite protection, 3-draft studio and short store name)
+Full SHA          : 412920280cc62bc5d17f8fd5837ea30f686cf9b9
+Parent Commit     : 05acc33
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 17 Nov 2026, 12:15 AM IST
+Deployment Date   : 17 Nov 2026, 09:25 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(booster): add store logo upload, scan scanner rename, and standardized standee footer
+Commit Title      : fix(reviews): google review auto-reply personalization, overwrite protection, 3-draft studio and short store name
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Live Outcomes:
 ----------------------------------------------------------
-1. https://customerpilot.in/                                 -> HTTP 200 (Homepage live & healthy)
-2. https://customerpilot.in/dashboard/WAGroupBooster        -> HTTP 200 (Store Logo Upload, Scan with any scanner, Standardized Powered By footer)
-3. https://customerpilot.in/dashboard/WAGroupBoosterPro     -> HTTP 200 (Store Logo Upload, Scan with any scanner, Standardized Powered By footer, Lead Capture)
-4. https://customerpilot.in/api/qr-codes                    -> HTTP 200 (Multi-style QR generator: WhatsApp logo, store logo, clean)
-5. Adversarial Red-Team Safety Gates:
+1. https://customerpilot.in/                                         -> HTTP 200 (Homepage live & healthy)
+2. https://customerpilot.in/dashboard/reviews                        -> HTTP 200 (1-Click GoogleReview AutoReply Studio with 3-Draft Selector & Overwrite Protection)
+3. https://customerpilot.in/ai-google-review-autoreply               -> HTTP 200 (1-Click AI AutoReply Showcase & Explainer)
+4. https://customerpilot.in/api/reviews/list                         -> HTTP 200 (Review query endpoint)
+5. Overwrite Protection & Personalization:
+   - Google API response parser extracts r.reviewReply directly so existing Google replies are 100% locked & immutable.
+   - Store name sanitized via getCleanMerchantName() strictly to 'Cake Connection' (no keyword-stuffed long title).
+   - Customer names extracted and products/experiences mirrored (customized wedding cake, on-time delivery, budget).
+   - 14 High-Intent Vadodara Bakery SEO keywords rotated dynamically across drafts.
+   - Multi-LLM cascade: Gemini -> Groq -> Intelligent Rule-Based Fallback.
+6. Adversarial Red-Team Safety Gates:
    - All 6 automated gates passed cleanly (AST import linter, full-app TS ratchet 0 errors, sensitive token redactions, 12 mathematical boundaries, payments regression, 0 tracked DBs)
