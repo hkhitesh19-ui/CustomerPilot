@@ -208,7 +208,7 @@ export async function POST(req: NextRequest) {
     const matchedMerchant = await findMerchantInDatabase(resolvedUrl || searchQuery)
     if (matchedMerchant) {
       const parsed = cleanBusinessTitle(matchedMerchant.name)
-      const cleanPhone = matchedMerchant.whatsappPhone || matchedMerchant.phone || ""
+      const cleanPhone = matchedMerchant.whatsappPhone || (matchedMerchant as any).phone || ""
       const formattedPhone = cleanPhone
         ? (cleanPhone.startsWith("91") && cleanPhone.length === 12
             ? `+91 ${cleanPhone.slice(2, 7)} ${cleanPhone.slice(7)}`
@@ -226,7 +226,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Generate category-specific ordering links
-      let defaultOrderingLinks = []
+      let defaultOrderingLinks: any[] = []
       if (parsed.isPet) {
         defaultOrderingLinks = [
           {
@@ -240,7 +240,7 @@ export async function POST(req: NextRequest) {
             platform: "catalog",
             label: "Pet Food",
             sublabel: "View All",
-            url: matchedMerchant.websiteUrl || "#",
+            url: (matchedMerchant as any).websiteUrl || "#",
             color: "#7c3aed"
           },
           {
@@ -254,7 +254,7 @@ export async function POST(req: NextRequest) {
             platform: "website",
             label: "Website",
             sublabel: "Store",
-            url: matchedMerchant.websiteUrl || "#",
+            url: (matchedMerchant as any).websiteUrl || "#",
             color: "#2563eb"
           },
           {
@@ -267,7 +267,7 @@ export async function POST(req: NextRequest) {
         ]
       } else {
         defaultOrderingLinks = [
-          { platform: "website", label: "Website", sublabel: "Order Now", url: matchedMerchant.websiteUrl || "#", color: "#2563eb" },
+          { platform: "website", label: "Website", sublabel: "Order Now", url: (matchedMerchant as any).websiteUrl || "#", color: "#2563eb" },
           { platform: "whatsapp", label: "WhatsApp", sublabel: "Order Now", url: `https://wa.me/${cleanPhone.replace(/[^0-9]/g, "")}?text=Hi%20${encodeURIComponent(parsed.name)}%2C%20I%20want%20to%20order`, color: "#16a34a" },
           { platform: "zomato", label: "Zomato", sublabel: "Order Now", url: "https://www.zomato.com", color: "#ef4444" },
           { platform: "swiggy", label: "Swiggy", sublabel: "Order Now", url: "https://www.swiggy.com", color: "#f97316" },
@@ -309,7 +309,11 @@ export async function POST(req: NextRequest) {
         const searchRes = await searchGooglePlaces(resolvedUrl || searchQuery)
         if (searchRes.results && searchRes.results.length > 0) {
           const topResult = searchRes.results[0]
-          const details = await getPlaceDetails(topResult.placeId)
+          const details: any = await getPlaceDetails(topResult.placeId)
+
+          if (!details) {
+            return NextResponse.json({ success: false, error: "Place details not found" }, { status: 404 })
+          }
 
           const categories = (details.types || [])
             .filter((t) => !["point_of_interest", "establishment"].includes(t))

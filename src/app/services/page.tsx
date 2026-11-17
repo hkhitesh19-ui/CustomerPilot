@@ -2,8 +2,6 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Star, 
   CreditCard, 
@@ -27,25 +25,27 @@ import {
   ExternalLink,
   MessageSquare,
   BadgePercent,
-  Cpu
+  Cpu,
+  BarChart3,
+  CheckCircle,
+  XCircle
 } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
 export default function ServicesInfographicPage() {
-  const [activeTab, setActiveTab] = useState<'all' | 'gear1' | 'growth' | 'pos'>('all')
-  const [selectedPillar, setSelectedPillar] = useState<number>(0)
+  const [activeTab, setActiveTab] = useState<'all' | 'reviews' | 'retention' | 'pos'>('all')
 
   const services = [
     {
       id: 1,
-      category: 'gear1',
+      category: 'reviews',
       title: 'Smart AI Google Review Engine',
       subtitle: 'Keyword Grounding & Dual Bestseller Studio',
       icon: Star,
       color: 'from-amber-500 to-orange-500',
-      badge: 'Core Hero • Gear 1',
+      badge: 'Local SEO Hero',
       badgeColor: 'bg-amber-100 text-amber-900 border-amber-300',
       tagline: 'Customer se 5-Star Reviews nikalne ka 100% Zero-Typing Solution',
       highlights: [
@@ -61,12 +61,12 @@ export default function ServicesInfographicPage() {
     },
     {
       id: 2,
-      category: 'gear1',
+      category: 'retention',
       title: 'Smart Digital Business Card',
       subtitle: 'Contactless vCard & Digital Catalog Hub',
       icon: CreditCard,
       color: 'from-cyan-500 to-blue-600',
-      badge: 'Core Hero • Gear 1',
+      badge: 'Digital Contact Hub',
       badgeColor: 'bg-cyan-100 text-cyan-900 border-cyan-300',
       tagline: 'Paper Visiting Card ko hamesha ke liye bye-bye kaho',
       highlights: [
@@ -82,7 +82,7 @@ export default function ServicesInfographicPage() {
     },
     {
       id: 3,
-      category: 'gear1',
+      category: 'reviews',
       title: 'High-Definition QR Standees',
       subtitle: 'Custom Acrylic Stands & Dynamic QR Studio',
       icon: QrCode,
@@ -91,11 +91,11 @@ export default function ServicesInfographicPage() {
       badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
       tagline: 'Billing counter par rakhte hi customer ka attention kheechne wala premium design',
       highlights: [
-        '5 High-Impact Layouts: Split Dual-QR, Reversible Duo, Unified Gateway & Royal Gold',
-        'Merchant Store Logo high-resolution vector center badge',
+        'Crystal clear acrylic standee tailored with Store Logo & brand theme',
         'Dynamic Routing: Physical standee re-print kiye bina destination link badlo anytime',
         'Real-time Scan Analytics: Total scans, unique devices, peak scan hours',
-        'Ultra-thick bevel-edged crystal acrylic build with matte anti-glare finish'
+        'Ultra-thick bevel-edged crystal acrylic build with matte anti-glare finish',
+        'Print-ready high-resolution PDF download for A4, A5, and table-tent sizes'
       ],
       metric: '3-Sec',
       metricLabel: 'Customer Scan & Action Time',
@@ -103,7 +103,7 @@ export default function ServicesInfographicPage() {
     },
     {
       id: 4,
-      category: 'growth',
+      category: 'retention',
       title: 'WhatsApp VIP Loyalty Stamp Card',
       subtitle: 'Zero-App Digital Stamp & Referral Rewards',
       icon: Gift,
@@ -145,7 +145,7 @@ export default function ServicesInfographicPage() {
     },
     {
       id: 6,
-      category: 'growth',
+      category: 'retention',
       title: '24/7 AI WhatsApp Chatbot',
       subtitle: 'Instant Customer Support & Lead Capture',
       icon: Bot,
@@ -166,7 +166,7 @@ export default function ServicesInfographicPage() {
     },
     {
       id: 7,
-      category: 'growth',
+      category: 'reviews',
       title: 'RankPilot AI — GBP SEO Radar',
       subtitle: '7x7 Geogrid Map Scanner & Ranking Accelerator',
       icon: Compass,
@@ -187,7 +187,7 @@ export default function ServicesInfographicPage() {
     },
     {
       id: 8,
-      category: 'growth',
+      category: 'retention',
       title: 'WhatsApp Group Booster',
       subtitle: 'Customer Community & Direct Sales Funnel',
       icon: Users,
@@ -210,7 +210,7 @@ export default function ServicesInfographicPage() {
 
   const filteredServices = activeTab === 'all' 
     ? services 
-    : services.filter(s => s.category === activeTab || (activeTab === 'gear1' && s.category === 'gear1'))
+    : services.filter(s => s.category === activeTab)
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-emerald-500 selection:text-slate-950">
@@ -395,22 +395,22 @@ export default function ServicesInfographicPage() {
               All Services (8)
             </button>
             <button
-              onClick={() => setActiveTab('gear1')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition ${activeTab === 'gear1' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'}`}
+              onClick={() => setActiveTab('reviews')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition ${activeTab === 'reviews' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'}`}
             >
-              Gear 1 Core (3)
+              Google Reviews & Standees (3)
             </button>
             <button
-              onClick={() => setActiveTab('growth')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition ${activeTab === 'growth' ? 'bg-cyan-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'}`}
+              onClick={() => setActiveTab('retention')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition ${activeTab === 'retention' ? 'bg-cyan-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'}`}
             >
-              Growth & Retention (4)
+              WhatsApp Retention & VIP (4)
             </button>
             <button
               onClick={() => setActiveTab('pos')}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition ${activeTab === 'pos' ? 'bg-indigo-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'}`}
             >
-              Smart POS (1)
+              Smart POS Billing (1)
             </button>
           </div>
         </div>
@@ -470,118 +470,117 @@ export default function ServicesInfographicPage() {
         </div>
       </section>
 
-      {/* SPECIAL SPOTLIGHT: GEAR 1 STANDEE OPTIONS SHOWCASE */}
-      <section className="py-20 bg-gradient-to-b from-slate-900 to-slate-950 border-t border-slate-800">
+      {/* WHY CUSTOMERPILOT WINS VS FRAGMENTED TOOLS */}
+      <section className="py-20 bg-slate-900/50 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3.5 py-1.5 rounded-full border border-amber-500/20">
-              Special Solution • Gear 1 Only Plan
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-3.5 py-1.5 rounded-full border border-emerald-500/20">
+              Unified Operating System
             </span>
             <h2 className="text-3xl sm:text-5xl font-black text-white mt-4">
-              Sirf 2 Services Chahiye? <br />
-              <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-                Smart Digital Business Card + Smart AI Google Review
+              6 Alag-Alag Software lene ki jagah <br />
+              <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                CustomerPilot All-in-One Engine
               </span>
             </h2>
             <p className="text-slate-400 text-base mt-4">
-              Jin merchants ko sirf ye 2 core services chahiye, unke counter par lagne wale acrylic standee ke 5 high-impact options:
+              Bina CustomerPilot ke ek merchant ko har mahine hazaron rupaye alag alag apps par waste karne padte hain:
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-16">
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
-              <h3 className="text-2xl font-black text-white mb-4 flex items-center gap-2">
-                <span className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-bold">1</span>
-                Option 1: Split Dual-QR Standee (Side-by-Side Balance)
-              </h3>
-              <p className="text-slate-300 text-sm leading-relaxed mb-6">
-                Ek hi standee me do alag-alag clearly marked sections: Left side me Google 5-Star Review with stars, right side me Digital Visiting Card with WhatsApp, phone aur direction links.
-              </p>
-              <ul className="space-y-3 mb-6">
-                <li className="flex items-center gap-2 text-xs text-slate-300">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Customer clear choice kar sakta hai review dena hai ya contact save karna hai
-                </li>
-                <li className="flex items-center gap-2 text-xs text-slate-300">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Store logo aur business category top header me bold display
-                </li>
-                <li className="flex items-center gap-2 text-xs text-slate-300">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Best for: Retail shops, Optical stores, Clinics, Salons
-                </li>
-              </ul>
-              <div className="inline-block bg-slate-950 px-4 py-2 rounded-xl text-xs font-mono text-emerald-400 border border-slate-800">
-                Recommended: Most popular counter layout
-              </div>
-            </div>
-
-            <div className="bg-slate-950 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl p-4 flex items-center justify-center">
-              <img 
-                src="/standees/gear1_standee_opt1_split_dual.png" 
-                alt="Option 1: Split Dual-QR Standee"
-                className="rounded-2xl max-h-[460px] object-contain shadow-lg"
-              />
-            </div>
-          </div>
-
-          {/* Other 4 Standee Options Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Option 2 */}
-            <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 flex flex-col justify-between">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+            {/* The Old Fragmented Way */}
+            <div className="bg-rose-950/20 border border-rose-900/40 rounded-3xl p-8 flex flex-col justify-between">
               <div>
-                <div className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">Option 2</div>
-                <h4 className="text-lg font-bold text-white mb-2">Reversible Duo (2-in-1)</h4>
-                <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-                  Double-sided acrylic: Front side billing counter par Google Review, Back side waiting lounge me Digital Card.
-                </p>
-                <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-950 p-2 mb-4">
-                  <img src="/standees/gear1_standee_opt2_reversible_duo.png" alt="Option 2 Standee" className="rounded-lg w-full h-44 object-cover" />
+                <div className="flex items-center gap-2 text-rose-400 font-bold text-sm mb-4">
+                  <XCircle className="w-5 h-5 text-rose-400" />
+                  Old Fragmented Way (₹50,000+/year)
+                </div>
+                <div className="space-y-4 text-xs text-slate-300">
+                  <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <div>
+                      <div className="font-bold text-white">Paper Visiting Cards</div>
+                      <div className="text-slate-400">Lost or thrown away within 24 hours</div>
+                    </div>
+                    <span className="text-rose-400 font-bold">₹3,000/yr</span>
+                  </div>
+
+                  <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <div>
+                      <div className="font-bold text-white">Thermal Paper Printer & Rolls</div>
+                      <div className="text-slate-400">Fades away in 3 months, costly rolls</div>
+                    </div>
+                    <span className="text-rose-400 font-bold">₹15,000/yr</span>
+                  </div>
+
+                  <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <div>
+                      <div className="font-bold text-white">SMS Gateway & Marketing</div>
+                      <div className="text-slate-400">High DLT friction, ignored in spam folder</div>
+                    </div>
+                    <span className="text-rose-400 font-bold">₹12,000/yr</span>
+                  </div>
+
+                  <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <div>
+                      <div className="font-bold text-white">Local SEO Agency Fees</div>
+                      <div className="text-slate-400">Manual fake reviews that Google deletes</div>
+                    </div>
+                    <span className="text-rose-400 font-bold">₹24,000/yr</span>
+                  </div>
                 </div>
               </div>
-              <span className="text-[11px] font-semibold text-slate-400">Zero footprint on small desks</span>
+
+              <div className="mt-8 pt-4 border-t border-rose-900/30 text-rose-300 text-xs font-semibold">
+                ❌ Fragmented tools: Zero data sync, huge monthly recurring bills & high staff hassle.
+              </div>
             </div>
 
-            {/* Option 3 */}
-            <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 flex flex-col justify-between">
+            {/* The CustomerPilot Way */}
+            <div className="bg-emerald-950/20 border border-emerald-900/40 rounded-3xl p-8 flex flex-col justify-between">
               <div>
-                <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2">Option 3</div>
-                <h4 className="text-lg font-bold text-white mb-2">Smart Unified Gateway</h4>
-                <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-                  Single Smart QR! Scan karte hi mobile par 2 big buttons aate hain: 1-Tap Google Review ya Save Contact & WhatsApp.
-                </p>
-                <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-950 p-2 mb-4">
-                  <img src="/standees/gear1_standee_opt3_smart_gateway.png" alt="Option 3 Standee" className="rounded-lg w-full h-44 object-cover" />
+                <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm mb-4">
+                  <CheckCircle className="w-5 h-5 text-emerald-400" />
+                  CustomerPilot Unified Architecture (Save 80%+)
                 </div>
-              </div>
-              <span className="text-[11px] font-semibold text-slate-400">Cleanest single QR counter stand</span>
-            </div>
+                <div className="space-y-4 text-xs text-slate-300">
+                  <div className="p-3 bg-slate-900/80 rounded-xl border border-emerald-800/40 flex justify-between items-center">
+                    <div>
+                      <div className="font-bold text-white">Smart Digital Business Card</div>
+                      <div className="text-emerald-400">1-Tap save directly into phone address book</div>
+                    </div>
+                    <span className="text-emerald-400 font-bold">Included</span>
+                  </div>
 
-            {/* Option 4 */}
-            <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 flex flex-col justify-between">
-              <div>
-                <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">Option 4</div>
-                <h4 className="text-lg font-bold text-white mb-2">Vertical Stacked Hero</h4>
-                <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-                  Top 70% par Big Google Review QR, bottom 30% par compact Digital Card QR with WhatsApp icon.
-                </p>
-                <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-950 p-2 mb-4">
-                  <img src="/standees/gear1_standee_opt4_vertical_stacked.png" alt="Option 4 Standee" className="rounded-lg w-full h-44 object-cover" />
-                </div>
-              </div>
-              <span className="text-[11px] font-semibold text-slate-400">Maximum focus on Google Reviews</span>
-            </div>
+                  <div className="p-3 bg-slate-900/80 rounded-xl border border-emerald-800/40 flex justify-between items-center">
+                    <div>
+                      <div className="font-bold text-white">Smart POS WhatsApp PDF Invoices</div>
+                      <div className="text-emerald-400">Paperless billing, auto GST & dynamic UPI</div>
+                    </div>
+                    <span className="text-emerald-400 font-bold">Included</span>
+                  </div>
 
-            {/* Option 5 */}
-            <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 flex flex-col justify-between">
-              <div>
-                <div className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">Option 5</div>
-                <h4 className="text-lg font-bold text-white mb-2">Royal Luxury Gold Edition</h4>
-                <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-                  Matte black & champagne gold finish. Premium boutiques, jewellery showrooms aur luxury opticals ke liye.
-                </p>
-                <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-950 p-2 mb-4">
-                  <img src="/standees/gear1_standee_opt5_royal_luxury.png" alt="Option 5 Standee" className="rounded-lg w-full h-44 object-cover" />
+                  <div className="p-3 bg-slate-900/80 rounded-xl border border-emerald-800/40 flex justify-between items-center">
+                    <div>
+                      <div className="font-bold text-white">WhatsApp VIP Loyalty Stamp Cards</div>
+                      <div className="text-emerald-400">Zero-app gamified rewards & win-back alerts</div>
+                    </div>
+                    <span className="text-emerald-400 font-bold">Included</span>
+                  </div>
+
+                  <div className="p-3 bg-slate-900/80 rounded-xl border border-emerald-800/40 flex justify-between items-center">
+                    <div>
+                      <div className="font-bold text-white">AI Google Reviews & AutoReply</div>
+                      <div className="text-emerald-400">20 authentic keywords with 100% Google Maps safety</div>
+                    </div>
+                    <span className="text-emerald-400 font-bold">Included</span>
+                  </div>
                 </div>
               </div>
-              <span className="text-[11px] font-semibold text-slate-400">Ultra-luxury aesthetic standee</span>
+
+              <div className="mt-8 pt-4 border-t border-emerald-900/30 text-emerald-300 text-xs font-semibold">
+                ✅ Single subscription: 100% automated, zero app download for customers, instant setup.
+              </div>
             </div>
           </div>
         </div>
@@ -594,7 +593,7 @@ export default function ServicesInfographicPage() {
             Ready To Upgrade Your Local Business?
           </h2>
           <p className="mt-4 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto">
-            Chahe aapko sirf Gear 1 chahiye ya pura CustomerPilot Growth Suite — setup lene me sirf 2 minute lagte hain.
+            Chahe aap bakery ho, optical store, saree palace, salon, clinic ya restaurant — CustomerPilot setup lene me sirf 2 minute lagte hain.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link href="/pricing">

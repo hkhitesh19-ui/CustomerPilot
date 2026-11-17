@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
       : merchant.city
 
     // Universal Category Auto-Detection from Google Places result
-    const candidateCategory = topMatch.primaryType || topMatch.displayName?.text || merchant.name
+    const candidateCategory = (topMatch as any).primaryType || topMatch.displayName?.text || merchant.name
     const categoryPreset = getKeywordPresetForCategory(candidateCategory, topMatch.displayName?.text || merchant.name)
 
     const existingKp = (merchant as any)?.keywordProfile

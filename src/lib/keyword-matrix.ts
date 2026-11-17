@@ -412,7 +412,7 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
     id: "optical_store",
     label: "Optician, Eyewear & Spectacles",
     gbpCategory: "Optician / Optical Store / Eyewear & Sunglasses",
-    audiencePersona: "All_Genders",
+    audiencePersona: "All_Neutral",
     serviceMode: "Store Walk-in & Eye Testing Consultation",
     seoEntities: [
       // Hero Services (First 10)

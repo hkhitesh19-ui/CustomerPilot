@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     }
 
     const merchantRecord = await db.merchant.findUnique({ where: { id: merchantId } });
-    const fallbackStoreName = merchantRecord?.businessName || merchantRecord?.name || "Store Location";
+    const fallbackStoreName = (merchantRecord as any)?.businessName || merchantRecord?.name || "Store Location";
 
     const finalReviewUrl = googleReviewUrl || `https://search.google.com/local/writereview?placeid=${placeId}`;
 
