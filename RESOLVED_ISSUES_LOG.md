@@ -4,6 +4,34 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [17 Nov 2026] Feature & Bugfix: Platform-Wide Universal Brand Logo Synchronization Across Digital Card, Standees & QR Codes
+- **Symptom**:
+  1. In `/dashboard/settings` and Standee Studios, a custom brand logo was uploaded and displayed on tabletop standees (e.g. Maw & Paw `/uploads/1794678129417-MawPawLogo.jpg`), but navigating to `/dashboard/digital-card` showed an empty "Store Logo Image URL" input field and the live simulator rendered a placeholder initials box ("MA").
+  2. Logo uploads were siloed: uploading or changing a logo on one screen (Settings, Standee Studio, or Digital Card) did not automatically propagate to other places across the merchant profile.
+  3. The Digital Card Studio (`/dashboard/digital-card`) only had a manual text input for the logo URL with no 1-click file upload or remove button.
+- **Root Cause**:
+  1. `POST /api/merchant/upload-brand` updated only `Merchant.logoUrl` and did not update `DigitalBusinessCard.logoUrl`.
+  2. `GET /api/digital-card` did not fall back to `merchant.logoUrl` when `card.logoUrl` was null/empty and did not backfill the database record.
+  3. `POST /api/digital-card` updated only `DigitalBusinessCard.logoUrl` without syncing back to `Merchant.logoUrl`.
+  4. `PATCH /api/merchant/update` cleared or updated `Merchant.logoUrl` without cascading the change to `DigitalBusinessCard`.
+- **Resolution**:
+  1. **Unified Upload & Cascade (`src/app/api/merchant/upload-brand/route.ts`)**:
+     - Whenever a logo or cover is uploaded, the API now updates both `db.merchant` and `db.digitalBusinessCard.updateMany` in a single transaction.
+  2. **Unified Removal & Update (`src/app/api/merchant/update/route.ts`)**:
+     - When `logoUrl` is updated or set to `null`, changes automatically cascade to `db.digitalBusinessCard`.
+  3. **Bidirectional Digital Card Sync (`src/app/api/digital-card/route.ts`)**:
+     - `GET`: Selects `merchant.logoUrl`, resolves `card.logoUrl = card.logoUrl || card.merchant?.logoUrl || null`, and automatically backfills `DigitalBusinessCard.logoUrl` in the database.
+     - `POST`: Synchronizes any updated `logoUrl` backward to `Merchant.logoUrl` so all standees immediately receive the change.
+  4. **Public Digital Card & OG Meta (`src/app/c/[slug]/page.tsx`)**:
+     - Now resolves `logoUrl: card.logoUrl || card.merchant?.logoUrl || null` for both the rendered card and social share meta tags.
+  5. **1-Click Logo Management Studio (`src/app/dashboard/digital-card/page.tsx`)**:
+     - Added direct 1-click "Upload Logo" / "Change Logo" and "Remove Logo" buttons wired to `/api/merchant/upload-brand` and `/api/merchant/update`.
+     - Displays live thumbnail preview and "Active Everywhere" confirmation badge.
+     - Auto-fetch via GBP now pulls the merchant's uploaded logo automatically.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [17 Nov 2026] Issue & Enhancement: Smart Digital Business Card GBP Auto-Fetch, Category-Aware Ordering Links & Official Business Email Integration
 - **Symptom**:
   1. On the Smart Digital Business Card editor (`/dashboard/digital-card`), auto-fetching via Google Business Profile (GBP) link for pet stores like "Maw & Paw" failed to extract correct business details (name, category, phone, rating, reviews, hours), leaving fields empty or retaining leftover bakery placeholders (e.g. Cake Connection).

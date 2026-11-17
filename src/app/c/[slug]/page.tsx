@@ -77,7 +77,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: "summary_large_image",
       title,
       description,
-      images: [card.logoUrl || "https://customerpilot.in/cplogo.png"],
+      images: [card.logoUrl || card.merchant?.logoUrl || "https://customerpilot.in/cplogo.png"],
     },
   }
 }
@@ -137,8 +137,8 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
     slug: card.slug,
     displayName: card.displayName,
     subCategories: card.subCategories,
-    logoUrl: card.logoUrl,
-    coverUrl: card.coverUrl,
+    logoUrl: card.logoUrl || card.merchant?.logoUrl || null,
+    coverUrl: card.coverUrl || card.merchant?.coverUrl || null,
     locationShort: card.locationShort,
     locationState: card.locationState,
     businessHours: card.businessHours,

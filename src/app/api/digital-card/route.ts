@@ -45,12 +45,12 @@ export async function GET(req: NextRequest) {
     if (slug) {
       card = await db.digitalBusinessCard.findUnique({
         where: { slug: slug.toLowerCase() },
-        include: { merchant: { select: { email: true, whatsappPhone: true } } },
+        include: { merchant: { select: { email: true, whatsappPhone: true, logoUrl: true } } },
       })
     } else if (targetMerchantId) {
       card = await db.digitalBusinessCard.findUnique({
         where: { merchantId: targetMerchantId },
-        include: { merchant: { select: { email: true, whatsappPhone: true } } },
+        include: { merchant: { select: { email: true, whatsappPhone: true, logoUrl: true } } },
       })
       if (!card) {
         card = await getOrCreateDigitalBusinessCard(targetMerchantId)
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
     } else {
       // Default to first merchant's card
       card = await db.digitalBusinessCard.findFirst({
-        include: { merchant: { select: { email: true, whatsappPhone: true } } },
+        include: { merchant: { select: { email: true, whatsappPhone: true, logoUrl: true } } },
       })
     }
 
@@ -75,6 +75,16 @@ export async function GET(req: NextRequest) {
 
     const resolvedEmail = card.email || parsedThemeMeta?.email || card.merchant?.email || null
     card.email = resolvedEmail
+
+    // ── AUTOMATIC GLOBAL LOGO RESOLUTION & BACKFILL ──
+    const resolvedLogoUrl = card.logoUrl || card.merchant?.logoUrl || null
+    if (!card.logoUrl && resolvedLogoUrl && card.id) {
+      await db.digitalBusinessCard.update({
+        where: { id: card.id },
+        data: { logoUrl: resolvedLogoUrl }
+      }).catch(() => null)
+    }
+    card.logoUrl = resolvedLogoUrl
 
     const isVcardFormat = searchParams.get("format") === "vcard" || searchParams.get("vcard") === "true"
     if (isVcardFormat) {
@@ -420,7 +430,17 @@ export async function POST(req: NextRequest) {
       },
     })
 
-        return NextResponse.json({ success: true, card: updatedCard, slug: updatedCard.slug })
+    // ── AUTOMATIC GLOBAL LOGO SYNCHRONIZATION ──
+    // If logoUrl is updated from the Digital Card Studio, sync it immediately to merchant.logoUrl
+    if (logoUrl !== undefined && targetMerchantId) {
+      const cleanLogo = logoUrl ? String(logoUrl).trim() : null
+      await db.merchant.update({
+        where: { id: targetMerchantId },
+        data: { logoUrl: cleanLogo }
+      }).catch(() => null)
+    }
+
+    return NextResponse.json({ success: true, card: updatedCard, slug: updatedCard.slug })
   } catch (error: any) {
     console.error("[API_DIGITAL_CARD_POST]", error)
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })

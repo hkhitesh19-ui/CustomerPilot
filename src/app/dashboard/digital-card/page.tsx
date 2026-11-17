@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { 
   Smartphone, 
   Share2, 
@@ -31,7 +31,9 @@ import {
   IndianRupee,
   CreditCard,
   Mail,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Upload,
+  Trash2
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -56,6 +58,8 @@ export default function DigitalCardDashboardPage() {
   const [swiggyUrl, setSwiggyUrl] = useState("")
   const [otherOrderUrl, setOtherOrderUrl] = useState("")
   const [otherOrderLabel, setOtherOrderLabel] = useState("EasyCater / Other")
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const logoInputRef = useRef<HTMLInputElement>(null)
 
   // Form State
   const [formData, setFormData] = useState<DigitalCardData>({
@@ -232,6 +236,59 @@ export default function DigitalCardDashboardPage() {
     loadCard()
   }, [])
 
+  // ── Unified Logo Upload / Removal (Synchronized Everywhere) ──
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Maximum allowed file size is 5MB", variant: "destructive" })
+      return
+    }
+    setUploadingLogo(true)
+    try {
+      const fd = new FormData()
+      fd.append("file", file)
+      fd.append("type", "logo")
+      const res = await fetch("/api/merchant/upload-brand", {
+        method: "POST",
+        body: fd,
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.error || "Upload failed")
+      const uploadedUrl = json.data?.url || json.url
+      if (uploadedUrl) {
+        setFormData(prev => ({ ...prev, logoUrl: uploadedUrl }))
+        toast({
+          title: "Logo Synchronized Everywhere! 🌟",
+          description: "Aapka logo Digital Card, Counter Standee, aur Google Review Standee sabhi jagah ek saath update ho gaya hai.",
+        })
+      }
+    } catch (err: any) {
+      toast({ title: "Upload Failed", description: err.message || "Failed to upload logo", variant: "destructive" })
+    } finally {
+      setUploadingLogo(false)
+      if (logoInputRef.current) logoInputRef.current.value = ""
+    }
+  }
+
+  const handleRemoveLogo = async () => {
+    if (!confirm("Kya aap sach me logo remove karna chahte hain? Ye Digital Card aur sabhi Standees se hat jayega.")) return
+    try {
+      await fetch("/api/merchant/update", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ logoUrl: null }),
+      })
+      setFormData(prev => ({ ...prev, logoUrl: "" }))
+      toast({
+        title: "Logo Removed Everywhere",
+        description: "Logo sabhi standees aur digital card se successfully remove ho gaya hai.",
+      })
+    } catch {
+      toast({ title: "Error", description: "Failed to remove logo", variant: "destructive" })
+    }
+  }
+
   // Auto-Fetch from Public GBP (No OAuth required)
   const handleAutoFetchGbp = async () => {
     if (!gbpSearchQuery.trim()) {
@@ -286,6 +343,7 @@ export default function DigitalCardDashboardPage() {
           locationState: d.locationState ? d.locationState : prev.locationState,
           phoneNumber: d.phoneNumber ? d.phoneNumber : prev.phoneNumber,
           whatsappNumber: d.whatsappNumber ? d.whatsappNumber : prev.whatsappNumber,
+          logoUrl: d.logoUrl ? d.logoUrl : prev.logoUrl,
           email: d.email ? d.email : (email || prev.email),
           googleRating: d.googleRating != null ? d.googleRating : prev.googleRating,
           googleReviewsCnt: d.googleReviewsCnt != null ? d.googleReviewsCnt : prev.googleReviewsCnt,
@@ -583,25 +641,74 @@ export default function DigitalCardDashboardPage() {
                 />
               </div>
 
-              {/* Logo URL with Live Preview */}
+              {/* Store Logo with Direct Upload & Global Auto-Sync */}
               <div>
-                <Label className="text-xs font-bold flex items-center gap-1.5">
-                  <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
-                  Store Logo Image URL
-                </Label>
-                <div className="flex items-center gap-2.5 mt-1">
+                <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1">
+                  <Label className="text-xs font-bold flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
+                    <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
+                    Store Brand Logo (Synchronized Across All Standees & Digital Card)
+                  </Label>
+                  {formData.logoUrl && (
+                    <span className="text-[10px] text-emerald-700 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Active Everywhere
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 mt-1 flex-wrap sm:flex-nowrap">
                   <Input
                     value={formData.logoUrl || ""}
                     onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
                     placeholder="/uploads/... or https://..."
-                    className="rounded-xl text-xs font-mono flex-1"
+                    className="rounded-xl text-xs font-mono flex-1 min-w-[200px]"
                   />
+
+                  {/* Hidden File Input */}
+                  <input
+                    type="file"
+                    ref={logoInputRef}
+                    onChange={handleLogoUpload}
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                    className="hidden"
+                  />
+
+                  {/* 1-Click Upload / Change Logo Button */}
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={uploadingLogo}
+                    onClick={() => logoInputRef.current?.click()}
+                    className="rounded-xl border-amber-300 bg-amber-50/70 hover:bg-amber-100 text-amber-900 font-bold text-xs shrink-0 shadow-xs"
+                  >
+                    <Upload className="w-3.5 h-3.5 mr-1 text-amber-600" />
+                    {uploadingLogo ? "Uploading..." : (formData.logoUrl ? "Change Logo" : "Upload Logo")}
+                  </Button>
+
+                  {/* Remove Logo Button */}
+                  {formData.logoUrl && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleRemoveLogo}
+                      className="h-8 px-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl shrink-0"
+                      title="Remove Logo everywhere"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+
+                  {/* Live Thumbnail Preview */}
                   {formData.logoUrl && (
                     <div className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white p-1 flex-shrink-0 flex items-center justify-center overflow-hidden shadow-xs">
                       <img src={formData.logoUrl} alt="Logo preview" className="w-full h-full object-contain" />
                     </div>
                   )}
                 </div>
+                <p className="text-[11px] text-slate-500 mt-1">
+                  ✨ Logo yahan upload/change karne par ye automatically Digital Card, Counter Standee, aur Google Review Standee sabhi jagah ek saath live change ho jayega.
+                </p>
               </div>
 
               {/* Google Rating & Review Count */}

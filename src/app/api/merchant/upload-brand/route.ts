@@ -96,6 +96,20 @@ export async function POST(req: NextRequest) {
       data: updateData
     })
 
+    // ── AUTOMATIC GLOBAL LOGO & COVER SYNCHRONIZATION ──
+    // Synchronize uploaded logo/cover to Digital Business Card so changing it anywhere updates all touchpoints
+    if (type === "logo") {
+      await db.digitalBusinessCard.updateMany({
+        where: { merchantId: merchant.id },
+        data: { logoUrl: publicUrl }
+      }).catch(() => null)
+    } else if (type === "cover") {
+      await db.digitalBusinessCard.updateMany({
+        where: { merchantId: merchant.id },
+        data: { coverUrl: publicUrl }
+      }).catch(() => null)
+    }
+
     return ok({ url: publicUrl, message: `${type} uploaded successfully` })
   } catch (error: any) {
     console.error("[API] Upload Error:", error.message)

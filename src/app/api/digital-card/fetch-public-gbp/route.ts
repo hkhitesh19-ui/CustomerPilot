@@ -289,6 +289,7 @@ export async function POST(req: NextRequest) {
           deliveryInfo: parsed.isPet ? "Store Walk-in & Express Home Delivery" : "Store Walk-in & Express Delivery Available",
           isPetStore: parsed.isPet,
           enableFoodDelivery: !parsed.isPet,
+          logoUrl: matchedMerchant.logoUrl || null,
           orderingLinks: JSON.stringify(defaultOrderingLinks)
         }
       })

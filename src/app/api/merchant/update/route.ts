@@ -66,6 +66,15 @@ export async function PATCH(req: NextRequest) {
       data: allowedUpdates,
     })
 
+    // ── AUTOMATIC GLOBAL LOGO SYNCHRONIZATION ──
+    // If logoUrl is updated or cleared, sync immediately to Digital Business Card
+    if (allowedUpdates.logoUrl !== undefined) {
+      await db.digitalBusinessCard.updateMany({
+        where: { merchantId },
+        data: { logoUrl: allowedUpdates.logoUrl || null }
+      }).catch(() => null)
+    }
+
     return ok({ message: "Merchant updated successfully", merchant: updated })
   } catch (error: any) {
     if (error.code === 'P2002' && error.meta?.target?.includes('whatsappPhone')) {
