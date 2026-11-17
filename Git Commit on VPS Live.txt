@@ -8,13 +8,12 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 4129202 (fix(reviews): google review auto-reply personalization, overwrite protection, 3-draft studio and short store name)
-Full SHA          : 412920280cc62bc5d17f8fd5837ea30f686cf9b9
-Parent Commit     : 05acc33
+Active Git Commit : 6718302 (Cumulative deployment including ccddc99: WhatsApp Group Booster & Booster Pro Store Logo Enlargement up to 165px Hero with Size Selectors + 4129202: Google Review AutoReply Studio)
+Full SHA          : 67183020e924dc5fb26c885abf00b7a5107153ad
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 17 Nov 2026, 09:25 AM IST
+Deployment Date   : 17 Nov 2026, 10:15 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(reviews): google review auto-reply personalization, overwrite protection, 3-draft studio and short store name
+Commit Title      : feat(booster): upgrade standee store logo to borderless hero format (up to 165px) with full dashboard preview & reviews studio sync
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -22,14 +21,10 @@ Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 O
 Verified Live Outcomes:
 ----------------------------------------------------------
 1. https://customerpilot.in/                                         -> HTTP 200 (Homepage live & healthy)
-2. https://customerpilot.in/dashboard/reviews                        -> HTTP 200 (1-Click GoogleReview AutoReply Studio with 3-Draft Selector & Overwrite Protection)
-3. https://customerpilot.in/ai-google-review-autoreply               -> HTTP 200 (1-Click AI AutoReply Showcase & Explainer)
-4. https://customerpilot.in/api/reviews/list                         -> HTTP 200 (Review query endpoint)
-5. Overwrite Protection & Personalization:
-   - Google API response parser extracts r.reviewReply directly so existing Google replies are 100% locked & immutable.
-   - Store name sanitized via getCleanMerchantName() strictly to 'Cake Connection' (no keyword-stuffed long title).
-   - Customer names extracted and products/experiences mirrored (customized wedding cake, on-time delivery, budget).
-   - 14 High-Intent Vadodara Bakery SEO keywords rotated dynamically across drafts.
-   - Multi-LLM cascade: Gemini -> Groq -> Intelligent Rule-Based Fallback.
+2. https://customerpilot.in/dashboard/WAGroupBooster                 -> HTTP 200 (Enlarged Hero Logo 165px + 1-Click Size Selector Pills [Medium 105px / Large 135px / Hero 165px] + Store Text Toggle)
+3. https://customerpilot.in/dashboard/WAGroupBoosterPro              -> HTTP 200 (WhatsApp Booster Pro Lead Capture Mode with Hero Logo & Size Selector)
+4. https://customerpilot.in/dashboard/reviews                        -> HTTP 200 (1-Click GoogleReview AutoReply Studio with 3-Draft Selector & Overwrite Protection)
+5. Physical Standee Print Template:
+   - handlePrintStandee() dynamically scales logo to 26mm, 34mm, or 42mm high on A4/A5 physical prints.
 6. Adversarial Red-Team Safety Gates:
    - All 6 automated gates passed cleanly (AST import linter, full-app TS ratchet 0 errors, sensitive token redactions, 12 mathematical boundaries, payments regression, 0 tracked DBs)
