@@ -84,11 +84,12 @@ export async function GET(req: NextRequest) {
     }
 
     // Generate QR Code with Merchant Business Logo in Center (or CustomerPilot fallback)
+    const effectiveLogoUrl = merchant.logoUrl || merchant.digitalBusinessCard?.logoUrl || null
     const qrDataUrl = await generateBrandedQRDataUrl(targetUrl, {
       width: 600,
       darkColor: mode === "reviews" || type.startsWith("review_") ? "#0f172a" : "#1e1b4b",
       lightColor: "#ffffff",
-      merchantLogoUrl: (mode === "reviews" || type.startsWith("review_")) ? null : (merchant.logoUrl || null)
+      merchantLogoUrl: effectiveLogoUrl
     })
 
     return ok({
@@ -99,7 +100,7 @@ export async function GET(req: NextRequest) {
       targetUrl,
       merchant: {
         name: merchant.name,
-        logoUrl: merchant.logoUrl,
+        logoUrl: effectiveLogoUrl,
         businessType: merchant.businessType,
         category: merchant.category,
         city: (merchant as any).city || null,

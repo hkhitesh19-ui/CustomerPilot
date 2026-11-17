@@ -19,6 +19,7 @@ export async function GET() {
         name: merchant.name,
         email: merchant.email,
         whatsappPhone: merchant.whatsappPhone,
+        logoUrl: merchant.logoUrl,
         plan: merchant.plan,
         trialEndsAt: merchant.trialEndsAt,
         enabledModules: merchant.enabledModules,

@@ -14,6 +14,11 @@ import {
   X, Wand2, AlertTriangle
 } from "lucide-react"
 import { sanitizeDestinationUrl, detectMultipleUrls } from "@/lib/url-sanitizer"
+import {
+  subscribeMerchantLogoUpdate,
+  downloadFullHdStandeeJpg,
+  type StandeeLogoSize,
+} from "@/lib/logo-sync"
 
 export default function DynamicQRStudioPage() {
   const { toast } = useToast()
@@ -22,6 +27,17 @@ export default function DynamicQRStudioPage() {
   const [loading, setLoading] = useState(true)
   const [qrCodes, setQrCodes] = useState<any[]>([])
   const [selectedQr, setSelectedQr] = useState<any>(null)
+  const [logoSize, setLogoSize] = useState<StandeeLogoSize>("xl")
+  const [downloadingHd, setDownloadingHd] = useState(false)
+
+  // Auto-sync logo whenever updated on ANY other standee / digital card
+  useEffect(() => {
+    if (!merchantId) return
+    return subscribeMerchantLogoUpdate(merchantId, (newLogoUrl) => {
+      setMerchantProfile((prev: any) => (prev ? { ...prev, logoUrl: newLogoUrl } : prev))
+      fetchQrs(merchantId)
+    })
+  }, [merchantId])
 
   // Creation State
   const [newLabel, setNewLabel] = useState("")
@@ -69,6 +85,9 @@ export default function DynamicQRStudioPage() {
       const data = await res.json()
       if (data.success && data.qrCodes) {
         setQrCodes(data.qrCodes)
+        if (data.qrCodes.length > 0 && data.qrCodes[0].merchant) {
+          setMerchantProfile((prev: any) => ({ ...prev, ...data.qrCodes[0].merchant }))
+        }
         if (data.qrCodes.length > 0 && !selectedQr) {
           setSelectedQr(data.qrCodes[0])
         }
@@ -482,19 +501,66 @@ export default function DynamicQRStudioPage() {
             </CardHeader>
 
             <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-              {/* QR Image Display */}
-              <div className="p-5 bg-white rounded-2xl border-2 border-slate-200 shadow-md flex items-center justify-center">
-                {previewQrDataUrl ? (
-                  <img src={previewQrDataUrl} alt="Preview QR" className="w-48 h-48 sm:w-56 sm:h-56 object-contain" />
-                ) : selectedQr?.qrDataUrl ? (
-                  <img src={selectedQr.qrDataUrl} alt={selectedQr.label} className="w-48 h-48 sm:w-56 sm:h-56 object-contain" />
+              {/* Branded Counter Standee Preview with L / XL / XXL Auto-Synced Logo */}
+              <div className="w-full max-w-[300px] p-5 bg-white rounded-3xl border-4 border-slate-900 shadow-xl flex flex-col items-center space-y-3">
+                {merchantProfile?.logoUrl ? (
+                  <img
+                    src={merchantProfile.logoUrl}
+                    alt={merchantProfile?.name || "Store Logo"}
+                    className={`${
+                      logoSize === "xxl"
+                        ? "max-h-[155px] max-w-[260px]"
+                        : logoSize === "l"
+                        ? "max-h-[95px] max-w-[200px]"
+                        : "max-h-[125px] max-w-[235px]"
+                    } w-auto h-auto object-contain transition-all`}
+                  />
                 ) : (
-                  <div className="w-48 h-48 sm:w-56 sm:h-56 flex flex-col items-center justify-center text-slate-400 gap-2 border border-dashed border-slate-300 rounded-xl">
+                  <div className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                    {merchantProfile?.name || "Your Store"}
+                  </div>
+                )}
+
+                <div className="inline-block px-3 py-1 rounded-full bg-teal-600 text-white text-[10px] font-black tracking-wide">
+                  {(previewQrDataUrl ? newLabel : selectedQr?.label || "Scan Dynamic QR").replace(/^\[NO_LOGO\]\s*/i, "")}
+                </div>
+
+                {previewQrDataUrl ? (
+                  <img src={previewQrDataUrl} alt="Preview QR" className="w-44 h-44 object-contain" />
+                ) : selectedQr?.qrDataUrl ? (
+                  <img src={selectedQr.qrDataUrl} alt={selectedQr.label} className="w-44 h-44 object-contain" />
+                ) : (
+                  <div className="w-44 h-44 flex flex-col items-center justify-center text-slate-400 gap-2 border border-dashed border-slate-300 rounded-xl">
                     <QrIcon className="w-10 h-10 opacity-40" />
                     <span className="text-xs">No QR Code Selected</span>
                   </div>
                 )}
+
+                <div className="text-[10px] font-extrabold text-slate-700 tracking-wider">SCAN WITH ANY CAMERA</div>
               </div>
+
+              {/* Logo Display Size (L / XL / XXL) */}
+              {merchantProfile?.logoUrl && (
+                <div className="w-full flex items-center justify-between p-2.5 rounded-xl bg-teal-50/70 border border-teal-200">
+                  <span className="text-[11px] font-extrabold text-teal-950">Logo Display Size:</span>
+                  <div className="flex items-center gap-1.5">
+                    {(["l", "xl", "xxl"] as StandeeLogoSize[]).map((sz) => (
+                      <button
+                        key={sz}
+                        type="button"
+                        onClick={() => setLogoSize(sz)}
+                        className={`px-3 py-1 text-[11px] font-extrabold uppercase rounded-lg transition-all ${
+                          logoSize === sz
+                            ? "bg-teal-700 text-white shadow-xs"
+                            : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                        }`}
+                      >
+                        {sz === "l" ? "L" : sz === "xl" ? "XL ✨" : "XXL 🚀"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Dynamic URL badge */}
               <div className="w-full bg-slate-50 rounded-xl p-3 border border-slate-200 text-left space-y-1.5">
@@ -542,15 +608,39 @@ export default function DynamicQRStudioPage() {
               {/* Download Buttons */}
               <div className="grid grid-cols-2 gap-2 w-full pt-2">
                 <Button
-                  onClick={() => {
-                    const imgUrl = previewQrDataUrl || selectedQr?.qrDataUrl
-                    if (imgUrl) downloadDataUrl(imgUrl, `${selectedQr?.slug || "dynamic-qr"}.png`)
+                  onClick={async () => {
+                    const targetMId = merchantId || merchantProfile?.id
+                    if (!targetMId) return
+                    setDownloadingHd(true)
+                    try {
+                      const activeLabel = (previewQrDataUrl ? newLabel : selectedQr?.label || "Scan Dynamic QR").replace(/^\[NO_LOGO\]\s*/i, "")
+                      const activeTarget = previewQrDataUrl ? newDestUrl : (selectedQr?.publicUrl || selectedQr?.currentDest || "")
+                      const { sizeMB } = await downloadFullHdStandeeJpg({
+                        merchantId: targetMId,
+                        design: "dynamic_qr",
+                        logoSize,
+                        fileName: `${(selectedQr?.slug || "dynamic-qr")}-Standee-HD.jpg`,
+                        extraParams: {
+                          message: activeLabel,
+                          qrStyle: logoChoice === "no_logo" ? "clean" : "store_logo",
+                          ...(activeTarget ? { targetUrl: activeTarget } : {}),
+                        },
+                      })
+                      toast({
+                        title: "Downloaded Full HD Standee! ✅",
+                        description: `Dynamic QR Full Standee JPEG (${sizeMB} MB Ultra-HD 600 DPI) downloaded.`,
+                      })
+                    } catch (e: any) {
+                      toast({ title: "Download Failed", description: e.message || "Failed to generate HD standee", variant: "destructive" })
+                    } finally {
+                      setDownloadingHd(false)
+                    }
                   }}
-                  disabled={!previewQrDataUrl && !selectedQr?.qrDataUrl}
+                  disabled={(!previewQrDataUrl && !selectedQr?.qrDataUrl) || downloadingHd}
                   className="rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white gap-1.5"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>Download PNG</span>
+                  <span>{downloadingHd ? "Generating HD..." : "Download QR (HD JPG)"}</span>
                 </Button>
 
                 <Button

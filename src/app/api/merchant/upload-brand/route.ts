@@ -1,11 +1,7 @@
 import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
-import { ok, err } from "@/lib/api"
+import { ok, err, getAuthenticatedMerchant } from "@/lib/api"
 import { storage } from "@/lib/storage"
-import { cookies } from "next/headers"
-import { jwtVerify } from "jose"
-import { getJwtSecret } from "@/lib/jwt-secret";
-
 
 async function resolveMerchant(req: NextRequest) {
   const headerId = req.headers.get("x-merchant-id")
@@ -14,19 +10,9 @@ async function resolveMerchant(req: NextRequest) {
     if (m) return m
   }
 
-  try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("token")?.value
-    if (token) {
-      const secret = new TextEncoder().encode(getJwtSecret())
-      const { payload } = await jwtVerify(token, secret)
-      const merchantId = payload.merchantId as string
-      if (merchantId) {
-        const m = await db.merchant.findUnique({ where: { id: merchantId } }).catch(() => null)
-        if (m) return m
-      }
-    }
-  } catch {}
+  // Respect authenticated session AND SuperAdmin impersonation cookie
+  const authMerchant = await getAuthenticatedMerchant().catch(() => null)
+  if (authMerchant) return authMerchant
 
   // Fallback to latest merchant
   return await db.merchant.findFirst({ orderBy: { createdAt: "desc" } })
@@ -110,7 +96,7 @@ export async function POST(req: NextRequest) {
       }).catch(() => null)
     }
 
-    return ok({ url: publicUrl, message: `${type} uploaded successfully` })
+    return ok({ url: publicUrl, merchantId: merchant.id, message: `${type} uploaded successfully` })
   } catch (error: any) {
     console.error("[API] Upload Error:", error.message)
     return err("Upload failed: " + error.message, 500)

@@ -8,6 +8,12 @@ import {
   Star, Download, Printer, Copy, CheckCircle2, Sparkles, ExternalLink, 
   RefreshCw, Upload, Trash2, MapPin, Building2, Image as ImageIcon 
 } from "lucide-react"
+import {
+  broadcastMerchantLogoUpdate,
+  subscribeMerchantLogoUpdate,
+  downloadFullHdStandeeJpg,
+  type StandeeLogoSize,
+} from "@/lib/logo-sync"
 
 interface GoogleReviewQRGeneratorProps {
   merchantId: string
@@ -38,6 +44,19 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
   const [copied, setCopied] = useState(false)
   const [imgFailed, setImgFailed] = useState(false)
   const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [logoSize, setLogoSize] = useState<StandeeLogoSize>("xl")
+  const [downloadingHd, setDownloadingHd] = useState(false)
+
+  // Listen for global logo uploads from ANY other standee / digital card
+  useEffect(() => {
+    if (!merchantId) return
+    return subscribeMerchantLogoUpdate(merchantId, (newLogoUrl) => {
+      setQrData((prev: any) =>
+        prev ? { ...prev, merchant: { ...prev.merchant, logoUrl: newLogoUrl } } : prev
+      )
+      setImgFailed(false)
+    })
+  }, [merchantId])
 
   // Multi-location GBP attached locations state
   const [locations, setLocations] = useState<any[]>([])
@@ -175,9 +194,10 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
           }
         }))
         setImgFailed(false)
+        broadcastMerchantLogoUpdate(merchantId, uploadedUrl)
         toast({
-          title: "Store Logo Updated! ✅",
-          description: "Your business logo is now active on the Smart Review Standee."
+          title: "Logo Synced Across All Standees! ✅",
+          description: "Your business logo is now automatically active on ALL QR Standees."
         })
       } else {
         throw new Error(json?.error || "Failed to upload logo")
@@ -214,6 +234,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
           }
         }))
         setImgFailed(false)
+        broadcastMerchantLogoUpdate(merchantId, null)
         toast({
           title: "Logo Removed",
           description: "Standee will now display your official store name badge."
@@ -236,15 +257,35 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
     setTimeout(() => setCopied(false), 2500)
   }
 
-  const handleDownloadPNG = () => {
-    if (!qrData?.qrDataUrl) return
-    const link = document.createElement("a")
-    link.href = qrData.qrDataUrl
-    link.download = `SmartAI-Google-Review-${qrType}-QR.png`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    toast({ title: "Downloaded PNG", description: "SmartAI Google Review QR downloaded successfully." })
+  // Download Full Ultra-HD Google Review Standee JPEG (~9–10 MB, 600 DPI)
+  const handleDownloadPNG = async () => {
+    if (!merchantId) return
+    setDownloadingHd(true)
+    try {
+      const safeName = (qrData?.merchant?.name || placeName || "Store").replace(/\s+/g, "_")
+      const { sizeMB } = await downloadFullHdStandeeJpg({
+        merchantId,
+        design: "google_review_v3",
+        logoSize,
+        fileName: `${safeName}-SmartAI-Google-Review-Standee-HD.jpg`,
+        extraParams: {
+          type: qrType,
+          ...(qrData?.targetUrl ? { targetUrl: qrData.targetUrl } : {}),
+        },
+      })
+      toast({
+        title: "Downloaded Full HD Standee! ✅",
+        description: `Smart AI Google Review Full Standee JPEG (${sizeMB} MB Ultra-HD 600 DPI) downloaded.`,
+      })
+    } catch (e: any) {
+      toast({
+        title: "Download Failed",
+        description: e.message || "Could not generate HD standee JPEG",
+        variant: "destructive",
+      })
+    } finally {
+      setDownloadingHd(false)
+    }
   }
 
   /* ─────────────────────────────────────────────────────────────────────────
@@ -317,7 +358,7 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
               margin-top: 2px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; min-height: 110px; width: 100%;
             }
             .merchant-logo {
-              height: 125px; max-width: 340px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.06));
+              max-height: ${logoSize === "l" ? "115px" : logoSize === "xxl" ? "190px" : "150px"}; max-width: ${logoSize === "l" ? "300px" : logoSize === "xxl" ? "380px" : "340px"}; width: auto; height: auto; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.06));
             }
             .store-name-badge {
               display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 22px; background: #F8FAFC; border: 2px solid #E2E8F0; border-radius: 20px; max-width: 340px; width: 100%;
@@ -466,11 +507,11 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
               variant="outline"
               size="sm"
               onClick={handleDownloadPNG}
-              disabled={loading || !qrData?.qrDataUrl}
+              disabled={loading || downloadingHd || !merchantId}
               className="border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-semibold rounded-xl"
             >
               <Download className="w-3.5 h-3.5 mr-1" />
-              Download QR
+              {downloadingHd ? "Generating HD (~10MB)..." : "Download QR (HD JPG)"}
             </Button>
             <Button
               size="sm"
@@ -563,6 +604,29 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
                   )}
                 </div>
               </div>
+
+              {/* Logo Display Size (L / XL / XXL) */}
+              {hasCustomLogo && (
+                <div className="pt-2.5 border-t border-amber-200/70 dark:border-slate-700/70 flex items-center justify-between gap-2">
+                  <span className="text-[11px] font-extrabold text-amber-950 dark:text-amber-200">Logo Display Size:</span>
+                  <div className="flex items-center gap-1.5">
+                    {(["l", "xl", "xxl"] as StandeeLogoSize[]).map((sz) => (
+                      <button
+                        key={sz}
+                        type="button"
+                        onClick={() => setLogoSize(sz)}
+                        className={`px-3 py-1 text-[11px] font-extrabold uppercase rounded-lg transition-all ${
+                          logoSize === sz
+                            ? "bg-amber-600 text-white shadow-sm"
+                            : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-amber-50"
+                        }`}
+                      >
+                        {sz === "l" ? "L" : sz === "xl" ? "XL ✨" : "XXL 🚀"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* 2. Attached Google Business Locations Switcher */}
@@ -706,12 +770,18 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
                   </div>
 
                   {/* Merchant Business Logo (or Clean Store Name Typography Badge) */}
-                  <div className="flex items-center justify-center pt-2 px-4 mb-2 min-h-[96px] sm:min-h-[110px] w-full">
+                  <div className="flex items-center justify-center pt-2 px-4 mb-2 min-h-[104px] sm:min-h-[120px] w-full">
                     {hasCustomLogo ? (
                       <img
                         src={qrData.merchant.logoUrl}
                         alt={storeName}
-                        className="max-h-24 sm:max-h-28 max-w-[280px] w-auto h-auto object-contain drop-shadow-sm transition-all"
+                        className={`${
+                          logoSize === "l"
+                            ? "max-h-24 sm:max-h-28 max-w-[230px]"
+                            : logoSize === "xxl"
+                            ? "max-h-40 sm:max-h-44 max-w-[300px]"
+                            : "max-h-32 sm:max-h-36 max-w-[270px]"
+                        } w-auto h-auto object-contain drop-shadow-sm transition-all`}
                         onError={() => setImgFailed(true)}
                       />
                     ) : (

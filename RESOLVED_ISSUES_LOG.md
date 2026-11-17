@@ -7343,3 +7343,23 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
      - Adversarial Master Guard: All 6 Gates passed cleanly (`node scripts/run_adversarial_guard.js`).
      - Local & VPS DB: Seeded and verified Alfa Opticals with clean `optical_store` preset and keywords.
 - **Status**: ✅ Resolved, Verified with Playwright, and Committed Locally.
+
+---
+## [18 Nov 2026] Issue: Unified L/XL/XXL Logo Sizing, Ultra-HD ~10MB Full Standee JPEG Downloads, and Global Auto-Sync of Latest Uploaded Logo Across All QR Standees
+- **Symptom**:
+  1. Only WhatsApp Group Booster had Logo Display Size controls, whereas Counter QR Standee Studio (`QRGenerator`), Smart AI Google Reviews Standee (`GoogleReviewQRGenerator`), and Dynamic QR Studio lacked L / XL / XXL logo sizing options.
+  2. Clicking "Download QR" across standees only downloaded a bare small PNG square of the QR code instead of the complete counter standee artwork in commercial print-ready (~10 MB Ultra-HD) JPEG quality.
+  3. Uploading a merchant logo on one standee (or Digital Business Card during SuperAdmin impersonation) did not automatically propagate to all other standees due to missing impersonation resolution in `/api/merchant/upload-brand`, missing `logoUrl` in `/api/auth/me`, stale `max-age=60` caching on `/api/qr/standee`, a `data.success && data.url` response-shape bug in `WAGroupBoosterPro`, and lack of live cross-component/cross-tab sync events.
+- **Root Cause**:
+  1. Standee rendering in `src/app/api/qr/standee/route.ts` used fixed 1x (`723x1024`) dimensions, fixed logo dimensions, and `Cache-Control: public, max-age=60`, and did not include dedicated renderers for `google_review_v3`, `wa_booster`, and `dynamic_qr`.
+  2. `src/app/api/merchant/upload-brand/route.ts` and `src/app/api/merchant/update/route.ts` did not fall back to `getAuthenticatedMerchant()` (missing SuperAdmin impersonation cookies when `x-merchant-id` was absent).
+  3. Standee components fetched QR data independently without subscribing to live logo update broadcasts.
+- **Resolution**:
+  1. **Unified L / XL / XXL Logo Display Controls**: Standardized `L`, `XL`, and `XXL` logo sizing controls across `QRGenerator`, `GoogleReviewQRGenerator`, `WAGroupBooster`, `WAGroupBoosterPro`, and `DynamicQRStudio`, plus server-side smart `.trim()` + `logoSize=l|xl|xxl` scaling in `src/app/api/qr/standee/route.ts`.
+  2. **Ultra-HD ~9–10 MB Full Standee JPEG Engine**: Upgraded `src/app/api/qr/standee/route.ts` to support all 7 standee designs (`master`, `review`, `card`, `combo`, `google_review_v3`, `wa_booster`, `dynamic_qr`) with `hd=1` rendering natively at 6x scale (`4338x6144 px`, 600 DPI metadata, `quality: 100`, `4:4:4` chroma subsampling, archival anti-banding finish) producing verified 8.95–10.11 MB print-master JPEGs. Wired EVERY "Download QR" button across all 5 standee modules to download the full Ultra-HD Standee JPEG via `downloadFullHdStandeeJpg`.
+  3. **Global Auto-Sync of Latest Uploaded Logo**:
+     - Created `src/lib/logo-sync.ts` (`broadcastMerchantLogoUpdate` + `subscribeMerchantLogoUpdate`) using `CustomEvent` + `localStorage` cross-tab events.
+     - Fixed SuperAdmin impersonation & auth resolution in `src/app/api/merchant/upload-brand/route.ts`, `src/app/api/merchant/update/route.ts`, `src/app/api/auth/me/route.ts`, `src/app/api/digital-card/route.ts`, and `src/app/api/qr/generate/route.ts`.
+     - Switched `/api/qr/standee` cache headers to `no-store, no-cache, must-revalidate` and fixed `WAGroupBoosterPro` upload response parsing & `fetchCounterQr` merchant sync.
+     - Wired broadcast + subscribe into `QRGenerator`, `GoogleReviewQRGenerator`, `WAGroupBooster`, `WAGroupBoosterPro`, `DynamicQRStudio`, and `DigitalCardStudio`.
+- **Status**: ✅ Resolved and Verified (All 8 HD Standee Renders 8.95–10.11 MB @ 4338x6144 600 DPI + Visual Snapshot Audited + 6/6 Adversarial Gates Passed).

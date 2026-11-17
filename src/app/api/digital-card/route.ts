@@ -77,8 +77,8 @@ export async function GET(req: NextRequest) {
     card.email = resolvedEmail
 
     // ── AUTOMATIC GLOBAL LOGO RESOLUTION & BACKFILL ──
-    const resolvedLogoUrl = card.logoUrl || card.merchant?.logoUrl || null
-    if (!card.logoUrl && resolvedLogoUrl && card.id) {
+    const resolvedLogoUrl = card.merchant?.logoUrl || card.logoUrl || null
+    if (card.logoUrl !== resolvedLogoUrl && resolvedLogoUrl && card.id) {
       await db.digitalBusinessCard.update({
         where: { id: card.id },
         data: { logoUrl: resolvedLogoUrl }

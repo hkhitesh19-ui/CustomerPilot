@@ -14,6 +14,12 @@ import {
   Upload, Trash2
 } from "lucide-react"
 import { sanitizeDestinationUrl, detectMultipleUrls } from "@/lib/url-sanitizer"
+import {
+  broadcastMerchantLogoUpdate,
+  subscribeMerchantLogoUpdate,
+  downloadFullHdStandeeJpg,
+  type StandeeLogoSize,
+} from "@/lib/logo-sync"
 
 export default function WAGroupBoosterSimplePage() {
   const { toast } = useToast()
@@ -23,13 +29,23 @@ export default function WAGroupBoosterSimplePage() {
   const [merchantsList, setMerchantsList] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [downloadingHd, setDownloadingHd] = useState(false)
   const [qrCode, setQrCode] = useState<any>(null)
   const [destUrl, setDestUrl] = useState("")
   const [saving, setSaving] = useState(false)
   const [qrStyle, setQrStyle] = useState<"whatsapp" | "store_logo" | "clean">("whatsapp")
-  const [logoScale, setLogoScale] = useState<"md" | "lg" | "xl">("lg")
+  const [logoScale, setLogoScale] = useState<StandeeLogoSize>("xl")
   const [showStoreText, setShowStoreText] = useState(false)
   const [standeeMessage, setStandeeMessage] = useState("Scan n Join Whatsapp Group")
+
+  // Auto-sync logo whenever updated on ANY other standee / digital card
+  useEffect(() => {
+    if (!merchantId) return
+    return subscribeMerchantLogoUpdate(merchantId, (newLogoUrl) => {
+      setMerchantProfile((prev: any) => (prev ? { ...prev, logoUrl: newLogoUrl } : prev))
+      fetchCounterQr(merchantId)
+    })
+  }, [merchantId])
 
   // 1. Fetch current merchant and counter QR
   useEffect(() => {
@@ -83,14 +99,34 @@ export default function WAGroupBoosterSimplePage() {
     qrStyle === "store_logo" ? (qrCode?.storeLogoQrDataUrl || qrCode?.qrDataUrl) :
     (qrCode?.waQrDataUrl || qrCode?.qrDataUrl)
 
-  const downloadQrImage = () => {
-    if (!activeQrDataUrl) return
-    const a = document.createElement("a")
-    a.href = activeQrDataUrl
-    a.download = `${qrCode?.slug || "whatsapp-booster"}-${qrStyle}-qr.png`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
+  // Download Full Ultra-HD Counter Standee JPEG (~9–10 MB, 600 DPI)
+  const downloadQrImage = async () => {
+    const targetMId = merchantId || merchantProfile?.id
+    if (!targetMId) return
+    setDownloadingHd(true)
+    try {
+      const safeName = (merchantProfile?.name || qrCode?.slug || "WA-Group-Booster").replace(/\s+/g, "_")
+      const { sizeMB } = await downloadFullHdStandeeJpg({
+        merchantId: targetMId,
+        design: "wa_booster",
+        logoSize: logoScale,
+        fileName: `${safeName}-WA-Group-Standee-HD.jpg`,
+        extraParams: {
+          qrStyle,
+          message: standeeMessage,
+          showStoreText: showStoreText ? "1" : "0",
+          ...(qrCode?.publicUrl ? { targetUrl: qrCode.publicUrl } : {}),
+        },
+      })
+      toast({
+        title: "Downloaded Full HD Standee! ✅",
+        description: `Full Standee JPEG (${sizeMB} MB Ultra-HD 600 DPI) downloaded successfully.`,
+      })
+    } catch (e: any) {
+      toast({ title: "Download Failed", description: e.message || "Could not generate HD Standee", variant: "destructive" })
+    } finally {
+      setDownloadingHd(false)
+    }
   }
 
   const fetchCounterQr = async (mId?: string) => {
@@ -147,7 +183,8 @@ export default function WAGroupBoosterSimplePage() {
       const uploadedUrl = json.data?.url || json.url
       if (uploadedUrl) {
         setMerchantProfile((prev: any) => ({ ...prev, logoUrl: uploadedUrl }))
-        toast({ title: "Store Logo Uploaded! ✅", description: "Your logo is now displayed on the counter standee." })
+        broadcastMerchantLogoUpdate(targetMId || json.data?.merchantId, uploadedUrl)
+        toast({ title: "Logo Synced Across All Standees! ✅", description: "Your latest logo is now automatically set on ALL QR standees." })
         await fetchCounterQr(targetMId || undefined)
       }
     } catch (err: any) {
@@ -172,6 +209,7 @@ export default function WAGroupBoosterSimplePage() {
       })
       if (!res.ok) throw new Error("Failed to remove logo")
       setMerchantProfile((prev: any) => ({ ...prev, logoUrl: null }))
+      broadcastMerchantLogoUpdate(targetMId, null)
       if (qrStyle === "store_logo") setQrStyle("whatsapp")
       toast({ title: "Logo Removed", description: "Standee will display store name typographically." })
       await fetchCounterQr(targetMId || undefined)
@@ -189,7 +227,7 @@ export default function WAGroupBoosterSimplePage() {
       return
     }
 
-    const printLogoH = logoScale === "xl" ? "42mm" : logoScale === "md" ? "26mm" : "34mm"
+    const printLogoH = logoScale === "xxl" ? "46mm" : logoScale === "l" ? "28mm" : "36mm"
     const logoHtml = merchantProfile?.logoUrl
       ? `<div style="text-align:center;margin-bottom:6px;min-height:30mm;display:flex;align-items:center;justify-content:center;">
            <img src="${merchantProfile.logoUrl}" style="max-height:${printLogoH};max-width:105mm;object-fit:contain;border-radius:12px;" alt="${storeName}" />
@@ -599,11 +637,11 @@ export default function WAGroupBoosterSimplePage() {
                           src={merchantProfile.logoUrl}
                           alt={storeName}
                           className={`${
-                            logoScale === "xl"
-                              ? "max-h-[165px] sm:max-h-[180px] max-w-[300px]"
-                              : logoScale === "md"
-                              ? "max-h-[105px] sm:max-h-[115px] max-w-[240px]"
-                              : "max-h-[135px] sm:max-h-[150px] max-w-[280px]"
+                            logoScale === "xxl"
+                              ? "max-h-[180px] sm:max-h-[195px] max-w-[305px]"
+                              : logoScale === "l"
+                              ? "max-h-[115px] sm:max-h-[125px] max-w-[240px]"
+                              : "max-h-[145px] sm:max-h-[160px] max-w-[280px]"
                           } w-auto h-auto object-contain rounded-2xl drop-shadow-md group-hover:scale-105 transition-all`}
                         />
                       </div>
@@ -676,39 +714,39 @@ export default function WAGroupBoosterSimplePage() {
                   <div className="p-3 rounded-2xl bg-teal-50/70 border border-teal-200/80 space-y-2.5">
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-extrabold text-teal-950 text-[11px]">Logo Display Size:</span>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
                         <button
                           type="button"
-                          onClick={() => setLogoScale("md")}
-                          className={`px-2 py-1 text-[10px] font-bold rounded-lg transition-all ${
-                            logoScale === "md"
-                              ? "bg-teal-700 text-white shadow-xs font-extrabold"
+                          onClick={() => setLogoScale("l")}
+                          className={`px-3 py-1 text-[11px] font-extrabold rounded-lg transition-all ${
+                            logoScale === "l"
+                              ? "bg-teal-700 text-white shadow-xs"
                               : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
                           }`}
                         >
-                          Medium (105px)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setLogoScale("lg")}
-                          className={`px-2.5 py-1 text-[10px] font-bold rounded-lg transition-all ${
-                            logoScale === "lg"
-                              ? "bg-teal-700 text-white shadow-xs font-extrabold"
-                              : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
-                          }`}
-                        >
-                          Large (135px) ✨
+                          L
                         </button>
                         <button
                           type="button"
                           onClick={() => setLogoScale("xl")}
-                          className={`px-2 py-1 text-[10px] font-bold rounded-lg transition-all ${
+                          className={`px-3 py-1 text-[11px] font-extrabold rounded-lg transition-all ${
                             logoScale === "xl"
-                              ? "bg-teal-700 text-white shadow-xs font-extrabold"
+                              ? "bg-teal-700 text-white shadow-xs"
                               : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
                           }`}
                         >
-                          Hero X-Large (165px) 🚀
+                          XL ✨
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setLogoScale("xxl")}
+                          className={`px-3 py-1 text-[11px] font-extrabold rounded-lg transition-all ${
+                            logoScale === "xxl"
+                              ? "bg-teal-700 text-white shadow-xs"
+                              : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                          }`}
+                        >
+                          XXL 🚀
                         </button>
                       </div>
                     </div>
@@ -808,11 +846,11 @@ export default function WAGroupBoosterSimplePage() {
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     onClick={downloadQrImage}
-                    disabled={!activeQrDataUrl}
+                    disabled={!activeQrDataUrl || downloadingHd}
                     className="rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white gap-1.5"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>Download QR</span>
+                    <span>{downloadingHd ? "Generating HD..." : "Download QR (HD JPG)"}</span>
                   </Button>
 
                   <Button

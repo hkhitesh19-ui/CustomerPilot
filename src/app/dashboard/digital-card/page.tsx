@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { broadcastMerchantLogoUpdate, subscribeMerchantLogoUpdate } from "@/lib/logo-sync"
 import { 
   Smartphone, 
   Share2, 
@@ -59,7 +60,15 @@ export default function DigitalCardDashboardPage() {
   const [otherOrderUrl, setOtherOrderUrl] = useState("")
   const [otherOrderLabel, setOtherOrderLabel] = useState("EasyCater / Other")
   const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [cardMerchantId, setCardMerchantId] = useState<string | null>(null)
   const logoInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!cardMerchantId) return
+    return subscribeMerchantLogoUpdate(cardMerchantId, (newLogoUrl) => {
+      setFormData(prev => ({ ...prev, logoUrl: newLogoUrl || "" }))
+    })
+  }, [cardMerchantId])
 
   // Form State
   const [formData, setFormData] = useState<DigitalCardData>({
@@ -186,6 +195,7 @@ export default function DigitalCardDashboardPage() {
         const json = await res.json()
         if (json.success && json.card) {
           const c = json.card
+          if (c.merchantId) setCardMerchantId(c.merchantId)
           setFormData(c)
 
           // Extract ordering platforms
@@ -258,18 +268,23 @@ export default function DigitalCardDashboardPage() {
       const fd = new FormData()
       fd.append("file", file)
       fd.append("type", "logo")
+      const headers: Record<string, string> = {}
+      if (cardMerchantId) headers["x-merchant-id"] = cardMerchantId
       const res = await fetch("/api/merchant/upload-brand", {
         method: "POST",
+        headers,
         body: fd,
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(json?.error || "Upload failed")
       const uploadedUrl = json.data?.url || json.url
+      const syncedMerchantId = cardMerchantId || json.data?.merchantId
       if (uploadedUrl) {
         setFormData(prev => ({ ...prev, logoUrl: uploadedUrl }))
+        if (syncedMerchantId) broadcastMerchantLogoUpdate(syncedMerchantId, uploadedUrl)
         toast({
           title: "Logo Synchronized Everywhere! 🌟",
-          description: "Aapka logo Digital Card, Counter Standee, aur Google Review Standee sabhi jagah ek saath update ho gaya hai.",
+          description: "Aapka logo Digital Card, Counter Standee, WA Booster, aur Google Review Standee sabhi jagah ek saath update ho gaya hai.",
         })
       }
     } catch (err: any) {
@@ -283,12 +298,15 @@ export default function DigitalCardDashboardPage() {
   const handleRemoveLogo = async () => {
     if (!confirm("Kya aap sach me logo remove karna chahte hain? Ye Digital Card aur sabhi Standees se hat jayega.")) return
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" }
+      if (cardMerchantId) headers["x-merchant-id"] = cardMerchantId
       await fetch("/api/merchant/update", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ logoUrl: null }),
       })
       setFormData(prev => ({ ...prev, logoUrl: "" }))
+      if (cardMerchantId) broadcastMerchantLogoUpdate(cardMerchantId, null)
       toast({
         title: "Logo Removed Everywhere",
         description: "Logo sabhi standees aur digital card se successfully remove ho gaya hai.",

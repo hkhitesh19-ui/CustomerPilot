@@ -1,8 +1,12 @@
 import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
-import { ok, err } from "@/lib/api"
+import { ok, err, getAuthenticatedMerchant } from "@/lib/api"
 export async function PATCH(req: NextRequest) {
-  const merchantId = req.headers.get("x-merchant-id")
+  let merchantId = req.headers.get("x-merchant-id")
+  if (!merchantId) {
+    const authMerchant = await getAuthenticatedMerchant().catch(() => null)
+    merchantId = authMerchant?.id || null
+  }
   if (!merchantId) return err("Unauthorized", 401)
 
   const body = await req.json().catch(() => null)

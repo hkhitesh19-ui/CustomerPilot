@@ -5,6 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { QrCode, Download, Printer, Copy, CheckCircle2, Sparkles, RefreshCw, Star, Smartphone, Gift, Layers, Upload, Trash2, Image as ImageIcon } from "lucide-react"
+import {
+  broadcastMerchantLogoUpdate,
+  subscribeMerchantLogoUpdate,
+  downloadFullHdStandeeJpg,
+  type StandeeLogoSize,
+} from "@/lib/logo-sync"
 
 export type StandeeDesignType = "review" | "card" | "combo" | "master"
 
@@ -22,9 +28,19 @@ export function QRGenerator({
   const [downloadingPoster, setDownloadingPoster] = useState(false)
   const [printingPoster, setPrintingPoster] = useState(false)
   const [selectedDesign, setSelectedDesign] = useState<StandeeDesignType>(initialDesign || "master")
+  const [logoSize, setLogoSize] = useState<StandeeLogoSize>("xl")
   const [uploadingLogo, setUploadingLogo] = useState(false)
-  const [standeeKey, setStandeeKey] = useState(0) // force re-render of standee preview after logo change
+  const [standeeKey, setStandeeKey] = useState(() => Date.now()) // force re-render of standee preview after logo change
   const logoInputRef = useRef<HTMLInputElement>(null)
+
+  // Listen for global logo uploads from ANY other standee / digital card
+  useEffect(() => {
+    if (!merchantId) return
+    return subscribeMerchantLogoUpdate(merchantId, (newLogoUrl, updatedAt) => {
+      setQrData((prev: any) => (prev ? { ...prev, merchant: { ...prev.merchant, logoUrl: newLogoUrl } } : prev))
+      setStandeeKey(updatedAt)
+    })
+  }, [merchantId])
 
   useEffect(() => {
     let isMounted = true
@@ -110,8 +126,9 @@ export function QRGenerator({
           ...prev,
           merchant: { ...prev?.merchant, logoUrl: uploadedUrl },
         }))
-        setStandeeKey(k => k + 1) // force standee preview refresh
-        toast({ title: "Logo Updated ✅", description: "Your business logo is now on the VIP Standee." })
+        setStandeeKey(Date.now()) // force standee preview refresh
+        broadcastMerchantLogoUpdate(merchantId, uploadedUrl)
+        toast({ title: "Logo Synced Across All Standees! ✅", description: "Your latest logo is now automatically set on ALL QR standees." })
       }
     } catch (err: any) {
       toast({ title: "Upload Failed", description: err.message || "Could not upload logo", variant: "destructive" })
@@ -133,7 +150,8 @@ export function QRGenerator({
         ...prev,
         merchant: { ...prev?.merchant, logoUrl: null },
       }))
-      setStandeeKey(k => k + 1)
+      setStandeeKey(Date.now())
+      broadcastMerchantLogoUpdate(merchantId, null)
       toast({ title: "Logo Removed", description: "Standee will display your store name typographically." })
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" })
@@ -149,37 +167,20 @@ export function QRGenerator({
     setTimeout(() => setCopied(false), 2500)
   }
 
-  // Download Standalone QR Code (PNG)
-  const handleDownloadQR = () => {
-    if (!qrDataUrl) return
-    const link = document.createElement("a")
-    link.href = qrDataUrl
-    link.download = `${storeName.replace(/\s+/g, "_")}-QR.png`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    toast({ title: "Downloaded QR", description: "Standalone QR Code image downloaded." })
-  }
-
-  // Download High-Resolution Standee Image (JPG)
+  // Download Full Ultra-HD Standee JPEG (~9–10 MB Print-Ready)
   const handleDownloadStandeeImage = async () => {
     if (!merchantId) return
     setDownloadingPoster(true)
     try {
-      const res = await fetch(`/api/qr/standee?design=${selectedDesign}&format=print&m=${merchantId}`)
-      if (!res.ok) throw new Error("Failed to generate standee poster")
-      const blob = await res.blob()
-      const blobUrl = URL.createObjectURL(blob)
-      const link = document.createElement("a")
-      link.href = blobUrl
-      link.download = `${storeName.replace(/\s+/g, "_")}-${selectedDesign.toUpperCase()}-Standee.jpg`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(blobUrl)
+      const { sizeMB } = await downloadFullHdStandeeJpg({
+        merchantId,
+        design: selectedDesign,
+        logoSize,
+        fileName: `${storeName.replace(/\s+/g, "_")}-${selectedDesign.toUpperCase()}-HD-Standee.jpg`,
+      })
       toast({
-        title: "Downloaded Standee!",
-        description: `${selectedDesign.toUpperCase()} Standee poster downloaded successfully.`,
+        title: "Downloaded Full HD Standee! ✅",
+        description: `${selectedDesign.toUpperCase()} Full Standee JPEG (${sizeMB} MB Ultra-HD 600 DPI) downloaded.`,
       })
     } catch (e: any) {
       toast({ title: "Download Failed", description: e.message || "Could not download standee image", variant: "destructive" })
@@ -187,6 +188,9 @@ export function QRGenerator({
       setDownloadingPoster(false)
     }
   }
+
+  // "Download QR" now also downloads the Full Ultra-HD Standee JPEG
+  const handleDownloadQR = handleDownloadStandeeImage
 
   // Print Standee (A4 Print-Ready)
   const handlePrintStandee = async () => {
@@ -197,7 +201,7 @@ export function QRGenerator({
 
     setPrintingPoster(true)
     try {
-      const res = await fetch(`/api/qr/standee?design=${selectedDesign}&format=print&m=${merchantId}`)
+      const res = await fetch(`/api/qr/standee?design=${selectedDesign}&logoSize=${logoSize}&format=print&m=${merchantId}&_t=${Date.now()}`, { cache: "no-store" })
       if (!res.ok) throw new Error("Failed to generate standee poster for printing")
       const blob = await res.blob()
       const reader = new FileReader()
@@ -384,11 +388,11 @@ export function QRGenerator({
             <Button
               onClick={handleDownloadQR}
               variant="outline"
-              disabled={loading || !qrDataUrl}
+              disabled={loading || downloadingPoster || !merchantId}
               size="sm"
               className="rounded-xl border-slate-300 dark:border-slate-700"
             >
-              <Download className="w-4 h-4 mr-1.5" /> Download QR
+              <Download className="w-4 h-4 mr-1.5" /> {downloadingPoster ? "Generating HD..." : "Download QR (HD JPG)"}
             </Button>
             <Button
               onClick={handleDownloadStandeeImage}
@@ -398,7 +402,7 @@ export function QRGenerator({
               className="rounded-xl border-amber-300 bg-amber-50/60 hover:bg-amber-100 text-amber-900 font-bold"
             >
               <Sparkles className="w-4 h-4 mr-1.5 text-amber-600" />
-              {downloadingPoster ? "Generating..." : "Download Standee (JPG)"}
+              {downloadingPoster ? "Generating HD (~10MB)..." : "Download Standee (HD JPG)"}
             </Button>
             <Button
               onClick={handlePrintStandee}
@@ -552,6 +556,28 @@ export function QRGenerator({
                   </Button>
                 )}
               </div>
+              {/* Logo Display Size (L / XL / XXL) */}
+              {hasCustomLogo && (
+                <div className="pt-2.5 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
+                  <span className="text-[11px] font-extrabold text-slate-700 dark:text-slate-300">Logo Display Size:</span>
+                  <div className="flex items-center gap-1.5">
+                    {(["l", "xl", "xxl"] as StandeeLogoSize[]).map((sz) => (
+                      <button
+                        key={sz}
+                        type="button"
+                        onClick={() => setLogoSize(sz)}
+                        className={`px-3 py-1 text-[11px] font-extrabold uppercase rounded-lg transition-all ${
+                          logoSize === sz
+                            ? "bg-indigo-600 text-white shadow-sm"
+                            : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100"
+                        }`}
+                      >
+                        {sz === "l" ? "L" : sz === "xl" ? "XL ✨" : "XXL 🚀"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* ══════════════════════════════════════════════════════════════════ */}
@@ -559,8 +585,8 @@ export function QRGenerator({
             {/* ══════════════════════════════════════════════════════════════════ */}
             <div className="w-full max-w-sm flex flex-col items-center relative">
               <img
-                key={standeeKey}
-                src={`/api/qr/standee?design=${selectedDesign}&m=${merchantId}&_t=${standeeKey}`}
+                key={`${standeeKey}-${logoSize}-${selectedDesign}`}
+                src={`/api/qr/standee?design=${selectedDesign}&logoSize=${logoSize}&m=${merchantId}&_t=${standeeKey}`}
                 alt={`${storeName} ${selectedDesign} Standee Artwork`}
                 className="w-full h-auto rounded-[24px] shadow-2xl border-2 border-slate-900 object-contain transition-all"
               />
