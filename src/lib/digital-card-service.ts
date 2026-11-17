@@ -113,3 +113,64 @@ export async function getOrCreateDigitalBusinessCard(merchantId: string) {
     return null
   }
 }
+
+function normalizeCompactSlug(value: string): string {
+  return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+}
+
+/**
+ * Self-healing Digital Business Card slug resolver.
+ * Prevents printed QR standees from breaking with 404 when a merchant later edits
+ * hyphens/punctuation in their slug (e.g. "maw-paw" <-> "mawpaw", "cake-connection" <-> "cakeconnection").
+ */
+export async function resolveDigitalCardBySlug(rawSlug: string) {
+  const cleanSlug = decodeURIComponent(String(rawSlug || "")).toLowerCase().trim()
+  if (!cleanSlug) return null
+
+  // 1. Fast exact slug match
+  const exact = await db.digitalBusinessCard.findUnique({
+    where: { slug: cleanSlug },
+    include: { merchant: true },
+  })
+  if (exact) return exact
+
+  const targetCompact = normalizeCompactSlug(cleanSlug)
+  if (!targetCompact) return null
+
+  // 2. Hyphen/punctuation-insensitive match against existing DigitalBusinessCards (slug or displayName)
+  const allCards = await db.digitalBusinessCard.findMany({
+    include: { merchant: true },
+  })
+  const fuzzyCard = allCards.find((c) => {
+    const slugCompact = normalizeCompactSlug(c.slug)
+    const nameCompact = normalizeCompactSlug(c.displayName)
+    return slugCompact === targetCompact || nameCompact === targetCompact
+  })
+  if (fuzzyCard) return fuzzyCard
+
+  // 3. Fallback match against Merchant name (full or short title before "(", ":", "|") or merchantId
+  const merchants = await db.merchant.findMany()
+  const matchingMerchant = merchants.find((m) => {
+    if (m.id === cleanSlug) return true
+    const fullName = String(m.name || "")
+    const shortName = fullName.split(/\s*(?:\(|:|\||—|–)\s*/)[0] || fullName
+    const fullKebab = fullName.toLowerCase().trim().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "")
+    return (
+      fullKebab === cleanSlug ||
+      normalizeCompactSlug(fullName) === targetCompact ||
+      normalizeCompactSlug(shortName) === targetCompact
+    )
+  })
+
+  if (matchingMerchant) {
+    const createdOrExisting = await getOrCreateDigitalBusinessCard(matchingMerchant.id)
+    if (createdOrExisting) {
+      return await db.digitalBusinessCard.findUnique({
+        where: { id: createdOrExisting.id },
+        include: { merchant: true },
+      })
+    }
+  }
+
+  return null
+}

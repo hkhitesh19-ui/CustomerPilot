@@ -7363,3 +7363,16 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
      - Switched `/api/qr/standee` cache headers to `no-store, no-cache, must-revalidate` and fixed `WAGroupBoosterPro` upload response parsing & `fetchCounterQr` merchant sync.
      - Wired broadcast + subscribe into `QRGenerator`, `GoogleReviewQRGenerator`, `WAGroupBooster`, `WAGroupBoosterPro`, `DynamicQRStudio`, and `DigitalCardStudio`.
 - **Status**: ✅ Resolved and Verified (All 8 HD Standee Renders 8.95–10.11 MB @ 4338x6144 600 DPI + Visual Snapshot Audited + 6/6 Adversarial Gates Passed).
+
+---
+## [18 Nov 2026] Issue: Printed Maw & Paw QR Standee Returning 404 (`/c/maw-paw` vs `/c/mawpaw` Slug Mismatch)
+- **Symptom**: Scanning an earlier downloaded/printed Maw & Paw VIP Loyalty Standee QR code failed with HTTP 404 Not Found, while the newly generated QR standee on `/dashboard/settings` worked normally.
+- **Root Cause**: Forensically decoded both QR images with `jsQR`: the old standee encoded `https://www.customerpilot.in/c/maw-paw` (with a hyphen), while Maw & Paw's Digital Business Card slug in the database was later updated to `mawpaw` (without a hyphen). `src/app/c/[slug]/page.tsx` and `src/app/api/digital-card/route.ts` only performed exact slug lookups (`where: { slug }`), causing any hyphen/punctuation slug edit after printing a standee to return 404.
+- **Resolution**:
+  1. Added a shared self-healing resolver `resolveDigitalCardBySlug(rawSlug)` in `src/lib/digital-card-service.ts` that performs:
+     - Exact slug lookup (`mawpaw`),
+     - Hyphen/punctuation-insensitive compact match (`normalizeCompactSlug`) against existing `digitalBusinessCard.slug` and `displayName` (`maw-paw` ➔ `mawpaw`),
+     - Fallback match against `merchant.name` (full or short title before `(`, `:`, `|`) and `merchant.id`.
+  2. Wired `resolveDigitalCardBySlug` into `src/app/c/[slug]/page.tsx` (`generateMetadata` + `PublicDigitalCardPage`) and `src/app/api/digital-card/route.ts`.
+  3. Verified locally: `/c/maw-paw`, `/c/mawpaw`, and `/api/digital-card?slug=maw-paw` all return HTTP 200 with Maw & Paw's real Digital Business Card.
+- **Status**: ✅ Resolved and Verified.

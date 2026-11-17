@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { jwtVerify } from "jose"
 import { getJwtSecret } from "@/lib/jwt-secret";
-import { getOrCreateDigitalBusinessCard } from "@/lib/digital-card-service"
+import { getOrCreateDigitalBusinessCard, resolveDigitalCardBySlug } from "@/lib/digital-card-service"
 
 
 async function getMerchantIdFromReq(req: NextRequest): Promise<string | null> {
@@ -43,10 +43,7 @@ export async function GET(req: NextRequest) {
     let card: any = null
 
     if (slug) {
-      card = await db.digitalBusinessCard.findUnique({
-        where: { slug: slug.toLowerCase() },
-        include: { merchant: { select: { email: true, whatsappPhone: true, logoUrl: true } } },
-      })
+      card = await resolveDigitalCardBySlug(slug)
     } else if (targetMerchantId) {
       card = await db.digitalBusinessCard.findUnique({
         where: { merchantId: targetMerchantId },

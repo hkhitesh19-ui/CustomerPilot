@@ -8,21 +8,24 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : ad5fb14
-Full SHA          : ad5fb14c0be85f8d54fc1e75aec9a507801c1ce5
+Active Git Commit : b52b16e
+Full SHA          : b52b16e422679838454d26a0f3836a1be2a01460
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 17 Nov 2026, 03:40 PM IST
+Deployment Date   : 18 Nov 2026, 12:38 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(standee): enlarge review qr standee logo and auto-trim whitespace margins
+Commit Title      : feat(standee): add L/XL/XXL logo sizing, ~10MB Ultra-HD 600DPI full standee JPEG downloads, and global logo auto-sync across all QR standees
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
-PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
+PM2 Services      : customerpilot-web (Online, :3000, pid=465309), customerpilot-cron (Online, pid=465331), cakeconnection (Online, :3001, pid=227606)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Live Outcomes:
 ----------------------------------------------------------
-1. https://customerpilot.in/review?m=cmwitzi0y0002kvwsw32v7uqc   -> HTTP 200 (Shreenath Rajwadi Silk Palace with Authentic Pethapur Silk Sarees, Wedding Saree Consultation, Fabric & Quality Angle, & Zero Pet Clinic/Veterinary Leakage)
-2. https://customerpilot.in/ai-google-review-qr-generator        -> HTTP 200 (Smart AI Google Review Standee Studio with Enlarged 125px Brand Logo, Auto-Trimmed Whitespace, & 1-Click A4 Acrylic Print)
-3. https://customerpilot.in/                                     -> HTTP 200 (Homepage live & healthy)
-4. https://customerpilot.in/dashboard/digital-card               -> HTTP 200 (Smart Digital Business Card Studio with Universal 2-Way Logo Sync & Category Purity)
+1. https://customerpilot.in/                                     -> HTTP 200 (Homepage live & healthy)
+2. https://customerpilot.in/services                             -> HTTP 200 (New Light-Theme 3D Interactive Services Page with 8 Canonical Modules, Live Phone Simulator & ROI Calculator)
+3. https://customerpilot.in/api/qr/standee?design=google_review_v3&logoSize=xxl&hd=1&m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (10.17 MB / 10,668,237 bytes Ultra-HD 600 DPI Full Standee JPEG live verified)
+4. All QR Standees Upgraded Live:
+   - Unified L / XL / XXL logo sizing across Counter QR Standee Studio, Smart AI Google Reviews, WA Group Booster, WA Booster Pro, & Dynamic QR Studio
+   - "Download QR" downloads full Ultra-HD (~9–10 MB, 4338x6144 px, 600 DPI) Standee JPEG
+   - Global auto-sync of latest uploaded merchant logo across all QR standees & Digital Business Card (with SuperAdmin impersonation support & zero stale cache)
 5. Adversarial Red-Team Safety Gates:
-   - All 6 automated gates passed cleanly (AST import linter, full-app TS ratchet 0 errors, sensitive token redactions, 12 mathematical boundaries, payments regression, 0 tracked DBs)
+   - All 6 automated gates passed cleanly prior to push & VPS build (0 errors, 0 tracked DBs)

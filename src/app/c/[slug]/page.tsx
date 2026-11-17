@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation"
 import { Metadata } from "next"
-import { db } from "@/lib/db"
 import { DigitalCardView, DigitalCardData } from "@/components/digital-card-view"
-import { getOrCreateDigitalBusinessCard } from "@/lib/digital-card-service"
+import { resolveDigitalCardBySlug } from "@/lib/digital-card-service"
 
 interface PageProps {
   params: Promise<{
@@ -12,22 +11,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const cleanSlug = slug.toLowerCase()
-
-  let card = await db.digitalBusinessCard.findUnique({
-    where: { slug: cleanSlug },
-  })
-
-  if (!card) {
-    const merchants = await db.merchant.findMany()
-    const matchingMerchant = merchants.find((m) => {
-      const s = (m.name || "").toLowerCase().trim().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "")
-      return s === cleanSlug || m.id === cleanSlug
-    })
-    if (matchingMerchant) {
-      card = await getOrCreateDigitalBusinessCard(matchingMerchant.id)
-    }
-  }
+  const card = await resolveDigitalCardBySlug(slug)
 
   if (!card) {
     return {
@@ -84,29 +68,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PublicDigitalCardPage({ params }: PageProps) {
   const { slug } = await params
-  const cleanSlug = slug.toLowerCase()
-
-  let card = await db.digitalBusinessCard.findUnique({
-    where: { slug: cleanSlug },
-    include: { merchant: true },
-  })
-
-  if (!card) {
-    const merchants = await db.merchant.findMany()
-    const matchingMerchant = merchants.find((m) => {
-      const s = (m.name || "").toLowerCase().trim().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "")
-      return s === cleanSlug || m.id === cleanSlug
-    })
-    if (matchingMerchant) {
-      const createdCard = await getOrCreateDigitalBusinessCard(matchingMerchant.id)
-      if (createdCard) {
-        card = await db.digitalBusinessCard.findUnique({
-          where: { id: createdCard.id },
-          include: { merchant: true },
-        })
-      }
-    }
-  }
+  const card = await resolveDigitalCardBySlug(slug)
 
   if (!card) {
     notFound()
