@@ -1,6 +1,7 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import { generateMerchantIdNumber } from "@/lib/merchant-id-generator"
+import { getKeywordPresetForCategory } from "@/lib/keyword-matrix"
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -43,14 +44,20 @@ export const authOptions: NextAuthOptions = {
           const trialEndsAt = new Date();
           trialEndsAt.setDate(trialEndsAt.getDate() + 3); // 3-day trial
           const merchantIdNumber = await generateMerchantIdNumber(db);
+          const bizName = user.name || "My Business";
+          const detectedPreset = getKeywordPresetForCategory(null, bizName);
+          const initialBusinessType = (detectedPreset && detectedPreset.id !== "restaurant") ? detectedPreset.id : "retail";
+          const initialCategory = detectedPreset ? detectedPreset.gbpCategory : "Retail Store";
+
           merchant = await db.merchant.create({
             data: {
               userId: dbUser.id,
               merchantIdNumber,
-              name: user.name || "My Business",
+              name: bizName,
               ownerName: user.name || "",
               email: cleanEmail,
-              businessType: "bakery",
+              category: initialCategory,
+              businessType: initialBusinessType,
               plan: "trial",
               status: "active",
               trialEndsAt,

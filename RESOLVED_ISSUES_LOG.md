@@ -7297,3 +7297,49 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   6. **Dual-Page Implementation**: Implemented identical high-impact layout and controls across both Simple (`WAGroupBooster`) and Pro (`WAGroupBoosterPro`) modules.
   7. **Full Verification**: All 6 Master Adversarial Gates passed cleanly (`node scripts/run_adversarial_guard.js`) with 0 TypeScript errors, and visual verification was confirmed via Playwright screenshot artifacts (`public/wa_booster_bigger_logo_comparison.png`, `public/wa_booster_full_dashboard_preview.png`).
 - **Status**: ✅ Resolved, Verified with Playwright, and Committed Locally.
+
+---
+## [17 Nov 2026] Issue: Universal Merchant Business Category Auto-Sync, Optical Store Architecture & Gear 1 Standee Engine
+- **Symptom**: When a newly registered merchant such as "Alfa Opticals" (Optician in Vadodara) logged in via Gmail and connected their Google Business Profile, the Smart AI Google Reviews settings displayed bakery/cake keywords ("Allowed Product and Services words", "Dual Bestseller Review Studio", "Quality & Taste"). Additionally, pet clinic keywords had previously leaked into silk saree showroom profiles.
+- **Root Cause**: 
+  1. `src/app/api/auth/[...nextauth]/route.ts` hardcoded `businessType: "bakery"` for any new Google OAuth signup (`businessType: "bakery"`).
+  2. `src/app/api/google-business/select-location/route.ts` and `sync-gbp/route.ts` saved Google `placeId` and `googleReviewUrl`, but failed to fetch Places API `types` or update `merchant.category`, `merchant.businessType`, and seed `merchant.keywordProfile`.
+  3. `MASTER_KEYWORD_PRESETS` in `src/lib/keyword-matrix.ts` lacked an `optical_store` preset.
+  4. `resolveMerchantKeywordProfile` fell back to `businessType: "bakery"` without checking if the store name actually matches a bakery.
+- **Resolution**:
+  1. **Optical Store Master Preset**: Added comprehensive `optical_store` preset to `MASTER_KEYWORD_PRESETS` in `src/lib/keyword-matrix.ts` with 10 Hero Products (Progressive lenses, Blue-cut glasses, Designer frames, etc.), 10 Hero Services (Computerized eye testing, PD measurement, Frame fitting, etc.), Vadodara local SEO geo-phrases, and strict food/clothing blacklists.
+  2. **Universal Category Decontamination Engine**:
+     - Updated `resolveMerchantKeywordProfile`: If `merchant.businessType === "bakery"`, it verifies whether the merchant name contains bakery tokens (`cake`, `bake`, `pastry`, `dessert`, `bread`). If not, it dynamically resolves the true category via `getKeywordPresetForCategory`.
+     - Removed hardcoded `businessType: "bakery"` from NextAuth route (`src/app/api/auth/[...nextauth]/route.ts`), dynamically inferring category from merchant name.
+  3. **Universal Category Auto-Sync via Google Places API**:
+     - Updated `src/app/api/google-business/select-location/route.ts` to request `fields=rating,user_ratings_total,types`.
+     - Automatically maps Google types to the appropriate category preset and seeds `keywordProfile` if empty or contaminated.
+     - Updated `src/app/api/admin/merchants/sync-gbp/route.ts` to also auto-sync category and seed keywords.
+  4. **Category-Aware Review UI & Generation Engine**:
+     - Updated `ReviewEditor.tsx` with dedicated optical headers (`👁️ Optical & Eye Testing Services:`, `👓 Eyewear, Frames & Lenses:`) and angles (`👓 Frame & Fitting`, `👁️ Eye Test & Vision`, `💬 Short 1-Liner`).
+     - Updated `dynamic-review-engine.ts` with `OPTICAL_REVIEWS` fallback pool, optical personas, and zero-food guard.
+  5. **Gear 1 Plan Standee Suite (5 Visual Mockup Images)**:
+     - Built `scripts/generate_gear1_standees.js` rendering 5 high-resolution physical counter standee options for merchants purchasing only Gear 1 (Smart Digital Business Card + Smart AI Google Review):
+       - Option 1: Split Dual-QR Standee (Side-by-side Review + Digital Card balance)
+       - Option 2: Reversible Double-Sided Acrylic Duo (Front: Review / Back: Digital Card)
+       - Option 3: Single Smart QR "Unified Gateway" (1 Scan opens mobile action hub)
+       - Option 4: Vertical Stacked Hierarchy (Top 70% Review Hero + Bottom Contact Bar)
+       - Option 5: Royal Luxury Gold Edition (Matte dark + champagne gold luxury acrylic)
+     - Rendered and saved all 5 PNGs to `public/standees/` and the artifact directory.
+  6. **New All Services Infographic Overview Page (`/services`)**:
+     - Created `src/app/services/page.tsx` infographically presenting all 8 CustomerPilot services:
+       - 1. Smart AI Google Review Engine & Keyword Grounding Studio
+       - 2. Smart Digital Business Card & Contactless vCard Hub
+       - 3. High-Definition Acrylic Counter Standees & Dynamic QR Studio
+       - 4. WhatsApp VIP Loyalty Stamp Card & Gamified Rewards
+       - 5. Smart POS Billing & 1-Click WhatsApp PDF Invoicing
+       - 6. 24/7 AI WhatsApp Customer Support & Inquiry Chatbot
+       - 7. RankPilot AI — Google Business Profile (GBP) Local SEO Radar
+       - 8. WhatsApp Group Booster & Community Growth Engine
+     - Added CustomerPilot 5-Stage Flywheel diagram, category filters (`All`, `Gear 1`, `Growth`, `Smart POS`), and Gear 1 Spotlight featuring the 5 standee options.
+     - Added `/services` link directly into the main navigation bar in `src/app/page.tsx`.
+  7. **Full Testing & Verification**:
+     - Unit Tests: `tests/unit/pillar3-optical-classification.test.ts` (5/5 tests passed).
+     - Adversarial Master Guard: All 6 Gates passed cleanly (`node scripts/run_adversarial_guard.js`).
+     - Local & VPS DB: Seeded and verified Alfa Opticals with clean `optical_store` preset and keywords.
+- **Status**: ✅ Resolved, Verified with Playwright, and Committed Locally.

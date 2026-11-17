@@ -547,6 +547,9 @@ export default function Home() {
               )}
             </div>
 
+            <Link href="/services" className="px-3 py-2 rounded-lg text-sm font-bold text-emerald-700 hover:text-emerald-900 hover:bg-emerald-50 transition flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> All Services
+            </Link>
             <Link href="/pricing" className="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition">
               Pricing
             </Link>

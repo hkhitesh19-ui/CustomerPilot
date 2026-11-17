@@ -408,6 +408,85 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
     ]
   },
 
+  optical_store: {
+    id: "optical_store",
+    label: "Optician, Eyewear & Spectacles",
+    gbpCategory: "Optician / Optical Store / Eyewear & Sunglasses",
+    audiencePersona: "All_Genders",
+    serviceMode: "Store Walk-in & Eye Testing Consultation",
+    seoEntities: [
+      // Hero Services (First 10)
+      "Computerized eye testing",
+      "Power prescription checking",
+      "Progressive lens fitting",
+      "Frame styling consultation",
+      "Blue-cut anti-glare lens fitting",
+      "Contact lens trial & training",
+      "Spectacle frame repair & adjustment",
+      "Zero-power gaming glasses consultation",
+      "Rimless frame fitting & alignment",
+      "Same-day emergency spectacle delivery",
+
+      // Hero Products (Next 10)
+      "Progressive multifocal lenses",
+      "Blue-cut digital protection glasses",
+      "Designer spectacle frames",
+      "Branded polarized sunglasses",
+      "Daily disposable contact lenses",
+      "Photochromatic transition lenses",
+      "Anti-reflective glare-free lenses",
+      "Rimless titanium frames",
+      "Reading glasses with case",
+      "Eyewear cleaning spray & microfiber cloth",
+
+      // Additional High-Search Entities
+      "Computer glasses for screen eye strain",
+      "Crizal anti-glare lenses",
+      "Bifocal reading glasses",
+      "Kids flexible unbreakable frames",
+      "UV400 protection sunglasses",
+      "High index thin lenses for high power",
+      "Colour contact lenses with power",
+      "Cat eye frames for women",
+      "Aviator polarized sunglasses",
+      "Wayfarer classic spectacle frames",
+      "Acetate premium lightweight frames",
+      "Night drive yellow anti-glare glasses",
+      "Sports protective goggles with power",
+      "Contact lens solution and cases",
+      "Zero-power fashion spectacles",
+      "Fast computerized auto-refractometer testing",
+      "Experienced optometrist consultation",
+      "Transparent lens pricing",
+      "Prompt delivery within 24 hours",
+      "Wide frame selection for all face shapes",
+      "Affordable to luxury frame collections",
+      "Precise optical lens alignment",
+      "Air-conditioned optical showroom",
+      "Helpful and polite staff",
+      "Convenient Manjalpur Vadodara location"
+    ],
+    aeoAnswers: [
+      "Accurate computerized eye testing done by certified experienced optometrists",
+      "Huge collection of stylish frames, sunglasses, and high-quality blue cut lenses",
+      "Specialized progressive lens fitting and fast 24-hour spectacle delivery",
+      "Affordable to designer eyewear with transparent pricing and warranty",
+      "Comfortable showroom with personalized frame selection guidance"
+    ],
+    geoContext: [
+      "Best optical shop near me in Vadodara for eye testing and spectacles",
+      "Famous optician in Manjalpur for progressive lenses and stylish frames",
+      "Top rated eyewear store with computerized power checkup",
+      "Affordable glasses and branded sunglasses store",
+      "Convenient optical showroom with wide collection"
+    ],
+    blacklist: [
+      "Cake", "Bakery", "Pastry", "Pastries", "Burger", "Pizza", "Biryani", "Food", "Delivery", "Parcel", "Zomato", "Swiggy",
+      "Puppy", "Dog", "Cat", "Kitten", "Pet", "Vaccination", "Deworming", "Veterinary", "Vet doctor", "Animal clinic",
+      "Dental", "Root canal", "Teeth", "Dentist", "Car wash", "Engine oil", "Barber shop", "Haircut", "Saree", "Dress"
+    ]
+  },
+
   supermarket: {
     id: "supermarket",
     label: "SuperMarket & Grocery Store",
@@ -979,6 +1058,24 @@ export function getKeywordPresetForCategory(category?: string | null, merchantNa
     c.includes("tech company")
   ) {
     return MASTER_KEYWORD_PRESETS.saas_agency;
+  }
+
+  // Optician, Eyewear, Optical Store & Spectacles (High Priority — Must evaluate before general retail)
+  if (
+    c.includes("optical") ||
+    c.includes("optician") ||
+    c.includes("eyewear") ||
+    c.includes("spectacle") ||
+    c.includes("sunglass") ||
+    c.includes("chashma") ||
+    c.includes("goggle") ||
+    c.includes("eye testing") ||
+    c.includes("optometry") ||
+    c.includes("optometrist") ||
+    c.includes("contact lens") ||
+    c.includes("eye care")
+  ) {
+    return MASTER_KEYWORD_PRESETS.optical_store;
   }
 
   // Silk Saree Palace, Bridal Ethnic Wear & Sarees (High Priority — Must evaluate before pet or general retail)
@@ -1613,6 +1710,48 @@ export function generateAutoKeywordsForLocation(
         ]
       };
 
+    case "optical_store":
+      return {
+        coreGeo: [
+          `best optical shop in ${loc}`,
+          `optician near me in ${loc}`,
+          `eye testing shop near me in ${loc}`,
+          `spectacles showroom in ${loc} ${cty}`,
+          `branded sunglasses in ${loc}`,
+          `best optician in ${cty}`
+        ],
+        commercial: [
+          `computer glasses for eye strain ${loc}`,
+          `progressive lenses cost ${cty}`,
+          `fast 24 hour spectacle delivery ${loc}`,
+          `blue cut lenses for laptop screen`,
+          `contact lenses with power ${loc}`,
+          `designer spectacle frames under 2000 ${cty}`
+        ],
+        services: [
+          `Computerized Eye Testing in ${loc}`,
+          `Progressive Lens Fitting in ${loc}`,
+          `Blue-cut Digital Glasses in ${loc}`,
+          `Designer Spectacle Frames in ${loc}`,
+          `Contact Lens Trial & Training in ${loc}`,
+          `Spectacle Frame Repair in ${loc}`
+        ],
+        catchmentLandmarks: [
+          `${loc} Main Market Optical Store`,
+          `Near Char Rasta ${loc}`,
+          `Trusted Optician ${cty}`
+        ],
+        voiceAeoQuestions: [
+          `Which is the best optical shop for eye testing in ${loc} ${cty}?`,
+          `Where can I get blue cut progressive glasses in ${loc}?`
+        ],
+        semanticReviewPhrases: [
+          "Bohot accurate computerized eye testing kiya. Progressive lenses ka vision crystal clear hai aur frame fitting perfect baithi.",
+          "Huge collection of stylish frames and sunglasses at reasonable rates. Staff bohot patient aur helpful tha.",
+          "Blue-cut lenses se laptop work me eye strain bilkul khatam ho gaya. Same day delivery mil gayi."
+        ]
+      };
+
     case "saree_palace":
     case "clothing":
       return {
@@ -1703,15 +1842,37 @@ export function resolveMerchantKeywordProfile(merchant: {
   // 1. Direct lookup by businessType preset key if exact match exists
   let categoryPreset: CategoryPreset;
   const bType = (merchant.businessType || "").toLowerCase().trim();
-  if (bType && (MASTER_KEYWORD_PRESETS as any)[bType]) {
+  const mNameLower = (merchant.name || "").toLowerCase();
+  const isActuallyBakery = mNameLower.includes("cake") || mNameLower.includes("bake") || mNameLower.includes("pastry") || mNameLower.includes("dessert") || mNameLower.includes("bread") || (merchant.category && merchant.category.toLowerCase().includes("bakery"));
+
+  if (bType && bType !== "bakery" && (MASTER_KEYWORD_PRESETS as any)[bType]) {
     categoryPreset = (MASTER_KEYWORD_PRESETS as any)[bType];
+  } else if (bType === "bakery" && isActuallyBakery) {
+    categoryPreset = MASTER_KEYWORD_PRESETS.bakery;
   } else {
     // Check businessType first, then category, taking merchant name into account
-    categoryPreset = getKeywordPresetForCategory(merchant.businessType || merchant.category, merchant.name);
+    categoryPreset = getKeywordPresetForCategory(merchant.category || (isActuallyBakery ? merchant.businessType : null), merchant.name);
   }
 
-  // Detect whether this business is Saree Palace, Pet Shop, Pet Clinic, or Dental Clinic
-  const isSareePalace = bType === "saree_palace" ||
+  // Detect whether this business is Optical Store, Saree Palace, Pet Shop, Pet Clinic, or Dental Clinic
+  const isOptical = bType === "optical_store" ||
+    (merchant.name && (
+      merchant.name.toLowerCase().includes("optical") ||
+      merchant.name.toLowerCase().includes("optician") ||
+      merchant.name.toLowerCase().includes("eyewear") ||
+      merchant.name.toLowerCase().includes("spectacle") ||
+      merchant.name.toLowerCase().includes("lens") ||
+      merchant.name.toLowerCase().includes("chashma")
+    )) ||
+    (merchant.category && (
+      merchant.category.toLowerCase().includes("optical") ||
+      merchant.category.toLowerCase().includes("optician") ||
+      merchant.category.toLowerCase().includes("eyewear") ||
+      merchant.category.toLowerCase().includes("spectacle") ||
+      merchant.category.toLowerCase().includes("eye care")
+    ));
+
+  const isSareePalace = !isOptical && (bType === "saree_palace" ||
     (merchant.name && (
       merchant.name.toLowerCase().includes("saree") ||
       merchant.name.toLowerCase().includes("sari") ||
@@ -1730,7 +1891,7 @@ export function resolveMerchantKeywordProfile(merchant: {
       merchant.category.toLowerCase().includes("silk") ||
       merchant.category.toLowerCase().includes("bridal") ||
       merchant.category.toLowerCase().includes("ethnic wear")
-    ));
+    )));
 
   const isPetShop = !isSareePalace && (bType === "pet_shop" ||
     (merchant.name && (merchant.name.toLowerCase().includes("pet shop") || merchant.name.toLowerCase().includes("pet store") || (merchant.name.toLowerCase().includes("grooming") && !isSareePalace) || merchant.name.toLowerCase().includes("pet food") || merchant.name.toLowerCase().includes("pet accessories") || merchant.name.toLowerCase().includes("pet cafe") || merchant.name.toLowerCase().includes("cat cafe") || merchant.name.toLowerCase().includes("dog cafe"))) ||
@@ -1743,7 +1904,9 @@ export function resolveMerchantKeywordProfile(merchant: {
     (merchant.name && (merchant.name.toLowerCase().includes("dental") || merchant.name.toLowerCase().includes("dentist"))));
 
   // If detected, ensure categoryPreset is definitively set
-  if (isSareePalace && categoryPreset.id !== "saree_palace") {
+  if (isOptical && categoryPreset.id !== "optical_store") {
+    categoryPreset = MASTER_KEYWORD_PRESETS.optical_store;
+  } else if (isSareePalace && categoryPreset.id !== "saree_palace") {
     categoryPreset = MASTER_KEYWORD_PRESETS.saree_palace;
   } else if (isPetShop && categoryPreset.id !== "pet_shop") {
     categoryPreset = MASTER_KEYWORD_PRESETS.pet_shop;
@@ -1769,7 +1932,13 @@ export function resolveMerchantKeywordProfile(merchant: {
       let effectiveHeroServices = Array.isArray(parsed.heroServices) && parsed.heroServices.length > 0 ? parsed.heroServices.slice(0, 10) : categoryPreset.seoEntities.slice(0, 10);
       let effectiveHeroProducts = Array.isArray(parsed.heroProducts) && parsed.heroProducts.length > 0 ? parsed.heroProducts.slice(0, 10) : (categoryPreset.seoEntities.length > 10 ? categoryPreset.seoEntities.slice(10, 20) : categoryPreset.seoEntities.slice(0, 5));
 
-      if (isSareePalace && (effectiveCategoryKey === "pet_clinic" || effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("vaccination") || s.toLowerCase().includes("puppy") || s.toLowerCase().includes("deworming")))) {
+      if (isOptical && (effectiveCategoryKey === "bakery" || effectiveCategoryKey === "restaurant" || effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("cake") || s.toLowerCase().includes("pastry") || s.toLowerCase().includes("burger") || s.toLowerCase().includes("pizza")))) {
+        effectiveCategoryKey = "optical_store";
+        effectiveAllowedSeo = MASTER_KEYWORD_PRESETS.optical_store.seoEntities;
+        effectiveStrictlyNotAllowed = MASTER_KEYWORD_PRESETS.optical_store.blacklist;
+        effectiveHeroServices = MASTER_KEYWORD_PRESETS.optical_store.seoEntities.slice(0, 10);
+        effectiveHeroProducts = MASTER_KEYWORD_PRESETS.optical_store.seoEntities.slice(10, 20);
+      } else if (isSareePalace && (effectiveCategoryKey === "pet_clinic" || effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("vaccination") || s.toLowerCase().includes("puppy") || s.toLowerCase().includes("deworming")))) {
         effectiveCategoryKey = "saree_palace";
         effectiveAllowedSeo = MASTER_KEYWORD_PRESETS.saree_palace.seoEntities;
         effectiveStrictlyNotAllowed = MASTER_KEYWORD_PRESETS.saree_palace.blacklist;

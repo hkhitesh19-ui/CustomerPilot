@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { ok, err } from "@/lib/api";
+import { getKeywordPresetForCategory, generateAutoKeywordsForLocation } from "@/lib/keyword-matrix";
 
 export async function POST(req: NextRequest) {
   try {
@@ -55,18 +56,20 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // Fetch live Google Maps rating and review count if Google Places API key is present
+    // Fetch live Google Maps rating, review count, and business category types if Google Places API key is present
     let fetchedRating: number | null = null;
     let fetchedReviewCount: number | null = null;
+    let fetchedTypes: string[] = [];
     const placesApiKey = process.env.GOOGLE_PLACES_API_KEY;
     if (placeId && placesApiKey) {
       try {
-        const placeRes = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(placeId)}&fields=rating,user_ratings_total&key=${placesApiKey}`);
+        const placeRes = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(placeId)}&fields=rating,user_ratings_total,types&key=${placesApiKey}`);
         if (placeRes.ok) {
           const placeData = await placeRes.json();
           if (placeData.result) {
             if (typeof placeData.result.rating === "number") fetchedRating = placeData.result.rating;
             if (typeof placeData.result.user_ratings_total === "number") fetchedReviewCount = placeData.result.user_ratings_total;
+            if (Array.isArray(placeData.result.types)) fetchedTypes = placeData.result.types;
           }
         }
       } catch (e) {
@@ -74,12 +77,34 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Update merchant record address, review link, and baseline reviews
+    // Universal Category Auto-Detection from Google Maps Types + Store Name
+    const candidateTypes = fetchedTypes.join(" ");
+    const candidateName = placeName || fallbackStoreName;
+    const categoryPreset = getKeywordPresetForCategory(candidateTypes || null, candidateName);
+
+    // Auto-seed or clean keywordProfile if empty or polluted with default bakery data
+    const existingKp = (merchantRecord as any)?.keywordProfile;
+    const isCurrentBakery = !existingKp || JSON.stringify(existingKp).toLowerCase().includes("cake") || JSON.stringify(existingKp).toLowerCase().includes("bakery");
+    const isActuallyBakery = candidateName.toLowerCase().includes("cake") || candidateName.toLowerCase().includes("bake") || candidateName.toLowerCase().includes("pastry");
+
+    let newKeywordProfile = existingKp;
+    if (!existingKp || (isCurrentBakery && !isActuallyBakery)) {
+      newKeywordProfile = generateAutoKeywordsForLocation(
+        categoryPreset.id,
+        address || merchantRecord?.address || "Vadodara",
+        candidateName
+      );
+    }
+
+    // Update merchant record address, review link, baseline reviews, business category and keywordProfile
     await (db.merchant as any).update({
       where: { id: merchantId },
       data: {
         ...(address ? { address } : {}),
         googleReviewLink: finalReviewUrl,
+        ...(categoryPreset?.id ? { businessType: categoryPreset.id } : {}),
+        ...(categoryPreset?.label ? { category: categoryPreset.label } : {}),
+        ...(newKeywordProfile ? { keywordProfile: newKeywordProfile } : {}),
         ...(fetchedRating !== null ? { baselineRating: fetchedRating } : {}),
         ...(fetchedReviewCount !== null ? { baselineReviewCount: fetchedReviewCount, baselineCapturedAt: new Date() } : {})
       }

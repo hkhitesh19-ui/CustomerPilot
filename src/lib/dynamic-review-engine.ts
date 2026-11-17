@@ -316,6 +316,24 @@ const SAAS_AGENCY_REVIEWS: FallbackReviewItem[] = [
   }
 ]
 
+const OPTICAL_REVIEWS: FallbackReviewItem[] = [
+  {
+    draft1: "Computerized eye testing bohot accurate hua. Progressive lenses ka vision crystal clear hai aur frame fitting perfect baithi.",
+    draft2: "New blue-cut glasses liye the screen work ke liye. Eye strain bilkul khatam ho gaya aur lightweight designer frame look bohot classy hai.",
+    draft3: "Best optician in Vadodara! Huge frame variety, quick 24hr delivery aur bohot professional staff guidance."
+  },
+  {
+    draft1: "Eye power checkup bohot detail me kiya optometrist ne. Lens quality Crizal clear hai aur frame rates bohot reasonable hain.",
+    draft2: "Family ke spectacles yahi se banwaye. Reading glasses aur bifocal lenses dono perfectly adjust hoke mile time par.",
+    draft3: "Polite staff, accurate eye power testing aur stylish branded sunglasses collection. Highly recommended optical store!"
+  },
+  {
+    draft1: "Rimless titanium frame aur anti-glare lenses liye. Fitting seamless hai aur wear karte waqt bilkul light weight lagta hai.",
+    draft2: "Daily disposable contact lenses aur eye testing dono smooth raha. Staff ne lens wear karne ki proper training di.",
+    draft3: "Top-notch optical service! Prompt delivery, precision lenses and very polite customer handling."
+  }
+]
+
 const SAREE_CLOTHING_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Wedding shopping ke liye visit kiya tha. Pure silk sarees aur bridal collection bohot hi khoobsurat hai. Staff ne bohot patience se har design dikhayi.",
@@ -401,6 +419,15 @@ function getCategoryAuthenticAngles(categoryKey: string): string[] {
         "Last-minute birthday gift selection",
         "Customized anniversary photo gift",
         "Kids birthday return gift purchase"
+      ]
+    case "optical_store":
+      return [
+        "Computerized eye power testing and prescription check",
+        "Progressive multifocal lens fitting and alignment",
+        "Blue-cut anti-glare glasses for laptop screen protection",
+        "Designer lightweight spectacle frame selection",
+        "Polarized UV sunglasses purchase",
+        "Contact lens trial and consultation"
       ]
     case "clothing":
     case "saree_palace":
@@ -499,7 +526,9 @@ export function getDynamicFallbackReview(
     (/\b(pet|pets|puppy|puppies|kitten|kittens|dog|dogs|cat|cats)\b/i.test(c) && !c.includes("pethapur") && !c.includes("carpet") && !c.includes("petlad"))
   )
 
-  if (
+  if (c.includes("optical") || c.includes("optician") || c.includes("eyewear") || c.includes("spectacle") || c.includes("lens") || c.includes("chashma") || c.includes("optical_store")) {
+    pool = OPTICAL_REVIEWS
+  } else if (
     c.includes("saree") || c.includes("silk") || c.includes("saree_palace") ||
     c.includes("rajwadi") || c.includes("pethapur") || c.includes("lehenga") ||
     c.includes("patola") || c.includes("chaniya") || c.includes("cloth") ||
@@ -600,6 +629,34 @@ function getCategoryAwareItemDrafts(
       draft1: chosen.draft1,
       draft2: chosen.draft2,
       draft3: poolEntry.draft3 || `Outstanding quality ${item} and wonderful shopping experience at this showroom!`
+    }
+  }
+
+  // ── OPTICAL STORE & EYEWEAR ──────────────────────────────────────────────────
+  if (
+    c.includes("optical") || c.includes("optician") || c.includes("eyewear") ||
+    c.includes("spectacle") || c.includes("lens") || c.includes("chashma") ||
+    c.includes("optical_store")
+  ) {
+    const templates = [
+      {
+        draft1: `Mera ${item} banwaya yahan se. Eye testing bohot accurate hui aur vision crystal clear hai. Frame fitting perfect baithi!`,
+        draft2: `${item} ka collection bohot stylish tha. Staff ne face shape ke hisab se best frame suggest kiya aur time par deliver kar diya.`
+      },
+      {
+        draft1: `Daily screen work ke liye ${item} liya. Glare aur eye strain bilkul khatam ho gaya. Lens quality outstanding hai.`,
+        draft2: `${item} ki fitting lightweight aur comfortable hai. Vadodara me trusted optician for genuine quality.`
+      },
+      {
+        draft1: `Showroom me ${item} ki wide variety available thi. Rates transparent hain aur optometrist ka guidance bohot professional tha.`,
+        draft2: `${item} ke sath case aur cleaning kit bhi di. Precise power checkup ke sath flawless service mili.`
+      }
+    ]
+    const chosen = templates[Math.floor(Math.random() * templates.length)]
+    return {
+      draft1: chosen.draft1,
+      draft2: chosen.draft2,
+      draft3: poolEntry.draft3 || `Outstanding quality ${item} and professional optical consultation at this store!`
     }
   }
 
@@ -912,7 +969,13 @@ export async function generateDynamicReviewDraft(params: {
 
   // 6. Audience Persona & Gender Grammar Directive
   let personaInstruction = "Tone: Casual, natural Indian English or Hinglish like a spontaneous WhatsApp text."
-  if (profile.categoryKey === "saree_palace" || profile.categoryKey === "clothing") {
+  if (profile.categoryKey === "optical_store") {
+    personaInstruction = `STRICT OPTICAL & EYEWEAR PERSONA RULE:
+- This is an OPTICIAN & EYEWEAR SHOWROOM (spectacles, prescription glasses, progressive lenses, blue-cut computer glasses, sunglasses).
+- Perspective: Customer getting computerized eye power testing, purchasing new spectacle frames, progressive lenses, contact lenses, or sunglasses.
+- Praising: Accurate computerized eye test, crystal clear progressive vision, lightweight durable frames, blue-cut anti-glare screen protection, polite optometrist and fast 24-hour delivery.
+- ABSOLUTELY NEVER mention cakes, pastries, bakery, burger, pizza, food delivery, pets, dogs, cats, or teeth/dentist.`
+  } else if (profile.categoryKey === "saree_palace" || profile.categoryKey === "clothing") {
     personaInstruction = `STRICT SAREE & ETHNIC WEAR PERSONA RULE:
 - This is a SILK SAREE PALACE & BRIDAL ETHNIC WEAR SHOWROOM.
 - Perspective: Customer / Bride / Family shopping for wedding, reception, festive function, or family ceremony.
@@ -961,7 +1024,14 @@ export async function generateDynamicReviewDraft(params: {
 
   // Category-specific anti-hallucination guard lines injected into prompt
   let categoryGuard = ""
-  if (profile.categoryKey === "saree_palace" || profile.categoryKey === "clothing") {
+  if (profile.categoryKey === "optical_store") {
+    categoryGuard = `
+CATEGORY-SPECIFIC HARD RULES (OPTICIAN, EYEWEAR & SPECTACLES):
+- BUSINESS TYPE: OPTICIAN / EYEWEAR STORE. NOT a bakery, not food, not a pet clinic, not dental.
+- Reviewer = Customer getting eye test, spectacles, progressive lenses, or sunglasses.
+- MUST USE OPTICAL TERMS: eye testing, power prescription, progressive lenses, blue-cut glasses, anti-glare, spectacle frame, crystal clear vision, optometrist.
+- STRICTLY FORBIDDEN: Words like "cake", "bakery", "pastry", "food", "puppy", "dog", "cat", "teeth", "clinic doctor" are BANNED.`
+  } else if (profile.categoryKey === "saree_palace" || profile.categoryKey === "clothing") {
     categoryGuard = `
 CATEGORY-SPECIFIC HARD RULES (SILK SAREE PALACE & BRIDAL ETHNIC WEAR):
 - BUSINESS TYPE: SILK SAREE PALACE & BRIDAL WEAR SHOWROOM. NOT a pet clinic, not medical, not food.

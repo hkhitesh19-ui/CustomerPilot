@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { searchPlaces } from "@/lib/google-places-api"
 import { ok, err } from "@/lib/api"
+import { getKeywordPresetForCategory, generateAutoKeywordsForLocation } from "@/lib/keyword-matrix"
 
 export const dynamic = "force-dynamic"
 
@@ -75,6 +76,23 @@ export async function POST(req: NextRequest) {
       ? (extractCityFromAddress(topMatch.formattedAddress) || merchant.city || "")
       : merchant.city
 
+    // Universal Category Auto-Detection from Google Places result
+    const candidateCategory = topMatch.primaryType || topMatch.displayName?.text || merchant.name
+    const categoryPreset = getKeywordPresetForCategory(candidateCategory, topMatch.displayName?.text || merchant.name)
+
+    const existingKp = (merchant as any)?.keywordProfile
+    const isCurrentBakery = !existingKp || JSON.stringify(existingKp).toLowerCase().includes("cake") || JSON.stringify(existingKp).toLowerCase().includes("bakery")
+    const isActuallyBakery = (merchant.name || "").toLowerCase().includes("cake") || (merchant.name || "").toLowerCase().includes("bake") || (merchant.name || "").toLowerCase().includes("pastry")
+
+    let newKeywordProfile = existingKp
+    if (!existingKp || (isCurrentBakery && !isActuallyBakery)) {
+      newKeywordProfile = generateAutoKeywordsForLocation(
+        categoryPreset.id,
+        topMatch.formattedAddress || merchant.address || detectedCity || "Vadodara",
+        topMatch.displayName?.text || merchant.name
+      )
+    }
+
     // 1. Update Merchant record
     const updatedMerchant = await db.merchant.update({
       where: { id: merchantId },
@@ -84,6 +102,9 @@ export async function POST(req: NextRequest) {
         googleReviewLink: reviewUrl,
         baselineRating: topMatch.rating || 0,
         baselineReviewCount: topMatch.userRatingCount || 0,
+        ...(categoryPreset?.id ? { businessType: categoryPreset.id } : {}),
+        ...(categoryPreset?.label ? { category: categoryPreset.label } : {}),
+        ...(newKeywordProfile ? { keywordProfile: newKeywordProfile } : {}),
       }
     })
 

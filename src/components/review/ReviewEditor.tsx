@@ -48,7 +48,11 @@ export function ReviewEditor({
     cLower.includes("patola") || cLower.includes("chaniya") || cLower.includes("cloth") ||
     cLower.includes("garment") || cLower.includes("boutique")
   )
-  const isMedicalOrPet = !isSareeOrClothing && (
+  const isOptical = !isSareeOrClothing && (
+    cLower.includes("optical") || cLower.includes("optician") || cLower.includes("eyewear") ||
+    cLower.includes("spectacle") || cLower.includes("lens") || cLower.includes("chashma")
+  )
+  const isMedicalOrPet = !isSareeOrClothing && !isOptical && (
     cLower.includes("clinic") || cLower.includes("hospital") || cLower.includes("doctor") ||
     cLower.includes("dental") || cLower.includes("veterin") ||
     (/\b(pet|pets|dog|cat)\b/i.test(cLower) && !cLower.includes("pethapur"))
@@ -56,17 +60,28 @@ export function ReviewEditor({
 
   const serviceSectionLabel = isSareeOrClothing
     ? "🥻 Saree Styling & Services:"
+    : isOptical
+    ? "👁️ Optical & Eye Testing Services:"
     : isMedicalOrPet
     ? "🩺 Services Received:"
     : "⭐ Services / Highlights:"
 
   const productSectionLabel = isSareeOrClothing
     ? "🛍️ Saree & Ethnic Collection:"
+    : isOptical
+    ? "👓 Eyewear, Frames & Lenses:"
     : isMedicalOrPet
     ? "💊 Products & Prescriptions:"
     : "🛍️ Products Purchased:"
 
   const getAngleLabels = () => {
+    if (isOptical) {
+      return {
+        angle1: "👓 Frame & Fitting",
+        angle2: "👁️ Eye Test & Vision",
+        angle3: "💬 Short 1-Liner"
+      }
+    }
     if (isSareeOrClothing) {
       return {
         angle1: "👗 Fabric & Quality",
