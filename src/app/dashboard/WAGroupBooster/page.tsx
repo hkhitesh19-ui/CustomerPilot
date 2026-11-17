@@ -189,10 +189,10 @@ export default function WAGroupBoosterSimplePage() {
       return
     }
 
-    const printLogoH = logoScale === "xl" ? "34mm" : logoScale === "md" ? "22mm" : "28mm"
+    const printLogoH = logoScale === "xl" ? "42mm" : logoScale === "md" ? "26mm" : "34mm"
     const logoHtml = merchantProfile?.logoUrl
-      ? `<div style="text-align:center;margin-bottom:6px;min-height:24mm;display:flex;align-items:center;justify-content:center;">
-           <img src="${merchantProfile.logoUrl}" style="max-height:${printLogoH};max-width:96mm;object-fit:contain;" alt="${storeName}" />
+      ? `<div style="text-align:center;margin-bottom:6px;min-height:30mm;display:flex;align-items:center;justify-content:center;">
+           <img src="${merchantProfile.logoUrl}" style="max-height:${printLogoH};max-width:105mm;object-fit:contain;border-radius:12px;" alt="${storeName}" />
          </div>`
       : `<div class="store-name">${storeName}</div>`
 
@@ -594,17 +594,17 @@ export default function WAGroupBoosterSimplePage() {
                       className="cursor-pointer group flex flex-col items-center justify-center p-1 w-full"
                       title="Click to change logo"
                     >
-                      <div className="w-full flex items-center justify-center min-h-[96px] sm:min-h-[112px] bg-slate-50/60 rounded-2xl p-2 border border-slate-100/90 shadow-2xs">
+                      <div className="w-full flex items-center justify-center py-1">
                         <img
                           src={merchantProfile.logoUrl}
                           alt={storeName}
                           className={`${
                             logoScale === "xl"
-                              ? "max-h-36 sm:max-h-40 max-w-[280px]"
+                              ? "max-h-[165px] sm:max-h-[180px] max-w-[300px]"
                               : logoScale === "md"
-                              ? "max-h-20 sm:max-h-24 max-w-[220px]"
-                              : "max-h-28 sm:max-h-32 max-w-[260px]"
-                          } w-auto h-auto object-contain drop-shadow-sm group-hover:scale-105 transition-all`}
+                              ? "max-h-[105px] sm:max-h-[115px] max-w-[240px]"
+                              : "max-h-[135px] sm:max-h-[150px] max-w-[280px]"
+                          } w-auto h-auto object-contain rounded-2xl drop-shadow-md group-hover:scale-105 transition-all`}
                         />
                       </div>
                       <span className="text-[9px] font-bold text-teal-600 opacity-0 group-hover:opacity-100 transition-opacity mt-1">
@@ -686,7 +686,7 @@ export default function WAGroupBoosterSimplePage() {
                               : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
                           }`}
                         >
-                          Medium (80px)
+                          Medium (105px)
                         </button>
                         <button
                           type="button"
@@ -697,7 +697,7 @@ export default function WAGroupBoosterSimplePage() {
                               : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
                           }`}
                         >
-                          Large (110px) ✨
+                          Large (135px) ✨
                         </button>
                         <button
                           type="button"
@@ -708,7 +708,7 @@ export default function WAGroupBoosterSimplePage() {
                               : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
                           }`}
                         >
-                          X-Large (135px) 🚀
+                          Hero X-Large (165px) 🚀
                         </button>
                       </div>
                     </div>
