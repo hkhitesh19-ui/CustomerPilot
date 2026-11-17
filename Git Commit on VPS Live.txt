@@ -8,12 +8,12 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : c667bb3
-Full SHA          : c667bb3ab0ba7ac760b87992ef3a8f45fa8a7672
+Active Git Commit : ad5fb14
+Full SHA          : ad5fb14c0be85f8d54fc1e75aec9a507801c1ce5
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 17 Nov 2026, 03:25 PM IST
+Deployment Date   : 17 Nov 2026, 03:40 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(reviews): resolve pethapur pet clinic collision and add saree palace category preset
+Commit Title      : feat(standee): enlarge review qr standee logo and auto-trim whitespace margins
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -21,8 +21,8 @@ Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 O
 Verified Live Outcomes:
 ----------------------------------------------------------
 1. https://customerpilot.in/review?m=cmwitzi0y0002kvwsw32v7uqc   -> HTTP 200 (Shreenath Rajwadi Silk Palace with Authentic Pethapur Silk Sarees, Wedding Saree Consultation, Fabric & Quality Angle, & Zero Pet Clinic/Veterinary Leakage)
-2. https://customerpilot.in/                                         -> HTTP 200 (Homepage live & healthy)
-3. https://customerpilot.in/dashboard/digital-card                   -> HTTP 200 (Smart Digital Business Card Studio with Universal 2-Way Logo Sync & Category Purity)
-4. https://customerpilot.in/dashboard/reviews                        -> HTTP 200 (Smart AI Review Setup)
+2. https://customerpilot.in/ai-google-review-qr-generator        -> HTTP 200 (Smart AI Google Review Standee Studio with Enlarged 125px Brand Logo, Auto-Trimmed Whitespace, & 1-Click A4 Acrylic Print)
+3. https://customerpilot.in/                                     -> HTTP 200 (Homepage live & healthy)
+4. https://customerpilot.in/dashboard/digital-card               -> HTTP 200 (Smart Digital Business Card Studio with Universal 2-Way Logo Sync & Category Purity)
 5. Adversarial Red-Team Safety Gates:
    - All 6 automated gates passed cleanly (AST import linter, full-app TS ratchet 0 errors, sensitive token redactions, 12 mathematical boundaries, payments regression, 0 tracked DBs)
