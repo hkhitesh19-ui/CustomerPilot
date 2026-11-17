@@ -314,10 +314,10 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
             .seg-yellow { background: #FBBC05; }
             .seg-green { background: #34A853; }
             .brand-header {
-              margin-top: 4px; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; min-height: 70px; width: 100%;
+              margin-top: 2px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; min-height: 110px; width: 100%;
             }
             .merchant-logo {
-              height: 68px; max-width: 320px; width: auto; object-fit: contain;
+              height: 125px; max-width: 340px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.06));
             }
             .store-name-badge {
               display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 22px; background: #F8FAFC; border: 2px solid #E2E8F0; border-radius: 20px; max-width: 340px; width: 100%;
@@ -706,12 +706,12 @@ export function GoogleReviewQRGenerator({ merchantId, googleReviewUrl, placeName
                   </div>
 
                   {/* Merchant Business Logo (or Clean Store Name Typography Badge) */}
-                  <div className="flex items-center justify-center pt-1 px-4 mb-2 min-h-[64px] w-full">
+                  <div className="flex items-center justify-center pt-2 px-4 mb-2 min-h-[96px] sm:min-h-[110px] w-full">
                     {hasCustomLogo ? (
                       <img
                         src={qrData.merchant.logoUrl}
                         alt={storeName}
-                        className="max-h-16 sm:max-h-20 max-w-[240px] w-auto h-auto object-contain drop-shadow-sm"
+                        className="max-h-24 sm:max-h-28 max-w-[280px] w-auto h-auto object-contain drop-shadow-sm transition-all"
                         onError={() => setImgFailed(true)}
                       />
                     ) : (

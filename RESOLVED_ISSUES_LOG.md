@@ -4,6 +4,30 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [17 Nov 2026] Feature & UI Fix: Smart AI Google Review QR Standee Brand Logo Enlargement & Auto-Trimming
+- **Symptom**:
+  1. On the Smart AI Google Review QR Standee (both live on-screen dashboard preview and 1-click A4 print preview at `about:blank`), the merchant's custom uploaded brand logo appeared very small, faint, and hard to read.
+  2. For "Shreenath Rajwadi Silk Palace (Pethapur Vala)", the golden emblem and royal typography ("SHREENATH RAJWADI SILK PALACE - SRSP -") were shrunk into a tiny 68x68 box with visual logo height barely ~40px.
+- **Root Cause**:
+  1. In `src/components/google-review-qr-generator.tsx`, the print stylesheet constrained `.merchant-logo` to `height: 68px; max-width: 320px`, and the React preview constrained it to `max-h-16 sm:max-h-20`. For square or 1:1 circular emblem logos, this forced the logo into a tiny square.
+  2. The merchant's uploaded 2048x2048 source image had ~364px of empty whitespace margins around the emblem, which compounded the size reduction.
+- **Resolution**:
+  1. **Enlarged Standee Container**:
+     - Increased `.brand-header` min-height from `70px` to `110px`.
+     - Increased `.merchant-logo` from `68px` to `125px` height (`max-width: 340px`), expanding visual area by over 3.1x.
+     - Added subtle depth drop-shadow (`filter: drop-shadow(0 2px 8px rgba(0,0,0,0.06))`).
+  2. **Enhanced Live Preview Simulator**:
+     - Upgraded container to `min-h-[96px] sm:min-h-[110px]`.
+     - Upgraded image constraints to `max-h-24 sm:max-h-28 max-w-[280px]`.
+  3. **Lossless Whitespace Auto-Cropping**:
+     - Tightly cropped the merchant's uploaded image to `1484 x 1259` using Sharp, removing all empty outer whitespace so the emblem and typography fill the allocated standee space with crisp clarity.
+  4. **Generated & Verified High-Res Samples**:
+     - Rendered sample images (`shreenath_standee_bigger_logo.png` - 125px and `shreenath_standee_xl_logo.png` - 145px) via headless browser.
+     - All 6 Master Adversarial Red-Team gates passed cleanly.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [17 Nov 2026] Issue: Shreenath Rajwadi Silk Palace (Pethapur Vala) Pet Clinic Misclassification & Review UI Bugfix
 - **Symptom**:
   1. Visiting the Google Review generation page for merchant "Shreenath Rajwadi Silk Palace (Pethapur Vala)" (`https://customerpilot.in/review?m=cmwitzi0y0002kvwsw32v7uqc`) incorrectly rendered veterinary and pet clinic services and products:

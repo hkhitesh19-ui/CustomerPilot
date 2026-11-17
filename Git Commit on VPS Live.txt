@@ -8,22 +8,21 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : f8e93ba
-Full SHA          : f8e93baf79fa4d4e1a49ae4685407b5411559dc7
+Active Git Commit : c667bb3
+Full SHA          : c667bb3ab0ba7ac760b87992ef3a8f45fa8a7672
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 17 Nov 2026, 11:32 AM IST
+Deployment Date   : 17 Nov 2026, 03:25 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(branding): universal 2-way logo synchronization across digital card, standees, and qr codes
+Commit Title      : fix(reviews): resolve pethapur pet clinic collision and add saree palace category preset
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Live Outcomes:
 ----------------------------------------------------------
-1. https://customerpilot.in/                                         -> HTTP 200 (Homepage live & healthy)
-2. https://customerpilot.in/dashboard/digital-card                   -> HTTP 200 (Smart Digital Business Card Studio with Universal 2-Way Logo Sync, 1-Click Upload/Remove, & Live Simulator)
-3. https://customerpilot.in/c/mawpaw                                 -> HTTP 200 (Public Digital Card for Maw & Paw with Active Brand Logo, Services Catalog, WhatsApp, & vCard)
-4. https://customerpilot.in/dashboard/settings                       -> HTTP 200 (Smart Standee Studio & Counter QR with Universal Brand Logo Sync)
-5. https://customerpilot.in/dashboard/reviews                        -> HTTP 200 (Smart AI Review Setup with Synced Brand Logo)
-6. Adversarial Red-Team Safety Gates:
+1. https://customerpilot.in/review?m=cmwitzi0y0002kvwsw32v7uqc   -> HTTP 200 (Shreenath Rajwadi Silk Palace with Authentic Pethapur Silk Sarees, Wedding Saree Consultation, Fabric & Quality Angle, & Zero Pet Clinic/Veterinary Leakage)
+2. https://customerpilot.in/                                         -> HTTP 200 (Homepage live & healthy)
+3. https://customerpilot.in/dashboard/digital-card                   -> HTTP 200 (Smart Digital Business Card Studio with Universal 2-Way Logo Sync & Category Purity)
+4. https://customerpilot.in/dashboard/reviews                        -> HTTP 200 (Smart AI Review Setup)
+5. Adversarial Red-Team Safety Gates:
    - All 6 automated gates passed cleanly (AST import linter, full-app TS ratchet 0 errors, sensitive token redactions, 12 mathematical boundaries, payments regression, 0 tracked DBs)
