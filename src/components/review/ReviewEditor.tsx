@@ -40,6 +40,90 @@ export function ReviewEditor({
   const photoBonus = bonusInfo?.photoBonus ?? 2
   const maxPossibleBonus = reviewBonus + photoBonus
 
+  // Category-Aware Labels & Emojis
+  const cLower = ((category || "") + " " + (merchant?.name || "")).toLowerCase()
+  const isSareeOrClothing = (
+    cLower.includes("saree") || cLower.includes("sari") || cLower.includes("silk") ||
+    cLower.includes("rajwadi") || cLower.includes("pethapur") || cLower.includes("lehenga") ||
+    cLower.includes("patola") || cLower.includes("chaniya") || cLower.includes("cloth") ||
+    cLower.includes("garment") || cLower.includes("boutique")
+  )
+  const isMedicalOrPet = !isSareeOrClothing && (
+    cLower.includes("clinic") || cLower.includes("hospital") || cLower.includes("doctor") ||
+    cLower.includes("dental") || cLower.includes("veterin") ||
+    (/\b(pet|pets|dog|cat)\b/i.test(cLower) && !cLower.includes("pethapur"))
+  )
+
+  const serviceSectionLabel = isSareeOrClothing
+    ? "🥻 Saree Styling & Services:"
+    : isMedicalOrPet
+    ? "🩺 Services Received:"
+    : "⭐ Services / Highlights:"
+
+  const productSectionLabel = isSareeOrClothing
+    ? "🛍️ Saree & Ethnic Collection:"
+    : isMedicalOrPet
+    ? "💊 Products & Prescriptions:"
+    : "🛍️ Products Purchased:"
+
+  const getAngleLabels = () => {
+    if (isSareeOrClothing) {
+      return {
+        angle1: "👗 Fabric & Quality",
+        angle2: "✨ Collection & Variety",
+        angle3: "💬 Short 1-Liner"
+      }
+    }
+    if (cLower.includes("pet") || cLower.includes("veterin") || cLower.includes("animal")) {
+      return {
+        angle1: "🐾 Care & Gentle Handling",
+        angle2: "🩺 Doctor & Treatment",
+        angle3: "💬 Short 1-Liner"
+      }
+    }
+    if (cLower.includes("dental") || cLower.includes("dentist") || cLower.includes("tooth")) {
+      return {
+        angle1: "🦷 Treatment & Care",
+        angle2: "👨‍⚕️ Doctor & Staff",
+        angle3: "💬 Short 1-Liner"
+      }
+    }
+    if (cLower.includes("clinic") || cLower.includes("doctor") || cLower.includes("hospital")) {
+      return {
+        angle1: "🩺 Diagnosis & Relief",
+        angle2: "👨‍⚕️ Care & Hygiene",
+        angle3: "💬 Short 1-Liner"
+      }
+    }
+    if (cLower.includes("beauty") || cLower.includes("parlor") || cLower.includes("parlour") || cLower.includes("salon") || cLower.includes("spa")) {
+      return {
+        angle1: "✨ Glow & Result",
+        angle2: "💆‍♀️ Service & Staff",
+        angle3: "💬 Short 1-Liner"
+      }
+    }
+    if (cLower.includes("bakery") || cLower.includes("cake") || cLower.includes("pastry")) {
+      return {
+        angle1: "🍰 Taste & Freshness",
+        angle2: "⚡ Service & Delivery",
+        angle3: "💬 Short 1-Liner"
+      }
+    }
+    if (cLower.includes("pizza") || cLower.includes("food") || cLower.includes("restaurant") || cLower.includes("cafe") || cLower.includes("dosa") || cLower.includes("biryani")) {
+      return {
+        angle1: "🍽️ Quality & Taste",
+        angle2: "⚡ Service & Vibes",
+        angle3: "💬 Short 1-Liner"
+      }
+    }
+    return {
+      angle1: "✨ Quality & Value",
+      angle2: "🛍️ Service & Shopping",
+      angle3: "💬 Short 1-Liner"
+    }
+  }
+  const angleLabels = getAngleLabels()
+
   const defaultText = existingReviewText || initialDraft || `Ordered from ${merchant.name} today. Super fresh quality, loved the taste and packaging. Definitely recommended!`
   const [draft, setDraft] = useState(defaultText)
   const [draftOptions, setDraftOptions] = useState(initialDraftOptions)
@@ -308,7 +392,7 @@ export function ReviewEditor({
                 <div className="space-y-1">
                   {heroProducts && heroProducts.length > 0 && (
                     <span className="text-[9.5px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                      <span>🩺 Services Received:</span>
+                      <span>{serviceSectionLabel}</span>
                     </span>
                   )}
                   <div className="flex flex-wrap gap-1 sm:gap-1.5 max-h-[72px] sm:max-h-none overflow-y-auto no-scrollbar">
@@ -339,7 +423,7 @@ export function ReviewEditor({
                 <div className="space-y-1 pt-0.5">
                   {heroServices && heroServices.length > 0 && (
                     <span className="text-[9.5px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                      <span>🛍️ Products Purchased:</span>
+                      <span>{productSectionLabel}</span>
                     </span>
                   )}
                   <div className="flex flex-wrap gap-1 sm:gap-1.5 max-h-[72px] sm:max-h-none overflow-y-auto no-scrollbar">
@@ -421,7 +505,7 @@ export function ReviewEditor({
                       : "bg-white text-[#3C4043] border-[#DADCE0] hover:bg-[#F1F3F4]"
                   }`}
                 >
-                  <span className="truncate">🍰 Quality &amp; Taste</span>
+                  <span className="truncate">{angleLabels.angle1}</span>
                 </button>
                 <button
                   type="button"
@@ -435,7 +519,7 @@ export function ReviewEditor({
                       : "bg-white text-[#3C4043] border-[#DADCE0] hover:bg-[#F1F3F4]"
                   }`}
                 >
-                  <span className="truncate">⚡ Service &amp; Vibes</span>
+                  <span className="truncate">{angleLabels.angle2}</span>
                 </button>
                 {draftOptions.draft3 && (
                   <button
@@ -450,7 +534,7 @@ export function ReviewEditor({
                         : "bg-white text-[#3C4043] border-[#DADCE0] hover:bg-[#F1F3F4]"
                     }`}
                   >
-                    <span className="truncate">💬 Short 1-Liner</span>
+                    <span className="truncate">{angleLabels.angle3}</span>
                   </button>
                 )}
               </div>

@@ -108,7 +108,15 @@ function cleanBusinessTitle(raw: string) {
   }
 
   const combined = (raw + " " + subCategories).toLowerCase()
-  const isPet = combined.includes("pet") || combined.includes("dog") || combined.includes("cat") || combined.includes("grooming") || combined.includes("paw") || combined.includes("puppy") || combined.includes("vet") || combined.includes("animal")
+  const isPet = (
+    !combined.includes("pethapur") && !combined.includes("carpet") && !combined.includes("petlad") &&
+    !combined.includes("saree") && !combined.includes("silk") &&
+    (
+      combined.includes("pet shop") || combined.includes("pet store") || combined.includes("pet food") ||
+      combined.includes("pet clinic") || combined.includes("veterin") || combined.includes("animal hospital") ||
+      (/\b(pet|pets|dog|dogs|cat|cats|puppy|puppies|animal|animals|paw|paws)\b/i.test(combined))
+    )
+  )
   const isFood = !isPet && (combined.includes("cake") || combined.includes("bakery") || combined.includes("dessert") || combined.includes("cafe") || combined.includes("restaurant") || combined.includes("food") || combined.includes("sweets"))
 
   if (isPet && !subCategories) {
@@ -310,7 +318,10 @@ export async function POST(req: NextRequest) {
             .join(" • ")
 
           const parsed = cleanBusinessTitle(details.displayName?.text || searchQuery)
-          const isPet = parsed.isPet || (categories.toLowerCase().includes("pet") || categories.toLowerCase().includes("vet"))
+          const isPet = parsed.isPet || (
+            !categories.toLowerCase().includes("pethapur") && !categories.toLowerCase().includes("carpet") &&
+            (/\b(pet|pets|vet|veterinary|animal)\b/i.test(categories))
+          )
 
           return NextResponse.json({
             success: true,

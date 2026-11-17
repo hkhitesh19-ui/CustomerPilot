@@ -318,6 +318,96 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
     ]
   },
 
+  saree_palace: {
+    id: "saree_palace",
+    label: "Silk Saree Palace & Ethnic Wear",
+    gbpCategory: "Saree shop / Silk Store / Bridal & Ethnic Wear",
+    audiencePersona: "Female_Only",
+    serviceMode: "Air-Conditioned Showroom Walk-in & Bridal Consultation",
+    seoEntities: [
+      // Hero Services (First 10)
+      "Bridal saree draping demo",
+      "Wedding saree consultation",
+      "Custom blouse matching & contrast styling",
+      "Pure silk & zari quality authentication",
+      "Festive wardrobe styling",
+      "Family wedding trousseau planning",
+      "Patient staff showcasing exclusive variety",
+      "Saree fall pico & finishing service",
+      "Bridal lehenga fitting & trial",
+      "VIP saree selection counter",
+
+      // Hero Products (Next 10)
+      "Pure Pethapur silk sarees",
+      "Rajwadi wedding sarees",
+      "Pure Kanjivaram silk sarees",
+      "Banarasi silk sarees",
+      "Designer bridal chaniya choli",
+      "Traditional Bandhani sarees",
+      "Pure Patola sarees",
+      "Gharchola wedding sarees",
+      "Dola silk designer sarees",
+      "Organza floral & zari sarees",
+
+      // Additional High-Intent SEO Entities
+      "Handloom Tussar silk sarees",
+      "Paithani silk sarees",
+      "Festive party wear sarees",
+      "Pure georgette & chiffon sarees",
+      "Ready-to-wear pre-draped sarees",
+      "Semi-silk celebration sarees",
+      "Printed daily wear sarees",
+      "Embroidered festive lehengas",
+      "Zari border tissue sarees",
+      "Silk blend festive sarees",
+      "Bridal trousseau saree hamper",
+      "Exclusive festive collection",
+      "Traditional Gujarati Rajwadi sarees",
+      "Pure linen sarees",
+      "Chanderi silk sarees",
+      "Authentic handblock print sarees",
+      "Kalamkari silk sarees",
+      "Heavy pallu bridal sarees",
+      "Contrast border festive sarees",
+      "Rich pallu wedding sarees",
+      "Muted pastel designer sarees",
+      "Royal velvet blouse fabrics",
+      "Unstitched designer suit pieces",
+      "Ethnic party wear gowns",
+      "Festive Dupattas and stoles",
+      "Spacious air-conditioned showroom",
+      "Polite and helpful sales staff",
+      "No rush relaxed shopping",
+      "Fixed transparent pricing",
+      "Family friendly seating lounge",
+      "Authentic silk mark guarantee",
+      "Wide color palette options",
+      "New festival arrivals every week",
+      "Wedding guest styling support",
+      "Convenient Manjalpur location"
+    ],
+    aeoAnswers: [
+      "Authentic Pethapur craft and pure silk sarees with genuine zari work",
+      "Patient and attentive staff who show dozens of sarees without rush",
+      "Extensive bridal and wedding collection for whole family shopping",
+      "Transparent fixed pricing with premium fabric guarantee",
+      "Spacious air-conditioned showroom with comfortable seating in Manjalpur Vadodara"
+    ],
+    geoContext: [
+      "Best saree showroom in Manjalpur Vadodara for wedding shopping",
+      "Famous Pethapur Vala silk saree collection in Vadodara",
+      "Family festive shopping destination with ample variety",
+      "Affordable to luxury wedding sarees for bride and family",
+      "Central Manjalpur location with convenient parking"
+    ],
+    blacklist: [
+      "Puppy", "Dog", "Cat", "Kitten", "Pet", "Vaccination", "Deworming", "Veterinary", "Vet doctor", "Animal clinic", "Parvovirus", "Tick flea", "Pet food", "Pet grooming", "Spaying",
+      "Doctor", "Hospital", "Clinic", "Dental", "Root canal", "Teeth", "Medicine", "Prescription", "Patient", "Fever", "Surgery",
+      "Cake", "Bakery", "Pastry", "Burger", "Pizza", "Biryani", "Food", "Delivery", "Parcel", "Zomato", "Swiggy",
+      "Car wash", "Ceramic coating", "Mechanic", "Engine oil", "Bike puncture", "Barber shop", "Men haircut", "Shaving"
+    ]
+  },
+
   supermarket: {
     id: "supermarket",
     label: "SuperMarket & Grocery Store",
@@ -891,38 +981,72 @@ export function getKeywordPresetForCategory(category?: string | null, merchantNa
     return MASTER_KEYWORD_PRESETS.saas_agency;
   }
 
+  // Silk Saree Palace, Bridal Ethnic Wear & Sarees (High Priority — Must evaluate before pet or general retail)
+  if (
+    c.includes("saree") ||
+    c.includes("sari") ||
+    c.includes("silk palace") ||
+    c.includes("rajwadi") ||
+    c.includes("pethapur") ||
+    c.includes("lehenga") ||
+    c.includes("chaniya choli") ||
+    c.includes("gharchola") ||
+    c.includes("patola") ||
+    c.includes("kanjivaram") ||
+    c.includes("banarasi") ||
+    c.includes("paithani") ||
+    c.includes("bandhani") ||
+    (c.includes("silk") && !c.includes("ice cream") && !c.includes("dairy"))
+  ) {
+    return MASTER_KEYWORD_PRESETS.saree_palace;
+  }
+
   // Pet Shop, Pet Grooming, Pet Food, Accessories & Pet/Cat Cafe
   if (
-    c.includes("pet shop") ||
-    c.includes("pet store") ||
-    c.includes("pet grooming") ||
-    c.includes("dog grooming") ||
-    c.includes("cat grooming") ||
-    c.includes("pet food") ||
-    c.includes("dog food") ||
-    c.includes("cat food") ||
-    c.includes("pet accessories") ||
-    c.includes("pet cafe") ||
-    c.includes("cat cafe") ||
-    c.includes("dog cafe") ||
-    c.includes("pet supplies") ||
-    c.includes("pet care supplies") ||
-    (c.includes("paw") && !c.includes("clinic") && !c.includes("hospital") && !c.includes("doctor"))
+    !c.includes("pethapur") &&
+    !c.includes("carpet") &&
+    !c.includes("petlad") &&
+    !c.includes("saree") &&
+    !c.includes("silk") &&
+    (
+      c.includes("pet shop") ||
+      c.includes("pet store") ||
+      c.includes("pet grooming") ||
+      c.includes("dog grooming") ||
+      c.includes("cat grooming") ||
+      c.includes("pet food") ||
+      c.includes("dog food") ||
+      c.includes("cat food") ||
+      c.includes("pet accessories") ||
+      c.includes("pet cafe") ||
+      c.includes("cat cafe") ||
+      c.includes("dog cafe") ||
+      c.includes("pet supplies") ||
+      c.includes("pet care supplies") ||
+      (c.includes("paw") && !c.includes("clinic") && !c.includes("hospital") && !c.includes("doctor"))
+    )
   ) {
     return MASTER_KEYWORD_PRESETS.pet_shop;
   }
 
   // Pet Clinic & Veterinary Hospital (MUST be evaluated BEFORE general clinic/doctor)
   if (
-    c.includes("veterin") ||
-    c.includes("animal hospital") ||
-    c.includes("pet hospital") ||
-    c.includes("vet clinic") ||
-    c.includes("pet clinic") ||
-    c.includes("dog clinic") ||
-    c.includes("cat clinic") ||
-    c.includes("animal care") ||
-    c.includes("pet")
+    !c.includes("pethapur") &&
+    !c.includes("carpet") &&
+    !c.includes("petlad") &&
+    !c.includes("saree") &&
+    !c.includes("silk") &&
+    (
+      c.includes("veterin") ||
+      c.includes("animal hospital") ||
+      c.includes("pet hospital") ||
+      c.includes("vet clinic") ||
+      c.includes("pet clinic") ||
+      c.includes("dog clinic") ||
+      c.includes("cat clinic") ||
+      c.includes("animal care") ||
+      (/\b(pet|pets|dog|dogs|cat|cats|puppy|puppies|kitten|kittens|canine|feline)\b/i.test(c))
+    )
   ) {
     return MASTER_KEYWORD_PRESETS.pet_clinic;
   }
@@ -1080,7 +1204,20 @@ export function getKeywordPresetForCategory(category?: string | null, merchantNa
   if (c.includes("gift") || c.includes("toy") || c.includes("novelty") || c.includes("frame")) {
     return MASTER_KEYWORD_PRESETS.gift_shop;
   }
-  if (c.includes("cloth") || c.includes("garment") || c.includes("boutique") || c.includes("saree") || c.includes("dress") || c.includes("wear")) {
+  if (
+    c.includes("saree") ||
+    c.includes("sari") ||
+    c.includes("silk") ||
+    c.includes("rajwadi") ||
+    c.includes("pethapur") ||
+    c.includes("lehenga") ||
+    c.includes("chaniya choli") ||
+    c.includes("gharchola") ||
+    c.includes("patola")
+  ) {
+    return MASTER_KEYWORD_PRESETS.saree_palace;
+  }
+  if (c.includes("cloth") || c.includes("garment") || c.includes("boutique") || c.includes("dress") || c.includes("wear")) {
     return MASTER_KEYWORD_PRESETS.clothing;
   }
   if (c.includes("supermarket") || c.includes("grocery") || c.includes("kirana") || c.includes("mart") || c.includes("store")) {
@@ -1476,6 +1613,48 @@ export function generateAutoKeywordsForLocation(
         ]
       };
 
+    case "saree_palace":
+    case "clothing":
+      return {
+        coreGeo: [
+          `saree shop in ${loc}`,
+          `silk sarees in ${loc} ${cty}`,
+          `best saree showroom near me in ${loc}`,
+          `wedding saree shop in ${cty}`,
+          `designer bridal sarees in ${loc}`
+        ],
+        commercial: [
+          `Pethapur silk saree showroom ${cty}`,
+          `pure Kanjivaram and Banarasi silk sarees in ${loc}`,
+          `bridal chaniya choli and wedding sarees ${loc}`,
+          `affordable festive saree shopping in ${cty}`,
+          `Rajwadi saree collection in ${loc}`
+        ],
+        services: [
+          `Pethapur Silk Sarees in ${loc}`,
+          `Kanjivaram & Banarasi Silk Sarees in ${loc}`,
+          `Designer Bridal Chaniya Choli in ${loc}`,
+          `Traditional Patola & Bandhani Sarees in ${loc}`,
+          `Wedding Saree Consultation in ${loc}`,
+          `Bridal Draping & Blouse Matching in ${loc}`
+        ],
+        catchmentLandmarks: [
+          `${loc} Main Market`,
+          `Near Patidar Char Rasta ${loc}`,
+          `${loc} Saree Hub`
+        ],
+        voiceAeoQuestions: [
+          `Where to get authentic Pethapur silk sarees in ${loc} ${cty}?`,
+          `Best wedding saree and bridal lehenga showroom in ${loc}?`
+        ],
+        semanticReviewPhrases: [
+          "pure silk fabric and authentic zari work",
+          "patient staff showing exclusive collection",
+          "best saree showroom for family wedding shopping",
+          "wide variety of Rajwadi and Pethapur designs"
+        ]
+      };
+
     default:
       return {
         coreGeo: [
@@ -1531,19 +1710,42 @@ export function resolveMerchantKeywordProfile(merchant: {
     categoryPreset = getKeywordPresetForCategory(merchant.businessType || merchant.category, merchant.name);
   }
 
-  // Detect whether this business is Pet Shop, Pet Clinic, or Dental Clinic
-  const isPetShop = bType === "pet_shop" ||
-    (merchant.name && (merchant.name.toLowerCase().includes("pet shop") || merchant.name.toLowerCase().includes("pet store") || merchant.name.toLowerCase().includes("grooming") || merchant.name.toLowerCase().includes("pet food") || merchant.name.toLowerCase().includes("pet accessories") || merchant.name.toLowerCase().includes("pet cafe") || merchant.name.toLowerCase().includes("cat cafe") || merchant.name.toLowerCase().includes("dog cafe"))) ||
-    (merchant.category && (merchant.category.toLowerCase().includes("pet shop") || merchant.category.toLowerCase().includes("pet store") || merchant.category.toLowerCase().includes("grooming") || merchant.category.toLowerCase().includes("supplies") || merchant.category.toLowerCase().includes("pet supplies")));
+  // Detect whether this business is Saree Palace, Pet Shop, Pet Clinic, or Dental Clinic
+  const isSareePalace = bType === "saree_palace" ||
+    (merchant.name && (
+      merchant.name.toLowerCase().includes("saree") ||
+      merchant.name.toLowerCase().includes("sari") ||
+      merchant.name.toLowerCase().includes("silk palace") ||
+      merchant.name.toLowerCase().includes("silk") ||
+      merchant.name.toLowerCase().includes("rajwadi") ||
+      merchant.name.toLowerCase().includes("pethapur") ||
+      merchant.name.toLowerCase().includes("lehenga") ||
+      merchant.name.toLowerCase().includes("chaniya choli") ||
+      merchant.name.toLowerCase().includes("patola") ||
+      merchant.name.toLowerCase().includes("gharchola")
+    )) ||
+    (merchant.category && (
+      merchant.category.toLowerCase().includes("saree") ||
+      merchant.category.toLowerCase().includes("sari") ||
+      merchant.category.toLowerCase().includes("silk") ||
+      merchant.category.toLowerCase().includes("bridal") ||
+      merchant.category.toLowerCase().includes("ethnic wear")
+    ));
 
-  const isPetClinic = !isPetShop && (bType === "pet_clinic" ||
-    (merchant.name && (merchant.name.toLowerCase().includes("vet") || merchant.name.toLowerCase().includes("animal hospital") || merchant.name.toLowerCase().includes("pet clinic") || merchant.name.toLowerCase().includes("dog clinic"))));
+  const isPetShop = !isSareePalace && (bType === "pet_shop" ||
+    (merchant.name && (merchant.name.toLowerCase().includes("pet shop") || merchant.name.toLowerCase().includes("pet store") || (merchant.name.toLowerCase().includes("grooming") && !isSareePalace) || merchant.name.toLowerCase().includes("pet food") || merchant.name.toLowerCase().includes("pet accessories") || merchant.name.toLowerCase().includes("pet cafe") || merchant.name.toLowerCase().includes("cat cafe") || merchant.name.toLowerCase().includes("dog cafe"))) ||
+    (merchant.category && (merchant.category.toLowerCase().includes("pet shop") || merchant.category.toLowerCase().includes("pet store") || merchant.category.toLowerCase().includes("supplies") || merchant.category.toLowerCase().includes("pet supplies"))));
 
-  const isDentalBusiness = bType === "dental_clinic" ||
-    (merchant.name && (merchant.name.toLowerCase().includes("dental") || merchant.name.toLowerCase().includes("dentist")));
+  const isPetClinic = !isSareePalace && !isPetShop && (bType === "pet_clinic" ||
+    (merchant.name && (merchant.name.toLowerCase().includes("veterin") || merchant.name.toLowerCase().includes("animal hospital") || merchant.name.toLowerCase().includes("pet clinic") || merchant.name.toLowerCase().includes("dog clinic"))));
+
+  const isDentalBusiness = !isSareePalace && !isPetShop && !isPetClinic && (bType === "dental_clinic" ||
+    (merchant.name && (merchant.name.toLowerCase().includes("dental") || merchant.name.toLowerCase().includes("dentist"))));
 
   // If detected, ensure categoryPreset is definitively set
-  if (isPetShop && categoryPreset.id !== "pet_shop") {
+  if (isSareePalace && categoryPreset.id !== "saree_palace") {
+    categoryPreset = MASTER_KEYWORD_PRESETS.saree_palace;
+  } else if (isPetShop && categoryPreset.id !== "pet_shop") {
     categoryPreset = MASTER_KEYWORD_PRESETS.pet_shop;
   } else if (isPetClinic && categoryPreset.id !== "pet_clinic") {
     categoryPreset = MASTER_KEYWORD_PRESETS.pet_clinic;
@@ -1567,7 +1769,13 @@ export function resolveMerchantKeywordProfile(merchant: {
       let effectiveHeroServices = Array.isArray(parsed.heroServices) && parsed.heroServices.length > 0 ? parsed.heroServices.slice(0, 10) : categoryPreset.seoEntities.slice(0, 10);
       let effectiveHeroProducts = Array.isArray(parsed.heroProducts) && parsed.heroProducts.length > 0 ? parsed.heroProducts.slice(0, 10) : (categoryPreset.seoEntities.length > 10 ? categoryPreset.seoEntities.slice(10, 20) : categoryPreset.seoEntities.slice(0, 5));
 
-      if (isPetShop && (effectiveCategoryKey === "pet_clinic" || effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("mbbs") || s.toLowerCase().includes("surgery") || s.toLowerCase().includes("vaccination") || s.toLowerCase().includes("physician")))) {
+      if (isSareePalace && (effectiveCategoryKey === "pet_clinic" || effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("vaccination") || s.toLowerCase().includes("puppy") || s.toLowerCase().includes("deworming")))) {
+        effectiveCategoryKey = "saree_palace";
+        effectiveAllowedSeo = MASTER_KEYWORD_PRESETS.saree_palace.seoEntities;
+        effectiveStrictlyNotAllowed = MASTER_KEYWORD_PRESETS.saree_palace.blacklist;
+        effectiveHeroServices = MASTER_KEYWORD_PRESETS.saree_palace.seoEntities.slice(0, 10);
+        effectiveHeroProducts = MASTER_KEYWORD_PRESETS.saree_palace.seoEntities.slice(10, 20);
+      } else if (isPetShop && (effectiveCategoryKey === "pet_clinic" || effectiveCategoryKey === "clinic_doctor" || effectiveAllowedSeo.some((s: string) => s.toLowerCase().includes("mbbs") || s.toLowerCase().includes("surgery") || s.toLowerCase().includes("vaccination") || s.toLowerCase().includes("physician")))) {
         effectiveCategoryKey = "pet_shop";
         effectiveAllowedSeo = MASTER_KEYWORD_PRESETS.pet_shop.seoEntities;
         effectiveStrictlyNotAllowed = MASTER_KEYWORD_PRESETS.pet_shop.blacklist;

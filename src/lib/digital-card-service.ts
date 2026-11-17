@@ -48,13 +48,21 @@ export async function getOrCreateDigitalBusinessCard(merchantId: string) {
 
     const businessType = (merchant.businessType || "").toLowerCase()
     const category = (merchant.category || "").toLowerCase()
-    const isPet = businessType.includes("pet") || category.includes("pet") || businessType.includes("animal") || category.includes("animal") || (merchant.name || "").toLowerCase().includes("pet") || (merchant.name || "").toLowerCase().includes("paw")
+    const mName = (merchant.name || "").toLowerCase()
+    const isPet = (
+      !mName.includes("pethapur") && !mName.includes("carpet") && !mName.includes("petlad") && !category.includes("saree") && !category.includes("cloth") &&
+      (
+        businessType.includes("pet_shop") || businessType.includes("pet_clinic") ||
+        category.includes("pet shop") || category.includes("pet store") || category.includes("veterin") || category.includes("animal hospital") ||
+        (/\b(pet|pets|dog|dogs|cat|cats|puppy|puppies|animal|animals|paw|paws)\b/i.test(`${businessType} ${category} ${mName}`))
+      )
+    )
     
     const subCategories =
       isPet
         ? "Pet Shop • Pet Grooming • Pet Food • Accessories • Pet Cafe"
-        : businessType.includes("fashion") || businessType.includes("clothing") || businessType.includes("apparel")
-        ? "Ethnic & Western Wear • Designer Collections • Premium Fashion"
+        : businessType.includes("fashion") || businessType.includes("clothing") || businessType.includes("apparel") || category.includes("saree") || category.includes("cloth") || mName.includes("saree") || mName.includes("silk")
+        ? "Silk Sarees • Bridal Lehengas • Ethnic Wear • Designer Collection"
         : businessType.includes("bakery") || businessType.includes("cake")
         ? "Cakes • Desserts • Bakery & Confectionery"
         : businessType.includes("restaurant") || businessType.includes("cafe")

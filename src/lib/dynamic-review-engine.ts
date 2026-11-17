@@ -316,6 +316,24 @@ const SAAS_AGENCY_REVIEWS: FallbackReviewItem[] = [
   }
 ]
 
+const SAREE_CLOTHING_REVIEWS: FallbackReviewItem[] = [
+  {
+    draft1: "Wedding shopping ke liye visit kiya tha. Pure silk sarees aur bridal collection bohot hi khoobsurat hai. Staff ne bohot patience se har design dikhayi.",
+    draft2: "Authentic Pethapur silk sarees aur designer collection lajawab hai. Fabric quality rich hai aur rates reasonable hain.",
+    draft3: "Best saree showroom in Vadodara! Royal Rajwadi collection aur wedding sarees ke liye must visit jagah hai."
+  },
+  {
+    draft1: "Family wedding ke liye Kanjivaram aur Banarasi silk sarees li. Zari work aur fabric bohot genuine hai. Pure silk ka trust mila.",
+    draft2: "Showroom me bohot bada collection hai, staff bilkul pushy nahi hai aur designs ek se badhkar ek dikhaye. Shopping experience smooth raha.",
+    draft3: "Festive collection aur designer bridal sarees bohot sundar hain. Fitting and fall-pico service timely mil gayi."
+  },
+  {
+    draft1: "Rajwadi silk saree li function ke liye, sabne tareef ki. Fabric bohot comfortable aur premium lag raha tha. Thank you team!",
+    draft2: "Traditional Patola aur Bandhani sarees ka exclusive collection yahan mila. Family ke sath shopping karne ka best experience.",
+    draft3: "Top-quality pure silk sarees, spacious AC showroom aur polite sales staff. 100% recommended for wedding shopping!"
+  }
+]
+
 const GENERAL_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Picked up some items earlier today. Super fresh quality, loved the experience and neat setup.",
@@ -385,10 +403,13 @@ function getCategoryAuthenticAngles(categoryKey: string): string[] {
         "Kids birthday return gift purchase"
       ]
     case "clothing":
+    case "saree_palace":
       return [
-        "Festive shopping for family",
-        "Wedding guest outfit trial",
-        "Casual daily wear shopping"
+        "Bridal wedding trousseau shopping",
+        "Festive Diwali & wedding reception saree trial",
+        "Authentic Pethapur silk saree selection",
+        "Family wedding saree matching & blouse contrast",
+        "Traditional Patola and Bandhani saree purchase"
       ]
     case "car_wash":
       return [
@@ -471,7 +492,21 @@ export function getDynamicFallbackReview(
 
   // Choose appropriate pool based on category
   let pool: FallbackReviewItem[] = GENERAL_REVIEWS
-  if (c.includes("pet") || c.includes("veterin") || c.includes("animal") || c.includes("dog") || c.includes("cat") || c.includes("puppy") || c.includes("kitten") || c.includes("pet_clinic")) {
+  const isPetCategory = (
+    c.includes("pet_clinic") || c.includes("pet_shop") ||
+    c.includes("veterin") || c.includes("animal hospital") || c.includes("pet hospital") ||
+    c.includes("vet clinic") || c.includes("dog clinic") || c.includes("cat clinic") ||
+    (/\b(pet|pets|puppy|puppies|kitten|kittens|dog|dogs|cat|cats)\b/i.test(c) && !c.includes("pethapur") && !c.includes("carpet") && !c.includes("petlad"))
+  )
+
+  if (
+    c.includes("saree") || c.includes("silk") || c.includes("saree_palace") ||
+    c.includes("rajwadi") || c.includes("pethapur") || c.includes("lehenga") ||
+    c.includes("patola") || c.includes("chaniya") || c.includes("cloth") ||
+    c.includes("garment") || c.includes("boutique")
+  ) {
+    pool = SAREE_CLOTHING_REVIEWS
+  } else if (isPetCategory) {
     pool = PET_CLINIC_REVIEWS
   } else if (c.includes("dental") || c.includes("dentist") || c.includes("tooth") || c.includes("teeth") || c.includes("orthodont") || c.includes("rct") || c.includes("dental_clinic")) {
     pool = DENTAL_REVIEWS
@@ -539,12 +574,43 @@ function getCategoryAwareItemDrafts(
 ): ReviewDraftOptions {
   const c = category.toLowerCase()
 
-  // ── PET CLINIC ───────────────────────────────────────────────────────────────
+  // ── SAREE & SILK PALACE / ETHNIC WEAR ─────────────────────────────────────────
   if (
-    c.includes("pet") || c.includes("veterin") || c.includes("animal") ||
-    c.includes("dog") || c.includes("cat") || c.includes("puppy") || c.includes("kitten") ||
-    c.includes("pet_clinic")
+    c.includes("saree") || c.includes("silk") || c.includes("cloth") ||
+    c.includes("garment") || c.includes("boutique") || c.includes("lehenga") ||
+    c.includes("sari") || c.includes("rajwadi") || c.includes("pethapur") ||
+    c.includes("saree_palace")
   ) {
+    const templates = [
+      {
+        draft1: `Wedding function ke liye ${item} liya tha. Fabric quality aur rich zari border bahut hi authentic hai. Sabne look ki bohot tareef ki!`,
+        draft2: `${item} ka collection bohot unique tha. Staff ne patience se styling dikhayi aur fall-pico finishing bhi time pe karke di.`
+      },
+      {
+        draft1: `Family shopping ke liye gaye the aur ${item} pasand aaya. Pure fabric aur genuine quality dekh kar maza aa gaya.`,
+        draft2: `${item} ki fitting aur drape perfect baitha. Vadodara me royal traditional wear ke liye best showroom hai.`
+      },
+      {
+        draft1: `Showroom me ${item} ki multiple exclusive designs dikhayi. Rates genuine hain aur staff ka behavior bohot polite tha.`,
+        draft2: `${item} ke sath blouse matching aur contrast suggestions bohot ache diye. Wedding trousseau shopping ke liye definitely recommend karti hoon.`
+      }
+    ]
+    const chosen = templates[Math.floor(Math.random() * templates.length)]
+    return {
+      draft1: chosen.draft1,
+      draft2: chosen.draft2,
+      draft3: poolEntry.draft3 || `Outstanding quality ${item} and wonderful shopping experience at this showroom!`
+    }
+  }
+
+  // ── PET CLINIC ───────────────────────────────────────────────────────────────
+  const isPetCategory = (
+    c.includes("pet_clinic") || c.includes("pet_shop") ||
+    c.includes("veterin") || c.includes("animal hospital") || c.includes("pet hospital") ||
+    c.includes("vet clinic") || c.includes("dog clinic") || c.includes("cat clinic") ||
+    (/\b(pet|pets|puppy|puppies|kitten|kittens|dog|dogs|cat|cats)\b/i.test(c) && !c.includes("pethapur") && !c.includes("carpet") && !c.includes("petlad"))
+  )
+  if (isPetCategory) {
     const templates = [
       {
         draft1: `Mera dog ka ${item} karwaya. Vet doctor ne bahut gently handle kiya, pet poori visit mein calm aur comfortable raha.`,
@@ -846,7 +912,13 @@ export async function generateDynamicReviewDraft(params: {
 
   // 6. Audience Persona & Gender Grammar Directive
   let personaInstruction = "Tone: Casual, natural Indian English or Hinglish like a spontaneous WhatsApp text."
-  if (profile.categoryKey === "saas_agency") {
+  if (profile.categoryKey === "saree_palace" || profile.categoryKey === "clothing") {
+    personaInstruction = `STRICT SAREE & ETHNIC WEAR PERSONA RULE:
+- This is a SILK SAREE PALACE & BRIDAL ETHNIC WEAR SHOWROOM.
+- Perspective: Customer / Bride / Family shopping for wedding, reception, festive function, or family ceremony.
+- Praising: Authentic Pethapur silk sarees, pure fabric, rich zari border, bridal chaniya choli, patient staff showing dozens of designs, comfortable showroom ambience.
+- ABSOLUTELY NEVER mention pets, dogs, cats, animals, vet, clinic, doctor, medicine, cakes, or food delivery.`
+  } else if (profile.categoryKey === "saas_agency") {
     personaInstruction = `STRICT B2B MERCHANT PERSONA RULE:
 - The reviewer is an authentic local retail store owner / merchant / shop manager writing for CustomerPilot (SaaS platform).
 - Perspective: "Hamare store/bakery/salon ke liye CustomerPilot WhatsApp loyalty lagaya", "Google reviews 800% badh gaye", "Counter standee se customers khush hoke review dete hain", "1-click owner auto-reply se daily time bachta hai".
@@ -889,7 +961,14 @@ export async function generateDynamicReviewDraft(params: {
 
   // Category-specific anti-hallucination guard lines injected into prompt
   let categoryGuard = ""
-  if (profile.categoryKey === "pet_clinic") {
+  if (profile.categoryKey === "saree_palace" || profile.categoryKey === "clothing") {
+    categoryGuard = `
+CATEGORY-SPECIFIC HARD RULES (SILK SAREE PALACE & BRIDAL ETHNIC WEAR):
+- BUSINESS TYPE: SILK SAREE PALACE & BRIDAL WEAR SHOWROOM. NOT a pet clinic, not medical, not food.
+- Reviewer = Woman / Bride / Family member shopping for authentic sarees and wedding wear.
+- MUST USE SAREE & ETHNIC TERMS: silk saree, Pethapur craft, pure fabric, rich zari border, bridal lehenga, wedding shopping, patient sales staff, comfortable showroom.
+- STRICTLY FORBIDDEN: Words like "puppy", "dog", "cat", "pet", "vaccination", "clinic", "doctor", "cake", "burger", "delivery" are BANNED.`
+  } else if (profile.categoryKey === "pet_clinic") {
     categoryGuard = `
 CATEGORY-SPECIFIC HARD RULES (PET CLINIC — VETERINARY):
 - BUSINESS TYPE: PET CLINIC / VETERINARY HOSPITAL. NOT a human hospital or medical clinic.

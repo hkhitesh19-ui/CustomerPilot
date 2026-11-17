@@ -4,6 +4,51 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [17 Nov 2026] Issue: Shreenath Rajwadi Silk Palace (Pethapur Vala) Pet Clinic Misclassification & Review UI Bugfix
+- **Symptom**:
+  1. Visiting the Google Review generation page for merchant "Shreenath Rajwadi Silk Palace (Pethapur Vala)" (`https://customerpilot.in/review?m=cmwitzi0y0002kvwsw32v7uqc`) incorrectly rendered veterinary and pet clinic services and products:
+     - Services: "Puppy 7-in-1 vaccination", "Kitten core vaccination", "Pet deworming tablet treatment", "Animal wound cleaning", etc.
+     - Products: "Pet surgery and spaying neutering", "Dog ultrasonic dental scaling", "Emergency pet veterinary care", etc.
+     - Review Angle: "🍰 Quality & Taste" (food/bakery default angle).
+     - AI Generated Review: *"Meri billi ka Pet health passport and record card kiya gaya. Procedure smooth raha aur doctor ne post-care instructions clearly di."*
+  2. For a premier silk saree and bridal ethnic wear showroom in Manjalpur, Vadodara, having pet clinic services, cat vaccination reviews, and cake angles was completely inappropriate and broken.
+- **Root Cause**:
+  1. Substring Collision in Category Detection: In `src/lib/keyword-matrix.ts` line 925, `getKeywordPresetForCategory` checked `c.includes("pet") || c.includes("vet") || c.includes("animal")`. The town name "Pethapur" in `"Shreenath Rajwadi Silk Palace (Pethapur Vala)"` contains the substring `"pet"`.
+  2. Substring Collision in Digital Card & GBP Parsers: `isPet` checks in `src/lib/digital-card-service.ts`, `src/app/api/digital-card/fetch-public-gbp/route.ts`, and `src/app/dashboard/digital-card/page.tsx` were doing naive `.includes("pet")` checks without excluding "pethapur" or "petlad".
+  3. Missing Dedicated Category Preset: The platform had presets for `clothing` (general clothing) and `jewellery_bridal`, but lacked a dedicated `saree_palace` preset tailored for authentic Indian silk sarees, bridal wear, trousseau shopping, and Pethapur artisan craftsmanship.
+  4. Hardcoded Review Angles & Section Labels: `ReviewEditor.tsx` had hardcoded `🍰 Quality & Taste` for angle 1, and static headers `🩺 Services Received:` and `🛍️ Products Purchased:`.
+- **Resolution**:
+  1. **New Dedicated `saree_palace` Category Preset (`src/lib/keyword-matrix.ts`)**:
+     - Added `saree_palace` to `MASTER_KEYWORD_PRESETS` with:
+       - 10 Hero Services: Bridal saree draping demo, Wedding saree consultation, Custom blouse matching & contrast styling, Pure silk & zari quality authentication, Festive wardrobe styling, Family wedding trousseau planning, Patient staff showcasing exclusive variety, Saree fall pico & finishing service, Bridal lehenga fitting & trial, VIP saree selection counter.
+       - 10 Hero Products: Pure Pethapur silk sarees, Rajwadi wedding sarees, Pure Kanjivaram silk sarees, Banarasi silk sarees, Designer bridal chaniya choli, Traditional Bandhani sarees, Pure Patola sarees, Gharchola wedding sarees, Dola silk designer sarees, Organza floral & zari sarees.
+       - Strict Blacklist: Banned all veterinary, clinic, medicine, animal, cake, and fast food terms.
+     - Updated `generateAutoKeywordsForLocation` with Vadodara local saree keywords.
+  2. **Substring Hazard Elimination & Regex Word Boundaries**:
+     - Replaced raw `c.includes("pet")` with regex word boundaries `/\b(pet|pets|dog|dogs|cat|cats|puppy|puppies|kitten|kittens|canine|feline)\b/i` combined with negative exclusions `!c.includes("pethapur") && !c.includes("carpet") && !c.includes("petlad")` across all 6 files (`keyword-matrix.ts`, `dynamic-review-engine.ts`, `digital-card-service.ts`, `fetch-public-gbp/route.ts`, `api/digital-card/route.ts`, and `dashboard/digital-card/page.tsx`).
+     - Placed Saree / Silk Palace / Pethapur / Rajwadi checks ahead of any pet/medical checks.
+  3. **Auto-Healing for Merchant Profiles (`src/lib/keyword-matrix.ts`)**:
+     - Added automatic healing in `resolveMerchantKeywordProfile`: if an existing merchant profile has `saree` or `pethapur` in their name/category but is contaminated with `pet_clinic` keywords, it automatically purges the invalid keywords and upgrades the profile to `saree_palace`.
+  4. **Dynamic Category-Aware Review Angles & Section Headers (`src/components/review/ReviewEditor.tsx`)**:
+     - Replaced hardcoded `🍰 Quality & Taste` with dynamic angle labels:
+       - Saree Palace / Clothing: `👗 Fabric & Quality`, `✨ Collection & Variety`, `💬 Short 1-Liner`.
+       - Pet Care: `🐾 Care & Gentle Handling`, `🩺 Doctor & Treatment`, `💬 Short 1-Liner`.
+       - Dental: `🦷 Treatment & Care`, `👨‍⚕️ Doctor & Staff`, `💬 Short 1-Liner`.
+       - Clinic: `🩺 Diagnosis & Relief`, `👨‍⚕️ Care & Hygiene`, `💬 Short 1-Liner`.
+       - Salon/Spa: `✨ Glow & Result`, `💆‍♀️ Service & Staff`, `💬 Short 1-Liner`.
+       - Bakery: `🍰 Taste & Freshness`, `⚡ Service & Delivery`, `💬 Short 1-Liner`.
+     - Replaced static section headers with category-aware headers: `🥻 Saree Styling & Services:` and `🛍️ Saree & Ethnic Collection:`.
+  5. **Authentic Gujarati Wedding Saree Review Generator (`src/lib/dynamic-review-engine.ts`)**:
+     - Added `SAREE_CLOTHING_REVIEWS` fallback review pool.
+     - Added category-specific AI prompt guards for `saree_palace` in `generateDynamicReviewDraft`.
+     - Added saree templates in `getCategoryAwareItemDrafts`.
+  6. **Automated Unit Testing & Adversarial Red-Team Gates**:
+     - Created `tests/unit/pillar3-shreenath-saree-classification.test.ts` with 5 automated unit tests validating classification, substring safety, hero entity purity, profile auto-healing, and review draft generation.
+     - Master Adversarial Guard (`scripts/run_adversarial_guard.js`) ran and passed all 6 gates cleanly (Spec Import, Full TypeScript Ratchet <= 36, Secrets, Math Boundaries, Payments Regression, Git Hygiene).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [17 Nov 2026] Feature & Bugfix: Platform-Wide Universal Brand Logo Synchronization Across Digital Card, Standees & QR Codes
 - **Symptom**:
   1. In `/dashboard/settings` and Standee Studios, a custom brand logo was uploaded and displayed on tabletop standees (e.g. Maw & Paw `/uploads/1794678129417-MawPawLogo.jpg`), but navigating to `/dashboard/digital-card` showed an empty "Store Logo Image URL" input field and the live simulator rendered a placeholder initials box ("MA").

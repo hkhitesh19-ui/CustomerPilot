@@ -94,7 +94,16 @@ export default function DigitalCardDashboardPage() {
   })
 
   // Dynamic category detection
-  const isPetCategory = ((formData.subCategories || "") + " " + (formData.displayName || "")).toLowerCase().match(/pet|dog|cat|puppy|animal|vet|grooming|paw/) !== null
+  const combinedCategoryText = ((formData.subCategories || "") + " " + (formData.displayName || "")).toLowerCase()
+  const isPetCategory = (
+    !combinedCategoryText.includes("pethapur") && !combinedCategoryText.includes("carpet") && !combinedCategoryText.includes("petlad") &&
+    !combinedCategoryText.includes("saree") && !combinedCategoryText.includes("silk") &&
+    (
+      combinedCategoryText.includes("pet shop") || combinedCategoryText.includes("pet store") || combinedCategoryText.includes("pet food") ||
+      combinedCategoryText.includes("pet clinic") || combinedCategoryText.includes("veterin") || combinedCategoryText.includes("animal hospital") ||
+      (/\b(pet|pets|dog|dogs|cat|cats|puppy|puppies|animal|animals|vet|veterinary|grooming|paw|paws)\b/i.test(combinedCategoryText))
+    )
+  )
 
   // Synchronize orderingLinks into formData for live interactive phone simulator
   const syncSimulatorLinks = (

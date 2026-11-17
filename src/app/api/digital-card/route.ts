@@ -287,7 +287,15 @@ export async function POST(req: NextRequest) {
 
     // Detect if this is a Pet Business (Pet store, clinic, grooming, supplies)
     const categoryText = `${subCategories || ""} ${displayName || ""}`.toLowerCase()
-    const isPetCategory = categoryText.includes("pet") || categoryText.includes("dog") || categoryText.includes("cat") || categoryText.includes("puppy") || categoryText.includes("animal") || categoryText.includes("vet") || categoryText.includes("grooming")
+    const isPetCategory = (
+      !categoryText.includes("pethapur") && !categoryText.includes("carpet") && !categoryText.includes("petlad") &&
+      !categoryText.includes("saree") && !categoryText.includes("silk") &&
+      (
+        categoryText.includes("pet shop") || categoryText.includes("pet store") || categoryText.includes("pet food") ||
+        categoryText.includes("pet clinic") || categoryText.includes("veterin") || categoryText.includes("animal hospital") ||
+        (/\b(pet|pets|dog|dogs|cat|cats|puppy|puppies|animal|animals|vet|veterinary|grooming)\b/i.test(categoryText))
+      )
+    )
     const allowFoodDelivery = Boolean(enableFoodDelivery)
 
     // Construct ordering links
