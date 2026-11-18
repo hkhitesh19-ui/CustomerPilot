@@ -4,6 +4,23 @@ import { ok, err, getAuthenticatedMerchant } from "@/lib/api"
 import { getIndustryLoyaltyRule } from "@/lib/industry-campaigns"
 import { getGlobalDefaultMerchantSettings } from "@/lib/default-merchant-settings"
 
+function getMerchantCardTitle(merchantName?: string | null, rawCardName?: string | null): string {
+  const cleanBiz = (merchantName || "Store").split(/[\(\-\:]/)[0].trim() || "Store"
+  const defaultTitle = `${cleanBiz} VIP Club`
+  
+  if (!rawCardName || rawCardName.trim() === "" || rawCardName === "Loyalty Stamp Card" || rawCardName === "VIP Club") {
+    return defaultTitle
+  }
+  
+  // If merchant is NOT Cake Connection, but card name has Cake Connection, rewrite to current merchant name
+  const isCakeMerchant = /cake\s*connection/i.test(merchantName || "")
+  if (!isCakeMerchant && /cake\s*connection/i.test(rawCardName)) {
+    return defaultTitle
+  }
+  
+  return rawCardName
+}
+
 export async function GET(req: NextRequest) {
   try {
     let merchantId = req.headers.get("x-merchant-id")
@@ -66,8 +83,9 @@ export async function GET(req: NextRequest) {
 
     if (!card) {
       const rule = getIndustryLoyaltyRule(merchant?.businessType, merchant?.name)
+      const computedName = getMerchantCardTitle(merchant?.name, globalDefaults?.cardName || rule.getCardTitle(merchant?.name))
       const defaultCardData = {
-        name: globalDefaults?.cardName || rule.getCardTitle(merchant?.name),
+        name: computedName,
         stampsRequired: globalDefaults?.stampsRequired ?? rule.stampsRequired,
         rewardName: globalDefaults?.rewardName || rule.rewardName,
         stampValue: globalDefaults?.stampValue ?? rule.stampValue,
@@ -108,6 +126,16 @@ export async function GET(req: NextRequest) {
       }, {
         headers: { "Cache-Control": "no-store, private" }
       })
+    }
+
+    // Auto-heal existing cards that inherited another business's default title (e.g. Maw & Paw inheriting Cake Connection)
+    const effectiveCardName = getMerchantCardTitle(merchant?.name, card.name)
+    if (effectiveCardName !== card.name) {
+      await db.stampCard.update({
+        where: { id: card.id },
+        data: { name: effectiveCardName }
+      }).catch(() => {})
+      card.name = effectiveCardName
     }
 
     return ok({ card: { ...card, ...referralRules, ...socialRewardRules, vipUpgradeBonusStamps: merchant?.vipUpgradeBonusStamps ?? globalDefaults?.vipUpgradeBonusStamps ?? 2 }, isDefault: false }, {

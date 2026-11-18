@@ -112,7 +112,7 @@ export default function QueuePage() {
                             REFERRED BY
                           </span>
                           <span className="text-xs font-black text-amber-950 dark:text-amber-100 truncate">
-                            {referrer.name}
+                            {referrer?.name || "VIP Member"}
                           </span>
                         </div>
                         <p className="text-[11px] text-amber-800 dark:text-amber-300 font-medium truncate mt-0.5">

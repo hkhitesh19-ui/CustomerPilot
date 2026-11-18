@@ -461,12 +461,13 @@ export async function POST(req: NextRequest) {
           continue
         }
 
-        // ── 2. Check if customer is already in queue ───────────────────────
+        // ── 2. Check if customer is already in queue (Active, non-expired only) ───
         const alreadyWaiting = await db.waitingCustomer.findFirst({
           where: {
             merchantId: merchant.id,
             customer: { phone: customerPhone },
-            status: "waiting"
+            status: "waiting",
+            expiresAt: { gt: new Date() }
           },
           include: { customer: true }
         })

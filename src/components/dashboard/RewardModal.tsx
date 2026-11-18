@@ -129,8 +129,6 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
     initData();
   }, [isOpen, merchantId]);
 
-  if (!waitingCustomer) return null;
-
   const handleClose = () => {
     setAmount('');
     setProductName('');
@@ -147,7 +145,7 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
     onClose();
   };
 
-  // ── Financial Calculations for Itemized Cart ──
+  // ── Financial Calculations for Itemized Cart (Hook count invariant across renders) ──
   const cartItemsList = useMemo(() => Object.values(cart).filter(i => i.quantity > 0), [cart]);
 
   const subtotal = useMemo(() => {
@@ -175,6 +173,19 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
   }, [taxableAmount, gstRate, gstType]);
 
   const grandTotal = Math.round(taxableAmount + totalTax);
+
+  const categories = useMemo(() => {
+    return Array.from(new Set((menuItems || []).map(i => i?.category))).filter(Boolean);
+  }, [menuItems]);
+
+  const filteredItems = useMemo(() => {
+    return (menuItems || []).filter(item => {
+      if (!item) return false;
+      const matchCat = selectedCategory === 'ALL' || item.category === selectedCategory;
+      const matchSearch = !searchQuery || (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      return matchCat && matchSearch;
+    });
+  }, [menuItems, selectedCategory, searchQuery]);
 
   // Cart Helpers
   const addToCart = (item: { id?: string; name: string; price: number; category?: string }) => {
@@ -231,12 +242,12 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
   // ── Quick Mode Calculations ──
   const parsedAmt = parseFloat(amount) || 0;
   const STAMP_THRESHOLD = stampValue && stampValue > 0 ? stampValue : 300;
-  const referrer = waitingCustomer.referrer || waitingCustomer.customer?.referredBy || waitingCustomer.customer?.referralsReceived?.[0]?.referrer || null;
+  const referrer = waitingCustomer?.referrer || waitingCustomer?.customer?.referredBy || waitingCustomer?.customer?.referralsReceived?.[0]?.referrer || null;
   const remainder = parsedAmt % STAMP_THRESHOLD;
   const realTimeShortfall = parsedAmt > 0 && remainder > 0 ? STAMP_THRESHOLD - remainder : (parsedAmt > 0 && parsedAmt < STAMP_THRESHOLD ? STAMP_THRESHOLD - parsedAmt : 0);
   const nextTargetAmount = parsedAmt + realTimeShortfall;
   const currentStampsCount = Math.floor(parsedAmt / STAMP_THRESHOLD);
-  const isReturningVIP = (waitingCustomer.customer?.lifetimeStamps || 0) > 0 || (waitingCustomer.customer?.bills?.length || 0) > 0;
+  const isReturningVIP = (waitingCustomer?.customer?.lifetimeStamps || 0) > 0 || (waitingCustomer?.customer?.bills?.length || 0) > 0;
 
   // Execute Quick Stamp Award
   const executeAward = async (forceProceed = false, overrideAmount?: number) => {
@@ -366,17 +377,7 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
     }
   };
 
-  const categories = useMemo(() => {
-    return Array.from(new Set(menuItems.map(i => i.category))).filter(Boolean);
-  }, [menuItems]);
-
-  const filteredItems = useMemo(() => {
-    return menuItems.filter(item => {
-      const matchCat = selectedCategory === 'ALL' || item.category === selectedCategory;
-      const matchSearch = !searchQuery || item.name.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchCat && matchSearch;
-    });
-  }, [menuItems, selectedCategory, searchQuery]);
+  if (!isOpen || !waitingCustomer) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
@@ -898,7 +899,7 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
                   <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2 text-amber-300">
                       <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>Referral Linked: <strong className="text-amber-200">{referrer.name}</strong></span>
+                      <span>Referral Linked: <strong className="text-amber-200">{referrer?.name || "VIP Referrer"}</strong></span>
                     </div>
                     <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
                       Auto Dual Stamp Ready

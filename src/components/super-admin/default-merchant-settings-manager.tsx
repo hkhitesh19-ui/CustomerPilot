@@ -16,7 +16,7 @@ import { FALLBACK_GLOBAL_DEFAULTS, DefaultMerchantSettingsData } from "@/lib/def
 
 const PRESET_TEMPLATES: Record<string, Partial<DefaultMerchantSettingsData>> = {
   bakery: {
-    cardName: "Cake Connection VIP Club",
+    cardName: "VIP Club",
     rewardName: "1 Free Cake",
     stampsRequired: 15,
     stampValue: 300,
@@ -373,7 +373,7 @@ export function DefaultMerchantSettingsManager() {
                 id="global-card-name"
                 value={form.cardName}
                 onChange={e => setForm({ ...form, cardName: e.target.value })}
-                placeholder="e.g. Cake Connection VIP Club"
+                placeholder="e.g. VIP Club"
                 className="bg-slate-950 border-slate-700 text-white rounded-xl text-sm"
               />
             </div>

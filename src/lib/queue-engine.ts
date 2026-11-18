@@ -101,6 +101,28 @@ export async function joinQueue(opts: {
     where: { customerId: customer.id, status: "waiting" },
   })
   if (existingWaiting) {
+    // If prior queue entry expired without billing, revive it with a fresh active countdown
+    if (existingWaiting.expiresAt && existingWaiting.expiresAt <= new Date()) {
+      const revivedExpiresAt = new Date(Date.now() + QUEUE_TIMEOUT_MINUTES * 60 * 1000)
+      const updated = await db.waitingCustomer.update({
+        where: { id: existingWaiting.id },
+        data: {
+          scannedAt: new Date(),
+          expiresAt: revivedExpiresAt,
+          scanSource: opts.scanSource ?? "qr_whatsapp",
+        }
+      })
+      const position = await getQueuePosition(updated.id, merchantId)
+      return {
+        queueId: updated.id,
+        customerId: customer.id,
+        isNewCustomer: false,
+        customerName: customer.name,
+        position,
+        expiresAt: updated.expiresAt,
+      }
+    }
+
     return {
       queueId: existingWaiting.id,
       customerId: customer.id,

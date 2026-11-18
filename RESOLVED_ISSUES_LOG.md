@@ -4,6 +4,29 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [18 Nov 2026] Issue: Live Queue React Error #310 Crash on Referral Card Click, Expired Queue Re-Scan Exclusion & Cross-Tenant Card Title Defaulting
+- **Symptom**:
+  1. In `Settings -> Section 04 (Stamps Reward Card Rules Setup)`, when managing another store (e.g., Maw & Paw), the "Card Title" field displayed "Cake Connection VIP Club" instead of "Maw & Paw VIP Club".
+  2. A customer (`+91 9033304707`) scanned the store Loyalty QR code and sent the WhatsApp check-in message, but did not appear in the Live Queue.
+  3. When an existing referral customer ("Ekta", `+91 9033456106`, Referred by Kiyaan Patel) appeared in the Live Queue and the merchant clicked the card / "🎁 Reward Dual Stamps →" button, the page instantly crashed with:
+     *"Something went wrong. The page encountered an unexpected issue while loading data. Please try reloading or head over to settings."*
+- **Root Cause**:
+  1. **React Rules of Hooks Violation (React Error #310)**: In `src/components/dashboard/RewardModal.tsx`, an early conditional return `if (!waitingCustomer) return null;` was located at line 132 *before* 6 `useMemo` hooks (`cartItemsList`, `subtotal`, `discountAmount`, `{ cgst, sgst, igst, totalTax }`, `categories`, `filteredItems`). When the page mounted, `waitingCustomer` was `null`, so the component returned early after only calling `useState` and `useEffect`. When the user clicked on any waiting customer card, `waitingCustomer` was populated, bypassing line 132 and executing the 6 subsequent `useMemo` hooks. React detected a change in hook count/order between renders, throwing `React Error #310: Rendered more hooks than during the previous render` and crashing into `src/app/error.tsx`.
+  2. **Expired Queue Re-Scan Lockout (Purgatory State)**: In `src/app/api/state/route.ts`, the queue query filters `expiresAt: { gt: new Date() }`. However, in `src/app/api/webhook/evolution/route.ts`, the duplicate check queried `where: { status: 'waiting' }` *without* checking `expiresAt`. If a customer joined earlier and their 30-minute timer elapsed, `/api/state` hid them from the dashboard, but when they scanned again, the webhook saw the old row, flagged them as `alreadyWaiting`, and skipped `joinQueue`. Similarly, `src/lib/queue-engine.ts` returned the expired row without refreshing `expiresAt`.
+  3. **Global Default Card Title Hardcoding**: In `src/components/super-admin/default-merchant-settings-manager.tsx`, default `cardName` was hardcoded to `"Cake Connection VIP Club"`. When saved to `GLOBAL_DEFAULT_MERCHANT_SETTINGS`, new merchants (e.g. Maw & Paw) inherited "Cake Connection VIP Club" instead of dynamically deriving their own brand name.
+- **Resolution**:
+  1. **Strict Hook Count Invariance in RewardModal**: Reorganized `src/components/dashboard/RewardModal.tsx` so that all `useState`, `useEffect`, and `useMemo` hooks are called unconditionally at the very top level. Replaced the premature early return with a safe render guard (`if (!isOpen || !waitingCustomer) return null;`) evaluated only after all hooks are initialized. Also added null-safety fallbacks for `referrer?.name`.
+  2. **Dynamic Queue Re-Join & Expiry Auto-Revival**:
+     - Updated `src/app/api/webhook/evolution/route.ts` duplicate check to require `expiresAt: { gt: new Date() }`. Expired waiting entries are no longer blocked.
+     - Updated `src/lib/queue-engine.ts` to detect expired waiting rows on re-scan and revive them by resetting `scannedAt: new Date()` and `expiresAt: new Date(Date.now() + QUEUE_TIMEOUT_MINUTES * 60 * 1000)`, immediately placing the customer back at the top of the merchant's Live Queue.
+  3. **Dynamic Business Brand Title Resolution**:
+     - Added `getMerchantCardTitle` helper in `src/app/api/cards/setup/route.ts` that dynamically derives `${cleanBiz} VIP Club` from the merchant's brand name.
+     - Implemented automatic database self-healing for any merchant cards that inherited a foreign merchant name (e.g., auto-healing Maw & Paw's title to "Maw & Paw VIP Club").
+     - Generalized SuperAdmin default merchant settings template from "Cake Connection VIP Club" to "VIP Club".
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [18 Nov 2026] Issue: WhatsApp 8-Digit Pairing Code Silent Invalidation & Resilient Webhook Queue Trigger Regex
 - **Symptom**:
   1. Maw & Paw merchant was able to link WhatsApp via QR scan, but after disconnecting and trying 8-Digit Pairing Code mode ('Link with Phone Number'), WhatsApp app displayed: 'Incorrect code. The code you entered was incorrect. Please try to link your device again.'
