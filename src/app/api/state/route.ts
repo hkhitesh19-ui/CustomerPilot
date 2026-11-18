@@ -90,7 +90,14 @@ export async function GET(req: NextRequest) {
     db.campaignDeliveryLog.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 50 }).catch(() => []),
     db.ownerOverrideLog.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "desc" }, take: 50 }).catch(() => []),
     db.waitingCustomer.findMany({ 
-      where: { merchantId: merchant.id, status: 'waiting' }, 
+      where: { 
+        merchantId: merchant.id, 
+        status: 'waiting',
+        // V13 FIX: Filter out expired entries at DB level so dashboard shows real active queue.
+        // Previously, state API returned ALL 'waiting' status entries even if expiresAt had passed.
+        // The getQueue() lib function had this filter but the state route did not, causing mismatch.
+        expiresAt: { gt: new Date() }
+      }, 
       include: { 
         customer: {
           include: {

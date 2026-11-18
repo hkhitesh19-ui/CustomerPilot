@@ -6,7 +6,12 @@ import { CommunicationService } from "@/communication/services/CommunicationServ
 import { scheduleGoogleReviewRequest } from "@/lib/review-scheduler"
 import { resolveLoyaltyCategoryName } from "@/lib/loyalty-category-service"
 
-export const QUEUE_TIMEOUT_MINUTES = 5
+// V13 FIX: Increased default queue timeout from 5 min to 30 min.
+// 5 minutes was too short for real-world retail: merchants are busy at counter and cannot
+// approve a customer within 5 minutes consistently. This caused customers to silently expire
+// and disappear from the Live Queue dashboard before the merchant could tap "Bill & Reward".
+// The 30-minute default gives merchants adequate time to serve the customer physically first.
+export const QUEUE_TIMEOUT_MINUTES = 30
 
 export interface QueueJoinResult {
   queueId: string

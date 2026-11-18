@@ -257,16 +257,19 @@ export const QUEUE_STATE_MACHINE: QueueStateDef[] = [
   },
 ]
 
-// V6.4 — Business-type default queue timeouts (minutes)
+// V6.5 — Business-type default queue timeouts (minutes)
+// Increased ALL timeouts to production-realistic values.
+// 5-minute "bakery" timeout was causing silent queue expiry before merchant could approve customers.
 export const QUEUE_TIMEOUT_BY_BUSINESS: Record<string, number> = {
-  cafe: 15,
-  bakery: 5,
+  cafe: 30,
+  bakery: 30,
   salon: 120,
   restaurant: 60,
-  retail: 10,
-  gym: 30,
+  retail: 30,
+  gym: 60,
   spa: 120,
-  other: 10,
+  petshop: 30,
+  other: 30,
 }
 
 export const RESERVATION_TIMEOUT_SECONDS = 10
