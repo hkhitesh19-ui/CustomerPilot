@@ -8,24 +8,23 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : b52b16e
-Full SHA          : b52b16e422679838454d26a0f3836a1be2a01460
+Active Git Commit : 4dcb6ae (RankLocal AI Full GBP AutoPilot — Live Places v1 SERP, Live GBP Performance Analytics, 4-Post WhatsApp Approval & IST Cron)
+Full SHA          : 4dcb6ae540fed497194dd34672f9fccfd07ce598
+Parent Commit     : 5bfc09c (VPS Live Deployment Tracker for 2933176)
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 18 Nov 2026, 12:38 AM IST
+Deployment Date   : 18 Nov 2026, 11:35 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(standee): add L/XL/XXL logo sizing, ~10MB Ultra-HD 600DPI full standee JPEG downloads, and global logo auto-sync across all QR standees
+Commit Title      : feat(ranklocal): enable full GBP AutoPilot mode with live Places v1 SERP, live GBP Performance analytics, 4-post WhatsApp approval loop & IST cron scheduler
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
-PM2 Services      : customerpilot-web (Online, :3000, pid=465309), customerpilot-cron (Online, pid=465331), cakeconnection (Online, :3001, pid=227606)
+PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online — Unified IST AutoPilot Scheduler), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
-Verified Live Outcomes:
+Verified Endpoints on Live VPS:
 ----------------------------------------------------------
-1. https://customerpilot.in/                                     -> HTTP 200 (Homepage live & healthy)
-2. https://customerpilot.in/services                             -> HTTP 200 (New Light-Theme 3D Interactive Services Page with 8 Canonical Modules, Live Phone Simulator & ROI Calculator)
-3. https://customerpilot.in/api/qr/standee?design=google_review_v3&logoSize=xxl&hd=1&m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (10.17 MB / 10,668,237 bytes Ultra-HD 600 DPI Full Standee JPEG live verified)
-4. All QR Standees Upgraded Live:
-   - Unified L / XL / XXL logo sizing across Counter QR Standee Studio, Smart AI Google Reviews, WA Group Booster, WA Booster Pro, & Dynamic QR Studio
-   - "Download QR" downloads full Ultra-HD (~9–10 MB, 4338x6144 px, 600 DPI) Standee JPEG
-   - Global auto-sync of latest uploaded merchant logo across all QR standees & Digital Business Card (with SuperAdmin impersonation support & zero stale cache)
-5. Adversarial Red-Team Safety Gates:
-   - All 6 automated gates passed cleanly prior to push & VPS build (0 errors, 0 tracked DBs)
+1. https://customerpilot.in/                                 -> HTTP 200
+2. https://customerpilot.in/api/cron/gbp-daily-serp          -> HTTP 200 (Daily 09:00 AM IST Live Google Places v1 SERP Capture)
+3. https://customerpilot.in/api/cron/gbp-posts               -> HTTP 200 (Monday 4-Post Generator + WhatsApp Approval + Hourly Due Auto-Publisher)
+4. https://customerpilot.in/api/cron/gbp-autopilot           -> HTTP 200 (30-Day Top-3 Checklist till 17 Dec 2026 + Live 5x5 Geo-Grid)
+5. https://customerpilot.in/api/gbp/analytics                -> HTTP 200 (Official Live Google Business Profile Performance API Telemetry)
+6. https://customerpilot.in/api/webhook/evolution            -> HTTP 200 (Two-Way WhatsApp Merchant Post Approval & AI Edit Loop)
+7. http://187.127.170.36:8080                                -> HTTP 200 (Evolution API Manager v2.2.2)
