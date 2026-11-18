@@ -285,8 +285,15 @@ export async function POST(req: NextRequest) {
           }
         })
 
-        // STRICT MATCH: Only trigger auto-onboarding if the text strictly matches the QR Code generated text
-        const isTriggerMsg = /Checking in for my VIP Club stamps/i.test(text)
+        // RESILIENT MATCH: Matches exact QR text or common customer message variations
+        const isTriggerMsg = 
+          /Checking in for.*stamps/i.test(text) ||
+          /VIP Club stamps/i.test(text) ||
+          /VIP.*stamps?/i.test(text) ||
+          /(get|claim|need|add|give).*stamps?/i.test(text) ||
+          /loyalty.*stamps?/i.test(text) ||
+          text.toLowerCase().includes("vip club stamps") ||
+          text.toLowerCase().includes("checking in for");
 
         // Determine public base URL — Priority: env NEXT_PUBLIC_APP_URL > x-forwarded-host
         // autoPinggySync.js keeps NEXT_PUBLIC_APP_URL always in sync with current Pinggy session

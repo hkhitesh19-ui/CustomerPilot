@@ -143,7 +143,7 @@ export function WhatsAppVerification({ merchantId }: { merchantId: string }) {
     }
   }, [qrCode, pairingCode, isVerified])
 
-  // Automatic Silent Background Refresh every 25 seconds for QR mode
+  // Automatic Silent Background Refresh every 25 seconds ONLY for QR mode (strictly disabled in pairing mode)
   useEffect(() => {
     if (connectMode !== "qr" || !qrCode || isVerified || sessionCountdown <= 0) {
       if (silentRefreshRef.current) clearInterval(silentRefreshRef.current)
@@ -153,7 +153,7 @@ export function WhatsAppVerification({ merchantId }: { merchantId: string }) {
     silentRefreshRef.current = setInterval(async () => {
       try {
         const phoneParam = phone ? `&phone=${encodeURIComponent(phone)}` : ""
-        const res = await fetch(`/api/whatsapp/connect?silent=true${phoneParam}`, {
+        const res = await fetch(`/api/whatsapp/connect?silent=true&mode=qr${phoneParam}`, {
           headers: { "x-merchant-id": merchantId }
         })
         if (res.ok) {
@@ -330,7 +330,11 @@ export function WhatsAppVerification({ merchantId }: { merchantId: string }) {
             <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200 dark:border-slate-700">
               <button
                 type="button"
-                onClick={() => setConnectMode("pairing")}
+                onClick={() => {
+                  setConnectMode("pairing")
+                  setQrCode("")
+                  if (silentRefreshRef.current) clearInterval(silentRefreshRef.current)
+                }}
                 className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   connectMode === "pairing"
                     ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-sm"
@@ -342,7 +346,11 @@ export function WhatsAppVerification({ merchantId }: { merchantId: string }) {
               </button>
               <button
                 type="button"
-                onClick={() => setConnectMode("qr")}
+                onClick={() => {
+                  setConnectMode("qr")
+                  setPairingCode(null)
+                  if (silentRefreshRef.current) clearInterval(silentRefreshRef.current)
+                }}
                 className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   connectMode === "qr"
                     ? "bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-400 shadow-sm"
@@ -390,7 +398,7 @@ export function WhatsAppVerification({ merchantId }: { merchantId: string }) {
                   <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-indigo-500/10 border-2 border-emerald-500/30 text-center space-y-4">
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-black">
                       <Clock className="w-3.5 h-3.5" />
-                      Active for {formatTime(sessionCountdown)} · Auto-linking enabled
+                      Active Pairing Window · Enter immediately on phone (Meta 60s window)
                     </div>
 
                     <div>

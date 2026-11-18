@@ -4,6 +4,19 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [18 Nov 2026] Issue: WhatsApp 8-Digit Pairing Code Silent Invalidation & Resilient Webhook Queue Trigger Regex
+- **Symptom**:
+  1. Maw & Paw merchant was able to link WhatsApp via QR scan, but after disconnecting and trying 8-Digit Pairing Code mode ('Link with Phone Number'), WhatsApp app displayed: 'Incorrect code. The code you entered was incorrect. Please try to link your device again.'
+  2. For Cake Connection, the user reported that a customer scanned the Loyalty QR code and sent the WhatsApp message, but the Live Queue remained empty ('0 Customers Waiting').
+- **Root Cause**:
+  1. **Silent Refresh Race Condition in Pairing Mode**: In \src/components/whatsapp-verification.tsx\, \silentRefreshRef\ was running every 25 seconds without verifying \connectMode === 'qr'\. It repeatedly hit \/api/whatsapp/connect?silent=true\ without \mode=pairing\, causing the backend to default to QR mode and delete or regenerate the active Baileys socket. By the time the merchant typed the 8-digit code displayed on screen, the socket had already been invalidated by the background interval, causing Meta WhatsApp to return 'Incorrect code'.
+  2. **Strict Regex Mismatch on Inbound Loyalty Message**: In \src/app/api/webhook/evolution/route.ts\, the check was \/Checking in for my VIP Club stamps/i.test(text)\. If a customer slightly edited the message, deleted 'my', or sent variations, the message was dropped and queue auto-join was skipped.
+  3. **Customer Sent to Wrong Phone Number (Live Reality Audit)**: Forensic audit of live VPS logs confirmed Cake Connection's instance (\CP_917203824012_cmtymavf_mw0whjx7\) was online and actively processing incoming customer chats (e.g. from \919586494428\). The screenshot provided by the user showed the customer sent the message to \+91 92657 01653\ ('Surti Dosa Wala') with a single grey tick, which is NOT Cake Connection's registered store number (\+91 72038 24012\).
+- **Resolution**:
+  1. **Strict Mode Isolation in Silent Refresh**: Updated \silentRefreshRef\ in \whatsapp-verification.tsx\ to run strictly only when \connectMode === 'qr'\ and append \&mode=qr\ to all background requests. Tab switching now immediately clears the alternative mode and clears any running intervals.
+  2. **60-Second Pairing Notice in UI**: Updated the pairing code banner to prominently display the Meta WhatsApp 60-second pairing validity window so merchants type the code immediately.
+  3. **Resilient Webhook Loyalty Detection**: Upgraded \isTriggerMsg\ in oute.ts\ to a multi-pattern regex matching \/Checking in for.*stamps/i\, \/VIP Club stamps/i\, \/VIP.*stamps?/i\, \/(get|claim|need|add|give).*stamps?/i\, and \/loyalty.*stamps?/i\.
+- **Status**: ✅ Resolved and Verified.
 ## [18 Nov 2026] Issue: Multi-Merchant Live Queue Isolation, 5-Minute Premature Timeout & Maw & Paw WhatsApp Sync Failure
 - **Symptom**: 
   1. Customers scanning QR for "Maw & Paw" to become Loyalty Members and earn stamps did not show up in the Live Queue of Maw & Paw's dashboard (showed "0 Customers Waiting" and "Queue is completely empty").
