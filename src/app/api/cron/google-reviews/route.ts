@@ -13,10 +13,10 @@ export async function GET(req: Request) {
 
     console.log("[CRON] Starting Real-time Google Reviews Polling...")
 
-    // 1. Fetch all active merchants who have Google Business Profiles connected
+    // 1. Fetch all active merchants who have Google Business Profiles connected (case-insensitive syncStatus)
     const connections = await db.merchantGoogleConnection.findMany({
       where: { 
-        syncStatus: "active",
+        syncStatus: { in: ["active", "ACTIVE"] },
         merchant: {
           OR: [
             { trialEndsAt: null },

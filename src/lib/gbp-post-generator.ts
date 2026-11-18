@@ -60,8 +60,8 @@ const INDUSTRY_PRODUCT_PRESETS: Record<string, Array<{ name: string; tag: string
 };
 
 export interface GeneratedPostData {
-  postType: "PRODUCT_SPOTLIGHT" | "SOCIAL_PROOF" | "WEEKEND_OFFER";
-  scheduledDay: "TUESDAY" | "THURSDAY" | "SATURDAY";
+  postType: "PRODUCT_SPOTLIGHT" | "SOCIAL_PROOF" | "WEEKEND_OFFER" | "BRAND_STORY";
+  scheduledDay: "TUESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
   scheduledDate: Date;
   title?: string;
   caption: string;
@@ -74,31 +74,39 @@ export interface GeneratedPostData {
 }
 
 /**
- * Calculates upcoming Tuesday, Thursday, and Saturday dates starting from a base date
+ * Calculates upcoming Tuesday, Thursday, Saturday, and Sunday dates starting from a base date
+ * (4-Post/Week RankLocal AI Schedule)
  */
-export function getUpcomingScheduleDates(baseDate: Date = new Date()): { tuesday: Date; thursday: Date; saturday: Date } {
+export function getUpcomingScheduleDates(baseDate: Date = new Date()): {
+  tuesday: Date;
+  thursday: Date;
+  saturday: Date;
+  sunday: Date;
+} {
   const result = {
     tuesday: new Date(baseDate),
     thursday: new Date(baseDate),
     saturday: new Date(baseDate),
+    sunday: new Date(baseDate),
   };
 
-  const day = baseDate.getDay(); // 0 is Sunday, 2 is Tue, 4 is Thu, 6 is Sat
+  const day = baseDate.getDay(); // 0 is Sunday, 1 is Mon, 2 is Tue, 4 is Thu, 6 is Sat
 
-  // Days until next Tuesday (2)
   const diffTue = (2 - day + 7) % 7 || 7;
   result.tuesday.setDate(baseDate.getDate() + diffTue);
   result.tuesday.setHours(10, 0, 0, 0);
 
-  // Days until next Thursday (4)
   const diffThu = (4 - day + 7) % 7 || 7;
   result.thursday.setDate(baseDate.getDate() + diffThu);
   result.thursday.setHours(10, 0, 0, 0);
 
-  // Days until next Saturday (6)
   const diffSat = (6 - day + 7) % 7 || 7;
   result.saturday.setDate(baseDate.getDate() + diffSat);
   result.saturday.setHours(10, 0, 0, 0);
+
+  const diffSun = (0 - day + 7) % 7 || 7;
+  result.sunday.setDate(baseDate.getDate() + diffSun);
+  result.sunday.setHours(10, 0, 0, 0);
 
   return result;
 }
@@ -365,7 +373,79 @@ export async function buildSaturdayOfferPost(merchant: any, date: Date, revision
 }
 
 /**
- * Master Generator: Orchestrates generation of all 3 weekly posts and persists to GbpPost
+ * 4. Post #4 (Sunday): Behind-the-Scenes / Local Authority & Craft Story Post
+ */
+export async function buildSundayBrandStoryPost(
+  merchant: any,
+  date: Date,
+  revisionOffset: number = 0
+): Promise<GeneratedPostData> {
+  const storeName = (merchant.name || "Our Store").split(/[-–:|]/)[0].trim();
+  const locality = extractLocality(merchant.address, merchant.city);
+  const city = merchant.city || "Vadodara";
+  const isCake =
+    merchant.id === "cmtymavfx0002kx008lbfvp57" ||
+    storeName.toLowerCase().includes("cake") ||
+    (merchant.category || "").toLowerCase().includes("bakery");
+  const isCP =
+    merchant.id === "customerpilot-hq" ||
+    merchant.id === "cmw1vwviv06f3kvwlkx62ghap" ||
+    storeName.toLowerCase().includes("customerpilot") ||
+    storeName.toLowerCase().includes("customer pilot");
+
+  const storyVariants = isCake
+    ? [
+        {
+          title: `Fresh Live Kitchen Baking Every Morning — ${storeName} ${locality}`,
+          caption: `Ever wondered how our signature cakes stay so soft, moist, and fresh? ✨🎂\n\nAt ${storeName} (${locality}), every single cake is baked fresh in our 100% Pure Veg Eggless Live Kitchen using premium Belgian cocoa, real whipped cream, and strict FSSAI hygiene standards.\n\n✅ 100% Pure Veg & Eggless Kitchen\n✅ Customized Birthday & Anniversary Photo Cakes Ready Fast\n✅ Same-Day Express Delivery across ${city}\n\nVisit us today at ${locality} or tap Call Now below to pre-order for tonight's celebration!\n\n#CakeConnection #LiveCakeVadodara #EgglessCakeManjalpur #BestBakeryVadodara #FreshBakedDaily`,
+          imageUrl: "/cake_connection_friday_post.png",
+          ctaType: "CALL" as const,
+          ctaUrl: "https://cakeconnection.in/",
+        },
+        {
+          title: `Why ${city} Families Trust ${storeName} for Every Celebration`,
+          caption: `From midnight birthday surprises to grand wedding anniversaries, thank you ${city} for 690+ 5-Star Google Reviews! 💛🎂\n\nOur chefs at ${storeName} (${locality}) handcraft every Rasmalai, Belgian Chocolate Truffle, and Designer Theme Cake fresh to order — zero frozen bases, 100% pure veg.\n\n📍 Serving Manjalpur, Eva Mall, Kalali, Makarpura & Tarsali\n📲 Tap Call Now below to customize your next celebration cake!\n\n#CakeShopManjalpur #VadodaraCakes #EgglessBakeryVadodara #CakeConnection`,
+          imageUrl: "/cake_connection_friday_post.png",
+          ctaType: "CALL" as const,
+          ctaUrl: "https://cakeconnection.in/",
+        },
+      ]
+    : isCP
+    ? [
+        {
+          title: `How Local Shops Rank Top-3 on Google Maps in 30 Days — ${storeName}`,
+          caption: `Why do some shops in ${city} get 50+ daily Google Maps calls while great nearby stores stay hidden on Page 2? 📈📍\n\nGoogle Maps rewards 3 live signals: Review Velocity, Keyword-Rich Replies, and Consistent Weekly GBP Updates.\n\nWith CustomerPilot RankLocal AI™:\n⭐ Smart Counter QR Standee turns happy buyers into 5-Star Google Reviews\n🤖 Instant AI SEO Review Replies published automatically\n🚀 Weekly Google Posts & Daily Rank Tracking on complete AutoPilot\n\n📍 Office: RutuPlatina Complex, Eva Mall Road, Manjalpur, ${city}\nTap Learn More below to activate your Free Trial today!\n\n#CustomerPilot #RankLocalAI #LocalSEOVadodara #GoogleMapsRanking #WhatsAppLoyalty`,
+          imageUrl: "/customerpilot_review_standee_tabletop.png",
+          ctaType: "LEARN_MORE" as const,
+          ctaUrl: "https://customerpilot.in/",
+        },
+      ]
+    : [
+        {
+          title: `Behind the Scenes: Quality & Care at ${storeName} (${locality})`,
+          caption: `Every day at ${storeName} in ${locality}, our team focuses on delivering the highest quality experience and warm local service to our community in ${city}. ✨\n\n✅ Trusted by local families across ${locality}\n✅ Fresh daily standards & transparent pricing\n✅ Rated highly by repeat visitors on Google Maps\n\nDrop by today or tap below to connect with us!\n\n#${storeName.replace(/\s+/g, "")} #${city.replace(/\s+/g, "")} #LocalBest`,
+          imageUrl: "/cplogo.png",
+          ctaType: "LEARN_MORE" as const,
+          ctaUrl: "https://customerpilot.in/",
+        },
+      ];
+
+  const chosen = storyVariants[revisionOffset % storyVariants.length];
+
+  return {
+    postType: "BRAND_STORY",
+    scheduledDay: "SUNDAY",
+    scheduledDate: date,
+    title: chosen.title,
+    caption: chosen.caption,
+    imageUrl: chosen.imageUrl,
+    ctaType: chosen.ctaType,
+    ctaUrl: chosen.ctaUrl,
+  };
+}
+
+/**
+ * Master Generator: Orchestrates generation of all 4 weekly posts (Tue/Thu/Sat/Sun) and persists to GbpPost
  */
 export async function generateWeeklyPostsForMerchant(merchantId: string, baseDate: Date = new Date()): Promise<any[]> {
   const merchant = await db.merchant.findUnique({
@@ -379,13 +459,14 @@ export async function generateWeeklyPostsForMerchant(merchantId: string, baseDat
     throw new Error(`Merchant ${merchantId} not found`);
   }
 
-  const { tuesday, thursday, saturday } = getUpcomingScheduleDates(baseDate);
+  const { tuesday, thursday, saturday, sunday } = getUpcomingScheduleDates(baseDate);
 
   const post1 = await buildTuesdayProductPost(merchant, tuesday);
   const post2 = await buildThursdayReviewPost(merchant, thursday);
   const post3 = await buildSaturdayOfferPost(merchant, saturday);
+  const post4 = await buildSundayBrandStoryPost(merchant, sunday);
 
-  const postsToPersist = [post1, post2, post3];
+  const postsToPersist = [post1, post2, post3, post4];
   const savedPosts: any[] = [];
 
   for (const postData of postsToPersist) {
@@ -408,7 +489,11 @@ export async function generateWeeklyPostsForMerchant(merchantId: string, baseDat
     });
 
     if (existing) {
-      // Update existing draft/queued post
+      // Never overwrite an already POSTED or APPROVED post during cron generation
+      if (existing.status === "POSTED" || existing.status === "APPROVED") {
+        savedPosts.push(existing);
+        continue;
+      }
       const updated = await db.gbpPost.update({
         where: { id: existing.id },
         data: {
@@ -474,6 +559,8 @@ export async function regenerateSinglePost(postId: string, feedback?: string): P
     newPostData = await buildTuesdayProductPost(post.merchant, post.scheduledDate, newRevision);
   } else if (post.postType === "SOCIAL_PROOF") {
     newPostData = await buildThursdayReviewPost(post.merchant, post.scheduledDate, newRevision);
+  } else if (post.postType === "BRAND_STORY") {
+    newPostData = await buildSundayBrandStoryPost(post.merchant, post.scheduledDate, newRevision);
   } else {
     newPostData = await buildSaturdayOfferPost(post.merchant, post.scheduledDate, newRevision);
   }
@@ -499,12 +586,67 @@ export async function regenerateSinglePost(postId: string, feedback?: string): P
   return updated;
 }
 
+/**
+ * Google GBP Content Policy Guard:
+ * Removes raw phone numbers from post summary text so Google's spam filter never REJECTS the post.
+ */
+export function sanitizeCaptionForGooglePolicy(caption: string): string {
+  return caption
+    .replace(/(?:call|whatsapp|contact|ph|mob|tel)?\s*[:\-]?\s*\+?\d[\d\s\-]{8,14}\d/gi, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+    .slice(0, 1450);
+}
 
 /**
- * Publishes an approved or scheduled GBP post directly to Google Business Profile API
- * Uses official allowlisted Google Cloud Project 391546314644 (300 QPM)
+ * Resolves a publicly crawlable HTTPS JPEG/PNG creative URL for Google's media crawler.
+ * Google GBP API rejects dynamic SVG endpoints (/api/gbp/posts/card) and relative paths.
  */
-export async function publishGbpPostToGoogle(postId: string): Promise<{ success: boolean; gbpPostId?: string; error?: string }> {
+export function resolvePublicGoogleImageUrl(
+  rawImageUrl: string | null | undefined,
+  merchant: { id: string; name?: string | null; category?: string | null }
+): string {
+  const baseUrl = "https://customerpilot.in";
+  const isCake =
+    merchant.id === "cmtymavfx0002kx008lbfvp57" ||
+    (merchant.name || "").toLowerCase().includes("cake");
+  const isCP =
+    merchant.id === "customerpilot-hq" ||
+    merchant.id === "cmw1vwviv06f3kvwlkx62ghap" ||
+    (merchant.name || "").toLowerCase().includes("customerpilot") ||
+    (merchant.name || "").toLowerCase().includes("customer pilot");
+
+  const defaultCreative = isCake
+    ? `${baseUrl}/cake_connection_friday_post.png`
+    : isCP
+    ? `${baseUrl}/customerpilot_review_standee_tabletop.png`
+    : `${baseUrl}/cplogo.png`;
+
+  if (!rawImageUrl) return defaultCreative;
+
+  // Reject SVG card generator routes since Google's image crawler only accepts JPEG/PNG
+  if (rawImageUrl.includes("/api/gbp/posts/card") || rawImageUrl.toLowerCase().endsWith(".svg")) {
+    return defaultCreative;
+  }
+
+  if (rawImageUrl.startsWith("https://")) {
+    return rawImageUrl;
+  }
+
+  if (rawImageUrl.startsWith("/")) {
+    return `${baseUrl}${rawImageUrl}`;
+  }
+
+  return defaultCreative;
+}
+
+/**
+ * Publishes an approved or scheduled GBP post directly to Google Business Profile API.
+ * Strictly zero fake-publish fallback: only marks POSTED when Google API returns HTTP 200 with a real localPost ID.
+ */
+export async function publishGbpPostToGoogle(
+  postId: string
+): Promise<{ success: boolean; gbpPostId?: string; searchUrl?: string; error?: string }> {
   const post = await db.gbpPost.findUnique({
     where: { id: postId },
     include: {
@@ -523,66 +665,93 @@ export async function publishGbpPostToGoogle(postId: string): Promise<{ success:
   const { getValidOAuthAccessToken } = await import("@/lib/google-reviews-service");
   const { connection, token } = await getValidOAuthAccessToken(post.merchantId);
 
-  // If live OAuth token & GBP account ID are available, call Google localPosts endpoint
-  if (token && connection?.gbpAccountId && connection?.gbpLocationId && !token.startsWith("mock_")) {
-    try {
-      const endpoint = `https://mybusiness.googleapis.com/v4/${connection.gbpAccountId}/${connection.gbpLocationId}/localPosts`;
-      const actionType = post.ctaType === "ORDER" ? "ORDER" : (post.ctaType === "CALL" ? "CALL" : "LEARN_MORE");
-
-      const bodyPayload: any = {
-        languageCode: "en-US",
-        summary: post.caption,
-        callToAction: post.ctaUrl ? {
-          actionType,
-          url: post.ctaUrl
-        } : undefined,
-        media: post.imageUrl ? [
-          {
-            mediaFormat: "PHOTO",
-            sourceUrl: post.imageUrl
-          }
-        ] : undefined
-      };
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(bodyPayload)
-      });
-
-      if (res.ok) {
-        const data = await res.json().catch(() => ({}));
-        const gbpPostId = data.name || data.localPostId || `gbp_${Date.now()}`;
-        await db.gbpPost.update({
-          where: { id: postId },
-          data: {
-            status: "POSTED",
-            postedAt: new Date(),
-            gbpPostId
-          }
-        });
-        return { success: true, gbpPostId };
-      } else {
-        const errJson = await res.json().catch(() => ({}));
-        console.warn(`[GBP Publish] Google API error (${res.status}):`, errJson);
-      }
-    } catch (e: any) {
-      console.error("[GBP Publish] Network error:", e.message);
-    }
+  if (!token || !connection?.gbpAccountId || !connection?.gbpLocationId || token.startsWith("mock_")) {
+    const errMsg = "Google Business Profile OAuth token or locationId not connected";
+    await db.gbpPost.update({
+      where: { id: postId },
+      data: { errorMessage: errMsg },
+    }).catch(() => {});
+    return { success: false, error: errMsg };
   }
 
-  // Simulated live publish for sandbox / staging / test accounts
-  const mockPostId = `gbp_live_post_${Date.now()}`;
-  await db.gbpPost.update({
-    where: { id: postId },
-    data: {
-      status: "POSTED",
-      postedAt: new Date(),
-      gbpPostId: mockPostId
+  try {
+    const endpoint = `https://mybusiness.googleapis.com/v4/${connection.gbpAccountId}/${connection.gbpLocationId}/localPosts`;
+    const cleanSummary = sanitizeCaptionForGooglePolicy(post.caption);
+    const publicPhotoUrl = resolvePublicGoogleImageUrl(post.imageUrl, post.merchant);
+
+    // Map CTA cleanly according to Google localPosts v4 specification
+    let callToAction: any = undefined;
+    if (post.ctaType === "CALL") {
+      callToAction = { actionType: "CALL" };
+    } else if (post.ctaUrl && post.ctaUrl.startsWith("https://")) {
+      const actionType =
+        post.ctaType === "ORDER"
+          ? "ORDER"
+          : post.ctaType === "OFFER"
+          ? "LEARN_MORE"
+          : "LEARN_MORE";
+      callToAction = { actionType, url: post.ctaUrl };
+    } else {
+      callToAction = { actionType: "CALL" };
     }
-  });
-  return { success: true, gbpPostId: mockPostId };
+
+    const bodyPayload: any = {
+      languageCode: "en",
+      summary: cleanSummary,
+      callToAction,
+      media: [
+        {
+          mediaFormat: "PHOTO",
+          sourceUrl: publicPhotoUrl,
+        },
+      ],
+      topicType: "STANDARD",
+    };
+
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bodyPayload),
+      signal: AbortSignal.timeout(15000),
+    });
+
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const rawName: string = data.name || "";
+      const gbpPostId = rawName.split("/").pop() || data.localPostId || rawName;
+      const searchUrl: string | undefined = data.searchUrl;
+
+      await db.gbpPost.update({
+        where: { id: postId },
+        data: {
+          status: "POSTED",
+          postedAt: new Date(),
+          postedBy: "RankLocal AI AutoPilot (Google API)",
+          gbpPostId,
+          errorMessage: null,
+        },
+      });
+      return { success: true, gbpPostId, searchUrl };
+    } else {
+      const errJson = await res.json().catch(() => ({}));
+      const errMsg = `Google API HTTP ${res.status}: ${errJson?.error?.message || JSON.stringify(errJson).slice(0, 200)}`;
+      console.warn(`[GBP Publish] ${errMsg}`);
+      await db.gbpPost.update({
+        where: { id: postId },
+        data: { errorMessage: errMsg },
+      }).catch(() => {});
+      return { success: false, error: errMsg };
+    }
+  } catch (e: any) {
+    const errMsg = `Network error: ${e.message}`;
+    console.error("[GBP Publish]", errMsg);
+    await db.gbpPost.update({
+      where: { id: postId },
+      data: { errorMessage: errMsg },
+    }).catch(() => {});
+    return { success: false, error: errMsg };
+  }
 }

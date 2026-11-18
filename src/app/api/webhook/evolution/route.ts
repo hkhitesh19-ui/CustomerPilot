@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { joinQueue } from "@/lib/queue-engine"
 import { getCompiledTemplate } from "@/lib/template-engine"
 import { isOrderTriggerMessage, isOrderStatusInquiry, processIncomingWhatsAppOrder } from "@/lib/order-bot"
+import { isGbpPostApprovalCommand, handleMerchantGbpPostWhatsAppReply } from "@/lib/gbp/whatsapp-post-approval"
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
@@ -249,6 +250,32 @@ export async function POST(req: NextRequest) {
         }).catch(() => {})
 
         const last10Phone = customerPhone.slice(-10)
+
+        // ── RankLocal AI: Two-Way Merchant WhatsApp GBP Post Approval / Edit Handler ──
+        const merchantOwnerPhone = (merchant.whatsappPhone || merchant.phone || "").replace(/\D/g, "")
+        const isMerchantOrAdminSender =
+          (merchantOwnerPhone.length >= 10 && merchantOwnerPhone.slice(-10) === last10Phone) ||
+          (genericAdminNumber.length >= 10 && genericAdminNumber.slice(-10) === last10Phone)
+
+        if (isMerchantOrAdminSender && isGbpPostApprovalCommand(text)) {
+          const gbpReply = await handleMerchantGbpPostWhatsAppReply({
+            merchantId: merchant.id,
+            senderPhone: customerPhone,
+            text,
+          })
+          if (gbpReply.handled && gbpReply.replyText) {
+            const sendRes = await sendEvolutionMessage(customerPhone, gbpReply.replyText, merchantInstance)
+            await saveOutgoingMessage(
+              merchant.id,
+              customerPhone,
+              "gbp_post_approval_ack",
+              gbpReply.replyText,
+              sendRes.data?.key?.id
+            )
+            console.log(`[Webhook] ✅ Handled RankLocal AI GBP Post command from +${customerPhone}`)
+            continue
+          }
+        }
 
         const existingCustomer = await db.customer.findFirst({
           where: {

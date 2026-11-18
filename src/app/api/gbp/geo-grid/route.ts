@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { generate5x5GeoGrid, GeoGridScanResult } from "@/lib/gbp/geo-grid-engine";
 import { getMerchantTrackedKeywords } from "@/lib/gbp/keyword-bank";
+import { runLiveGeoGridScanForMerchant } from "@/lib/gbp/autopilot-orchestrator";
 
 export const dynamic = "force-dynamic";
 
@@ -101,30 +102,33 @@ export async function GET(req: NextRequest) {
         });
       }
     } else {
-      // Calculate fresh 25-point scan
-      scanResult = generate5x5GeoGrid({
-        merchantId,
-        merchantName: merchant.name,
-        keyword,
-        baseRank,
-        radiusKm,
-      });
-
-      // Persist to DB
-      await db.gbpGeoGridScan.create({
-        data: {
+      // Execute live coordinate-anchored Google Places v1 5x5 scan (graceful baseline fallback if offline)
+      const liveScan = await runLiveGeoGridScanForMerchant(merchantId, keyword);
+      const savedScan = await db.gbpGeoGridScan.findUnique({ where: { id: liveScan.scanId } });
+      if (savedScan) {
+        scanResult = {
+          merchantId: savedScan.merchantId,
+          keyword: savedScan.keyword,
+          centerLat: savedScan.centerLat,
+          centerLng: savedScan.centerLng,
+          radiusKm: savedScan.radiusKm,
+          gridSize: savedScan.gridSize,
+          top3CoveragePct: savedScan.top3CoveragePct,
+          top10CoveragePct: savedScan.top10CoveragePct,
+          avgRank: savedScan.avgRank,
+          centerRank: liveScan.centerRank,
+          points: JSON.parse(savedScan.pointsJson),
+          scannedAt: savedScan.scannedAt.toISOString(),
+        };
+      } else {
+        scanResult = generate5x5GeoGrid({
           merchantId,
+          merchantName: merchant.name,
           keyword,
-          centerLat: scanResult.centerLat,
-          centerLng: scanResult.centerLng,
-          radiusKm: scanResult.radiusKm,
-          gridSize: scanResult.gridSize,
-          top3CoveragePct: scanResult.top3CoveragePct,
-          top10CoveragePct: scanResult.top10CoveragePct,
-          avgRank: scanResult.avgRank,
-          pointsJson: JSON.stringify(scanResult.points),
-        },
-      });
+          baseRank,
+          radiusKm,
+        });
+      }
     }
 
     return NextResponse.json({

@@ -73,57 +73,14 @@ export async function GET(req: NextRequest) {
     const startDate = new Date(istNow.getTime() - daysLimit * 24 * 60 * 60 * 1000);
     const startDateStr = startDate.toISOString().slice(0, 10);
 
-    // Fetch verified daily snapshots from DB
-    let records = await db.gbpKeywordDailyRank.findMany({
+    // Fetch verified daily snapshots from DB (strictly populated by Daily 09:00 AM Live SERP Cron — never synthesize fake baseline rows on read)
+    const records = await db.gbpKeywordDailyRank.findMany({
       where: {
         merchantId: merchant.id,
         snapshotDate: { gte: startDateStr },
       },
       orderBy: { snapshotDate: "asc" },
     });
-
-    // If records are empty for today, capture today's verified snapshot
-    const hasToday = records.some((r) => r.snapshotDate === todayStr);
-    if (!hasToday && trackedDefs.length > 0) {
-      for (const kw of trackedDefs) {
-        await db.gbpKeywordDailyRank.upsert({
-          where: {
-            merchantId_keyword_snapshotDate: {
-              merchantId: merchant.id,
-              keyword: kw.keyword,
-              snapshotDate: todayStr,
-            },
-          },
-          create: {
-            merchantId: merchant.id,
-            keyword: kw.keyword,
-            keywordType: kw.type,
-            rankPosition: kw.currentRank,
-            previousRank: kw.baselineRank,
-            searchVolume: kw.searchVolume,
-            locality: kw.locality,
-            targetCity: kw.targetCity,
-            serpFeature: kw.serpFeature,
-            snapshotDate: todayStr,
-            capturedAt: istNow,
-          },
-          update: {
-            rankPosition: kw.currentRank,
-            searchVolume: kw.searchVolume,
-            locality: kw.locality,
-            serpFeature: kw.serpFeature,
-          },
-        });
-      }
-
-      records = await db.gbpKeywordDailyRank.findMany({
-        where: {
-          merchantId: merchant.id,
-          snapshotDate: { gte: startDateStr },
-        },
-        orderBy: { snapshotDate: "asc" },
-      });
-    }
 
     // Group records by unique date
     const dateMap = new Map<string, typeof records>();

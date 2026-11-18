@@ -7376,3 +7376,21 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   2. Wired `resolveDigitalCardBySlug` into `src/app/c/[slug]/page.tsx` (`generateMetadata` + `PublicDigitalCardPage`) and `src/app/api/digital-card/route.ts`.
   3. Verified locally: `/c/maw-paw`, `/c/mawpaw`, and `/api/digital-card?slug=maw-paw` all return HTTP 200 with Maw & Paw's real Digital Business Card.
 - **Status**: ✅ Resolved and Verified.
+
+---
+## [18 Nov 2026] Issue: RankLocal AI AutoPilot Scheduler, Live Google SERP/Analytics & 4-Post WhatsApp Approval Loop
+- **Symptom**: During the 13–18 Nov 2026 production audit, only Cake Connection's Google Review Auto-Reply ran automatically; weekly Google posts, daily 9 AM keyword ranking captures, live GBP analytics, 5x5 Geo-Grid scans, 30-day checklists, and CustomerPilot HQ OAuth sync were not running automatically or showed static baseline data.
+- **Root Cause**:
+  1. `scripts/localCronRunner.js` only triggered `/api/cron/automations` and `/api/cron/google-reviews`; `/api/cron/gbp-daily-serp`, `/api/cron/gbp-posts`, `/api/cron/gbp-autopilot`, and `/api/cron/gbp-monthly-reports` had no cron schedule.
+  2. `/api/cron/gbp-daily-serp` copied static `baselineRank` instead of calling Google Places API (New v1) `places:searchText`, and `/api/gbp/daily-serp` synthesized static baseline rows on read.
+  3. `/api/gbp/analytics` returned hardcoded demo metrics instead of calling Google Business Profile Performance API (`businessprofileperformance.googleapis.com/v1`).
+  4. `/api/cron/gbp-posts` only generated 3 weekly drafts without a due-post auto-publisher worker, Google anti-spam phone sanitizer, PNG creative resolver, or WhatsApp two-way approval/edit handler.
+  5. `getValidOAuthAccessToken` did not resolve shared Agency Manager OAuth tokens (`accounts/112133617085294120548`) for `customerpilot-hq`, and `/api/cron/google-reviews` filtered case-sensitively on `syncStatus: "active"` and never synced `Merchant.gbpReviewCount`.
+- **Resolution**:
+  1. Built `src/lib/gbp/live-serp-engine.ts` (official Google Places API v1 `places:searchText` with GPS `locationBias`) and wired into `/api/cron/gbp-daily-serp` and `/api/gbp/geo-grid`; removed synthetic baseline write-on-read in `/api/gbp/daily-serp`.
+  2. Built `src/lib/gbp/live-analytics-engine.ts` (official Google Business Profile Performance API 30-day metrics + monthly discovery keywords) and replaced all hardcoded numbers in `/api/gbp/analytics`.
+  3. Upgraded `src/lib/gbp-post-generator.ts` to 4 weekly posts (Tue/Thu/Sat/Sun), added `sanitizeCaptionForGooglePolicy`, `resolvePublicGoogleImageUrl`, and eliminated fake-publish fallback in `publishGbpPostToGoogle`.
+  4. Built `src/lib/gbp/whatsapp-post-approval.ts` and wired two-way WhatsApp approval/edit commands (`Approved all`, `Approved 1,2,4`, `Edit 3: ...`, `Price 1: ...`, `Change creative 1`, `Reject 2`) into `/api/webhook/evolution` and `/api/cron/gbp-posts` (both `mode=generate` and `mode=publish`).
+  5. Built `src/lib/gbp/autopilot-orchestrator.ts` + `/api/cron/gbp-autopilot` (30-Day Top-3 sprint checklist till 17 Dec 2026 + live coordinate-anchored 5x5 Geo-Grid scan + CustomerPilot keyword portfolio seeding).
+  6. Upgraded `src/lib/google-reviews-service.ts` with Agency Shared Manager OAuth fallback + live `Merchant.gbpReviewCount` sync, fixed case-insensitive `syncStatus` in `/api/cron/google-reviews`, and upgraded `scripts/localCronRunner.js` to full IST AutoPilot scheduling.
+- **Status**: ✅ Resolved and Verified (All 6 Adversarial Master Gates + Unit Assertions Passed).

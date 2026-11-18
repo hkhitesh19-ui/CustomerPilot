@@ -40,20 +40,72 @@ function generateMockReviews(merchantId: string, count: number): MockReview[] {
   return reviews
 }
 
+const AGENCY_GBP_ACCOUNT_ID = "accounts/112133617085294120548"
+const KNOWN_AGENCY_LOCATIONS: Record<string, { gbpAccountId: string; gbpLocationId: string; placeId: string }> = {
+  "cmtymavfx0002kx008lbfvp57": {
+    gbpAccountId: AGENCY_GBP_ACCOUNT_ID,
+    gbpLocationId: "locations/9875374650197271242",
+    placeId: "ChIJc7ija2zFXzkR8DbOxXEfaM4",
+  },
+  "customerpilot-hq": {
+    gbpAccountId: AGENCY_GBP_ACCOUNT_ID,
+    gbpLocationId: "locations/4702053894702959517",
+    placeId: "ChIJnZHNfaa7HmwRceqGnkPiMJw",
+  },
+  "cmw1vwviv06f3kvwlkx62ghap": {
+    gbpAccountId: AGENCY_GBP_ACCOUNT_ID,
+    gbpLocationId: "locations/4702053894702959517",
+    placeId: "ChIJnZHNfaa7HmwRceqGnkPiMJw",
+  },
+}
+
 /**
- * Automatically get valid Google OAuth Access Token, refreshing it if expired
+ * Automatically get valid Google OAuth Access Token, refreshing it if expired.
+ * Supports Agency Shared Manager Fallback (customerpilot1@gmail.com) for merchants
+ * managed under the CustomerPilot Agency GBP account.
  */
 export async function getValidOAuthAccessToken(merchantId: string): Promise<{ connection: any; token: string | null }> {
-  const connection = await db.merchantGoogleConnection.findUnique({
+  let connection = await db.merchantGoogleConnection.findUnique({
     where: { merchantId }
   })
 
-  if (!connection || !connection.oauthAccessToken) {
+  // If this merchant doesn't hold its own OAuth refresh token, check if it is managed by the shared agency account
+  let tokenHolder = connection
+  const knownLoc = KNOWN_AGENCY_LOCATIONS[merchantId]
+
+  if (!tokenHolder || (!tokenHolder.oauthAccessToken && !tokenHolder.oauthRefreshToken)) {
+    const agencyConn = await db.merchantGoogleConnection.findFirst({
+      where: {
+        gbpAccountId: AGENCY_GBP_ACCOUNT_ID,
+        oauthRefreshToken: { not: null },
+      },
+      orderBy: { lastSyncedAt: "desc" }
+    })
+
+    if (agencyConn && (knownLoc || connection?.gbpLocationId)) {
+      tokenHolder = agencyConn
+      connection = {
+        ...(connection || { id: agencyConn.id, merchantId }),
+        gbpAccountId: connection?.gbpAccountId || knownLoc?.gbpAccountId || agencyConn.gbpAccountId,
+        gbpLocationId: connection?.gbpLocationId || knownLoc?.gbpLocationId || null,
+        placeId: connection?.placeId && !connection.placeId.includes("CustomerPilotVadodaraHQ")
+          ? connection.placeId
+          : (knownLoc?.placeId || connection?.placeId || null),
+        oauthAccessToken: agencyConn.oauthAccessToken,
+        oauthRefreshToken: agencyConn.oauthRefreshToken,
+        oauthTokenExpiry: agencyConn.oauthTokenExpiry,
+      }
+    }
+  }
+
+  if (!connection || (!connection.oauthAccessToken && !connection.oauthRefreshToken)) {
     return { connection: null, token: null }
   }
 
   // Check if token is expired (or expires in < 5 mins)
-  const isExpired = connection.oauthTokenExpiry ? new Date(connection.oauthTokenExpiry).getTime() - Date.now() < 5 * 60 * 1000 : false
+  const isExpired = !connection.oauthAccessToken || (connection.oauthTokenExpiry
+    ? new Date(connection.oauthTokenExpiry).getTime() - Date.now() < 5 * 60 * 1000
+    : false)
 
   if (isExpired && connection.oauthRefreshToken) {
     try {
@@ -76,13 +128,20 @@ export async function getValidOAuthAccessToken(merchantId: string): Promise<{ co
         const data = await res.json()
         const newExpiry = new Date(Date.now() + (data.expires_in || 3600) * 1000)
 
-        const updated = await db.merchantGoogleConnection.update({
-          where: { id: connection.id },
-          data: {
-            oauthAccessToken: data.access_token,
-            oauthTokenExpiry: newExpiry
-          }
-        })
+        if (tokenHolder?.id) {
+          await db.merchantGoogleConnection.update({
+            where: { id: tokenHolder.id },
+            data: {
+              oauthAccessToken: data.access_token,
+              oauthTokenExpiry: newExpiry
+            }
+          }).catch(() => {})
+        }
+        const updated = {
+          ...connection,
+          oauthAccessToken: data.access_token,
+          oauthTokenExpiry: newExpiry,
+        }
         console.log(`[GBP OAuth] ✅ Access Token successfully refreshed! Expires at: ${newExpiry.toISOString()}`)
         return { connection: updated, token: data.access_token }
       } else {
@@ -122,6 +181,16 @@ export async function fetchGoogleReviews(merchantId: string, maxLimit: number = 
 
       if (response.ok) {
         const data = await response.json()
+        // Sync live review count & rating directly to Merchant record
+        if (typeof data.totalReviewCount === "number" || typeof data.averageRating === "number") {
+          await db.merchant.update({
+            where: { id: merchantId },
+            data: {
+              ...(typeof data.totalReviewCount === "number" ? { gbpReviewCount: data.totalReviewCount } : {}),
+              ...(typeof data.averageRating === "number" ? { baselineRating: Number(data.averageRating.toFixed(1)) } : {}),
+            }
+          }).catch(() => {})
+        }
         if (data.reviews && Array.isArray(data.reviews)) {
           return data.reviews.map((r: any) => ({
             gbpReviewId: r.reviewId || r.name,
@@ -132,6 +201,8 @@ export async function fetchGoogleReviews(merchantId: string, maxLimit: number = 
             submittedAt: r.createTime ? new Date(r.createTime) : new Date()
           }))
         }
+        return []
+      } else {
         const errJson = await response.json().catch(() => ({}))
         console.warn(`[GBP API] Fetch failed with status ${response.status}:`, errJson?.error?.message || errJson);
       }
