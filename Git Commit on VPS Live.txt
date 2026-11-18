@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : b6c40b6 (Multi-Tenant Queue Isolation, 30-Min Queue Expiry Window & Expired Record Filtering)
-Full SHA          : b6c40b6ef37705f025d1e0f626bf0c2fa8a755ff
-Parent Commit     : 8992814 (fix(queue): resolve multi-merchant queue isolation, 5-min timeout, and expired entry display bugs)
+Active Git Commit : 2041c68 (WhatsApp 8-Digit Pairing Code Silent Refresh Isolation & Resilient Loyalty Trigger Regex)
+Full SHA          : 2041c68a7a9e4af52f1eb79e0bd771941bf6622f
+Parent Commit     : c3e910a (chore: sync VPS live deployment tracker for commit b6c40b6)
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 18 Nov 2026, 03:26 PM IST
+Deployment Date   : 18 Nov 2026, 04:22 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : docs: append multi-tenant queue isolation and 30-min timeout resolution to RESOLVED_ISSUES_LOG.md
+Commit Title      : fix(whatsapp): resolve 8-digit pairing silent refresh invalidation and resilient loyalty trigger regex
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online — Unified IST AutoPilot Scheduler), cakeconnection (Online, :3001)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -23,8 +23,9 @@ Verified Endpoints on Live VPS:
 ----------------------------------------------------------
 1. https://customerpilot.in/                                 -> HTTP 200
 2. https://customerpilot.in/dashboard/queue                  -> HTTP 200 (Live Multi-Merchant Isolated Queue)
-3. https://customerpilot.in/api/state                        -> HTTP 200 (Active Non-Expired Queue Customers)
-4. https://customerpilot.in/api/queue/join                   -> HTTP 200 (Tenant Authenticated Queue Ingestion)
-5. https://customerpilot.in/api/cron/whatsapp-health         -> HTTP 200 (WhatsApp Fleet Health Monitor)
-6. https://customerpilot.in/api/webhook/evolution            -> HTTP 200 (Two-Way WhatsApp Event Dispatcher)
-7. http://187.127.170.36:8080                                -> HTTP 200 (Evolution API Manager v2.2.2)
+3. https://customerpilot.in/dashboard/settings#section-whatsapp -> HTTP 200 (WhatsApp Verification with 8-Digit Pairing)
+4. https://customerpilot.in/api/state                        -> HTTP 200 (Active Non-Expired Queue Customers)
+5. https://customerpilot.in/api/queue/join                   -> HTTP 200 (Tenant Authenticated Queue Ingestion)
+6. https://customerpilot.in/api/cron/whatsapp-health         -> HTTP 200 (WhatsApp Fleet Health Monitor)
+7. https://customerpilot.in/api/webhook/evolution            -> HTTP 200 (Resilient Two-Way WhatsApp Event Dispatcher)
+8. http://187.127.170.36:8080                                -> HTTP 200 (Evolution API Manager v2.2.2)
