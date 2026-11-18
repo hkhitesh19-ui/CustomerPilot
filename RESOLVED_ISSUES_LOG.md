@@ -4,6 +4,25 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [18 Nov 2026] Issue: Multi-Merchant Live Queue Isolation, 5-Minute Premature Timeout & Maw & Paw WhatsApp Sync Failure
+- **Symptom**: 
+  1. Customers scanning QR for "Maw & Paw" to become Loyalty Members and earn stamps did not show up in the Live Queue of Maw & Paw's dashboard (showed "0 Customers Waiting" and "Queue is completely empty").
+  2. In the SuperAdmin view, customers from one store were leaking into Cake Connection or disappearing completely.
+  3. Merchants asked why this module was repeatedly breaking and whether a permanent solution exists.
+- **Root Cause**:
+  1. **Cross-Tenant Queue Hijacking**: `/api/queue/join` and `/api/queue` endpoints used hardcoded `db.merchant.findFirst({ orderBy: { createdAt: "asc" } })`, which invariably bound all queue join events and dashboard queue queries to the first-ever seeded merchant (Cake Connection), completely breaking multi-tenant isolation for Maw & Paw and other stores.
+  2. **Premature 5-Minute Queue Expiry**: In `src/lib/queue-engine.ts`, `QUEUE_TIMEOUT_MINUTES` was hardcoded to `5` minutes (and in `queue-state-machine.ts`, bakery/retail were set to 5-10 minutes). In busy physical stores, merchants attending to customers physically could not tap "Bill & Reward" within 5 minutes, causing entries to silently expire and disappear from the queue screen.
+  3. **Queue State Inconsistency in `/api/state`**: The `/api/state` endpoint queried `waitingCustomer` with `{ status: 'waiting' }` without checking `expiresAt: { gt: new Date() }`, causing discrepancies between the background state and the filtered queue response.
+  4. **WhatsApp Multi-Device Socket Unlink (Maw & Paw)**: On the Evolution API gateway, Maw & Paw's instance `CP_918401232325_cmwgac6h_mwgatpy8` was in `close` state (Meta Code 401: phone unlinked/disconnected). Because the socket was closed, inbound WhatsApp check-in messages could not be received or delivered to CustomerPilot webhooks.
+- **Resolution**:
+  1. **Strict Multi-Tenant Session Resolution**: Refactored `/api/queue/join/route.ts` and `/api/queue/route.ts` to use `getAuthenticatedMerchant()` via JWT session rather than `findFirst({ orderBy: { createdAt: "asc" } })`. Now every store strictly interacts with their own queue.
+  2. **Production-Realistic 30-Minute Queue Timeout**: Increased `QUEUE_TIMEOUT_MINUTES` to 30 minutes in `src/lib/queue-engine.ts`, and updated `QUEUE_TIMEOUT_BY_BUSINESS` across all categories (cafe, bakery, retail, petshop, other) to 30 minutes in `src/lib/queue-state-machine.ts`. This guarantees that waiting customers stay visible on the merchant's screen until the physical billing is finalized.
+  3. **Synchronized Expiry Filtering in `/api/state`**: Updated `waitingCustomer.findMany` in `src/app/api/state/route.ts` to include `expiresAt: { gt: new Date() }`, ensuring 100% data consistency across dashboard polling.
+  4. **WhatsApp Evolution Instance Verification & Reconnection Guidance**: Verified Evolution API gateway; confirmed instance exists and isolated the exact physical requirement for Maw & Paw merchant to re-link their phone via QR in `/dashboard/settings#section-whatsapp`.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [17 Nov 2026] Feature & UI Fix: Smart AI Google Review QR Standee Brand Logo Enlargement & Auto-Trimming
 - **Symptom**:
   1. On the Smart AI Google Review QR Standee (both live on-screen dashboard preview and 1-click A4 print preview at `about:blank`), the merchant's custom uploaded brand logo appeared very small, faint, and hard to read.
