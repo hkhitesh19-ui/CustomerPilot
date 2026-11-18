@@ -7449,3 +7449,18 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   5. Built `src/lib/gbp/autopilot-orchestrator.ts` + `/api/cron/gbp-autopilot` (30-Day Top-3 sprint checklist till 17 Dec 2026 + live coordinate-anchored 5x5 Geo-Grid scan + CustomerPilot keyword portfolio seeding).
   6. Upgraded `src/lib/google-reviews-service.ts` with Agency Shared Manager OAuth fallback + live `Merchant.gbpReviewCount` sync, fixed case-insensitive `syncStatus` in `/api/cron/google-reviews`, and upgraded `scripts/localCronRunner.js` to full IST AutoPilot scheduling.
 - **Status**: ✅ Resolved and Verified (All 6 Adversarial Master Gates + Unit Assertions Passed).
+
+---
+## [19 Nov 2026] Issue: Expired Queue Lockout & Webhook Production Sync Gap
+- **Symptom**: 
+  1. A customer who previously scanned Cake Connection's loyalty QR (e.g. at 07:05 PM) and had their 30-minute queue timer expire, scanned again at 11:10 PM and 12:04 AM and sent "Hi Cake Connection! Checking in for my VIP Club stamps 🎁".
+  2. The message received Double Blue Ticks in WhatsApp, but Cake Connection's dashboard (`/dashboard/queue`) remained at `0 Customers Waiting` / `Queue is completely empty`.
+- **Root Cause**:
+  1. **Expired Queue Lockout (Purgatory State)**: In `src/app/api/webhook/evolution/route.ts`, the duplicate check queried `where: { merchantId, customer: { phone }, status: "waiting" }` without checking `expiresAt: { gt: new Date() }`. Because the customer's prior 7:05 PM row remained with `status: "waiting"` in the database (even though `/api/state` hid it due to `expiresAt < now`), the webhook matched it as `alreadyWaiting`, sent the `QUEUE_DUPLICATE` message, and exited with `continue`, skipping `joinQueue`.
+  2. **VPS Code Sync Gap**: The auto-revival logic added to `src/lib/queue-engine.ts` and `src/app/api/webhook/evolution/route.ts` was present locally, but the production build on the VPS was running an older bundle where `route.ts` and `queue-engine.ts` lacked the revival check.
+- **Resolution**:
+  1. Updated `src/app/api/webhook/evolution/route.ts` to strictly filter active non-expired queue entries (`expiresAt: { gt: new Date() }`).
+  2. Ensured `src/lib/queue-engine.ts` auto-revives expired entries with a fresh 30-minute countdown window (`expiresAt = Date.now() + 30 mins`).
+  3. Uploaded both files directly to `/var/www/CustomerPilot` on the production VPS, executed Next.js 16 standalone production build, synchronized static assets, and reloaded PM2 (`customerpilot-web`).
+  4. Executed live webhook test with customer `+91 9033304707` and Cake Connection: confirmed customer immediately revived with a fresh 30-minute timer (`expiresAt: 01:01:48 AM IST`) and verified `Cake Connection Live Queue Count: 1` live in `/dashboard/queue`.
+- **Status**: ✅ Resolved, Deployed, and Verified Live on VPS (187.127.170.36).
