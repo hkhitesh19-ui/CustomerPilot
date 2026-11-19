@@ -26,8 +26,9 @@ function hashFile(relPath) {
   if (!fs.existsSync(fullPath)) {
     throw new Error(`Core file not found: ${relPath}`);
   }
-  const content = fs.readFileSync(fullPath);
-  return crypto.createHash('sha256').update(content).digest('hex');
+  // Normalize CRLF to LF to ensure deterministic cross-platform hashes (Windows vs Linux VPS)
+  const content = fs.readFileSync(fullPath, 'utf8').replace(/\r\n/g, '\n');
+  return crypto.createHash('sha256').update(content, 'utf8').digest('hex');
 }
 
 const action = process.argv[2] || 'check';
