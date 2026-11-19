@@ -55,9 +55,9 @@ export default function ReviewsManagementPage() {
           const drafts: Record<string, string> = {}
           json.reviews.forEach((r: ReviewItem) => {
             const isNonSeoFallback = !r.reviewReply || r.reviewReply === "Thank you for the amazing review! It means a lot to us."
-            drafts[r.id] = isNonSeoFallback 
+            drafts[r.id] = (isNonSeoFallback 
               ? generateDefaultAiReply(r.reviewerName, r.rating, r.comment)
-              : r.reviewReply
+              : r.reviewReply) || ""
           })
           setDraftReplies(drafts)
         }
@@ -230,7 +230,7 @@ export default function ReviewsManagementPage() {
       </div>
 
       {/* Google Business Connect Banner */}
-      {!dashboardData?.isGoogleConnected && (
+      {!((dashboardData?.merchantGoogleConnections?.length ?? 0) > 0 || !!dashboardData?.merchant?.googlePlaceId) && (
         <Card className="bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-950 border-emerald-500/30 shadow-xl overflow-hidden relative">
           <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay"></div>
           <CardContent className="p-6 md:p-8 relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -248,7 +248,7 @@ export default function ReviewsManagementPage() {
               {/* Using native Google Business Integration component */}
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-xl">
                 <Button 
-                  onClick={() => window.location.href = `/api/google-business/oauth?merchantId=${dashboardData?.merchantId || 'admin_merchant'}&mode=instant`}
+                  onClick={() => window.location.href = `/api/google-business/oauth?merchantId=${dashboardData?.merchant?.id || 'admin_merchant'}&mode=instant`}
                   className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold mb-3"
                 >
                   ⚡ Instant 1-Click Connect (Sandbox)
@@ -259,7 +259,7 @@ export default function ReviewsManagementPage() {
                   <div className="flex-1 border-t border-white/10" />
                 </div>
                 <Button 
-                  onClick={() => window.location.href = `/api/google-business/oauth?merchantId=${dashboardData?.merchantId || 'admin_merchant'}`}
+                  onClick={() => window.location.href = `/api/google-business/oauth?merchantId=${dashboardData?.merchant?.id || 'admin_merchant'}`}
                   variant="outline" 
                   className="w-full bg-white text-slate-900 hover:bg-slate-100"
                 >

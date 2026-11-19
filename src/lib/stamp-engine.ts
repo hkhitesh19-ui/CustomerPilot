@@ -70,8 +70,14 @@ export async function awardStampsForBill(opts: {
 
     if (isFirstCard && template.joiningBonusEnabled) {
       initialStamps = template.joiningBonusStamps ?? 2;
-    } else if (!isFirstCard && template.vipUpgradeBonusStamps > 0) {
-      initialStamps = template.vipUpgradeBonusStamps;
+    } else if (!isFirstCard) {
+      const merchantRecord = await db.merchant.findUnique({
+        where: { id: merchantId },
+        select: { vipUpgradeBonusStamps: true }
+      });
+      if ((merchantRecord?.vipUpgradeBonusStamps ?? 0) > 0) {
+        initialStamps = merchantRecord?.vipUpgradeBonusStamps ?? 1;
+      }
     }
 
     card = await db.customerStampCard.create({

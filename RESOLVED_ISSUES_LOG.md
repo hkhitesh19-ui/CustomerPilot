@@ -4,6 +4,23 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [19 Nov 2026] Issue: Evolution Webhook Schema Mismatch (merchant.phone vs whatsappPhone), Stamp Engine VIP Bonus Source & Reviews Dashboard Type Alignments
+- **Symptom**:
+  1. Evolution Webhook GBP Post approval/edit handler checked `(merchant.whatsappPhone || merchant.phone || "")`. Because `Merchant` model in Prisma has `whatsappPhone` (and no `phone` field), in strict type systems or runtime evaluation `merchant.phone` resulted in `undefined` access or type errors.
+  2. In `src/lib/stamp-engine.ts`, returning VIP customers' bonus stamps calculation attempted to access `template.vipUpgradeBonusStamps`. In Prisma schema, `vipUpgradeBonusStamps` exists on `Merchant`, not on `StampCard` (template), causing property access failure and type violation.
+  3. In `src/app/dashboard/reviews/page.tsx`, `useDashboardState()` returns nested `merchant: { id, ... }` rather than top-level `merchantId`, and `isGoogleConnected` was deprecated in favor of `merchantGoogleConnections` or `googlePlaceId`. Clicking Instant Google Connect had fallback to `admin_merchant` instead of real merchant ID. Also, `drafts[r.id]` had no string null-fallback.
+- **Root Cause**:
+  1. Schema divergence: `phone` attribute only existed on `Customer` and `Staff` models, while `Merchant` uses `whatsappPhone`.
+  2. Model boundary confusion: VIP upgrade bonus configuration is a merchant-level preference (`Merchant.vipUpgradeBonusStamps`), not a card template attribute (`StampCard.vipUpgradeBonusStamps`).
+  3. Dashboard state typing mismatch: `DashboardState` returned by `useDashboardState` has `merchant?: Merchant` object rather than a flat `merchantId` and `isGoogleConnected` field.
+- **Resolution**:
+  1. Patched `src/app/api/webhook/evolution/route.ts`: Removed nonexistent `merchant.phone` reference and strictly used `merchant.whatsappPhone`.
+  2. Patched `src/lib/stamp-engine.ts`: Dynamically fetched `vipUpgradeBonusStamps` directly from `db.merchant.findUnique({ where: { id: merchantId } })` with null-safe default.
+  3. Patched `src/app/dashboard/reviews/page.tsx`: Fixed Google Connection banner predicate to check `(dashboardData?.merchantGoogleConnections?.length ?? 0) > 0 || !!dashboardData?.merchant?.googlePlaceId`, aligned OAuth connect URL parameter to `dashboardData?.merchant?.id`, and added fallback `|| ""` for `drafts[r.id]`.
+  4. Core Guard manifest `guard/core.sha256` re-baselined with `ALLOW_CORE_CHANGE=1`.
+  5. Full verification passed: `npx tsc --noEmit` returned 0 errors across all 3 files, and all 7 Master Adversarial Red-Team Gates passed cleanly (Exit Code 0).
+- **Status**: ✅ Resolved and Verified.
+
 ---
 
 ## [19 Nov 2026] Issue: WhatsApp Outbox Notification Extraction to Isolated Lib, Next.js Route Export Standards & Multi-Merchant Instance Hardening

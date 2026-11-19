@@ -252,7 +252,7 @@ export async function POST(req: NextRequest) {
         const last10Phone = customerPhone.slice(-10)
 
         // ── RankLocal AI: Two-Way Merchant WhatsApp GBP Post Approval / Edit Handler ──
-        const merchantOwnerPhone = (merchant.whatsappPhone || merchant.phone || "").replace(/\D/g, "")
+        const merchantOwnerPhone = (merchant.whatsappPhone || "").replace(/\D/g, "")
         const isMerchantOrAdminSender =
           (merchantOwnerPhone.length >= 10 && merchantOwnerPhone.slice(-10) === last10Phone) ||
           (genericAdminNumber.length >= 10 && genericAdminNumber.slice(-10) === last10Phone)
