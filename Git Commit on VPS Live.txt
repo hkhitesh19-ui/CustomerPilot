@@ -8,15 +8,15 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 54baf4b (Live Queue React 310 Hook Crash Fix, Expired Queue Re-Scan Auto-Revival & Playwright Ground-Truth Verified)
-Full SHA          : 54baf4b852f66ee9fb8c2a6f1959fb3d837e912d
-Parent Commit     : 2137b12 (docs: append expired queue lockout and webhook production sync resolution)
+Active Git Commit : 89dbdb6 (Phase 1 Hardening: Layer 1 Immunity, Layer 2/3 Watchdog Alert-Only, Layer 5 Core Guard & Gate 7)
+Full SHA          : 89dbdb6eabde4716d2fd9cf687c7ce691ea62b3e
+Parent Commit     : 939de63 (fix(queue-reviews): harden appUrl fallbacks, optimize queue polling to 10s and document review consent flow)
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 19 Nov 2026, 07:00 AM IST
+Deployment Date   : 19 Nov 2026, 09:50 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : chore: sync VPS live deployment tracker and ground truth verification for RewardModal fix
+Commit Title      : feat(hardening): phase 1 implementation - layer 5 core guard, codeowners, and gate 7 integration
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
-PM2 Services      : customerpilot-web (Online, PID 488253, :3000), customerpilot-cron (Online — Unified IST AutoPilot Scheduler), cakeconnection (Online, :3001)
+PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online — Unified IST AutoPilot Scheduler), cakeconnection (Online, :3001), cp-watchdog (Online — Alert-Only Dry-Run Mode)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
