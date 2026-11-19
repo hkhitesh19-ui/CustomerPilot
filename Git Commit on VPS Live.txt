@@ -8,11 +8,11 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 9f241f025392374d83ca6662876c394cd714c2a2 (9f241f0)
+Active Git Commit : f01dd1ae37305507f9afd0262b7fa0db249a1333 (f01dd1a)
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 19 Nov 2026, 07:30 PM IST
+Deployment Date   : 19 Nov 2026, 10:45 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : refactor(whatsapp): extract sendWhatsAppNotification to lib and adhere to nextjs route export standards
+Commit Title      : feat(security): complete Phases 3-6 - centralized evo client, watchdog v4 anti-conflict guard, and resolved issues documentation
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -25,5 +25,5 @@ Verified Endpoints on Live VPS:
 4. https://customerpilot.in/api/state                        -> HTTP 200
 5. https://customerpilot.in/api/cards/setup                  -> HTTP 200 / 401 Auth Guard
 6. https://customerpilot.in/api/cron/whatsapp-health         -> HTTP 200
-7. https://customerpilot.in/api/webhook/evolution            -> HTTP 200
-8. http://187.127.170.36:8080                                -> HTTP 200 (Evolution API Manager v2.2.2)
+7. https://customerpilot.in/api/webhook/evolution            -> HTTP 200 / 401 Guard
+8. http://187.127.170.36:8080                                -> HTTP 200 (Evolution API Manager v2.3.7)
