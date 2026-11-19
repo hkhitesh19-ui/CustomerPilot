@@ -4,6 +4,24 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+---
+
+## [19 Nov 2026] Issue: WhatsApp Outbox Notification Extraction to Isolated Lib, Next.js Route Export Standards & Multi-Merchant Instance Hardening
+- **Symptom**:
+  1. Cashier checkout on VPS was vulnerable to freezing up to 60s when WhatsApp instances were offline, due to inline awaits.
+  2. In Next.js route src/app/api/rewards/award/route.ts, exporting helper function sendWhatsAppNotification violated Next.js App Router rules (which restrict exports to HTTP verbs and route configs), risking production build breakages.
+  3. Unconfigured merchants with missing WhatsApp instances in Evolution API had confusing error reporting, and duplicate/stale instances in Evolution API created risks of session replaced conflicts (conflict: replaced).
+- **Root Cause**:
+  1. **Next.js App Router Export Violation**: sendWhatsAppNotification was exported directly from route.ts. In Next.js App Router, routes should only export HTTP method handlers (GET, POST, etc.).
+  2. **Cross-Tenant Fallback Leak**: Previous code had fallbacks like || defaultInstance or guessed names like CP_M which could route one merchant's message to another merchant's WhatsApp instance.
+  3. **Stale Multi-Tenant Evolution Instances**: Multiple legacy instances were connected or attempting reconnect loops in Evolution API container, leading to Baileys socket crash loops (TypeError: Cannot destructure property 'content' at fetchPrivacySettings) and signal ratchet desyncs (Bad MAC Error).
+- **Resolution**:
+  1. **Clean Architecture Refactor**: Extracted sendWhatsAppNotification into src/lib/whatsapp-notify.ts. src/app/api/rewards/award/route.ts now strictly exports ONLY POST.
+  2. **Zero-Fallback Strict Instance Isolation**: whatsapp-notify.ts strictly queries merchant.whatsappInstanceName without fallbacks. If null, it logs 'No WhatsApp instance configured for merchant' to db.whatsAppMessage and returns immediately without attempting network fetch.
+  3. **Physical Mutation Test Verification**: Added Vitest suite tests/unit/award-notification-failure.test.ts importing directly from src/lib/whatsapp-notify.ts. Tested against artificial mutation (re-introducing fallback), proving the test reliably fails on regressions and passes on clean code (3/3 passed in 20ms).
+  4. **Production Build & Deploy Verified**: Next.js standalone build passed cleanly on VPS (Exit Code 0), PM2 customerpilot-web reloaded successfully, and all 7 Adversarial Master Gates passed cleanly.
+- **Status**: ✅ Resolved and Verified.
+
 ## [18 Nov 2026] Issue: Live Queue React Error #310 Crash on Referral Card Click, Expired Queue Re-Scan Exclusion & Cross-Tenant Card Title Defaulting
 - **Symptom**:
   1. In `Settings -> Section 04 (Stamps Reward Card Rules Setup)`, when managing another store (e.g., Maw & Paw), the "Card Title" field displayed "Cake Connection VIP Club" instead of "Maw & Paw VIP Club".
