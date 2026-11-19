@@ -89,7 +89,7 @@ for (const gate of gates) {
 
 console.log('\n═══════════════════════════════════════════════════════════════');
 if (allPassed) {
-  console.log('🎯 ALL 6 ADVERSARIAL MASTER GATES PASSED CLEANLY.');
+  console.log(`🎯 ALL ${gates.length} ADVERSARIAL MASTER GATES PASSED CLEANLY.`);
   console.log('Code is mathematically sound, type-safe, and security-hardened.');
   console.log('═══════════════════════════════════════════════════════════════');
   process.exit(0);
