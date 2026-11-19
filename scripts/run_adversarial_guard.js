@@ -21,7 +21,7 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 
 console.log('═══════════════════════════════════════════════════════════════');
 console.log('🛡️  CustomerPilot Master Adversarial Red-Team Guard');
-console.log('Executing 6 automated security & mathematical safety gates...');
+console.log('Executing 7 automated security & mathematical safety gates...');
 console.log('═══════════════════════════════════════════════════════════════\n');
 
 const gates = [
@@ -55,6 +55,10 @@ const gates = [
       }
       return '0 SQLite database files tracked in Git.';
     }
+  },
+  {
+    name: 'Gate 7: Frozen Production Core SHA-256 Integrity Guard',
+    cmd: 'node guard/core-guard.js check',
   }
 ];
 

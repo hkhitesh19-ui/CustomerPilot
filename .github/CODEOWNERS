@@ -1,0 +1,8 @@
+# GitHub CODEOWNERS — Require review from Code Owners before merge
+/src/lib/queue-engine.ts                     @hkhitesh19-ui
+/src/components/dashboard/RewardModal.tsx    @hkhitesh19-ui
+/src/app/api/webhook/evolution/route.ts      @hkhitesh19-ui
+/src/app/api/rewards/award/route.ts          @hkhitesh19-ui
+/guard/                                      @hkhitesh19-ui
+/.github/                                    @hkhitesh19-ui
+/tests/golden/                               @hkhitesh19-ui

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Install: cp guard/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+[ "${ALLOW_CORE_CHANGE:-0}" = "1" ] && exit 0
+./guard/core-guard.sh check
