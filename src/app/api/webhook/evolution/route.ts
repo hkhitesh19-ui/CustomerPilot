@@ -302,7 +302,7 @@ export async function POST(req: NextRequest) {
         const publicBaseUrl = process.env.NEXT_PUBLIC_APP_URL
           || ((requestHost && !requestHost.includes("localhost"))
             ? `${requestProto}://${requestHost}`
-            : "http://localhost:3000")
+            : "https://customerpilot.in")
 
         // ── 1. CONTEXT AWARE REPLIES (Review & Name) ──────────────────────
         if (!isTriggerMsg && existingCustomer && text.length > 0 && text.length < 50) {

@@ -7464,3 +7464,20 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   3. Uploaded both files directly to `/var/www/CustomerPilot` on the production VPS, executed Next.js 16 standalone production build, synchronized static assets, and reloaded PM2 (`customerpilot-web`).
   4. Executed live webhook test with customer `+91 9033304707` and Cake Connection: confirmed customer immediately revived with a fresh 30-minute timer (`expiresAt: 01:01:48 AM IST`) and verified `Cake Connection Live Queue Count: 1` live in `/dashboard/queue`.
 - **Status**: ✅ Resolved, Deployed, and Verified Live on VPS (187.127.170.36).
+
+---
+## [19 Nov 2026] Issue: WhatsApp Template URL Fallback & Dashboard Queue Polling Latency
+- **Symptom**:
+  1. Customer Pilot (+91 9033304707) received a WhatsApp message with `http://localhost:3000/q/wallet/...` instead of `https://customerpilot.in/q/wallet/...`.
+  2. Merchant dashboard (`/dashboard/queue`) showed "0 Customers Waiting" for 30+ seconds until manual refresh even though customer had checked in.
+  3. Customer replied "Yes" at 7:51 AM to the Review Request prompt, but the 1-click Google review link was not dispatched.
+- **Root Cause**:
+  1. `src/app/api/rewards/award/route.ts` line 561 and `src/lib/review-photo-verifier.ts` line 339 had hardcoded fallback `process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"`. Because `NEXT_PUBLIC_APP_URL` was not present in the VPS `.env`, URLs defaulted to `localhost:3000`.
+  2. `src/hooks/use-dashboard-state.ts` used a 30-second `refetchInterval` without `refetchOnWindowFocus`, meaning backgrounded tabs or tabs opened right after an event did not immediately refresh the queue state.
+  3. In Evolution API Baileys socket (`docker logs evolution-api`), a temporary WhatsApp encryption session desync (`Decrypted message with closed session. TypeError: Cannot read properties of undefined (reading 'attrs')`) prevented the 7:51 AM "Yes" message from being decrypted or forwarded to CustomerPilot webhook. The customer's state in the database remained preserved in `AWAITING_REVIEW_CONSENT`.
+- **Resolution**:
+  1. Replaced all `http://localhost:3000` fallbacks across `src/app/api/rewards/award/route.ts`, `src/lib/review-photo-verifier.ts`, and `src/app/api/webhook/evolution/route.ts` with strict `https://customerpilot.in` fallbacks.
+  2. Added `NEXT_PUBLIC_APP_URL="https://customerpilot.in"` to `/var/www/CustomerPilot/.env` on the VPS.
+  3. Optimized `src/hooks/use-dashboard-state.ts` by reducing `refetchInterval` from 30s to 10s and enabling `refetchOnWindowFocus: true` for immediate fresh updates when the merchant switches to the tab.
+  4. Verified via headless Playwright test that `/dashboard/queue` renders `Customer Pilot (+91 9033304707)` in the live queue (`1 Customers Waiting`).
+- **Status**: ✅ Resolved, Tested with Adversarial Red-Team Gates, and Verified via Playwright.

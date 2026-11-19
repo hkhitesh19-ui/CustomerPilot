@@ -336,7 +336,7 @@ export async function awardVerifiedPhotoBonus(params: {
   })
 
   // Dispatch celebratory WhatsApp confirmation
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.in"
   const walletUrl = `${appUrl}/q/wallet/${customerId}`
   const stampsRequired = template?.stampsRequired || 10
   const remaining = Math.max(0, stampsRequired - finalStamps)

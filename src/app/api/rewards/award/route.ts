@@ -558,7 +558,7 @@ export async function POST(req: Request) {
       const { vipBonusStamps, joiningBonusStamps: resJoinBonus, newTier, cycleCompletedInTx, completedCardReward, completedCardStampsRequired, referralBonusResult } = transactionResult;
       const custName = waitingCustomer.customer.name || "there";
 
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === "production" ? "https://customerpilot.in" : "https://customerpilot.in");
       const walletUrl = `${appUrl}/q/wallet/${waitingCustomer.customerId}`;
 
       if (cycleCompletedInTx) {

@@ -67,6 +67,7 @@ export function useDashboardState() {
       
       return dashboardData
     },
-    refetchInterval: 30000, // Poll every 30s for Live Queue freshness
+    refetchInterval: 10000, // Poll every 10s for snappy Live Queue updates
+    refetchOnWindowFocus: true,
   })
 }
