@@ -24,16 +24,24 @@ export async function scheduleGoogleReviewRequest({
       return { scheduled: false, reason: "Review already submitted" }
     }
 
-    // 3. Deduplication: Skip if review_request was EVER sent to this customer
+    // 3. Deduplication: Skip if review_request was delivered, or actively queued in last 24h
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
     const previousRequest = await db.whatsAppMessage.findFirst({
       where: {
         merchantId: merchant.id,
         toPhone: customer.phone,
-        template: "review_request"
+        template: "review_request",
+        OR: [
+          { status: { in: ["sent", "delivered", "read"] } },
+          { 
+            status: { in: ["scheduled", "queued"] },
+            createdAt: { gte: twentyFourHoursAgo }
+          }
+        ]
       }
     })
     if (previousRequest) {
-      return { scheduled: false, reason: "Review request already sent previously" }
+      return { scheduled: false, reason: "Review request already sent or active" }
     }
 
     // 4. Calculate Delay based on merchant.googleReviewDelayMinutes configuration

@@ -8,24 +8,22 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 89dbdb6 (Phase 1 Hardening: Layer 1 Immunity, Layer 2/3 Watchdog Alert-Only, Layer 5 Core Guard & Gate 7)
-Full SHA          : 89dbdb6eabde4716d2fd9cf687c7ce691ea62b3e
-Parent Commit     : 939de63 (fix(queue-reviews): harden appUrl fallbacks, optimize queue polling to 10s and document review consent flow)
+Active Git Commit : [Pending Local Commit] (Award Fallback Removal, Non-Blocking Void Outbox, Review Dedup 24h & Watchdog v3)
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 19 Nov 2026, 09:50 AM IST
+Deployment Date   : 19 Nov 2026, 10:52 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(hardening): phase 1 implementation - layer 5 core guard, codeowners, and gate 7 integration
+Commit Title      : fix(award-watchdog): remove dangerous fallback, add 6s timeout, non-blocking void outbox, review 24h dedup, and watchdog v3 POST
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
-PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online — Unified IST AutoPilot Scheduler), cakeconnection (Online, :3001), cp-watchdog (Online — Alert-Only Dry-Run Mode)
+PM2 Services      : customerpilot-web (Online, PID 502306, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online, PID 502212)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
 1. https://customerpilot.in/                                 -> HTTP 200
-2. https://customerpilot.in/dashboard/queue                  -> HTTP 200 / 307 Auth Guard (Crash-Free Dual Stamp & POS Modal Verified)
-3. https://customerpilot.in/dashboard/settings#section-whatsapp -> HTTP 200 (Dynamic Merchant Card Title: Maw & Paw VIP Club)
-4. https://customerpilot.in/api/state                        -> HTTP 200 (Active Non-Expired Multi-Tenant Queue)
-5. https://customerpilot.in/api/cards/setup                  -> HTTP 200 / 401 Auth Guard (Auto-Healing Business Brand Titles)
-6. https://customerpilot.in/api/cron/whatsapp-health         -> HTTP 200 (WhatsApp Fleet Health Monitor)
-7. https://customerpilot.in/api/webhook/evolution            -> HTTP 200 (Auto-Reviving Queue Scan Ingestion)
+2. https://customerpilot.in/dashboard/queue                  -> HTTP 200 / 307 Auth Guard
+3. https://customerpilot.in/dashboard/settings#section-whatsapp -> HTTP 200
+4. https://customerpilot.in/api/state                        -> HTTP 200
+5. https://customerpilot.in/api/cards/setup                  -> HTTP 200 / 401 Auth Guard
+6. https://customerpilot.in/api/cron/whatsapp-health         -> HTTP 200
+7. https://customerpilot.in/api/webhook/evolution            -> HTTP 200
 8. http://187.127.170.36:8080                                -> HTTP 200 (Evolution API Manager v2.2.2)

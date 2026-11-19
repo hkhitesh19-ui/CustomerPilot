@@ -16,57 +16,46 @@ import { getVipTierForSpend, VIP_TIER_LABELS } from "@/lib/vip-engine";
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 
+const SEND_TIMEOUT_MS = 6000
+
 async function sendWhatsAppNotification(merchantId: string, toPhone: string, text: string, templateKey: string = "STAMP_AWARDED") {
+  let ok = false
+  let errorMsg: string | null = null
+  let metaId: string | undefined
   try {
     if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
-      console.error("[Award API] EVOLUTION_API_URL or EVOLUTION_API_KEY not configured — skipping notification dispatch")
-      return { ok: false, error: "Evolution API credentials not configured" }
-    }
-    const merchant = await db.merchant.findUnique({ where: { id: merchantId } })
-    const defaultInstance = process.env.EVOLUTION_INSTANCE_NAME || "CustomerPilot_Main"
-    const instanceName = merchant?.whatsappInstanceName || (merchant?.whatsappPhone ? `CP_M${merchant.whatsappPhone.replace(/\D/g, "")}` : defaultInstance)
-    
-    let res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
-      body: JSON.stringify({
-        number: toPhone,
-        text: text
-      })
-    })
-
-    if (!res.ok && instanceName !== defaultInstance) {
-      console.log(`[Award API] Merchant instance ${instanceName} failed. Falling back to ${defaultInstance}`);
-      res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${defaultInstance}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
-        body: JSON.stringify({ number: toPhone, text: text })
-      })
-    }
-
-    const data = await res.json().catch(() => ({}))
-    let errorMsg = null;
-    if (!res.ok) {
-        errorMsg = data.message || data.error || `HTTP ${res.status}`;
-    }
-    
-    await db.whatsAppMessage.create({
-      data: {
-        merchantId,
-        toPhone,
-        template: templateKey,
-        body: text.substring(0, 500),
-        status: res.ok ? "sent" : "failed",
-        sentAt: res.ok ? new Date() : null,
-        metaMessageId: data?.key?.id || `stamp_${Date.now()}`,
-        errorMessage: errorMsg
+      errorMsg = "Evolution API credentials not configured"
+    } else {
+      const merchant = await db.merchant.findUnique({ where: { id: merchantId } })
+      const instanceName = merchant?.whatsappInstanceName
+      if (!instanceName) {
+        // never fall back to a shared/guessed instance (cross-merchant leak)
+        errorMsg = "No WhatsApp instance configured for merchant"
+      } else {
+        const res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${encodeURIComponent(instanceName)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
+          body: JSON.stringify({ number: toPhone, text }),
+          signal: AbortSignal.timeout(SEND_TIMEOUT_MS),
+        })
+        const data: any = await res.json().catch(() => ({}))
+        if (res.ok) { ok = true; metaId = data?.key?.id }
+        else errorMsg = `[${instanceName}] HTTP ${res.status}: ${String(data?.response?.message ?? data?.message ?? data?.error ?? "unknown")}`.slice(0, 300)
       }
-    }).catch(() => {})
-    
-    console.log(`[Award API] ✉️ WhatsApp notification (${templateKey}) processed for +${toPhone}`)
+    }
   } catch (e: any) {
-    console.error("[Award API] WhatsApp send error:", e.message)
+    errorMsg = (e?.name === "TimeoutError" || e?.name === "AbortError")
+      ? `Timeout ${SEND_TIMEOUT_MS}ms (delivery unknown)`
+      : String(e?.message || e).slice(0, 300)
   }
+  await db.whatsAppMessage.create({
+    data: {
+      merchantId, toPhone, template: templateKey, body: text.substring(0, 500),
+      status: ok ? "sent" : "failed", sentAt: ok ? new Date() : null,
+      metaMessageId: metaId || `stamp_${Date.now()}`, errorMessage: errorMsg,
+    },
+  }).catch((err: any) => console.error("[Award API] failed to log WhatsApp message:", err?.message))
+  if (!ok) console.error(`[Award API] WhatsApp ${templateKey} to +${toPhone.slice(0, 4)}**** failed: ${errorMsg}`)
 }
 
 export async function POST(req: Request) {
@@ -573,7 +562,7 @@ export async function POST(req: Request) {
           walletUrl
         });
         const finalRewardMsg = rewardMsg.includes(walletUrl) ? rewardMsg : `${rewardMsg}\n\n📱 *View Your Reward in Digital Wallet:*\n${walletUrl}`;
-        sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, finalRewardMsg, "REWARD_UNLOCKED");
+        void sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, finalRewardMsg, "REWARD_UNLOCKED");
 
         // EVENT 2: NEXT LEVEL UNLOCKED -> If Next Level Kickstart Bonus was awarded, send LEVEL_COMPLETE WhatsApp Notification!
         if (vipBonusStamps > 0) {
@@ -585,7 +574,7 @@ export async function POST(req: Request) {
             walletUrl
           });
           const finalLevelMsg = levelMsg.includes(walletUrl) ? levelMsg : `${levelMsg}\n\n📱 *Check Your New Card:*\n${walletUrl}`;
-          sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, finalLevelMsg, "LEVEL_COMPLETE");
+          void sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, finalLevelMsg, "LEVEL_COMPLETE");
         }
       } else {
         // STANDARD STAMP AWARDED (Card not completed yet)
@@ -620,7 +609,7 @@ export async function POST(req: Request) {
         });
 
         const finalStampMsg = stampMsg.includes(walletUrl) ? stampMsg : `${stampMsg}\n\n📱 *View Your Live Digital Stamp Card:*\n${walletUrl}`;
-        sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, finalStampMsg, "STAMP_AWARDED");
+        void sendWhatsAppNotification(merchantId, waitingCustomer.customer.phone, finalStampMsg, "STAMP_AWARDED");
       }
 
       // EVENT 3: REFERRAL BONUS -> Send instant notification to Referrer (Customer A)
@@ -631,7 +620,7 @@ export async function POST(req: Request) {
 
         const refMsg = `🎉 *Great News, ${referrerName}!* ❤️\n\nYour friend *${friendDisplayName}* just completed their first purchase at *${merchantName}*!\n\n🎁 *+${referrerBonusStamps} Referral Bonus Stamp* has been credited to your VIP Card!\n\n📱 *View Your Updated Card:*\n${refWalletUrl}`;
 
-        sendWhatsAppNotification(merchantId, referrerPhone, refMsg, "REFERRAL_BONUS");
+        void sendWhatsAppNotification(merchantId, referrerPhone, refMsg, "REFERRAL_BONUS");
       }
 
       // Schedule Google Review request only if merchant has REVIEWS module enabled
