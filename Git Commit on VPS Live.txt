@@ -8,13 +8,13 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 26e3ac4bde8edb7913caaef5ce49189c9febff7f (26e3ac4)
+Active Git Commit : 9f241f025392374d83ca6662876c394cd714c2a2 (9f241f0)
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 19 Nov 2026, 10:52 AM IST
+Deployment Date   : 19 Nov 2026, 07:30 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(award-watchdog): remove dangerous fallback, add 6s timeout, non-blocking void outbox, review 24h dedup, and watchdog v3 POST
+Commit Title      : refactor(whatsapp): extract sendWhatsAppNotification to lib and adhere to nextjs route export standards
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
-PM2 Services      : customerpilot-web (Online, PID 502306, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online, PID 502212)
+PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
