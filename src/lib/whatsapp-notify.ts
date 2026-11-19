@@ -1,8 +1,5 @@
 import { db } from '@/lib/db';
 
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
-
 const SEND_TIMEOUT_MS = 6000;
 
 /**
@@ -23,8 +20,11 @@ export async function sendWhatsAppNotification(
   let errorMsg: string | null = null;
   let metaId: string | undefined;
 
+  const evolutionUrl = process.env.EVOLUTION_API_URL || "http://187.127.170.36:8080";
+  const evolutionKey = process.env.EVOLUTION_API_KEY;
+
   try {
-    if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
+    if (!evolutionUrl || !evolutionKey) {
       errorMsg = "Evolution API credentials not configured";
     } else {
       const merchant = await db.merchant.findUnique({ where: { id: merchantId } });
@@ -33,9 +33,9 @@ export async function sendWhatsAppNotification(
         // never fall back to a shared/guessed instance (cross-merchant leak)
         errorMsg = "No WhatsApp instance configured for merchant";
       } else {
-        const res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${encodeURIComponent(instanceName)}`, {
+        const res = await fetch(`${evolutionUrl}/message/sendText/${encodeURIComponent(instanceName)}`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
+          headers: { "Content-Type": "application/json", "apikey": evolutionKey },
           body: JSON.stringify({ number: toPhone, text }),
           signal: AbortSignal.timeout(SEND_TIMEOUT_MS),
         });

@@ -49,8 +49,8 @@ interface CartItem {
 }
 
 export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merchantId = "", stampValue }: RewardModalProps) {
-  // Mode: "quick" vs "itemized"
-  const [activeTab, setActiveTab] = useState<'itemized' | 'quick'>('itemized');
+  // Mode: "quick" vs "itemized" - Default strictly to "quick" (Quick Stamps Only)
+  const [activeTab, setActiveTab] = useState<'itemized' | 'quick'>('quick');
   const [billingSettings, setBillingSettings] = useState<{
     itemizedBillingEnabled: boolean;
     defaultGstRate: number;
@@ -102,12 +102,11 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
           const s = settingsData.data.settings;
           setBillingSettings(s);
           if (s.itemizedBillingEnabled) {
-            setActiveTab('itemized');
             setGstRate(s.defaultGstRate || 0);
             setGstType(s.gstType || 'CGST_SGST');
-          } else {
-            setActiveTab('quick');
           }
+          // Always ensure Quick Stamp Only is default mode on modal open
+          setActiveTab('quick');
         }
 
         // 2. Fetch Merchant Menu Items
@@ -130,6 +129,7 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
   }, [isOpen, merchantId]);
 
   const handleClose = () => {
+    setActiveTab('quick');
     setAmount('');
     setProductName('');
     setReferralCode('');
@@ -896,15 +896,27 @@ export function RewardModal({ isOpen, onClose, waitingCustomer, onSuccess, merch
 
                 {/* Friend Referral Status / Input */}
                 {referrer ? (
-                  <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2 text-amber-300">
-                      <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>Referral Linked: <strong className="text-amber-200">{referrer?.name || "VIP Referrer"}</strong></span>
+                  !isReturningVIP ? (
+                    <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2 text-amber-300">
+                        <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span>Referral Linked: <strong className="text-amber-200">{referrer?.name || "VIP Referrer"}</strong></span>
+                      </div>
+                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
+                        Auto Dual Stamp (1st Visit Only)
+                      </span>
                     </div>
-                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
-                      Auto Dual Stamp Ready
-                    </span>
-                  </div>
+                  ) : (
+                    <div className="p-3 rounded-xl bg-slate-900/80 border border-amber-500/25 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <UserCheck className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span>Referred by: <strong className="text-amber-300">{referrer?.name || "VIP Referrer"}</strong></span>
+                      </div>
+                      <span className="text-[10px] font-semibold text-slate-400 bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-700">
+                        1-Time Bonus Already Awarded
+                      </span>
+                    </div>
+                  )
                 ) : !isReturningVIP ? (
                   <div className="space-y-1.5 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
                     <div className="flex items-center justify-between">

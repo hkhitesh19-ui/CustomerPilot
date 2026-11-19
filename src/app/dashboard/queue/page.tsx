@@ -64,6 +64,7 @@ export default function QueuePage() {
                 const durationStr = diffMins > 0 ? `${diffMins} min${diffMins > 1 ? 's' : ''} ago` : `${diffSecs}s ago`;
                 const phoneStr = wc.customer?.phone ? `+${wc.customer.phone.replace(/^91/, "91 ")}` : "Unknown";
                 const referrer = wc.customer?.referredBy || wc.customer?.referralsReceived?.[0]?.referrer || wc.referrer;
+                const isFirstVisitReferred = !!referrer && (!wc.customer?.lifetimeStamps || wc.customer.lifetimeStamps === 0);
 
                 return (
                 <div 
@@ -132,8 +133,8 @@ export default function QueuePage() {
                     </div>
                   </div>
 
-                  <div className={`mt-3 pt-2.5 border-t border-slate-200 dark:border-slate-700/50 text-xs font-bold flex items-center justify-between opacity-80 group-hover:opacity-100 transition-opacity relative z-10 ${referrer ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-500'}`}>
-                    <span>{referrer ? '🤝 Reward Dual Stamps' : 'Tap to Bill & Reward'}</span>
+                  <div className={`mt-3 pt-2.5 border-t border-slate-200 dark:border-slate-700/50 text-xs font-bold flex items-center justify-between opacity-80 group-hover:opacity-100 transition-opacity relative z-10 ${isFirstVisitReferred ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-500'}`}>
+                    <span>{isFirstVisitReferred ? '🤝 First Visit Dual Stamps' : '🎁 Reward Stamp'}</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
                   </div>
                 </div>

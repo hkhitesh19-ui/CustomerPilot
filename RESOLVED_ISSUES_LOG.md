@@ -4,6 +4,31 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [20 Nov 2026] Issue: WhatsApp Outbox 401 Env Desync, Live Queue Quick Stamp Tab Defaulting, Persistent Referral Badging & Contact/Services/Digital Card Overhaul
+- **Symptom**:
+  1. Customers (Ekta & Customer Pilot) checked in via counter QR and rewards were approved from Live Queue between 11:15 PM and 11:36 PM IST, but automated WhatsApp stamp award & cycle-completion notifications failed with `[CP_917203824012_cmtymavf_mw0whjx7] HTTP 401: Unauthorized`.
+  2. In Merchant Live Queue, clicking 'Reward Stamp' opened the "Itemized Bill & Tax Invoice" tab by default instead of "Quick Stamp Only".
+  3. When a referred customer (Customer B) made subsequent visits as a returning customer, the card displayed "🤝 Reward Dual Stamps" and "Auto Dual Stamp Ready" on every visit, creating confusion, even though referral bonuses are strictly one-time.
+  4. On `/contact`, legacy locality "Manjalpur" and postal code "390011" remained visible, support hours were outdated, and Schema.org SEO/GEO/AEO structures were missing.
+  5. The `/services` showcase listed only 8 generic modules instead of all 10 specialized CustomerPilot services (Website Sales Machine, Guaranteed Top 3 GBP SEO, WhatsApp Invoicing POS, etc.).
+  6. Developer Hitesh needed an official Smart Digital Business Card (`customerpilot.in/c/hitesh`).
+- **Root Cause**:
+  1. Next.js App Router in production loads `.env.production` with higher precedence over `.env`. While `.env` had the rotated Evolution 64-char key, VPS `/var/www/CustomerPilot/.env.production` still contained the stale key `Evo_Api_Key_Secure_998877!`.
+  2. `RewardModal.tsx` initialized `activeTab` to `'itemized'` and overrode state in `initData()`.
+  3. Queue card and modal buttons unconditionally showed "Reward Dual Stamps" without checking if the customer was already an existing returning member.
+- **Resolution**:
+  1. **VPS Env Sync & Outbox Healing**: Synchronized rotated Evolution API key across `/var/www/CustomerPilot/.env.production` and standalone `.env.production`, reloaded PM2 `customerpilot-web` with `--update-env`, and physically resent failed stamp notifications to Ekta (`919033456106`) and Customer Pilot (`919033304707`) with HTTP 201 Created.
+  2. **Live Queue & Reward Modal Streamlining**:
+     - Made `activeTab: 'quick'` the permanent default in `RewardModal.tsx` on modal open and reset.
+     - Updated referral badging in `RewardModal.tsx` and `src/app/dashboard/queue/page.tsx`: 1st visit displays "Auto Dual Stamp (1st Visit Only)" and "🤝 First Visit Dual Stamps"; subsequent visits display "Customer B is referred by: Customer A" with "1-Time Bonus Already Awarded" while keeping button as standard "🎁 Reward Stamp".
+  3. **Contact Page Redesign**: Purged "Manjalpur" and "390011" from `src/app/contact/page.tsx`, updated operating hours to `Monday – Saturday: 10:00 AM – 7:00 PM IST`, and injected structured `LocalBusiness`, `GeoCoordinates`, and `FAQPage` JSON-LD schemas.
+  4. **10 Services Page**: Expanded `src/app/services/page.tsx` with all 10 specialized services, subtitle descriptors, updated category filter pills, and pricing/SLA badges.
+  5. **Hitesh Digital Business Card**: Provisioned active `DigitalBusinessCard` record (`slug: "hitesh"`, `hitesh-kumar`) with official CustomerPilot links, executive theme, permanent lifetime active flag, verified 200 OK status on live VPS.
+  6. **Security & Regression Verification**: Re-baselined Gate 7 core integrity checksums (`guard/core.sha256`) with `ALLOW_CORE_CHANGE=1`. All 7 Master Adversarial Red-Team Gates passed cleanly (Exit Code 0).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [19 Nov 2026] Issue: Evolution Security Hardening (Phases 3-6) — Webhook Secret Guard, Helper Scripts Centralization, Key Rotation & Watchdog v4 Anti-Conflict Guard
 - **Symptom**:
   1. Plaintext API key (`Evo_Api_Key_Secure_998877!`) was present in helper scripts and reported in transcripts, posing a credential compromise risk.

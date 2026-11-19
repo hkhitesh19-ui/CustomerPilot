@@ -40,25 +40,102 @@ import {
   MapPin,
   Share2,
   Award,
-  ChevronDown
+  ChevronDown,
+  Globe
 } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
 export default function ServicesInfographicPage() {
-  const [activeCategory, setActiveCategory] = useState<'all' | 'reviews' | 'retention' | 'pos'>('all')
+  const [activeCategory, setActiveCategory] = useState<'all' | 'web_seo' | 'reviews' | 'retention' | 'pos_menu'>('all')
   const [interactiveStep, setInteractiveStep] = useState<number>(1)
   const [dailyFootfall, setDailyFootfall] = useState<number>(50)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
-  // ─── STRICT CANONICAL 8 CORE MODULES ───
+  // ─── CANONICAL 10 COMPLETE SERVICES OF CUSTOMERPILOT ───
   const coreModules = [
     {
       id: 1,
-      category: 'reviews',
+      category: 'web_seo',
+      name: 'Website (Like Sales Machine)',
+      subtitle: 'Mini Website, Dynamic, E-Commerce — for All Businesses',
+      route: '/contact',
+      dashboardRoute: '/dashboard',
+      icon: Globe,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200',
+      hoverBorder: 'hover:border-blue-400',
+      gradient: 'from-blue-600 to-indigo-600',
+      badge: 'Sales Machine Engine',
+      badgeStyle: 'bg-blue-100 text-blue-800 border-blue-300',
+      headline: 'Ultra-Fast Conversion Websites Designed to Generate Daily Sales',
+      benefit: 'Custom Mini Websites, Dynamic Product Catalogs, and Full E-Commerce Stores crafted for retail stores, cafes, bakeries, clinics, and service businesses to turn traffic into phone calls and WhatsApp orders.',
+      howItWorks: [
+        'Built for maximum local conversion with 1-tap WhatsApp ordering and direct call triggers',
+        'Google PageSpeed 95+ score with zero lag, mobile-first responsiveness, and schema integration',
+        'Custom domain setup with automated lead capture synced directly to your Customer CRM'
+      ],
+      metric: '3.8x',
+      metricSub: 'Higher visitor-to-inquiry conversion rate vs generic WordPress templates'
+    },
+    {
+      id: 2,
+      category: 'web_seo',
+      name: 'GBP Creation, Optimization & SEO (RankPilot AI™)',
+      subtitle: 'Guaranteed Top 3 Rank in 3 Months — Just ₹9,000/-',
+      route: '/rankpilot',
+      dashboardRoute: '/dashboard/gbp-status',
+      icon: Compass,
+      color: 'text-emerald-600',
+      bgColor: 'bg-emerald-50',
+      borderColor: 'border-emerald-200',
+      hoverBorder: 'hover:border-emerald-400',
+      gradient: 'from-emerald-600 to-teal-600',
+      badge: 'Guaranteed Top 3 Rank · ₹9,000',
+      badgeStyle: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+      headline: 'Rank #1 to #3 on Google Maps in 90 Days or Money-Back',
+      benefit: 'Complete Google Business Profile setup, category optimization, keyword-infused weekly updates, and local citation audit. Guaranteed Top 3 rank in 3 months for just ₹9,000/-.',
+      howItWorks: [
+        '5x5 Geo-Grid multi-radius competitor rank audit across your complete 10 km catchment',
+        '3 Weekly AI-rendered high-resolution photo posts with localized geo-tagged keywords',
+        'Strict 100% money-back SLA guarantee if your store does not reach Top 3 Google Maps rank'
+      ],
+      metric: 'Top 3',
+      metricSub: 'Guaranteed Google Maps ranking within 90 days (100% SLA Guarantee)'
+    },
+    {
+      id: 3,
+      category: 'pos_menu',
+      name: 'POS Invoice Making & WhatsApp PDF',
+      subtitle: 'Fast POS Billing & Instant PDF Invoices to Customer WhatsApp',
+      route: '/dashboard/billing',
+      dashboardRoute: '/dashboard/billing',
+      icon: Receipt,
+      color: 'text-indigo-600',
+      bgColor: 'bg-indigo-50',
+      borderColor: 'border-indigo-200',
+      hoverBorder: 'hover:border-indigo-400',
+      gradient: 'from-indigo-600 to-purple-600',
+      badge: 'Paperless WhatsApp POS',
+      badgeStyle: 'bg-indigo-100 text-indigo-800 border-indigo-300',
+      headline: 'Lightning-Fast Billing with Automated WhatsApp PDF Invoices',
+      benefit: 'Create GST or Non-GST bills in 3 seconds from phone, tablet, or PC. Automatically delivers professional computer-generated PDF bills straight to your customer’s WhatsApp with UPI payment QR attached.',
+      howItWorks: [
+        'Visual touch-screen product catalog with automatic discount & GST computation',
+        'Direct automated PDF invoice delivery straight to customer WhatsApp chat',
+        'Bluetooth thermal printer integration whenever physical hardcopies are required'
+      ],
+      metric: '100%',
+      metricSub: 'Paper bill cost eliminated with automated WhatsApp delivery'
+    },
+    {
+      id: 4,
+      category: 'pos_menu',
       name: 'Smart Digital Business Card',
-      route: '/smart-digital-business-card',
+      subtitle: 'Contactless NFC & QR Visiting Card with 1-Tap Save',
+      route: '/dashboard/digital-card',
       dashboardRoute: '/dashboard/digital-card',
       icon: Smartphone,
       color: 'text-cyan-600',
@@ -68,44 +145,21 @@ export default function ServicesInfographicPage() {
       gradient: 'from-cyan-500 to-blue-600',
       badge: '1-Tap Contact Save',
       badgeStyle: 'bg-cyan-100 text-cyan-800 border-cyan-300',
-      headline: 'Contactless Smart Visiting Card with 1-Tap Save',
-      benefit: 'Customers save your phone number, address, and live digital menu directly into their contacts in 1 tap — without paper business cards.',
+      headline: 'Contactless Smart Visiting Card with 1-Tap Phonebook Save',
+      benefit: 'Never run out of paper business cards. Customers tap via NFC or scan your QR code to instantly save your phone number, address, and live digital menu directly into their contacts in 1 tap.',
       howItWorks: [
-        'Customer taps NFC card or scans your table QR code',
-        'Your verified business profile opens with 1-tap "Save Contact"',
+        'Customer taps NFC card or scans your table QR code with any smartphone camera',
+        'Your verified business profile opens with 1-tap "Save Contact" (.vcf file download)',
         'Direct WhatsApp chat, catalog links, and Google Maps directions built in'
       ],
       metric: '8.4x',
-      metricSub: 'Higher contact saves vs paper visiting cards'
+      metricSub: 'Higher contact saves vs traditional paper visiting cards'
     },
     {
-      id: 2,
-      category: 'retention',
-      name: 'WhatsApp Digital Loyalty Membership Club',
-      route: '/whatsapp-digital-loyalty-card',
-      dashboardRoute: '/dashboard/rewards',
-      icon: Gift,
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-50',
-      borderColor: 'border-amber-200',
-      hoverBorder: 'hover:border-amber-400',
-      gradient: 'from-amber-500 to-orange-500',
-      badge: 'App-Less Loyalty Stamps',
-      badgeStyle: 'bg-amber-100 text-amber-800 border-amber-300',
-      headline: 'Digital Stamp Cards & VIP Perks Right on WhatsApp',
-      benefit: 'Turn one-time walk-in buyers into lifelong regulars. Customers earn stamps on WhatsApp automatically — zero mobile apps to download.',
-      howItWorks: [
-        'Customer enters mobile number or scans counter QR at checkout',
-        'Digital stamp card arrives on their WhatsApp with live milestone progress',
-        'Automatic 30/60 day win-back cashback alerts bring dormant buyers back'
-      ],
-      metric: '+42%',
-      metricSub: 'Increase in repeat customer visits within 30 days'
-    },
-    {
-      id: 3,
+      id: 5,
       category: 'reviews',
-      name: 'Smart AI Google Reviews',
+      name: 'AI Google Review Booster',
+      subtitle: 'Zero-Typing 5-Star Reviews Powered by Gemini AI',
       route: '/ai-google-review-qr-generator',
       dashboardRoute: '/dashboard/reviews',
       icon: Star,
@@ -117,9 +171,9 @@ export default function ServicesInfographicPage() {
       badge: '5-Star Review Booster',
       badgeStyle: 'bg-emerald-100 text-emerald-800 border-emerald-300',
       headline: 'Zero-Typing 5-Star Google Reviews Powered by Gemini AI',
-      benefit: 'Customers never have to struggle thinking what to write. Gemini AI drafts a genuine, keyword-rich 5-star review in 3 seconds for 1-tap posting.',
+      benefit: 'Customers never hesitate or struggle with what to write. Gemini AI drafts a genuine, keyword-rich 5-star review in 3 seconds for 1-tap posting to Google Maps.',
       howItWorks: [
-        'Customer scans your custom acrylic tabletop standee',
+        'Customer scans your custom acrylic tabletop standee at the cash counter',
         'Selects products or services purchased from your live store catalog',
         'AI drafts 3 authentic 5-star options with 1-click copy directly to Google Maps'
       ],
@@ -127,81 +181,60 @@ export default function ServicesInfographicPage() {
       metricSub: 'Faster review velocity on Google Maps with 0 fake reviews'
     },
     {
-      id: 4,
+      id: 6,
       category: 'reviews',
-      name: '1-Click AI AutoReply',
+      name: 'AI Review AutoReply',
+      subtitle: '1-Second Automated Owner Responses on Google Maps',
       route: '/ai-google-review-autoreply',
       dashboardRoute: '/dashboard/reviews',
       icon: MessageSquare,
-      color: 'text-indigo-600',
-      bgColor: 'bg-indigo-50',
-      borderColor: 'border-indigo-200',
-      hoverBorder: 'hover:border-indigo-400',
-      gradient: 'from-indigo-500 to-violet-600',
+      color: 'text-violet-600',
+      bgColor: 'bg-violet-50',
+      borderColor: 'border-violet-200',
+      hoverBorder: 'hover:border-violet-400',
+      gradient: 'from-violet-500 to-purple-600',
       badge: '1-Sec Google Reply',
-      badgeStyle: 'bg-indigo-100 text-indigo-800 border-indigo-300',
+      badgeStyle: 'bg-violet-100 text-violet-800 border-violet-300',
       headline: 'Instant Professional Owner Replies on Google Maps',
-      benefit: 'Never leave a Google review unanswered. Gemini AI creates appreciative, context-aware responses with local SEO keywords and publishes in 1 click.',
+      benefit: 'Never leave a Google review unanswered. Gemini AI creates appreciative, context-aware responses with local SEO keywords and publishes in 1 click via official Google API.',
       howItWorks: [
         'New customer review appears instantly on your CustomerPilot dashboard',
         'AI analyzes sentiment and mentions specific products reviewed',
-        'Approve in 1 tap or set auto-pilot to publish via official Google API'
+        'Approve in 1 tap or set auto-pilot to publish via official Google Business API'
       ],
       metric: '100%',
       metricSub: 'Google Review response rate within 60 seconds'
     },
     {
-      id: 5,
-      category: 'reviews',
-      name: 'GBP Optimization (RankPilot AI™)',
-      route: '/rankpilot',
-      dashboardRoute: '/dashboard/gbp-status',
-      icon: Compass,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
-      hoverBorder: 'hover:border-blue-400',
-      gradient: 'from-blue-600 to-cyan-500',
-      badge: 'Top 3 Maps Guarantee',
-      badgeStyle: 'bg-blue-100 text-blue-800 border-blue-300',
-      headline: 'Rank #1 on Google Maps for High-Intent "Near Me" Searches',
-      benefit: 'Autonomous local SEO engine that optimizes your business categories, posts weekly updates, and pushes your store to Google Maps Top 3 ranking.',
-      howItWorks: [
-        'Multi-radius grid audit analyzes your competitors across 10 km',
-        'Auto-schedules 3 weekly photo posts with localized geo-tagged keywords',
-        '100% money-back SLA if your store does not reach top 3 positions'
-      ],
-      metric: '#1',
-      metricSub: 'Position on Google Maps for local high-intent buyers'
-    },
-    {
-      id: 6,
-      category: 'retention',
-      name: 'Dynamic QR Studio',
-      route: '/dashboard/DynamicQRStudio',
-      dashboardRoute: '/dashboard/DynamicQRStudio',
-      icon: QrCode,
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50',
-      borderColor: 'border-emerald-200',
-      hoverBorder: 'hover:border-emerald-400',
-      gradient: 'from-emerald-600 to-teal-500',
-      badge: 'Permanent Counter QR',
-      badgeStyle: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-      headline: 'Self-Hosted QR Code Engine with Instant Destination Updates',
-      benefit: 'Print once on your acrylic standees and counters. Change destination anytime to WhatsApp groups, festivals, or menus with zero re-printing costs.',
-      howItWorks: [
-        'Download high-resolution print-ready vector QR codes in PNG and SVG',
-        'Switch target URL anytime from your dashboard with 0-second redirect lag',
-        'Track daily, weekly, and monthly customer scan analytics in real time'
-      ],
-      metric: '₹0',
-      metricSub: 'Zero paid third-party API fees or renewal traps forever'
-    },
-    {
       id: 7,
       category: 'retention',
-      name: 'WhatsApp Group Booster & Lead Capture',
+      name: 'Digital Loyalty VIP Club',
+      subtitle: 'WhatsApp Stamp Cards & Automatic Win-Back Retention Engine',
+      route: '/whatsapp-digital-loyalty-card',
+      dashboardRoute: '/dashboard/rewards',
+      icon: Gift,
+      color: 'text-amber-600',
+      bgColor: 'bg-amber-50',
+      borderColor: 'border-amber-200',
+      hoverBorder: 'hover:border-amber-400',
+      gradient: 'from-amber-500 to-orange-500',
+      badge: 'App-Less Loyalty Stamps',
+      badgeStyle: 'bg-amber-100 text-amber-800 border-amber-300',
+      headline: 'Digital Stamp Cards & VIP Perks Right on WhatsApp',
+      benefit: 'Turn one-time walk-in buyers into lifelong regulars. Customers earn stamps on WhatsApp automatically — zero mobile apps to download. Automatic win-back alerts bring dormant buyers back.',
+      howItWorks: [
+        'Customer enters mobile number or scans counter QR at checkout',
+        'Digital stamp card arrives on their WhatsApp with live milestone progress',
+        'Automatic 30/60 day win-back cashback alerts bring dormant buyers back'
+      ],
+      metric: '+42%',
+      metricSub: 'Increase in repeat customer visits within 30 days'
+    },
+    {
+      id: 8,
+      category: 'retention',
+      name: 'WhatsApp Group (Auto JOIN & Lead Capture)',
+      subtitle: 'Capture Verified Customer Names & Phones Before Community Join',
       route: '/whatsapp-group-booster',
       dashboardRoute: '/dashboard/WAGroupBoosterPro',
       icon: Users,
@@ -213,38 +246,64 @@ export default function ServicesInfographicPage() {
       badge: 'VIP Community Builder',
       badgeStyle: 'bg-teal-100 text-teal-800 border-teal-300',
       headline: 'Capture Customer Names & Phone Numbers Before Group Join',
-      benefit: 'Turn counter scans into an owned VIP community. A fast mobile form collects customer name & WhatsApp number before redirecting to your WhatsApp group.',
+      benefit: 'Turn counter scans into an owned VIP community. A fast mobile form collects customer name & WhatsApp number before redirecting to your WhatsApp group, building your CRM automatically.',
       howItWorks: [
         'Customer scans QR code to claim an in-store offer or VIP community access',
         'Enters Name + Phone in a 3-second friction-free mobile form',
-        'Customer is automatically saved to your CRM with transactional consent'
+        'Customer is automatically saved to your CRM and joined to WhatsApp group'
       ],
       metric: '95%+',
       metricSub: 'Visitor-to-community join conversion rate'
     },
     {
-      id: 8,
-      category: 'pos',
-      name: 'Smart POS Billing & WhatsApp Invoicing Pro',
-      route: '/dashboard/billing',
-      dashboardRoute: '/dashboard/billing',
-      icon: Receipt,
-      color: 'text-indigo-600',
-      bgColor: 'bg-indigo-50',
-      borderColor: 'border-indigo-200',
-      hoverBorder: 'hover:border-indigo-400',
-      gradient: 'from-indigo-600 to-purple-600',
-      badge: '3-Sec Rapid POS',
-      badgeStyle: 'bg-indigo-100 text-indigo-800 border-indigo-300',
-      headline: 'Lightning-Fast Billing with Automated WhatsApp PDF Invoices',
-      benefit: 'Generate bills in 3 seconds from your mobile or tablet. Automatically delivers professional PDF bills to your customer on WhatsApp with zero paper waste.',
+      id: 9,
+      category: 'retention',
+      name: 'WhatsApp AI ChatBot',
+      subtitle: '24/7 Autonomous Customer Inquiries & Order Assistant',
+      route: '/whatsapp-chatbot',
+      dashboardRoute: '/dashboard/WAGroupBoosterFast',
+      icon: Bot,
+      color: 'text-sky-600',
+      bgColor: 'bg-sky-50',
+      borderColor: 'border-sky-200',
+      hoverBorder: 'hover:border-sky-400',
+      gradient: 'from-sky-500 to-blue-600',
+      badge: '24/7 Auto-Pilot',
+      badgeStyle: 'bg-sky-100 text-sky-800 border-sky-300',
+      headline: 'Never Miss a Customer Inquiry Even When Your Store is Closed',
+      benefit: 'Autonomous WhatsApp assistant that greets customers, answers pricing & timing questions, shares catalogs, and takes pre-orders around the clock.',
       howItWorks: [
-        'Tap items from your visual touch menu with auto-GST calculations',
-        '1-click print to Bluetooth thermal printer if physical receipt is needed',
-        'Digital PDF invoice sent to customer WhatsApp with review link attached'
+        'Instant response to incoming customer messages, greetings, and location queries',
+        'Shares interactive digital menus and current promotions automatically',
+        'Escalates special orders or high-value inquiries directly to staff or owner'
       ],
-      metric: '100%',
-      metricSub: 'Paper receipt cost saved with automated WhatsApp delivery'
+      metric: '< 2s',
+      metricSub: 'Average response time on WhatsApp 24 hours a day'
+    },
+    {
+      id: 10,
+      category: 'pos_menu',
+      name: 'Online Digital Menu (Live Catalog)',
+      subtitle: 'Interactive Mobile Catalog with 1-Tap WhatsApp Ordering',
+      route: '/menu',
+      dashboardRoute: '/dashboard/menu',
+      icon: Store,
+      color: 'text-rose-600',
+      bgColor: 'bg-rose-50',
+      borderColor: 'border-rose-200',
+      hoverBorder: 'hover:border-rose-400',
+      gradient: 'from-rose-500 to-pink-600',
+      badge: 'Zero App Menu',
+      badgeStyle: 'bg-rose-100 text-rose-800 border-rose-300',
+      headline: 'Showcase Your Full Product Lineup with Real Photos & Live Prices',
+      benefit: 'Mobile-optimized digital menu with category filtering, dietary tags (Pure Veg/Eggless), real-time pricing updates, and instant 1-tap WhatsApp cart checkout.',
+      howItWorks: [
+        'Customer scans tabletop QR to browse interactive visual menu',
+        'Filter by categories, specials, and bestselling signature items',
+        '1-Tap "Order on WhatsApp" sends itemized cart directly to cashier'
+      ],
+      metric: '3x',
+      metricSub: 'Higher average order value through visual upselling'
     }
   ]
 
@@ -323,7 +382,7 @@ export default function ServicesInfographicPage() {
     },
     {
       q: 'How does CustomerPilot replace 6 different tools?',
-      a: 'Most retail store owners waste money paying separate monthly fees for Birdeye/review tools (₹1,500), WhatsApp marketing APIs (₹2,500), dynamic QR generators (₹1,000), loyalty apps (₹1,800), and billing POS systems (₹1,200). CustomerPilot bundles all 8 engines into one unified dashboard starting at just ₹1,499/mo.'
+      a: 'Most retail store owners waste money paying separate monthly fees for Birdeye/review tools (₹1,500), WhatsApp marketing APIs (₹2,500), dynamic QR generators (₹1,000), loyalty apps (₹1,800), and billing POS systems (₹1,200). CustomerPilot bundles all 10 specialized services into one unified dashboard starting at just ₹1,499/mo.'
     },
     {
       q: 'How soon can my store go live with the acrylic standees?',
@@ -357,7 +416,7 @@ export default function ServicesInfographicPage() {
           </Link>
           <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
             <a href="#how-it-works" className="hover:text-emerald-600 transition">How It Works</a>
-            <a href="#modules" className="hover:text-emerald-600 transition">8 Core Modules</a>
+            <a href="#modules" className="hover:text-emerald-600 transition">10 Core Services</a>
             <a href="#roi-calculator" className="hover:text-emerald-600 transition">ROI Calculator</a>
             <a href="#comparison" className="hover:text-emerald-600 transition">Why Us vs 6 Tools</a>
             <a href="#faqs" className="hover:text-emerald-600 transition">FAQs</a>
@@ -741,18 +800,18 @@ export default function ServicesInfographicPage() {
         </div>
       </section>
 
-      {/* ─── SECTION 3: THE 8 CORE MODULES GRID (STRICT STANDARDIZED NAMES) ─── */}
+      {/* ─── SECTION 3: THE 10 COMPLETE SERVICES GRID ─── */}
       <section id="modules" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-blue-700 bg-blue-100/80 px-3.5 py-1 rounded-full border border-blue-300/80">
-            Platform Capabilities
+          <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-700 bg-emerald-100/80 px-3.5 py-1 rounded-full border border-emerald-300/80">
+            Complete Suite · 10 Specialized Services
           </span>
           <h2 className="text-3xl sm:text-5xl font-black text-slate-900 mt-4 tracking-tight">
-            The 8 Core Modules of CustomerPilot
+            The 10 Supercharged Services of CustomerPilot
           </h2>
           <p className="text-base text-slate-600 mt-3">
-            Every module works together seamlessly under one single dashboard, or can be used independently as your store expands.
+            From high-converting website sales machines to guaranteed Top 3 Google Maps ranking and WhatsApp loyalty automation — everything under one roof.
           </p>
 
           {/* Category Filter Pills */}
@@ -765,7 +824,17 @@ export default function ServicesInfographicPage() {
                   : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
               }`}
             >
-              All 8 Modules
+              All 10 Services
+            </button>
+            <button
+              onClick={() => setActiveCategory('web_seo')}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeCategory === 'web_seo'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              Websites &amp; Google SEO (2)
             </button>
             <button
               onClick={() => setActiveCategory('reviews')}
@@ -775,7 +844,7 @@ export default function ServicesInfographicPage() {
                   : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
               }`}
             >
-              Google Reviews & Local SEO (3)
+              AI Reviews &amp; AutoReply (2)
             </button>
             <button
               onClick={() => setActiveCategory('retention')}
@@ -785,17 +854,17 @@ export default function ServicesInfographicPage() {
                   : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
               }`}
             >
-              WhatsApp Loyalty & CRM (4)
+              WhatsApp Loyalty, ChatBot &amp; Community (3)
             </button>
             <button
-              onClick={() => setActiveCategory('pos')}
+              onClick={() => setActiveCategory('pos_menu')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                activeCategory === 'pos'
+                activeCategory === 'pos_menu'
                   ? 'bg-indigo-600 text-white shadow-md'
                   : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
               }`}
             >
-              Smart POS Billing (1)
+              POS Billing, Digital Card &amp; Menu (3)
             </button>
           </div>
         </div>
@@ -836,6 +905,11 @@ export default function ServicesInfographicPage() {
                   <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight group-hover:text-emerald-700 transition-colors">
                     {module.name}
                   </h3>
+                  {module.subtitle && (
+                    <p className="text-xs font-bold text-emerald-700 mt-1">
+                      {module.subtitle}
+                    </p>
+                  )}
 
                   {/* Headline & Benefit in Plain English */}
                   <p className="text-sm font-bold text-slate-800 mt-2">
