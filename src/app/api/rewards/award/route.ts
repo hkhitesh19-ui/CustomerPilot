@@ -18,7 +18,7 @@ const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 
 const SEND_TIMEOUT_MS = 6000
 
-async function sendWhatsAppNotification(merchantId: string, toPhone: string, text: string, templateKey: string = "STAMP_AWARDED") {
+export async function sendWhatsAppNotification(merchantId: string, toPhone: string, text: string, templateKey: string = "STAMP_AWARDED") {
   let ok = false
   let errorMsg: string | null = null
   let metaId: string | undefined
