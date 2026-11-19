@@ -4,6 +4,31 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [19 Nov 2026] Issue: Evolution Security Hardening (Phases 3-6) — Webhook Secret Guard, Helper Scripts Centralization, Key Rotation & Watchdog v4 Anti-Conflict Guard
+- **Symptom**:
+  1. Plaintext API key (`Evo_Api_Key_Secure_998877!`) was present in helper scripts and reported in transcripts, posing a credential compromise risk.
+  2. Scripts across `scripts/` maintained duplicated hardcoded keys and individual SSH/HTTP connections instead of importing a central authenticated client.
+  3. Watchdog v3 attempted automatic reconnects on closed instances without inspecting disconnection reasons, risking infinite 440 conflict loops when a merchant uses WhatsApp Web.
+  4. Webhook secret verification needed physical proof on live VPS ensuring unauthenticated webhook calls are rejected.
+- **Root Cause**:
+  1. Lack of a centralized credential resolver for standalone automation and test scripts.
+  2. Watchdog v3 lacked inspection of `disconnectionReasonCode` (440 session conflict) and `disconnectionObject`, blindly attempting reconnection during socket replacement events.
+  3. Legacy hardcoded API keys left in historical debug scripts.
+- **Resolution**:
+  1. **Phase 3 (Webhook Secret Verification)**: Physically verified on VPS that `POST /api/webhook/evolution` returns `HTTP 401 Unauthorized` without secret / with invalid secret, and `HTTP 200 OK` with valid `?secret=...`.
+  2. **Phase 4 (Centralized Helper Scripts)**: Built `scripts/lib/evo_client.py` and `scripts/lib/__init__.py`. Replaced all hardcoded keys across 29 scripts with zero remaining matches (`grep` returned 0).
+  3. **Phase 5 (Key Rotation Ceremony)**: Rotated Evolution API key to a 64-character cryptographic hex token across `/opt/evolution-api/docker-compose.yml`, `/var/www/CustomerPilot/.env`, `/opt/cp-watchdog/.env`, and local `.env.production`. Recreated container (`docker compose up -d`) and verified:
+     - Live curl with NEW key returns `HTTP 200 OK` (`state: "open"`).
+     - Live curl with OLD key returns `HTTP 401 Unauthorized`.
+  4. **Phase 6 (Watchdog v4 Anti-Conflict Guard)**: Implemented session replacement trap in `/opt/cp-watchdog/watchdog.js`:
+     - Checks `disconnectionCode === 440 || disconnectionCode === 401` or `conflict`.
+     - Automatically locks out auto-reconnect (`conflictLocked: true`) to avoid socket collision with merchant phone/web.
+     - Enforces 1-hour cooldown (`3600000ms`) between restarts.
+     - Simulated with non-live test instance: verified 0 restart calls and 0 connect calls. Deployed to VPS and verified PM2 reload.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [19 Nov 2026] Issue: Evolution Webhook Schema Mismatch (merchant.phone vs whatsappPhone), Stamp Engine VIP Bonus Source & Reviews Dashboard Type Alignments
 - **Symptom**:
   1. Evolution Webhook GBP Post approval/edit handler checked `(merchant.whatsappPhone || merchant.phone || "")`. Because `Merchant` model in Prisma has `whatsappPhone` (and no `phone` field), in strict type systems or runtime evaluation `merchant.phone` resulted in `undefined` access or type errors.

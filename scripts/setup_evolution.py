@@ -1,3 +1,4 @@
+from scripts.lib.evo_client import get_evo_api_key
 import os
 """Setup Evolution API PostgreSQL database and deploy via Docker Compose on VPS."""
 import paramiko
@@ -53,7 +54,7 @@ run("""PGPASSWORD='EvoDb_Secure_2026!' psql -h 127.0.0.1 -U evolution -d evoluti
     "Test evolution DB connection")
 
 # Step 4: Write docker-compose.yml for Evolution API
-compose_content = """services:
+compose_content = f"""services:
   evolution-api:
     image: evoapicloud/evolution-api:latest
     container_name: evolution-api
@@ -63,7 +64,7 @@ compose_content = """services:
     environment:
       - SERVER_URL=http://187.127.170.36:8080
       - AUTHENTICATION_TYPE=apikey
-      - AUTHENTICATION_API_KEY=Evo_Api_Key_Secure_998877!
+      - AUTHENTICATION_API_KEY={get_evo_api_key()}
       - AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES=true
       - DATABASE_ENABLED=true
       - DATABASE_PROVIDER=postgresql
