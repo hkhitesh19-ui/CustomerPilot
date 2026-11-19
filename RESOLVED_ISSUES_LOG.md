@@ -7481,3 +7481,23 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   3. Optimized `src/hooks/use-dashboard-state.ts` by reducing `refetchInterval` from 30s to 10s and enabling `refetchOnWindowFocus: true` for immediate fresh updates when the merchant switches to the tab.
   4. Verified via headless Playwright test that `/dashboard/queue` renders `Customer Pilot (+91 9033304707)` in the live queue (`1 Customers Waiting`).
 - **Status**: ✅ Resolved, Tested with Adversarial Red-Team Gates, and Verified via Playwright.
+
+---
+## [19 Nov 2026] Issue: WhatsApp Outbound Fallback 404 Masking, Blocking Latency, 24h Review Dedup & Watchdog v3
+- **Symptom**:
+  1. Cashier stamp approval suffered delays up to ~60s if the WhatsApp socket was closed or degraded.
+  2. Failed outbound attempts returned misleading Ą Not Found: The 'CustomerPilot_Main' instance does not exist\ instead of the actual socket state.
+  3. Google Review scheduler had lifetime deduplication: any customer with a stuck queued/scheduled message was permanently blocked from receiving review invitations.
+  4. Watchdog restart failed with 404 because Evolution API v2 uses \POST /instance/restart/:name\, not \PUT\.
+- **Root Cause**:
+  1. \src/app/api/rewards/award/route.ts\ had a hardcoded \defaultInstance = 'CustomerPilot_Main'\ fallback. When Cake Connection's instance call timed out, it called \CustomerPilot_Main\ which does not exist in Evolution API, generating a false 404.
+  2. \sendWhatsAppNotification\ was awaited inline on the HTTP response thread instead of being dispatched asynchronously.
+  3. \src/lib/review-scheduler.ts\ deduplication queried \WhatsAppMessage\ without filtering out stale queued/scheduled messages older than 24h.
+  4. Evolution v2 instance restart method was HTTP POST, while early watchdog scripts used PUT.
+- **Resolution**:
+  1. Hardened \src/app/api/rewards/award/route.ts\ (frozen core file): removed all fallback instance chains, added 6000ms \AbortSignal.timeout\, explicitly logged primary instance errors, and wrapped all 4 call sites with \oid sendWhatsAppNotification(...)\ for non-blocking execution (<150ms cashier response).
+  2. Hardened \src/lib/review-scheduler.ts\ to only consider \scheduled\/\queued\ messages created within the last 24 hours (\	wentyFourHoursAgo\).
+  3. Deployed Watchdog v3 with \POST /instance/restart/:name\ and alert/reconnect handling for \close\ state.
+  4. Re-baselined Gate 7 core integrity checksums (\guard/core.sha256\) and passed all 7 Master Adversarial Red-Team Gates.
+  5. Pushed commits e3ac4\ and \d34ffdc\ to GitHub \deploy/pricing-update-20261102\, updated \Git Commit on VPS Live.txt\, and verified live Next.js 16 standalone build and PM2 services on VPS (187.127.170.36).
+- **Status**: ✅ Resolved, Tested, Pushed to GitHub, and Verified Live on VPS (187.127.170.36).
