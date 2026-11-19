@@ -18,8 +18,8 @@ vi.mock('@/lib/db', () => ({
   },
 }))
 
-// Import the REAL production function directly from the route
-import { sendWhatsAppNotification } from '@/app/api/rewards/award/route'
+// Import the REAL production function directly from whatsapp-notify lib
+import { sendWhatsAppNotification } from '@/lib/whatsapp-notify'
 import { db } from '@/lib/db'
 
 describe('Award Notification Failure Path Regression (True Direct Import Golden Test)', () => {

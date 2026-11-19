@@ -1,4 +1,4 @@
 f7326ff1507efc2de98e40b374b530402fe57b9bc75ae5fe30f5e847d62436fc  src/lib/queue-engine.ts
 33e500216b9e84b6fa423de21f50f773873685fc4ba3f81743ffd388026a4346  src/components/dashboard/RewardModal.tsx
 6658cf67ae3987e8b3b0b1653e674d7055c703182659d262ad7f0e25e9b94ca4  src/app/api/webhook/evolution/route.ts
-becddada21323de80c1d6353f8cda5c93ae35be6f505dbda5051fd00881e8901  src/app/api/rewards/award/route.ts
+eccd029b12a9bf3e1a1f92d65f42de3cede267ba80ba98bb32686a31c9676413  src/app/api/rewards/award/route.ts
