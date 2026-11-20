@@ -22,11 +22,31 @@ export async function POST(req: Request) {
 
     const cleanEmail = email.trim().toLowerCase();
 
-    // 1. Find user by email
-    const user = await db.user.findUnique({ where: { email: cleanEmail } });
+    // 1. Find user by email or linked merchant phone
+    let user = await db.user.findUnique({ where: { email: cleanEmail } });
+    if (!user) {
+      const cleanPhone = email.replace(/[^0-9]/g, "");
+      if (cleanPhone.length >= 10) {
+        const last10 = cleanPhone.slice(-10);
+        const matchingMerchant = await db.merchant.findFirst({
+          where: {
+            OR: [
+              { whatsappPhone: { contains: last10 } },
+              { whatsappPhone: cleanPhone }
+            ]
+          }
+        });
+        if (matchingMerchant?.userId) {
+          user = await db.user.findUnique({ where: { id: matchingMerchant.userId } });
+        } else if (matchingMerchant?.email) {
+          user = await db.user.findUnique({ where: { email: matchingMerchant.email } });
+        }
+      }
+    }
+
     if (!user) {
       return NextResponse.json({ 
-        error: `No account found with email '${cleanEmail}'. Please check your email or click 'Start FREE Trial' to sign up.` 
+        error: `No account found with '${email}'. Please check your email/mobile or click 'Start FREE Trial' to sign up.` 
       }, { status: 401 });
     }
 
