@@ -97,8 +97,20 @@ export class SimplePdfWriter {
     this.stream.push(`BT /${font} ${size} Tf ${x} ${y} Td (${escaped}) Tj ET`)
   }
 
-  addLine(x1: number, y1: number, x2: number, y2: number, lineWidth = 0.5) {
-    this.stream.push(`${lineWidth} w ${x1} ${y1} m ${x2} ${y2} l S`)
+  addCenteredText(font: "F1" | "F2", size: number, y: number, text: string, pageWidth = 595.28) {
+    const str = String(text || "")
+    const charWidth = (font === "F2" ? 0.54 : 0.48) * size
+    const estWidth = str.length * charWidth
+    const x = Math.max(40, (pageWidth - estWidth) / 2)
+    this.addText(font, size, Math.round(x), y, str)
+  }
+
+  addLine(x1: number, y1: number, x2: number, y2: number, lineWidth = 0.5, dashed = false) {
+    if (dashed) {
+      this.stream.push(`[3 2] 0 d\n${lineWidth} w ${x1} ${y1} m ${x2} ${y2} l S\n[] 0 d`)
+    } else {
+      this.stream.push(`${lineWidth} w ${x1} ${y1} m ${x2} ${y2} l S`)
+    }
   }
 
   addRect(x: number, y: number, w: number, h: number, fill = false, stroke = true, r = 0, g = 0, b = 0) {
@@ -142,50 +154,177 @@ export class SimplePdfWriter {
   }
 }
 
-export function generateInvoicePdf(data: InvoicePdfData): Buffer {
-  const pdf = new SimplePdfWriter()
+function renderNonGstSalesReceiptPdf(pdf: SimplePdfWriter, data: InvoicePdfData) {
+  // Receipt Card Container
+  pdf.addRect(55, 75, 485, 705, true, true, 0.99, 0.99, 0.99)
+  pdf.addRect(55, 75, 485, 705, false, true, 0.85, 0.85, 0.85)
 
-  const isNonGst =
-    data.documentType === "NON_GST_RECEIPT" ||
-    data.documentType === "NON_GST_SALES_RECEIPT" ||
-    (!data.gstin && data.documentType !== "GST_TAX_INVOICE")
+  let y = 745
 
-  const isBillOfSupply = data.documentType === "BILL_OF_SUPPLY"
+  // 1. Title
+  pdf.addCenteredText("F2", 16, y, "SALES RECEIPT")
+  y -= 20
 
-  // Document Title
-  let docTitle = "TAX INVOICE"
-  if (isBillOfSupply) {
-    docTitle = "BILL OF SUPPLY"
-  } else if (isNonGst) {
-    docTitle = "SALES RECEIPT"
+  // Merchant Business Name
+  const cleanMerchantName = data.merchantName.includes("Cake Connection")
+    ? "CAKE CONNECTION"
+    : data.merchantName.toUpperCase()
+  pdf.addCenteredText("F2", 14, y, cleanMerchantName)
+  y -= 16
+
+  // Merchant Address
+  const addressText = data.merchantAddress || (data.merchantName.includes("Cake")
+    ? "Ground Floor, Alkapuri Arcade, Near Railway Station, Alkapuri, Vadodara, Gujarat 390007"
+    : "Shop No., Street, Area, City, State, PIN")
+  pdf.addCenteredText("F1", 8.5, y, addressText)
+  y -= 14
+
+  // Contact line & FSSAI
+  const phone = data.merchantPhone ? `Mobile: ${data.merchantPhone}` : (data.merchantName.includes("Cake") ? "Mobile: +91 7203824012" : "Mobile: +91 XXXXX XXXXX")
+  const fssai = data.fssai ? `FSSAI: ${data.fssai}` : (data.merchantName.includes("Cake") ? "FSSAI: 20722026001289" : "FSSAI: Available on Request")
+  pdf.addCenteredText("F1", 8.5, y, `${phone} | ${fssai}`)
+  y -= 16
+
+  // Dashed divider
+  pdf.addLine(75, y, 520, y, 0.6, true)
+  y -= 16
+
+  // 2. Receipt metadata
+  pdf.addText("F2", 9, 85, y, "Receipt No.:")
+  pdf.addText("F1", 9, 150, y, data.orderNo || "RCP-000125")
+  pdf.addText("F2", 9, 340, y, "Date:")
+  pdf.addText("F1", 9, 410, y, data.date)
+  y -= 14
+
+  pdf.addText("F2", 9, 85, y, "Payment Mode:")
+  pdf.addText("F1", 9, 160, y, (data.paymentMethod || "CASH").toUpperCase())
+  pdf.addText("F2", 9, 340, y, "Payment Status:")
+  pdf.addText("F1", 9, 420, y, "PAID")
+  y -= 14
+
+  // Dashed divider
+  pdf.addLine(75, y, 520, y, 0.6, true)
+  y -= 15
+
+  // 3. Customer Details
+  pdf.addText("F2", 9.5, 85, y, "CUSTOMER DETAILS")
+  y -= 14
+  pdf.addText("F2", 8.5, 85, y, "Customer Name:")
+  pdf.addText("F1", 8.5, 165, y, data.customerName || "Rahul Sharma")
+  pdf.addText("F2", 8.5, 340, y, "Mobile:")
+  pdf.addText("F1", 8.5, 385, y, data.customerPhone || "+91 9033304707")
+  y -= 14
+
+  // Dashed divider
+  pdf.addLine(75, y, 520, y, 0.6, true)
+  y -= 15
+
+  // 4. Item Details Header
+  pdf.addText("F2", 9.5, 85, y, "ITEM DETAILS")
+  y -= 10
+  pdf.addLine(75, y, 520, y, 0.6, true)
+  y -= 14
+
+  // Table Columns
+  pdf.addText("F2", 9, 85, y, "Item")
+  pdf.addText("F2", 9, 310, y, "Qty")
+  pdf.addText("F2", 9, 370, y, "Rate")
+  pdf.addText("F2", 9, 450, y, "Amount")
+  y -= 14
+
+  // Items rows
+  const items = data.items || []
+  items.forEach((item) => {
+    const cleanName = item.name.length > 32 ? item.name.slice(0, 30) + ".." : item.name
+    pdf.addText("F1", 9, 85, y, cleanName)
+    pdf.addText("F1", 9, 315, y, String(item.quantity))
+    pdf.addText("F1", 9, 370, y, `Rs. ${Number(item.unitPrice).toFixed(2)}`)
+    pdf.addText("F1", 9, 450, y, `Rs. ${Number(item.totalPrice).toFixed(2)}`)
+    y -= 15
+  })
+
+  // Calculation lines
+  y -= 4
+  pdf.addLine(300, y, 515, y, 0.5, true)
+  y -= 14
+
+  pdf.addText("F1", 9, 310, y, "Subtotal")
+  pdf.addText("F1", 9, 450, y, `Rs. ${Number(data.subtotal).toFixed(2)}`)
+  y -= 14
+
+  if (Number(data.discount || 0) > 0) {
+    pdf.addText("F1", 9, 310, y, "Discount")
+    pdf.addText("F1", 9, 450, y, `-Rs. ${Number(data.discount).toFixed(2)}`)
+    y -= 14
   }
+
+  pdf.addLine(300, y, 515, y, 0.5, true)
+  y -= 14
+
+  // NET AMOUNT
+  pdf.addRect(295, y - 4, 225, 20, true, false, 0.94, 0.97, 0.95)
+  pdf.addText("F2", 10.5, 305, y, "NET AMOUNT")
+  pdf.addText("F2", 10.5, 445, y, `Rs. ${Number(data.grandTotal).toFixed(2)}`)
+  y -= 8
+  pdf.addLine(300, y, 515, y, 0.8, true)
+  y -= 18
+
+  // 5. Amount in Words
+  pdf.addText("F2", 9, 85, y, "Amount in Words:")
+  y -= 13
+  const words = data.amountInWords || numberToWordsINR(data.grandTotal)
+  pdf.addText("F1", 8.5, 85, y, words)
+  y -= 18
+
+  // 6. Payment Details (Cash Workflow)
+  pdf.addText("F2", 9.5, 85, y, "PAYMENT DETAILS (Cash Workflow)")
+  y -= 14
+
+  const recv = Number(data.amountReceived || data.grandTotal)
+  const chg = Number(data.changeReturned || 0)
+  const bal = Number(data.balanceDue || 0)
+
+  pdf.addText("F1", 8.5, 85, y, `Payment Method: ${data.paymentMethod || "Cash"}`)
+  pdf.addText("F1", 8.5, 270, y, `Amount Received: Rs. ${recv.toFixed(2)}`)
+  y -= 13
+  pdf.addText("F1", 8.5, 85, y, `Change Returned: Rs. ${chg.toFixed(2)}`)
+  pdf.addText("F1", 8.5, 270, y, `Balance Due:     Rs. ${bal.toFixed(2)}`)
+  y -= 16
+
+  // Dashed divider
+  pdf.addLine(75, y, 520, y, 0.6, true)
+  y -= 18
+
+  // 7. Footer
+  pdf.addCenteredText("F2", 10, y, "Thank You for Your Business!")
+  y -= 14
+  pdf.addCenteredText("F1", 8.5, y, "Computer generated sales receipt")
+  y -= 12
+  pdf.addCenteredText("F1", 7.5, y, "Powered by CustomerPilot POS & Smart WhatsApp Invoicing | customerpilot.in")
+}
+
+function renderGstTaxInvoicePdf(pdf: SimplePdfWriter, data: InvoicePdfData) {
+  const isBillOfSupply = data.documentType === "BILL_OF_SUPPLY"
+  const docTitle = isBillOfSupply ? "BILL OF SUPPLY" : "TAX INVOICE"
 
   // 1. Header Banner Box
   pdf.addRect(40, 735, 515, 75, true, true, 0.97, 0.98, 0.99)
 
-  // Store Brand Title
-  const cleanMerchantName = data.merchantName.includes("Cake Connection")
-    ? "CAKE CONNECTION"
-    : data.merchantName.toUpperCase()
+  const cleanMerchantName = data.merchantName.toUpperCase()
   pdf.addText("F2", 17, 55, 786, cleanMerchantName)
 
-  // Address
   const addressText = data.merchantAddress || "Ground Floor, Alkapuri Arcade, Near Railway Station, Alkapuri, Vadodara, Gujarat 390007"
   pdf.addText("F1", 8.5, 55, 772, addressText)
 
-  // Contact line
   const contactParts: string[] = []
   if (data.merchantPhone) contactParts.push(`Mobile: ${data.merchantPhone}`)
   if (data.fssai) contactParts.push(`FSSAI: ${data.fssai}`)
-  else if (data.merchantName.includes("Cake")) contactParts.push("FSSAI: 20722026001289")
   if (contactParts.length > 0) {
     pdf.addText("F1", 8.5, 55, 758, contactParts.join(" | "))
   }
 
-  if (!isNonGst && data.gstin) {
+  if (data.gstin) {
     pdf.addText("F2", 8.5, 55, 744, `GSTIN: ${data.gstin}`)
-  } else if (isNonGst) {
-    pdf.addText("F2", 8, 55, 744, "100% PURE VEG & FRESH EGGLESS CAKES | ZERO ARTIFICIAL PRESERVATIVES")
   }
 
   // Document Type & Number Pill on right
@@ -199,14 +338,13 @@ export function generateInvoicePdf(data: InvoicePdfData): Buffer {
   pdf.addLine(40, 725, 555, 725, 0.5)
   pdf.addLine(40, 675, 555, 675, 0.5)
 
-  const customerHeader = isNonGst ? "CUSTOMER DETAILS:" : "BILLED TO:"
-  pdf.addText("F2", 9, 55, 708, customerHeader)
+  pdf.addText("F2", 9, 55, 708, "BILLED TO:")
   pdf.addText("F1", 9, 160, 708, `${data.customerName || "Walk-in Guest"} (${data.customerPhone})`)
 
   pdf.addText("F2", 9, 360, 708, "PAYMENT MODE:")
   pdf.addText("F2", 9, 450, 708, `${data.paymentMethod || "CASH"} (PAID)`)
 
-  if (!isNonGst && data.gstin) {
+  if (data.gstin) {
     pdf.addText("F2", 9, 55, 688, "CUSTOMER GSTIN:")
     pdf.addText("F1", 9, 160, 688, "N/A (Consumer / B2C)")
   } else {
@@ -249,8 +387,7 @@ export function generateInvoicePdf(data: InvoicePdfData): Buffer {
     currentY -= 15
   }
 
-  if (!isNonGst && !isBillOfSupply) {
-    // Regular GST Tax Breakdown
+  if (!isBillOfSupply) {
     pdf.addText("F1", 9, 360, currentY, "Taxable Value:")
     pdf.addText("F1", 9, 490, currentY, `Rs. ${Number(data.taxableAmount).toFixed(2)}`)
     currentY -= 15
@@ -272,47 +409,46 @@ export function generateInvoicePdf(data: InvoicePdfData): Buffer {
     }
   }
 
-  // Grand Total / Net Amount Box
+  // Grand Total Box
   pdf.addLine(340, currentY + 4, 555, currentY + 4, 0.8)
   pdf.addRect(340, currentY - 20, 215, 24, true, false, 0.93, 0.97, 0.94)
-  const totalLabel = isNonGst ? "NET AMOUNT:" : "GRAND TOTAL:"
-  pdf.addText("F2", 12, 350, currentY - 8, totalLabel)
+  pdf.addText("F2", 12, 350, currentY - 8, "GRAND TOTAL:")
   pdf.addText("F2", 12, 475, currentY - 8, `Rs. ${Number(data.grandTotal).toFixed(2)}`)
   pdf.addLine(340, currentY - 22, 555, currentY - 22, 1.2)
 
-  // 5. Amount in Words (Section 9 & 10 requirement)
+  // 5. Amount in Words
   currentY -= 36
   const wordsText = data.amountInWords || numberToWordsINR(data.grandTotal)
   pdf.addText("F2", 8.5, 55, currentY, "Amount in Words:")
   pdf.addText("F1", 8.5, 140, currentY, wordsText)
 
-  // 6. Payment Details Breakdown (Section 10 Cash Workflow)
+  // 6. Payment Details
   currentY -= 20
   pdf.addLine(40, currentY + 12, 555, currentY + 12, 0.4)
   pdf.addText("F2", 8.5, 55, currentY, "PAYMENT DETAILS:")
+  const upiRef = data.upiId ? `VPA: ${data.upiId}` : "UPI Counter QR"
+  pdf.addText("F1", 8.5, 150, currentY, `Method: ${data.paymentMethod || "CASH"} | ${upiRef} | Payment Status: Confirmed Paid`)
 
-  if (isNonGst && (data.paymentMethod || "").toUpperCase() === "CASH") {
-    const recv = Number(data.amountReceived || data.grandTotal)
-    const chg = Number(data.changeReturned || 0)
-    const bal = Number(data.balanceDue || 0)
-    pdf.addText("F1", 8.5, 150, currentY, `Payment Method: Cash | Received: Rs. ${recv.toFixed(2)} | Change Returned: Rs. ${chg.toFixed(2)} | Balance Due: Rs. ${bal.toFixed(2)}`)
-  } else {
-    const upiRef = data.upiId ? `VPA: ${data.upiId}` : "UPI Counter QR"
-    pdf.addText("F1", 8.5, 150, currentY, `Method: ${data.paymentMethod || "CASH"} | ${upiRef} | Payment Status: Confirmed Paid`)
-  }
-
-  // 7. Footer Notice
+  // 7. Footer
   const footerY = Math.max(currentY - 50, 90)
   pdf.addLine(40, footerY + 22, 555, footerY + 22, 0.5)
+  pdf.addText("F2", 9, 55, footerY + 10, "Thank You for Your Business!")
+  pdf.addText("F1", 8, 55, footerY - 2, "Computer generated tax invoice. Subject to local jurisdiction.")
+  pdf.addText("F2", 8, 55, footerY - 14, "Official CustomerPilot Digital GST Billing | customerpilot.in")
+}
+
+export function generateInvoicePdf(data: InvoicePdfData): Buffer {
+  const pdf = new SimplePdfWriter()
+
+  const isNonGst =
+    data.documentType === "NON_GST_RECEIPT" ||
+    data.documentType === "NON_GST_SALES_RECEIPT" ||
+    (!data.gstin && data.documentType !== "GST_TAX_INVOICE")
 
   if (isNonGst) {
-    pdf.addText("F2", 9, 55, footerY + 10, "Thank You for Your Business!")
-    pdf.addText("F1", 8, 55, footerY - 2, "Computer generated sales receipt. No signature required.")
-    pdf.addText("F2", 8, 55, footerY - 14, "Powered by CustomerPilot POS & Smart WhatsApp Invoicing | customerpilot.in")
+    renderNonGstSalesReceiptPdf(pdf, data)
   } else {
-    pdf.addText("F2", 9, 55, footerY + 10, "Thank You for Your Business!")
-    pdf.addText("F1", 8, 55, footerY - 2, "Computer generated tax invoice. Subject to local jurisdiction.")
-    pdf.addText("F2", 8, 55, footerY - 14, "Official CustomerPilot Digital GST Billing | customerpilot.in")
+    renderGstTaxInvoicePdf(pdf, data)
   }
 
   return pdf.build()

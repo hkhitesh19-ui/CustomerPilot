@@ -201,7 +201,8 @@ export async function POST(req: NextRequest) {
         grandTotal,
         merchantName: merchant.name,
         invoiceId: invoice.id,
-        customerId
+        customerId,
+        isNonGst: gstRate === 0
       })
       waSent = waResult.success
     }

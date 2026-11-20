@@ -76,7 +76,8 @@ export async function POST(
       grandTotal: invoice.grandTotal,
       merchantName: invoice.merchant.name,
       invoiceId: invoice.id,
-      customerId: invoice.customerId
+      customerId: invoice.customerId,
+      isNonGst
     })
 
     return NextResponse.json({

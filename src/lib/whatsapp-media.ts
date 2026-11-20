@@ -13,6 +13,7 @@ export interface SendInvoicePdfParams {
   merchantName: string
   invoiceId: string
   customerId?: string | null
+  isNonGst?: boolean
 }
 
 /**
@@ -49,10 +50,16 @@ export async function sendInvoicePdfViaWhatsApp(
       cleanPhone = `91${cleanPhone}`
     }
 
-    const caption = `🧾 *Official Tax Invoice from ${params.merchantName}*\n\n` +
-      `• *Invoice No:* ${params.invoiceNumber}\n` +
-      `• *Grand Total:* ₹${params.grandTotal.toFixed(2)}\n\n` +
-      `Thank you for shopping with us! Your digital invoice PDF is attached above. 🙏`
+    const isNonGst = params.isNonGst ?? false
+    const docLabel = isNonGst ? "Sales Receipt" : "Official Tax Invoice"
+    const numberLabel = isNonGst ? "Receipt No" : "Invoice No"
+    const totalLabel = isNonGst ? "Net Amount" : "Grand Total"
+    const thankYouDoc = isNonGst ? "digital sales receipt" : "digital invoice"
+
+    const caption = `🧾 *${docLabel} from ${params.merchantName}*\n\n` +
+      `• *${numberLabel}:* ${params.invoiceNumber}\n` +
+      `• *${totalLabel}:* ₹${params.grandTotal.toFixed(2)}\n\n` +
+      `Thank you for shopping with us! Your ${thankYouDoc} PDF is attached above. 🙏`
 
     const payload = {
       number: cleanPhone,
@@ -60,7 +67,7 @@ export async function sendInvoicePdfViaWhatsApp(
       mimetype: "application/pdf",
       caption: caption,
       media: base64Pdf,
-      fileName: `Invoice_${params.invoiceNumber}.pdf`
+      fileName: isNonGst ? `SalesReceipt_${params.invoiceNumber}.pdf` : `Invoice_${params.invoiceNumber}.pdf`
     }
 
     const res = await fetch(`${EVOLUTION_API_URL}/message/sendMedia/${instanceName}`, {
