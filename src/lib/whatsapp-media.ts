@@ -44,7 +44,10 @@ export async function sendInvoicePdfViaWhatsApp(
 
     const instanceName = resolveWhatsappInstanceName(merchant)
     const base64Pdf = params.pdfBuffer.toString("base64")
-    const cleanPhone = params.toPhone.replace(/\D/g, "")
+    let cleanPhone = params.toPhone.replace(/\D/g, "")
+    if (cleanPhone.length === 10) {
+      cleanPhone = `91${cleanPhone}`
+    }
 
     const caption = `🧾 *Official Tax Invoice from ${params.merchantName}*\n\n` +
       `• *Invoice No:* ${params.invoiceNumber}\n` +
