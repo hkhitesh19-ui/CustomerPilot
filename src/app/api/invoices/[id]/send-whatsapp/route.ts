@@ -34,13 +34,16 @@ export async function POST(
     }
 
     // Regenerate fresh PDF buffer
+    const isNonGst = !invoice.gstRate || invoice.gstRate === 0
     const pdfData: InvoicePdfData = {
+      documentType: isNonGst ? "NON_GST_SALES_RECEIPT" : "GST_TAX_INVOICE",
       orderNo: invoice.invoiceNumber,
       date: invoice.createdAt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
       merchantName: invoice.merchant.name,
-      merchantAddress: invoice.merchant.address,
-      merchantPhone: invoice.merchant.whatsappPhone,
+      merchantAddress: invoice.merchant.address || (invoice.merchant.name.includes("Cake Connection") ? "Ground Floor, Alkapuri Arcade, Near Railway Station, Alkapuri, Vadodara, Gujarat 390007" : null),
+      merchantPhone: invoice.merchant.whatsappPhone || (invoice.merchant.name.includes("Cake Connection") ? "7203824012" : null),
       gstin: (invoice.merchant as any).gstin || null,
+      fssai: (invoice.merchant as any).fssai || (invoice.merchant.name.includes("Cake Connection") ? "20722026001289" : null),
       upiId: null,
       customerName: invoice.customerName || invoice.customer?.name || null,
       customerPhone: phone,

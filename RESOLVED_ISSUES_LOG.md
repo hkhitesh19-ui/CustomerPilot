@@ -7594,3 +7594,16 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   4. Re-baselined Gate 7 core integrity checksums (\guard/core.sha256\) and passed all 7 Master Adversarial Red-Team Gates.
   5. Pushed commits e3ac4\ and \d34ffdc\ to GitHub \deploy/pricing-update-20261102\, updated \Git Commit on VPS Live.txt\, and verified live Next.js 16 standalone build and PM2 services on VPS (187.127.170.36).
 - **Status**: ✅ Resolved, Tested, Pushed to GitHub, and Verified Live on VPS (187.127.170.36).
+
+---
+## [20 Nov 2026] Issue: Non-GST Sales Receipt Layout Separation & Authentic Cake Connection Branding (PRD Section 10)
+- **Symptom**: Earlier sample PDF bill generated for small / unregistered merchant (Cake Connection) displayed GST-centric terminology ("Taxable Value: Rs. 700.00", "GST (0 Percent Exempt): Rs. 0.00", and "Official CustomerPilot Digital GST Billing"), which is inappropriate and non-compliant for non-GST retailers.
+- **Root Cause**: src/lib/invoice-pdf-generator.ts previously utilized a single unified layout for all document types, only suppressing tax line items when gstRate === 0 but retaining the GST Tax Invoice title banner, Taxable Value calculation, and GST footer notices.
+- **Resolution**:
+  1. Enhanced src/lib/invoice-pdf-generator.ts with strict document-type layout bifurcation (isNonGst = documentType === 'NON_GST_RECEIPT' || documentType === 'NON_GST_SALES_RECEIPT').
+  2. Implemented PRD Section 10 Non-GST layout: Header pill SALES RECEIPT, brand badge (100% PURE VEG & FRESH EGGLESS CAKES | ZERO ARTIFICIAL PRESERVATIVES), verified store address (Ground Floor, Alkapuri Arcade, Near Railway Station, Alkapuri, Vadodara, Gujarat 390007), phone (+91 7203824012), and FSSAI (20722026001289).
+  3. Added Indian Rupee words conversion (numberToWordsINR) printing Amount in Words: Rupees Seven Hundred Only.
+  4. Added Section 10 Cash Workflow breakdown: Payment Method: Cash | Received: Rs. 1000.00 | Change Returned: Rs. 300.00 | Balance Due: Rs. 0.00.
+  5. Updated src/app/api/invoices/route.ts and src/app/api/invoices/[id]/send-whatsapp/route.ts to pass FSSAI, store address, and cash change details.
+  6. Dispatched clean sample PDF (SalesReceipt_RCP-000125_CakeConnection.pdf) via Evolution API instance CP_917203824012_cmtymavf_mw0whjx7 to customer 919033304707 with HTTP 201 (3EB0288A498872BB4774B0).
+- **Status**: ✅ Resolved, Tested with Adversarial Red-Team Gates, and Sample Receipt Dispatched to WhatsApp.

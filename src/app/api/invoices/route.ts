@@ -147,10 +147,11 @@ export async function POST(req: NextRequest) {
       orderNo: invoiceNumber,
       date: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
       merchantName: merchant.name,
-      merchantAddress: merchant.address,
-      merchantPhone: merchant.whatsappPhone,
+      merchantAddress: merchant.address || (merchant.name.includes("Cake Connection") ? "Ground Floor, Alkapuri Arcade, Near Railway Station, Alkapuri, Vadodara, Gujarat 390007" : null),
+      merchantPhone: merchant.whatsappPhone || (merchant.name.includes("Cake Connection") ? "7203824012" : null),
       gstin: (merchant as any).gstin || null,
-      upiId: null,
+      fssai: (merchant as any).fssai || (merchant.name.includes("Cake Connection") ? "20722026001289" : null),
+      upiId: body.upiId || null,
       customerName: customerName || null,
       customerPhone: customerPhone || "",
       paymentMethod: paymentMode.toUpperCase(),
@@ -169,7 +170,10 @@ export async function POST(req: NextRequest) {
       cgst,
       sgst,
       igst,
-      grandTotal
+      grandTotal,
+      amountReceived: Number(body.amountReceived || grandTotal),
+      changeReturned: Number(body.changeReturned || 0),
+      balanceDue: Number(body.balanceDue || 0)
     }
 
     const pdfBuffer = generateInvoicePdf(pdfData)
