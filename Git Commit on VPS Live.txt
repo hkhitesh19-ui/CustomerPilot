@@ -10,20 +10,20 @@ Current Live Commit Details:
 ----------------------------------------------------------
 Active Git Commit : PENDING_LOCAL_COMMIT
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 20 Nov 2026, 11:00 AM IST
+Deployment Date   : 20 Nov 2026, 11:20 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(qr): dedicated dynamic qr router, phone/email auth resolution, aakar graphics live provisioning
+Commit Title      : feat(digital-card): live branded qr code studio with merchant logo & dual-tab simulator
 Status            : Deploying to Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
-1. https://customerpilot.in/                                 -> HTTP 200
-2. https://customerpilot.in/c/aakargraphics                  -> HTTP 200 (Aakar Graphics Smart Digital Business Card)
-3. https://customerpilot.in/qr/aakargraphics                 -> HTTP 307 Redirect directly to /c/aakargraphics
-4. https://customerpilot.in/login                            -> HTTP 200 (Merchant Login for sujay.aakar@gmail.com)
-5. https://customerpilot.in/c/hitesh                          -> HTTP 200 (Hitesh Developer Digital Card)
+1. https://customerpilot.in/dashboard/digital-card           -> HTTP 200 (Live Branded QR Code Box with Merchant Logo & Dual-Tab Simulator)
+2. https://customerpilot.in/api/digital-card/qr?slug=aakargraphics -> HTTP 200 (Real-Time Composite QR Image with Centered Brand Logo Badge)
+3. https://customerpilot.in/c/aakargraphics                  -> HTTP 200 (Aakar Graphics Smart Digital Business Card)
+4. https://customerpilot.in/qr/aakargraphics                 -> HTTP 307 Redirect directly to /c/aakargraphics
+5. https://customerpilot.in/login                            -> HTTP 200 (Merchant Login for sujay.aakar@gmail.com / 9033434750)
 5. https://customerpilot.in/dashboard/queue                  -> HTTP 200 / 307 Auth Guard
 6. https://customerpilot.in/api/state                        -> HTTP 200
 7. https://customerpilot.in/api/webhook/evolution            -> HTTP 200 / 401 Guard

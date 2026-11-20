@@ -34,7 +34,9 @@ import {
   Mail,
   SlidersHorizontal,
   Upload,
-  Trash2
+  Trash2,
+  Download,
+  Printer
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -61,6 +63,7 @@ export default function DigitalCardDashboardPage() {
   const [otherOrderLabel, setOtherOrderLabel] = useState("EasyCater / Other")
   const [uploadingLogo, setUploadingLogo] = useState(false)
   const [cardMerchantId, setCardMerchantId] = useState<string | null>(null)
+  const [rightPanelTab, setRightPanelTab] = useState<"simulator" | "qr">("simulator")
   const logoInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -1092,35 +1095,153 @@ export default function DigitalCardDashboardPage() {
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════ */}
-        {/* RIGHT COLUMN: LIVE INTERACTIVE IPHONE SIMULATOR (5 COLS)        */}
+        {/* RIGHT COLUMN: DUAL-TAB (PHONE SIMULATOR & BRANDED QR STUDIO)     */}
         {/* ═══════════════════════════════════════════════════════════════ */}
-        <div className="lg:col-span-5 flex flex-col items-center sticky top-6">
+        <div className="lg:col-span-5 flex flex-col items-center sticky top-6 space-y-4">
           
-          <div className="flex items-center justify-between w-full max-w-sm mb-2 px-2">
-            <span className="text-xs font-black uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
-              <Eye className="w-3.5 h-3.5 text-indigo-600" />
-              Live Interactive Simulator
-            </span>
-            <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-300">
-              Live Preview
-            </span>
+          {/* Top Switcher Tabs: Phone Simulator vs Branded QR Code */}
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl w-full max-w-[380px] shadow-sm border border-slate-200 dark:border-slate-700">
+            <button
+              type="button"
+              onClick={() => setRightPanelTab("simulator")}
+              className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                rightPanelTab === "simulator"
+                  ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+              }`}
+            >
+              <Smartphone className="w-3.5 h-3.5 text-indigo-600" />
+              Phone Simulator
+            </button>
+            <button
+              type="button"
+              onClick={() => setRightPanelTab("qr")}
+              className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                rightPanelTab === "qr"
+                  ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+              }`}
+            >
+              <QrCode className="w-3.5 h-3.5 text-amber-500" />
+              Branded QR &amp; Standee
+            </button>
           </div>
 
-          {/* iPhone Outer Chassis Frame */}
-          <div className="w-full max-w-[380px] rounded-[48px] bg-slate-950 p-3 shadow-2xl border-4 border-slate-800 relative ring-1 ring-slate-700/50">
+          {/* TAB 1: PHONE SIMULATOR */}
+          {rightPanelTab === "simulator" && (
+            <div className="w-full flex flex-col items-center space-y-3">
+              <div className="flex items-center justify-between w-full max-w-[380px] px-2">
+                <span className="text-xs font-black uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
+                  <Eye className="w-3.5 h-3.5 text-indigo-600" />
+                  Live Mobile Simulator
+                </span>
+                <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-300">
+                  Live Preview
+                </span>
+              </div>
+
+              {/* iPhone Outer Chassis Frame */}
+              <div className="w-full max-w-[380px] rounded-[48px] bg-slate-950 p-3 shadow-2xl border-4 border-slate-800 relative ring-1 ring-slate-700/50">
+                {/* Top Speaker / Dynamic Island */}
+                <div className="absolute top-5 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-full z-40 flex items-center justify-end pr-2.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-900 border border-slate-800" />
+                </div>
+
+                {/* Inner Mobile Screen Canvas */}
+                <div className="w-full rounded-[38px] overflow-hidden bg-white max-h-[640px] overflow-y-auto no-scrollbar relative shadow-inner">
+                  <DigitalCardView card={formData} />
+                </div>
+
+                {/* Bottom Home Indicator Bar */}
+                <div className="w-32 h-1 bg-slate-600 rounded-full mx-auto mt-2" />
+              </div>
+            </div>
+          )}
+
+          {/* PERMANENT BRANDED QR CODE BOX (Visible below simulator OR in Tab 2) */}
+          <div className="w-full max-w-[380px] rounded-3xl bg-white dark:bg-slate-900 p-5 shadow-xl border border-slate-200 dark:border-slate-800 text-center space-y-4">
             
-            {/* Top Speaker / Dynamic Island */}
-            <div className="absolute top-5 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-full z-40 flex items-center justify-end pr-2.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-slate-900 border border-slate-800" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-left">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold">
+                  <QrCode className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                    Official Brand QR Code
+                  </h4>
+                  <p className="text-[10px] text-slate-500 font-medium">
+                    With Merchant Logo • Scan to Open Card
+                  </p>
+                </div>
+              </div>
+              <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">
+                Scan Ready
+              </span>
             </div>
 
-            {/* Inner Mobile Screen Canvas */}
-            <div className="w-full rounded-[38px] overflow-hidden bg-white max-h-[720px] overflow-y-auto no-scrollbar relative shadow-inner">
-              <DigitalCardView card={formData} />
+            {/* QR Code Canvas Frame */}
+            <div className="relative p-3 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border-2 border-slate-900 dark:border-slate-700 shadow-inner flex flex-col items-center justify-center mx-auto">
+              <img
+                src={`/api/digital-card/qr?slug=${formData.slug}&v=${encodeURIComponent(formData.logoUrl || "")}`}
+                alt={`${formData.displayName} QR Code`}
+                className="w-48 h-48 object-contain rounded-xl"
+              />
+              <div className="mt-2 text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono flex items-center gap-1">
+                <span>customerpilot.in/c/{formData.slug}</span>
+              </div>
             </div>
 
-            {/* Bottom Home Indicator Bar */}
-            <div className="w-32 h-1 bg-slate-600 rounded-full mx-auto mt-2" />
+            {/* Scan Guidance Pill */}
+            <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-[11px] text-emerald-800 dark:text-emerald-300 font-semibold flex items-center justify-center gap-1.5">
+              <span>📱</span>
+              <span>Mobile Camera ya Google Lens se scan karke live card dekhein</span>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  window.open(`/api/digital-card/qr?slug=${formData.slug}&download=1`, "_blank")
+                }}
+                className="rounded-xl border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 text-indigo-600" />
+                Download QR
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  window.open(`/c/${formData.slug}`, "_blank")
+                }}
+                className="rounded-xl border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-amber-500" />
+                Test Live Card
+              </Button>
+            </div>
+
+            <div className="pt-1">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  window.open(`/qr-codes/aakar_graphics_counter_standee.png`, "_blank")
+                }}
+                className="w-full rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                <Printer className="w-3.5 h-3.5 text-amber-400" />
+                View Print-Ready Counter Standee (A4 / Acrylic)
+              </Button>
+            </div>
+
           </div>
 
         </div>
