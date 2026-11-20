@@ -11,8 +11,15 @@ import {
   Printer, Smartphone, Plus, Trash2, Search, CheckCircle2,
   RefreshCw, FileText, Send, Sparkles, AlertCircle, ShoppingBag,
   CreditCard, MessageCircle, DollarSign, QrCode, Eye, Download, X,
-  Clock, Check, Layers, Store, ArrowRight
+  Clock, Check, Layers, Store, ArrowRight, Camera, UploadCloud, Loader2
 } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription
+} from "@/components/ui/dialog"
 
 interface LineItem {
   id: string
@@ -49,6 +56,23 @@ export default function SmartBillingPage() {
   const [newItemPrice, setNewItemPrice] = useState("")
   const [newItemQty, setNewItemQty] = useState("1")
   const [selectedCategory, setSelectedCategory] = useState<string>("All")
+  const [catalogItems, setCatalogItems] = useState<any[]>(PRESET_CATALOG)
+  const [categories, setCategories] = useState<string[]>(["All", "Cakes", "Pastries", "Beverages", "Accessories"])
+  const [loadingMenu, setLoadingMenu] = useState(false)
+
+  // AI Photo Menu Scanner State
+  const [scanModalOpen, setScanModalOpen] = useState(false)
+  const [scannedImage, setScannedImage] = useState<string | null>(null)
+  const [scanningImage, setScanningImage] = useState(false)
+  const [extractedItems, setExtractedItems] = useState<Array<{
+    category: string
+    name: string
+    variation?: string | null
+    price: number
+    originalPrice?: number | null
+    selected: boolean
+  }>>([])
+  const [importingMenu, setImportingMenu] = useState(false)
 
   // Payment State
   const [paymentMode, setPaymentMode] = useState<"CASH" | "UPI" | "CARD" | "SPLIT">("CASH")
@@ -81,9 +105,150 @@ export default function SmartBillingPage() {
     }
   }
 
+  const fetchMenuItems = async () => {
+    setLoadingMenu(true)
+    try {
+      const res = await fetch("/api/menu/items")
+      const data = await res.json()
+      if (data.items && Array.isArray(data.items) && data.items.length > 0) {
+        setCatalogItems(data.items)
+        const cats = Array.from(new Set(data.items.map((i: any) => i.category || "General")))
+        setCategories(["All", ...(cats as string[])])
+      }
+    } catch {
+      console.warn("Using default catalog presets")
+    } finally {
+      setLoadingMenu(false)
+    }
+  }
+
   useEffect(() => {
     fetchInvoices()
+    fetchMenuItems()
   }, [])
+
+  // AI Menu Photo Upload & Extraction Handlers
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Invalid File", description: "Please upload an image file (PNG, JPG, WebP).", variant: "destructive" })
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      setScannedImage(reader.result as string)
+      setExtractedItems([])
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleScanMenuPhoto = async () => {
+    if (!scannedImage) {
+      toast({ title: "No Photo Selected", description: "Please choose or capture a photo first.", variant: "destructive" })
+      return
+    }
+
+    setScanningImage(true)
+    try {
+      const res = await fetch("/api/menu/extract-from-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageBase64: scannedImage })
+      })
+      const data = await res.json()
+      if (data.success && Array.isArray(data.items) && data.items.length > 0) {
+        setExtractedItems(data.items.map((it: any) => ({
+          category: it.category || "General",
+          name: it.name || "Product",
+          variation: it.variation || null,
+          price: Number(it.price) || 0,
+          originalPrice: it.originalPrice ? Number(it.originalPrice) : null,
+          selected: true
+        })))
+        toast({
+          title: "Menu Scanned Successfully! ✨",
+          description: `Extracted ${data.items.length} products with rates from photo.`
+        })
+      } else {
+        toast({
+          title: "Scan Incomplete",
+          description: data.error || "Could not detect products in photo. Try another clearer angle.",
+          variant: "destructive"
+        })
+      }
+    } catch {
+      toast({ title: "Scan Failed", description: "Network error while processing photo.", variant: "destructive" })
+    } finally {
+      setScanningImage(false)
+    }
+  }
+
+  const handleImportToStoreMenu = async () => {
+    const selected = extractedItems.filter((i) => i.selected)
+    if (selected.length === 0) {
+      toast({ title: "No items selected", description: "Please select at least 1 item to import.", variant: "destructive" })
+      return
+    }
+
+    setImportingMenu(true)
+    try {
+      const res = await fetch("/api/menu/bulk-import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: selected.map((it) => ({
+            name: it.name,
+            category: it.category,
+            price: it.price,
+            originalPrice: it.originalPrice,
+            variation: it.variation
+          })),
+          mode: "append"
+        })
+      })
+      const data = await res.json()
+      if (data.success || data.imported !== undefined) {
+        toast({
+          title: "Menu Items Saved! 🧁",
+          description: `Imported ${selected.length} items to your POS catalogue.`
+        })
+        await fetchMenuItems()
+        setScanModalOpen(false)
+        setScannedImage(null)
+        setExtractedItems([])
+      } else {
+        toast({ title: "Import Error", description: data.error || "Failed to save items.", variant: "destructive" })
+      }
+    } catch {
+      toast({ title: "Network Error", description: "Could not save items to menu.", variant: "destructive" })
+    } finally {
+      setImportingMenu(false)
+    }
+  }
+
+  const handleAddSelectedToBill = () => {
+    const selected = extractedItems.filter((i) => i.selected)
+    if (selected.length === 0) return
+
+    const newLines: LineItem[] = selected.map((it) => ({
+      id: Date.now().toString() + Math.random().toString().slice(2, 6),
+      name: it.name,
+      category: it.category,
+      quantity: 1,
+      unitPrice: it.price,
+      total: it.price
+    }))
+
+    setItems((prev) => [...prev, ...newLines])
+    toast({
+      title: "Added to Current Bill! 🧾",
+      description: `Added ${selected.length} items directly to your active invoice.`
+    })
+    setScanModalOpen(false)
+  }
 
   // Line item handlers
   const handleAddItem = (nameOverride?: string, priceOverride?: number) => {
@@ -225,9 +390,10 @@ export default function SmartBillingPage() {
     }
   }
 
+  const activeCatalog = catalogItems && catalogItems.length > 0 ? catalogItems : PRESET_CATALOG
   const filteredPresets = selectedCategory === "All"
-    ? PRESET_CATALOG
-    : PRESET_CATALOG.filter((p) => p.category === selectedCategory)
+    ? activeCatalog
+    : activeCatalog.filter((p) => (p.category || "General").toLowerCase() === selectedCategory.toLowerCase())
 
   return (
     <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6 font-sans">
@@ -348,39 +514,67 @@ export default function SmartBillingPage() {
           </Card>
 
           {/* Quick Catalogue Presets (1-Tap Add) */}
-          <Card className="border-slate-200 shadow-sm rounded-2xl bg-white">
-            <CardHeader className="p-4 border-b border-slate-100 flex flex-row items-center justify-between">
+          <Card className="border-slate-200 shadow-sm rounded-2xl bg-white overflow-hidden">
+            <CardHeader className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-0.5">
-                <CardTitle className="text-sm font-bold text-slate-900">2. Quick Item Presets (1-Tap Add)</CardTitle>
-                <CardDescription className="text-[11px] text-slate-500">Tap any product to add immediately to current bill.</CardDescription>
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-sm font-bold text-slate-900">2. Quick Item Presets (1-Tap Add)</CardTitle>
+                  <Badge variant="outline" className="text-[10px] text-slate-500 font-normal">
+                    {activeCatalog.length} Products Online
+                  </Badge>
+                </div>
+                <CardDescription className="text-[11px] text-slate-500">
+                  Tap any product to add immediately to current bill, or scan physical menu photo with AI.
+                </CardDescription>
               </div>
-              {/* Category pills */}
-              <div className="flex items-center gap-1">
-                {["All", "Cakes", "Pastries", "Beverages"].map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition ${
-                      selectedCategory === cat
-                        ? "bg-indigo-600 text-white"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+
+              {/* Action: AI Photo Scan Button */}
+              <Button
+                type="button"
+                onClick={() => setScanModalOpen(true)}
+                size="sm"
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl shadow-sm text-xs gap-1.5 font-bold h-9 px-3 self-start sm:self-auto"
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span>📸 Photo Se Menu Scan Karo</span>
+                <Badge className="bg-emerald-950/40 text-emerald-200 text-[9px] px-1.5 py-0 border-0">AI Vision</Badge>
+              </Button>
             </CardHeader>
+
+            {/* Category pills */}
+            <div className="px-4 py-2.5 bg-slate-50/70 border-b border-slate-100 flex items-center gap-1.5 overflow-x-auto">
+              <span className="text-[11px] font-semibold text-slate-400 mr-1 shrink-0">Filter:</span>
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition shrink-0 ${
+                    selectedCategory.toLowerCase() === cat.toLowerCase()
+                      ? "bg-indigo-600 text-white shadow-xs"
+                      : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
             <CardContent className="p-4">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {filteredPresets.map((preset) => (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {filteredPresets.map((preset: any) => (
                   <button
-                    key={preset.name}
+                    key={preset.id || preset.name}
                     onClick={() => handleAddItem(preset.name, preset.price)}
-                    className="p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-indigo-50 hover:border-indigo-300 text-left transition flex flex-col justify-between"
+                    className="p-3 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50/60 hover:border-indigo-300 text-left transition flex flex-col justify-between shadow-xs group"
                   >
-                    <span className="text-[11px] font-bold text-slate-800 line-clamp-2">{preset.name}</span>
-                    <span className="text-xs font-extrabold text-indigo-700 mt-2">₹{preset.price}</span>
+                    <div>
+                      <div className="flex items-center justify-between gap-1 mb-1">
+                        <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">{preset.category || "General"}</span>
+                        <span className="opacity-0 group-hover:opacity-100 transition text-indigo-600 text-[10px] font-bold">+Add</span>
+                      </div>
+                      <span className="text-xs font-bold text-slate-800 line-clamp-2 group-hover:text-indigo-900 transition">{preset.name}</span>
+                    </div>
+                    <span className="text-xs font-extrabold text-emerald-700 mt-2">₹{preset.price}</span>
                   </button>
                 ))}
               </div>
@@ -848,6 +1042,205 @@ export default function SmartBillingPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* 6. AI Photo Menu Scanner Modal */}
+      <Dialog open={scanModalOpen} onOpenChange={setScanModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 bg-white border border-slate-200">
+          <DialogHeader>
+            <div className="flex items-center gap-2.5">
+              <div className="p-2.5 rounded-2xl bg-emerald-100 text-emerald-800">
+                <Camera className="w-5 h-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-base font-bold text-slate-900">
+                  AI Menu &amp; Product Photo Scanner
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-500">
+                  Dukaan ke physical menu card, rate board, ya product list ki photo upload karein — AI turant sabhi items, weight, aur prices online load kar dega.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-4 my-2">
+            {/* Upload Area */}
+            {!scannedImage ? (
+              <label className="border-2 border-dashed border-emerald-300 hover:border-emerald-500 bg-emerald-50/40 hover:bg-emerald-50/70 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer transition text-center space-y-2">
+                <div className="p-3.5 bg-white rounded-2xl shadow-sm text-emerald-600">
+                  <UploadCloud className="w-7 h-7" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-800">Menu Card ya Rate Board ki Photo Upload Karein</p>
+                  <p className="text-xs text-slate-500 mt-1">Mobile Camera se direct photo khinchein ya file chunein (JPG, PNG)</p>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+              </label>
+            ) : (
+              <div className="space-y-3">
+                <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 flex items-center justify-center max-h-56">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={scannedImage}
+                    alt="Menu Preview"
+                    className="max-h-56 object-contain"
+                  />
+                  <button
+                    onClick={() => { setScannedImage(null); setExtractedItems([]); }}
+                    className="absolute top-2 right-2 p-1.5 bg-black/70 hover:bg-black text-white rounded-full transition"
+                    title="Change Photo"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {extractedItems.length === 0 && (
+                  <Button
+                    onClick={handleScanMenuPhoto}
+                    disabled={scanningImage}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold gap-2 py-5 text-xs shadow-md"
+                  >
+                    {scanningImage ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        AI Menu Card Scan Kar Raha Hai (Extracting Items &amp; Prices)...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        ✨ Photo Se Products &amp; Prices Extract Karein (AI Scan)
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {/* Extracted Items Review Table */}
+            {extractedItems.length > 0 && (
+              <div className="space-y-3 border-t border-slate-200 pt-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-900">Extracted Products ({extractedItems.length})</span>
+                    <Badge className="bg-emerald-100 text-emerald-800 text-[10px]">
+                      {extractedItems.filter((i) => i.selected).length} Selected
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setExtractedItems((prev) => prev.map((i) => ({ ...i, selected: true })))}
+                      className="text-indigo-600 hover:underline font-semibold"
+                    >
+                      Select All
+                    </button>
+                    <span className="text-slate-300">•</span>
+                    <button
+                      type="button"
+                      onClick={() => setExtractedItems((prev) => prev.map((i) => ({ ...i, selected: false })))}
+                      className="text-slate-500 hover:underline"
+                    >
+                      Deselect
+                    </button>
+                  </div>
+                </div>
+
+                <div className="border border-slate-200 rounded-xl overflow-hidden max-h-60 overflow-y-auto">
+                  <table className="w-full text-xs text-left">
+                    <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 sticky top-0">
+                      <tr>
+                        <th className="p-2 w-8 text-center">✓</th>
+                        <th className="p-2">Category</th>
+                        <th className="p-2">Product Name</th>
+                        <th className="p-2 w-20 text-right">Price (₹)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {extractedItems.map((item, idx) => (
+                        <tr key={idx} className={item.selected ? "bg-white" : "bg-slate-50/60 opacity-60"}>
+                          <td className="p-2 text-center">
+                            <input
+                              type="checkbox"
+                              checked={item.selected}
+                              onChange={(e) => {
+                                const checked = e.target.checked
+                                setExtractedItems((prev) => prev.map((it, i) => (i === idx ? { ...it, selected: checked } : it)))
+                              }}
+                              className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                            />
+                          </td>
+                          <td className="p-2">
+                            <input
+                              value={item.category}
+                              onChange={(e) => {
+                                const val = e.target.value
+                                setExtractedItems((prev) => prev.map((it, i) => (i === idx ? { ...it, category: val } : it)))
+                              }}
+                              className="w-24 text-[11px] px-2 py-1 border border-slate-200 rounded-lg font-medium"
+                            />
+                          </td>
+                          <td className="p-2">
+                            <input
+                              value={item.name}
+                              onChange={(e) => {
+                                const val = e.target.value
+                                setExtractedItems((prev) => prev.map((it, i) => (i === idx ? { ...it, name: val } : it)))
+                              }}
+                              className="w-full text-xs px-2 py-1 border border-slate-200 rounded-lg font-semibold text-slate-800"
+                            />
+                          </td>
+                          <td className="p-2 text-right">
+                            <input
+                              type="number"
+                              value={item.price}
+                              onChange={(e) => {
+                                const val = Number(e.target.value) || 0
+                                setExtractedItems((prev) => prev.map((it, i) => (i === idx ? { ...it, price: val } : it)))
+                              }}
+                              className="w-20 text-xs text-right px-2 py-1 border border-slate-200 rounded-lg font-mono font-bold text-emerald-700"
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                  <Button
+                    type="button"
+                    onClick={handleImportToStoreMenu}
+                    disabled={importingMenu}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold gap-1.5 text-xs py-4"
+                  >
+                    {importingMenu ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Store className="w-3.5 h-3.5" />
+                    )}
+                    <span>💾 Save to Store Catalog &amp; POS</span>
+                  </Button>
+
+                  <Button
+                    type="button"
+                    onClick={handleAddSelectedToBill}
+                    variant="outline"
+                    className="border-emerald-600 text-emerald-700 hover:bg-emerald-50 rounded-xl font-bold gap-1.5 text-xs py-4"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>🧾 Add Selected to Active Bill</span>
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

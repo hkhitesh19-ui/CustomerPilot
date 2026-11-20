@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Users, Gift, Clock, Menu } from "lucide-react"
+import { LayoutDashboard, Users, Receipt, Clock, Menu } from "lucide-react"
 import { useSidebar } from "@/components/ui/sidebar"
 import { useDashboardState } from "@/hooks/use-dashboard-state"
 import { hasModule } from "@/lib/feature-gate"
@@ -31,12 +31,11 @@ export function MobileBottomNav() {
       isActive: pathname.startsWith("/dashboard/customers"),
     },
     {
-      id: "rewards",
-      label: "Rewards",
-      href: "/dashboard/rewards",
-      icon: Gift,
-      isActive: pathname.startsWith("/dashboard/rewards"),
-      show: isLoyaltyEnabled,
+      id: "billing",
+      label: "Smart POS Billing",
+      href: "/dashboard/billing",
+      icon: Receipt,
+      isActive: pathname.startsWith("/dashboard/billing"),
     },
     {
       id: "queue",
@@ -84,9 +83,10 @@ export function MobileBottomNav() {
                 <Icon className="w-5 h-5" />
               </div>
               <span
-                className={`text-[10px] tracking-tight font-bold mt-0.5 leading-none ${
+                className={`text-[9.5px] tracking-tight font-bold mt-0.5 leading-none max-w-[72px] truncate text-center ${
                   active ? "text-emerald-400 font-extrabold" : "text-slate-400"
                 }`}
+                title={item.label}
               >
                 {item.label}
               </span>

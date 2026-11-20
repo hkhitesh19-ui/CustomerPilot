@@ -15,12 +15,21 @@ export interface ExtractedMenuItem {
 }
 
 const DEFAULT_SAMPLE_ITEMS: ExtractedMenuItem[] = [
-  { category: "Cakes", name: "Dutch Chocolate Truffle Cake", variation: "500g", price: 550, originalPrice: 650, isVeg: true, description: "Rich Dutch dark chocolate sponge with decadent ganache" },
-  { category: "Cakes", name: "Fresh Pineapple Gateau", variation: "500g", price: 480, originalPrice: 550, isVeg: true, description: "Real pineapple chunks with freshly whipped dairy cream" },
-  { category: "Pastries", name: "Red Velvet Cream Cheese Pastry", variation: "1 pc", price: 120, originalPrice: 140, isVeg: true, description: "Velvety sponge layered with Philadelphia-style cream cheese" },
+  { category: "Cakes", name: "Dutch Chocolate Truffle Cake (1kg)", variation: "1kg", price: 650, originalPrice: 750, isVeg: true, description: "Rich Dutch dark chocolate sponge with decadent ganache" },
+  { category: "Cakes", name: "Fresh Pineapple Gateau (500g)", variation: "500g", price: 350, originalPrice: 400, isVeg: true, description: "Real pineapple chunks with freshly whipped dairy cream" },
+  { category: "Cakes", name: "Black Forest Cake (500g)", variation: "500g", price: 380, originalPrice: 450, isVeg: true, description: "Classic chocolate sponge layered with cherries and vanilla cream" },
+  { category: "Cakes", name: "Red Velvet Cream Cheese Cake (500g)", variation: "500g", price: 450, originalPrice: 550, isVeg: true, description: "Velvety sponge layered with cream cheese frosting" },
+  { category: "Cakes", name: "Butterscotch Crunch Cake (500g)", variation: "500g", price: 360, originalPrice: 420, isVeg: true, description: "Caramel praline crunch with rich butterscotch ganache" },
+  { category: "Pastries", name: "Dutch Truffle Pastry", variation: "1 pc", price: 95, originalPrice: 110, isVeg: true, description: "Silky 55% Dutch chocolate glaze" },
+  { category: "Pastries", name: "Red Velvet Pastry", variation: "1 pc", price: 90, originalPrice: 105, isVeg: true, description: "Velvety sponge with vanilla frosting" },
+  { category: "Pastries", name: "Fresh Pineapple Pastry", variation: "1 pc", price: 70, originalPrice: 85, isVeg: true, description: "Whipped cream with real pineapple slice" },
   { category: "Pastries", name: "Belgian Dark Chocolate Pastry", variation: "1 pc", price: 110, originalPrice: 130, isVeg: true, description: "Silky 55% Belgian chocolate glaze" },
-  { category: "Dry Snacks", name: "Artisanal Butter Croissant", variation: "Pack of 2", price: 180, originalPrice: 200, isVeg: true, description: "Flaky European butter baked fresh daily" },
-  { category: "Beverages", name: "Cold Brew Hazelnut Frappe", variation: "300ml", price: 190, originalPrice: 220, isVeg: true, description: "Slow-steeped Arabica cold brew with roasted hazelnut" },
+  { category: "Savory", name: "Artisanal Butter Croissant", variation: "Pack of 2", price: 180, originalPrice: 200, isVeg: true, description: "Flaky European butter baked fresh daily" },
+  { category: "Savory", name: "Baked Paneer Tikka Puff", variation: "1 pc", price: 60, originalPrice: 75, isVeg: true, description: "Spiced cottage cheese filling in flaky puff pastry" },
+  { category: "Beverages", name: "Cold Coffee with Ice Cream", variation: "350ml", price: 120, originalPrice: 140, isVeg: true, description: "Slow-steeped Arabica coffee with vanilla ice cream" },
+  { category: "Beverages", name: "Chocolate Thick Shake", variation: "350ml", price: 140, originalPrice: 160, isVeg: true, description: "Rich chocolate blend with dark fudge sauce" },
+  { category: "Accessories", name: "Birthday Candle & Knife Set", variation: "1 Set", price: 50, originalPrice: 60, isVeg: true, description: "Set of birthday candles, matches, and food-grade knife" },
+  { category: "Accessories", name: "Sparkle Celebration Fountain Candle", variation: "Pack of 2", price: 60, originalPrice: 80, isVeg: true, description: "Safe indoor golden fountain sparkle candle" },
 ]
 
 export async function POST(req: NextRequest) {

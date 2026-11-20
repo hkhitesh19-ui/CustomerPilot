@@ -7635,3 +7635,20 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   5. Established deterministic visual verification via pypdfium2 rendering engine, confirming 11,592 sharp dark text pixels.
   6. Dispatched upgraded PDF (89,359 bytes) with official logo via Evolution API to customer +91 9033304707 (Message ID: 3EB0A097159CD1557F2031, HTTP 201 Created).
 - **Status**: ✅ Resolved, Visually Audited via Pixel Rasterization, and Delivered to Customer WhatsApp.
+
+---
+## [20 Nov 2026] Issue: Mobile Bottom Nav Billing Link & AI Photo Menu Scanner for Smart POS
+- **Symptom**:
+  1. Cashier creating a bill on live production (`customerpilot.in/dashboard/billing`) received a blank/faint white-on-white text PDF because the local graphics state bugfix (`040fd17`) was awaiting user approval and had not yet been deployed to the live VPS.
+  2. In mobile view, the bottom navigation bar displayed "Rewards" instead of direct access to "Smart POS Billing".
+  3. Merchants had to manually type all product names and rates one by one instead of simply scanning physical menu cards or rate boards from a photo.
+- **Root Cause**:
+  1. The live VPS server was still running the pre-fix compiled Next.js bundle where `addRect` set `0.99 0.99 0.99 rg` without graphics state isolation (`q ... Q`).
+  2. `src/components/mobile-bottom-nav.tsx` routed to `/dashboard/rewards` instead of `/dashboard/billing`.
+  3. Smart POS Billing lacked an AI Vision photo scanner modal to extract and ingest items from camera/photo uploads into the merchant's `MenuItem` catalog.
+- **Resolution**:
+  1. Root cause verified for live blank PDF: pending local commit `040fd17` awaiting user manual test confirmation and push command.
+  2. Replaced "Rewards" with "Smart POS Billing" (`Receipt` icon, `/dashboard/billing`, optimized 9.5px truncated badge) in `src/components/mobile-bottom-nav.tsx`.
+  3. Integrated `📸 Photo Se Menu Scan Karo` AI Scanner modal into `src/app/dashboard/billing/page.tsx` with image upload / camera capture, AI product extraction (`/api/menu/extract-from-image`), review table with editable categories/names/prices, and 1-tap bulk import into store catalog (`/api/menu/bulk-import`) plus instant addition to active bill.
+  4. Verified all 7 Master Adversarial Red-Team safety gates (Exit Code 0).
+- **Status**: ✅ Resolved and Verified.
