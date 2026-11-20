@@ -4,6 +4,19 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [20 Nov 2026] Issue: Merchant Onboarding & Smart Digital Business Card Ecosystem Provisioning for Aakar Graphics
+- **Symptom**: New merchant "Aakar Graphics" (Digital, Large Format, Offset Printing & LED Boards in Manjalpur, Vadodara) needed an official merchant account, authenticated profile, live Smart Digital Business Card (`/c/aakargraphics`), and print-ready high-resolution QR codes with center brand logo badge.
+- **Root Cause**: New merchant entity onboarding requirement from client visiting card (`sujay.aakar@gmail.com`, `+91 90334 34750` / `+91 98988 80107`).
+- **Resolution**:
+  1. Extracted and normalized business identity from physical visiting card and logo assets into `Merchant`, `User` (`user_aakargraphics_01`), `DigitalBusinessCard` (`slug: aakargraphics`), and `QrCode` (`slug: aakargraphics`) entities.
+  2. Built 7 specialized high-conversion printing action links (Instant WhatsApp Quote, Calling channels for Sujay Patel & Ankita Patel, Official Website, Email Inquiry, Print Portfolio Catalog, and Google Maps Studio Directions).
+  3. Extended vCard engine in `src/app/api/digital-card/route.ts` to seamlessly support secondary contact numbers from card theme metadata (`TEL;TYPE=CELL,VOICE:${cleanSec}`).
+  4. Generated high-resolution 1024x1024 PNG and vector SVG QR codes with centered AG brand logo badge, plus a 1000x1500 print-ready Counter Standee graphic (`public/qr-codes/aakar_graphics_counter_standee.png`).
+  5. Verified all 7 Master Adversarial Red-Team safety gates (Exit Code 0).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [20 Nov 2026] Issue: WhatsApp Invoice PDF 10-Digit Phone Normalization for Indian Numbers
 - **Symptom**: In Smart POS Billing (/dashboard/billing) and Invoice Resend API (/api/invoices/[id]/send-whatsapp), dispatching WhatsApp PDF invoices to 10-digit Indian mobile numbers without country code prefix (e.g. 9033304707) failed with Evolution API error 400 Bad Request: jid exists: false.
 - **Root Cause**: Phone sanitizer used params.toPhone.replace(/\D/g, ''), which stripped non-digit characters without ensuring the mandatory E.164 international country code prefix (91). WhatsApp JID resolution requires 919033304707@s.whatsapp.net, so WhatsApp reported the un-prefixed account as non-existent.

@@ -121,6 +121,13 @@ export async function GET(req: NextRequest) {
         vcardLines.push(`TEL;TYPE=WORK,VOICE:${cleanPhone}`)
       }
 
+      if (parsedThemeMeta?.secondaryPhone) {
+        const cleanSec = String(parsedThemeMeta.secondaryPhone).replace(/[^0-9+]/g, "")
+        if (cleanSec && cleanSec !== cleanPhone) {
+          vcardLines.push(`TEL;TYPE=CELL,VOICE:${cleanSec}`)
+        }
+      }
+
       if (cleanWhatsapp) {
         vcardLines.push(`TEL;TYPE=WHATSAPP:${cleanWhatsapp}`)
         vcardLines.push(`X-SOCIALPROFILE;TYPE=whatsapp:https://wa.me/${cleanWhatsapp.replace(/[^0-9]/g, "")}`)
