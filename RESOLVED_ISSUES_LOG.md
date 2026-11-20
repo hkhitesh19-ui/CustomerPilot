@@ -7620,3 +7620,18 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   5. Updated src/app/api/invoices/route.ts and src/app/api/invoices/[id]/send-whatsapp/route.ts to pass FSSAI, store address, and cash change details.
   6. Dispatched clean sample PDF (SalesReceipt_RCP-000125_CakeConnection.pdf) via Evolution API instance CP_917203824012_cmtymavf_mw0whjx7 to customer 919033304707 with HTTP 201 (3EB0288A498872BB4774B0).
 - **Status**: ✅ Resolved, Tested with Adversarial Red-Team Gates, and Sample Receipt Dispatched to WhatsApp.
+
+---
+## [20 Nov 2026] Issue: Non-GST Sales Receipt Graphics State Color Desync & Real Brand Logo Embedding
+- **Symptom**: User opened Cake_Connection_Sales_Receipt_Sample.pdf in the IDE/viewer and observed an empty white document with missing text and no brand logo.
+- **Root Cause**:
+  1. In src/lib/invoice-pdf-generator.ts, addRect executed "0.99 0.99 0.99 rg" for the background card fill. In the standard PDF 1.4 operator specification, "rg" sets the non-stroking fill color for both vector paths and text. Because text drawing operators lacked graphics state isolation ("q ... Q") and did not explicitly re-assert black/dark text color, all subsequent text glyphs were rendered in off-white (0.99, 0.99, 0.99) on a white background. Pixel analysis confirmed 0 dark pixels (< 60 brightness) on the rendered page.
+  2. The PDF engine lacked native XObject DCTDecode (JPEG) embedding capabilities, leaving out the merchant's authentic visual logo.
+- **Resolution**:
+  1. Implemented defensive graphics state isolation ("q ... Q") across all text, vector, and rectangle operators in SimplePdfWriter.
+  2. Added native PDF 1.4 XObject JPEG binary embedding ("addImage", "drawImage", and XObject dictionary integration).
+  3. Hardened all text rendering with explicit high-contrast RGB colors (headers: [0.07, 0.09, 0.15], brand pill: [0.06, 0.45, 0.35], body text: [0.3, 0.35, 0.42]).
+  4. Converted and embedded authentic Cake Connection store logo (public/cake_connection_logo.jpg) at the top center of the receipt.
+  5. Established deterministic visual verification via pypdfium2 rendering engine, confirming 11,592 sharp dark text pixels.
+  6. Dispatched upgraded PDF (89,359 bytes) with official logo via Evolution API to customer +91 9033304707 (Message ID: 3EB0A097159CD1557F2031, HTTP 201 Created).
+- **Status**: ✅ Resolved, Visually Audited via Pixel Rasterization, and Delivered to Customer WhatsApp.
