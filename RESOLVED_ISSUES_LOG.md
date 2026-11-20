@@ -4,6 +4,14 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [20 Nov 2026] Issue: WhatsApp Invoice PDF 10-Digit Phone Normalization for Indian Numbers
+- **Symptom**: In Smart POS Billing (/dashboard/billing) and Invoice Resend API (/api/invoices/[id]/send-whatsapp), dispatching WhatsApp PDF invoices to 10-digit Indian mobile numbers without country code prefix (e.g. 9033304707) failed with Evolution API error 400 Bad Request: jid exists: false.
+- **Root Cause**: Phone sanitizer used params.toPhone.replace(/\D/g, ''), which stripped non-digit characters without ensuring the mandatory E.164 international country code prefix (91). WhatsApp JID resolution requires 919033304707@s.whatsapp.net, so WhatsApp reported the un-prefixed account as non-existent.
+- **Resolution**: Updated src/lib/whatsapp-media.ts to automatically prepend 91 when cleanPhone.length === 10. Verified via live Evolution API dispatch from Cake Connection instance (CP_917203824012_cmtymavf_mw0whjx7) to customer +91 9033304707 with status: 201 Created, message ID 3EB0880CE50C692B592AFF, and confirmed PDF attachment delivery.
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [20 Nov 2026] Issue: WhatsApp Outbox 401 Env Desync, Live Queue Quick Stamp Tab Defaulting, Persistent Referral Badging & Contact/Services/Digital Card Overhaul
 - **Symptom**:
   1. Customers (Ekta & Customer Pilot) checked in via counter QR and rewards were approved from Live Queue between 11:15 PM and 11:36 PM IST, but automated WhatsApp stamp award & cycle-completion notifications failed with `[CP_917203824012_cmtymavf_mw0whjx7] HTTP 401: Unauthorized`.
