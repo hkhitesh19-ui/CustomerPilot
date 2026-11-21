@@ -8,23 +8,25 @@
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : PENDING_LOCAL_COMMIT
+Active Git Commit : 8bb5beb
+Full SHA          : 8bb5beb99d22f7c6b76747e5466acec2bc272477
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 20 Nov 2026, 11:20 AM IST
+Deployment Date   : 21 Nov 2026, 10:30 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(digital-card): live branded qr code studio with merchant logo & dual-tab simulator
-Status            : Deploying to Hostinger VPS (187.127.170.36)
+Commit Title      : feat(referrals): complete seamless customer referral claim and auto-detection pipeline
+Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
-1. https://customerpilot.in/dashboard/digital-card           -> HTTP 200 (Live Branded QR Code Box with Merchant Logo & Dual-Tab Simulator)
-2. https://customerpilot.in/api/digital-card/qr?slug=aakargraphics -> HTTP 200 (Real-Time Composite QR Image with Centered Brand Logo Badge)
-3. https://customerpilot.in/c/aakargraphics                  -> HTTP 200 (Aakar Graphics Smart Digital Business Card)
-4. https://customerpilot.in/qr/aakargraphics                 -> HTTP 307 Redirect directly to /c/aakargraphics
-5. https://customerpilot.in/login                            -> HTTP 200 (Merchant Login for sujay.aakar@gmail.com / 9033434750)
-5. https://customerpilot.in/dashboard/queue                  -> HTTP 200 / 307 Auth Guard
-6. https://customerpilot.in/api/state                        -> HTTP 200
-7. https://customerpilot.in/api/webhook/evolution            -> HTTP 200 / 401 Guard
-8. http://187.127.170.36:8080                                -> HTTP 200 (Evolution API Manager v2.3.7)
+1. https://customerpilot.in/c/cake-connection-live-cake-online-cake-delivery-in-vadodara -> HTTP 200 (Digital Card with VIP Referral Hero Card)
+2. https://customerpilot.in/api/referrals/claim              -> HTTP 200 / 400 Validation (Public Referral Claim API)
+3. https://customerpilot.in/dashboard/queue                  -> HTTP 200 / 307 (Live Queue with Automatic Referrer Detection)
+4. https://customerpilot.in/dashboard/billing                -> HTTP 200 (Smart POS Billing & Invoicing)
+5. https://customerpilot.in/dashboard/digital-card           -> HTTP 200 (Branded QR Box Studio)
+6. https://customerpilot.in/c/aakargraphics                  -> HTTP 200 (Digital Card)
+7. https://customerpilot.in/login                            -> HTTP 200 (Merchant Login)
+8. https://customerpilot.in/api/state                        -> HTTP 200
+9. https://customerpilot.in/api/webhook/evolution            -> HTTP 200 / 401 Guard (Evolution Webhook & Referral Intent Handler)
+10. http://187.127.170.36:8080                               -> HTTP 200 (Evolution API v2.3.7)

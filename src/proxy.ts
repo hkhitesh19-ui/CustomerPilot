@@ -95,6 +95,7 @@ export async function proxy(request: NextRequest) {
     '/api/webhook/',
     '/api/webhooks/',
     '/api/reviews/',
+    '/api/referrals/claim',
     '/api/queue/join',
     '/api/queue/claim',
     '/api/queue/reserve',
