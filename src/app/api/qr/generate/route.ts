@@ -59,11 +59,11 @@ export async function GET(req: NextRequest) {
       if (!merchantPhone) return err("Merchant WhatsApp number not configured. Please configure WhatsApp number first.", 400)
 
       let digitalCard = merchant.digitalBusinessCard
-      if (!digitalCard && (type === "counter" || type === "card" || type === "complete")) {
+      if (!digitalCard && (type === "card" || type === "complete")) {
         digitalCard = await getOrCreateDigitalBusinessCard(merchant.id)
       }
 
-      if (digitalCard && (type === "counter" || type === "card" || type === "complete")) {
+      if (type === "card" && digitalCard) {
         const host = req.headers.get("host") || "localhost:3000"
         const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https"
         targetUrl = `${protocol}://${host}/c/${digitalCard.slug}`

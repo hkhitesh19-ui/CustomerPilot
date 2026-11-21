@@ -4,6 +4,18 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [21 Nov 2026] Issue: Counter Loyalty QR Code Standee Digital Card Override & Live Queue Bypass
+- **Symptom**: When a customer at Cake Connection scanned the Loyalty QR Code Standee, they did not appear in the merchant's Live Queue (/dashboard/queue). The merchant's queue remained completely empty ("0 Customers Waiting / Queue is completely empty").
+- **Root Cause**: In src/app/api/qr/generate/route.ts and src/app/api/qr/standee/route.ts, the QR target URL resolution contained an unconditional check: if (digitalCard) targetUrl = ${protocol}://${host}/c/${digitalCard.slug}. Because Cake Connection has an active Digital Business Card (slug: cake-connection), the Master Standee and Counter QR codes were encoded with https://customerpilot.in/c/cake-connection (the web page) instead of the WhatsApp check-in URL (https://wa.me/917203824012?text=Hi%20Cake%20Connection!%20Checking%20in%20for%20my%20VIP%20Club%20stamps%20🎁). When scanned by a customer's phone, the device opened Chrome/Safari to the digital business card page rather than launching WhatsApp. Because no incoming message was sent to Evolution API (917203824012), the webhook never fired and joinQueue was never called.
+- **Resolution**:
+  1. Updated src/app/api/qr/generate/route.ts so that type === "card" routes to /c/${digitalCard.slug}, while type === "counter", table, poster, and other loyalty QR types strictly route to https://wa.me/${merchantPhone}?text=${encodeURIComponent(joinText)}.
+  2. Updated src/app/api/qr/standee/route.ts so that only activeDesign === "card" routes to /c/${slug}, while activeDesign === "master", bakery, royal, and other loyalty standees directly route to WhatsApp with the pre-typed VIP stamps check-in message.
+  3. Verified via VPS Nginx access logs at 05:12:44 UTC (10:42:44 AM IST) that scanning the old standee hit GET /c/cake-connection. Tested simulated webhook dispatch on VPS (joinQueue) which created WaitingCustomer record cmwpysow800uzkvpirburxxoi in 200 OK (verified clean cleanup).
+  4. Ran Master Adversarial Red-Team Guard across all 7 gates (Exit Code 0).
+- **Status**: ✅ Resolved and Verified.
+
+---
+
 ## [20 Nov 2026] Issue: Merchant Onboarding & Smart Digital Business Card Ecosystem Provisioning for Aakar Graphics
 - **Symptom**: New merchant "Aakar Graphics" (Digital, Large Format, Offset Printing & LED Boards in Manjalpur, Vadodara) needed an official merchant account, authenticated profile, live Smart Digital Business Card (`/c/aakargraphics`), and print-ready high-resolution QR codes with center brand logo badge.
 - **Root Cause**: New merchant entity onboarding requirement from client visiting card (`sujay.aakar@gmail.com`, `+91 90334 34750` / `+91 98988 80107`).
