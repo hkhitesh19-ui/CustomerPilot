@@ -1,19 +1,20 @@
-# ==========================================================
-# CUSTOMERPILOT - VPS LIVE DEPLOYMENT TRACKER
-# ==========================================================
-# This file records the active Git commit currently running
-# live on the Hostinger Production VPS (187.127.170.36).
-# Rule: Update this file every time a VPS deployment is executed!
-# ==========================================================
+==========================================================
+CUSTOMER PILOT - LIVE VPS HOSTINGER TRACKER & SYSTEM HEALTH
+==========================================================
+
+Hostinger VPS IP  : 187.127.170.36
+Location          : Mumbai / India
+Environment       : Production (Ubuntu 22.04 LTS / Node v20 / PM2)
+Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 8bb5beb
-Full SHA          : 8bb5beb99d22f7c6b76747e5466acec2bc272477
+Active Git Commit : efa013e
+Full SHA          : efa013eebb972371012e3c8937de4175459b8060
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 21 Nov 2026, 10:30 AM IST
+Deployment Date   : 21 Nov 2026, 11:05 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(referrals): complete seamless customer referral claim and auto-detection pipeline
+Commit Title      : fix(qr): route loyalty counter and master standee QR directly to whatsapp check-in
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
@@ -21,12 +22,13 @@ Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 O
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
 1. https://customerpilot.in/c/cake-connection-live-cake-online-cake-delivery-in-vadodara -> HTTP 200 (Digital Card with VIP Referral Hero Card)
-2. https://customerpilot.in/api/referrals/claim              -> HTTP 200 / 400 Validation (Public Referral Claim API)
-3. https://customerpilot.in/dashboard/queue                  -> HTTP 200 / 307 (Live Queue with Automatic Referrer Detection)
-4. https://customerpilot.in/dashboard/billing                -> HTTP 200 (Smart POS Billing & Invoicing)
-5. https://customerpilot.in/dashboard/digital-card           -> HTTP 200 (Branded QR Box Studio)
-6. https://customerpilot.in/c/aakargraphics                  -> HTTP 200 (Digital Card)
-7. https://customerpilot.in/login                            -> HTTP 200 (Merchant Login)
-8. https://customerpilot.in/api/state                        -> HTTP 200
-9. https://customerpilot.in/api/webhook/evolution            -> HTTP 200 / 401 Guard (Evolution Webhook & Referral Intent Handler)
-10. http://187.127.170.36:8080                               -> HTTP 200 (Evolution API v2.3.7)
+2. https://customerpilot.in/api/qr/generate?type=counter     -> HTTP 200 (WhatsApp Direct Check-in Target)
+3. https://customerpilot.in/api/referrals/claim              -> HTTP 200 / 400 Validation (Public Referral Claim API)
+4. https://customerpilot.in/dashboard/queue                  -> HTTP 200 / 307 (Live Queue with Automatic Referrer Detection)
+5. https://customerpilot.in/dashboard/billing                -> HTTP 200 (Smart POS Billing & Invoicing)
+6. https://customerpilot.in/dashboard/digital-card           -> HTTP 200 (Branded QR Box Studio)
+7. https://customerpilot.in/c/aakargraphics                  -> HTTP 200 (Digital Card)
+8. https://customerpilot.in/login                            -> HTTP 200 (Merchant Login)
+9. https://customerpilot.in/api/state                        -> HTTP 200
+10. https://customerpilot.in/api/webhook/evolution           -> HTTP 200 / 401 Guard (Evolution Webhook & Referral Intent Handler)
+11. http://187.127.170.36:8080                               -> HTTP 200 (Evolution API v2.3.7)
