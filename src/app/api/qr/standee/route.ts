@@ -23,9 +23,9 @@ interface StandeeConfig {
 const STANDEE_COORDS: Record<string, StandeeConfig> = {
   master: {
     image: "standee_master_authentic.jpg",
-    qr: { left: 221, top: 366, width: 280, height: 280 },
+    qr: { left: 151, top: 348, width: 420, height: 420 },
     darkColor: "#0f172a",
-    whiteCard: { left: 190, top: 359, width: 342, height: 294, rx: 22 },
+    whiteCard: { left: 130, top: 334, width: 462, height: 448, rx: 28 },
     headerPill: { left: 122, top: 16, width: 480, height: 104 },
   },
   bakery: {
@@ -63,9 +63,9 @@ const STANDEE_COORDS: Record<string, StandeeConfig> = {
 const PRINT_POSTER_COORDS: Record<string, StandeeConfig> = {
   master: {
     image: "standee_master_authentic.jpg",
-    qr: { left: 221, top: 366, width: 280, height: 280 },
+    qr: { left: 151, top: 348, width: 420, height: 420 },
     darkColor: "#0f172a",
-    whiteCard: { left: 190, top: 359, width: 342, height: 294, rx: 22 },
+    whiteCard: { left: 130, top: 334, width: 462, height: 448, rx: 28 },
     headerPill: { left: 122, top: 16, width: 480, height: 104 },
   },
   bakery: {
