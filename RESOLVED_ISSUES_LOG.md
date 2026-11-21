@@ -4,6 +4,20 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [21 Nov 2026] Issue: Tabletop Standee QR Code Small Size & Blurry Center Logo
+- **Symptom**: User reported that on the VIP Loyalty Standee (Template D / Master), the QR code is too small inside the center card, and the merchant logo in the center of the QR code is tiny and hard to read.
+- **Root Cause**:
+  1. Standee QR dimensions were hardcoded to 250x250 inside a 330x286 card, leaving excessive 40px margins and making the QR look shrunken.
+  2. The center badge size was constrained to only 21% of QR size with a 78% logo inner fill ratio and square-only bounding box. For wide landscape logos like Cake Connection (aspect ratio 1.72:1), this squished the logo height to a microscopic 24 pixels.
+- **Resolution**:
+  1. Enlarged master standee QR code from 250x250 to 280x280 (+25.4% larger scanning area) and adjusted whiteCard dimensions to 342x294.
+  2. Enhanced `createBrandedQRBuffer` with aspect-ratio awareness: wide logos automatically receive an expanded proportional badge (28% x 21%) and fill ratio increased from 78% to 88%, resulting in a 2.83x larger, crystal-clear center logo.
+  3. Verified 100% scan decoding using `jsQR` unit tests on rendered outputs across sizes (276px, 280px, 284px).
+  4. Passed all 7 CustomerPilot Master Adversarial Red-Team Gates cleanly.
+- **Status**: ✅ Resolved and Verified Locally (Commit ID: 2a82053).
+
+---
+
 ## [21 Nov 2026] Issue: Counter Loyalty QR Code Standee Digital Card Override & Live Queue Bypass
 - **Symptom**: When a customer at Cake Connection scanned the Loyalty QR Code Standee, they did not appear in the merchant's Live Queue (/dashboard/queue). The merchant's queue remained completely empty ("0 Customers Waiting / Queue is completely empty").
 - **Root Cause**: In src/app/api/qr/generate/route.ts and src/app/api/qr/standee/route.ts, the QR target URL resolution contained an unconditional check: if (digitalCard) targetUrl = ${protocol}://${host}/c/${digitalCard.slug}. Because Cake Connection has an active Digital Business Card (slug: cake-connection), the Master Standee and Counter QR codes were encoded with https://customerpilot.in/c/cake-connection (the web page) instead of the WhatsApp check-in URL (https://wa.me/917203824012?text=Hi%20Cake%20Connection!%20Checking%20in%20for%20my%20VIP%20Club%20stamps%20🎁). When scanned by a customer's phone, the device opened Chrome/Safari to the digital business card page rather than launching WhatsApp. Because no incoming message was sent to Evolution API (917203824012), the webhook never fired and joinQueue was never called.

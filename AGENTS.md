@@ -145,6 +145,17 @@ To ensure that the Antigravity Agent operates with the exact same merciless rigo
    - Leverage Gemini's high execution speed and large context window to run extensive physical scripts, grep entire disk volumes, and parse multi-thousand-line logs.
    - Apply Claude's forensic skepticism to treat every unverified assumption as a potential failure. Trust only Exit Code 0, raw byte SHA256, and live external verification.
 
+## Mandatory Non-Technical Summary at the End (GLOBAL USER RULE)
+In every single response to the user, after providing the detailed technical report / investigation, the agent MUST include a dedicated section at the very end:
+`### 🧩 Aasan Bhasha Me Summary (Non-Technical 3 to 10 Lines):`
+This section must explain the situation in simple, plain non-technical Hinglish (3 to 10 lines):
+- Asal me kya hua (What actually happened)
+- Kya problem / issue thi (What was the problem)
+- Kya theek kiya gaya (What got fixed)
+- Abhi kya status hai aur aage kya karna hai (Current status & next action)
+So that anyone without technical knowledge can instantly understand the complete reality within 1 minute.
+
+
 
 <!-- BEGIN:nextjs-agent-rules -->
 

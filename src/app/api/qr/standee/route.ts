@@ -23,9 +23,9 @@ interface StandeeConfig {
 const STANDEE_COORDS: Record<string, StandeeConfig> = {
   master: {
     image: "standee_master_authentic.jpg",
-    qr: { left: 236, top: 381, width: 250, height: 250 },
+    qr: { left: 221, top: 366, width: 280, height: 280 },
     darkColor: "#0f172a",
-    whiteCard: { left: 196, top: 363, width: 330, height: 286, rx: 22 },
+    whiteCard: { left: 190, top: 359, width: 342, height: 294, rx: 22 },
     headerPill: { left: 122, top: 16, width: 480, height: 104 },
   },
   bakery: {
@@ -63,9 +63,9 @@ const STANDEE_COORDS: Record<string, StandeeConfig> = {
 const PRINT_POSTER_COORDS: Record<string, StandeeConfig> = {
   master: {
     image: "standee_master_authentic.jpg",
-    qr: { left: 236, top: 381, width: 250, height: 250 },
+    qr: { left: 221, top: 366, width: 280, height: 280 },
     darkColor: "#0f172a",
-    whiteCard: { left: 196, top: 363, width: 330, height: 286, rx: 22 },
+    whiteCard: { left: 190, top: 359, width: 342, height: 294, rx: 22 },
     headerPill: { left: 122, top: 16, width: 480, height: 104 },
   },
   bakery: {
@@ -231,18 +231,35 @@ async function createBrandedQRBuffer(
 
   if (centerLogoBuffer) {
     try {
-      const badgeSize = Math.round(qrSize * 0.21)
-      const logoInnerSize = Math.round(badgeSize * 0.78)
-      const rx = Math.max(8, Math.round(badgeSize * 0.16))
+      const logoMeta = await sharp(centerLogoBuffer).metadata()
+      const aspect = (logoMeta.width && logoMeta.height) ? (logoMeta.width / logoMeta.height) : 1
+
+      // Standard safe center badge size: 26% of QR size (fully scannable under Level H)
+      let badgeW = Math.round(qrSize * 0.26)
+      let badgeH = badgeW
+
+      // Aspect-ratio-aware adaptation: wide landscape logos get appropriate width instead of being crushed
+      if (aspect > 1.3) {
+        badgeW = Math.min(Math.round(qrSize * 0.28), Math.round(badgeH * 1.35))
+        badgeH = Math.round(badgeW / 1.35)
+      } else if (aspect < 0.77) {
+        badgeH = Math.min(Math.round(qrSize * 0.28), Math.round(badgeW * 1.35))
+        badgeW = Math.round(badgeH / 1.35)
+      }
+
+      const logoInnerW = Math.round(badgeW * 0.88)
+      const logoInnerH = Math.round(badgeH * 0.88)
+      const rx = Math.max(6, Math.round(Math.min(badgeW, badgeH) * 0.18))
       const strokeW = Math.max(1.8, Math.round(qrSize / 150))
+
       const resizedLogo = await sharp(centerLogoBuffer)
-        .resize({ width: logoInnerSize, height: logoInnerSize, fit: "inside" })
+        .resize({ width: logoInnerW, height: logoInnerH, fit: "inside" })
         .png()
         .toBuffer()
 
       const badgeSvg = Buffer.from(
-        `<svg width="${badgeSize}" height="${badgeSize}" xmlns="http://www.w3.org/2000/svg">
-          <rect x="${strokeW}" y="${strokeW}" width="${badgeSize - strokeW * 2}" height="${badgeSize - strokeW * 2}" rx="${rx}" ry="${rx}" fill="#ffffff" stroke="#cbd5e1" stroke-width="${strokeW}"/>
+        `<svg width="${badgeW}" height="${badgeH}" xmlns="http://www.w3.org/2000/svg">
+          <rect x="${strokeW}" y="${strokeW}" width="${badgeW - strokeW * 2}" height="${badgeH - strokeW * 2}" rx="${rx}" ry="${rx}" fill="#ffffff" stroke="#cbd5e1" stroke-width="${strokeW}"/>
         </svg>`
       )
 
