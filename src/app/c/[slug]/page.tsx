@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import { Metadata } from "next"
+import { db } from "@/lib/db"
 import { DigitalCardView, DigitalCardData } from "@/components/digital-card-view"
 import { resolveDigitalCardBySlug } from "@/lib/digital-card-service"
 
@@ -7,6 +8,7 @@ interface PageProps {
   params: Promise<{
     slug: string
   }>
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -66,12 +68,39 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default async function PublicDigitalCardPage({ params }: PageProps) {
+export default async function PublicDigitalCardPage({ params, searchParams }: PageProps) {
   const { slug } = await params
+  const sp = searchParams ? await searchParams : {}
+  const rawRef = typeof sp?.ref === "string" ? sp.ref.trim().toUpperCase() : null
+
   const card = await resolveDigitalCardBySlug(slug)
 
   if (!card) {
     notFound()
+  }
+
+  let referralInfo: {
+    referralCode: string
+    referrerName: string
+    referrerId: string
+  } | null = null
+
+  if (rawRef) {
+    const referrer = await db.customer.findFirst({
+      where: {
+        merchantId: card.merchantId,
+        referralCode: rawRef,
+        deletedAt: null
+      },
+      select: { id: true, name: true, referralCode: true }
+    })
+    if (referrer) {
+      referralInfo = {
+        referralCode: referrer.referralCode || rawRef,
+        referrerName: referrer.name || "A VIP Member",
+        referrerId: referrer.id
+      }
+    }
   }
 
   // Ensure theme honors merchant's active plan and extended trialEndsAt from SuperAdmin
@@ -121,5 +150,5 @@ export default async function PublicDigitalCardPage({ params }: PageProps) {
     googlePlaceId: card.googlePlaceId,
   }
 
-  return <DigitalCardView card={cardData} />
+  return <DigitalCardView card={cardData} referralInfo={referralInfo} />
 }

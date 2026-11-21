@@ -94,10 +94,20 @@ export interface DigitalCardData {
   upiPayeeName?: string | null
 }
 
-export function DigitalCardView({ card }: { card: DigitalCardData }) {
+export interface ReferralInfo {
+  referralCode: string
+  referrerName: string
+  referrerId: string
+}
+
+export function DigitalCardView({ card, referralInfo }: { card: DigitalCardData; referralInfo?: ReferralInfo | null }) {
   const [qrModalOpen, setQrModalOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [savingContact, setSavingContact] = useState(false)
+  const [claimPhone, setClaimPhone] = useState("")
+  const [claiming, setClaiming] = useState(false)
+  const [claimedSuccess, setClaimedSuccess] = useState(false)
+  const [claimError, setClaimError] = useState<string | null>(null)
   const [contactToast, setContactToast] = useState<{
     open: boolean
     message: string
@@ -550,6 +560,40 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  // 🎁 1-Tap Claim Referral VIP Pass
+  const handleClaimReferral = async () => {
+    if (!referralInfo) return
+    const digits = claimPhone.replace(/\D/g, "")
+    if (digits.length < 10) {
+      setClaimError("Please enter a valid 10-digit mobile number")
+      return
+    }
+    setClaiming(true)
+    setClaimError(null)
+    try {
+      const res = await fetch("/api/referrals/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          referralCode: referralInfo.referralCode,
+          friendPhone: digits,
+          merchantSlug: card.slug,
+          merchantId: card.merchantId,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setClaimedSuccess(true)
+      } else {
+        setClaimError(data.error || "Could not activate referral pass.")
+      }
+    } catch (_) {
+      setClaimError("Network error. Please try again.")
+    } finally {
+      setClaiming(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fbf8f2] via-[#f7f2e7] to-[#ede4d1] text-slate-900 flex justify-center selection:bg-amber-200">
       
@@ -562,6 +606,82 @@ export function DigitalCardView({ card }: { card: DigitalCardData }) {
 
         <div className="relative z-10 space-y-4 sm:space-y-5">
           
+          {/* 🎁 VIP REFERRAL WELCOME HERO CARD */}
+          {referralInfo && (
+            <div className="rounded-3xl bg-gradient-to-br from-amber-600 via-amber-700 to-amber-900 p-4 text-white shadow-xl border-2 border-amber-400 relative overflow-hidden">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 text-xl shadow-inner">
+                  🎁
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-white/25 px-2.5 py-0.5 rounded-full text-amber-100">
+                    VIP Invite from {referralInfo.referrerName}
+                  </span>
+                  <h3 className="font-extrabold text-base leading-tight mt-1 text-white">
+                    +1 Free Bonus Stamp Gift! 🎂
+                  </h3>
+                  <p className="text-xs text-amber-100/90 mt-0.5 leading-snug">
+                    {referralInfo.referrerName} ne aapko {card.displayName} ka VIP Welcome Pass bheja hai! Niche WhatsApp number enter karke activate karein:
+                  </p>
+                </div>
+              </div>
+
+              {claimedSuccess ? (
+                <div className="mt-3.5 bg-emerald-950/90 border border-emerald-400/50 text-white rounded-2xl p-3.5 text-center space-y-1 shadow-lg">
+                  <div className="flex items-center justify-center gap-1.5 text-emerald-300 font-bold text-sm">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span>VIP Pass Activated!</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-100 leading-relaxed">
+                    Aapka WhatsApp number link ho gaya hai. Jab aap shop visit karein, counter par laga <strong>Loyalty QR</strong> scan karein — aapka +1 Free Bonus Stamp automatic WhatsApp par add ho jayega! 🎉
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-3.5 space-y-2">
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <span className="absolute left-3 top-2.5 text-xs text-slate-500 font-bold">+91</span>
+                      <input
+                        type="tel"
+                        maxLength={10}
+                        placeholder="Enter WhatsApp Mobile No"
+                        value={claimPhone}
+                        onChange={(e) => setClaimPhone(e.target.value.replace(/\D/g, ""))}
+                        className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-white text-slate-900 text-xs font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-inner"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleClaimReferral}
+                      disabled={claiming || claimPhone.length < 10}
+                      className="px-4 py-2.5 bg-slate-900 hover:bg-black text-amber-300 font-extrabold text-xs rounded-xl shadow-md disabled:opacity-50 transition shrink-0 border border-amber-400/40"
+                    >
+                      {claiming ? "Activating..." : "Activate Pass 🎁"}
+                    </button>
+                  </div>
+
+                  {claimError && (
+                    <p className="text-[11px] font-semibold text-red-200 bg-red-950/60 border border-red-500/40 px-2.5 py-1.5 rounded-xl">
+                      {claimError}
+                    </p>
+                  )}
+
+                  <div className="pt-1 text-center">
+                    <a
+                      href={`https://wa.me/${(card.whatsappNumber || "919033304707").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi ${card.displayName}! Claiming VIP Pass from referral ${referralInfo.referralCode} 🎁`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-amber-200 hover:text-white underline font-semibold inline-flex items-center gap-1"
+                    >
+                      <span>Or Activate via WhatsApp Chat</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Active 3-Day Free Trial Notice Banner */}
           {!isPermanent && (
             <div className="px-3.5 py-1.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-[11px] font-bold flex items-center justify-between shadow-xs">

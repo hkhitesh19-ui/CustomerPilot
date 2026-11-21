@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { joinQueue } from "@/lib/queue-engine"
+import { normalizePhone } from "@/lib/utils"
 import { getCompiledTemplate } from "@/lib/template-engine"
 import { isOrderTriggerMessage, isOrderStatusInquiry, processIncomingWhatsAppOrder } from "@/lib/order-bot"
 import { isGbpPostApprovalCommand, handleMerchantGbpPostWhatsAppReply } from "@/lib/gbp/whatsapp-post-approval"
@@ -455,6 +456,68 @@ export async function POST(req: NextRequest) {
           }
         }
 
+        // ── 1.7 REFERRAL VIP PASS CLAIM VIA WHATSAPP ─────────────────────
+        const referralCodeMatch = text.match(/(?:claim.*pass.*|ref[:\s]+|referral[:\s]+|code[:\s]+|^ref\s+)(CP-[A-Z0-9]+)/i)
+          || (text.trim().toUpperCase().startsWith("CP-") && text.trim().length <= 14 ? [null, text.trim().toUpperCase()] : null)
+
+        if (referralCodeMatch && referralCodeMatch[1]) {
+          const rawCode = referralCodeMatch[1].trim().toUpperCase()
+          const referrer = await db.customer.findFirst({
+            where: { merchantId: merchant.id, referralCode: rawCode, deletedAt: null }
+          })
+
+          if (referrer) {
+            const referrerPhone = normalizePhone(referrer.phone) || referrer.phone
+            const normCustomerPhone = normalizePhone(customerPhone) || customerPhone
+            const last10 = normCustomerPhone.slice(-10)
+
+            if (referrerPhone === normCustomerPhone || referrerPhone.slice(-10) === last10) {
+              const selfMsg = `⚠️ *Notice:* Aap apna hi referral code use nahi kar sakte. Ye pass apne friends ke sath share karein! 🎁`
+              const res = await sendEvolutionMessage(customerPhone, selfMsg, merchantInstance)
+              if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "REFERRAL_SELF", selfMsg, res.data?.key?.id)
+              continue
+            }
+
+            const existingRef = await db.referral.findFirst({
+              where: {
+                merchantId: merchant.id,
+                OR: [
+                  { friendPhone: normCustomerPhone },
+                  { friendPhone: last10 },
+                  { friendPhone: `+${normCustomerPhone}` },
+                  { friendPhone: `91${last10}` }
+                ]
+              }
+            })
+
+            if (!existingRef) {
+              await db.referral.create({
+                data: {
+                  merchantId: merchant.id,
+                  referrerId: referrer.id,
+                  friendPhone: normCustomerPhone,
+                  status: "pending",
+                  rewardType: "stamps",
+                  rewardAmount: 1
+                }
+              })
+            }
+
+            const welcomeRefMsg = `🎉 *VIP Pass Activated!* 🎂\n\n` +
+              `Hi! Aapka VIP Welcome Pass *${merchant.name}* ke liye successfully activate ho gaya hai (Gifted by *${referrer.name}*)! 🎁\n\n` +
+              `⭐ *Aapko kya milega:*\n` +
+              `• 1st visit par *+1 Extra Free Bonus Stamp* bilkul Free 🎁\n` +
+              `• Digital VIP Stamp Card & Birthday Perks 🎂\n\n` +
+              `🏪 *Shop Par Kaise Use Karein:*\n` +
+              `Store visit karke counter par laga Loyalty QR scan karein — aapka Free Bonus Stamp automatic aapke account me add ho jayega! ✨`
+
+            console.log(`[Webhook] 🎁 Referral claimed via WhatsApp by +${customerPhone} for code ${rawCode}`)
+            const res = await sendEvolutionMessage(customerPhone, welcomeRefMsg, merchantInstance)
+            if (res.ok) await saveOutgoingMessage(merchant.id, customerPhone, "REFERRAL_ACTIVATED", welcomeRefMsg, res.data?.key?.id)
+            continue
+          }
+        }
+
         // If the message is NOT from a QR scan and NOT a reply to a pending bot message, skip queue join!
         if (!isTriggerMsg) {
           console.log(`[Webhook] ℹ️ Non-QR chat received from ${customerPhone}: "${text}". Skipping queue auto-join.`)
@@ -482,9 +545,11 @@ export async function POST(req: NextRequest) {
           continue
         }
 
-        // ── Determine scan type ─────────────────────────────────────────
+        // ── Determine scan type & embedded referral ─────────────────────
         const scanTypeMatch = text.match(/\(ref:([^)]+)\)/)
         const scanType = scanTypeMatch ? `qr_${scanTypeMatch[1]}_whatsapp` : "qr_counter_whatsapp"
+        const inlineRefMatch = text.match(/\b(CP-[A-Z0-9]+)\b/i)
+        const detectedReferralCode = inlineRefMatch ? inlineRefMatch[1].toUpperCase() : undefined
 
         // ── JOIN: Add customer to Live Queue (Only for QR Code Scans) ────
         try {
@@ -495,7 +560,8 @@ export async function POST(req: NextRequest) {
             merchantId: merchant.id,
             phone: customerPhone,
             name: detectedName || undefined,
-            scanSource: scanType
+            scanSource: scanType,
+            referralCode: detectedReferralCode
           })
 
           // Get stamp card info

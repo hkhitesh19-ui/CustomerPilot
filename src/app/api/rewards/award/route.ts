@@ -245,13 +245,16 @@ export async function POST(req: Request) {
           const custPhone = waitingCustomer.customer.phone;
           const trimmedRefCode = typeof referralCode === 'string' ? referralCode.trim().toUpperCase() : '';
 
-          // 1. Look for pending referral by Customer B's phone or customer ID
+          // 1. Look for pending referral by Customer B's phone or customer ID (resilient format matching)
+          const custLast10 = custPhone.slice(-10);
           let pendingRef = await tx.referral.findFirst({
             where: {
               merchantId,
               status: 'pending',
               OR: [
                 { friendPhone: custPhone },
+                { friendPhone: custLast10 },
+                { friendPhone: `91${custLast10}` },
                 { friendCustomerId: waitingCustomer.customerId }
               ]
             },
@@ -266,7 +269,14 @@ export async function POST(req: Request) {
 
             if (referrerByCode && referrerByCode.id !== waitingCustomer.customerId && referrerByCode.phone !== custPhone) {
               const alreadyReferred = await tx.referral.findFirst({
-                where: { merchantId, friendPhone: custPhone }
+                where: {
+                  merchantId,
+                  OR: [
+                    { friendPhone: custPhone },
+                    { friendPhone: custLast10 },
+                    { friendPhone: `91${custLast10}` }
+                  ]
+                }
               });
               if (!alreadyReferred) {
                 pendingRef = await tx.referral.create({

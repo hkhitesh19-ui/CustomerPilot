@@ -105,6 +105,16 @@ export default async function WalletPage({
   const hasPostedReview = Boolean(latestReview)
   const hasPostedPhoto = Boolean(latestReview && (latestReview.photoBonusStamps > 0 || latestReview.photoUrl))
 
+  // Self-heal: ensure customer has a valid unique referral code
+  let activeReferralCode = customer.referralCode
+  if (!activeReferralCode) {
+    activeReferralCode = `CP-${customer.phone.slice(-4)}${customer.id.slice(-4).toUpperCase()}`
+    await db.customer.update({
+      where: { id: customer.id },
+      data: { referralCode: activeReferralCode }
+    }).catch(() => {})
+  }
+
   const initialData = {
     customer: {
       id: customer.id,
@@ -113,7 +123,7 @@ export default async function WalletPage({
       vipTier: customer.vipTier || "VIP",
       lifetimeStamps: customer.lifetimeStamps,
       walletCredit: customer.walletCredit || 0,
-      referralCode: customer.referralCode || ""
+      referralCode: activeReferralCode
     },
     merchant: {
       id: customer.merchant.id,

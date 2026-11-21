@@ -260,42 +260,68 @@ export function DigitalWalletClient({ initialData }: { initialData: WalletData }
           {/* WhatsApp Invite Friend */}
           {(() => {
             const mSlug = (data.merchant.name || "store").toLowerCase().trim().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "")
-            const digitalCardUrl = `https://customerpilot.in/c/${mSlug}`
+            const refCode = data.customer.referralCode || `CP-${data.customer.phone.slice(-4)}`
+            const digitalCardUrl = `https://customerpilot.in/c/${mSlug}?ref=${refCode}`
             const referralShareMsg = `🍰 *Hey! ${data.merchant.name} ka VIP Pass aapke liye!* 🎁\n\n` +
               `Maine ${data.merchant.name} ka VIP Loyalty Club join kiya hai aur mere paas aapke liye ek *Free Welcome Stamp* ka gift hai!\n\n` +
               `⭐ *Aapko kya milega:*\n` +
               `• 1st visit par *+1 Extra Bonus Stamp* bilkul Free 🎁\n` +
               `• ${data.rule.stampsRequired || 10} stamps collect karke *Free ${data.card.rewardName || 'Reward / Treat'}* 🎂\n\n` +
-              `👇 *${data.merchant.name} ka digital card yahan dekhein & claim karein:*\n` +
+              `👇 *VIP Pass activate karne ke liye link par click karein:*\n` +
               `👉 ${digitalCardUrl}\n\n` +
+              `🎟️ *Mera Referral Code:* ${refCode}\n\n` +
               `📍 *Kaise use karein:*\n` +
-              `Store visit karke counter par laga QR code scan karein — aapka Free Bonus Stamp automatic aapke WhatsApp par add ho jayega! ✨`
+              `1. Upar di gayi link par click karke apna WhatsApp number activate karein.\n` +
+              `2. Kal jab aap shop visit karein, counter par laga Loyalty QR scan karein — aapka Free Bonus Stamp automatic aapke WhatsApp par add ho jayega! ✨`
 
             return (
-              <a
-                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(referralShareMsg)}`}
-                target="_blank"
-                rel="noreferrer"
-                className="block group no-underline"
-              >
-                <div className="bg-gradient-to-r from-emerald-950/40 to-teal-950/40 border border-emerald-500/30 hover:border-emerald-400/50 rounded-2xl p-4 flex items-center justify-between transition-all">
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4 text-emerald-400" />
-                      <span className="font-bold text-sm text-slate-100">Refer a Friend</span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
-                        +1 Bonus Stamp
-                      </span>
+              <div className="bg-gradient-to-r from-emerald-950/40 to-teal-950/40 border border-emerald-500/30 hover:border-emerald-400/50 rounded-2xl p-4 transition-all space-y-3">
+                <a
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(referralShareMsg)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block group no-underline"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-1.5">
+                        <Sparkles className="w-4 h-4 text-emerald-400" />
+                        <span className="font-bold text-sm text-slate-100">Refer a Friend</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
+                          +1 Bonus Stamp
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-400">
+                        Share your VIP invite on WhatsApp. Both you & your friend earn +1 Stamp!
+                      </p>
                     </div>
-                    <p className="text-xs text-slate-400">
-                      Invite your friends to earn rewards together on WhatsApp.
-                    </p>
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 group-hover:scale-110 transition-transform flex-shrink-0">
+                      <ExternalLink className="w-4 h-4" />
+                    </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 group-hover:scale-110 transition-transform flex-shrink-0">
-                    <ExternalLink className="w-4 h-4" />
+                </a>
+
+                {/* Referral Code Badge with Copy */}
+                <div className="pt-2 border-t border-emerald-500/20 flex items-center justify-between text-xs">
+                  <span className="text-slate-400">Your Referral Code:</span>
+                  <div className="flex items-center gap-2">
+                    <code className="px-2 py-0.5 rounded bg-emerald-900/60 border border-emerald-400/40 font-mono font-bold text-emerald-300 text-xs tracking-wider">
+                      {refCode}
+                    </code>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        navigator.clipboard?.writeText(refCode)
+                        alert(`Referral code ${refCode} copied!`)
+                      }}
+                      className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 underline"
+                    >
+                      Copy
+                    </button>
                   </div>
                 </div>
-              </a>
+              </div>
             )
           })()}
         </div>

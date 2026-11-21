@@ -7652,3 +7652,41 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   3. Integrated `📸 Photo Se Menu Scan Karo` AI Scanner modal into `src/app/dashboard/billing/page.tsx` with image upload / camera capture, AI product extraction (`/api/menu/extract-from-image`), review table with editable categories/names/prices, and 1-tap bulk import into store catalog (`/api/menu/bulk-import`) plus instant addition to active bill.
   4. Verified all 7 Master Adversarial Red-Team safety gates (Exit Code 0).
 - **Status**: ✅ Resolved and Verified.
+
+
+---
+## [21 Nov 2026] Issue: Evolution WhatsApp API Authentication Key & Webhook Secret Cryptographic Rotation
+- **Symptom**: Historical API authentication key (`299f8651`) and webhook secret (`c14d088b`) were exposed in conversation context during environment diagnostics, posing an unauthorized API execution risk. Additionally, Cake Connection's storefront possessed a stale legacy disk key (`3af16053`) that returned HTTP 401 on Evolution API.
+- **Root Cause**:
+  1. Plaintext output of `pm2 env 1 | grep EVOLUTION` printed raw credentials into chat logs.
+  2. Latent key drift in `/var/www/CakeConnection/next-app/.env.production` where the disk key remained on a dead 26-char token while PM2 memory ran on an inherited key from a prior global reload.
+  3. External network ports required complete verification under UFW to guarantee external probing drop.
+- **Resolution**:
+  1. Developed, hardened, and executed `rotate_keys_v6.3.sh` on the live Hostinger VPS (`187.127.170.36`) inside `tmux`.
+  2. Implemented fail-closed queue gates asserting 0 active cashier waiting customers (`sqlite3 dev.db` count = 0) before modifying any production configurations.
+  3. Generated cryptographically random 256-bit credentials for `AUTHENTICATION_API_KEY` (new hash: `8d5eb14c`) and `EVOLUTION_WEBHOOK_SECRET` (new hash: `0f46dd43`).
+  4. Updated all configuration files (`docker-compose.yml`, CustomerPilot `.env`, `.env.production`, CakeConnection `.env.production`, and `cp-watchdog/.env`) with permission mode 600 and internal loopback URL routing (`http://127.0.0.1:8080`).
+  5. Recreated Evolution API container, dynamically asserting that old key returned HTTP 401 Unauthorized and new key returned HTTP 200 OK.
+  6. Reconfigured webhooks for active WhatsApp instances (`CP_917203824012_cmtymavf_mw0whjx7` and `CP_M_cmwgac6h_cmwgac6h_mwov2v15`), confirming HTTP 200/201 and valid payload acceptance.
+  7. Gracefully reloaded PM2 applications (`customerpilot-cron`, `cakeconnection`, `customerpilot-web`, and clean restarted `cp-watchdog`), sanitizing `dump.pm2` to 0 instances of old credentials.
+  8. Verified all 37 selftest cases (`pass=37 fail=0`) and 100% of Stage D post-execution audit assertions.
+- **Status**: ✅ Resolved, Fully Rotated, and Verified on Live VPS.
+
+---
+## [21 Nov 2026] Issue: Customer Referral Flow Auto-Detection and Link Claim Disconnect
+- **Symptom**: When Customer A scanned the loyalty QR code, received stamps, and shared their referral invite link with Customer B, Customer B visiting the store tomorrow and scanning the counter loyalty QR code would appear in the Live Queue as an organic customer without linking Customer A as the referrer, preventing automatic dual bonus stamps.
+- **Root Cause**:
+  1. In `DigitalWalletClient.tsx`, the WhatsApp referral sharing button was generating a generic URL (`https://customerpilot.in/c/${slug}`) lacking the referrer's `?ref=CP-XXXX` tracking parameter and code.
+  2. Public landing page `/c/[slug]` did not parse or bind referral query parameters, and lacked an interactive VIP Referral Claim interface for Customer B to register their WhatsApp mobile number.
+  3. `queue-engine.ts` only performed pending referral lookup when `customer` was null; if Customer B already existed in the database, `referredById` was left unlinked.
+  4. Phone formatting discrepancies (`91XXXXXXXXXX` vs `XXXXXXXXXX`) caused strict equality queries on `friendPhone` to miss matches.
+- **Resolution**:
+  1. Updated `DigitalWalletClient.tsx` to automatically append `?ref=${referralCode}` to the shared WhatsApp invitation link and display Customer A's unique referral code with a 1-tap copy button.
+  2. Enhanced `src/app/c/[slug]/page.tsx` to resolve `searchParams.ref`, fetch the referrer profile, and pass verified `referralInfo` to `DigitalCardView`.
+  3. Built an interactive VIP Referral Welcome Hero Card in `DigitalCardView` allowing Customer B to enter their 10-digit WhatsApp phone number to activate their pass immediately upon clicking the link, or activate via 1-tap WhatsApp chat.
+  4. Created a public, hardened API endpoint `POST /api/referrals/claim` with anti-self-referral validation, repeat customer check, phone normalization, idempotent pending referral creation, and automated WhatsApp confirmation.
+  5. Hardened `queue-engine.ts` and `award/route.ts` with resilient multi-format phone matching (`normPhone`, `last10`, `91${last10}`) and automatic retroactive linking for existing customer records.
+  6. Added incoming WhatsApp referral intent parsing in `evolution/route.ts` to support in-chat activation (`REF CP-XXXX`).
+  7. Updated Layer 5 Frozen Core Guard manifest and passed all 7 Master Adversarial Gates.
+  8. Verified full end-to-end simulation in `scripts/test_referral_flow_e2e.js`: Customer A invite -> Customer B web claim -> Next day counter QR scan -> Live Queue golden badge `✨ Referral Linked: Customer A` -> Cashier bill approval -> Atomic dual bonus stamps.
+- **Status**: ✅ Resolved and Verified.

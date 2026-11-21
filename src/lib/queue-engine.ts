@@ -1,5 +1,6 @@
 // CustomerPilot V12 — Queue Engine with Unified Communication Pipeline
 import { db } from "@/lib/db"
+import { normalizePhone } from "@/lib/utils"
 import { awardStampsForBill } from "@/lib/stamp-engine"
 import { QUEUE_TIMEOUT_BY_BUSINESS, RESERVATION_TIMEOUT_SECONDS, UNDO_WINDOW_SECONDS, canTransition } from "@/lib/queue-state-machine"
 import { CommunicationService } from "@/communication/services/CommunicationService"
@@ -27,11 +28,59 @@ export async function joinQueue(opts: {
   phone: string
   name?: string
   scanSource?: string
+  referralCode?: string
 }): Promise<QueueJoinResult> {
   const { merchantId, phone, name } = opts
 
+  const normPhone = normalizePhone(phone) || phone
+  const last10 = normPhone.slice(-10)
+
+  // 1. Look up pending referral by friend's phone (resilient matching with/without country code)
+  let pendingReferral = await db.referral.findFirst({
+    where: {
+      merchantId,
+      status: "pending",
+      OR: [
+        { friendPhone: normPhone },
+        { friendPhone: last10 },
+        { friendPhone: `+${normPhone}` },
+        { friendPhone: `91${last10}` }
+      ]
+    }
+  })
+
+  // 2. If not pre-registered by phone, check if a referralCode was supplied (e.g. via WhatsApp chat)
+  if (!pendingReferral && opts.referralCode) {
+    const cleanRef = opts.referralCode.trim().toUpperCase()
+    const referrer = await db.customer.findFirst({
+      where: { merchantId, referralCode: cleanRef, deletedAt: null }
+    })
+    const referrerPhone = referrer ? (normalizePhone(referrer.phone) || referrer.phone) : ""
+    if (referrer && referrerPhone !== normPhone && referrerPhone.slice(-10) !== last10) {
+      try {
+        pendingReferral = await db.referral.create({
+          data: {
+            merchantId,
+            referrerId: referrer.id,
+            friendPhone: normPhone,
+            status: "pending",
+            rewardType: "stamps",
+            rewardAmount: 1
+          }
+        })
+      } catch (_) {}
+    }
+  }
+
   let customer = await db.customer.findFirst({
-    where: { merchantId, phone },
+    where: {
+      merchantId,
+      OR: [
+        { phone },
+        { phone: normPhone },
+        { phone: last10 }
+      ]
+    },
   })
 
   const isNewCustomer = !customer
@@ -42,19 +91,15 @@ export async function joinQueue(opts: {
       select: { loyaltyCategoryNames: true }
     })
     const initialCategory = resolveLoyaltyCategoryName(merchant?.loyaltyCategoryNames, 0)
-    const customerName = name || `Customer ${phone.slice(-4)}`
-    // Look up if this phone has a pending referral from another customer
-    const pendingReferral = await db.referral.findFirst({
-      where: { merchantId, friendPhone: phone, status: "pending" }
-    })
+    const customerName = name || `Customer ${normPhone.slice(-4)}`
 
-    const customerReferralCode = `CP-${phone.slice(-4)}${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+    const customerReferralCode = `CP-${normPhone.slice(-4)}${Math.random().toString(36).substring(2, 6).toUpperCase()}`
 
     customer = await db.customer.create({
       data: {
         merchantId,
         name: customerName,
-        phone,
+        phone: normPhone,
         vipTier: initialCategory,
         acquisitionChan: pendingReferral ? "referral" : "qr_scan",
         referredById: pendingReferral ? pendingReferral.referrerId : null,
@@ -76,7 +121,7 @@ export async function joinQueue(opts: {
 
     // Dispatch Welcome WhatsApp via CommunicationService
     await CommunicationService.dispatch({
-      to: phone,
+      to: normPhone,
       templateName: "qr_welcome",
       variables: { name: customerName },
       metadata: { merchantId, customerId: customer.id }
@@ -91,6 +136,25 @@ export async function joinQueue(opts: {
       },
     })
   } else {
+    // If customer already exists, link pending referral if not yet linked
+    if (!customer.referredById && pendingReferral) {
+      await db.customer.update({
+        where: { id: customer.id },
+        data: {
+          referredById: pendingReferral.referrerId,
+          acquisitionChan: "referral"
+        }
+      }).catch(() => {})
+      customer.referredById = pendingReferral.referrerId
+    }
+
+    if (pendingReferral && !pendingReferral.friendCustomerId) {
+      await db.referral.update({
+        where: { id: pendingReferral.id },
+        data: { friendCustomerId: customer.id }
+      }).catch(() => {})
+    }
+
     await db.customer.update({
       where: { id: customer.id },
       data: { lastActiveAt: new Date() },
