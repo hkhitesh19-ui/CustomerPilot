@@ -4,6 +4,22 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [21 Nov 2026] Issue: Loyalty Master Standee Giant QR Upgrade (280px to 420px, +50% Area) & Card Expansion
+- **Symptom**: User reviewed the deployed 280px QR standee and reported that the QR code was still visibly small inside the overall 723x1024 poster composition, and requested a giant, high-impact QR code with an easily readable merchant logo.
+- **Root Cause**: The 280px QR in a 342x294 card occupied only 38.7% of the 723px standee width. The center dark graphic card zone had ample space (~540px) to accommodate a much larger QR without clipping the surrounding artwork.
+- **Resolution**:
+  1. Upgraded `STANDEE_COORDS.master` and `PRINT_POSTER_COORDS.master` in `src/app/api/qr/standee/route.ts`:
+     - QR dimensions enlarged from 280x280 to 420x420 (+50% dimension, +125% surface area, 58.1% of poster width).
+     - Centered `whiteCard` expanded from 342x294 to 462x448 (rx: 28) with gold corner brackets.
+     - Center logo badge enlarged from 73x54px to 118x87px (+62%), occupying only 5.8% of QR area (safely within Error Correction Level H 30% limit).
+  2. Generated local preview image and verified scannability before deployment.
+  3. Passed all 7 CustomerPilot Master Adversarial Red-Team Gates cleanly.
+  4. Committed locally (`614b4ae`), pushed to GitHub `deploy/pricing-update-20261102`, deployed via SFTP to VPS live, executed full Next.js production build (`Compiled successfully in 70s`), and restarted PM2 (`customerpilot-web` PID 590040).
+  5. Verified live endpoint `https://customerpilot.in/api/qr/standee?m=cmtymavfx0002kx008lbfvp57` returning HTTP 200 (227,915 bytes).
+- **Status**: ✅ Resolved, Deployed to Live VPS, and Verified.
+
+---
+
 ## [21 Nov 2026] Issue: Tabletop Standee QR Code Small Size & Blurry Center Logo
 - **Symptom**: User reported that on the VIP Loyalty Standee (Template D / Master), the QR code is too small inside the center card, and the merchant logo in the center of the QR code is tiny and hard to read.
 - **Root Cause**:

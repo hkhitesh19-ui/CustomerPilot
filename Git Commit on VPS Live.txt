@@ -9,19 +9,19 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : d25fcd1
-Full SHA          : d25fcd161ed07ce61eafc8bee26f0a0a7817fe66
+Active Git Commit : 614b4ae
+Full SHA          : 614b4aea26bdf92b823ac6f328eba3fd9368d1c3
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 21 Nov 2026, 05:42 PM IST
+Deployment Date   : 21 Nov 2026, 11:15 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(standee): enlarge QR code to 280px and enhance center logo clarity
+Commit Title      : feat(standee): Giant QR upgrade 280->420px (+50%), whiteCard 342x294->462x448 for Loyalty standee master template - approved by user 21-Nov-2026 11:06 PM IST
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
-1. https://customerpilot.in/api/qr/standee?m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (Live Standee with 280px QR & 2.83x Larger Center Logo)
+1. https://customerpilot.in/api/qr/standee?m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (Live Standee with Giant 420px QR, 462x448 Card & Crystal Clear Logo)
 2. https://customerpilot.in/c/cake-connection-live-cake-online-cake-delivery-in-vadodara -> HTTP 200 (Digital Card with VIP Referral Hero Card)
 3. https://customerpilot.in/api/qr/generate?type=counter     -> HTTP 200 (WhatsApp Direct Check-in Target)
 4. https://customerpilot.in/api/referrals/claim              -> HTTP 200 / 400 Validation (Public Referral Claim API)
