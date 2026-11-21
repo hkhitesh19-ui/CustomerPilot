@@ -9,26 +9,27 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : efa013e
-Full SHA          : efa013eebb972371012e3c8937de4175459b8060
+Active Git Commit : d25fcd1
+Full SHA          : d25fcd161ed07ce61eafc8bee26f0a0a7817fe66
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 21 Nov 2026, 11:05 AM IST
+Deployment Date   : 21 Nov 2026, 05:42 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(qr): route loyalty counter and master standee QR directly to whatsapp check-in
+Commit Title      : fix(standee): enlarge QR code to 280px and enhance center logo clarity
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
-1. https://customerpilot.in/c/cake-connection-live-cake-online-cake-delivery-in-vadodara -> HTTP 200 (Digital Card with VIP Referral Hero Card)
-2. https://customerpilot.in/api/qr/generate?type=counter     -> HTTP 200 (WhatsApp Direct Check-in Target)
-3. https://customerpilot.in/api/referrals/claim              -> HTTP 200 / 400 Validation (Public Referral Claim API)
-4. https://customerpilot.in/dashboard/queue                  -> HTTP 200 / 307 (Live Queue with Automatic Referrer Detection)
-5. https://customerpilot.in/dashboard/billing                -> HTTP 200 (Smart POS Billing & Invoicing)
-6. https://customerpilot.in/dashboard/digital-card           -> HTTP 200 (Branded QR Box Studio)
-7. https://customerpilot.in/c/aakargraphics                  -> HTTP 200 (Digital Card)
-8. https://customerpilot.in/login                            -> HTTP 200 (Merchant Login)
-9. https://customerpilot.in/api/state                        -> HTTP 200
-10. https://customerpilot.in/api/webhook/evolution           -> HTTP 200 / 401 Guard (Evolution Webhook & Referral Intent Handler)
-11. http://187.127.170.36:8080                               -> HTTP 200 (Evolution API v2.3.7)
+1. https://customerpilot.in/api/qr/standee?m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (Live Standee with 280px QR & 2.83x Larger Center Logo)
+2. https://customerpilot.in/c/cake-connection-live-cake-online-cake-delivery-in-vadodara -> HTTP 200 (Digital Card with VIP Referral Hero Card)
+3. https://customerpilot.in/api/qr/generate?type=counter     -> HTTP 200 (WhatsApp Direct Check-in Target)
+4. https://customerpilot.in/api/referrals/claim              -> HTTP 200 / 400 Validation (Public Referral Claim API)
+5. https://customerpilot.in/dashboard/queue                  -> HTTP 200 / 307 (Live Queue with Automatic Referrer Detection)
+6. https://customerpilot.in/dashboard/billing                -> HTTP 200 (Smart POS Billing & Invoicing)
+7. https://customerpilot.in/dashboard/digital-card           -> HTTP 200 (Branded QR Box Studio)
+8. https://customerpilot.in/c/aakargraphics                  -> HTTP 200 (Digital Card)
+9. https://customerpilot.in/login                            -> HTTP 200 (Merchant Login)
+10. https://customerpilot.in/api/state                       -> HTTP 200
+11. https://customerpilot.in/api/webhook/evolution          -> HTTP 200 / 401 Guard (Evolution Webhook & Referral Intent Handler)
+12. http://187.127.170.36:8080                              -> HTTP 200 (Evolution API v2.3.7)
