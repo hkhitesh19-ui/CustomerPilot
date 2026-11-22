@@ -4,6 +4,22 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [22 Nov 2026] Issue: Loyalty Standee Sample B (305px Compact & Airy) Deployed with Real Merchant Gold Badge
+- **Symptom**: User reviewed giant 420px QR preview and noted that the surrounding graphics/text ("CONFIRM REWARDS", "Scan Here", "Join Now", and feature badges) were cramped. User requested Sample B (305px QR) with breathing room and prominent Cake Connection merchant logo.
+- **Root Cause**: The 420px QR card was 462x448, which overlapped the background typography.
+- **Resolution**:
+  1. Updated `STANDEE_COORDS.master` and `PRINT_POSTER_COORDS.master` in `src/app/api/qr/standee/route.ts`:
+     - QR dimensions set to 305x305 at `left: 209, top: 362`.
+     - White card container set to 345x334 at `left: 189, top: 348, rx: 22`.
+     - Center logo badge calibrated to 106x68 with `#d4af37` gold stroke, containing Cake Connection's authentic logo (`cake_connection_official_logo.png`).
+  2. Verified live scannability via automated `jsQR` test: 100% decoded.
+  3. Passed all 7 CustomerPilot Master Adversarial Red-Team Gates cleanly.
+  4. Local commit `fec4a36`, pushed to GitHub `deploy/pricing-update-20261102`, deployed via SFTP to VPS, Next.js build completed in 72s, PM2 reloaded `customerpilot-web` (PID: 595098).
+  5. Live API endpoint `https://customerpilot.in/api/qr/standee?m=cmtymavfx0002kx008lbfvp57` verified returning HTTP 200 (220,976 bytes).
+- **Status**: ✅ Resolved, Deployed, and Verified Live on VPS.
+
+---
+
 ## [21 Nov 2026] Issue: Loyalty Master Standee Giant QR Upgrade (280px to 420px, +50% Area) & Card Expansion
 - **Symptom**: User reviewed the deployed 280px QR standee and reported that the QR code was still visibly small inside the overall 723x1024 poster composition, and requested a giant, high-impact QR code with an easily readable merchant logo.
 - **Root Cause**: The 280px QR in a 342x294 card occupied only 38.7% of the 723px standee width. The center dark graphic card zone had ample space (~540px) to accommodate a much larger QR without clipping the surrounding artwork.
