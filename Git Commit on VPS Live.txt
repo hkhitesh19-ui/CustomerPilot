@@ -9,12 +9,12 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 01e62d6
-Full SHA          : 01e62d6253830ad9fdbdeae572b8ff7794162e49
+Active Git Commit : 0ef3c92
+Full SHA          : 0ef3c9285c16040eef2bd2ecc6c44cfaeae56cfa
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 22 Nov 2026, 09:25 PM IST
+Deployment Date   : 22 Nov 2026, 09:30 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(instagram): deploy automated instagram social loyalty engine with atomic claim and proof-image rbac
+Commit Title      : docs: sync git commit on vps live tracking file for instagram social loyalty release
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online, v4.2 Stream-Guard)
 Docker Containers : evolution-api (evoapicloud/evolution-api pinned @sha256:966625532d9076a2381e973a271307d107e6f070450de3abeeea8bd18be07252, Port 8080 Open in UFW, Online & Healthy)

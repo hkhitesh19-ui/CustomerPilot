@@ -41,10 +41,10 @@ def run_command(ssh, cmd, desc):
     return exit_code, output, err
 
 def main():
-    print(f"==========================================================")
-    print(f"🚀 CUSTOMER PILOT LIVE VPS DEPLOYMENT: INSTAGRAM LOYALTY")
+    print("==========================================================")
+    print("🚀 CUSTOMER PILOT LIVE VPS DEPLOYMENT: INSTAGRAM LOYALTY")
     print(f"Target: {HOST} | User: {USER}")
-    print(f"==========================================================\n")
+    print("==========================================================\n")
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -70,21 +70,21 @@ def main():
         print("❌ Backup failed! Aborting deployment.")
         sys.exit(1)
 
-    # Step 2: Ensure Remote Directories Exist
-    sftp = ssh.open_sftp()
-    remote_dirs = [
-        "/var/www/CustomerPilot/storage/proofs",
-        "/var/www/CustomerPilot/src/app/api/instagram/proof-image/[id]",
-        "/var/www/CustomerPilot/src/components/admin"
-    ]
-    for rdir in remote_dirs:
-        try:
-            ssh.exec_command(f"mkdir -p '{rdir}'")
-        except Exception as e:
-            pass
+    # Step 2: Ensure Remote Directories Exist Synchronously
+    remote_dirs = set()
+    for _, remote_path in FILES_TO_UPLOAD:
+        remote_dirs.add(os.path.dirname(remote_path).replace("\\", "/"))
+    remote_dirs.add("/var/www/CustomerPilot/storage/proofs")
+
+    mkdir_cmds = " && ".join([f"mkdir -p '{d}'" for d in sorted(remote_dirs)])
+    code, _, _ = run_command(ssh, mkdir_cmds, "2. Synchronously Creating Remote Directories")
+    if code != 0:
+        print("❌ Directory creation failed! Aborting deployment.")
+        sys.exit(1)
 
     # Step 3: SFTP Upload Changed Files
-    print("\n--- 2. SFTP Uploading Hardened Files ---")
+    print("\n--- 3. SFTP Uploading Hardened Files ---")
+    sftp = ssh.open_sftp()
     for local_path, remote_path in FILES_TO_UPLOAD:
         if os.path.exists(local_path):
             sftp.put(local_path, remote_path)
@@ -101,16 +101,16 @@ def main():
     grep -q "META_APP_SECRET" .env || echo 'META_APP_SECRET="customerpilot_meta_secret_2026"' >> .env
     grep -E "META_VERIFY_TOKEN|META_APP_SECRET" .env
     """
-    run_command(ssh, env_cmd, "3. Verifying Meta Environment Variables in .env")
+    run_command(ssh, env_cmd, "4. Verifying Meta Environment Variables in .env")
 
     # Step 5: Check Nginx client_max_body_size & reload
-    nginx_cmd = """
+    nginx_cmd = r"""
     if ! grep -q "client_max_body_size" /etc/nginx/nginx.conf; then
       sed -i '/http {/a \    client_max_body_size 10M;' /etc/nginx/nginx.conf
     fi
     nginx -t && systemctl reload nginx
     """
-    run_command(ssh, nginx_cmd, "4. Nginx 10M Body Size & Configuration Test")
+    run_command(ssh, nginx_cmd, "5. Nginx 10M Body Size & Configuration Test")
 
     # Step 6: Prisma DB Push (Safe migration with --accept-data-loss=false)
     prisma_cmd = """
@@ -118,7 +118,7 @@ def main():
     npx prisma db push --accept-data-loss=false
     npx prisma generate
     """
-    code, _, _ = run_command(ssh, prisma_cmd, "5. Prisma DB Schema Push & Client Regeneration")
+    code, _, _ = run_command(ssh, prisma_cmd, "6. Prisma DB Schema Push & Client Regeneration")
     if code != 0:
         print("❌ Prisma schema push failed! Check logs.")
         sys.exit(1)
@@ -128,7 +128,7 @@ def main():
     cd /var/www/CustomerPilot
     npm run build
     """
-    code, _, _ = run_command(ssh, build_cmd, "6. Next.js Production Compilation")
+    code, _, _ = run_command(ssh, build_cmd, "7. Next.js Production Compilation")
     if code != 0:
         print("❌ Next.js build failed! Aborting reload.")
         sys.exit(1)
@@ -138,7 +138,7 @@ def main():
     pm2 reload customerpilot-web
     pm2 status customerpilot-web
     """
-    run_command(ssh, pm2_cmd, "7. PM2 Cluster Reload")
+    run_command(ssh, pm2_cmd, "8. PM2 Cluster Reload")
 
     # Step 9: Post-Deploy Smoke Verification
     smoke_cmd = """
@@ -152,7 +152,7 @@ def main():
     echo -e "\n=== Test 3: Public Website Health ==="
     curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" https://customerpilot.in/
     """
-    run_command(ssh, smoke_cmd, "8. Post-Deploy Smoke Tests")
+    run_command(ssh, smoke_cmd, "9. Post-Deploy Smoke Tests")
 
     ssh.close()
     print("\n🎉 ALL VPS DEPLOYMENT STAGES COMPLETED SUCCESSFULLY!")
