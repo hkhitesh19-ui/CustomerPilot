@@ -1,8 +1,13 @@
 import { db } from "../src/lib/db";
 import { POST as webhookPost } from "../src/app/api/webhook/instagram/route";
 import { POST as tokenGenPost } from "../src/app/api/instagram/generate-token/route";
+import { GET as proofImageGet } from "../src/app/api/instagram/proof-image/[id]/route";
 import { NextRequest } from "next/server";
 import crypto from "crypto";
+import { SignJWT } from "jose";
+import { getJwtSecret } from "../src/lib/jwt-secret";
+import path from "path";
+import { mkdir, writeFile, unlink } from "fs/promises";
 
 const TEST_SECRET = "test_meta_app_secret_super_secure_2026";
 process.env.META_APP_SECRET = TEST_SECRET;
@@ -348,6 +353,75 @@ async function runAdversarialInstagramTestSuite() {
   }
   console.log("✅ TEST E PASSED: updateMany atomic claim prevented double-stamp race; exactly 2 stamps credited.\n");
 
+  // ─────────────────────────────────────────────────────────────
+  // 🛡️ TEST F: Proof-Image RBAC & Tenant Isolation Security Gate
+  // ─────────────────────────────────────────────────────────────
+  console.log("--- 🛡️ TEST F: Proof-Image Route RBAC & Tenant Isolation Gate ---");
+  const testStorageDir = path.join(process.cwd(), "storage", "proofs");
+  await mkdir(testStorageDir, { recursive: true });
+  const testFilename = `test_proof_auth_${Date.now()}.jpg`;
+  const testFilePath = path.join(testStorageDir, testFilename);
+  // Write valid dummy JPEG bytes (FF D8 FF)
+  await writeFile(testFilePath, Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46]));
+
+  const testProof = await db.instagramStoryProof.create({
+    data: {
+      merchantId: merchant.id,
+      customerId: customer.id,
+      phone: customer.phone,
+      screenshot: testFilename,
+      stamps: 2,
+      status: "PENDING"
+    }
+  });
+
+  const validToken = await new SignJWT({ merchantId: merchant.id, role: "merchant" })
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("1h")
+    .sign(new TextEncoder().encode(getJwtSecret()));
+
+  const otherMerchantToken = await new SignJWT({ merchantId: "other_attacker_merchant_999", role: "merchant" })
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("1h")
+    .sign(new TextEncoder().encode(getJwtSecret()));
+
+  // Case F1: Unauthenticated GET (Missing cookie/token)
+  const reqF1 = new NextRequest(`http://localhost:3000/api/instagram/proof-image/${testProof.id}`, {
+    method: "GET"
+  });
+  const resF1 = await proofImageGet(reqF1, { params: Promise.resolve({ id: testProof.id }) });
+  console.log(`Unauthenticated Proof-Image GET Status: ${resF1.status} (Expected: 401)`);
+  if (resF1.status !== 401) {
+    throw new Error(`FAIL: Unauthenticated access permitted! Expected 401, got ${resF1.status}`);
+  }
+
+  // Case F2: Cross-Merchant GET (Attacker merchant tries to view another merchant's proof)
+  const reqF2 = new NextRequest(`http://localhost:3000/api/instagram/proof-image/${testProof.id}`, {
+    method: "GET",
+    headers: { authorization: `Bearer ${otherMerchantToken}` }
+  });
+  const resF2 = await proofImageGet(reqF2, { params: Promise.resolve({ id: testProof.id }) });
+  console.log(`Cross-Merchant Proof-Image GET Status: ${resF2.status} (Expected: 403)`);
+  if (resF2.status !== 403) {
+    throw new Error(`FAIL: Cross-merchant ID enumeration permitted! Expected 403, got ${resF2.status}`);
+  }
+
+  // Case F3: Authorized Merchant GET
+  const reqF3 = new NextRequest(`http://localhost:3000/api/instagram/proof-image/${testProof.id}`, {
+    method: "GET",
+    headers: { authorization: `Bearer ${validToken}` }
+  });
+  const resF3 = await proofImageGet(reqF3, { params: Promise.resolve({ id: testProof.id }) });
+  console.log(`Authorized Merchant Proof-Image GET Status: ${resF3.status} (Expected: 200)`);
+  if (resF3.status !== 200) {
+    throw new Error(`FAIL: Authorized merchant blocked! Expected 200, got ${resF3.status}`);
+  }
+
+  // Cleanup Test F
+  await db.instagramStoryProof.delete({ where: { id: testProof.id } });
+  await unlink(testFilePath).catch(() => {});
+  console.log("✅ TEST F PASSED: Proof-image endpoint strictly enforces RBAC & tenant isolation.\n");
+
   // Cleanup Test Artifacts
   await db.customerInstagramIdentity.deleteMany({
     where: { igsid: { in: [testIgsid, concurrentIgsid] } }
@@ -362,7 +436,7 @@ async function runAdversarialInstagramTestSuite() {
   });
 
   console.log("=================================================================");
-  console.log("🎯 ALL 5 ADVERSARIAL HARDENING SECURITY GATES PASSED 100%!");
+  console.log("🎯 ALL 6 ADVERSARIAL HARDENING SECURITY GATES PASSED 100%!");
   console.log("=================================================================");
 }
 

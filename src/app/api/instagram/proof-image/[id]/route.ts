@@ -2,6 +2,36 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { readFile } from "fs/promises";
 import path from "path";
+import { jwtVerify } from "jose";
+import { getJwtSecret } from "@/lib/jwt-secret";
+
+async function getCallerAuth(req: NextRequest): Promise<{ merchantId: string; isSuperAdmin: boolean } | null> {
+  const token = req.cookies.get("token")?.value || req.headers.get("authorization")?.replace("Bearer ", "");
+  if (!token) return null;
+
+  try {
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(getJwtSecret()));
+    const role = (payload.role as string) || "";
+    const tokenMerchantId = (payload.merchantId as string) || "";
+
+    const impCookie = req.cookies.get("cp_impersonation")?.value;
+    if (impCookie) {
+      try {
+        const imp = JSON.parse(impCookie);
+        if (imp?.merchantId) {
+          return { merchantId: imp.merchantId, isSuperAdmin: role === "super_admin" };
+        }
+      } catch {}
+    }
+
+    return {
+      merchantId: tokenMerchantId,
+      isSuperAdmin: role === "super_admin" || role === "admin"
+    };
+  } catch {
+    return null;
+  }
+}
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -16,6 +46,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     if (!proof || !proof.screenshot) {
       return new Response("Proof image not found", { status: 404 });
+    }
+
+    // RBAC Guard: Require authenticated merchant session & enforce tenant boundary
+    const auth = await getCallerAuth(req);
+    if (!auth) {
+      return new Response("Unauthorized: Merchant login session required", { status: 401 });
+    }
+
+    if (!auth.isSuperAdmin && auth.merchantId && auth.merchantId !== proof.merchantId) {
+      return new Response("Forbidden: Cross-merchant access denied", { status: 403 });
     }
 
     // Storage directory outside public/

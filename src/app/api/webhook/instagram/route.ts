@@ -166,29 +166,19 @@ export async function POST(req: NextRequest) {
                     const isFollowing = Boolean(graphData.is_user_follow_business);
 
                     if (isFollowing) {
-                      // 7. Atomic Follow Claim Pattern (updateMany prevents double-stamp race)
-                      const claim = await db.customerInstagramIdentity.updateMany({
-                        where: {
-                          id: identity.id,
-                          followRewarded: false
-                        },
-                        data: {
-                          isFollowing: true,
-                          followRewarded: true
-                        }
+                      // 7. Atomic Follow Claim & Credit in Single Transaction (ACID rollback on error)
+                      const credited = await claimAndCreditFollowReward(identity.id, {
+                        merchantId,
+                        customerId,
+                        phone,
+                        stamps: 1,
+                        sourceNote: "Instagram Follow Verified"
                       });
 
-                      if (claim.count === 1) {
-                        await creditInstagramStamps({
-                          merchantId,
-                          customerId,
-                          phone,
-                          stamps: 1,
-                          sourceNote: "Instagram Follow Verified"
-                        });
-                        console.log(`[Instagram Webhook] 🏆 +1 Stamp credited atomically to customer ${customerId} for Follow.`);
+                      if (credited) {
+                        console.log(`[Instagram Webhook] 🏆 +1 Stamp credited atomically in transaction to customer ${customerId} for Follow.`);
                       } else {
-                        console.log(`[Instagram Webhook] Follow reward race condition dropped (claim.count === 0).`);
+                        console.log(`[Instagram Webhook] Follow reward race condition dropped (already claimed).`);
                       }
                     } else {
                       // Customer mapped, but not following yet -> Keep record so follow re-verification works
@@ -234,7 +224,7 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * Story Mention Reward Processor with Atomic updateMany Claim & 24h Cadence Lock
+ * Story Mention Reward Processor with Atomic db.$transaction Claim & Credit
  */
 async function processStoryMentionReward(senderIgsid: string) {
   const identity = await db.customerInstagramIdentity.findFirst({
@@ -246,31 +236,15 @@ async function processStoryMentionReward(senderIgsid: string) {
     return;
   }
 
-  // 8. Atomic Story Claim Pattern: updateMany with 24h cutoff prevents race conditions
-  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const claim = await db.customerInstagramIdentity.updateMany({
-    where: {
-      id: identity.id,
-      OR: [
-        { lastStoryRewardedAt: null },
-        { lastStoryRewardedAt: { lt: cutoff } }
-      ]
-    },
-    data: {
-      lastStoryMentionAt: new Date(),
-      lastStoryRewardedAt: new Date()
-    }
+  const credited = await claimAndCreditStoryReward(identity.id, {
+    merchantId: identity.merchantId,
+    customerId: identity.customerId,
+    phone: identity.phone,
+    stamps: 2,
+    sourceNote: "Instagram Story Mention Verified"
   });
 
-  if (claim.count === 1) {
-    // Award 2 Story Bonus Stamps
-    await creditInstagramStamps({
-      merchantId: identity.merchantId,
-      customerId: identity.customerId,
-      phone: identity.phone,
-      stamps: 2,
-      sourceNote: "Instagram Story Mention Verified"
-    });
+  if (credited) {
     console.log(`[Instagram Webhook] 📸 +2 Story Bonus Stamps credited atomically to customer ${identity.customerId}`);
   } else {
     console.log(`[Instagram Webhook] Story tag reward skipped: 24h cooldown active or race condition dropped.`);
@@ -297,25 +271,15 @@ async function checkPendingFollowReward(senderIgsid: string) {
     );
     const graphData = await graphRes.json();
     if (graphData.is_user_follow_business) {
-      const claim = await db.customerInstagramIdentity.updateMany({
-        where: {
-          id: identity.id,
-          followRewarded: false
-        },
-        data: {
-          isFollowing: true,
-          followRewarded: true
-        }
+      const credited = await claimAndCreditFollowReward(identity.id, {
+        merchantId: identity.merchantId,
+        customerId: identity.customerId,
+        phone: identity.phone,
+        stamps: 1,
+        sourceNote: "Instagram Follow Verified"
       });
 
-      if (claim.count === 1) {
-        await creditInstagramStamps({
-          merchantId: identity.merchantId,
-          customerId: identity.customerId,
-          phone: identity.phone,
-          stamps: 1,
-          sourceNote: "Instagram Follow Verified"
-        });
+      if (credited) {
         console.log(`[Instagram Webhook] 🏆 +1 Stamp credited to customer ${identity.customerId} on subsequent message.`);
       }
     }
@@ -325,26 +289,48 @@ async function checkPendingFollowReward(senderIgsid: string) {
 }
 
 /**
- * Transactional Social Stamp Ledger Credit
+ * Truly Atomic Follow Claim & Credit inside a single db.$transaction
+ * If stamp creation throws, the claim rolls back so reward is not lost!
  */
-async function creditInstagramStamps(params: {
-  merchantId: string;
-  customerId: string;
-  phone: string;
-  stamps: number;
-  sourceNote: string;
-}) {
+async function claimAndCreditFollowReward(
+  identityId: string,
+  params: {
+    merchantId: string;
+    customerId: string;
+    phone: string;
+    stamps: number;
+    sourceNote: string;
+  }
+): Promise<boolean> {
   const { merchantId, customerId, phone, stamps, sourceNote } = params;
 
   const template = await db.stampCard.findFirst({
     where: { merchantId, active: true }
   });
-  if (!template) return;
+  if (!template) return false;
 
+  let credited = false;
   let totalCollected = 0;
   let rewardUnlocked = false;
 
   await db.$transaction(async (tx) => {
+    // 1. Atomic claim inside transaction
+    const claim = await tx.customerInstagramIdentity.updateMany({
+      where: {
+        id: identityId,
+        followRewarded: false
+      },
+      data: {
+        isFollowing: true,
+        followRewarded: true
+      }
+    });
+
+    if (claim.count !== 1) {
+      return; // Already rewarded or concurrent race condition
+    }
+
+    // 2. Credit stamps inside transaction
     let card = await tx.customerStampCard.findFirst({
       where: { customerId, stampCardId: template.id, completed: false, redeemed: false },
       orderBy: { createdAt: "desc" }
@@ -408,9 +394,168 @@ async function creditInstagramStamps(params: {
       where: { id: customerId },
       data: { lifetimeStamps: { increment: stamps } }
     });
+
+    credited = true;
   });
 
-  // WhatsApp Celebratory Notification
+  if (credited) {
+    sendInstagramRewardWhatsApp({
+      merchantId,
+      customerId,
+      phone,
+      stamps,
+      sourceNote,
+      template,
+      totalCollected,
+      rewardUnlocked
+    });
+  }
+
+  return credited;
+}
+
+/**
+ * Truly Atomic Story Claim & Credit inside a single db.$transaction
+ * If stamp creation throws, the 24h cadence timestamp rolls back!
+ */
+async function claimAndCreditStoryReward(
+  identityId: string,
+  params: {
+    merchantId: string;
+    customerId: string;
+    phone: string;
+    stamps: number;
+    sourceNote: string;
+  }
+): Promise<boolean> {
+  const { merchantId, customerId, phone, stamps, sourceNote } = params;
+
+  const template = await db.stampCard.findFirst({
+    where: { merchantId, active: true }
+  });
+  if (!template) return false;
+
+  let credited = false;
+  let totalCollected = 0;
+  let rewardUnlocked = false;
+
+  await db.$transaction(async (tx) => {
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const claim = await tx.customerInstagramIdentity.updateMany({
+      where: {
+        id: identityId,
+        OR: [
+          { lastStoryRewardedAt: null },
+          { lastStoryRewardedAt: { lt: cutoff } }
+        ]
+      },
+      data: {
+        lastStoryMentionAt: new Date(),
+        lastStoryRewardedAt: new Date()
+      }
+    });
+
+    if (claim.count !== 1) {
+      return; // 24h cooldown active or concurrent race condition
+    }
+
+    let card = await tx.customerStampCard.findFirst({
+      where: { customerId, stampCardId: template.id, completed: false, redeemed: false },
+      orderBy: { createdAt: "desc" }
+    });
+
+    if (!card) {
+      card = await tx.customerStampCard.create({
+        data: {
+          customerId,
+          stampCardId: template.id,
+          merchantId,
+          stampsCollected: 0
+        }
+      });
+    }
+
+    for (let i = 0; i < stamps; i++) {
+      await tx.stamp.create({
+        data: {
+          customerId,
+          merchantId,
+          stampCardId: template.id,
+          customerStampCardId: card.id,
+          source: sourceNote || "instagram_reward"
+        }
+      });
+    }
+
+    const required = template.stampsRequired || 10;
+    const newCount = card.stampsCollected + stamps;
+
+    if (newCount >= required) {
+      rewardUnlocked = true;
+      await tx.customerStampCard.update({
+        where: { id: card.id },
+        data: { stampsCollected: required, completed: true }
+      });
+      totalCollected = required;
+
+      const overflow = newCount - required;
+      if (overflow > 0) {
+        await tx.customerStampCard.create({
+          data: {
+            customerId,
+            stampCardId: template.id,
+            merchantId,
+            stampsCollected: overflow
+          }
+        });
+        totalCollected = overflow;
+      }
+    } else {
+      await tx.customerStampCard.update({
+        where: { id: card.id },
+        data: { stampsCollected: newCount }
+      });
+      totalCollected = newCount;
+    }
+
+    await tx.customer.update({
+      where: { id: customerId },
+      data: { lifetimeStamps: { increment: stamps } }
+    });
+
+    credited = true;
+  });
+
+  if (credited) {
+    sendInstagramRewardWhatsApp({
+      merchantId,
+      customerId,
+      phone,
+      stamps,
+      sourceNote,
+      template,
+      totalCollected,
+      rewardUnlocked
+    });
+  }
+
+  return credited;
+}
+
+/**
+ * Non-blocking WhatsApp Celebratory Notification
+ */
+function sendInstagramRewardWhatsApp(params: {
+  merchantId: string;
+  customerId: string;
+  phone: string;
+  stamps: number;
+  sourceNote: string;
+  template: any;
+  totalCollected: number;
+  rewardUnlocked: boolean;
+}) {
+  const { merchantId, customerId, phone, stamps, sourceNote, template, totalCollected, rewardUnlocked } = params;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.in";
   const walletUrl = `${appUrl}/q/wallet/${customerId}`;
   const required = template.stampsRequired || 10;
@@ -423,7 +568,7 @@ async function creditInstagramStamps(params: {
     `🎯 *Goal:* ${template.rewardName || "FREE Reward"}${rewardUnlocked ? " — 🏆 *REWARD UNLOCKED!*" : ` (${remaining} more needed)`}\n\n` +
     `📱 *View Your Live Stamp Card:*\n${walletUrl}`;
 
-  await sendCentralWhatsAppMessage({
+  sendCentralWhatsAppMessage({
     merchantId,
     toPhone: phone,
     text,
