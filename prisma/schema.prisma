@@ -138,6 +138,9 @@ model Merchant {
   qrCodes                   QrCode[]
   invoices                  Invoice[]
   customerConsents          CustomerConsent[]
+  instagramConnection       MerchantInstagramConnection?
+  customerInstagramIdentities CustomerInstagramIdentity[]
+  instagramStoryProofs      InstagramStoryProof[]
 }
 
 model Incident {
@@ -225,6 +228,8 @@ model Customer {
   orders              Order[]
   invoices            Invoice[]
   customerConsents    CustomerConsent[]
+  instagramIdentities CustomerInstagramIdentity[]
+  instagramStoryProofs InstagramStoryProof[]
 
   @@unique([merchantId, phone])
   @@index([merchantId])
@@ -1335,4 +1340,63 @@ model CustomerConsent {
 
   @@index([customerId, merchantId])
   @@index([merchantId, consentType])
+}
+
+// ── Instagram Social Loyalty & Story Mention Infrastructure ──
+model MerchantInstagramConnection {
+  id                String    @id @default(cuid())
+  merchantId        String    @unique
+  instagramPageId   String    // Facebook Page ID
+  instagramUserId   String    // Instagram Business/Creator User ID
+  instagramUsername String    // e.g. "cakeconnection"
+  accessToken       String    // Long-lived Page Access Token
+  tokenExpiresAt    DateTime?
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  merchant          Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@index([instagramUsername])
+}
+
+model CustomerInstagramIdentity {
+  id                  String    @id @default(cuid())
+  merchantId          String
+  customerId          String
+  phone               String
+  igsid               String    // Meta Instagram-Scoped ID
+  instagramUsername   String?
+  isFollowing         Boolean   @default(false)
+  followRewarded      Boolean   @default(false)
+  lastStoryMentionAt  DateTime?
+  lastStoryRewardedAt DateTime?
+  verifiedAt          DateTime  @default(now())
+
+  customer            Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  merchant            Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@unique([merchantId, customerId])
+  @@unique([merchantId, igsid])
+  @@index([igsid])
+  @@index([merchantId, phone])
+}
+
+model InstagramStoryProof {
+  id         String   @id @default(cuid())
+  merchantId String
+  customerId String
+  phone      String
+  screenshot String   // Path to uploaded proof screenshot
+  status     String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  stamps     Int      @default(2)
+  notes      String?
+  reviewedBy String?
+  reviewedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@index([merchantId, status])
+  @@index([customerId])
 }
