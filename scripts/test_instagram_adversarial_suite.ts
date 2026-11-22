@@ -416,6 +416,25 @@ async function runAdversarialInstagramTestSuite() {
   if (resF3.status !== 200) {
     throw new Error(`FAIL: Authorized merchant blocked! Expected 200, got ${resF3.status}`);
   }
+  const cacheControl = resF3.headers.get("cache-control") || "";
+  if (!cacheControl.includes("no-store") || !cacheControl.includes("no-cache")) {
+    throw new Error(`FAIL: Proof image response missing private no-store cache headers: ${cacheControl}`);
+  }
+
+  // Case F4: Deny-by-default when token has empty merchantId and role !== super_admin
+  const emptyMerchantToken = await new SignJWT({ merchantId: "", role: "merchant" })
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("1h")
+    .sign(new TextEncoder().encode(getJwtSecret()));
+  const reqF4 = new NextRequest(`http://localhost:3000/api/instagram/proof-image/${testProof.id}`, {
+    method: "GET",
+    headers: { authorization: `Bearer ${emptyMerchantToken}` }
+  });
+  const resF4 = await proofImageGet(reqF4, { params: Promise.resolve({ id: testProof.id }) });
+  console.log(`Empty-Merchant Token GET Status: ${resF4.status} (Expected: 403)`);
+  if (resF4.status !== 403) {
+    throw new Error(`FAIL: Deny-by-default bypassed for empty merchantId! Expected 403, got ${resF4.status}`);
+  }
 
   // Cleanup Test F
   await db.instagramStoryProof.delete({ where: { id: testProof.id } });

@@ -313,51 +313,50 @@ async function claimAndCreditFollowReward(
   let totalCollected = 0;
   let rewardUnlocked = false;
 
-  await db.$transaction(async (tx) => {
-    // 1. Atomic claim inside transaction
-    const claim = await tx.customerInstagramIdentity.updateMany({
-      where: {
-        id: identityId,
-        followRewarded: false
-      },
-      data: {
-        isFollowing: true,
-        followRewarded: true
-      }
-    });
-
-    if (claim.count !== 1) {
-      return; // Already rewarded or concurrent race condition
-    }
-
-    // 2. Credit stamps inside transaction
-    let card = await tx.customerStampCard.findFirst({
-      where: { customerId, stampCardId: template.id, completed: false, redeemed: false },
-      orderBy: { createdAt: "desc" }
-    });
-
-    if (!card) {
-      card = await tx.customerStampCard.create({
+  await db.$transaction(
+    async (tx) => {
+      // 1. Atomic claim inside transaction
+      const claim = await tx.customerInstagramIdentity.updateMany({
+        where: {
+          id: identityId,
+          followRewarded: false
+        },
         data: {
-          customerId,
-          stampCardId: template.id,
-          merchantId,
-          stampsCollected: 0
+          isFollowing: true,
+          followRewarded: true
         }
       });
-    }
 
-    for (let i = 0; i < stamps; i++) {
-      await tx.stamp.create({
-        data: {
+      if (claim.count !== 1) {
+        return; // Already rewarded or concurrent race condition
+      }
+
+      // 2. Credit stamps inside transaction
+      let card = await tx.customerStampCard.findFirst({
+        where: { customerId, stampCardId: template.id, completed: false, redeemed: false },
+        orderBy: { createdAt: "desc" }
+      });
+
+      if (!card) {
+        card = await tx.customerStampCard.create({
+          data: {
+            customerId,
+            stampCardId: template.id,
+            merchantId,
+            stampsCollected: 0
+          }
+        });
+      }
+
+      await tx.stamp.createMany({
+        data: Array.from({ length: stamps }).map(() => ({
           customerId,
           merchantId,
           stampCardId: template.id,
           customerStampCardId: card.id,
           source: sourceNote || "instagram_reward"
-        }
+        }))
       });
-    }
 
     const required = template.stampsRequired || 10;
     const newCount = card.stampsCollected + stamps;
@@ -396,7 +395,7 @@ async function claimAndCreditFollowReward(
     });
 
     credited = true;
-  });
+  }, { timeout: 15000, maxWait: 5000 });
 
   if (credited) {
     sendInstagramRewardWhatsApp({
@@ -439,53 +438,52 @@ async function claimAndCreditStoryReward(
   let totalCollected = 0;
   let rewardUnlocked = false;
 
-  await db.$transaction(async (tx) => {
-    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const claim = await tx.customerInstagramIdentity.updateMany({
-      where: {
-        id: identityId,
-        OR: [
-          { lastStoryRewardedAt: null },
-          { lastStoryRewardedAt: { lt: cutoff } }
-        ]
-      },
-      data: {
-        lastStoryMentionAt: new Date(),
-        lastStoryRewardedAt: new Date()
-      }
-    });
-
-    if (claim.count !== 1) {
-      return; // 24h cooldown active or concurrent race condition
-    }
-
-    let card = await tx.customerStampCard.findFirst({
-      where: { customerId, stampCardId: template.id, completed: false, redeemed: false },
-      orderBy: { createdAt: "desc" }
-    });
-
-    if (!card) {
-      card = await tx.customerStampCard.create({
+  await db.$transaction(
+    async (tx) => {
+      const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const claim = await tx.customerInstagramIdentity.updateMany({
+        where: {
+          id: identityId,
+          OR: [
+            { lastStoryRewardedAt: null },
+            { lastStoryRewardedAt: { lt: cutoff } }
+          ]
+        },
         data: {
-          customerId,
-          stampCardId: template.id,
-          merchantId,
-          stampsCollected: 0
+          lastStoryMentionAt: new Date(),
+          lastStoryRewardedAt: new Date()
         }
       });
-    }
 
-    for (let i = 0; i < stamps; i++) {
-      await tx.stamp.create({
-        data: {
+      if (claim.count !== 1) {
+        return; // 24h cooldown active or concurrent race condition
+      }
+
+      let card = await tx.customerStampCard.findFirst({
+        where: { customerId, stampCardId: template.id, completed: false, redeemed: false },
+        orderBy: { createdAt: "desc" }
+      });
+
+      if (!card) {
+        card = await tx.customerStampCard.create({
+          data: {
+            customerId,
+            stampCardId: template.id,
+            merchantId,
+            stampsCollected: 0
+          }
+        });
+      }
+
+      await tx.stamp.createMany({
+        data: Array.from({ length: stamps }).map(() => ({
           customerId,
           merchantId,
           stampCardId: template.id,
           customerStampCardId: card.id,
           source: sourceNote || "instagram_reward"
-        }
+        }))
       });
-    }
 
     const required = template.stampsRequired || 10;
     const newCount = card.stampsCollected + stamps;
@@ -524,7 +522,7 @@ async function claimAndCreditStoryReward(
     });
 
     credited = true;
-  });
+  }, { timeout: 15000, maxWait: 5000 });
 
   if (credited) {
     sendInstagramRewardWhatsApp({

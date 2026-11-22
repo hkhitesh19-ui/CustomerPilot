@@ -48,13 +48,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return new Response("Proof image not found", { status: 404 });
     }
 
-    // RBAC Guard: Require authenticated merchant session & enforce tenant boundary
+    // RBAC Guard: Deny by default. Allow ONLY super admin or matching merchant ID
     const auth = await getCallerAuth(req);
     if (!auth) {
       return new Response("Unauthorized: Merchant login session required", { status: 401 });
     }
 
-    if (!auth.isSuperAdmin && auth.merchantId && auth.merchantId !== proof.merchantId) {
+    const isAuthorized = auth.isSuperAdmin || (Boolean(auth.merchantId) && auth.merchantId === proof.merchantId);
+    if (!isAuthorized) {
       return new Response("Forbidden: Cross-merchant access denied", { status: 403 });
     }
 
@@ -74,7 +75,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         status: 200,
         headers: {
           "Content-Type": contentType,
-          "Cache-Control": "private, max-age=86400, no-transform",
+          "Cache-Control": "private, no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
           "X-Content-Type-Options": "nosniff"
         }
       });
@@ -86,7 +89,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         status: 200,
         headers: {
           "Content-Type": "image/jpeg",
-          "Cache-Control": "private, max-age=86400"
+          "Cache-Control": "private, no-cache, no-store, must-revalidate"
         }
       });
     }
