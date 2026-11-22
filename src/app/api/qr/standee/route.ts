@@ -1184,9 +1184,9 @@ export async function GET(req: NextRequest) {
     }
 
     const enabledModules = merchant.enabledModules || "LOYALTY,REVIEWS,AUTOREPLY"
-    const hasLoyalty = enabledModules.includes("LOYALTY")
-    const hasReviews = enabledModules.includes("REVIEWS") || enabledModules.includes("AUTOREPLY")
-    const hasCard = enabledModules.includes("DIGITAL_CARD") || !!digitalCard
+    const hasLoyalty = enabledModules.includes("LOYALTY") || enabledModules.includes("digital_loyalty")
+    const hasReviews = enabledModules.includes("REVIEWS") || enabledModules.includes("AUTOREPLY") || enabledModules.includes("google_reviews")
+    const hasCard = Boolean(digitalCard && digitalCard.slug) || enabledModules.includes("DIGITAL_CARD") || enabledModules.includes("smart_digital_cards")
 
     let activeDesign = rawDesign
     if (activeDesign === "auto" || !activeDesign) {
@@ -1235,12 +1235,18 @@ export async function GET(req: NextRequest) {
           (merchant as any).googleReviewLink ||
           `${protocol}://${host}/review?m=${merchant.id}`
       } else if (activeDesign === "card") {
-        targetUrl = `${protocol}://${host}/c/${slug}`
+        const domain = host.includes("localhost") || host.includes("127.0.0.1") ? `${protocol}://${host}` : "https://www.customerpilot.in"
+        targetUrl = `${domain}/c/${slug}`
       } else {
-        const merchantPhone = normalizePhone(merchant.whatsappPhone) || "919999999999"
-        const bizName = merchant.name || "our store"
-        const joinText = `Hi ${bizName}! Checking in for my VIP Club stamps 🎁`
-        targetUrl = `https://wa.me/${merchantPhone}?text=${encodeURIComponent(joinText)}`
+        if (hasCard && slug) {
+          const domain = host.includes("localhost") || host.includes("127.0.0.1") ? `${protocol}://${host}` : "https://www.customerpilot.in"
+          targetUrl = `${domain}/c/${slug}`
+        } else {
+          const merchantPhone = normalizePhone(merchant.whatsappPhone) || "919999999999"
+          const bizName = merchant.name || "our store"
+          const joinText = `Hi ${bizName}! Checking in for my VIP Club stamps 🎁`
+          targetUrl = `https://wa.me/${merchantPhone}?text=${encodeURIComponent(joinText)}`
+        }
       }
     }
 
