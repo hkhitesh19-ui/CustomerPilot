@@ -9,27 +9,24 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 485f821
-Full SHA          : 485f82120a5a856734b15d7549e13cb2fee156f1
+Active Git Commit : adb7907
+Full SHA          : adb7907fd4ec1bd80a1d9692f00193883917a71b
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 22 Nov 2026, 10:55 AM IST
+Deployment Date   : 22 Nov 2026, 03:38 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(settings): add universal store logo uploader to store profile and unify brand sync across all QRs and standees
+Commit Title      : feat(watchdog): harden watchdog v4.2 with stream-guard and enhance duplicate qr webhook logging
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
-PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online)
-Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
+PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online, v4.2 Stream-Guard)
+Docker Containers : evolution-api (evoapicloud/evolution-api pinned @sha256:966625532d9076a2381e973a271307d107e6f070450de3abeeea8bd18be07252, Port 8080 Open in UFW, Online & Healthy)
 
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
-1. https://customerpilot.in/api/qr/standee?m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (Live Standee with Sample B: 305px QR, 345x334 Card, Cake Connection Gold Badge, 100% jsQR Decoded)
-2. https://customerpilot.in/c/cake-connection-live-cake-online-cake-delivery-in-vadodara -> HTTP 200 (Digital Card with VIP Referral Hero Card)
-3. https://customerpilot.in/api/qr/generate?type=counter     -> HTTP 200 (WhatsApp Direct Check-in Target)
-4. https://customerpilot.in/api/referrals/claim              -> HTTP 200 / 400 Validation (Public Referral Claim API)
-5. https://customerpilot.in/dashboard/queue                  -> HTTP 200 / 307 (Live Queue with Automatic Referrer Detection)
-6. https://customerpilot.in/dashboard/billing                -> HTTP 200 (Smart POS Billing & Invoicing)
-7. https://customerpilot.in/dashboard/digital-card           -> HTTP 200 (Branded QR Box Studio)
-8. https://customerpilot.in/c/aakargraphics                  -> HTTP 200 (Digital Card)
-9. https://customerpilot.in/login                            -> HTTP 200 (Merchant Login)
-10. https://customerpilot.in/api/state                       -> HTTP 200
-11. https://customerpilot.in/api/webhook/evolution          -> HTTP 200 / 401 Guard (Evolution Webhook & Referral Intent Handler)
-12. http://187.127.170.36:8080                              -> HTTP 200 (Evolution API v2.3.7)
+1. https://customerpilot.in/                                      -> HTTP 200 (Live Domain Cloudflare Edge Verified)
+2. https://customerpilot.in/api/webhook/evolution                -> HTTP 405/401 Guard (Evolution Webhook & Referral Intent Handler with Nginx URI Redaction)
+3. /var/log/nginx/webhook.log                                    -> Active, 0640 permissions, query string secrets stripped via $uri format
+4. /opt/cp-watchdog/watchdog.js                                  -> v4.2 Stream-Guard Live under PM2 (PID: 610904, 75s auto-recovery window)
+5. /opt/evolution-api/docker-compose.yml                         -> Pinned by immutable SHA256 digest
+6. https://customerpilot.in/api/qr/standee?m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (Live Standee with Sample B: 305px QR, Cake Connection Gold Badge)
+7. https://customerpilot.in/dashboard/queue                      -> HTTP 200 / 307 (Live Queue)
+8. https://customerpilot.in/dashboard/billing                    -> HTTP 200 (Smart POS Billing & Invoicing)
+9. http://187.127.170.36:8080                                    -> HTTP 200 (Evolution API v2.3.7)
