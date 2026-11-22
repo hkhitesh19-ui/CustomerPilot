@@ -11,6 +11,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "merchantId, customerId, and phone are required" }, { status: 400 });
     }
 
+    // 1. Authoritative Customer Validation (Anti-Forgery)
+    const customer = await db.customer.findFirst({
+      where: { id: customerId, merchantId, phone }
+    });
+    if (!customer) {
+      return NextResponse.json({ error: "Customer not found or phone mismatch with store record" }, { status: 403 });
+    }
+
     const merchant = await db.merchant.findUnique({
       where: { id: merchantId },
       include: { instagramConnection: true }
@@ -20,11 +28,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Merchant not found" }, { status: 404 });
     }
 
-    // Default to connected username or merchant slug/name fallback if during setup
     const igUsername = merchant.instagramConnection?.instagramUsername || 
                        merchant.name.toLowerCase().replace(/[^a-z0-9_]/g, "");
 
-    // Generate 6-char clean token (e.g. CP_A9B2)
+    // Generate 6-char clean cryptographic token
     const token = "CP_" + crypto.randomBytes(3).toString("hex").toUpperCase();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins validity
 

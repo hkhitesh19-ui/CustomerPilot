@@ -25,51 +25,118 @@ export async function GET(req: NextRequest) {
 }
 
 /**
+ * Timing-safe HMAC SHA-256 Signature Verification
+ */
+function verifyMetaSignature(rawBody: string, signatureHeader: string | null, secret: string): boolean {
+  if (!signatureHeader || !signatureHeader.startsWith("sha256=")) {
+    return false;
+  }
+  const receivedSig = signatureHeader.slice(7);
+  const expectedSig = crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
+
+  const receivedBuf = Buffer.from(receivedSig, "hex");
+  const expectedBuf = Buffer.from(expectedSig, "hex");
+
+  if (receivedBuf.length !== expectedBuf.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(receivedBuf, expectedBuf);
+}
+
+/**
  * Meta Webhook Inbound Events (POST)
  */
 export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.text();
+    const appSecret = process.env.META_APP_SECRET;
 
-    // 1. Verify HMAC Signature (Security Anti-Spoofing Guard)
-    if (APP_SECRET) {
+    // 1. Mandatory Timing-Safe Signature Verification
+    if (appSecret) {
       const signature = req.headers.get("x-hub-signature-256");
-      if (signature) {
-        const expected = "sha256=" + crypto.createHmac("sha256", APP_SECRET).update(rawBody).digest("hex");
-        if (signature !== expected) {
-          console.warn("[Instagram Webhook] ❌ Invalid HMAC signature rejected.");
-          return new Response("Invalid signature", { status: 401 });
-        }
+      const isValid = verifyMetaSignature(rawBody, signature, appSecret);
+      if (!isValid) {
+        console.warn("[Instagram Webhook] ❌ Rejecting request: Invalid or missing x-hub-signature-256");
+        return new Response("Invalid signature", { status: 401 });
       }
     }
 
-    const data = JSON.parse(rawBody);
-    if (data.object !== "instagram") {
+    let data: any;
+    try {
+      data = JSON.parse(rawBody);
+    } catch {
+      return NextResponse.json({ error: "Malformed JSON" }, { status: 400 });
+    }
+
+    if (data.object !== "instagram" && data.object !== "page") {
       return NextResponse.json({ status: "ignored" });
     }
 
     for (const entry of data.entry || []) {
-      // ── Event 1: Messaging / Inbound DM (Token Pairing & Follow Verification) ──
+      // ── Stream A: Messenger / Inbound Messaging Events ──
       for (const messaging of entry.messaging || []) {
-        const senderIgsid = String(messaging.sender?.id || "");
-        const rawText = messaging.message?.text?.trim() || "";
+        // 2. Ignore Echo Messages Sent by the Page
+        if (messaging.message?.is_echo) {
+          continue;
+        }
 
+        const senderIgsid = String(messaging.sender?.id || "");
+        const mid = messaging.message?.mid ? String(messaging.message.mid) : null;
+
+        // 3. Webhook Delivery Deduplication via Message ID (.mid)
+        if (mid) {
+          const dedupeKey = `ig_mid_${mid}`;
+          const existing = await db.systemContent.findUnique({ where: { key: dedupeKey } });
+          if (existing) {
+            console.log(`[Instagram Webhook] Duplicate delivery ignored for mid: ${mid}`);
+            continue;
+          }
+          await db.systemContent.create({
+            data: {
+              section: "instagram_dedupe",
+              key: dedupeKey,
+              value: JSON.stringify({ senderIgsid, processedAt: new Date().toISOString() })
+            }
+          }).catch(() => {});
+        }
+
+        // 4. Story Mention Attachment in messaging[] (Meta Messaging API Spec)
+        const attachments = messaging.message?.attachments || [];
+        const isStoryMentionAttachment = attachments.some((att: any) => att.type === "story_mention");
+
+        if (isStoryMentionAttachment && senderIgsid) {
+          await processStoryMentionReward(senderIgsid);
+        }
+
+        // 5. Inbound DM Token Pairing & Follow Verification
+        const rawText = messaging.message?.text?.trim() || "";
         if (rawText.toUpperCase().includes("VERIFY CP_") || rawText.toUpperCase().startsWith("CP_")) {
           const match = rawText.match(/CP_[A-F0-9]+/i);
           const token = match ? match[0].toUpperCase() : null;
 
           if (token) {
-            console.log(`[Instagram Webhook] Inbound DM pairing token detected: ${token} from IGSID: ${senderIgsid}`);
-            const tokenRecord = await db.systemContent.findUnique({
-              where: { key: `ig_token_${token}` }
-            });
+            console.log(`[Instagram Webhook] Pairing token detected: ${token} from IGSID: ${senderIgsid}`);
+            const tokenKey = `ig_token_${token}`;
+
+            // 6. Atomic Token Consumption (Replay Attack Guard)
+            // Once read, token is deleted so replay or duplicate submissions receive 0 stamps.
+            let tokenRecord: any = null;
+            try {
+              tokenRecord = await db.systemContent.delete({
+                where: { key: tokenKey }
+              });
+            } catch {
+              // Already consumed or does not exist
+              tokenRecord = null;
+            }
 
             if (tokenRecord) {
               const payload = JSON.parse(tokenRecord.value);
               const { merchantId, customerId, phone, expiresAt } = payload;
 
               if (new Date(expiresAt) > new Date()) {
-                // Map Phone <-> IGSID
+                // Map Phone <-> IGSID in DB
                 const identity = await db.customerInstagramIdentity.upsert({
                   where: {
                     merchantId_customerId: { merchantId, customerId }
@@ -85,9 +152,9 @@ export async function POST(req: NextRequest) {
                   }
                 });
 
-                console.log(`[Instagram Webhook] ✅ Paired Phone ${phone} to IGSID ${senderIgsid}`);
+                console.log(`[Instagram Webhook] ✅ Mapped Phone ${phone} to IGSID ${senderIgsid}`);
 
-                // Query Meta Graph API for Follow Status
+                // Check Follow status via Meta Graph API
                 const conn = await db.merchantInstagramConnection.findUnique({
                   where: { merchantId }
                 });
@@ -123,52 +190,21 @@ export async function POST(req: NextRequest) {
                   }
                 }
               } else {
-                console.warn(`[Instagram Webhook] Token ${token} has expired.`);
+                console.warn(`[Instagram Webhook] Expired token rejected: ${token}`);
               }
+            } else {
+              console.warn(`[Instagram Webhook] Token ${token} already consumed or invalid (Replay blocked).`);
             }
           }
         }
       }
 
-      // ── Event 2: Story Mentions (User tagged business in Instagram Story) ──
+      // ── Stream B: Graph API Changes Webhook (changes[].field === 'story_mentions') ──
       for (const change of entry.changes || []) {
         if (change.field === "story_mentions") {
           const senderIgsid = String(change.value?.sender?.id || change.value?.from?.id || "");
-          console.log(`[Instagram Webhook] Inbound story_mention from IGSID: ${senderIgsid}`);
-
           if (senderIgsid) {
-            const identity = await db.customerInstagramIdentity.findFirst({
-              where: { igsid: senderIgsid }
-            });
-
-            if (identity) {
-              const lastRewardedMs = identity.lastStoryRewardedAt ? identity.lastStoryRewardedAt.getTime() : 0;
-              const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-
-              if (Date.now() - lastRewardedMs > ONE_DAY_MS) {
-                // Award 2 Story Bonus Stamps
-                await creditInstagramStamps({
-                  merchantId: identity.merchantId,
-                  customerId: identity.customerId,
-                  phone: identity.phone,
-                  stamps: 2,
-                  sourceNote: "Instagram Story Mention Verified"
-                });
-
-                await db.customerInstagramIdentity.update({
-                  where: { id: identity.id },
-                  data: {
-                    lastStoryMentionAt: new Date(),
-                    lastStoryRewardedAt: new Date()
-                  }
-                });
-                console.log(`[Instagram Webhook] 📸 +2 Story Bonus Stamps credited to customer ${identity.customerId}`);
-              } else {
-                console.log(`[Instagram Webhook] Story tag reward skipped: Cooldown active (<24h).`);
-              }
-            } else {
-              console.warn(`[Instagram Webhook] Story tag received from unmapped IGSID: ${senderIgsid}. Customer needs to pair via DM token.`);
-            }
+            await processStoryMentionReward(senderIgsid);
           }
         }
       }
@@ -178,6 +214,45 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error("[Instagram Webhook Processing Error]:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+/**
+ * Story Mention Reward Processor with Strict 24h Cadence Lock
+ */
+async function processStoryMentionReward(senderIgsid: string) {
+  const identity = await db.customerInstagramIdentity.findFirst({
+    where: { igsid: senderIgsid }
+  });
+
+  if (!identity) {
+    console.warn(`[Instagram Webhook] Story tag from unmapped IGSID: ${senderIgsid}`);
+    return;
+  }
+
+  const lastRewardedMs = identity.lastStoryRewardedAt ? identity.lastStoryRewardedAt.getTime() : 0;
+  const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+  if (Date.now() - lastRewardedMs > ONE_DAY_MS) {
+    // Award 2 Story Bonus Stamps
+    await creditInstagramStamps({
+      merchantId: identity.merchantId,
+      customerId: identity.customerId,
+      phone: identity.phone,
+      stamps: 2,
+      sourceNote: "Instagram Story Mention Verified"
+    });
+
+    await db.customerInstagramIdentity.update({
+      where: { id: identity.id },
+      data: {
+        lastStoryMentionAt: new Date(),
+        lastStoryRewardedAt: new Date()
+      }
+    });
+    console.log(`[Instagram Webhook] 📸 +2 Story Bonus Stamps credited to customer ${identity.customerId}`);
+  } else {
+    console.log(`[Instagram Webhook] Story tag reward skipped: 24h cooldown active for ${identity.customerId}.`);
   }
 }
 
