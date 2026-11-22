@@ -20,12 +20,12 @@ This document serves as a historical record of all major bugs, configuration iss
      - Filters out page echoes (`is_echo: true`).
      - Atomic token consumption via `db.systemContent.delete` (blocks replay attacks).
      - **Atomic Claim Pattern (`updateMany`)**: Implemented atomic check-and-set claims for both follow (`followRewarded: false`) and story mentions (`lastStoryRewardedAt: null || lt: cutoff24h`) with `claim.count === 1` guard, mathematically preventing double-stamp concurrency races.
-     - **ACID Claim-and-Credit Single `$transaction`**: Wrapped the claim and stamp ledger creation in a single atomic `db.$transaction`. If stamp creation fails, the claim rolls back, ensuring rewards are never lost.
+     - **ACID Claim-and-Credit Single `$transaction`**: Wrapped the claim and stamp ledger creation in a single atomic `db.$transaction` configured with `{ timeout: 15000, maxWait: 5000 }` and batch `tx.stamp.createMany`. If stamp creation fails, the claim rolls back, ensuring rewards are never lost.
      - **Subsequent Message Follow Re-Verification**: If a user pairs their phone to IGSID before clicking Follow, any subsequent DM automatically triggers `checkPendingFollowReward` to credit the stamp.
      - Supports both Messenger API attachment format (`type: "story_mention"`) and Graph API changes format (`field: "story_mentions"`).
-  4. **Secure Proof Pipeline Outside Public Webroot & RBAC Route**:
+  4. **Secure Proof Pipeline Outside Public Webroot & Deny-by-Default RBAC**:
      - Uploaded screenshot proofs are validated for magic header bytes (JPEG/PNG/WebP) with a 5MB size limit and saved in `storage/proofs/` outside `public/`.
-     - Served dynamically through secure streaming route `/api/instagram/proof-image/[id]` with strict JWT session authentication and merchant tenant isolation (prevents ID enumeration).
+     - Served dynamically through secure streaming route `/api/instagram/proof-image/[id]` with deny-by-default JWT session authentication (allowing only super-admins or matching merchant IDs), preventing ID enumeration, with `private, no-cache, no-store, must-revalidate` headers.
      - Built merchant one-tap review and approval UI in `src/components/admin/InstagramProofQueue.tsx` and customer wallet card in `src/components/loyalty/InstagramTaskCard.tsx`.
   5. **Adversarial Red-Team Test Suite (`scripts/test_instagram_adversarial_suite.ts`)**:
      - Test A: Unsigned / wrong-signature POST rejected with 401.
@@ -33,8 +33,8 @@ This document serves as a historical record of all major bugs, configuration iss
      - Test C: Webhook delivery deduplication via `.mid`.
      - Test D: Dual story mention & 24h cadence lock.
      - Test E: Concurrent double-stamp race condition via `Promise.all` (exactly 2 stamps credited, duplicate dropped).
-     - Test F: Proof-image endpoint RBAC & tenant isolation gate (401 unauthenticated, 403 cross-merchant, 200 authorized).
-  6. Passed all 7 CustomerPilot Master Adversarial Red-Team Gates cleanly. Local commits: `b9d32a5`, `8341460`, `5a9e35c`, `42c5f11`, and `78889a7`.
+     - Test F: Proof-image endpoint RBAC & tenant isolation gate (401 unauthenticated, 403 cross-merchant, 403 empty merchantId, 200 authorized with no-store cache headers).
+  6. Passed all 7 CustomerPilot Master Adversarial Red-Team Gates cleanly. Local commits: `b9d32a5`, `8341460`, `5a9e35c`, `42c5f11`, `78889a7`, and `ab039fc`.
 - **Status**: ✅ Resolved, Hardened, and Verified Locally. Awaiting User Confirmation for Git Push & Live VPS Deployment.
 
 ---
