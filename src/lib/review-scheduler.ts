@@ -32,7 +32,10 @@ export async function scheduleGoogleReviewRequest({
         toPhone: customer.phone,
         template: "review_request",
         OR: [
-          { status: { in: ["sent", "delivered", "read"] } },
+          { 
+            status: { in: ["sent", "delivered", "read"] },
+            createdAt: { gte: twentyFourHoursAgo }
+          },
           { 
             status: { in: ["scheduled", "queued"] },
             createdAt: { gte: twentyFourHoursAgo }

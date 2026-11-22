@@ -4,6 +4,19 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [22 Nov 2026] Issue: Google Review Prompt 5-Minute Timer Blocked by Orphaned Review Request & Unbounded Deduplication
+- **Symptom**: At 9:52 PM IST, customer scanned Cake Connection loyalty QR standee, WhatsApp message was captured in Live Queue, and merchant approved the stamp. However, after 5 minutes, no Google Review prompt message with the 1-click review link was sent to the customer on WhatsApp.
+- **Root Cause**:
+  1. In `src/lib/review-scheduler.ts`, the deduplication query checked `{ status: { in: ["sent", "delivered", "read"] } }` with **NO DATE FILTER** (`createdAt: gte`). Consequently, if a customer ever received a `review_request` message in the past (even weeks or months ago), all future review requests were permanently and silently aborted with `{ scheduled: false, reason: "Review request already sent or active" }`.
+  2. An orphaned `WhatsAppMessage` record (`cmwncn7u00ag0kvky5uti432v`, status `sent`, from 19 Nov 2026) existed for Cake Connection with `toPhone: '919033304707'` and `customerId: NULL`. When the customer data was deleted for fresh testing, this record was skipped because the cleanup query only filtered by `customerId IN (...)`. When the merchant approved the stamp at 9:52 PM, the scheduler matched this orphaned row and silently aborted scheduling the 5-minute delayed review message.
+- **Resolution**:
+  1. **Bounded 24-Hour Deduplication Window (`src/lib/review-scheduler.ts`)**: Updated the deduplication query to enforce `{ createdAt: { gte: twentyFourHoursAgo } }` on both branches (`sent/delivered/read` and `scheduled/queued`). This prevents duplicate spam within 24 hours while ensuring legitimate visits or fresh test cycles are never permanently locked out.
+  2. **Comprehensive Message Cleanup (`scripts/reset_cake_connection_customers.py`)**: Updated the reset script to delete all `WhatsAppMessage` records for the targeted merchant and customer phones regardless of whether `customerId` is null, preventing orphaned locks.
+  3. **Immediate VPS Recovery**: Cleared the stale orphaned message on live VPS and verified `review_request` scheduling.
+- **Status**: ✅ Resolved, Hardened, and Verified. All 7 Adversarial Master Gates Passed.
+
+---
+
 ## [22 Nov 2026] Issue: Automated Instagram Social Loyalty Engine & Webhook Security Hardening
 - **Symptom**: User requested an automated Instagram social loyalty verification system in CustomerPilot where customers earn stamps for following the merchant's Instagram page and mentioning the merchant in Instagram stories without requiring cashiers to manually inspect phones. Furthermore, adversarial review required eliminating race conditions, preventing token replay attacks, securing customer screenshot proof storage, and handling concurrent webhook deliveries.
 - **Root Cause**:

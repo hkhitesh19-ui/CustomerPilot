@@ -57,7 +57,7 @@ def delete_customer_data_from_db(conn, label):
     # Conditional deletes for nullable relations
     if cust_ids:
         placeholders = ",".join(["?"] * len(cust_ids))
-        for tbl in ["Achievement", "WhatsAppMessage"]:
+        for tbl in ["Achievement"]:
             try:
                 c.execute(f"SELECT COUNT(*) FROM \"{tbl}\" WHERE customerId IN ({placeholders})", cust_ids)
                 count = c.fetchone()[0]
@@ -66,6 +66,16 @@ def delete_customer_data_from_db(conn, label):
                     print(f"  [{label}] Deleted {count} rows from {tbl}")
             except Exception:
                 pass
+
+        # Clean all WhatsApp messages for this merchant or customer IDs to avoid orphaned review locks
+        try:
+            c.execute(f"SELECT COUNT(*) FROM \"WhatsAppMessage\" WHERE merchantId = ? OR customerId IN ({placeholders})", [MERCHANT_ID] + cust_ids)
+            count = c.fetchone()[0]
+            if count > 0:
+                c.execute(f"DELETE FROM \"WhatsAppMessage\" WHERE merchantId = ? OR customerId IN ({placeholders})", [MERCHANT_ID] + cust_ids)
+                print(f"  [{label}] Deleted {count} rows from WhatsAppMessage")
+        except Exception:
+            pass
                 
         for tbl in ["Order", "Invoice"]:
             try:
