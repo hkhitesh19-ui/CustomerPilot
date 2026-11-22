@@ -9,12 +9,12 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : fec4a36
-Full SHA          : fec4a362a265691ea9e29a8a704e3b1239c0953a
+Active Git Commit : 485f821
+Full SHA          : 485f82120a5a856734b15d7549e13cb2fee156f1
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 22 Nov 2026, 08:40 AM IST
+Deployment Date   : 22 Nov 2026, 10:55 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(standee): implement approved Sample B (305px QR, 345x334 white card, aspect-aware gold badge) for loyalty standee
+Commit Title      : feat(settings): add universal store logo uploader to store profile and unify brand sync across all QRs and standees
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online)
 Docker Containers : evolution-api (evoapicloud/evolution-api:latest, Port 8080 Open in UFW, Online & Healthy)
