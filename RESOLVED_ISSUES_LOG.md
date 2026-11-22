@@ -4,6 +4,39 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [22 Nov 2026] Issue: Automated Instagram Social Loyalty Engine & Webhook Security Hardening
+- **Symptom**: User requested an automated Instagram social loyalty verification system in CustomerPilot where customers earn stamps for following the merchant's Instagram page and mentioning the merchant in Instagram stories without requiring cashiers to manually inspect phones. Furthermore, adversarial review required eliminating race conditions, preventing token replay attacks, securing customer screenshot proof storage, and handling concurrent webhook deliveries.
+- **Root Cause**:
+  1. Meta Graph API does not provide a follower list endpoint; `is_user_follow_business` can only be queried via Graph API for an IGSID once the user initiates a conversation via DM.
+  2. Concurrent webhook deliveries or duplicate retries from Meta without atomic database claims (`updateMany`) could result in double-stamp rewards.
+  3. Story mentions from private Instagram accounts do not trigger business webhooks due to Meta privacy restrictions, requiring an authentic fallback proof pipeline.
+  4. Storing customer screenshot proofs in `public/uploads/` exposes them to unauthorized web scraping and static asset bundling risks on VPS.
+- **Resolution**:
+  1. **Dual DB Architecture & Prisma Schema**: Added `MerchantInstagramConnection`, `CustomerInstagramIdentity`, and `InstagramStoryProof` models with foreign keys to `Merchant` and `Customer`.
+  2. **Authoritative Token Generator (`/api/instagram/generate-token`)**: Validates customer and phone against store records, enforces 15-minute expiration, generates cryptographic token (`CP_XXXXXX`) and deep link (`https://ig.me/m/{username}?text=Verify%20CP_XXXXXX`), and includes unexpired active token reuse and rate-limiting.
+  3. **Atomic Webhook Engine (`/api/webhook/instagram`)**:
+     - Enforces timing-safe HMAC SHA-256 signature verification (`crypto.timingSafeEqual`) against `process.env.META_APP_SECRET`.
+     - Webhook delivery deduplication via `.mid` tracked in `db.systemContent`.
+     - Filters out page echoes (`is_echo: true`).
+     - Atomic token consumption via `db.systemContent.delete` (blocks replay attacks).
+     - **Atomic Claim Pattern (`updateMany`)**: Implemented atomic check-and-set claims for both follow (`followRewarded: false`) and story mentions (`lastStoryRewardedAt: null || lt: cutoff24h`) with `claim.count === 1` guard, mathematically preventing double-stamp concurrency races.
+     - **Subsequent Message Follow Re-Verification**: If a user pairs their phone to IGSID before clicking Follow, any subsequent DM automatically triggers `checkPendingFollowReward` to credit the stamp.
+     - Supports both Messenger API attachment format (`type: "story_mention"`) and Graph API changes format (`field: "story_mentions"`).
+  4. **Secure Proof Pipeline Outside Public Webroot**:
+     - Uploaded screenshot proofs are validated for magic header bytes (JPEG/PNG/WebP) with a 5MB size limit and saved in `storage/proofs/` outside `public/`.
+     - Served dynamically through secure streaming route `/api/instagram/proof-image/[id]`.
+     - Built merchant one-tap review and approval UI in `src/components/admin/InstagramProofQueue.tsx` and customer wallet card in `src/components/loyalty/InstagramTaskCard.tsx`.
+  5. **Adversarial Red-Team Test Suite (`scripts/test_instagram_adversarial_suite.ts`)**:
+     - Test A: Unsigned / wrong-signature POST rejected with 401.
+     - Test B: Atomic token consumption & replay attack prevention (0 duplicate stamps).
+     - Test C: Webhook delivery deduplication via `.mid`.
+     - Test D: Dual story mention & 24h cadence lock.
+     - Test E: Concurrent double-stamp race condition via `Promise.all` (exactly 2 stamps credited, duplicate dropped).
+  6. Passed all 7 CustomerPilot Master Adversarial Red-Team Gates cleanly. Local commits: `b9d32a5`, `8341460`, and `5a9e35c`.
+- **Status**: ✅ Resolved, Hardened, and Verified Locally. Awaiting User Confirmation for Git Push & Live VPS Deployment.
+
+---
+
 ## [22 Nov 2026] Issue: WhatsApp Webhook Decryption & Watchdog v4.2 Production Hardening
 - **Symptom**: User reported that around 11:09 AM and 11:27 AM IST, customer loyalty check-in messages ("Hi Cake Connection! Checking in for my VIP Club stamps.") sent via WhatsApp failed to register in CustomerPilot Live Queue, leaving the queue empty without any alert or self-healing.
 - **Root Cause**:
