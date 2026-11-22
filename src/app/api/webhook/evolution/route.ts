@@ -536,7 +536,7 @@ export async function POST(req: NextRequest) {
         })
 
         if (alreadyWaiting) {
-          console.log(`[Webhook] Customer ${customerPhone} already in queue`)
+          console.log(`[Webhook] ⚠️ Duplicate QR Scan from +${customerPhone}: Customer already waiting in queue (ID: ${alreadyWaiting.id}, ScannedAt: ${alreadyWaiting.scannedAt}). Dispatched QUEUE_DUPLICATE notification.`)
           const alreadyMsg = await getCompiledTemplate(merchant.id, "QUEUE_DUPLICATE", {
             merchantName: merchant.name || "our store"
           })

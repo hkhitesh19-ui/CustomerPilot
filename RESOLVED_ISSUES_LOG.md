@@ -4,6 +4,23 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [22 Nov 2026] Issue: WhatsApp Webhook Decryption & Watchdog v4.2 Production Hardening
+- **Symptom**: User reported that around 11:09 AM and 11:27 AM IST, customer loyalty check-in messages ("Hi Cake Connection! Checking in for my VIP Club stamps.") sent via WhatsApp failed to register in CustomerPilot Live Queue, leaving the queue empty without any alert or self-healing.
+- **Root Cause**:
+  1. WhatsApp server sent a media status ACK node (`{"tag":"ack","attrs":{"class":"status","type":"media",...}}`) at 11:04:52 AM and 11:05:12 AM IST, triggering Baileys stream errors (`stream errored out`, `Bad MAC`) on the Cake Connection WhatsApp socket.
+  2. The double-crash in 20 seconds caused Baileys socket to hang in an unrecovered disconnected state for 43 minutes until 11:48:59 AM IST.
+  3. The existing Watchdog v4 was blind to this crash because `probe(i)` checked `/chat/whatsappNumbers`, which responded `exists: true` directly from Baileys local in-memory cache, advancing `lastOk` timestamps without testing the actual stream. Furthermore, `WD_DRYRUN=1` suppressed automated restarts.
+- **Resolution**:
+  1. **Nginx Webhook Security Logging**: Configured dedicated `/var/log/nginx/webhook.log` using `$uri` in `webhook_safe` log format to redact all `?secret=` query strings from access logs, configured logrotate with 14-day retention, and restricted permissions to `0640`.
+  2. **Evolution API Docker Pinning**: Pinned `/opt/evolution-api/docker-compose.yml` to the exact immutable image digest `evoapicloud/evolution-api@sha256:966625532d9076a2381e973a271307d107e6f070450de3abeeea8bd18be07252`.
+  3. **Duplicate Scan Visibility**: Added explicit diagnostic logging and template metadata in `src/app/api/webhook/evolution/route.ts` for duplicate queue scan attempts.
+  4. **Watchdog v4.2 Upgrade**: Developed and deployed Watchdog v4.2 featuring a real-time Docker log monitor (`docker logs -f --tail 0 evolution-api`). When `stream errored out` occurs, Watchdog gives Baileys a 75-second window to self-heal naturally. If no inbound traffic or recovery occurs within 75 seconds, Watchdog automatically executes a targeted single-instance restart (`/instance/restart/:name`), preserving all other merchants (e.g. Maw & Paw) and respecting Anti-Conflict locks (codes 440/401).
+  5. Verified all 3 simulation test suites cleanly and verified PM2 startup under `cp-watchdog` (PID: 610904).
+  6. Passed all 7 CustomerPilot Master Adversarial Red-Team Gates cleanly.
+- **Status**: ✅ Resolved, Hardened, and Verified Locally & on VPS.
+
+---
+
 ## [22 Nov 2026] Issue: Loyalty Standee Sample B (305px Compact & Airy) Deployed with Real Merchant Gold Badge
 - **Symptom**: User reviewed giant 420px QR preview and noted that the surrounding graphics/text ("CONFIRM REWARDS", "Scan Here", "Join Now", and feature badges) were cramped. User requested Sample B (305px QR) with breathing room and prominent Cake Connection merchant logo.
 - **Root Cause**: The 420px QR card was 462x448, which overlapped the background typography.
