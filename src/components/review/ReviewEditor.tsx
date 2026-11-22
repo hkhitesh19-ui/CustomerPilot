@@ -153,6 +153,9 @@ export function ReviewEditor({
   const handleSelectChip = async (chip: string) => {
     const next = activeProduct.toLowerCase() === chip.toLowerCase() ? "" : chip
     setActiveProduct(next)
+    if (next) {
+      setIsEditingExisting(false)
+    }
     if (isRegenerating) return
     setIsRegenerating(true)
     try {
@@ -384,7 +387,7 @@ export function ReviewEditor({
           )}
 
           {/* 1-Tap Dual Bestseller Selection: Services (Up to 10) + Products (Up to 10) */}
-          {((heroServices && heroServices.length > 0) || (heroProducts && heroProducts.length > 0) || (heroChips && heroChips.length > 0)) && !isEditingExisting && (
+          {((heroServices && heroServices.length > 0) || (heroProducts && heroProducts.length > 0) || (heroChips && heroChips.length > 0)) && (
             <div className="space-y-1.5 sm:space-y-2 pb-1 bg-white sm:bg-transparent p-2 sm:p-0 rounded-xl border sm:border-0 border-slate-200/80">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] sm:text-[11px] font-bold text-[#5F6368] uppercase tracking-wider flex items-center gap-1">

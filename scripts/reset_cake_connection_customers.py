@@ -214,7 +214,7 @@ for tbl, where_clause, params in deletion_queries:
 
 if cust_ids:
     placeholders = ",".join(["?"] * len(cust_ids))
-    for tbl in ["Achievement", "WhatsAppMessage"]:
+    for tbl in ["Achievement"]:
         try:
             c.execute(f"SELECT COUNT(*) FROM \\\"{tbl}\\\" WHERE customerId IN ({placeholders})", cust_ids)
             count = c.fetchone()[0]
@@ -242,6 +242,16 @@ if cust_ids:
             print(f"  [VPS] Deleted {count} rows from QrScanEvent")
     except Exception:
         pass
+
+# Clean all WhatsApp messages for Cake Connection to guarantee 100% clean test slate
+try:
+    c.execute(f"SELECT COUNT(*) FROM \\\"WhatsAppMessage\\\" WHERE merchantId = ?", (MERCHANT_ID,))
+    count = c.fetchone()[0]
+    if count > 0:
+        c.execute(f"DELETE FROM \\\"WhatsAppMessage\\\" WHERE merchantId = ?", (MERCHANT_ID,))
+        print(f"  [VPS] Deleted {count} rows from WhatsAppMessage")
+except Exception:
+    pass
 
 c.execute("DELETE FROM Customer WHERE merchantId = ?", (MERCHANT_ID,))
 print(f"  [VPS] Deleted {len(cust_ids)} rows from Customer table.")

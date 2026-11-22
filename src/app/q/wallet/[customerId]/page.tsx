@@ -17,7 +17,9 @@ export default async function WalletPage({
     include: {
       merchant: {
         include: {
-          merchantGoogleConnections: true
+          merchantGoogleConnections: true,
+          instagramConnection: true,
+          digitalBusinessCard: true
         }
       },
       stampCards: {
@@ -115,6 +117,16 @@ export default async function WalletPage({
     }).catch(() => {})
   }
 
+  // Resolve store Instagram username
+  const rawIgUrl = (customer.merchant as any).digitalBusinessCard?.instagramUrl
+  let igUsername = (customer.merchant as any).instagramConnection?.instagramUsername
+  if (!igUsername && rawIgUrl) {
+    igUsername = rawIgUrl.replace(/.*instagram\.com\//i, "").replace(/\/.*$/, "").replace(/[@]/g, "").trim()
+  }
+  if (!igUsername) {
+    igUsername = "cakeconnection"
+  }
+
   const initialData = {
     customer: {
       id: customer.id,
@@ -130,7 +142,8 @@ export default async function WalletPage({
       name: customer.merchant.name,
       logoUrl: customer.merchant.logoUrl,
       address: customer.merchant.address,
-      whatsappPhone: customer.merchant.whatsappPhone
+      whatsappPhone: customer.merchant.whatsappPhone,
+      instagramUsername: igUsername
     },
     rule: {
       id: activeStampCardRule.id,

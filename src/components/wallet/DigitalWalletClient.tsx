@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Star, Gift, Crown, ExternalLink, RefreshCw, Sparkles, CheckCircle2, Clock, Camera } from "lucide-react"
+import InstagramTaskCard from "@/components/loyalty/InstagramTaskCard"
 
 interface WalletData {
   customer: {
@@ -19,6 +20,7 @@ interface WalletData {
     logoUrl: string | null
     address: string | null
     whatsappPhone: string | null
+    instagramUsername?: string | null
   }
   rule: {
     id: string
@@ -256,6 +258,15 @@ export function DigitalWalletClient({ initialData }: { initialData: WalletData }
               </div>
             </div>
           </a>
+
+          {/* Instagram Social Rewards Task */}
+          <InstagramTaskCard
+            merchantId={data.merchant.id}
+            customerId={data.customer.id}
+            phone={data.customer.phone}
+            instagramUsername={data.merchant.instagramUsername || "cakeconnection"}
+            onRewardClaimed={() => window.location.reload()}
+          />
 
           {/* WhatsApp Invite Friend */}
           {(() => {

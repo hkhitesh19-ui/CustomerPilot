@@ -7843,3 +7843,18 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   4. Verified webhook flow: simulated VIP check-in message immediately joined the Live Queue with HTTP 200, confirming `WaitingCustomer` record creation.
   5. Verified all 7 Master Adversarial Red-Team gates passed cleanly.
 - **Status**: ✅ Resolved and Verified.
+
+---
+## [22 Nov 2026] Issue: Instagram Reward Task Card Missing in Digital Wallet and Keyword Grounding Studio Hidden on Review Page
+- **Symptom**:
+  1. On the customer's live Digital Wallet (`customerpilot.in/q/wallet/<customerId>`), the Instagram Social Rewards card ("Follow @CakeConnection on Instagram (+1 Stamp)") was completely missing under `⚡ Quick Bonus Stamps`.
+  2. On the AI Google Review page (`/review?c=...&m=...`), the "What did you visit / purchase today?" bestseller keyword chips ("Smart Keyword Grounding Studio") disappeared and only showed "Google allows 1 review per account. Clicking below will open your review in Edit mode".
+- **Root Cause**:
+  1. `InstagramTaskCard.tsx` had been created but was never imported or rendered inside `src/components/wallet/DigitalWalletClient.tsx`. In addition, `src/app/q/wallet/[customerId]/page.tsx` did not pass the store's `instagramUsername`.
+  2. In `src/components/review/ReviewEditor.tsx`, the keyword chips section was guarded by `&& !isEditingExisting`. When a customer had an existing review record in the database (or clicked "Copy & Post on Google Maps" earlier), `isEditingExisting` initialized to `true`, which hid the product/service chips.
+- **Resolution**:
+  1. Imported and rendered `<InstagramTaskCard />` under `⚡ Quick Bonus Stamps` in `src/components/wallet/DigitalWalletClient.tsx`.
+  2. Enhanced `src/app/q/wallet/[customerId]/page.tsx` to query `instagramConnection` and `digitalBusinessCard` on Merchant and pass `instagramUsername` to `DigitalWalletClient`.
+  3. Removed `&& !isEditingExisting` guard in `src/components/review/ReviewEditor.tsx` so bestseller keyword chips are accessible even when in edit mode. When a customer selects any chip, it dynamically fetches the relevant draft and switches `isEditingExisting` to `false`.
+  4. Executed Master Adversarial Red-Team Guard (`node scripts/run_adversarial_guard.js`) with all 7 safety and mathematical boundary gates passing cleanly.
+- **Status**: ✅ Resolved and Verified.
