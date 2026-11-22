@@ -10,18 +10,27 @@ async function verifyToken(token: string) {
 }
 
 function resolveMerchantId(payload: any, request: NextRequest): string | undefined {
-  let merchantId = payload.merchantId as string | undefined;
-  if (payload.role === 'super_admin' || merchantId === 'admin_merchant' || !merchantId) {
-    const impCookie = request.cookies.get('cp_impersonation')?.value;
-    if (impCookie) {
-      try {
-        const imp = JSON.parse(impCookie);
-        if (imp?.merchantId) return imp.merchantId;
-      } catch {}
-    }
-    // Default to primary merchant (Cake Connection) so super_admin can inspect dashboard seamlessly
-    return 'cmtymavfx0002kx008lbfvp57';
+  // 1. If impersonation cookie is present, super_admin is explicitly viewing another merchant
+  const impCookie = request.cookies.get('cp_impersonation')?.value;
+  if (impCookie) {
+    try {
+      const imp = JSON.parse(impCookie);
+      if (imp?.merchantId) return imp.merchantId;
+    } catch {}
   }
+
+  let merchantId = payload.merchantId as string | undefined;
+
+  // 2. If user already has a valid merchantId attached (not generic admin_merchant), always use it!
+  if (merchantId && merchantId !== 'admin_merchant') {
+    return merchantId;
+  }
+
+  // 3. Fallback only if no merchantId is linked to this user (defaults to CustomerPilot HQ merchant)
+  if (payload.role === 'super_admin' || !merchantId || merchantId === 'admin_merchant') {
+    return 'cmw1vwviv06f3kvwlkx62ghap';
+  }
+
   return merchantId;
 }
 

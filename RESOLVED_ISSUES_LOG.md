@@ -7748,3 +7748,17 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   7. Updated Layer 5 Frozen Core Guard manifest and passed all 7 Master Adversarial Gates.
   8. Verified full end-to-end simulation in `scripts/test_referral_flow_e2e.js`: Customer A invite -> Customer B web claim -> Next day counter QR scan -> Live Queue golden badge `✨ Referral Linked: Customer A` -> Cashier bill approval -> Atomic dual bonus stamps.
 - **Status**: ✅ Resolved and Verified.
+
+---
+## [22 Nov 2026] Issue: Super Admin & CustomerPilot Settings Merchant Desync and Cake Connection Fallback Overwrite
+- **Symptom**: When logging in as CustomerPilot (`customerpilot1@gmail.com`), the Settings page (`customerpilot.in/dashboard/settings`) displayed Cake Connection's store name, Cake Connection's logo, and Cake Connection's Google review link instead of CustomerPilot's own profile and review link (`https://g.page/r/CXHqhp5D4jCcECE/review`).
+- **Root Cause**:
+  1. In `src/proxy.ts`, `resolveMerchantId(payload, request)` checked `if (payload.role === 'super_admin' || merchantId === 'admin_merchant' || !merchantId)` and returned `'cmtymavfx0002kx008lbfvp57'` (Cake Connection). This unconditionally wiped out `payload.merchantId` (`cmw1vwviv06f3kvwlkx62ghap`) whenever a user held the `super_admin` role.
+  2. Downstream routes (`src/app/api/state/route.ts`, `src/app/api/digital-card/route.ts`, and `src/lib/api.ts`) possessed identical hardcoded fallbacks to Cake Connection for super admins.
+  3. In SQLite DB, merchant `cmw1vwviv06f3kvwlkx62ghap` had an empty `googleReviewLink` and was missing an active `MerchantGoogleConnection` record.
+- **Resolution**:
+  1. Refactored `src/proxy.ts`: Prioritized `payload.merchantId` if present and valid (`!== 'admin_merchant'`). If super admin has no linked merchant and no impersonation cookie, it defaults safely to CustomerPilot HQ (`cmw1vwviv06f3kvwlkx62ghap`) rather than Cake Connection.
+  2. Updated `src/app/api/state/route.ts`, `src/app/api/digital-card/route.ts`, and `src/lib/api.ts` to respect user's real merchant and default super admins to CustomerPilot HQ.
+  3. Updated live VPS database: Configured `cmw1vwviv06f3kvwlkx62ghap` and `customerpilot-hq` with `googleReviewLink: 'https://g.page/r/CXHqhp5D4jCcECE/review'`, `logoUrl: '/cplogo_horizontal.png'`, upserted `MerchantGoogleConnection` with active verified status, and restored Cake Connection's authentic placeName.
+  4. Executed Master Adversarial Guard (`node scripts/run_adversarial_guard.js`) with all 7 safety and mathematical boundary gates passing cleanly.
+- **Status**: ✅ Resolved and Verified.

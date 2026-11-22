@@ -15,15 +15,18 @@ async function getMerchantIdFromReq(req: NextRequest): Promise<string | null> {
       const { payload } = await jwtVerify(token, new TextEncoder().encode(getJwtSecret()))
       const role = payload.role as string
       const tokenMerchantId = payload.merchantId as string
+      const impCookie = req.cookies.get("cp_impersonation")?.value
+      if (impCookie) {
+        try {
+          const imp = JSON.parse(impCookie)
+          if (imp?.merchantId) return imp.merchantId
+        } catch {}
+      }
+      if (tokenMerchantId && tokenMerchantId !== "admin_merchant") {
+        return tokenMerchantId
+      }
       if (role === "super_admin" || tokenMerchantId === "admin_merchant" || !tokenMerchantId) {
-        const impCookie = req.cookies.get("cp_impersonation")?.value
-        if (impCookie) {
-          try {
-            const imp = JSON.parse(impCookie)
-            if (imp?.merchantId) return imp.merchantId
-          } catch {}
-        }
-        return "cmtymavfx0002kx008lbfvp57"
+        return "cmw1vwviv06f3kvwlkx62ghap"
       }
       return tokenMerchantId
     } catch {}

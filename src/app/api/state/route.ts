@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
     if (!merchantId || merchantId === 'admin_merchant') {
       if (userRole === 'super_admin') {
-        merchantId = 'cmtymavfx0002kx008lbfvp57' // Default to Cake Connection
+        merchantId = 'cmw1vwviv06f3kvwlkx62ghap' // Default to CustomerPilot HQ
       }
     }
 

@@ -29,10 +29,10 @@ export async function getAuthenticatedMerchant() {
       if (merchant) return merchant
     }
 
-    // If Super Admin without a specific merchant, fallback to Cake Connection or primary merchant
+    // If Super Admin without a specific merchant, fallback to CustomerPilot HQ or primary merchant
     if (userRole === 'super_admin' || merchantId === 'admin_merchant') {
-      const cakeConnection = await db.merchant.findUnique({ where: { id: 'cmtymavfx0002kx008lbfvp57' } })
-      if (cakeConnection) return cakeConnection
+      const customerPilot = await db.merchant.findUnique({ where: { id: 'cmw1vwviv06f3kvwlkx62ghap' } })
+      if (customerPilot) return customerPilot
       const primaryMerchant = await db.merchant.findFirst({
         where: { status: 'active' },
         orderBy: { createdAt: 'asc' }
