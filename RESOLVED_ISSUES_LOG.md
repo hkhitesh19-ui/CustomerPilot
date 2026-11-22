@@ -7762,3 +7762,19 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   3. Updated live VPS database: Configured `cmw1vwviv06f3kvwlkx62ghap` and `customerpilot-hq` with `googleReviewLink: 'https://g.page/r/CXHqhp5D4jCcECE/review'`, `logoUrl: '/cplogo_horizontal.png'`, upserted `MerchantGoogleConnection` with active verified status, and restored Cake Connection's authentic placeName.
   4. Executed Master Adversarial Guard (`node scripts/run_adversarial_guard.js`) with all 7 safety and mathematical boundary gates passing cleanly.
 - **Status**: ✅ Resolved and Verified.
+
+---
+## [22 Nov 2026] Issue: Universal Store Profile Logo Uploader, Standee Brand Sync, and Evolution WhatsApp Decryption Ratchet Desync
+- **Symptom**:
+  1. On `customerpilot.in/dashboard/settings`, the "Digital Loyalty Stamps" section was not changing the store logo, and there was no central logo uploader in Tab 1 ("Store Profile & Info").
+  2. Customers scanning the Loyalty QR at Cake Connection and sending "Hi Cake Connection! Checking in for my VIP Club stamps." at 09:59 AM IST were not being captured into the Live Queue.
+- **Root Cause**:
+  1. Tab 1 ("Store Profile & Info") lacked a Store Logo uploader component. In Tab 2, `src/components/qr-generator.tsx` and `src/app/api/qr/standee/route.ts` contained a legacy filter `logoUrl.includes("cplogo")` which treated CustomerPilot's own brand assets as "no logo" and bypassed custom rendering.
+  2. In Evolution API Docker container, Baileys Signal session storage had corrupt/desynced ratchet files for customer contact `78503546454242` (`919104448446`), throwing `SessionError: No matching sessions found for message` and `Bad MAC`. Because Baileys failed to decrypt the message, it never fired the `MESSAGES_UPSERT` webhook to CustomerPilot.
+- **Resolution**:
+  1. Built a unified **Store Logo & Brand Identity Card** in Tab 1 ("Store Profile & Info") of `src/app/dashboard/settings/page.tsx` with instant 1-place upload, active logo preview, remove option, and automatic query cache invalidation.
+  2. Removed the legacy `cplogo` blocking clause from `src/components/qr-generator.tsx` and `src/app/api/qr/standee/route.ts`, allowing custom store logos to render across all standees, digital passes, review QR posters, and dynamic QR studio.
+  3. Purged stale/corrupt Baileys session files for `78503546454242` (`919104448446`) on the VPS, restarted the Evolution API instance (`CP_917203824012_cmtymavf_mw0whjx7`), and sent a gateway sync ping to re-negotiate fresh Signal ratchet keys.
+  4. Verified webhook flow: simulated VIP check-in message immediately joined the Live Queue with HTTP 200, confirming `WaitingCustomer` record creation.
+  5. Verified all 7 Master Adversarial Red-Team gates passed cleanly.
+- **Status**: ✅ Resolved and Verified.

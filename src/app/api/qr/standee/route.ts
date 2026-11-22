@@ -159,7 +159,7 @@ function loadPublicAssetBuffer(relPath: string): Buffer | null {
 // Helper: load merchant logo buffer safely & trim empty transparent/white padding
 async function getMerchantLogoBuffer(logoUrl: string | null | undefined): Promise<Buffer | null> {
   if (!logoUrl) return null
-  if (logoUrl.includes("cplogo") || logoUrl.includes("placeholder")) return null
+  if (logoUrl.includes("placeholder")) return null
 
   let rawBuf: Buffer | null = null
   try {

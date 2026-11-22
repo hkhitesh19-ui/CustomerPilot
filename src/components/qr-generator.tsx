@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
@@ -22,6 +23,7 @@ export function QRGenerator({
   initialDesign?: StandeeDesignType
 }) {
   const { toast } = useToast()
+  const queryClient = useQueryClient()
   const [loading, setLoading] = useState(true)
   const [qrData, setQrData] = useState<any>(null)
   const [copied, setCopied] = useState(false)
@@ -96,7 +98,6 @@ export function QRGenerator({
 
   const hasCustomLogo = Boolean(
     qrData?.merchant?.logoUrl &&
-    !qrData.merchant.logoUrl.includes("cplogo") &&
     !qrData.merchant.logoUrl.includes("placeholder")
   )
 
@@ -128,6 +129,7 @@ export function QRGenerator({
         }))
         setStandeeKey(Date.now()) // force standee preview refresh
         broadcastMerchantLogoUpdate(merchantId, uploadedUrl)
+        queryClient.invalidateQueries({ queryKey: ["dashboard-state"] })
         toast({ title: "Logo Synced Across All Standees! ✅", description: "Your latest logo is now automatically set on ALL QR standees." })
       }
     } catch (err: any) {
@@ -152,6 +154,7 @@ export function QRGenerator({
       }))
       setStandeeKey(Date.now())
       broadcastMerchantLogoUpdate(merchantId, null)
+      queryClient.invalidateQueries({ queryKey: ["dashboard-state"] })
       toast({ title: "Logo Removed", description: "Standee will display your store name typographically." })
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" })

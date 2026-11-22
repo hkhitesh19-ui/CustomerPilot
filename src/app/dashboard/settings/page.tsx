@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import Link from "next/link"
 import { useDashboardState } from "@/hooks/use-dashboard-state"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,8 +24,12 @@ import {
   Gift,
   Star,
   QrCode,
-  Receipt
+  Receipt,
+  Upload,
+  Trash2,
+  Image as ImageIcon
 } from "lucide-react"
+import { broadcastMerchantLogoUpdate } from "@/lib/logo-sync"
 import { WhatsAppVerification } from "@/components/whatsapp-verification"
 import { WhatsAppJourneyTemplates } from "@/components/whatsapp-journey-templates"
 import { GoogleBusinessIntegration } from "@/components/google-business-integration"
@@ -72,7 +77,67 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle")
 
+  const queryClient = useQueryClient()
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const logoInputRef = useRef<HTMLInputElement>(null)
+
   const merchant = data?.merchant
+  const hasCustomLogo = Boolean(
+    merchant?.logoUrl &&
+    !merchant.logoUrl.includes("placeholder")
+  )
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Please upload an image under 5MB.", variant: "destructive" })
+      return
+    }
+    setUploadingLogo(true)
+    try {
+      const fd = new FormData()
+      fd.append("file", file)
+      fd.append("type", "logo")
+      const res = await fetch("/api/merchant/upload-brand", {
+        method: "POST",
+        headers: { "x-merchant-id": merchant?.id || "" },
+        body: fd,
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.error || "Upload failed")
+      const uploadedUrl = json.data?.url || json.url
+      if (uploadedUrl) {
+        broadcastMerchantLogoUpdate(merchant?.id, uploadedUrl)
+        queryClient.invalidateQueries({ queryKey: ["dashboard-state"] })
+        toast({ 
+          title: "Store Logo Updated Everywhere! ✅", 
+          description: "New logo is now automatically synchronized across all QR Standees, Digital Cards, Review Posters, and WhatsApp Bot." 
+        })
+      }
+    } catch (err: any) {
+      toast({ title: "Upload Failed", description: err.message || "Could not upload logo", variant: "destructive" })
+    } finally {
+      setUploadingLogo(false)
+      if (logoInputRef.current) logoInputRef.current.value = ""
+    }
+  }
+
+  const handleRemoveLogo = async () => {
+    try {
+      const res = await fetch("/api/merchant/update", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "x-merchant-id": merchant?.id || "" },
+        body: JSON.stringify({ logoUrl: null }),
+      })
+      if (!res.ok) throw new Error("Failed to remove logo")
+      broadcastMerchantLogoUpdate(merchant?.id, null)
+      queryClient.invalidateQueries({ queryKey: ["dashboard-state"] })
+      toast({ title: "Logo Removed", description: "All QR standees and passes will now display clean store typography." })
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" })
+    }
+  }
   const isLoyaltyEnabled = hasModule(merchant, "LOYALTY")
   const isReviewsEnabled = hasModule(merchant, "REVIEWS") || hasModule(merchant, "AUTOREPLY")
   const isReviewsOnly = isReviewsEnabled && !isLoyaltyEnabled
@@ -442,6 +507,89 @@ export default function SettingsPage() {
             >
               {isSaving ? "Saving..." : "Save Changes"}
             </Button>
+          </div>
+        </div>
+
+        {/* ─── 0. Universal Store Logo & Brand Identity (Syncs Across All Services) ─── */}
+        <div className="rounded-2xl border-2 border-dashed border-sky-300 dark:border-sky-800 bg-gradient-to-r from-sky-50/70 via-indigo-50/30 to-slate-50 dark:from-slate-900 dark:to-slate-950 p-5 shadow-xs space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              {/* Logo Preview Box */}
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center p-2 overflow-hidden shrink-0">
+                {hasCustomLogo ? (
+                  <img
+                    src={merchant.logoUrl}
+                    alt={merchant.name || "Store Logo"}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                ) : (
+                  <div className="text-center text-slate-400 dark:text-slate-500 flex flex-col items-center">
+                    <ImageIcon className="w-7 h-7 text-slate-300 dark:text-slate-600 mb-1" />
+                    <span className="text-[9px] font-extrabold uppercase tracking-wider">No Logo</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Logo Info */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    Official Store Logo
+                  </span>
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      hasCustomLogo
+                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300"
+                        : "bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300"
+                    }`}
+                  >
+                    {hasCustomLogo ? "Active Store Logo" : "Clean Typography Active"}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md">
+                  {hasCustomLogo
+                    ? "Your official logo is rendered in Ultra-HD across all QRs, Standees, and passes."
+                    : "Upload your store's PNG or JPG logo. It will appear on your counter standees, posters, and customer passes."}
+                </p>
+                <div className="text-[11px] font-semibold text-sky-700 dark:text-sky-300 flex items-center gap-1 pt-0.5">
+                  <span>✨ 1-Place Update: Automatically updates Countertop QR Standees, Digital Passes, Review QR, Dynamic QR &amp; WhatsApp Bot.</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2 shrink-0">
+              <input
+                type="file"
+                ref={logoInputRef}
+                accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                className="hidden"
+                onChange={handleLogoUpload}
+              />
+              <Button
+                type="button"
+                onClick={() => logoInputRef.current?.click()}
+                disabled={uploadingLogo}
+                className="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md"
+              >
+                <Upload className="w-3.5 h-3.5 mr-1.5" />
+                {uploadingLogo ? "Uploading..." : (hasCustomLogo ? "Change Logo" : "Upload Store Logo")}
+              </Button>
+              {hasCustomLogo && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleRemoveLogo}
+                  disabled={uploadingLogo}
+                  title="Remove logo and use clean typography"
+                  className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 border-rose-200 dark:border-rose-900 text-xs font-bold px-3 py-2.5 rounded-xl"
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-1" />
+                  Remove
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
