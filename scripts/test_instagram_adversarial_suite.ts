@@ -214,6 +214,10 @@ async function runAdversarialInstagramTestSuite() {
   // 📸 TEST D: Dual Story Mention & 24-Hour Cadence Lock
   // ─────────────────────────────────────────────────────────────
   console.log("--- 📸 TEST D: Dual Story Mention & 24h Cadence Lock ---");
+  await db.customerInstagramIdentity.updateMany({
+    where: { igsid: testIgsid },
+    data: { lastStoryRewardedAt: null }
+  });
   const stampsBeforeStory = (await db.customer.findUnique({ where: { id: customer.id } }))?.lifetimeStamps || 0;
 
   // Story Mention 1 via messaging[] attachment (Messenger API format)
@@ -279,8 +283,75 @@ async function runAdversarialInstagramTestSuite() {
   }
   console.log("✅ TEST D PASSED: Story 1 awarded +2 stamps; Story 2 within 24h rejected by Cadence Lock.\n");
 
+  // ─────────────────────────────────────────────────────────────
+  // ⚡ TEST E: Concurrent Double-Stamp Race Condition (Promise.all)
+  // ─────────────────────────────────────────────────────────────
+  console.log("--- ⚡ TEST E: Concurrent Double-Stamp Race Defense (updateMany) ---");
+  const concurrentIgsid = "igsid_concurrent_race_" + Date.now();
+  await db.customerInstagramIdentity.deleteMany({ where: { customerId: customer.id } });
+  await db.customerInstagramIdentity.create({
+    data: {
+      merchantId: merchant.id,
+      customerId: customer.id,
+      phone: customer.phone,
+      igsid: concurrentIgsid,
+      followRewarded: false,
+      lastStoryRewardedAt: null
+    }
+  });
+
+  const baselineBeforeConcurrent = (await db.customer.findUnique({ where: { id: customer.id } }))?.lifetimeStamps || 0;
+
+  const payloadRace1 = {
+    object: "instagram",
+    entry: [{
+      id: "entry_race_1",
+      time: Date.now(),
+      messaging: [{
+        sender: { id: concurrentIgsid },
+        message: {
+          mid: "mid.concurrent_race_1_" + Date.now(),
+          attachments: [{ type: "story_mention", payload: { url: "https://ig.me/story1" } }]
+        }
+      }]
+    }]
+  };
+
+  const payloadRace2 = {
+    object: "instagram",
+    entry: [{
+      id: "entry_race_2",
+      time: Date.now(),
+      messaging: [{
+        sender: { id: concurrentIgsid },
+        message: {
+          mid: "mid.concurrent_race_2_" + Date.now(),
+          attachments: [{ type: "story_mention", payload: { url: "https://ig.me/story2" } }]
+        }
+      }]
+    }]
+  };
+
+  const reqRace1 = createSignedRequest(payloadRace1, TEST_SECRET);
+  const reqRace2 = createSignedRequest(payloadRace2, TEST_SECRET);
+
+  // Fire both requests concurrently at the exact same millisecond
+  console.log("Dispatching 2 simultaneous webhook calls via Promise.all...");
+  await Promise.all([webhookPost(reqRace1), webhookPost(reqRace2)]);
+
+  const stampsAfterConcurrent = (await db.customer.findUnique({ where: { id: customer.id } }))?.lifetimeStamps || 0;
+  const stampsAwarded = stampsAfterConcurrent - baselineBeforeConcurrent;
+  console.log(`Concurrent Execution Result: Baseline=${baselineBeforeConcurrent}, Final=${stampsAfterConcurrent}, Awarded=${stampsAwarded}`);
+
+  if (stampsAwarded !== 2) {
+    throw new Error(`FAIL: Double-stamp race detected! Expected exactly 2 stamps, but got ${stampsAwarded}`);
+  }
+  console.log("✅ TEST E PASSED: updateMany atomic claim prevented double-stamp race; exactly 2 stamps credited.\n");
+
   // Cleanup Test Artifacts
-  await db.customerInstagramIdentity.deleteMany({ where: { igsid: testIgsid } });
+  await db.customerInstagramIdentity.deleteMany({
+    where: { igsid: { in: [testIgsid, concurrentIgsid] } }
+  });
   await db.systemContent.deleteMany({
     where: {
       OR: [
@@ -291,7 +362,7 @@ async function runAdversarialInstagramTestSuite() {
   });
 
   console.log("=================================================================");
-  console.log("🎯 ALL 4 ADVERSARIAL HARDENING SECURITY GATES PASSED 100%!");
+  console.log("🎯 ALL 5 ADVERSARIAL HARDENING SECURITY GATES PASSED 100%!");
   console.log("=================================================================");
 }
 

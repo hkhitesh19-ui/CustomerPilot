@@ -167,7 +167,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "merchantId is required" }, { status: 400 });
     }
 
-    const proofs = await db.instagramStoryProof.findMany({
+    const rawProofs = await db.instagramStoryProof.findMany({
       where: {
         merchantId,
         status: "PENDING"
@@ -180,6 +180,11 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
       take: 50
     });
+
+    const proofs = rawProofs.map((item) => ({
+      ...item,
+      screenshot: `/api/instagram/proof-image/${item.id}`
+    }));
 
     return NextResponse.json({ success: true, proofs });
   } catch (error: any) {

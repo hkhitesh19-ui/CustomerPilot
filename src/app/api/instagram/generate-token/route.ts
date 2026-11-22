@@ -31,7 +31,40 @@ export async function POST(req: NextRequest) {
     const igUsername = merchant.instagramConnection?.instagramUsername || 
                        merchant.name.toLowerCase().replace(/[^a-z0-9_]/g, "");
 
-    // Generate 6-char clean cryptographic token
+    // 2. Active Token Reuse & Rate-Limiting Guard
+    const activeCustKey = `ig_cust_active_${customerId}`;
+    const existingActive = await db.systemContent.findUnique({
+      where: { key: activeCustKey }
+    });
+
+    if (existingActive) {
+      try {
+        const meta = JSON.parse(existingActive.value);
+        const expiresAt = new Date(meta.expiresAt);
+        const remainingMs = expiresAt.getTime() - Date.now();
+        // If active unexpired token exists (> 60s remaining), reuse it
+        if (remainingMs > 60 * 1000) {
+          const tokenExists = await db.systemContent.findUnique({
+            where: { key: `ig_token_${meta.token}` }
+          });
+          if (tokenExists) {
+            const deepLink = `https://ig.me/m/${igUsername}?text=Verify%20${meta.token}`;
+            return NextResponse.json({
+              success: true,
+              token: meta.token,
+              deepLink,
+              username: igUsername,
+              expiresInSeconds: Math.floor(remainingMs / 1000),
+              reused: true
+            });
+          }
+        }
+      } catch {
+        // Continue to fresh token generation
+      }
+    }
+
+    // 3. Generate 6-char clean cryptographic token
     const token = "CP_" + crypto.randomBytes(3).toString("hex").toUpperCase();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins validity
 
@@ -54,6 +87,21 @@ export async function POST(req: NextRequest) {
       update: {
         section: "instagram_verification",
         value: JSON.stringify(tokenPayload)
+      }
+    });
+
+    // Save active reference for reuse/rate-limiting
+    await db.systemContent.upsert({
+      where: { key: activeCustKey },
+      create: {
+        section: "instagram_verification",
+        key: activeCustKey,
+        value: JSON.stringify({ token, expiresAt: expiresAt.toISOString() }),
+        category: "instagram_pairing"
+      },
+      update: {
+        section: "instagram_verification",
+        value: JSON.stringify({ token, expiresAt: expiresAt.toISOString() })
       }
     });
 

@@ -50,13 +50,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Corrupt or spoofed image binary rejected" }, { status: 400 });
     }
 
-    // 4. Save to secure storage path
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "proofs");
-    await mkdir(uploadDir, { recursive: true });
+    // 4. Save to secure storage path outside public/
+    const storageDir = path.join(process.cwd(), "storage", "proofs");
+    await mkdir(storageDir, { recursive: true });
 
     const ext = isPng ? ".png" : (isWebp ? ".webp" : ".jpg");
     const filename = `ig_proof_${Date.now()}_${crypto.randomBytes(6).toString("hex")}${ext}`;
-    const filePath = path.join(uploadDir, filename);
+    const filePath = path.join(storageDir, filename);
 
     await writeFile(filePath, buffer);
 
@@ -65,17 +65,19 @@ export async function POST(req: NextRequest) {
         merchantId,
         customerId,
         phone,
-        screenshot: `/uploads/proofs/${filename}`,
+        screenshot: filename, // filename saved, served via /api/instagram/proof-image/[id]
         stamps: 2,
         notes: notes ? String(notes).substring(0, 300) : "Story screenshot uploaded via customer wallet",
         status: "PENDING"
       }
     });
 
+    const secureUrl = `/api/instagram/proof-image/${proof.id}`;
+
     return NextResponse.json({
       success: true,
       proofId: proof.id,
-      screenshotUrl: proof.screenshot,
+      screenshotUrl: secureUrl,
       status: proof.status
     });
   } catch (error: any) {

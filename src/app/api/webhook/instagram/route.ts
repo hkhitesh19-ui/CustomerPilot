@@ -4,7 +4,6 @@ import { sendCentralWhatsAppMessage } from "@/lib/whatsapp-service";
 import crypto from "crypto";
 
 const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN || "customerpilot_verify_123";
-const APP_SECRET = process.env.META_APP_SECRET;
 
 /**
  * Meta Webhook Handshake (GET)
@@ -120,7 +119,6 @@ export async function POST(req: NextRequest) {
             const tokenKey = `ig_token_${token}`;
 
             // 6. Atomic Token Consumption (Replay Attack Guard)
-            // Once read, token is deleted so replay or duplicate submissions receive 0 stamps.
             let tokenRecord: any = null;
             try {
               tokenRecord = await db.systemContent.delete({
@@ -136,7 +134,7 @@ export async function POST(req: NextRequest) {
               const { merchantId, customerId, phone, expiresAt } = payload;
 
               if (new Date(expiresAt) > new Date()) {
-                // Map Phone <-> IGSID in DB
+                // Map Phone <-> IGSID in DB (Persists even if user isn't following yet)
                 const identity = await db.customerInstagramIdentity.upsert({
                   where: {
                     merchantId_customerId: { merchantId, customerId }
@@ -167,23 +165,38 @@ export async function POST(req: NextRequest) {
                     const graphData = await graphRes.json();
                     const isFollowing = Boolean(graphData.is_user_follow_business);
 
-                    if (isFollowing && !identity.followRewarded) {
-                      await creditInstagramStamps({
-                        merchantId,
-                        customerId,
-                        phone,
-                        stamps: 1,
-                        sourceNote: "Instagram Follow Verified"
-                      });
-
-                      await db.customerInstagramIdentity.update({
-                        where: { id: identity.id },
+                    if (isFollowing) {
+                      // 7. Atomic Follow Claim Pattern (updateMany prevents double-stamp race)
+                      const claim = await db.customerInstagramIdentity.updateMany({
+                        where: {
+                          id: identity.id,
+                          followRewarded: false
+                        },
                         data: {
                           isFollowing: true,
                           followRewarded: true
                         }
                       });
-                      console.log(`[Instagram Webhook] 🏆 +1 Stamp credited to customer ${customerId} for Follow.`);
+
+                      if (claim.count === 1) {
+                        await creditInstagramStamps({
+                          merchantId,
+                          customerId,
+                          phone,
+                          stamps: 1,
+                          sourceNote: "Instagram Follow Verified"
+                        });
+                        console.log(`[Instagram Webhook] 🏆 +1 Stamp credited atomically to customer ${customerId} for Follow.`);
+                      } else {
+                        console.log(`[Instagram Webhook] Follow reward race condition dropped (claim.count === 0).`);
+                      }
+                    } else {
+                      // Customer mapped, but not following yet -> Keep record so follow re-verification works
+                      await db.customerInstagramIdentity.update({
+                        where: { id: identity.id },
+                        data: { isFollowing: false }
+                      });
+                      console.log(`[Instagram Webhook] Customer ${customerId} is not following yet. Phone <-> IGSID remains paired.`);
                     }
                   } catch (err: any) {
                     console.error("[Instagram Webhook] Error checking is_user_follow_business:", err.message);
@@ -196,6 +209,9 @@ export async function POST(req: NextRequest) {
               console.warn(`[Instagram Webhook] Token ${token} already consumed or invalid (Replay blocked).`);
             }
           }
+        } else {
+          // If no pairing token in text, check if this sender was previously paired and pending follow reward
+          await checkPendingFollowReward(senderIgsid);
         }
       }
 
@@ -218,7 +234,7 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * Story Mention Reward Processor with Strict 24h Cadence Lock
+ * Story Mention Reward Processor with Atomic updateMany Claim & 24h Cadence Lock
  */
 async function processStoryMentionReward(senderIgsid: string) {
   const identity = await db.customerInstagramIdentity.findFirst({
@@ -230,10 +246,23 @@ async function processStoryMentionReward(senderIgsid: string) {
     return;
   }
 
-  const lastRewardedMs = identity.lastStoryRewardedAt ? identity.lastStoryRewardedAt.getTime() : 0;
-  const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+  // 8. Atomic Story Claim Pattern: updateMany with 24h cutoff prevents race conditions
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const claim = await db.customerInstagramIdentity.updateMany({
+    where: {
+      id: identity.id,
+      OR: [
+        { lastStoryRewardedAt: null },
+        { lastStoryRewardedAt: { lt: cutoff } }
+      ]
+    },
+    data: {
+      lastStoryMentionAt: new Date(),
+      lastStoryRewardedAt: new Date()
+    }
+  });
 
-  if (Date.now() - lastRewardedMs > ONE_DAY_MS) {
+  if (claim.count === 1) {
     // Award 2 Story Bonus Stamps
     await creditInstagramStamps({
       merchantId: identity.merchantId,
@@ -242,17 +271,56 @@ async function processStoryMentionReward(senderIgsid: string) {
       stamps: 2,
       sourceNote: "Instagram Story Mention Verified"
     });
-
-    await db.customerInstagramIdentity.update({
-      where: { id: identity.id },
-      data: {
-        lastStoryMentionAt: new Date(),
-        lastStoryRewardedAt: new Date()
-      }
-    });
-    console.log(`[Instagram Webhook] 📸 +2 Story Bonus Stamps credited to customer ${identity.customerId}`);
+    console.log(`[Instagram Webhook] 📸 +2 Story Bonus Stamps credited atomically to customer ${identity.customerId}`);
   } else {
-    console.log(`[Instagram Webhook] Story tag reward skipped: 24h cooldown active for ${identity.customerId}.`);
+    console.log(`[Instagram Webhook] Story tag reward skipped: 24h cooldown active or race condition dropped.`);
+  }
+}
+
+/**
+ * Re-check pending follow reward for mapped customers sending regular DMs
+ */
+async function checkPendingFollowReward(senderIgsid: string) {
+  try {
+    const identity = await db.customerInstagramIdentity.findFirst({
+      where: { igsid: senderIgsid, followRewarded: false }
+    });
+    if (!identity) return;
+
+    const conn = await db.merchantInstagramConnection.findUnique({
+      where: { merchantId: identity.merchantId }
+    });
+    if (!conn || !conn.accessToken) return;
+
+    const graphRes = await fetch(
+      `https://graph.facebook.com/v21.0/${senderIgsid}?fields=is_user_follow_business&access_token=${conn.accessToken}`
+    );
+    const graphData = await graphRes.json();
+    if (graphData.is_user_follow_business) {
+      const claim = await db.customerInstagramIdentity.updateMany({
+        where: {
+          id: identity.id,
+          followRewarded: false
+        },
+        data: {
+          isFollowing: true,
+          followRewarded: true
+        }
+      });
+
+      if (claim.count === 1) {
+        await creditInstagramStamps({
+          merchantId: identity.merchantId,
+          customerId: identity.customerId,
+          phone: identity.phone,
+          stamps: 1,
+          sourceNote: "Instagram Follow Verified"
+        });
+        console.log(`[Instagram Webhook] 🏆 +1 Stamp credited to customer ${identity.customerId} on subsequent message.`);
+      }
+    }
+  } catch (err: any) {
+    console.error("[Instagram Webhook] Error in checkPendingFollowReward:", err.message);
   }
 }
 
