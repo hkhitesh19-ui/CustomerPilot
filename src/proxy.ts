@@ -125,6 +125,8 @@ export async function proxy(request: NextRequest) {
     '/api/marketing/video-studio',
     '/api/gbp/agent',
     '/api/menu',
+    '/api/instagram/generate-token',
+    '/api/instagram/upload-proof',
     // SECURITY FIX: /api/payments/ removed from public — payments require merchant auth
     // Both create-order and verify are called from the authenticated /dashboard context
   ];

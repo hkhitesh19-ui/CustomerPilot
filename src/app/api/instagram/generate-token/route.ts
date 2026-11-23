@@ -21,15 +21,27 @@ export async function POST(req: NextRequest) {
 
     const merchant = await db.merchant.findUnique({
       where: { id: merchantId },
-      include: { instagramConnection: true }
+      include: { 
+        instagramConnection: true,
+        digitalBusinessCard: true
+      }
     });
 
     if (!merchant) {
       return NextResponse.json({ error: "Merchant not found" }, { status: 404 });
     }
 
-    const igUsername = merchant.instagramConnection?.instagramUsername || 
-                       merchant.name.toLowerCase().replace(/[^a-z0-9_]/g, "");
+    let igUsername = merchant.instagramConnection?.instagramUsername;
+    if (!igUsername && merchant.digitalBusinessCard?.instagramUrl) {
+      igUsername = merchant.digitalBusinessCard.instagramUrl
+        .replace(/.*instagram\.com\//i, "")
+        .replace(/[/?#].*$/, "")
+        .replace(/[@]/g, "")
+        .trim();
+    }
+    if (!igUsername) {
+      igUsername = merchant.name.toLowerCase().replace(/[^a-z0-9_]/g, "");
+    }
 
     // 2. Active Token Reuse & Rate-Limiting Guard
     const activeCustKey = `ig_cust_active_${customerId}`;

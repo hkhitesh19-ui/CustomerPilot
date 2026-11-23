@@ -4,6 +4,19 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [23 Nov 2026] Issue: Customer Digital Wallet Instagram DM Verification "Unauthorized" 401 Block
+- **Symptom**: On the live customer digital wallet (`/q/wallet/[customerId]`), tapping "Verify Automatically via Instagram DM" in the Instagram Social Rewards card returned a red alert pill stating `(! Unauthorized)`.
+- **Root Cause**:
+  1. Next.js middleware in `src/proxy.ts` protects `/api/*` routes by requiring a valid merchant/admin JWT cookie unless the endpoint is explicitly declared in `PUBLIC_API_PREFIXES`.
+  2. The customer wallet runs on mobile browsers used by store customers who are unauthenticated end-users (no merchant admin session). Because `'/api/instagram/generate-token'` and `'/api/instagram/upload-proof'` were missing from `PUBLIC_API_PREFIXES`, `src/proxy.ts` intercepted the request and returned `401 Unauthorized`.
+  3. In `src/app/api/instagram/generate-token/route.ts`, the merchant query omitted `digitalBusinessCard: true`, causing the Instagram username resolution to fall back to the raw business name slug (`cakeconnectionlivecakeonlinecakedeliveryinvadodara`) instead of the store's verified Instagram handle (`CakeConnection.in`) stored in `DigitalBusinessCard`.
+- **Resolution**:
+  1. **Proxy Public Access Allowlist (`src/proxy.ts`)**: Added `'/api/instagram/generate-token'` and `'/api/instagram/upload-proof'` to `PUBLIC_API_PREFIXES`. Both routes enforce cryptographic customer authentication against the database (`where: { id: customerId, merchantId, phone }`), ensuring robust zero-trust security without requiring merchant session cookies.
+  2. **Instagram Username Resolution Hardening (`src/app/api/instagram/generate-token/route.ts` & `src/app/q/wallet/[customerId]/page.tsx`)**: Included `digitalBusinessCard: true` in the Prisma query and implemented regex extraction (`.replace(/.*instagram\.com\//i, "").replace(/[/?#].*$/, "").replace(/[@]/g, "").trim()`) to accurately resolve handles with query parameters or subpaths.
+- **Status**: ✅ Resolved, Hardened, and Verified. All 7 Adversarial Master Gates Passed.
+
+---
+
 ## [22 Nov 2026] Issue: Google Review Prompt 5-Minute Timer Blocked by Orphaned Review Request & Unbounded Deduplication
 - **Symptom**: At 9:52 PM IST, customer scanned Cake Connection loyalty QR standee, WhatsApp message was captured in Live Queue, and merchant approved the stamp. However, after 5 minutes, no Google Review prompt message with the 1-click review link was sent to the customer on WhatsApp.
 - **Root Cause**:

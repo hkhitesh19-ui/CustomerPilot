@@ -121,7 +121,7 @@ export default async function WalletPage({
   const rawIgUrl = (customer.merchant as any).digitalBusinessCard?.instagramUrl
   let igUsername = (customer.merchant as any).instagramConnection?.instagramUsername
   if (!igUsername && rawIgUrl) {
-    igUsername = rawIgUrl.replace(/.*instagram\.com\//i, "").replace(/\/.*$/, "").replace(/[@]/g, "").trim()
+    igUsername = rawIgUrl.replace(/.*instagram\.com\//i, "").replace(/[/?#].*$/, "").replace(/[@]/g, "").trim()
   }
   if (!igUsername) {
     igUsername = "cakeconnection"
