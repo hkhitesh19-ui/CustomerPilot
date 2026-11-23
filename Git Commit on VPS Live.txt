@@ -9,12 +9,12 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 06d9ca3
-Full SHA          : 06d9ca3d97c561f20cd1665d61689109b3d630c7
+Active Git Commit : 1d1585a
+Full SHA          : 1d1585a7fe70fcdd3e441ba37b1b6fbe9964c065
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 23 Nov 2026, 07:35 AM IST
+Deployment Date   : 23 Nov 2026, 09:05 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(superadmin): add 1-click fresh testing customer data reset button to impersonation banner for all merchants
+Commit Title      : fix(instagram): allow public wallet customer access to generate-token and upload-proof in proxy and harden handle resolution
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online, v4.2 Stream-Guard)
 Docker Containers : evolution-api (evoapicloud/evolution-api pinned @sha256:966625532d9076a2381e973a271307d107e6f070450de3abeeea8bd18be07252, Port 8080 Open in UFW, Online & Healthy)
