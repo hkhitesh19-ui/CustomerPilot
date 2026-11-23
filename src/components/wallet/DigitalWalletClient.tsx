@@ -21,6 +21,7 @@ interface WalletData {
     address: string | null
     whatsappPhone: string | null
     instagramUsername?: string | null
+    slug?: string | null
   }
   rule: {
     id: string

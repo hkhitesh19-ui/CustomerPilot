@@ -148,10 +148,21 @@ async function runSmokeTests() {
     results.push({ id: 8, name: "Manual Stamps Auth", passed: false });
   }
 
+  // Test 9: Maw & Paw Digital Business Card (/c/mawpaw)
+  process.stdout.write("⏳ [Test 9: Maw & Paw Card & Socials (/c/mawpaw)]... ");
+  const mawpawRes = await requestUrl("/c/mawpaw");
+  if (mawpawRes.statusCode === 200 && mawpawRes.body.includes("Maw") && mawpawRes.body.includes("Paw")) {
+    console.log("✅ PASSED (HTTP 200 Live)");
+    results.push({ id: 9, name: "Maw & Paw Digital Card", passed: true });
+  } else {
+    console.log(`❌ FAILED (Status: ${mawpawRes.statusCode})`);
+    results.push({ id: 9, name: "Maw & Paw Digital Card", passed: false });
+  }
+
   console.log("\n═══════════════════════════════════════════════════════════════");
   const failed = results.filter(r => !r.passed);
   if (failed.length === 0) {
-    console.log("🎯 ALL 8 SMOKE TESTS PASSED CLEANLY!");
+    console.log(`🎯 ALL ${results.length} SMOKE TESTS PASSED CLEANLY!`);
     console.log("Production state is healthy. No regressions detected.");
     console.log("═══════════════════════════════════════════════════════════════\n");
     process.exit(0);

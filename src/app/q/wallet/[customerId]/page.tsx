@@ -151,7 +151,7 @@ export default async function WalletPage({
       address: customer.merchant.address,
       whatsappPhone: customer.merchant.whatsappPhone,
       instagramUsername: igUsername,
-      slug: (customer.merchant as any).digitalBusinessCard?.slug || "cake-connection"
+      slug: (customer.merchant as any).digitalBusinessCard?.slug || (customer.merchant.name || "store").toLowerCase().trim().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "")
     },
     rule: {
       id: activeStampCardRule.id,

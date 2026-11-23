@@ -9,12 +9,12 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : e03ebe1
-Full SHA          : e03ebe1065e4ff655dce6d1938169cae78e4e096
+Active Git Commit : c907154
+Full SHA          : c907154629a695ab36412c5ae9b2e002569a4e7e
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 23 Nov 2026, 02:55 PM IST
+Deployment Date   : 23 Nov 2026, 03:17 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : chore(guardrails): add PROTECTED_FILES.md, SMOKE_TESTS.md, .frozen-paths and automated smoke test suite
+Commit Title      : fix(mawpaw): robust canonical slug resolution and bidirectional regex referral matching
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online, v4.2 Stream-Guard)
 Docker Containers : evolution-api (evoapicloud/evolution-api pinned @sha256:966625532d9076a2381e973a271307d107e6f070450de3abeeea8bd18be07252, Port 8080 Open in UFW, Online & Healthy)

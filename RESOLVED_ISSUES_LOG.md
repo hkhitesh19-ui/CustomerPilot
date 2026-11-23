@@ -4,6 +4,21 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [23 Nov 2026] Issue: Maw & Paw Referral Slug Mismatch & Instagram DM Linking Diagnosis
+- **Symptom**: User asked why both Referral and Instagram were not working for merchant 'Maw & Paw' (`https://customerpilot.in/c/mawpaw`).
+- **Root Cause**:
+  1. **Referral Link Broken (Slug Overextension)**: Maw & Paw's official business name in the database is `"Maw & Paw ( Best Pet Shop, Pet Grooming, Pets Food and Accessories, Pets Cafe )"`. The legacy digital wallet lacked the merchant `slug` field in `WalletData`, so it auto-generated the referral link from the merchant's title: `https://customerpilot.in/c/maw-paw-best-pet-shop-pet-grooming-pets-food-and-accessories-pets-cafe?ref=CP-XXXX`. Because the real slug in `DigitalBusinessCard` is `mawpaw`, that URL resulted in an HTTP 404 Not Found.
+  2. **Referral Code Format Mismatch**: On the live VPS database, customer records for Maw & Paw had randomized 8-character codes (e.g. `CP-47075W60`). The old referral lookup strictly checked `where: { referralCode: cleanRef }`. When tested with short code `CP-4707`, it returned null, failing to resolve the referrer.
+  3. **Instagram DM Chat Instead of Follow**: Maw & Paw's Instagram is `https://www.instagram.com/mawpaw2323/?hl=en`. On live VPS, `InstagramTaskCard` only had the legacy "Verify Automatically via Instagram DM" button which opened `ig.me/m/mawpaw2323` (chat window) rather than the profile page, and because Maw & Paw has no Meta OAuth webhook connection (`instagramConnection: null`), DM verifications never completed.
+- **Resolution**:
+  1. **Robust Canonical Slug Resolution (`src/app/q/wallet/[customerId]/page.tsx` & `DigitalWalletClient.tsx`)**: Injected `slug: customer.merchant.digitalBusinessCard.slug || slugify(name)` into `WalletData['merchant']` so referral sharing links always use `https://customerpilot.in/c/mawpaw?ref=...`.
+  2. **Multi-Directional Regex Token Matcher (`src/lib/referral-resolver.ts`)**: Added `cleanRef.match(/CP-?(\d{4})/i)` and reverse base-code checking (`CP-47075W60` <-> `CP-4707`), mapping seamlessly to phone numbers ending in `4707` across both exact, prefix, suffix, and fallback tiers.
+  3. **Direct Instagram Profile Follow Button**: Added `Follow @mawpaw2323 on Instagram` CTA opening `https://www.instagram.com/mawpaw2323/` directly with the blue Follow button.
+  4. **Smoke Test Automation**: Added Test 9 (`/c/mawpaw`) to `scripts/run_smoke_tests.js`. All 9 tests passed cleanly.
+- **Status**: ✅ Resolved, Hardened, and Verified. All 7 Adversarial Master Gates Passed.
+
+---
+
 ## [23 Nov 2026] Issue: Referral Link Fragility, Customer Reset Coupling & Multi-Tier Self-Healing Referral Engine
 - **Symptom**: User reported that referral invite links were working smoothly in the morning, but later stopped working (`https://customerpilot.in/c/cake-connection?ref=CP-4707` did not display the VIP Invite banner or allowed pass activation).
 - **Root Cause**:
