@@ -97,7 +97,7 @@ export interface DigitalCardData {
 export interface ReferralInfo {
   referralCode: string
   referrerName: string
-  referrerId: string
+  referrerId?: string | null
 }
 
 export function DigitalCardView({ card, referralInfo }: { card: DigitalCardData; referralInfo?: ReferralInfo | null }) {

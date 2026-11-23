@@ -39,65 +39,30 @@ export async function POST(req: NextRequest) {
       merchant = card?.merchant || null
     }
 
-    // 2. Resolve referrer customer with multi-tier self-healing
+    // 2. Resolve target merchant
     const targetMerchantId = rawMerchantId || merchant?.id
-    let referrer: { id: string; name: string; phone: string; referralCode: string } | null = null
-
-    if (targetMerchantId) {
-      referrer = await resolveReferrerCustomer(targetMerchantId, cleanRefCode)
-    }
-
-    if (!referrer) {
-      const anyCustomer = await db.customer.findFirst({
-        where: { referralCode: cleanRefCode, deletedAt: null },
-        include: { merchant: true }
-      })
-      if (anyCustomer) {
-        referrer = {
-          id: anyCustomer.id,
-          name: anyCustomer.name || "A VIP Member",
-          phone: anyCustomer.phone,
-          referralCode: anyCustomer.referralCode || cleanRefCode
-        }
-        if (!merchant) merchant = anyCustomer.merchant
-      }
-    }
-
     let activeMerchant = merchant
     if (!activeMerchant && targetMerchantId) {
       activeMerchant = await db.merchant.findUnique({ where: { id: targetMerchantId } })
     }
 
     if (!activeMerchant) {
-      return NextResponse.json({ success: false, error: "Merchant not found" }, { status: 404 })
+      return NextResponse.json({ success: false, error: "Merchant not found", granted: false }, { status: 404 })
     }
 
-    // Graceful fallback: If referrer was deleted in fresh testing reset, auto-bind to store VIP club
+    // 3. Resolve referrer customer with strict exact match
+    const referrer = await resolveReferrerCustomer(activeMerchant.id, cleanRefCode)
+
+    // Security Gate: Unknown or fake codes MUST NOT grant stamps and MUST NOT create a pending pass!
     if (!referrer) {
-      let fallbackCustomer = await db.customer.findFirst({
-        where: { merchantId: activeMerchant.id, deletedAt: null }
-      })
-      if (!fallbackCustomer) {
-        fallbackCustomer = await db.customer.create({
-          data: {
-            merchantId: activeMerchant.id,
-            name: "VIP Club Member",
-            phone: activeMerchant.whatsappPhone || "919033304707",
-            referralCode: cleanRefCode,
-            vipTier: "VIP",
-            whatsappOptIn: true,
-          }
-        })
-      }
-      referrer = {
-        id: fallbackCustomer.id,
-        name: fallbackCustomer.name || "A VIP Member",
-        phone: fallbackCustomer.phone,
-        referralCode: cleanRefCode
-      }
+      return NextResponse.json({
+        success: false,
+        granted: false,
+        error: "Invalid or expired referral code. No bonus stamps granted."
+      }, { status: 200 })
     }
 
-    // 3. Anti-abuse: Self-referral prevention
+    // 4. Anti-abuse: Self-referral prevention
     const referrerPhone = normalizePhone(referrer.phone) || referrer.phone
     if (referrerPhone === normalizedFriendPhone || referrerPhone.slice(-10) === normalizedFriendPhone.slice(-10)) {
       return NextResponse.json({ success: false, error: "Self-referral is not allowed. Please share this pass with a friend!" }, { status: 400 })
@@ -202,6 +167,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      granted: true,
       referralId: referral.id,
       referrerName: referrer.name,
       merchantName: activeMerchant.name,

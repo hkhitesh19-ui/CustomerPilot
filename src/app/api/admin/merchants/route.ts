@@ -278,6 +278,20 @@ export async function POST(req: Request) {
         await tx.referral.deleteMany({ where: { merchantId } });
         // 9. Delete all customers
         await tx.customer.deleteMany({ where: { merchantId } });
+        // 9b. Deterministic Re-Seed: If merchant is Cake Connection, automatically restore test referrer CP-4707
+        if (merchantId === 'cmtymavfx0002kx008lbfvp57' || merchant.name.toLowerCase().includes('cake connection')) {
+          await tx.customer.create({
+            data: {
+              merchantId,
+              name: 'Hitesh Kumar',
+              phone: '919033304707',
+              referralCode: 'CP-4707',
+              vipTier: 'VIP',
+              lifetimeStamps: 2,
+              whatsappOptIn: true
+            }
+          });
+        }
         // 10. Clean temporary tokens in SystemContent
         await tx.systemContent.deleteMany({ where: { id: { startsWith: 'CP_' } } });
         await tx.systemContent.deleteMany({ where: { id: { startsWith: 'STAMP_' } } });

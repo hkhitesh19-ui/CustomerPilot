@@ -83,24 +83,25 @@ export default async function PublicDigitalCardPage({ params, searchParams }: Pa
   let referralInfo: {
     referralCode: string
     referrerName: string
-    referrerId: string
+    referrerId?: string | null
   } | null = null
 
   if (rawRef) {
-    const referrer = await resolveReferrerCustomer(card.merchantId, rawRef)
+    const cleanRef = rawRef.trim().toUpperCase()
+    const referrer = await resolveReferrerCustomer(card.merchantId, cleanRef)
     if (referrer) {
       referralInfo = {
-        referralCode: referrer.referralCode || rawRef,
+        referralCode: referrer.referralCode,
         referrerName: referrer.name || "A VIP Member",
         referrerId: referrer.id
       }
     } else {
-      // Graceful fallback: If customer was cleared during testing reset or code is informal,
-      // still show the VIP invite banner so the customer's invite link NEVER breaks!
+      // Neutral banner: shows code was entered, but referrer is unverified in DB.
+      // CRITICAL: NEVER use empty string "" as referrerId.
       referralInfo = {
-        referralCode: rawRef,
-        referrerName: "A VIP Member",
-        referrerId: ""
+        referralCode: cleanRef,
+        referrerName: "VIP Club",
+        referrerId: null
       }
     }
   }

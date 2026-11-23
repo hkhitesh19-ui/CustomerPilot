@@ -89,15 +89,15 @@ async function runSmokeTests() {
     results.push({ id: 3, name: "Digital Card", passed: false });
   }
 
-  // Test 4: Referral Link VIP Banner
-  process.stdout.write("⏳ [Test 4: Referral Link With Fallback (?ref=CP-4707)]... ");
-  const refRes = await requestUrl("/c/cake-connection?ref=CP-4707");
-  if (refRes.statusCode === 200 && (refRes.body.includes("VIP Invite") || refRes.body.includes("referral") || refRes.body.includes("Activate Pass"))) {
-    console.log("✅ PASSED (HTTP 200 VIP Banner Rendered)");
-    results.push({ id: 4, name: "Referral Link", passed: true });
-  } else {
-    console.log(`❌ FAILED (Banner missing or status: ${refRes.statusCode})`);
-    results.push({ id: 4, name: "Referral Link", passed: false });
+  // Test 4: Referrer Exact Match & Security Isolation Guard
+  process.stdout.write("⏳ [Test 4: Referrer Exact Match & Anti-Collision Security]... ");
+  try {
+    execSync("node scripts/test_resolver_security.js", { stdio: "pipe" });
+    console.log("✅ PASSED (Exact match only, fake/prefix/phone suffix rejected)");
+    results.push({ id: 4, name: "Referral Exact Match Security", passed: true });
+  } catch (err) {
+    console.log("❌ FAILED");
+    results.push({ id: 4, name: "Referral Exact Match Security", passed: false, error: err.message });
   }
 
   // Test 5: Referral Claim API Validation
