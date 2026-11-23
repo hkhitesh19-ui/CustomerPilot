@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     const count = Math.max(1, Math.min(20, Math.floor(Number(stamps) || 1)));
 
     // Find customer by customerId or phone
-    let customer = null;
+    let customer: any = null;
     if (customerId) {
       customer = await db.customer.findFirst({
         where: { id: customerId, merchantId: merchant.id }

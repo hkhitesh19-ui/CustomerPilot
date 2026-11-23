@@ -233,8 +233,8 @@ export default function InstagramTaskCard({
               </div>
             )}
           </form>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
