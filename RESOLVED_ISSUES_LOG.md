@@ -4,6 +4,20 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [23 Nov 2026] Issue: Instagram Direct Follow Profile CTA & Disabling Review Photo Automatic Grace Period
+- **Symptom**: 
+  1. In the customer digital wallet, tapping Instagram button opened a Direct Message (DM) chat window rather than the merchant's Instagram profile page where the prominent blue "Follow" button resides.
+  2. Customers who clicked "Copy & Post on Google Maps" without posting a photo automatically received +2 Photo Bonus stamps 20 minutes later via background cron job.
+- **Root Cause**:
+  1. `InstagramTaskCard.tsx` only had a single CTA triggering `ig.me/m/<username>` (Instagram DM deep link) meant for Meta webhook pairing. Customers expecting to follow the store were dropped into a blank message screen.
+  2. In `src/lib/review-photo-verifier.ts`, `DEFAULT_PHOTO_BONUS_GRACE_PERIOD` was set to `true` (a fallback originally designed for the 10-15 day GBP API approval window), causing the background queue worker at T+20 minutes to automatically approve pending photo verifications without actual photo evidence.
+- **Resolution**:
+  1. **Direct Profile Follow Primary CTA (`src/components/loyalty/InstagramTaskCard.tsx`)**: Added a prominent primary CTA button `Follow @{cleanUsername} on Instagram` linking directly to `https://www.instagram.com/{cleanUsername}/` so customers land immediately on the store profile with the blue Follow button. Bfurcated verification into two secondary actions: "Verify via DM (+1)" and "Upload Proof (+2)".
+  2. **Strict Zero-Assumption Photo Verification (`src/lib/review-photo-verifier.ts`)**: Set `DEFAULT_PHOTO_BONUS_GRACE_PERIOD = false`. Pending rechecks at T+20m now strictly require verified photo evidence (via Google GBP Media API or verified upload); without verified photo media, the record is finalized at 2 stamps with zero unearned photo stamps.
+- **Status**: ✅ Resolved, Hardened, and Verified. All 7 Adversarial Master Gates Passed.
+
+---
+
 ## [23 Nov 2026] Issue: Customer Digital Wallet Instagram DM Verification "Unauthorized" 401 Block
 - **Symptom**: On the live customer digital wallet (`/q/wallet/[customerId]`), tapping "Verify Automatically via Instagram DM" in the Instagram Social Rewards card returned a red alert pill stating `(! Unauthorized)`.
 - **Root Cause**:

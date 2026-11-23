@@ -26,6 +26,9 @@ export default function InstagramTaskCard({
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const cleanUsername = (instagramUsername || "cakeconnection").replace(/^@/, "").replace(/\/.*$/, "").trim();
+  const profileUrl = `https://www.instagram.com/${cleanUsername}/`;
+
   // 1. Generate One-Time DM Token and Open Instagram
   const handleAutoVerify = async () => {
     try {
@@ -129,25 +132,45 @@ export default function InstagramTaskCard({
         </div>
       )}
 
-      {/* Action Mode A: Automated Verification via DM Token */}
-      <div className="space-y-2">
-        <button
-          onClick={handleAutoVerify}
-          disabled={loadingToken}
-          className="w-full py-2.5 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-pink-600 via-rose-600 to-purple-600 hover:opacity-95 shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+      {/* 1. Primary Action: Direct Follow Profile Link */}
+      <div className="space-y-1.5">
+        <a
+          href={profileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-pink-600 via-rose-600 to-purple-600 hover:opacity-95 shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
         >
-          {loadingToken ? (
-            "Connecting to Instagram..."
-          ) : (
-            <>
-              <span>Verify Automatically via Instagram DM</span>
-              <ArrowRight className="w-4 h-4" />
-            </>
-          )}
-        </button>
+          <Instagram className="w-4.5 h-4.5" />
+          <span>Follow @{cleanUsername} on Instagram</span>
+          <ExternalLink className="w-4 h-4 opacity-80" />
+        </a>
         <p className="text-[11px] text-center text-slate-500 dark:text-slate-400">
-          Tapping opens Instagram DM. Just tap <strong>&ldquo;Send&rdquo;</strong> to auto-credit your stamps!
+          Tapping opens Instagram profile. Tap <strong>&ldquo;Follow&rdquo;</strong> to support our store!
         </p>
+      </div>
+
+      {/* 2. Secondary Action: Verification & Claim Options */}
+      <div className="pt-2 border-t border-pink-500/20 space-y-2">
+        <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
+          <span>Claim Your Bonus Stamps:</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button
+            onClick={handleAutoVerify}
+            disabled={loadingToken}
+            className="w-full py-2 px-3 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-pink-400 text-pink-700 dark:text-pink-300 hover:bg-pink-50 dark:hover:bg-slate-800 flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <span>{loadingToken ? "Connecting..." : "Verify via DM (+1)"}</span>
+          </button>
+          <button
+            onClick={() => setShowScreenshotUpload(!showScreenshotUpload)}
+            className="w-full py-2 px-3 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-purple-400 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-slate-800 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <UploadCloud className="w-3.5 h-3.5 text-purple-500" />
+            <span>{showScreenshotUpload ? "Close Upload" : "Upload Proof (+2)"}</span>
+          </button>
+        </div>
       </div>
 
       {/* Deep Link Active Box */}
@@ -168,16 +191,9 @@ export default function InstagramTaskCard({
         </div>
       )}
 
-      {/* Mode B: Private Account Fallback */}
-      <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
-        {!showScreenshotUpload ? (
-          <button
-            onClick={() => setShowScreenshotUpload(true)}
-            className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 underline block text-center w-full cursor-pointer"
-          >
-            Private Account? Upload Story Screenshot Instead
-          </button>
-        ) : (
+      {/* Mode B: Screenshot Proof Upload */}
+      {showScreenshotUpload && (
+        <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
           <form onSubmit={handleUploadProof} className="space-y-3 pt-1">
             <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-300">
               <span className="font-semibold flex items-center gap-1">

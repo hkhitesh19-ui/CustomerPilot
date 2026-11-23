@@ -385,9 +385,9 @@ export async function processPendingReviewPhotoVerifications() {
         log.createdAt
       )
 
-      // During Google Business Profile Enterprise API approval period (10-15 business days),
-      // default approve pending checks to 4 stamps
-      const DEFAULT_PHOTO_BONUS_GRACE_PERIOD = true;
+      // Strict Zero-Assumption Verification: Grace period disabled to prevent unearned photo bonus allocations.
+      // Only genuine photos verified via Google API or session upload earn photo bonus stamps.
+      const DEFAULT_PHOTO_BONUS_GRACE_PERIOD = false;
 
       if (result.verified || DEFAULT_PHOTO_BONUS_GRACE_PERIOD) {
         // Photo verified or grace period active -> Award +2 stamps (Total 4)
