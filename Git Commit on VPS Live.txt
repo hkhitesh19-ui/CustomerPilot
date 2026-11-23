@@ -9,12 +9,12 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 5eb3187
-Full SHA          : 5eb318754944b07651d84e0739cfa3469073ad91
+Active Git Commit : 1180e15
+Full SHA          : 1180e1535c22a450b477713f45da9d962dfc5247
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 23 Nov 2026, 05:15 PM IST
+Deployment Date   : 23 Nov 2026, 11:15 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(referral-ux): hide referral banner on unverified code and document security hardening
+Commit Title      : feat(ops): add encrypted off-vps daily backup and isolated smoke:local test suite
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online, v4.2 Stream-Guard)
 Docker Containers : evolution-api (evoapicloud/evolution-api pinned @sha256:966625532d9076a2381e973a271307d107e6f070450de3abeeea8bd18be07252, Port 8080 Open in UFW, Online & Healthy)
