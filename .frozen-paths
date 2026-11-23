@@ -1,0 +1,9 @@
+^prisma/schema\.prisma$
+^prisma/migrations/
+^src/proxy\.ts$
+^src/app/api/auth/
+^src/app/api/razorpay/
+^src/app/api/webhook/evolution/
+^src/lib/db\.ts$
+^src/lib/queue-engine\.ts$
+^src/lib/stamp-engine\.ts$

@@ -15,6 +15,7 @@
     "check-types": "tsc --noEmit > tsc_errors.txt",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "smoke": "node scripts/run_smoke_tests.js",
     "doctor": "node scripts/doctor.js",
     "setup": "node scripts/setup.js",
     "rollback": "node scripts/rollback.js"
