@@ -4,6 +4,22 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [23 Nov 2026] Issue: Referral Security Hardening, Anti-Collision Exact Match & UX Alignment
+- **Symptom**: Red-team review identified three security & UX concerns with fuzzy fallback referral matching:
+  1. Phone last-4 matching had a potential collision risk across large customer bases.
+  2. Prefix matching (`startsWith`) could theoretically match inadvertent prefix overlaps.
+  3. Visiting an unverified referral code (e.g. `?ref=CP-FAKE`) displayed a "+1 Free Stamp" banner, but claim returned `granted: false`, creating UX confusion.
+- **Root Cause**: The self-healing resolver included fuzzy match tiers to absorb deleted test records, which weakened strict code attribution.
+- **Resolution**:
+  1. **Strict Exact Match Only (`src/lib/referral-resolver.ts`)**: Removed Tier 2 (`startsWith`), Tier 2b (Base code), and Tier 3 (phone last-4). Resolver enforces strict exact match `where: { merchantId, referralCode: cleanRef, deletedAt: null }`.
+  2. **Zero Free Stamps for Unverified Codes (`src/app/api/referrals/claim/route.ts`)**: If `!referrer`, returns `{ success: false, granted: false }` with zero stamps and zero pending passes created.
+  3. **Clean UX on Unverified Codes (`src/app/c/[slug]/page.tsx`)**: If `!referrer`, sets `referralInfo = null` so visitors see the store's clean digital business card without false promises.
+  4. **Isolated Security Unit Test (`scripts/test_resolver_security.js`)**: Validated exact match, fake code rejection, prefix rejection, and suffix rejection.
+  5. **Deterministic Seed Preservation (`src/app/api/admin/merchants/route.ts`)**: Added automated re-seeding for Cake Connection (`CP-4707`, Hitesh Kumar) during customer reset.
+- **Status**: ✅ Resolved, Hardened, and Verified. All 7 Adversarial Master Gates and 9 Smoke Tests Passed.
+
+---
+
 ## [23 Nov 2026] Issue: Maw & Paw Referral Slug Mismatch & Instagram DM Linking Diagnosis
 - **Symptom**: User asked why both Referral and Instagram were not working for merchant 'Maw & Paw' (`https://customerpilot.in/c/mawpaw`).
 - **Root Cause**:

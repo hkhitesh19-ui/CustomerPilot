@@ -96,13 +96,8 @@ export default async function PublicDigitalCardPage({ params, searchParams }: Pa
         referrerId: referrer.id
       }
     } else {
-      // Neutral banner: shows code was entered, but referrer is unverified in DB.
-      // CRITICAL: NEVER use empty string "" as referrerId.
-      referralInfo = {
-        referralCode: cleanRef,
-        referrerName: "VIP Club",
-        referrerId: null
-      }
+      // If code is not found in DB, do NOT show a misleading +1 Free Stamp banner
+      referralInfo = null
     }
   }
 
