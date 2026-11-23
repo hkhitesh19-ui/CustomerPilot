@@ -59,23 +59,14 @@ export async function GET(req: NextRequest) {
       if (!merchantPhone) return err("Merchant WhatsApp number not configured. Please configure WhatsApp number first.", 400)
 
       let digitalCard = merchant.digitalBusinessCard
-      if (!digitalCard && (type === "card" || type === "complete" || type === "counter")) {
+      if (!digitalCard) {
         digitalCard = await getOrCreateDigitalBusinessCard(merchant.id)
       }
 
-      const enabledModules = merchant.enabledModules || "LOYALTY,REVIEWS,AUTOREPLY"
-      const hasCard = Boolean(digitalCard && digitalCard.slug) || enabledModules.includes("DIGITAL_CARD") || enabledModules.includes("smart_digital_cards")
-
-      if ((type === "card" || type === "counter" || hasCard) && digitalCard?.slug) {
-        const host = req.headers.get("host") || "customerpilot.in"
-        const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https"
-        const domain = host.includes("localhost") || host.includes("127.0.0.1") ? `${protocol}://${host}` : "https://www.customerpilot.in"
-        targetUrl = `${domain}/c/${digitalCard.slug}`
-      } else {
-        const bizName = merchant.name || "our store"
-        const joinText = `Hi ${bizName}! Checking in for my VIP Club stamps 🎁`
-        targetUrl = `https://wa.me/${merchantPhone}?text=${encodeURIComponent(joinText)}`
-      }
+      const host = req.headers.get("host") || "customerpilot.in"
+      const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https"
+      const domain = host.includes("localhost") || host.includes("127.0.0.1") ? `${protocol}://${host}` : "https://www.customerpilot.in"
+      targetUrl = digitalCard?.slug ? `${domain}/c/${digitalCard.slug}` : `${domain}/c/${merchant.id}`
 
       const loyaltyTitleMap: Record<string, string> = {
         counter: "VIP Loyalty Counter QR Stand",

@@ -1234,19 +1234,12 @@ export async function GET(req: NextRequest) {
           merchant.merchantGoogleConnections?.googleReviewUrl ||
           (merchant as any).googleReviewLink ||
           `${protocol}://${host}/review?m=${merchant.id}`
-      } else if (activeDesign === "card") {
+      } else if (activeDesign === "card" || activeDesign === "master" || activeDesign === "combo") {
         const domain = host.includes("localhost") || host.includes("127.0.0.1") ? `${protocol}://${host}` : "https://www.customerpilot.in"
-        targetUrl = `${domain}/c/${slug}`
+        targetUrl = slug ? `${domain}/c/${slug}` : `${domain}/c/${merchant.id}`
       } else {
-        if (hasCard && slug) {
-          const domain = host.includes("localhost") || host.includes("127.0.0.1") ? `${protocol}://${host}` : "https://www.customerpilot.in"
-          targetUrl = `${domain}/c/${slug}`
-        } else {
-          const merchantPhone = normalizePhone(merchant.whatsappPhone) || "919999999999"
-          const bizName = merchant.name || "our store"
-          const joinText = `Hi ${bizName}! Checking in for my VIP Club stamps 🎁`
-          targetUrl = `https://wa.me/${merchantPhone}?text=${encodeURIComponent(joinText)}`
-        }
+        const domain = host.includes("localhost") || host.includes("127.0.0.1") ? `${protocol}://${host}` : "https://www.customerpilot.in"
+        targetUrl = slug ? `${domain}/c/${slug}` : `${domain}/c/${merchant.id}`
       }
     }
 
