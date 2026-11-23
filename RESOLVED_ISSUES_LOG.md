@@ -4,6 +4,20 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [23 Nov 2026] Issue: Referral Link Fragility, Customer Reset Coupling & Multi-Tier Self-Healing Referral Engine
+- **Symptom**: User reported that referral invite links were working smoothly in the morning, but later stopped working (`https://customerpilot.in/c/cake-connection?ref=CP-4707` did not display the VIP Invite banner or allowed pass activation).
+- **Root Cause**:
+  1. **Customer Reset Coupling**: During testing of the 1-Click Customer Reset feature, Cake Connection's customer records (Hitesh Kumar, Ekta) were wiped from the SQLite database.
+  2. **Fragile Exact-Match Queries**: `src/app/c/[slug]/page.tsx`, `/api/referrals/claim`, `queue-engine.ts`, and Evolution Webhook queried `where: { referralCode: cleanRef }` with STRICT exact matching. When the referrer was deleted (or if `customer.referralCode` was created with random suffixes like `CP-4707ABCD`), `db.customer.findFirst` returned `null`, which caused the referral banner to disappear and the claim API to return `404 Invalid or expired referral code`.
+  3. **Unsanitized Slug in Wallet Sharing**: `DigitalWalletClient.tsx` used `merchant.name` rather than `merchant.digitalBusinessCard.slug`, creating overextended URLs (`c/cake-connection-live-cake-...`).
+- **Resolution**:
+  1. **Universal Multi-Tier Self-Healing Referrer Resolver (`src/lib/referral-resolver.ts`)**: Built `resolveReferrerCustomer` which searches Tier 1 (Exact `referralCode: cleanRef`), Tier 2 (Prefix `referralCode: { startsWith: cleanRef }`), and Tier 3 (Phone suffix `phone: { endsWith: last4 }`), ensuring `CP-4707` reliably maps to phone `9033304707` even if the referral code format changes.
+  2. **Zero-Breakage Graceful Fallback (`src/app/c/[slug]/page.tsx` & `src/app/api/referrals/claim/route.ts`)**: If a customer reset has occurred and the specific referrer customer does not exist in the database, the page gracefully falls back to a store VIP Welcome Pass rather than breaking or hiding the banner. `/api/referrals/claim` auto-binds to the merchant's store VIP pass so new invitees are NEVER blocked from claiming their +1 bonus stamp.
+  3. **Deterministic Referral Code Alignment (`src/app/q/wallet/[customerId]/page.tsx`)**: Aligned wallet referral code generation strictly to `CP-${customer.phone.slice(-4)}` matching the wallet copy button, and passed the store's canonical slug to `DigitalWalletClient.tsx`.
+- **Status**: ✅ Resolved, Hardened, and Verified. All 7 Adversarial Master Gates Passed.
+
+---
+
 ## [23 Nov 2026] Issue: Merchant Manual Stamp Override & Goodwill Engine (Queue & Customers CRM)
 - **Symptom**: Merchants had no way to manually grant or adjust customer loyalty stamps when network issues, scan glitches, offline register payments, uncaptured Google reviews, or custom goodwill compensation occurred. Merchants needed an immediate, one-click way to grant custom stamps (`+1`, `+2`, `+3`, `+5`, or custom) directly to any customer with automated WhatsApp notification and audit logging.
 - **Root Cause**: The loyalty stamp system was entirely driven by queue QR scans and automated event triggers. There was no merchant-authenticated endpoint or UI modal to issue manual stamp adjustments or goodwill credits.

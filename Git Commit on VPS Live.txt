@@ -9,12 +9,12 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 17de0c5
-Full SHA          : 17de0c57c83ba5851abdb7be265ac7faa0bd783f
+Active Git Commit : 1b99101
+Full SHA          : 1b99101eebe3aa01a0cad5346e525745bc694392
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 23 Nov 2026, 11:23 AM IST
+Deployment Date   : 23 Nov 2026, 02:00 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(syntax): resolve InstagramTaskCard jsx tag closing and manual-stamps customer type
+Commit Title      : fix(referrals): universal self-healing referral resolver with multi-tier fallback and zero-breakage guarantee
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online, v4.2 Stream-Guard)
 Docker Containers : evolution-api (evoapicloud/evolution-api pinned @sha256:966625532d9076a2381e973a271307d107e6f070450de3abeeea8bd18be07252, Port 8080 Open in UFW, Online & Healthy)

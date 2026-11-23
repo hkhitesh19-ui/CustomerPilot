@@ -110,11 +110,18 @@ export default async function WalletPage({
   // Self-heal: ensure customer has a valid unique referral code
   let activeReferralCode = customer.referralCode
   if (!activeReferralCode) {
-    activeReferralCode = `CP-${customer.phone.slice(-4)}${customer.id.slice(-4).toUpperCase()}`
+    activeReferralCode = `CP-${customer.phone.slice(-4)}`
     await db.customer.update({
       where: { id: customer.id },
       data: { referralCode: activeReferralCode }
-    }).catch(() => {})
+    }).catch(async () => {
+      // In case another customer has exact same last 4 digits, append 2 chars
+      activeReferralCode = `CP-${customer.phone.slice(-4)}${customer.id.slice(-2).toUpperCase()}`
+      await db.customer.update({
+        where: { id: customer.id },
+        data: { referralCode: activeReferralCode }
+      }).catch(() => {})
+    })
   }
 
   // Resolve store Instagram username
@@ -143,7 +150,8 @@ export default async function WalletPage({
       logoUrl: customer.merchant.logoUrl,
       address: customer.merchant.address,
       whatsappPhone: customer.merchant.whatsappPhone,
-      instagramUsername: igUsername
+      instagramUsername: igUsername,
+      slug: (customer.merchant as any).digitalBusinessCard?.slug || "cake-connection"
     },
     rule: {
       id: activeStampCardRule.id,

@@ -3,6 +3,7 @@ import { Metadata } from "next"
 import { db } from "@/lib/db"
 import { DigitalCardView, DigitalCardData } from "@/components/digital-card-view"
 import { resolveDigitalCardBySlug } from "@/lib/digital-card-service"
+import { resolveReferrerCustomer } from "@/lib/referral-resolver"
 
 interface PageProps {
   params: Promise<{
@@ -86,19 +87,20 @@ export default async function PublicDigitalCardPage({ params, searchParams }: Pa
   } | null = null
 
   if (rawRef) {
-    const referrer = await db.customer.findFirst({
-      where: {
-        merchantId: card.merchantId,
-        referralCode: rawRef,
-        deletedAt: null
-      },
-      select: { id: true, name: true, referralCode: true }
-    })
+    const referrer = await resolveReferrerCustomer(card.merchantId, rawRef)
     if (referrer) {
       referralInfo = {
         referralCode: referrer.referralCode || rawRef,
         referrerName: referrer.name || "A VIP Member",
         referrerId: referrer.id
+      }
+    } else {
+      // Graceful fallback: If customer was cleared during testing reset or code is informal,
+      // still show the VIP invite banner so the customer's invite link NEVER breaks!
+      referralInfo = {
+        referralCode: rawRef,
+        referrerName: "A VIP Member",
+        referrerId: ""
       }
     }
   }

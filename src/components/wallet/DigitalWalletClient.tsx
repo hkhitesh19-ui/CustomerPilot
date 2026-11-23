@@ -270,7 +270,7 @@ export function DigitalWalletClient({ initialData }: { initialData: WalletData }
 
           {/* WhatsApp Invite Friend */}
           {(() => {
-            const mSlug = (data.merchant.name || "store").toLowerCase().trim().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "")
+            const mSlug = (data.merchant as any).slug || (data.merchant.name || "store").toLowerCase().trim().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "")
             const refCode = data.customer.referralCode || `CP-${data.customer.phone.slice(-4)}`
             const digitalCardUrl = `https://customerpilot.in/c/${mSlug}?ref=${refCode}`
             const referralShareMsg = `🍰 *Hey! ${data.merchant.name} ka VIP Pass aapke liye!* 🎁\n\n` +
