@@ -4,6 +4,17 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [23 Nov 2026] Issue: Merchant Manual Stamp Override & Goodwill Engine (Queue & Customers CRM)
+- **Symptom**: Merchants had no way to manually grant or adjust customer loyalty stamps when network issues, scan glitches, offline register payments, uncaptured Google reviews, or custom goodwill compensation occurred. Merchants needed an immediate, one-click way to grant custom stamps (`+1`, `+2`, `+3`, `+5`, or custom) directly to any customer with automated WhatsApp notification and audit logging.
+- **Root Cause**: The loyalty stamp system was entirely driven by queue QR scans and automated event triggers. There was no merchant-authenticated endpoint or UI modal to issue manual stamp adjustments or goodwill credits.
+- **Resolution**:
+  1. **Atomic Manual Stamps API (`src/app/api/customers/manual-stamps/route.ts`)**: Created a merchant-session authenticated route (`POST /api/customers/manual-stamps`) that validates customer records, merchant stamp card rules, runs atomic Prisma transactions to generate `Stamp` rows (`source: "manual_override"`), updates `CustomerStampCard.stampsCollected` and completion status, increments `customer.lifetimeStamps`, records audit logs, and sends instant automated WhatsApp notifications to customers with reasons and updated wallet links.
+  2. **Interactive ManualStampModal Component (`src/components/dashboard/ManualStampModal.tsx`)**: Created a modal supporting phone lookup or pre-selected customer context, quick-select stamp pills (`+1`, `+2`, `+3`, `+5`), pre-configured reason chips ("Google Review Bonus Credit", "Instagram Follow / Story Reward", "System / Network Scan Resolution", "Merchant Goodwill / VIP Surprise", "Offline Register Bill Compensation"), live projected wallet balance calculations, and confirmation receipts.
+  3. **Queue & Customers CRM Integration (`src/app/dashboard/queue/page.tsx` & `src/app/dashboard/customers/page.tsx`)**: Integrated quick action buttons in both the Live Queue header and the Customers CRM (header and Customer Details drawer) with full real-time re-fetch integration.
+- **Status**: ✅ Resolved, Hardened, and Verified. All 7 Adversarial Master Gates Passed.
+
+---
+
 ## [23 Nov 2026] Issue: Instagram Direct Follow Profile CTA & Disabling Review Photo Automatic Grace Period
 - **Symptom**: 
   1. In the customer digital wallet, tapping Instagram button opened a Direct Message (DM) chat window rather than the merchant's Instagram profile page where the prominent blue "Follow" button resides.

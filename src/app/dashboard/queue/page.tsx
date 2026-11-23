@@ -2,15 +2,17 @@
 
 import { useDashboardState } from "@/hooks/use-dashboard-state"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Clock, Users, ArrowRight, UserCheck, Sparkles } from "lucide-react"
+import { Clock, Users, ArrowRight, UserCheck, Sparkles, Zap } from "lucide-react"
 import { useState } from "react"
 import { RewardModal } from "@/components/dashboard/RewardModal"
+import { ManualStampModal } from "@/components/dashboard/ManualStampModal"
 import Link from "next/link"
 
 export default function QueuePage() {
   const { data, isLoading, refetch } = useDashboardState()
   const [selectedWaitingCustomer, setSelectedWaitingCustomer] = useState<any>(null)
   const [isRewardModalOpen, setIsRewardModalOpen] = useState(false)
+  const [isManualStampModalOpen, setIsManualStampModalOpen] = useState(false)
 
   if (isLoading) {
     return <div className="p-8 text-slate-400 animate-pulse">Loading Live Queue...</div>
@@ -39,10 +41,19 @@ export default function QueuePage() {
         
         <CardHeader className="bg-slate-50/70 dark:bg-slate-900/40 pb-4 border-b border-slate-200 dark:border-slate-800">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <CardTitle className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-              <Clock className="h-5 w-5 animate-pulse" /> 
-              {waitingCustomers.length} Customers Waiting
-            </CardTitle>
+            <div className="flex items-center gap-3">
+              <CardTitle className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                <Clock className="h-5 w-5 animate-pulse" /> 
+                {waitingCustomers.length} Customers Waiting
+              </CardTitle>
+              <button
+                onClick={() => setIsManualStampModalOpen(true)}
+                className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-emerald-600 hover:opacity-95 text-white rounded-xl shadow-xs transition-all cursor-pointer"
+              >
+                <Zap className="w-3.5 h-3.5 fill-current" />
+                <span>Manual Stamp Override</span>
+              </button>
+            </div>
             {waitingCustomers.some((wc: any) => wc.customer?.referredBy || wc.customer?.referralsReceived?.[0]?.referrer || wc.referrer) && (
               <span className="flex items-center gap-1.5 text-xs font-black px-3 py-1 bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-400/40 rounded-full animate-pulse shadow-xs">
                 <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
@@ -165,6 +176,12 @@ export default function QueuePage() {
         onSuccess={() => refetch()}
         merchantId={data?.merchant?.id || ""}
         stampValue={data?.stampCards?.[0]?.stampValue || 300}
+      />
+
+      <ManualStampModal
+        isOpen={isManualStampModalOpen}
+        onClose={() => setIsManualStampModalOpen(false)}
+        onSuccess={() => refetch()}
       />
     </div>
   )

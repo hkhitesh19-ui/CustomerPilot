@@ -9,12 +9,12 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 1d1585a
-Full SHA          : 1d1585a7fe70fcdd3e441ba37b1b6fbe9964c065
+Active Git Commit : 1dc482f
+Full SHA          : 1dc482fa816913e73822295914a80ce0f62b6f1f
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 23 Nov 2026, 09:05 AM IST
+Deployment Date   : 23 Nov 2026, 11:15 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(instagram): allow public wallet customer access to generate-token and upload-proof in proxy and harden handle resolution
+Commit Title      : feat(loyalty): add merchant manual stamp override and goodwill engine in queue and customers CRM
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online, v4.2 Stream-Guard)
 Docker Containers : evolution-api (evoapicloud/evolution-api pinned @sha256:966625532d9076a2381e973a271307d107e6f070450de3abeeea8bd18be07252, Port 8080 Open in UFW, Online & Healthy)
