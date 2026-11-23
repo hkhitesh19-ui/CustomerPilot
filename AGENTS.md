@@ -28,6 +28,15 @@ The report format must strictly follow:
 
 Failure to log resolved issues is a violation of the project workflow.
 
+## Mandatory Zero-Assumption Fresh-Testing & Customer-Reset Protocol (STRICT RULE)
+Whenever the user requests customer data deletion or fresh testing for any merchant (e.g. Cake Connection, Maw & Paw):
+1. **Never Assume Prior Execution**: The agent is STRICTLY FORBIDDEN from relying on past turn claims, conversation memory, or assuming that data was already deleted earlier in the session.
+2. **Mandatory Physical Re-Execution**: The agent MUST physically execute the deletion script on BOTH Local SQLite (`prisma/dev.db`) and Live VPS (`/var/www/CustomerPilot/prisma/dev.db`) in that exact turn.
+3. **Mandatory Physical DB Count Audit**: The agent MUST physically execute an immediate verification query across `Customer`, `Stamp`, `CustomerStampCard`, `WaitingCustomer`, `Review`, `ReviewBonusLog`, and `WhatsAppMessage`, and print the raw verified count:
+   `Remaining Customers: 0, Remaining Stamps: 0`.
+4. **Strict Output Prohibition**: Never tell the user "data delete ho gaya hai / fresh testing shuru karein" without capturing the raw physical exit code 0 and `Remaining: 0` query output within the active turn.
+
+
 ## New Session Start Protocol (MANDATORY)
 At the very beginning of any new session or conversation, before executing any tasks, you MUST silently read the following files to establish your context:
 1. `InstructionFlow.md` (to understand the architectural blueprint and non-technical journeys)

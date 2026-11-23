@@ -7869,3 +7869,14 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   3. Verified via automated image decoding that Maw & Paw standee decodes to `https://www.customerpilot.in/c/mawpaw`, Cake Connection standee decodes to `https://www.customerpilot.in/c/cake-connection`, and all other merchants decode to their permanent dynamic card, ensuring 100% exact parity between the dashboard and the physical acrylic standees on the counter.
   4. Executed Master Adversarial Red-Team Guard (`node scripts/run_adversarial_guard.js`) with all 7 safety and mathematical boundary gates passing cleanly.
 - **Status**: ✅ Resolved and Verified.
+
+---
+## [23 Nov 2026] Issue: 1-Click Merchant-Specific Fresh Testing Data Reset Button in SuperAdmin Impersonation Bar
+- **Symptom**: During live testing across multiple merchants (Cake Connection, Maw & Paw, etc.), testing new customer journeys (Welcome bonuses, stamps, review flows) required manual database deletion scripts. If previous test records were left in the database, subsequent test scans recognized the phone number as an existing customer (Visit #2) and accumulated stamps instead of starting fresh with Visit #1.
+- **Root Cause**: There was no direct, single-click UI control inside the active merchant dashboard for SuperAdmins to wipe test customer data on demand. The reset logic in `/api/admin/merchants` also omitted newly added relation tables (`CustomerInstagramIdentity`, `InstagramStoryProof`, `CustomerConsent`, `ReviewBonusLog`, `WinBackEscalation`, `Order`, `Invoice`, `QrScanEvent`, `SystemContent`), risking orphaned locks or foreign key constraints.
+- **Resolution**:
+  1. Enhanced `src/app/api/admin/merchants/route.ts` `action === 'reset_customers'` to atomically cascade delete across all 20+ child tables, verify remaining counts = 0, and return detailed verification telemetry.
+  2. Enhanced `src/components/impersonation-banner.tsx` (the top SuperAdmin Bar present across all dashboard views) to include a prominent, merchant-specific **"🧹 Reset Test Customers (Fresh Testing)"** button with confirmation guard and instant reload.
+  3. Verified that every merchant viewed under SuperAdmin mode (Cake Connection, Maw & Paw, etc.) can be cleanly reset independently with a single click, completely eliminating reliance on conversational agent memory.
+  4. Executed Master Adversarial Red-Team Guard (`node scripts/run_adversarial_guard.js`) with all 7 safety and mathematical boundary gates passing cleanly.
+- **Status**: ✅ Resolved and Verified.

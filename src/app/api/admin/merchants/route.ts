@@ -250,33 +250,50 @@ export async function POST(req: Request) {
       }
 
       await db.$transaction(async (tx) => {
-        // 1. Delete all WhatsApp messages
-        await tx.whatsAppMessage.deleteMany({ where: { merchantId } });
-        // 2. Delete waiting queue entries
-        await tx.waitingCustomer.deleteMany({ where: { merchantId } });
-        // 3. Delete stamps
-        await tx.stamp.deleteMany({ where: { merchantId } });
-        // 4. Delete redemptions
-        await tx.redemption.deleteMany({ where: { merchantId } });
-        // 5. Delete bills
-        await tx.bill.deleteMany({ where: { merchantId } });
-        // 6. Delete reviews
+        // 1. Delete Instagram identities & proofs
+        await tx.customerInstagramIdentity.deleteMany({ where: { merchantId } });
+        await tx.instagramStoryProof.deleteMany({ where: { merchantId } });
+        // 2. Delete customer consents
+        await tx.customerConsent.deleteMany({ where: { merchantId } });
+        // 3. Delete Review bonus logs & reviews
+        await tx.reviewBonusLog.deleteMany({ where: { merchantId } });
         await tx.review.deleteMany({ where: { merchantId } });
-        // 7. Delete customer stamp cards
+        // 4. Delete all WhatsApp messages & queue entries
+        await tx.whatsAppMessage.deleteMany({ where: { merchantId } });
+        await tx.waitingCustomer.deleteMany({ where: { merchantId } });
+        // 5. Delete stamps & cards
+        await tx.stamp.deleteMany({ where: { merchantId } });
         await tx.customerStampCard.deleteMany({ where: { merchantId } });
-        // 8. Delete achievements
+        // 6. Delete redemptions & bills
+        await tx.redemption.deleteMany({ where: { merchantId } });
+        await tx.bill.deleteMany({ where: { merchantId } });
+        // 7. Delete achievements, birthdays, win-back, orders, invoices, QR scans
         await tx.achievement.deleteMany({ where: { customer: { merchantId } } });
-        // 9. Delete birthdays
         await tx.birthday.deleteMany({ where: { merchantId } });
-        // 10. Delete referrals
+        await tx.winBackEscalation.deleteMany({ where: { merchantId } });
+        await tx.order.deleteMany({ where: { merchantId } });
+        await tx.invoice.deleteMany({ where: { merchantId } });
+        await tx.qrScanEvent.deleteMany({ where: { merchantId } });
+        // 8. Delete referrals
         await tx.referral.deleteMany({ where: { merchantId } });
-        // 11. Delete all customers
+        // 9. Delete all customers
         await tx.customer.deleteMany({ where: { merchantId } });
+        // 10. Clean temporary tokens in SystemContent
+        await tx.systemContent.deleteMany({ where: { id: { startsWith: 'CP_' } } });
+        await tx.systemContent.deleteMany({ where: { id: { startsWith: 'STAMP_' } } });
+        await tx.systemContent.deleteMany({ where: { id: { startsWith: 'mid_' } } });
       });
+
+      const remainingCustomers = await db.customer.count({ where: { merchantId } });
+      const remainingStamps = await db.stamp.count({ where: { merchantId } });
 
       return NextResponse.json({
         success: true,
-        message: `Successfully wiped all customer history for "${merchant.name}". Customers, stamps, and bills reset to 0.`
+        merchantId: merchant.id,
+        merchantName: merchant.name,
+        remainingCustomers,
+        remainingStamps,
+        message: `Successfully wiped all test customer data for "${merchant.name}". Remaining Customers: ${remainingCustomers}, Stamps: ${remainingStamps}.`
       });
     }
 
@@ -287,6 +304,10 @@ export async function POST(req: Request) {
       }
 
       await db.$transaction(async (tx) => {
+        await tx.customerInstagramIdentity.deleteMany({ where: { customerId } });
+        await tx.instagramStoryProof.deleteMany({ where: { customerId } });
+        await tx.customerConsent.deleteMany({ where: { customerId } });
+        await tx.reviewBonusLog.deleteMany({ where: { customerId } });
         await tx.whatsAppMessage.deleteMany({ where: { customerId } });
         await tx.waitingCustomer.deleteMany({ where: { customerId } });
         await tx.stamp.deleteMany({ where: { customerId } });
@@ -296,6 +317,9 @@ export async function POST(req: Request) {
         await tx.customerStampCard.deleteMany({ where: { customerId } });
         await tx.achievement.deleteMany({ where: { customerId } });
         await tx.birthday.deleteMany({ where: { customerId } });
+        await tx.winBackEscalation.deleteMany({ where: { customerId } });
+        await tx.order.deleteMany({ where: { customerId } });
+        await tx.invoice.deleteMany({ where: { customerId } });
         await tx.referral.deleteMany({ where: { OR: [{ referrerId: customerId }, { friendCustomerId: customerId }] } });
         await tx.customer.delete({ where: { id: customerId } });
       });
