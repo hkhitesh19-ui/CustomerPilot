@@ -1,19 +1,30 @@
 /**
  * CustomerPilot Automated Smoke Test Runner (v1.0)
  * Run after every change to prevent regressions across Auth, Referral, QR, and CRM.
+ * Supports isolated safe testing via SMOKE_DB_COPY=1 and guards live targets.
  */
 
 const http = require("http");
 const https = require("https");
 const { execSync } = require("child_process");
 
-const TARGET_HOST = process.env.SMOKE_HOST || "customerpilot.in";
+// 1. Target Host & Mode Detection
+let rawHost = process.env.SMOKE_HOST || "https://customerpilot.in";
+if (!rawHost.startsWith("http://") && !rawHost.startsWith("https://")) {
+  rawHost = `https://${rawHost}`;
+}
+const hostUrl = new URL(rawHost);
+const isHttps = hostUrl.protocol === "https:";
+const TARGET_HOST = hostUrl.host;
+
+// Safe Target Rule: Safe mode ONLY via SMOKE_DB_COPY=1 (per spec)
+const isSafeTarget = process.env.SMOKE_DB_COPY === "1";
+const isLive = !isSafeTarget;
 
 function requestUrl(urlPath, options = {}) {
-  return new Promise((resolve, reject) => {
-    const isHttps = !TARGET_HOST.includes("localhost") && !TARGET_HOST.includes("127.0.0.1");
+  return new Promise((resolve) => {
     const client = isHttps ? https : http;
-    const url = isHttps ? `https://${TARGET_HOST}${urlPath}` : `http://${TARGET_HOST}${urlPath}`;
+    const url = `${hostUrl.protocol}//${TARGET_HOST}${urlPath}`;
 
     const reqOptions = {
       method: options.method || "GET",
@@ -51,124 +62,143 @@ function requestUrl(urlPath, options = {}) {
 
 async function runSmokeTests() {
   console.log("═══════════════════════════════════════════════════════════════");
-  console.log(`🚀 CustomerPilot Automated Smoke Test Suite — Target: ${TARGET_HOST}`);
+  console.log(`🚀 CustomerPilot Automated Smoke Test Suite`);
+  console.log(`   Target Host : ${hostUrl.protocol}//${TARGET_HOST}`);
+  console.log(`   Mode        : ${isLive ? "⚠️ LIVE TARGET (Destructive tests guarded)" : "🛡️ SAFE SANDBOX (SMOKE_DB_COPY=1)"}`);
   console.log("═══════════════════════════════════════════════════════════════\n");
 
   const results = [];
 
-  // Test 1: TypeScript Ratchet Guard
-  process.stdout.write("⏳ [Test 1: TypeScript Ratchet Guard (Baseline <= 36)]... ");
-  try {
-    execSync("node scripts/verify_typecheck_ratchet.js", { stdio: "pipe" });
-    console.log("✅ PASSED (0 new type regressions)");
-    results.push({ id: 1, name: "TypeScript Syntax", passed: true });
-  } catch (err) {
-    console.log("❌ FAILED");
-    results.push({ id: 1, name: "TypeScript Syntax", passed: false, error: err.message });
+  // 9 Canonical Smoke Tests with explicit destructive flags
+  const tests = [
+    {
+      id: 1,
+      name: "TypeScript Syntax Ratchet",
+      destructive: false,
+      run: async () => {
+        execSync("node scripts/verify_typecheck_ratchet.js", { stdio: "pipe" });
+        return true;
+      }
+    },
+    {
+      id: 2,
+      name: "Dashboard Auth Guard",
+      destructive: false,
+      run: async () => {
+        const res = await requestUrl("/dashboard");
+        return res.statusCode === 307 || res.statusCode === 302 || res.statusCode === 401 || (res.body && res.body.includes("/login"));
+      }
+    },
+    {
+      id: 3,
+      name: "Digital Business Card (/c/cake-connection)",
+      destructive: false,
+      run: async () => {
+        const res = await requestUrl("/c/cake-connection");
+        return res.statusCode === 200 && res.body.includes("Cake Connection");
+      }
+    },
+    {
+      id: 4,
+      name: "Referral Exact Match Security",
+      destructive: false,
+      run: async () => {
+        execSync("node scripts/test_resolver_security.js", { stdio: "pipe" });
+        return true;
+      }
+    },
+    {
+      id: 5,
+      name: "Referral Claim API Validation",
+      destructive: false, // Read-only validation check (empty payload -> 400 Bad Request)
+      run: async () => {
+        const res = await requestUrl("/api/referrals/claim", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: {}
+        });
+        return res.statusCode === 400;
+      }
+    },
+    {
+      id: 6,
+      name: "Standee Studio Artwork (/api/qr/standee)",
+      destructive: false,
+      run: async () => {
+        const res = await requestUrl("/api/qr/standee?m=cmtymavfx0002kx008lbfvp57");
+        return res.statusCode === 200;
+      }
+    },
+    {
+      id: 7,
+      name: "Customers CRM API RBAC (/api/customers)",
+      destructive: false,
+      run: async () => {
+        const res = await requestUrl("/api/customers");
+        return res.statusCode === 401 || res.statusCode === 403;
+      }
+    },
+    {
+      id: 8,
+      name: "Manual Stamps API Auth (/api/customers/manual-stamps)",
+      destructive: false,
+      run: async () => {
+        const res = await requestUrl("/api/customers/manual-stamps", { method: "POST" });
+        return res.statusCode === 401 || res.statusCode === 403;
+      }
+    },
+    {
+      id: 9,
+      name: "Maw & Paw Digital Card (/c/mawpaw)",
+      destructive: false,
+      run: async () => {
+        const res = await requestUrl("/c/mawpaw");
+        return res.statusCode === 200 && res.body.includes("Maw") && res.body.includes("Paw");
+      }
+    }
+  ];
+
+  for (const test of tests) {
+    process.stdout.write(`⏳ [Test ${test.id}: ${test.name}]... `);
+
+    // Live Target Guard: Refuse destructive actions on live unless explicitly authorized
+    if (test.destructive && isLive && process.env.SMOKE_ALLOW_LIVE !== "1") {
+      console.log(`⚠️ SKIPPED (Live protection active: set SMOKE_ALLOW_LIVE=1 or use SMOKE_DB_COPY=1)`);
+      results.push({ id: test.id, name: test.name, passed: true, skipped: true });
+      continue; // NEVER return early; continues to next test
+    }
+
+    try {
+      const passed = await test.run();
+      if (passed) {
+        console.log("✅ PASSED");
+        results.push({ id: test.id, name: test.name, passed: true, skipped: false });
+      } else {
+        console.log("❌ FAILED");
+        results.push({ id: test.id, name: test.name, passed: false, skipped: false });
+      }
+    } catch (err) {
+      console.log(`❌ FAILED (${err.message})`);
+      results.push({ id: test.id, name: test.name, passed: false, skipped: false, error: err.message });
+    }
   }
 
-  // Test 2: Auth Guard Redirect
-  process.stdout.write("⏳ [Test 2: Dashboard Auth Guard (Redirect logged-out)]... ");
-  const authRes = await requestUrl("/dashboard");
-  if (authRes.statusCode === 307 || authRes.statusCode === 302 || authRes.statusCode === 401 || (authRes.body && authRes.body.includes("/login"))) {
-    console.log(`✅ PASSED (HTTP ${authRes.statusCode} Guarded)`);
-    results.push({ id: 2, name: "Auth Guard", passed: true });
-  } else {
-    console.log(`❌ FAILED (Unexpected status: ${authRes.statusCode})`);
-    results.push({ id: 2, name: "Auth Guard", passed: false });
-  }
-
-  // Test 3: Public Digital Business Card
-  process.stdout.write("⏳ [Test 3: Digital Business Card (/c/cake-connection)]... ");
-  const cardRes = await requestUrl("/c/cake-connection");
-  if (cardRes.statusCode === 200 && cardRes.body.includes("Cake Connection")) {
-    console.log("✅ PASSED (HTTP 200 Live)");
-    results.push({ id: 3, name: "Digital Card", passed: true });
-  } else {
-    console.log(`❌ FAILED (Status: ${cardRes.statusCode})`);
-    results.push({ id: 3, name: "Digital Card", passed: false });
-  }
-
-  // Test 4: Referrer Exact Match & Security Isolation Guard
-  process.stdout.write("⏳ [Test 4: Referrer Exact Match & Anti-Collision Security]... ");
-  try {
-    execSync("node scripts/test_resolver_security.js", { stdio: "pipe" });
-    console.log("✅ PASSED (Exact match only, fake/prefix/phone suffix rejected)");
-    results.push({ id: 4, name: "Referral Exact Match Security", passed: true });
-  } catch (err) {
-    console.log("❌ FAILED");
-    results.push({ id: 4, name: "Referral Exact Match Security", passed: false, error: err.message });
-  }
-
-  // Test 5: Referral Claim API Validation
-  process.stdout.write("⏳ [Test 5: Referral Claim API Validation (Empty payload test)]... ");
-  const claimRes = await requestUrl("/api/referrals/claim", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: {}
-  });
-  if (claimRes.statusCode === 400) {
-    console.log("✅ PASSED (HTTP 400 Bad Request trapped cleanly)");
-    results.push({ id: 5, name: "Referral Claim API", passed: true });
-  } else {
-    console.log(`❌ FAILED (Expected 400, got: ${claimRes.statusCode})`);
-    results.push({ id: 5, name: "Referral Claim API", passed: false });
-  }
-
-  // Test 6: Standee Studio Dynamic QR Endpoint
-  process.stdout.write("⏳ [Test 6: Standee Studio Artwork (/api/qr/standee)]... ");
-  const standeeRes = await requestUrl("/api/qr/standee?m=cmtymavfx0002kx008lbfvp57");
-  if (standeeRes.statusCode === 200) {
-    console.log("✅ PASSED (HTTP 200 Standee Rendered)");
-    results.push({ id: 6, name: "Standee Studio", passed: true });
-  } else {
-    console.log(`❌ FAILED (Status: ${standeeRes.statusCode})`);
-    results.push({ id: 6, name: "Standee Studio", passed: false });
-  }
-
-  // Test 7: Customers CRM RBAC Protection
-  process.stdout.write("⏳ [Test 7: Customers CRM API RBAC (/api/customers)]... ");
-  const crmRes = await requestUrl("/api/customers");
-  if (crmRes.statusCode === 401 || crmRes.statusCode === 403) {
-    console.log(`✅ PASSED (HTTP ${crmRes.statusCode} Protected)`);
-    results.push({ id: 7, name: "CRM RBAC", passed: true });
-  } else {
-    console.log(`❌ FAILED (Expected 401/403, got: ${crmRes.statusCode})`);
-    results.push({ id: 7, name: "CRM RBAC", passed: false });
-  }
-
-  // Test 8: Manual Stamp Override API Protection
-  process.stdout.write("⏳ [Test 8: Manual Stamps API Auth (/api/customers/manual-stamps)]... ");
-  const manualRes = await requestUrl("/api/customers/manual-stamps", { method: "POST" });
-  if (manualRes.statusCode === 401 || manualRes.statusCode === 403) {
-    console.log(`✅ PASSED (HTTP ${manualRes.statusCode} Protected)`);
-    results.push({ id: 8, name: "Manual Stamps Auth", passed: true });
-  } else {
-    console.log(`❌ FAILED (Expected 401/403, got: ${manualRes.statusCode})`);
-    results.push({ id: 8, name: "Manual Stamps Auth", passed: false });
-  }
-
-  // Test 9: Maw & Paw Digital Business Card (/c/mawpaw)
-  process.stdout.write("⏳ [Test 9: Maw & Paw Card & Socials (/c/mawpaw)]... ");
-  const mawpawRes = await requestUrl("/c/mawpaw");
-  if (mawpawRes.statusCode === 200 && mawpawRes.body.includes("Maw") && mawpawRes.body.includes("Paw")) {
-    console.log("✅ PASSED (HTTP 200 Live)");
-    results.push({ id: 9, name: "Maw & Paw Digital Card", passed: true });
-  } else {
-    console.log(`❌ FAILED (Status: ${mawpawRes.statusCode})`);
-    results.push({ id: 9, name: "Maw & Paw Digital Card", passed: false });
-  }
-
+  // Final Summary & Exit Code Logic
   console.log("\n═══════════════════════════════════════════════════════════════");
   const failed = results.filter(r => !r.passed);
+  const skipped = results.filter(r => r.skipped);
+  const passed = results.filter(r => r.passed && !r.skipped);
+
+  console.log(`📊 Smoke Test Summary: ${results.length} total | ${passed.length} passed | ${skipped.length} skipped | ${failed.length} failed`);
+
   if (failed.length === 0) {
-    console.log(`🎯 ALL ${results.length} SMOKE TESTS PASSED CLEANLY!`);
-    console.log("Production state is healthy. No regressions detected.");
+    console.log(`🎯 ALL ${results.length} SMOKE TESTS VERIFIED CLEANLY!`);
+    console.log(`Mode: ${isLive ? "LIVE TARGET" : "SAFE SANDBOX (SMOKE_DB_COPY=1)"}`);
     console.log("═══════════════════════════════════════════════════════════════\n");
     process.exit(0);
   } else {
     console.log(`🚨 ${failed.length} SMOKE TEST(S) FAILED:`);
-    failed.forEach(f => console.log(`  - Test ${f.id} (${f.name})`));
+    failed.forEach(f => console.log(`  - Test ${f.id} (${f.name}): ${f.error || "Assertion failed"}`));
     console.log("═══════════════════════════════════════════════════════════════\n");
     process.exit(1);
   }

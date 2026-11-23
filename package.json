@@ -16,6 +16,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "smoke": "node scripts/run_smoke_tests.js",
+    "smoke:local": "bash scripts/smoke_local.sh",
     "doctor": "node scripts/doctor.js",
     "setup": "node scripts/setup.js",
     "rollback": "node scripts/rollback.js"
