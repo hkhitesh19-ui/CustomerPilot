@@ -9,12 +9,12 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 0ef3c92
-Full SHA          : 0ef3c9285c16040eef2bd2ecc6c44cfaeae56cfa
+Active Git Commit : 9738029
+Full SHA          : 97380297b0ddbef22438629ae49e3f3d45785f1e
 Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 22 Nov 2026, 09:30 PM IST
+Deployment Date   : 23 Nov 2026, 06:25 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : docs: sync git commit on vps live tracking file for instagram social loyalty release
+Commit Title      : fix(standee): enforce universal dynamic QR routing for all merchants across standee studio
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online, v4.2 Stream-Guard)
 Docker Containers : evolution-api (evoapicloud/evolution-api pinned @sha256:966625532d9076a2381e973a271307d107e6f070450de3abeeea8bd18be07252, Port 8080 Open in UFW, Online & Healthy)
@@ -22,13 +22,12 @@ Docker Containers : evolution-api (evoapicloud/evolution-api pinned @sha256:9666
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
 1. https://customerpilot.in/                                      -> HTTP 200 (Live Domain Cloudflare Edge Verified)
-2. https://customerpilot.in/api/webhook/instagram                 -> HTTP 200 (Meta Challenge GET) & HTTP 401 (Unsigned POST Guard)
-3. https://customerpilot.in/api/instagram/proof-image/[id]       -> HTTP 401 (RBAC Merchant Session Required)
-4. https://customerpilot.in/api/webhook/evolution                -> HTTP 405/401 Guard (Evolution Webhook & Referral Intent Handler with Nginx URI Redaction)
-5. /var/log/nginx/webhook.log                                    -> Active, 0640 permissions, query string secrets stripped via $uri format
-6. /opt/cp-watchdog/watchdog.js                                  -> v4.2 Stream-Guard Live under PM2 (PID: 610904, 75s auto-recovery window)
-7. /opt/evolution-api/docker-compose.yml                         -> Pinned by immutable SHA256 digest
-8. https://customerpilot.in/api/qr/standee?m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (Live Standee with Sample B: 305px QR, Cake Connection Gold Badge)
-9. https://customerpilot.in/dashboard/queue                      -> HTTP 200 / 307 (Live Queue)
-10. https://customerpilot.in/dashboard/billing                   -> HTTP 200 (Smart POS Billing & Invoicing)
-11. http://187.127.170.36:8080                                   -> HTTP 200 (Evolution API v2.3.7)
+2. https://customerpilot.in/c/mawpaw                              -> HTTP 200 (Maw & Paw Dynamic Digital Business Card)
+3. https://customerpilot.in/c/cake-connection                     -> HTTP 200 (Cake Connection Dynamic Digital Business Card)
+4. https://customerpilot.in/api/qr/standee?m=cmwgac6hc0d9gkv94sz2b8bsr -> HTTP 200 (Maw & Paw Dynamic Standee Studio Artwork)
+5. https://customerpilot.in/api/qr/standee?m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (Cake Connection Dynamic Standee Studio Artwork)
+6. https://customerpilot.in/api/webhook/instagram                 -> HTTP 200 (Meta Challenge GET) & HTTP 401 (Unsigned POST Guard)
+7. https://customerpilot.in/api/instagram/proof-image/[id]       -> HTTP 401 (RBAC Merchant Session Required)
+8. https://customerpilot.in/api/webhook/evolution                -> HTTP 405/401 Guard (Evolution Webhook & Referral Intent Handler with Nginx URI Redaction)
+9. /opt/cp-watchdog/watchdog.js                                  -> v4.2 Stream-Guard Live under PM2 (PID: 610904, 75s auto-recovery window)
+10. http://187.127.170.36:8080                                   -> HTTP 200 (Evolution API v2.3.7)
