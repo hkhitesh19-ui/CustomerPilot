@@ -65,12 +65,18 @@ if [ "$INTEGRITY" != "ok" ]; then
 fi
 log "SQLite integrity check passed: ok"
 
-# 5. Archive DB, .env, and uploads directory
+# 5. Archive DB, .env, uploads directory, and cp-watchdog configuration/scripts
 log "Creating archive bundle..."
+EXTRA_TAR_ARGS=()
+if [ -d "/opt/cp-watchdog" ]; then
+    EXTRA_TAR_ARGS+=(-C "/opt" cp-watchdog)
+fi
+
 tar -czf "$BUNDLE" \
     -C "$WORKDIR" dev.db \
     -C "$APP_DIR" .env \
-    -C "${APP_DIR}/public" uploads
+    -C "${APP_DIR}/public" uploads \
+    "${EXTRA_TAR_ARGS[@]}"
 
 # 6. GPG Symmetric AES256 Encryption
 log "Encrypting archive with AES256..."
