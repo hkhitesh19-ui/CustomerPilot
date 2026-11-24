@@ -23,6 +23,8 @@ node scripts/run_smoke_tests.js
 | 6 | **Dynamic QR Standee** | `GET /api/qr/standee?m=cmtymavfx0002kx008lbfvp57` | HTTP 200, dynamic SVG/PNG standee generated |
 | 7 | **Customers CRM API** | `GET /api/customers` (Logged out) | HTTP 401 Unauthorized (Protected RBAC) |
 | 8 | **Manual Stamp API** | `POST /api/customers/manual-stamps` (Logged out) | HTTP 401 Unauthorized (Protected Merchant Auth) |
+| 9 | **Maw & Paw Digital Card** | `GET /c/mawpaw` | HTTP 200, renders store brand and catalog |
+| 10 | **Destructive Guard Proof** | `GET /api/health` (`destructive: true`) | SKIPPED on live; RUNS under `smoke:local` sandbox |
 
 ---
 

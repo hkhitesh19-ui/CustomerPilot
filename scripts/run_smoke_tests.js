@@ -69,7 +69,7 @@ async function runSmokeTests() {
 
   const results = [];
 
-  // 9 Canonical Smoke Tests with explicit destructive flags
+  // 10 Canonical Smoke Tests with explicit destructive flags
   const tests = [
     {
       id: 1,
@@ -154,6 +154,15 @@ async function runSmokeTests() {
       run: async () => {
         const res = await requestUrl("/c/mawpaw");
         return res.statusCode === 200 && res.body.includes("Maw") && res.body.includes("Paw");
+      }
+    },
+    {
+      id: 10,
+      name: "Destructive Guard Proof (Simulated Write /api/health)",
+      destructive: true,
+      run: async () => {
+        const res = await requestUrl("/api/health");
+        return res.statusCode === 200 || res.statusCode === 401;
       }
     }
   ];
