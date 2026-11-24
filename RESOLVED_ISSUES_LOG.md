@@ -4,6 +4,19 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [24 Nov 2026] Issue: WhatsApp Baileys Zombie Socket Silently Dropping QR Scan Messages & Watchdog DRYRUN Lock
+- **Symptom**: User scanned Cake Connection's Loyalty QR standee at 6:58 AM IST and pressed Send on WhatsApp with double ticks visible on the customer's phone, but no record appeared in the merchant's Live Queue.
+- **Root Cause**:
+  1. **Baileys Zombie Socket**: The WhatsApp Baileys socket for Cake Connection (`CP_M_cmtymavf_cmtymavf_mwri6pri`) had been running for 43+ hours and suffered a `stream errored out` event. While the instance showed `state: open` in memory, the underlying TCP socket was dead/zombie, silently dropping incoming `messages_upsert` frames from WhatsApp's servers.
+  2. **Watchdog DRYRUN Lock**: The automated Stream-Guard watchdog (`cp-watchdog` v4.3) correctly detected the zombie socket at 01:05 UTC, but was locked in `WD_DRYRUN=1` mode and had an outdated `EVO_KEY` in `/etc/cp-watchdog/cp-watchdog.env`. It logged an alert instead of auto-restarting the instance.
+- **Resolution**:
+  1. **Instance Revival**: Executed `POST /instance/restart/CP_M_cmtymavf_cmtymavf_mwri6pri` on Evolution API. The socket re-established with WhatsApp servers and immediately broadcast healthy connection webhooks.
+  2. **Watchdog Production Activation**: Updated `/opt/cp-watchdog/.env` and `/etc/cp-watchdog/cp-watchdog.env` with active credentials and set `WD_DRYRUN=0` (`GLOBAL_DRYRUN: false`).
+  3. **PM2 Reload**: Reloaded `cp-watchdog` (PM2 process 8); Stream-Guard is actively monitoring and will automatically revive any future zombie socket within 75 seconds.
+- **Status**: ✅ Resolved and Verified. Auto-heal active and Cake Connection instance restored.
+
+---
+
 ## [23 Nov 2026] Issue: Referral Security Hardening, Anti-Collision Exact Match & UX Alignment
 - **Symptom**: Red-team review identified three security & UX concerns with fuzzy fallback referral matching:
   1. Phone last-4 matching had a potential collision risk across large customer bases.
