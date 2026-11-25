@@ -3,6 +3,9 @@ import { db } from "@/lib/db";
 import { getAuthenticatedMerchant } from "@/lib/api";
 import { sendCentralWhatsAppMessage } from "@/lib/whatsapp-service";
 
+const IG_REASON_PREFIX = "Instagram Follow / Story Reward";
+class InstagramBonusAlreadyGiven extends Error {}
+
 export async function POST(req: NextRequest) {
   try {
     const merchant = await getAuthenticatedMerchant();
@@ -57,6 +60,23 @@ export async function POST(req: NextRequest) {
 
     // Atomic transaction
     const result = await db.$transaction(async (tx) => {
+      if (String(reason).startsWith(IG_REASON_PREFIX)) {
+        // row lock: two simultaneous requests for same customer run one after another
+        await tx.customer.update({
+          where: { id: customer.id },
+          data: { lastActiveAt: new Date() }
+        });
+        const alreadyGiven = await tx.stamp.findFirst({
+          where: {
+            merchantId: merchant.id,
+            customerId: customer.id,
+            source: "manual_override",
+            notes: { startsWith: IG_REASON_PREFIX }
+          },
+          select: { id: true }
+        });
+        if (alreadyGiven) throw new InstagramBonusAlreadyGiven();
+      }
       // Find or create active CustomerStampCard
       let card = await tx.customerStampCard.findFirst({
         where: {
@@ -174,6 +194,12 @@ export async function POST(req: NextRequest) {
       }
     });
   } catch (error: any) {
+    if (error instanceof InstagramBonusAlreadyGiven) {
+      return NextResponse.json(
+        { error: "Instagram bonus already given to this customer" },
+        { status: 409 }
+      );
+    }
     console.error("[Manual Stamp Error]:", error);
     return NextResponse.json({ error: error.message || "Failed to award stamps" }, { status: 500 });
   }
