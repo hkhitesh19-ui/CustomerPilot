@@ -4,6 +4,24 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [25 Nov 2026] Issue: Optical & Multi-Category AI Review Repetition & Anti-Formulaic Persona Architecture Hardening
+- **Symptom**: Merchant 'Alfa Opticals' canceled service after observing that AI-generated Google review drafts across consecutive scans produced repetitive, formulaic reviews (e.g. repeated phrasing like "The optometrist performed precise computerized eye testing, and my new progressive lenses give crystal clear vision" and "Thoda rush tha par service polite thi").
+- **Root Cause**:
+  1. **Rigid Category Mandates in System Prompt**: The AI prompt explicitly demanded: `- MUST USE OPTICAL TERMS: eye testing, power prescription, progressive lenses, blue-cut glasses, anti-glare, spectacle frame, crystal clear vision, optometrist.`, forcing the LLM to cram all terms into the same sentence skeleton every single turn.
+  2. **Clichéd Prompt Output Directive**: The system prompt explicitly instructed `"draft_2": "12 to 20 words conversational Hinglish with mild crowd marker ('thoda rush tha par service polite thi')"`, causing the LLM to literally parrot "thoda rush tha par service polite thi" in almost every generation.
+  3. **Insufficient Fallback Diversity**: The static fallback pool `OPTICAL_REVIEWS` contained only 3 items with 3 generic item templates, causing high collision probability when API timeouts or rate limits occurred.
+  4. **Missing Persona / Need Segmentation**: Real customers at an optician have 8+ distinct needs (screen blue-cut glasses, progressive multifocals, kids flexible frames, UV sunglasses, rimless titanium, emergency screw repair, contact lenses, computerized vision check), but the engine lacked archetype routing.
+- **Resolution**:
+  1. **8 Distinct Customer Archetypes (`OPTICAL_ARCHETYPES`)**: Defined discrete customer personas with tailored goals, angles, and forbidden cross-industry or cross-service terms.
+  2. **8 Real-Life Indian Store Realities (`STORE_REALITIES`)**: Injected randomized visit contexts (24h turnaround, trying 15+ frames patiently, transparent pricing + hard case, sanitized auto-refractor room, snug nose-pad fitting) replacing the clichéd "thoda rush" phrase.
+  3. **Strict Anti-Formula Prompt Guard**: Explicitly forbade robotic openings ("The optometrist performed...", "[Store] provided...", "Visited [Store]..."), banned cramming multiple services, and raised LLM temperature to 0.90 for rich lexical entropy.
+  4. **Expanded 12-Item Realistic Fallback Pool**: Expanded `OPTICAL_REVIEWS` from 3 to 12 diverse, non-overlapping authentic Indian reviews.
+  5. **Item-Intelligent Fallback Router**: Rebuilt `getCategoryAwareItemDrafts` with 8 specialized branches (Blue-Cut/Screen, Progressive/Bifocal, Sunglasses/UV, Kids/Unbreakable, Contact Lenses, Repair/Cleaning, Eye Testing/Refractor, Designer Frames).
+  6. **Unit Test Automation**: Created `tests/unit/optical-anti-repetition.test.ts` verifying persona diversity, zero robotic openings, and non-repetitive generation.
+- **Status**: ✅ Resolved, Hardened, and Verified. All 7 Adversarial Master Gates Passed.
+
+---
+
 ## [24 Nov 2026] Issue: WhatsApp Baileys Zombie Socket Silently Dropping QR Scan Messages & Watchdog DRYRUN Lock
 - **Symptom**: User scanned Cake Connection's Loyalty QR standee at 6:58 AM IST and pressed Send on WhatsApp with double ticks visible on the customer's phone, but no record appeared in the merchant's Live Queue.
 - **Root Cause**:

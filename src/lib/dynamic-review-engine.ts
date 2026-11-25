@@ -198,6 +198,19 @@ const CLINIC_REVIEWS: FallbackReviewItem[] = [
   }
 ]
 
+const EDUCATION_REVIEWS: FallbackReviewItem[] = [
+  {
+    draft1: "Faculty members are experienced and explain every concept with crystal clarity. Personal attention given to each student.",
+    draft2: "Doubt solving sessions regular hoti hain aur study material structured hai. Test series se confidence boost hua.",
+    draft3: "Excellent coaching institute, supportive faculty and result-oriented academic environment!"
+  },
+  {
+    draft1: "Concept clarity aur syllabus completion dono time par hua. Batch size comfortable hai aur classrooms air-conditioned hain.",
+    draft2: "Weekly tests aur performance analysis se weak areas quickly identify hue. Teachers very encouraging hain.",
+    draft3: "Best coaching classes in the city for competitive exam preparation!"
+  }
+]
+
 const DENTAL_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Painless single-sitting root canal karwaya. Doctor bohot gentle the aur sterilization standards top class the.",
@@ -318,19 +331,64 @@ const SAAS_AGENCY_REVIEWS: FallbackReviewItem[] = [
 
 const OPTICAL_REVIEWS: FallbackReviewItem[] = [
   {
-    draft1: "Computerized eye testing bohot accurate hua. Progressive lenses ka vision crystal clear hai aur frame fitting perfect baithi.",
-    draft2: "New blue-cut glasses liye the screen work ke liye. Eye strain bilkul khatam ho gaya aur lightweight designer frame look bohot classy hai.",
-    draft3: "Best optician in Vadodara! Huge frame variety, quick 24hr delivery aur bohot professional staff guidance."
+    draft1: "Daily screen coding hours ke liye blue-cut anti-glare specs liye. Eyes me jo dry burn aur heaviness hoti thi wo completely khatam ho gayi.",
+    draft2: "Shaam ko visit kiya tha, counter staff ne face cut ke hisab se lightweight acetate frame suggest kiya. Delivery within 24 hours mili.",
+    draft3: "Zero-power blue-cut computer glasses with crisp clarity. Excellent anti-glare eye strain protection!"
   },
   {
-    draft1: "Eye power checkup bohot detail me kiya optometrist ne. Lens quality Crizal clear hai aur frame rates bohot reasonable hain.",
-    draft2: "Family ke spectacles yahi se banwaye. Reading glasses aur bifocal lenses dono perfectly adjust hoke mile time par.",
-    draft3: "Polite staff, accurate eye power testing aur stylish branded sunglasses collection. Highly recommended optical store!"
+    draft1: "Optometrist ne computerized auto-refractor se detail me eye test kiya. Progressive multifocal lenses me reading aur driving dono corridors bilkul smooth hain.",
+    draft2: "Family ke sath gaye the, staff ne bina rush kiye 10-15 frames patiently try karwaye. Fitting zero distortion ke sath perfect mili.",
+    draft3: "Crystal clear progressive vision and accurate power testing. Best optician in Vadodara!"
   },
   {
-    draft1: "Rimless titanium frame aur anti-glare lenses liye. Fitting seamless hai aur wear karte waqt bilkul light weight lagta hai.",
-    draft2: "Daily disposable contact lenses aur eye testing dono smooth raha. Staff ne lens wear karne ki proper training di.",
-    draft3: "Top-notch optical service! Prompt delivery, precision lenses and very polite customer handling."
+    draft1: "Polarized UV400 branded sunglasses purchase kiye highway road trip ke liye. Harsh sunlight glare bilkul cut ho gaya aur frame fit ekdum snug hai.",
+    draft2: "Showroom me latest sunglasses collection kafi bada hai. Transparent rates the aur hard protective case ke sath microfiber cloth bhi diya.",
+    draft3: "Stylish polarized sunglasses, genuine branded quality and very courteous customer service!"
+  },
+  {
+    draft1: "Mera beta ke liye unbreakable flexible spectacle frame liya. School aur playground activities me safe rehta hai aur bilkul bendable hai.",
+    draft2: "Optometrist ne bache ka eye checkup bohot gently aur friendly tareeqe se kiya. Beta bilkul nervous nahi hua.",
+    draft3: "Durable kids eyewear frames, gentle optometrist checkup and very cooperative team!"
+  },
+  {
+    draft1: "Rimless titanium frame with high-index ultra-thin lenses karwaya. Face par weight bilkul feel nahi hota aur professional executive look aata hai.",
+    draft2: "Pehle purane glasses se nose bridge par marks aate the, yahan soft silicon nose pad fitting ke baad zero discomfort hai.",
+    draft3: "Featherweight rimless titanium frame fitting and precision lens marking. Outstanding craftsmanship!"
+  },
+  {
+    draft1: "Spectacle frame ka loose screw aur nose pads emergency me replace karwaye. Counter staff ne 5 minute me frame perfectly align kar diya.",
+    draft2: "Old glasses ki ultrasonic machine deep cleaning bhi karke di bina kisi extra charge ke. Extremely polite and helpful gesture.",
+    draft3: "Quick 5-minute spectacle repair, courteous staff and prompt assistance. Highly dependable!"
+  },
+  {
+    draft1: "Daily disposable contact lenses liye. Optometrist ne lens insertion, removal aur hygienic care ki proper step-by-step training di.",
+    draft2: "Whole day screen work ke baad bhi zero eye dryness ya irritation hui. Fresh sealed packaging aur genuine solution mila.",
+    draft3: "Comfortable contact lens trial, expert guidance and transparent pricing. 100% satisfied!"
+  },
+  {
+    draft1: "Night drive yellow tint anti-glare glasses banwaye. Opposite vehicles ki high-beam headlight glare se driving me bohot sukoon mila.",
+    draft2: "Staff ne UV light demo tester pe anti-glare coating live check karke dikhayi. Very knowledgeable and honest guidance.",
+    draft3: "Safe night driving spectacles with genuine anti-glare coating. Highly recommended for motorists!"
+  },
+  {
+    draft1: "Dadi ke liye reading aur walking ke liye bifocal lenses banwaye. Distance aur reading lines clearly separated hain, first day se adjust ho gaya.",
+    draft2: "Senior citizen ke sath staff ne bohot respect aur patience rakhi. Clear explanation diya bina kisi jaldbaazi ke.",
+    draft3: "Accurate bifocal spectacles, respectful staff and timely delivery. Trusted family optical store!"
+  },
+  {
+    draft1: "Acetate cat-eye designer frame liya everyday wear ke liye. Color subtle hai, hinges sturdy hain aur aesthetic compliments mil rahe hain.",
+    draft2: "Weekend evening me rush tha billing counter pe, par team ne briskly pack karke warranty card ke sath hand over kiya.",
+    draft3: "Trendy eyewear collection, aesthetic frames and reliable lens quality. Great collection!"
+  },
+  {
+    draft1: "Original Crizal anti-reflective scratch-resistant lenses lagwaye. Dust aur fingerprints easily wipe ho jate hain, vision 100% sharp hai.",
+    draft2: "Cylinder power checkup optometrist ne double-verify kiya trail frame pe. Delivery promise time se 2 ghante pehle ready ho gaya.",
+    draft3: "Original scratch-resistant lenses with warranty card. Crystal sharp vision and dependable service!"
+  },
+  {
+    draft1: "High minus power ke liye 1.67 high-index thin lenses liye. Lenses bilkul flat aur lightweight bane, thick edges bilkul nahi dikh rahe.",
+    draft2: "Optometrist ne frame selection me guidance di ki high power me kaunsa frame fit best baithega. Superb technical knowledge.",
+    draft3: "Ultra-thin high index lenses, flawless aesthetic finish and pocket-friendly pricing!"
   }
 ]
 
@@ -561,6 +619,8 @@ export function getDynamicFallbackReview(
     pool = CAR_WASH_REVIEWS
   } else if (c.includes("clinic") || c.includes("hospital") || c.includes("doctor")) {
     pool = CLINIC_REVIEWS
+  } else if (c.includes("education") || c.includes("coaching") || c.includes("institute") || c.includes("tuition") || c.includes("classes")) {
+    pool = EDUCATION_REVIEWS
   } else if (c.includes("saas") || c.includes("software") || c.includes("customerpilot") || c.includes("agency") || c.includes("tech")) {
     pool = SAAS_AGENCY_REVIEWS
   }
@@ -638,25 +698,127 @@ function getCategoryAwareItemDrafts(
     c.includes("spectacle") || c.includes("lens") || c.includes("chashma") ||
     c.includes("optical_store")
   ) {
-    const templates = [
-      {
-        draft1: `Mera ${item} banwaya yahan se. Eye testing bohot accurate hui aur vision crystal clear hai. Frame fitting perfect baithi!`,
-        draft2: `${item} ka collection bohot stylish tha. Staff ne face shape ke hisab se best frame suggest kiya aur time par deliver kar diya.`
-      },
-      {
-        draft1: `Daily screen work ke liye ${item} liya. Glare aur eye strain bilkul khatam ho gaya. Lens quality outstanding hai.`,
-        draft2: `${item} ki fitting lightweight aur comfortable hai. Vadodara me trusted optician for genuine quality.`
-      },
-      {
-        draft1: `Showroom me ${item} ki wide variety available thi. Rates transparent hain aur optometrist ka guidance bohot professional tha.`,
-        draft2: `${item} ke sath case aur cleaning kit bhi di. Precise power checkup ke sath flawless service mili.`
-      }
-    ]
+    const itemLower = item.toLowerCase()
+    let templates: { draft1: string; draft2: string; draft3?: string }[] = []
+
+    // 1. Eye testing & Clinical Checkup (Must evaluate before computer specs)
+    if (itemLower.includes("eye test") || itemLower.includes("power") || itemLower.includes("optometrist") || itemLower.includes("refract") || itemLower.includes("checkup")) {
+      templates = [
+        {
+          draft1: `Detailed ${item} karwaya. Optometrist ne cylinder aur spherical numbers bahut thoroughly verify kiye trial frame pe.`,
+          draft2: `Testing room clean aur sanitized tha. Doctor ne eye strain causes aur screen hygiene tips clearly samjhaye.`,
+          draft3: `Accurate computerized ${item} and trustworthy eye care advice!`
+        },
+        {
+          draft1: `Accurate ${item} done with digital autorefractor machine. Clear explanation mili bina kisi hurry ke.`,
+          draft2: `Zero waiting time tha appointment me. Staff courteous tha aur transparent eye power prescription di.`,
+          draft3: `Dependable ${item} and professional optical consultation!`
+        }
+      ]
+    } else if (itemLower.includes("blue") || itemLower.includes("screen") || itemLower.includes("gaming") || itemLower.includes("anti-glare") || itemLower.includes("computer glasses") || itemLower.includes("computer protect")) {
+      templates = [
+        {
+          draft1: `Daily laptop screen work ke liye ${item} liya. Glare aur eye fatigue bilkul stop ho gaya, visual comfort top class hai!`,
+          draft2: `Shaam ko counter pe visit kiya tha, staff ne face cut ke hisab se lightweight frame suggest kiya. Delivery on-time mili.`,
+          draft3: `Outstanding quality ${item} and crystal clear screen protection from this optical store!`
+        },
+        {
+          draft1: `Mera new ${item} banwaya yahan se. Coding aur continuous monitor use ke baad bhi headaches completely band ho gaye.`,
+          draft2: `Optometrist ne lens anti-reflective coating light meter pe demo karke dikhayi. Honest advice and zero upselling.`,
+          draft3: `High-performance ${item} with featherweight frames. Highly recommended for professionals!`
+        },
+        {
+          draft1: `Picked up ${item} for office work. Lenses crystal clear hain aur frame nose bridge par bilkul heavy feel nahi hota.`,
+          draft2: `Staff polite tha aur hard case ke sath lens cleaning microfiber kit bhi provide ki. Smooth transaction.`,
+          draft3: `Total value for money ${item} and courteous optical service!`
+        }
+      ]
+    } else if (itemLower.includes("progressive") || itemLower.includes("multifocal") || itemLower.includes("bifocal")) {
+      templates = [
+        {
+          draft1: `New ${item} banwaye yahan se. Reading aur distant vision dono corridors bilkul seamless hain bina kisi distortion ke!`,
+          draft2: `Optometrist ne computerized power checkup bahut detail me kiya. Fitting exact pupil distance ke sath perfect mili.`,
+          draft3: `Precision-crafted ${item} and exceptional progressive adaptation guarantee!`
+        },
+        {
+          draft1: `Got my ${item} fitted here. Driving aur mobile text reading me quick switch ho jata hai, first day se adjust ho gaya.`,
+          draft2: `Family ke sath visit kiya tha, staff ne 15 frames patiently try karwaye bina kisi rush ke. Prompt 24-hr delivery.`,
+          draft3: `Flawless ${item} and experienced optometrist consultation. Best optician in Vadodara!`
+        },
+        {
+          draft1: `Accurate power testing ke baad ${item} order kiye. Lens quality Crizal clear hai aur peripheral blurriness bilkul nahi hai.`,
+          draft2: `Store me progressive lenses ke multiple branded options explain kiye. Transparent pricing aur warranty card mila.`,
+          draft3: `Crystal sharp ${item} and highly professional eyewear dispensing!`
+        }
+      ]
+    } else if (itemLower.includes("sunglass") || itemLower.includes("polarized") || itemLower.includes("uv400") || itemLower.includes("photochrom")) {
+      templates = [
+        {
+          draft1: `Highway trips aur daily driving ke liye ${item} purchase kiya. Harsh sunlight glare bilkul cut ho gaya aur build solid hai.`,
+          draft2: `Showroom me stylish sunglasses ka huge collection tha. Rates transparent hain aur staff guidance bahut helpful rahi.`,
+          draft3: `Stylish polarized ${item} and genuine UV protection. Superb collection!`
+        },
+        {
+          draft1: `Picked up branded ${item} with UV protection. Eyes relaxed rehti hain outdoor daylight me aur finish premium hai.`,
+          draft2: `Counter staff ne snug face fitting karke di aur sturdy protective hard case diya. Great buying experience.`,
+          draft3: `Top-notch quality ${item} and very polite customer handling!`
+        }
+      ]
+    } else if (itemLower.includes("repair") || itemLower.includes("screw") || itemLower.includes("nose pad") || itemLower.includes("clean")) {
+      templates = [
+        {
+          draft1: `Chashme ke frame me ${item} karwaya emergency me. 5 minute me perfectly align karke tight kar diya.`,
+          draft2: `Ultrasonic machine se deep frame cleaning bhi karke di bina kisi extra charge ke. Very polite and helpful gesture.`,
+          draft3: `Quick 5-minute ${item} and prompt optical goodwill assistance!`
+        },
+        {
+          draft1: `Loose frame screw and ${item} done instantly. Proper temple adjustment karke di taaki frame slip na ho.`,
+          draft2: `Staff immediately attend kiya bina wait karwaye. Dependable neighborhood optical clinic.`,
+          draft3: `Fast dependable ${item} and courteous optical service!`
+        }
+      ]
+    } else if (itemLower.includes("contact") || itemLower.includes("solution")) {
+      templates = [
+        {
+          draft1: `Got my ${item} from here. Whole day screen wear ke baad bhi zero eye irritation ya dryness feel hui.`,
+          draft2: `Optometrist ne hygienic insertion aur safe lens care steps bohot patiently demonstrate kiye. Fresh sealed pack mila.`,
+          draft3: `Comfortable ${item} and expert optometrist training!`
+        }
+      ]
+    } else if (itemLower.includes("kid") || itemLower.includes("flexible") || itemLower.includes("unbreakable")) {
+      templates = [
+        {
+          draft1: `Mera beta ke liye ${item} liya. Unbreakable flexible material hai jo school aur outdoor play me bilkul safe hai.`,
+          draft2: `Optometrist ne bache ka vision test bahut playfully aur patiently kiya. Child-friendly staff aur cooperative behavior.`,
+          draft3: `Durable kids ${item} and gentle optometrist care!`
+        }
+      ]
+    } else {
+      // General Frames, Rimless, Titanium & Spectacles
+      templates = [
+        {
+          draft1: `Mera ${item} banwaya yahan se. Featherweight lightweight fit baitha aur vision ekdum crisp sharp hai!`,
+          draft2: `Showroom me stylish frames ka wide collection available tha. Staff ne face shape ke according best design pick karwaya.`,
+          draft3: `High-quality ${item} and prompt 24-hour delivery!`
+        },
+        {
+          draft1: `Picked up new ${item}. Frame finishing solid hai, hinges sturdy hain aur nose bridge par bilkul pressure nahi padta.`,
+          draft2: `Transparent pricing mili aur hard protective case ke sath warranty card diya. Polite and attentive team.`,
+          draft3: `Stylish durable ${item} and wonderful shopping experience at this showroom!`
+        },
+        {
+          draft1: `Showroom me ${item} ki wide variety available thi. Fitting seamless hai aur look bahut sophisticated aaya.`,
+          draft2: `Delivery promise time se pehle message aa gaya tha collection ke liye. Smooth and pleasant transaction.`,
+          draft3: `Top-grade ${item} with genuine warranty and dependable after-sales support!`
+        }
+      ]
+    }
+
     const chosen = templates[Math.floor(Math.random() * templates.length)]
     return {
       draft1: chosen.draft1,
       draft2: chosen.draft2,
-      draft3: poolEntry.draft3 || `Outstanding quality ${item} and professional optical consultation at this store!`
+      draft3: chosen.draft3 || poolEntry.draft3 || `Outstanding quality ${item} and professional optical consultation at this store!`
     }
   }
 
@@ -932,10 +1094,103 @@ export async function generateDynamicReviewDraft(params: {
     }
   }
 
-  // 3. Category-appropriate authentic context angle
+  // 3. Category-appropriate authentic context angle & archetype selection
   const categoryAngles = getCategoryAuthenticAngles(profile.categoryKey)
   const randomAngle = categoryAngles[Math.floor(Math.random() * categoryAngles.length)]
   const timestampSeed = Date.now().toString(36)
+
+  // Dynamic Archetypes for Anti-Repetition
+  const OPTICAL_ARCHETYPES = [
+    {
+      label: "Screen Worker (Blue-Cut Computer Specs)",
+      need: "blue-cut anti-glare screen glasses for laptop coding and monitor work",
+      angle: "eye strain and headache relief, featherweight frame",
+      avoid: "progressive, bifocal, sunglasses, kids"
+    },
+    {
+      label: "Senior / Middle-Aged (Progressive Multifocal)",
+      need: "progressive multifocal lenses for reading and distance",
+      angle: "smooth corridor switch, zero peripheral distortion, accurate power",
+      avoid: "gaming, computer glasses, sunglasses, kids"
+    },
+    {
+      label: "Fashion & Highway Driving (Polarized Sunglasses)",
+      need: "polarized UV400 branded sunglasses for road trips and daylight",
+      angle: "glare-free driving vision, stylish look, compliments, sturdy hinges",
+      avoid: "progressive, power checkup, kids"
+    },
+    {
+      label: "Parent for School Child (Kids Eyewear)",
+      need: "flexible unbreakable eyewear frames for kids",
+      angle: "gentle friendly optometrist eye test, durable play-proof flexible frame",
+      avoid: "progressive, computer coding, reading bifocal"
+    },
+    {
+      label: "Executive / Professional (Rimless Titanium)",
+      need: "rimless titanium featherweight spectacles",
+      angle: "sophisticated executive look, zero pressure marks on nose bridge, precision fit",
+      avoid: "sunglasses, kids, emergency repair"
+    },
+    {
+      label: "Quick Frame Maintenance (Emergency Repair)",
+      need: "loose screw tightening and nose pad replacement",
+      angle: "quick 5-minute fix, ultrasonic machine cleaning, polite helpful gesture",
+      avoid: "new eye test, progressive lenses"
+    },
+    {
+      label: "Contact Lens Wearer (Disposable Lenses)",
+      need: "daily disposable contact lenses",
+      angle: "comfort during long wear, clear hygienic insertion training by optometrist, fresh stock",
+      avoid: "spectacle frame, sunglasses"
+    },
+    {
+      label: "Night Driver (Anti-Glare Yellow Tint)",
+      need: "night drive yellow tint anti-glare glasses",
+      angle: "high-beam light glare reduction, relaxed night driving, certified lens coating",
+      avoid: "progressive, contact lenses, kids"
+    },
+    {
+      label: "Eye Testing & Clinical Checkup",
+      need: "computerized eye power testing with digital autorefractor",
+      angle: "precise cylindrical & spherical power check, patient optometrist explanation, zero rush",
+      avoid: "sunglasses, repair, kids play"
+    }
+  ]
+
+  const STORE_REALITIES = [
+    "prompt 24-hour turnaround with spectacles ready on time",
+    "patient consultation where staff let me try 15+ frames without any pushiness",
+    "transparent pricing with warranty card and sturdy hard protective case",
+    "clean sanitized auto-refractor testing room and well-maintained optical setup",
+    "prompt WhatsApp notification when glasses were ready for collection",
+    "snug nose pad and temple adjustment ensuring zero slippage during wear",
+    "attentive optometrist who double-checked cylinder numbers on the trial frame",
+    "brisk efficient billing and courteous interaction"
+  ]
+
+  let assignedArchetype = OPTICAL_ARCHETYPES[Math.floor(Math.random() * OPTICAL_ARCHETYPES.length)]
+  const focalLower = focalItem.toLowerCase()
+  if (focalLower.includes("eye test") || focalLower.includes("power") || focalLower.includes("autorefractor") || focalLower.includes("optometrist") || focalLower.includes("pupil")) {
+    assignedArchetype = OPTICAL_ARCHETYPES[8]
+  } else if (focalLower.includes("blue") || focalLower.includes("screen") || focalLower.includes("gaming") || focalLower.includes("computer glasses") || focalLower.includes("computer protect")) {
+    assignedArchetype = OPTICAL_ARCHETYPES[0]
+  } else if (focalLower.includes("progressive") || focalLower.includes("multifocal") || focalLower.includes("bifocal")) {
+    assignedArchetype = OPTICAL_ARCHETYPES[1]
+  } else if (focalLower.includes("sunglass") || focalLower.includes("polarized") || focalLower.includes("uv400")) {
+    assignedArchetype = OPTICAL_ARCHETYPES[2]
+  } else if (focalLower.includes("kid") || focalLower.includes("flexible") || focalLower.includes("unbreakable")) {
+    assignedArchetype = OPTICAL_ARCHETYPES[3]
+  } else if (focalLower.includes("rimless") || focalLower.includes("titanium")) {
+    assignedArchetype = OPTICAL_ARCHETYPES[4]
+  } else if (focalLower.includes("repair") || focalLower.includes("screw") || focalLower.includes("nose pad") || focalLower.includes("clean")) {
+    assignedArchetype = OPTICAL_ARCHETYPES[5]
+  } else if (focalLower.includes("contact") || focalLower.includes("solution")) {
+    assignedArchetype = OPTICAL_ARCHETYPES[6]
+  } else if (focalLower.includes("night")) {
+    assignedArchetype = OPTICAL_ARCHETYPES[7]
+  }
+
+  const assignedVibe = STORE_REALITIES[Math.floor(Math.random() * STORE_REALITIES.length)]
 
   // 4. Prepare fallback immediately
   const fallback = getDynamicFallbackReview(profile.categoryKey || businessCategory, focalItem, seed || timestampSeed)
@@ -1028,9 +1283,19 @@ export async function generateDynamicReviewDraft(params: {
     categoryGuard = `
 CATEGORY-SPECIFIC HARD RULES (OPTICIAN, EYEWEAR & SPECTACLES):
 - BUSINESS TYPE: OPTICIAN / EYEWEAR STORE. NOT a bakery, not food, not a pet clinic, not dental.
-- Reviewer = Customer getting eye test, spectacles, progressive lenses, or sunglasses.
-- MUST USE OPTICAL TERMS: eye testing, power prescription, progressive lenses, blue-cut glasses, anti-glare, spectacle frame, crystal clear vision, optometrist.
-- STRICTLY FORBIDDEN: Words like "cake", "bakery", "pastry", "food", "puppy", "dog", "cat", "teeth", "clinic doctor" are BANNED.`
+- Assigned Customer Archetype: ${assignedArchetype.label}
+- Specific Visit Need: ${assignedArchetype.need} (${assignedArchetype.angle})
+- ANTI-REPETITION MANDATE (CRITICAL):
+  * Focus ONLY on this specific customer goal: "${assignedArchetype.need}".
+  * NEVER combine unrelated services! If this review is about ${assignedArchetype.label}, DO NOT mention ${assignedArchetype.avoid}!
+  * FORBIDDEN FORMULAIC OPENINGS: DO NOT start your review with:
+    - "The optometrist performed..."
+    - "${profile.businessName} provided..."
+    - "Visited ${profile.businessName}..."
+    - "Got my eye testing done..."
+  * Start dynamically and naturally: start with the need, the product, the comfort, or the experience.
+  * FOR DRAFT 2: DO NOT write "thoda rush tha par service polite thi". Instead, naturally reflect this real visit context: "${assignedVibe}". Rephrase it in casual conversational Hinglish.
+  * STRICTLY FORBIDDEN: Words like "cake", "bakery", "pastry", "food", "puppy", "dog", "cat", "teeth", "clinic doctor" are BANNED.`
   } else if (profile.categoryKey === "saree_palace" || profile.categoryKey === "clothing") {
     categoryGuard = `
 CATEGORY-SPECIFIC HARD RULES (SILK SAREE PALACE & BRIDAL ETHNIC WEAR):
@@ -1118,8 +1383,8 @@ CRITICAL ANTI-HALLUCINATION RULES:
 [OUTPUT FORMAT]
 Return ONLY a valid parseable JSON object:
 {
-  "draft_1": "12 to 20 words focusing on service quality & results",
-  "draft_2": "12 to 20 words conversational Hinglish with mild crowd marker ('thoda rush tha par service polite thi')",
+  "draft_1": "12 to 20 words natural English or Hinglish focusing on the specific product experience",
+  "draft_2": "12 to 20 words conversational Hinglish naturally reflecting this visit context ('${assignedVibe}') without clichéd repetition",
   "draft_3": "8 to 14 words punchy 1-liner review"
 }`
 
@@ -1135,7 +1400,7 @@ Return ONLY a valid parseable JSON object:
           try {
             const model = genAI.getGenerativeModel({
               model: modelName,
-              generationConfig: { temperature: 0.85 }
+              generationConfig: { temperature: 0.90 }
             })
             const res = await model.generateContent(systemPrompt)
             const text = (await res.response).text().trim()
@@ -1187,7 +1452,7 @@ Return ONLY a valid parseable JSON object:
             { role: "system", content: "You generate authentic Indian Google reviews in strict JSON format. Strictly observe all banned keywords." },
             { role: "user", content: systemPrompt }
           ],
-          temperature: 0.85,
+          temperature: 0.90,
           response_format: { type: "json_object" }
         }),
         signal: controller.signal
