@@ -58,24 +58,39 @@ export async function POST(req: NextRequest) {
 
     const stampsRequired = template.stampsRequired || 10;
 
+    const isInstagramBonus = String(reason).startsWith(IG_REASON_PREFIX);
+
     // Atomic transaction
     const result = await db.$transaction(async (tx) => {
-      if (String(reason).startsWith(IG_REASON_PREFIX)) {
+      if (isInstagramBonus) {
         // row lock: two simultaneous requests for same customer run one after another
         await tx.customer.update({
           where: { id: customer.id },
           data: { lastActiveAt: new Date() }
         });
-        const alreadyGiven = await tx.stamp.findFirst({
-          where: {
-            merchantId: merchant.id,
-            customerId: customer.id,
-            source: "manual_override",
-            notes: { startsWith: IG_REASON_PREFIX }
-          },
-          select: { id: true }
-        });
-        if (alreadyGiven) throw new InstagramBonusAlreadyGiven();
+        const [alreadyByStamp, alreadyByAudit] = await Promise.all([
+          tx.stamp.findFirst({
+            where: {
+              merchantId: merchant.id,
+              customerId: customer.id,
+              source: "manual_instagram_bonus",
+              deletedAt: null
+            },
+            select: { id: true }
+          }),
+          tx.auditLog.findFirst({
+            where: {
+              merchantId: merchant.id,
+              action: "MANUAL_STAMP_OVERRIDE",
+              AND: [
+                { metadata: { contains: customer.id } },
+                { metadata: { contains: IG_REASON_PREFIX } }
+              ]
+            },
+            select: { id: true }
+          })
+        ]);
+        if (alreadyByStamp || alreadyByAudit) throw new InstagramBonusAlreadyGiven();
       }
       // Find or create active CustomerStampCard
       let card = await tx.customerStampCard.findFirst({
@@ -107,8 +122,7 @@ export async function POST(req: NextRequest) {
           stampCardId: template.id,
           customerStampCardId: card.id,
           merchantId: merchant.id,
-          source: "manual_override",
-          notes: String(reason).substring(0, 200)
+          source: isInstagramBonus ? "manual_instagram_bonus" : "manual_override"
         });
       }
       await tx.stamp.createMany({ data: stampData });
@@ -201,6 +215,6 @@ export async function POST(req: NextRequest) {
       );
     }
     console.error("[Manual Stamp Error]:", error);
-    return NextResponse.json({ error: error.message || "Failed to award stamps" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to award stamps. Please try again." }, { status: 500 });
   }
 }
