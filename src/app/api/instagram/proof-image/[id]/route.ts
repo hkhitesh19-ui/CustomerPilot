@@ -14,8 +14,9 @@ async function getCallerAuth(req: NextRequest): Promise<{ merchantId: string; is
     const role = (payload.role as string) || "";
     const tokenMerchantId = (payload.merchantId as string) || "";
 
+    const isSuperOrImpersonated = role === "super_admin" || (payload as any).impersonatedBy === "super_admin";
     const impCookie = req.cookies.get("cp_impersonation")?.value;
-    if (impCookie) {
+    if (impCookie && isSuperOrImpersonated) {
       try {
         const imp = JSON.parse(impCookie);
         if (imp?.merchantId) {
@@ -26,7 +27,7 @@ async function getCallerAuth(req: NextRequest): Promise<{ merchantId: string; is
 
     return {
       merchantId: tokenMerchantId,
-      isSuperAdmin: role === "super_admin" || role === "admin"
+      isSuperAdmin: role === "super_admin"
     };
   } catch {
     return null;

@@ -10,9 +10,10 @@ async function verifyToken(token: string) {
 }
 
 function resolveMerchantId(payload: any, request: NextRequest): string | undefined {
-  // 1. If impersonation cookie is present, super_admin is explicitly viewing another merchant
+  // 1. If impersonation cookie is present, allow ONLY IF caller is verified super_admin
+  const isSuperAdmin = payload?.role === 'super_admin' || payload?.impersonatedBy === 'super_admin';
   const impCookie = request.cookies.get('cp_impersonation')?.value;
-  if (impCookie) {
+  if (impCookie && isSuperAdmin) {
     try {
       const imp = JSON.parse(impCookie);
       if (imp?.merchantId) return imp.merchantId;

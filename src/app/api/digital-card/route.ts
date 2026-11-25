@@ -15,8 +15,9 @@ async function getMerchantIdFromReq(req: NextRequest): Promise<string | null> {
       const { payload } = await jwtVerify(token, new TextEncoder().encode(getJwtSecret()))
       const role = payload.role as string
       const tokenMerchantId = payload.merchantId as string
+      const isSuperAdmin = role === "super_admin" || (payload as any).impersonatedBy === "super_admin";
       const impCookie = req.cookies.get("cp_impersonation")?.value
-      if (impCookie) {
+      if (impCookie && isSuperAdmin) {
         try {
           const imp = JSON.parse(impCookie)
           if (imp?.merchantId) return imp.merchantId

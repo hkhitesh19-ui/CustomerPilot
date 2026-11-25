@@ -7994,3 +7994,15 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   3. Verified that every merchant viewed under SuperAdmin mode (Cake Connection, Maw & Paw, etc.) can be cleanly reset independently with a single click, completely eliminating reliance on conversational agent memory.
   4. Executed Master Adversarial Red-Team Guard (`node scripts/run_adversarial_guard.js`) with all 7 safety and mathematical boundary gates passing cleanly.
 - **Status**: ✅ Resolved and Verified.
+
+---
+## [25 Nov 2026] Issue: SuperAdmin Impersonation Cookie Spoofing & Cross-Tenant Access Hardening
+- **Symptom**: If an authenticated merchant or registered user manually set or manipulated the `cp_impersonation` browser cookie with a target merchant's ID (`{"merchantId":"<target_id>"}`), the Next.js proxy middleware and downstream API routes (`/api/digital-card`, `/api/instagram/proof-image/[id]`) honored the cookie without strictly checking whether the authenticated session belonged to `super_admin`.
+- **Root Cause**: In `src/proxy.ts` (`resolveMerchantId`), `src/app/api/digital-card/route.ts`, and `src/app/api/instagram/proof-image/[id]/route.ts`, the presence of `cp_impersonation` cookie was checked and parsed directly without validating `payload.role === 'super_admin' || payload.impersonatedBy === 'super_admin'`. Since the cookie is non-httpOnly (used by the frontend banner), untrusted client tampering could spoof the downstream `x-merchant-id` header.
+- **Resolution**:
+  1. Updated `src/proxy.ts` in `resolveMerchantId`: Added strict gate `const isSuperAdmin = payload?.role === 'super_admin' || payload?.impersonatedBy === 'super_admin';` so `cp_impersonation` cookie is parsed and honored ONLY when verified JWT role is `super_admin`.
+  2. Updated `src/app/api/digital-card/route.ts`: Added matching `isSuperAdmin` check before reading `cp_impersonation`.
+  3. Updated `src/app/api/instagram/proof-image/[id]/route.ts`: Added matching gate before parsing `cp_impersonation`, and tightened fallthrough return to `isSuperAdmin: role === 'super_admin'` (removed legacy `admin` check).
+  4. Ran full automated smoke suite (`node scripts/run_smoke_tests.js`) — 10 total | 9 passed | 1 skipped (live guard) | 0 failed.
+  5. Ran Master Adversarial Red-Team Guard (`node scripts/run_adversarial_guard.js`) with all 7 safety and mathematical boundary gates passing cleanly.
+- **Status**: ✅ Resolved and Verified.
