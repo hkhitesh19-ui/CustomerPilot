@@ -4,6 +4,20 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [26 Nov 2026] Issue: Google Reviews Cron Location ID Mismatch & Star-Only Empty Comment Filter Patch
+- **Symptom**: Reviews left by customers on Google Maps after 15 Nov (including Mayurvan Gosai, Rakesh Radadiya, Pradeep Parmar) were not syncing to Cake Connection's dashboard database, leaving them unrecorded.
+- **Root Cause**:
+  1. **Misplaced HQ Location ID**: Cake Connection's OAuth connection in `MerchantGoogleConnection` had `gbpLocationId` pointing to `locations/4702053894702959517` (CustomerPilot HQ, 0 reviews) instead of its real store location `locations/9875374650197271242`. The cron polled the empty HQ location every minute without errors, fetching 0 reviews.
+  2. **Star-Only Empty Comment Auto-Reply Trap**: In `src/app/api/cron/google-reviews/route.ts`, the query filter checked `comment: { not: null }`. When customers gave star-only ratings without text, Google returned `comment: ""` which passed the filter, potentially generating AI replies for textless reviews.
+- **Resolution**:
+  1. **Pre-Fix Database Backup**: Created backup of SQLite database on both local and live VPS at `prisma/dev.db.bak-20261126` (4.2 MB) before any mutation.
+  2. **Location Assertion & Fix**: Verified `locations/9875374650197271242` via Google Business Information API (`Title: Cake Connection...`, `PlaceId: ChIJc7ija2zFXzkR8DbOxXEfaM4`), asserted Place ID against database records, and updated `gbpLocationId` in SQLite dev.db on both local and live VPS.
+  3. **Empty Comment Patch**: Updated cron query filter to `AND: [{ comment: { not: null } }, { comment: { not: "" } }]` and added an in-loop `trim().length === 0` guard to prevent AI replies to star-only reviews.
+  4. **Sync Verification**: The live cron tick successfully polled location `9875...`, fetched 3 new reviews (Mayurvan Gosai, Rakesh Radadiya, Pradeep Parmar), mapped their existing owner replies, and saved them with `status: "replied"`, `isReplied: true`, and `pending: 0`.
+- **Status**: ✅ Resolved, Verified, and Master Adversarial Guard Passed.
+
+---
+
 ## [26 Nov 2026] Issue: Men's Salon 'grooming' Keyword Collision with Pet Shop & Blacklist Truncation Fix
 - **Symptom**: During multi-category review generation, Men's Salon & Grooming merchant ('Urban Cut Men's Salon & Grooming') received pet clinic / vet drafts containing "puppy", "vet doctor", and "pet grooming in Vadodara".
 - **Root Cause**:
