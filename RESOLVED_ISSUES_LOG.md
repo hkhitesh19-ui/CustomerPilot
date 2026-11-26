@@ -4,6 +4,21 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [26 Nov 2026] Issue: Men's Salon 'grooming' Keyword Collision with Pet Shop & Blacklist Truncation Fix
+- **Symptom**: During multi-category review generation, Men's Salon & Grooming merchant ('Urban Cut Men's Salon & Grooming') received pet clinic / vet drafts containing "puppy", "vet doctor", and "pet grooming in Vadodara".
+- **Root Cause**:
+  1. **Keyword Collision in `keyword-matrix.ts`**: The `isPetShop` heuristic checked `merchant.name.toLowerCase().includes("grooming") && !isSareePalace`. Because men's hair salons often have "grooming" in their business name, the parser erroneously categorized human salons as pet shops, loading `pet_shop` keywords.
+  2. **Blacklist Truncation in Prompt**: `profile.strictlyNotAllowed.slice(0, 30)` truncated the negative blacklist after 30 entities, leaving pet words unpassed to the LLM.
+  3. **Missing Category Guard for Salons**: The review generator lacked explicit negative guardrails against animal, veterinary, and pet terminology for `salon_men` and `beauty_parlour`.
+- **Resolution**:
+  1. **Salon Isolation Guard**: Added `isSalonOrBarber` check before `isPetShop` and restricted pet grooming matching to explicit phrases ("pet grooming", "dog grooming", "cat grooming").
+  2. **Negative Blacklist Expansion**: Added "Pet", "Puppy", "Dog", "Cat", "Kitten", "Veterinary", "Animal hospital", "Pet clinic" to both `salon_men.blacklist` and `beauty_parlour.blacklist`.
+  3. **Expanded Entity Slice**: Increased negative blacklist prompt slice from 30 to 50 entities.
+  4. **Strict Prompt Directives**: Added explicit category guards for `salon_men` and `beauty_parlour` forbidding pet, veterinary, and food terms.
+- **Status**: ✅ Resolved, Hardened, and Verified. All 7 Adversarial Master Gates Passed.
+
+---
+
 ## [25 Nov 2026] Issue: Optical & Multi-Category AI Review Repetition & Anti-Formulaic Persona Architecture Hardening
 - **Symptom**: Merchant 'Alfa Opticals' canceled service after observing that AI-generated Google review drafts across consecutive scans produced repetitive, formulaic reviews (e.g. repeated phrasing like "The optometrist performed precise computerized eye testing, and my new progressive lenses give crystal clear vision" and "Thoda rush tha par service polite thi").
 - **Root Cause**:

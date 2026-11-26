@@ -1273,9 +1273,9 @@ export async function generateDynamicReviewDraft(params: {
   }
 
   // 7. Dynamic Variable Grounding Prompt
-  const allowedSample = profile.allowedSeoEntities.slice(0, 15).join(", ")
-  const aeoSample = profile.allowedAeoAnswers.slice(0, 6).join(", ")
-  const bannedSample = profile.strictlyNotAllowed.slice(0, 30).join(", ")
+  const allowedSample = profile.allowedSeoEntities.slice(0, 20).join(", ")
+  const aeoSample = profile.allowedAeoAnswers.slice(0, 8).join(", ")
+  const bannedSample = profile.strictlyNotAllowed.slice(0, 50).join(", ")
 
   // Category-specific anti-hallucination guard lines injected into prompt
   let categoryGuard = ""
@@ -1325,16 +1325,18 @@ CATEGORY-SPECIFIC HARD RULES (FOOD BUSINESS):
 - BUSINESS TYPE: FOOD RESTAURANT / EATERY.
 - Reviewer = customer who visited to EAT. Focus on taste, freshness, service speed, ambiance.
 - NEVER mention doctor, clinic, medicine, haircut, salon, car wash, or software.`
-  } else if (profile.audiencePersona === "Female_Only") {
+  } else if (profile.audiencePersona === "Female_Only" || profile.categoryKey === "beauty_parlour") {
     categoryGuard = `
 CATEGORY-SPECIFIC HARD RULES (LADIES BEAUTY PARLOUR):
 - BUSINESS TYPE: LADIES BEAUTY PARLOUR. Reviewer = woman/girl customer.
-- MUST USE feminine language. NEVER masculine verbs or food/delivery context.`
-  } else if (profile.audiencePersona === "Male_Only") {
+- MUST USE feminine language and beauty terms (threading, facial, waxing, hair spa, cleanup, bridal makeup).
+- STRICTLY FORBIDDEN: NEVER mention masculine haircut/fade, beard, men grooming, pets, animals, clinic doctor, or food delivery.`
+  } else if (profile.audiencePersona === "Male_Only" || profile.categoryKey === "salon_men") {
     categoryGuard = `
 CATEGORY-SPECIFIC HARD RULES (MEN SALON / BARBERSHOP):
 - BUSINESS TYPE: MEN SALON / BARBER. Reviewer = male customer getting haircut/grooming.
-- MUST USE masculine language and grooming terms. NEVER ladies makeup or food context.`
+- MUST USE masculine language and grooming terms (haircut, fade, beard styling, trim, head massage, hair wash, facial cleanup).
+- STRICTLY FORBIDDEN: NEVER mention pets, dogs, cats, puppy, kitten, pet grooming, vet, clinic, doctor, ladies makeup, bridal saree, cake, or food delivery.`
   }
 
   // 8. Authentic Real GBP Past Reviews Style Inspiration (Few-Shot Grounding)

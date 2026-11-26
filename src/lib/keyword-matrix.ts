@@ -75,7 +75,8 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
       "Packaging box", "Live cake counter", "Cake", "Birthday cake", "Pastry", "Truffle", "Brownie",
       "Bread", "Pav", "Cookies", "Biscuits", "Muffins", "Cupcakes", "Khari", "Puffs",
       "Samosa", "Chai", "Tea", "Masala chai", "Coffee", "Cold coffee", "Food", "Dinner",
-      "Lunch", "Thali", "Dosa", "Pizza", "Burger", "Car wash", "Ceramic coating", "Bike puncture", "Tailoring stitching"
+      "Lunch", "Thali", "Dosa", "Pizza", "Burger", "Car wash", "Ceramic coating", "Bike puncture", "Tailoring stitching",
+      "Pet", "Puppy", "Dog", "Cat", "Kitten", "Pet grooming", "Veterinary", "Animal hospital", "Pet clinic"
     ]
   },
 
@@ -185,7 +186,8 @@ export const MASTER_KEYWORD_PRESETS: Record<string, CategoryPreset> = {
       "Pastry", "Truffle", "Bread", "Cookies", "Chai", "Tea", "Coffee", "Dine-in dinner",
       "Dal makhani", "Punjabi thali", "Pizza", "Burger", "Car wash", "Underbody wash", "Ceramic coating",
       "Clothes", "Boutique", "Kurtis", "Lehenga", "Footwear", "Grocery", "Medicines", "Hospital",
-      "Gym machines", "Mobile screen", "Bargaining", "Pet grooming", "Tattoo", "Alcohol", "Hookah"
+      "Gym machines", "Mobile screen", "Bargaining", "Pet grooming", "Tattoo", "Alcohol", "Hookah",
+      "Pet", "Puppy", "Dog", "Cat", "Kitten", "Veterinary", "Vet clinic", "Pet clinic", "Animal hospital"
     ]
   },
 
@@ -1893,8 +1895,12 @@ export function resolveMerchantKeywordProfile(merchant: {
       merchant.category.toLowerCase().includes("ethnic wear")
     )));
 
-  const isPetShop = !isSareePalace && (bType === "pet_shop" ||
-    (merchant.name && (merchant.name.toLowerCase().includes("pet shop") || merchant.name.toLowerCase().includes("pet store") || (merchant.name.toLowerCase().includes("grooming") && !isSareePalace) || merchant.name.toLowerCase().includes("pet food") || merchant.name.toLowerCase().includes("pet accessories") || merchant.name.toLowerCase().includes("pet cafe") || merchant.name.toLowerCase().includes("cat cafe") || merchant.name.toLowerCase().includes("dog cafe"))) ||
+  const isSalonOrBarber = (bType === "salon_men" || bType === "womens_salon" || bType === "beauty_parlour" ||
+    (merchant.name && (merchant.name.toLowerCase().includes("salon") || merchant.name.toLowerCase().includes("barber") || merchant.name.toLowerCase().includes("hair cut") || merchant.name.toLowerCase().includes("haircut"))) ||
+    (merchant.category && (merchant.category.toLowerCase().includes("salon") || merchant.category.toLowerCase().includes("barber"))));
+
+  const isPetShop = !isSareePalace && !isSalonOrBarber && (bType === "pet_shop" ||
+    (merchant.name && (merchant.name.toLowerCase().includes("pet shop") || merchant.name.toLowerCase().includes("pet store") || merchant.name.toLowerCase().includes("pet grooming") || merchant.name.toLowerCase().includes("dog grooming") || merchant.name.toLowerCase().includes("cat grooming") || merchant.name.toLowerCase().includes("pet food") || merchant.name.toLowerCase().includes("pet accessories") || merchant.name.toLowerCase().includes("pet cafe") || merchant.name.toLowerCase().includes("cat cafe") || merchant.name.toLowerCase().includes("dog cafe"))) ||
     (merchant.category && (merchant.category.toLowerCase().includes("pet shop") || merchant.category.toLowerCase().includes("pet store") || merchant.category.toLowerCase().includes("supplies") || merchant.category.toLowerCase().includes("pet supplies"))));
 
   const isPetClinic = !isSareePalace && !isPetShop && (bType === "pet_clinic" ||
