@@ -8051,3 +8051,17 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   4. **Full 10-Category Automated Test Suite**: Created `tests/unit/all-categories-review-engine.test.ts` covering all 10 categories, trigram anti-repetition, NFKC Unicode buzzword guard, cross-subtype semantic checks, cross-category contamination, and `engine_used` telemetry.
   5. **Verification**: All 46/46 Vitest unit tests (`all-categories-review-engine.test.ts` + `optical-anti-repetition.test.ts`) and all 7/7 Master Adversarial Red-Team Guard gates (`node scripts/run_adversarial_guard.js`) passed cleanly.
 - **Status**: ✅ Resolved and Verified locally.
+
+---
+## [26 Nov 2026] Issue: Hard Focal-Item Lock, Unverified Claims Purge, `<think>` Stripper & Mocked LLM Test Suite
+- **Symptom**: Pre-push audit of commit `ca99e90` caught: (1) Live Groq prompt still leaked secondary services in `draft_2`/`draft_3` (e.g., dog vaccination/deworming on Cat skin allergy, haircut/head massage on Charcoal facial); (2) Tier-3 `draft3` still pulled from generic category-wide pools (`poolEntry.draft3`) and static templates/realities still contained unverified claims (`24/7`, `24-hour`, `X-ray`, `zero waiting`, `doorstep delivery`, `15+ frames`, `bina extra charge`, non-SaaS `WhatsApp`), `rush tha` clichés, and 3 source buzzword literals (`Outstanding`, `Highly recommended`, `exceptional`); (3) No unit tests covered `generateDynamicReviewDraft()` (Gemini parser, `<think>` tag stripping, malformed JSON recovery, or failover telemetry).
+- **Root Cause**:
+  1. `systemPrompt` did not enforce a hard focal-item lock across all 3 drafts (`draft_1`, `draft_2`, `draft_3`) or strip `<think>...</think>` / fenced JSON before `JSON.parse()`.
+  2. `getCategoryAwareItemDrafts()` still fell back to `poolEntry.draft3` instead of sub-type-locked `draft3` arrays, and `STORE_REALITIES` / static pools retained unverified operational claims and clichés.
+  3. `ReviewDraftOptions` lacked `model_used` telemetry.
+- **Resolution**:
+  1. **Hard Focal-Item Lock + `<think>`/JSON Sanitizer (`src/lib/dynamic-review-engine.ts`)**: Enforced non-negotiable focal-item lock across all 3 drafts in `systemPrompt`, added `extractCleanJsonFromLlmResponse()` to strip `<think>...</think>` / `<reasoning>...</reasoning>` and markdown fences safely, and added `model_used?: string` telemetry.
+  2. **Sub-Type Isolated `draft3` + Full Claims/Clichés/Buzzword Purge (`src/lib/dynamic-review-engine.ts`)**: Replaced `poolEntry.draft3` in all sub-typed categories with sub-type-locked `draft3` strings, purged all unverified claims (`24/7`, `24-hour`, `X-ray`, `zero waiting`, `doorstep delivery`, `15+ frames`, `bina extra charge`, non-SaaS `WhatsApp`), `rush tha` clichés, and remaining source buzzwords.
+  3. **Mocked LLM + Zero-Leak + Trigram Tests (`tests/unit/all-categories-review-engine.test.ts`)**: Added Suites 14–18 testing mocked Tier-1 Gemini parser + NFKC scrubbing, `<think>` + fenced/malformed JSON recovery, failover telemetry chain, strict focal-item lock across all 3 drafts, and zero-leak output gate across all 10 categories × 5 seeds.
+  4. **Verification**: All 57/57 Vitest unit tests and all 7/7 Master Adversarial Red-Team Guard gates passed cleanly. (Note: Live VPS `GEMINI_API_KEY` remains empty/403 and requires manual key update before VPS deploy).
+- **Status**: ✅ Resolved and Verified locally (awaiting user GO + valid VPS `GEMINI_API_KEY` before push/deploy).

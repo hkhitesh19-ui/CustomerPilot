@@ -13,8 +13,24 @@
  *   (j) No "teeth fresh" after a consultation-only dental visit
  */
 
-import { describe, it, expect } from "vitest"
-import { getDynamicFallbackReview, ReviewDraftOptions } from "@/lib/dynamic-review-engine"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+import {
+  getDynamicFallbackReview,
+  generateDynamicReviewDraft,
+  extractCleanJsonFromLlmResponse,
+  ReviewDraftOptions
+} from "@/lib/dynamic-review-engine"
+
+const mockGeminiGenerate = vi.fn()
+vi.mock("@google/generative-ai", () => {
+  return {
+    GoogleGenerativeAI: class {
+      getGenerativeModel() {
+        return { generateContent: mockGeminiGenerate }
+      }
+    }
+  }
+})
 
 // ── Helper: Trigram similarity between two strings ─────────────────────────────
 function getTrigrams(s: string): Set<string> {
@@ -591,6 +607,257 @@ describe("13. engine_used Telemetry — Present on 100% of tier3 outputs", () =>
       const r = getDynamicFallbackReview(cat, undefined, i)
       expect(r.engine_used, `Missing engine_used for pool-only call, category="${cat}"`).toBeDefined()
       expect(r.engine_used).toBe("tier3_fallback")
+      expect(r.model_used).toBe("tier3_static")
     })
   })
 })
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SUITE 14: Tier-1 Gemini Parser & NFKC Scrubbing (Mocked LLM)
+// ═══════════════════════════════════════════════════════════════════════════════
+describe("14. generateDynamicReviewDraft — Tier-1 Gemini Parser & Scrubbing", () => {
+  const origEnv = { ...process.env }
+
+  beforeEach(() => {
+    process.env.GEMINI_API_KEY = "AIzaMockValidKey12345678901234567890123"
+    delete process.env.AI_API_KEY
+    mockGeminiGenerate.mockReset()
+  })
+
+  afterEach(() => {
+    process.env = { ...origEnv }
+    vi.restoreAllMocks()
+  })
+
+  it("parses Gemini HTTP 200 JSON, sets engine_used='gemini', model_used, and scrubs NFKC Unicode buzzwords", async () => {
+    mockGeminiGenerate.mockResolvedValueOnce({
+      response: {
+        text: () => JSON.stringify({
+          draft_1: "Blue-cut glasses liya aur screen glare kam ho gaya, spot\u2011on clarity!",
+          draft_2: "Staff ne frames patiently dikhaye, top\u2010notch service aur clean setup.",
+          draft_3: "Crystal clear computer glasses, game\u2212changer for coding!"
+        })
+      }
+    })
+
+    const res = await generateDynamicReviewDraft({
+      businessCategory: "optical_store",
+      businessType: "optical_store",
+      merchantName: "Alfa Opticals",
+      productName: "Blue-cut digital screen protection glasses"
+    })
+
+    expect(res.engine_used).toBe("gemini")
+    expect(res.model_used).toBe("gemini-2.5-flash")
+    expect(hasBannedBuzzword(res.draft1)).toBeNull()
+    expect(hasBannedBuzzword(res.draft2)).toBeNull()
+    expect(hasBannedBuzzword(res.draft3)).toBeNull()
+    expect(res.draft1.toLowerCase()).toContain("blue-cut")
+  })
+})
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SUITE 15: <think> Block Stripping & Malformed/Fenced JSON Recovery
+// ═══════════════════════════════════════════════════════════════════════════════
+describe("15. <think> Block Stripping & Malformed JSON Recovery", () => {
+  const origEnv = { ...process.env }
+
+  beforeEach(() => {
+    delete process.env.GEMINI_API_KEY
+    process.env.AI_API_KEY = "mock-groq-key"
+    process.env.AI_MODEL = "qwen/qwen3.8-27b"
+  })
+
+  afterEach(() => {
+    process.env = { ...origEnv }
+    vi.restoreAllMocks()
+  })
+
+  it("strips <think>...</think> blocks and markdown code fences without dropping to Tier-3", async () => {
+    const wrappedQwenOutput = `<think>Let me think about writing a natural Hinglish review for keratin hair spa...</think>\n\`\`\`json\n{\n  "draft_1": "Keratin hair spa karwaya, hair ekdum silky aur smooth ho gaye bina frizz ke.",\n  "draft_2": "Didi ne step-by-step aftercare tips samjhaye, parlour bilkul hygienic tha.",\n  "draft_3": "Smooth silky hair after keratin spa session!"\n}\n\`\`\``
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          choices: [{ message: { content: wrappedQwenOutput } }]
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      )
+    )
+
+    const res = await generateDynamicReviewDraft({
+      businessCategory: "beauty_parlour",
+      businessType: "beauty_parlour",
+      merchantName: "Glow & Glam",
+      productName: "Keratin hair spa treatment"
+    })
+
+    expect(res.engine_used).toBe("groq")
+    expect(res.model_used).toBe("qwen/qwen3.8-27b")
+    expect(res.draft1).not.toContain("<think>")
+    expect(res.draft1.toLowerCase()).toContain("keratin")
+  })
+
+  it("extractCleanJsonFromLlmResponse safely returns null on malformed/truncated JSON", () => {
+    expect(extractCleanJsonFromLlmResponse("<think>abc</think> {\"draft_1\": \"broken")).toBeNull()
+    expect(extractCleanJsonFromLlmResponse("plain prose without braces")).toBeNull()
+    expect(extractCleanJsonFromLlmResponse("")).toBeNull()
+  })
+})
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SUITE 16: Failover Telemetry Chain (Gemini -> Groq 429 -> Groq Backup -> Tier-3)
+// ═══════════════════════════════════════════════════════════════════════════════
+describe("16. Failover Telemetry Chain", () => {
+  const origEnv = { ...process.env }
+
+  beforeEach(() => {
+    process.env.GEMINI_API_KEY = "AIzaMockKeyThatFails403"
+    process.env.AI_API_KEY = "mock-groq-key"
+    process.env.AI_MODEL = "openai/gpt-oss-120b"
+    mockGeminiGenerate.mockReset()
+  })
+
+  afterEach(() => {
+    process.env = { ...origEnv }
+    vi.restoreAllMocks()
+  })
+
+  it("fails over Gemini error -> Groq primary 429 -> Groq backup 200 with exact model_used", async () => {
+    mockGeminiGenerate.mockRejectedValue(new Error("403 API_KEY_INVALID"))
+
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+    // Primary Groq 120b -> 429
+    fetchSpy.mockResolvedValueOnce(new Response("rate limit", { status: 429 }))
+    // Backup Groq 20b -> 200
+    fetchSpy.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({
+                  draft_1: "Fresh Fruit Gateau order kiya, fresh fruits aur soft sponge bohot tasty tha.",
+                  draft_2: "Counter par neat packing mili aur staff polite tha.",
+                  draft_3: "Fresh juicy fruit gateau, balanced sweetness!"
+                })
+              }
+            }
+          ]
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      )
+    )
+
+    const res = await generateDynamicReviewDraft({
+      businessCategory: "bakery",
+      businessType: "bakery",
+      merchantName: "Cake Connection",
+      productName: "Fresh Fruit Gateau"
+    })
+
+    expect(res.engine_used).toBe("groq")
+    expect(res.model_used).toBe("openai/gpt-oss-20b")
+    expect(fetchSpy).toHaveBeenCalledTimes(2)
+  })
+
+  it("falls back cleanly to Tier-3 with model_used='tier3_static' when all LLMs fail", async () => {
+    mockGeminiGenerate.mockRejectedValue(new Error("403 API_KEY_INVALID"))
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("rate limit", { status: 429 }))
+
+    const res = await generateDynamicReviewDraft({
+      businessCategory: "pet_clinic",
+      businessType: "pet_clinic",
+      merchantName: "Maw & Paw Vet",
+      productName: "Cat skin allergy treatment"
+    })
+
+    expect(res.engine_used).toBe("tier3_fallback")
+    expect(res.model_used).toBe("tier3_static")
+    const combined = `${res.draft1} ${res.draft2} ${res.draft3}`.toLowerCase()
+    expect(combined).not.toMatch(/\b(dog|puppy|kutta|kutte|vaccination|deworming|emergency)\b/i)
+  })
+})
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SUITE 17: Strict Focal-Item Lock & Anti-Contamination Across All 3 Drafts
+// ═══════════════════════════════════════════════════════════════════════════════
+describe("17. Strict Focal-Item Lock Across All 3 Drafts (draft1, draft2, draft3)", () => {
+  it("Cat skin allergy NEVER mentions dog/puppy/kutta/kutte/vaccination/deworming/emergency in any draft", () => {
+    for (let s = 0; s < 5; s++) {
+      const r = getDynamicFallbackReview("pet_clinic", "Cat skin allergy treatment", s)
+      const all = `${r.draft1} ${r.draft2} ${r.draft3}`.toLowerCase()
+      expect(all).not.toMatch(/\b(dog|puppy|kutta|kutte|vaccination|deworming|emergency)\b/i)
+    }
+  })
+
+  it("Men's Charcoal facial NEVER mentions haircut/fade/scissors/razor/head massage in any draft", () => {
+    for (let s = 0; s < 5; s++) {
+      const r = getDynamicFallbackReview("salon_men", "Charcoal de-tan facial cleanup", s)
+      const all = `${r.draft1} ${r.draft2} ${r.draft3}`.toLowerCase()
+      expect(all).not.toMatch(/\b(haircut|fade|scissors|razor|head massage)\b/i)
+    }
+  })
+
+  it("Beauty Keratin hair spa NEVER mentions threading/waxing/skin glow in any draft", () => {
+    for (let s = 0; s < 5; s++) {
+      const r = getDynamicFallbackReview("beauty_parlour", "Keratin hair spa treatment", s)
+      const all = `${r.draft1} ${r.draft2} ${r.draft3}`.toLowerCase()
+      expect(all).not.toMatch(/\b(threading|waxing|skin glow)\b/i)
+    }
+  })
+
+  it("Bakery Fresh Fruit Gateau NEVER mentions chocolate/doorstep delivery/bina extra in any draft", () => {
+    for (let s = 0; s < 5; s++) {
+      const r = getDynamicFallbackReview("bakery", "Fresh Fruit Gateau", s)
+      const all = `${r.draft1} ${r.draft2} ${r.draft3}`.toLowerCase()
+      expect(all).not.toMatch(/\b(chocolate|doorstep delivery|bina extra)\b/i)
+    }
+  })
+})
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SUITE 18: Zero-Leak Output Gate & Pairwise Trigram Overlap Across All Categories
+// ═══════════════════════════════════════════════════════════════════════════════
+describe("18. Zero-Leak Output Gate Across All Categories & Seeds", () => {
+  const FAKE_CLAIMS_RE = /24\/7|24-hour|X-ray|zero waiting|doorstep delivery|15\+ frames|bina extra|extra charge/i
+  const CLICHES_RE = /rush tha|thoda rush|thodi bheed|\bSuno,/i
+
+  it("asserts 0 fake claims, 0 clichés, 0 WhatsApp leaks (non-SaaS), and 0 buzzwords across all categories × items × seeds", () => {
+    Object.entries(CATEGORY_ITEMS).forEach(([category, items]) => {
+      items.forEach((item) => {
+        for (let seed = 0; seed < 5; seed++) {
+          const r = getDynamicFallbackReview(category, item, seed)
+          checkDraft(r)
+          const combined = normalizeUnicode(
+            `${r.draft1} ${r.draft2} ${r.draft3}`
+          )
+          expect(combined, `Fake claim leak in ${category}/${item}`).not.toMatch(FAKE_CLAIMS_RE)
+          expect(combined, `Cliché leak in ${category}/${item}`).not.toMatch(CLICHES_RE)
+          if (category !== "saas_agency") {
+            expect(combined, `WhatsApp leak in non-SaaS ${category}/${item}`).not.toMatch(/whatsapp/i)
+          }
+        }
+      })
+    })
+  })
+
+  it("verifies distinct drafts across 5 items in same category have trigram overlap < 0.30 where pooled", () => {
+    const catsToCheck = ["saree_palace", "restaurant"] as const
+    for (const cat of catsToCheck) {
+      const results = CATEGORY_ITEMS[cat].map((item, i) =>
+        getDynamicFallbackReview(cat, item, i)
+      )
+      for (let i = 0; i < results.length; i++) {
+        for (let j = i + 1; j < results.length; j++) {
+          const sim = trigramSimilarity(results[i].draft1, results[j].draft1)
+          expect(sim, `${cat} draft1[${i}] vs [${j}] trigram=${sim.toFixed(2)}`).toBeLessThan(0.30)
+        }
+      }
+    }
+  })
+})
+
+function normalizeUnicode(s: string): string {
+  return s.normalize("NFKC").replace(/[\u2010-\u2015\u2212\u2E3A\u2E3B\uFE58\uFE63\uFF0D]/g, "-")
+}
