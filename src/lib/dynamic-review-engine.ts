@@ -9,6 +9,27 @@ export interface ReviewDraftOptions {
   draft1: string // Quality & Core Experience (with allowed SEO keywords)
   draft2: string // Service & Vibes (conversational Hinglish with mild crowd marker)
   draft3: string // Short 1-Liner (punchy, high conversion)
+  engine_used: "gemini" | "groq" | "tier3_fallback" // Telemetry: which engine generated this
+}
+
+/**
+ * Universal NFKC + Unicode hyphen normalizer & banned buzzword scrubber.
+ * Enforced across ALL 3 tiers (Gemini, Groq, and Tier-3 fallback).
+ */
+export function normalizeUnicodeHyphens(s: string): string {
+  return s.normalize("NFKC").replace(/[\u2010-\u2015\u2212\u2E3A\u2E3B\uFE58\uFE63\uFF0D]/g, "-")
+}
+
+export const BANNED_BUZZWORD_REGEX = /\b(spot[- ]?on|top[- ]?notch|hidden gem|highly recommend(?:ed)?|pristine|testament|delve|exceptional|outstanding|game[- ]?changer|store special)\b/gi
+
+export function scrubBannedBuzzwords(s: string): string {
+  return normalizeUnicodeHyphens(s)
+    .replace(BANNED_BUZZWORD_REGEX, "")
+    .replace(/["\\]/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/\s+([.,!])/g, "$1")
+    .replace(/^[.,!\s]+/, "")
+    .trim()
 }
 
 interface FallbackReviewItem {
@@ -32,7 +53,7 @@ const BAKERY_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Red velvet pastry and walnut brownie combo was unbelievable. Sponge super soft tha aur cream bilkul light thi.",
     draft2: "Shop pe thoda rush tha evening me, par counter boy was very polite. Safe sealed packaging mili.",
-    draft3: "Delicious fresh pastries at very genuine rates. Highly recommended!"
+    draft3: "Delicious fresh pastries at very genuine rates. Worth every visit!"
   },
   {
     draft1: "Belgian dark chocolate cake ordered for our anniversary. Presentation photo se bhi zyada premium aayi.",
@@ -52,7 +73,7 @@ const BAKERY_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Ordered customized fondant birthday cake. Design exactly jaisa reference picture bheja tha waisa hi banaya.",
     draft2: "Evening peak hours me thoda waiting tha par delivery boy delivered it safely without any tilt or melt.",
-    draft3: "Spot-on custom cake design and heavenly taste. Made our celebration special!"
+    draft3: "Exact custom cake design and heavenly taste. Made our celebration special!"
   },
   {
     draft1: "Cupcake hamper and dry fruit cookies super fresh the. Packaging premium aur gifting ke liye ideal thi.",
@@ -75,7 +96,7 @@ const CAFE_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Peri peri french fries were super crispy and the chocolate frappe was thick and rich.",
     draft2: "Counter pe staff polite tha aur Wi-Fi speed was genuinely fast for attending an urgent call.",
-    draft3: "Crispy snacks, top notch cold beverages and cozy interior aesthetic."
+    draft3: "Crispy snacks, refreshing cold beverages and cozy interior aesthetic."
   },
   {
     draft1: "Sourdough pizza and peach iced tea taste me bohot authentic the. Not oily, light on the stomach.",
@@ -126,7 +147,7 @@ const SALON_MEN_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Low fade haircut aur beard contour sharp diya. Finishing touch ekdum clean aur symmetric thi.",
     draft2: "Evening peak time me thoda waiting tha, par staff courteous tha aur wait comfortable AC lounge me tha.",
-    draft3: "Top-notch men's grooming and hygienic haircut tools. Highly recommended!"
+    draft3: "Clean men's grooming and hygienic haircut tools. Worth visiting again!"
   }
 ]
 
@@ -220,7 +241,7 @@ const DENTAL_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Got composite tooth filling and dental checkup done. Doctor explained the X-ray findings patiently and clearly.",
     draft2: "Hygienic clinic with sealed disposable instruments. Staff was courteous and the procedure was completely comfortable.",
-    draft3: "Gentle dental care, advanced high-tech clinic and zero waiting time. Highly recommended!"
+    draft3: "Gentle dental care, advanced high-tech clinic and zero waiting time. Truly dependable!"
   }
 ]
 
@@ -233,7 +254,7 @@ const PET_CLINIC_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Meri billi ka skin allergy diagnosis accurately kiya aur effective treatment di. 3 din mein visible relief dikhi, cat bilkul comfortable ho gayi.",
     draft2: "Clinic sanitized hai aur staff polite hai. Emergency support bahut prompt tha, doctor ne immediately attend kiya.",
-    draft3: "Compassionate vet care, stress-free for pets and transparent charges. Highly recommended!"
+    draft3: "Compassionate vet care, stress-free for pets and transparent charges. Truly caring clinic!"
   },
   {
     draft1: "Mera German Shepherd ka tick fever diagnose karke IV drip aur medicines di. Doctor ne poora treatment patiently explain kiya.",
@@ -302,7 +323,7 @@ const NON_VEG_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Tandoori Chicken super smoky aur well-marinated tha. Mutton Rogan Josh gravy rich thi bina excess oil ke.",
     draft2: "Saturday night family dinner ke liye rush tha, par manager arranged comfortable table quickly. Fast parcel counter service.",
-    draft3: "Top-notch non-veg food quality, generous portions and courteous service. Highly recommended!"
+    draft3: "Authentic non-veg food quality, generous portions and courteous service. Must visit!"
   }
 ]
 
@@ -315,17 +336,17 @@ const SAAS_AGENCY_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Smart AI Google review engine works like magic. Billing counter pe customers QR scan karte hi 10 second me review post kar dete hain.",
     draft2: "1-Click AI owner review auto-reply feature ne hamara daily time bacha diya. Great software for busy store owners.",
-    draft3: "Professional SaaS platform, polite team and game-changer WhatsApp loyalty system for Indian retailers."
+    draft3: "Professional SaaS platform, polite team and reliable WhatsApp loyalty system for Indian retailers."
   },
   {
     draft1: "Replaced our old paper stamp cards with CustomerPilot WhatsApp loyalty wallet. Customers love seeing their stamps on mobile.",
-    draft2: "Onboarding was done in 5 minutes with zero technical hassle. Team in Vadodara provided exceptional guidance.",
+    draft2: "Onboarding was done in 5 minutes with zero technical hassle. Team in Vadodara provided genuine guidance.",
     draft3: "100% value for money software. Helps genuine local businesses reach Google Maps Top 3 pack."
   },
   {
     draft1: "Customer retention aur Google review automation ke liye CustomerPilot se better koi tool nahi hai. Transparent pricing and great support.",
     draft2: "Automated WhatsApp winback messages se puraane customers wapas aane lage. Store sales me noticeable jump aaya.",
-    draft3: "Highly recommended software company for retail merchants looking to grow repeat business."
+    draft3: "Dependable software company for retail merchants looking to grow repeat business."
   }
 ]
 
@@ -353,7 +374,7 @@ const OPTICAL_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Rimless titanium frame with high-index ultra-thin lenses karwaya. Face par weight bilkul feel nahi hota aur professional executive look aata hai.",
     draft2: "Pehle purane glasses se nose bridge par marks aate the, yahan soft silicon nose pad fitting ke baad zero discomfort hai.",
-    draft3: "Featherweight rimless titanium frame fitting and precision lens marking. Outstanding craftsmanship!"
+    draft3: "Featherweight rimless titanium frame fitting and precision lens marking. Superb craftsmanship!"
   },
   {
     draft1: "Spectacle frame ka loose screw aur nose pads emergency me replace karwaye. Counter staff ne 5 minute me frame perfectly align kar diya.",
@@ -368,7 +389,7 @@ const OPTICAL_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Night drive yellow tint anti-glare glasses banwaye. Opposite vehicles ki high-beam headlight glare se driving me bohot sukoon mila.",
     draft2: "Staff ne UV light demo tester pe anti-glare coating live check karke dikhayi. Very knowledgeable and honest guidance.",
-    draft3: "Safe night driving spectacles with genuine anti-glare coating. Highly recommended for motorists!"
+    draft3: "Safe night driving spectacles with genuine anti-glare coating. Great for regular motorists!"
   },
   {
     draft1: "Dadi ke liye reading aur walking ke liye bifocal lenses banwaye. Distance aur reading lines clearly separated hain, first day se adjust ho gaya.",
@@ -640,28 +661,39 @@ export function getDynamicFallbackReview(
 
   const selected = pool[index] || pool[0]
 
-  if (hasItem) {
-    return getCategoryAwareItemDrafts(c, item, selected)
-  }
+  const rawResult: ReviewDraftOptions = hasItem
+    ? getCategoryAwareItemDrafts(c, item, selected, typeof seed === "number" ? Math.abs(seed) : index)
+    : {
+        draft1: selected.draft1,
+        draft2: selected.draft2,
+        draft3: selected.draft3,
+        engine_used: "tier3_fallback"
+      }
 
   return {
-    draft1: selected.draft1,
-    draft2: selected.draft2,
-    draft3: selected.draft3
+    draft1: scrubBannedBuzzwords(rawResult.draft1),
+    draft2: scrubBannedBuzzwords(rawResult.draft2),
+    draft3: scrubBannedBuzzwords(rawResult.draft3),
+    engine_used: rawResult.engine_used
   }
 }
 
 /**
  * Generates category-specific draft1 and draft2 when a focal item (service/product) is provided.
+ * Sub-typed routing prevents ALL semantic blunders (puppy for cat, scissors for facial, etc.)
  * draft3 is always taken from the category pool entry for consistency.
- * This prevents generic human-medical language leaking into Pet Clinic, Dental, etc.
+ * engine_used is always "tier3_fallback" since this is offline template generation.
  */
 function getCategoryAwareItemDrafts(
   category: string,
   item: string,
-  poolEntry: FallbackReviewItem
+  poolEntry: FallbackReviewItem,
+  seedIndex?: number
 ): ReviewDraftOptions {
   const c = category.toLowerCase()
+  const itemLower = item.toLowerCase()
+  const pickTemplate = <T>(arr: T[]): T =>
+    arr[(typeof seedIndex === "number" ? seedIndex : Math.floor(Math.random() * arr.length)) % arr.length]
 
   // ── SAREE & SILK PALACE / ETHNIC WEAR ─────────────────────────────────────────
   if (
@@ -672,23 +704,32 @@ function getCategoryAwareItemDrafts(
   ) {
     const templates = [
       {
-        draft1: `Wedding function ke liye ${item} liya tha. Fabric quality aur rich zari border bahut hi authentic hai. Sabne look ki bohot tareef ki!`,
+        draft1: `Wedding function ke liye ${item} li thi. Rich zari border aur pure fabric dekh kar sabne look ki bohot tareef ki!`,
         draft2: `${item} ka collection bohot unique tha. Staff ne patience se styling dikhayi aur fall-pico finishing bhi time pe karke di.`
       },
       {
-        draft1: `Family shopping ke liye gaye the aur ${item} pasand aaya. Pure fabric aur genuine quality dekh kar maza aa gaya.`,
-        draft2: `${item} ki fitting aur drape perfect baitha. Vadodara me royal traditional wear ke liye best showroom hai.`
+        draft1: `Family shopping ke liye gaye the aur ${item} pasand aayi. Genuine weave aur soft drape dekh kar maza aa gaya.`,
+        draft2: `${item} ki fitting aur drape perfect baithi. Vadodara me royal traditional wear ke liye best showroom hai.`
       },
       {
-        draft1: `Showroom me ${item} ki multiple exclusive designs dikhayi. Rates genuine hain aur staff ka behavior bohot polite tha.`,
-        draft2: `${item} ke sath blouse matching aur contrast suggestions bohot ache diye. Wedding trousseau shopping ke liye definitely recommend karti hoon.`
+        draft1: `Showroom me ${item} ki multiple exclusive designs dikhayin. Rates genuine hain aur staff ka behavior bohot polite tha.`,
+        draft2: `${item} ke sath blouse matching aur contrast suggestions bohot ache diye. Wedding trousseau shopping ke liye zaroor visit karein.`
+      },
+      {
+        draft1: `Festive occasion ke liye ${item} select ki — color combination aur handloom detailing bilkul royal lag rahi thi.`,
+        draft2: `Bina kisi hurry ke sales team ne 20+ patterns khol kar dikhaye. Comfortable AC showroom aur genuine silk trust.`
+      },
+      {
+        draft1: `Meri sister ki shaadi ke liye ${item} purchase ki. Lightweight feel aur authentic craft dono lajawab nikle!`,
+        draft2: `Alteration aur blouse stitching guidance time pe mil gayi. Pure family ko yahan ka collection pasand aaya.`
       }
     ]
-    const chosen = templates[Math.floor(Math.random() * templates.length)]
+    const chosen = pickTemplate(templates)
     return {
       draft1: chosen.draft1,
       draft2: chosen.draft2,
-      draft3: poolEntry.draft3 || `Outstanding quality ${item} and wonderful shopping experience at this showroom!`
+      draft3: poolEntry.draft3 || `Genuine quality ${item} and wonderful shopping experience at this showroom!`,
+      engine_used: "tier3_fallback"
     }
   }
 
@@ -698,10 +739,9 @@ function getCategoryAwareItemDrafts(
     c.includes("spectacle") || c.includes("lens") || c.includes("chashma") ||
     c.includes("optical_store")
   ) {
-    const itemLower = item.toLowerCase()
     let templates: { draft1: string; draft2: string; draft3?: string }[] = []
 
-    // 1. Eye testing & Clinical Checkup (Must evaluate before computer specs)
+    // 1. Eye testing & Clinical Checkup
     if (itemLower.includes("eye test") || itemLower.includes("power") || itemLower.includes("optometrist") || itemLower.includes("refract") || itemLower.includes("checkup")) {
       templates = [
         {
@@ -761,7 +801,7 @@ function getCategoryAwareItemDrafts(
         {
           draft1: `Picked up branded ${item} with UV protection. Eyes relaxed rehti hain outdoor daylight me aur finish premium hai.`,
           draft2: `Counter staff ne snug face fitting karke di aur sturdy protective hard case diya. Great buying experience.`,
-          draft3: `Top-notch quality ${item} and very polite customer handling!`
+          draft3: `Premium quality ${item} and very polite customer handling!`
         }
       ]
     } else if (itemLower.includes("repair") || itemLower.includes("screw") || itemLower.includes("nose pad") || itemLower.includes("clean")) {
@@ -814,11 +854,12 @@ function getCategoryAwareItemDrafts(
       ]
     }
 
-    const chosen = templates[Math.floor(Math.random() * templates.length)]
+    const chosen = pickTemplate(templates)
     return {
       draft1: chosen.draft1,
       draft2: chosen.draft2,
-      draft3: chosen.draft3 || poolEntry.draft3 || `Outstanding quality ${item} and professional optical consultation at this store!`
+      draft3: chosen.draft3 || poolEntry.draft3 || `Genuine quality ${item} and professional optical consultation at this store!`,
+      engine_used: "tier3_fallback"
     }
   }
 
@@ -830,22 +871,127 @@ function getCategoryAwareItemDrafts(
     (/\b(pet|pets|puppy|puppies|kitten|kittens|dog|dogs|cat|cats)\b/i.test(c) && !c.includes("pethapur") && !c.includes("carpet") && !c.includes("petlad"))
   )
   if (isPetCategory) {
-    const templates = [
-      {
-        draft1: `Mera dog ka ${item} karwaya. Vet doctor ne bahut gently handle kiya, pet poori visit mein calm aur comfortable raha.`,
-        draft2: `${item} ke liye visit ki — doctor ne clearly samjhaya kya karein aur kya nahi. Clinic clean aur hygienic hai.`
-      },
-      {
-        draft1: `Meri billi ka ${item} kiya gaya. Procedure smooth raha aur doctor ne post-care instructions clearly di.`,
-        draft2: `${item} ke baad pet ki condition mein quick improvement aayi. Vet team caring aur professional hai.`
-      },
-      {
-        draft1: `Puppy ka ${item} karwaya — vet ne gently handle kiya, bilkul dard nahi hua pet ko. Genuine medicines use ki.`,
-        draft2: `${item} ke liye appointment timely mila. Staff polite tha aur examination table properly sanitized thi.`
-      }
-    ]
+    // Sub-typed: detect animal type and service type from ITEM, not generic ${item} blind paste
+    const isDogItem = itemLower.includes("dog") || itemLower.includes("puppy") || itemLower.includes("labrador") || itemLower.includes("retriever") || itemLower.includes("pup")
+    const isCatItem = itemLower.includes("cat") || itemLower.includes("kitten") || itemLower.includes("billi") || itemLower.includes("persian") || itemLower.includes("feline")
+    const isVaccination = itemLower.includes("vaccin") || itemLower.includes("deworming") || itemLower.includes("7-in-1") || itemLower.includes("core vaccine")
+    const isSurgery = itemLower.includes("surgery") || itemLower.includes("spay") || itemLower.includes("neuter") || itemLower.includes("operation")
+    const isEmergency = itemLower.includes("emergency") || itemLower.includes("parvovirus") || itemLower.includes("tick fever") || itemLower.includes("iv drip") || itemLower.includes("critical")
+    const isSkinAllergy = itemLower.includes("skin allergy") || itemLower.includes("allergy") || itemLower.includes("rash") || itemLower.includes("infection")
+    const isCheckup = itemLower.includes("checkup") || itemLower.includes("health check") || itemLower.includes("wellness") || itemLower.includes("routine")
+    const isEarInfection = itemLower.includes("ear") && itemLower.includes("infection")
+    const isSeniorCare = itemLower.includes("senior") || itemLower.includes("geriatric") || itemLower.includes("arthritis") || itemLower.includes("old dog") || itemLower.includes("old cat")
+
+    // Animal pronoun/descriptor for the item
+    const animalSubject = isCatItem ? "billi" : isDogItem ? "dog" : "pet"
+    const animalPronoun = isCatItem ? "meri billi ka" : isDogItem ? "mera dog ka" : "mera pet ka"
+
+    let templates: { draft1: string; draft2: string }[]
+
+    if (isVaccination && isCatItem) {
+      templates = [
+        {
+          draft1: `Meri billi ka core vaccination aur deworming kiya — vet ne gently handle kiya, bilkul dard nahi hua. Vaccination card di aur next schedule bataya.`,
+          draft2: `Waiting room comfortable aur clean tha. Doctor ne kitten ko dheere handle kiya, billi bilkul nervous nahi hui.`
+        },
+        {
+          draft1: `Kitten ka pehla vaccination yahan karwaya. Doctor ne carefully inject kiya aur post-vaccination feeding tips clearly samjhaye.`,
+          draft2: `Clinic sanitized aur hygienic hai. Staff polite tha aur vet ne care instructions ka written summary diya.`
+        }
+      ]
+    } else if (isVaccination) {
+      // Dog or general vaccination
+      templates = [
+        {
+          draft1: `${animalPronoun} 7-in-1 vaccination aur deworming karwaya — vet ne gently handle kiya, pet poori visit mein calm aur comfortable raha.`,
+          draft2: `Doctor ne post-vaccination feeding aur care ke baare mein clearly samjhaya. Clean hygienic clinic aur caring veterinary team.`
+        },
+        {
+          draft1: `${animalPronoun} vaccination schedule complete kiya yahan. Vet professional aur gentle tha, pet ko bilkul stress nahi hua.`,
+          draft2: `Clinic ka atmosphere friendly aur calm tha. Appointment timely mila aur examination table properly sanitized thi.`
+        }
+      ]
+    } else if (isSkinAllergy && isCatItem) {
+      templates = [
+        {
+          draft1: `Meri billi ka skin allergy diagnosis accurately kiya aur effective treatment di. 3 din mein visible relief dikhi, cat bilkul comfortable ho gayi.`,
+          draft2: `Clinic sanitized hai aur staff polite hai. Emergency support bahut prompt tha, doctor ne immediately attend kiya.`
+        },
+        {
+          draft1: `Persian cat ki skin allergy ka treatment kiya — vet ne proper diagnosis ke baad targeted medicine di. Cat ka itching aur rash 4 din mein completely theek ho gaya.`,
+          draft2: `Doctor ne allergy trigger identify karke diet change bhi suggest ki. Very thorough consultation, koi rush nahi kiya.`
+        }
+      ]
+    } else if (isSkinAllergy) {
+      templates = [
+        {
+          draft1: `${animalPronoun} skin allergy ka treatment kiya — vet ne proper diagnosis ke baad effective medicine di. 3-4 din mein visible improvement dikhi.`,
+          draft2: `Clinic sanitized aur hygienic hai. Doctor ne allergy trigger identify karke dietary advice bhi di. Very caring team.`
+        }
+      ]
+    } else if (isSurgery) {
+      templates = [
+        {
+          draft1: `${animalPronoun} surgery yahan successfully karwai. Anesthesia safe tha aur post-surgery recovery guide clear di doctor ne.`,
+          draft2: `Dedicated pet recovery area hai clinic mein. Staff ne surgery ke baad bhi follow-up call ki — genuinely caring service.`
+        },
+        {
+          draft1: `Pet surgery ke liye best clinic in area. Vet team experienced hai aur har step detail mein explain kiya.`,
+          draft2: `Pre-surgery tests aur post-op care dono thorough the. Mera pet smooth recovery pe hai, bohot grateful hoon.`
+        }
+      ]
+    } else if (isEmergency) {
+      templates = [
+        {
+          draft1: `${animalPronoun} critical case mein doctor ne quickly diagnose kiya, fluids shuru kiye aur recovery track pe hai. Life-saving care!`,
+          draft2: `Night mein bhi clinic available tha. Doctor ne phone pe guide kiya aur immediately admit kiya — bahut grateful hoon.`
+        },
+        {
+          draft1: `Emergency mein bhi doctor ne promptly attend kiya aur treatment shuru kiya. Mera pet ab bahut better hai.`,
+          draft2: `Round-the-clock availability is rare aur yahan real hai. Staff caring aur vet highly experienced hai emergency cases mein.`
+        }
+      ]
+    } else if (isCheckup) {
+      templates = [
+        {
+          draft1: `${animalPronoun} routine health checkup kiya — vet ne thorough physical exam, weight check aur diet assessment kiya. Sab normal nikla!`,
+          draft2: `Clinic clean aur organized hai. Doctor ne checkup ke baad preventive care tips clearly samjhaye bina kisi extra charge ke.`
+        },
+        {
+          draft1: `Annual wellness checkup ke liye ${animalSubject} ko lekar gaya. Vet ne patiently sab examine kiya aur vaccination schedule updated kiya.`,
+          draft2: `Waiting time minimal tha. Examination table sanitized aur vet team very professional aur gentle tha.`
+        }
+      ]
+    } else if (isEarInfection) {
+      templates = [
+        {
+          draft1: `${animalPronoun} ear infection properly clean karke drops prescribe ki. Doctor ne ghar pe care kaise karein clearly demonstrate kiya.`,
+          draft2: `Clinic mein examination table sanitized thi aur vet gloves wear karke handle kiya. Hygienic aur professional setup.`
+        }
+      ]
+    } else if (isSeniorCare) {
+      templates = [
+        {
+          draft1: `${animalPronoun} arthritis ke liye joint supplement aur physiotherapy advice mili. Doctor ne age-appropriate diet chart bhi diya.`,
+          draft2: `Doctor ne senior ${animalSubject} ke sath extra patience rakkhi. Unhurried consultation, sab kuch samjhaya bina rush kiye.`
+        }
+      ]
+    } else {
+      // Generic pet service
+      templates = [
+        {
+          draft1: `${animalPronoun} treatment yahan karwaya. Vet doctor ne bahut gently handle kiya, ${animalSubject} poori visit mein calm aur comfortable raha.`,
+          draft2: `Clinic clean aur hygienic hai. Doctor ne clearly samjhaya kya karein aur kya nahi — thorough and caring vet.`
+        },
+        {
+          draft1: `${animalPronoun} care ke liye visited — procedure smooth raha aur doctor ne post-care instructions clearly di.`,
+          draft2: `Appointment timely mila. Staff polite tha aur examination table properly sanitized thi. Genuinely caring clinic.`
+        }
+      ]
+    }
+
     const t = templates[Math.floor(Math.random() * templates.length)]
-    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3, engine_used: "tier3_fallback" }
   }
 
   // ── DENTAL CLINIC ────────────────────────────────────────────────────────────
@@ -853,18 +999,99 @@ function getCategoryAwareItemDrafts(
     c.includes("dental") || c.includes("dentist") || c.includes("tooth") ||
     c.includes("teeth") || c.includes("orthodont")
   ) {
-    const templates = [
-      {
-        draft1: `${item} karwaya — completely painless procedure tha. Doctor ne X-ray dikhakar sab clearly explain kiya.`,
-        draft2: `${item} ke liye visit kiya. Clinic sterilized instruments use karti hai aur zero waiting time tha.`
-      },
-      {
-        draft1: `${item} done here — doctor bahut gentle the aur chair pe bilkul comfortable feel hua throughout.`,
-        draft2: `${item} ke baad teeth ekdum fresh aur clean feel ho rahe hain. Transparent pricing, no hidden charges.`
-      }
-    ]
+    // Sub-typed: consultation vs actual procedure
+    const isConsultation = itemLower.includes("consult") || itemLower.includes("opinion") || itemLower.includes("advice") || itemLower.includes("wisdom tooth consult") || itemLower.includes("second opinion")
+    const isScaling = itemLower.includes("scaling") || itemLower.includes("polishing") || itemLower.includes("cleaning")
+    const isRCT = itemLower.includes("root canal") || itemLower.includes("rct") || itemLower.includes("endodontic")
+    const isExtraction = itemLower.includes("extraction") || itemLower.includes("wisdom tooth removal") || itemLower.includes("tooth pull")
+    const isFilling = itemLower.includes("filling") || itemLower.includes("composite") || itemLower.includes("cavity")
+    const isWhitening = itemLower.includes("whiten") || itemLower.includes("bleach") || itemLower.includes("bright smile")
+    const isAligner = itemLower.includes("aligner") || itemLower.includes("braces") || itemLower.includes("orthodontic") || itemLower.includes("invisalign")
+
+    let templates: { draft1: string; draft2: string }[]
+
+    if (isConsultation) {
+      // NEVER say "teeth fresh after consultation" — no procedure done
+      templates = [
+        {
+          draft1: `${item} ke liye doctor ke paas gaya — comprehensive evaluation kiya, X-ray explain kiya aur clear treatment roadmap diya.`,
+          draft2: `Doctor ne sab options clearly samjhaye bina pressure ke. Clinic environment clean aur professional tha.`
+        },
+        {
+          draft1: `Wisdom tooth ke baare mein expert opinion liya — doctor ne X-ray pe clearly dikhaaya aur realistic options explain kiye.`,
+          draft2: `Consultation ke time koi rush nahi tha. Doctor patient the aur sab questions ke detailed answers diye.`
+        }
+      ]
+    } else if (isScaling) {
+      templates = [
+        {
+          draft1: `Teeth scaling aur polishing karwai — plaque completely clean ho gaya aur teeth ekdum fresh aur smooth feel ho rahe hain after treatment!`,
+          draft2: `Scaling ke baad zero sensitivity hui. Clinic spotlessly clean hai aur sealed instruments use kiye — hygienic setup.`
+        },
+        {
+          draft1: `Professional scaling aur polishing done here. Stubborn tartar completely removed, teeth visibly brighter aur gums healthier feel ho rahe hain.`,
+          draft2: `Appointment on time start hua. Dentist gentle the aur step-by-step sab explain kiya during the procedure.`
+        }
+      ]
+    } else if (isRCT) {
+      templates = [
+        {
+          draft1: `Painless single-sitting root canal karwaya. Doctor bohot gentle the aur sterilization standards top class the.`,
+          draft2: `RCT procedure mein bilkul dard nahi hua. Clinic ke sanitized environment ne confidence diya, sealed instruments use hue.`
+        },
+        {
+          draft1: `Root canal completely painless tha — doctor skilled hain aur anesthesia perfectly effective tha throughout the procedure.`,
+          draft2: `Post-RCT care instructions clearly di. Clinic clean aur well-equipped hai, follow-up appointment bhi timely schedule kiya.`
+        }
+      ]
+    } else if (isExtraction) {
+      templates = [
+        {
+          draft1: `Wisdom tooth extraction bilkul painless tha. Doctor experienced hain aur extraction smooth raha without any post-surgical complications.`,
+          draft2: `Post-extraction aftercare instructions clearly di — kya khana hai, kya nahi. Clinic hygienic aur staff very supportive tha.`
+        }
+      ]
+    } else if (isFilling) {
+      templates = [
+        {
+          draft1: `Composite tooth filling karwaya — doctor ne cavity properly clean kiya aur filling natural tooth color se match kiya. Bilkul painless procedure tha.`,
+          draft2: `Clinic neat aur sterilized instruments use kiye. Doctor ne filling ke baad bite adjustment carefully check kiya.`
+        },
+        {
+          draft1: `Got composite filling done here. Procedure quick aur comfortable tha, aur natural tooth color se ekdum match kar raha hai.`,
+          draft2: `Transparent pricing mili — koi hidden charges nahi. Doctor ne X-ray explain kiya aur filling material ke options bataye.`
+        }
+      ]
+    } else if (isWhitening) {
+      templates = [
+        {
+          draft1: `Professional teeth whitening done here — shade visibly lighter ho gaya! Doctor ne gums protect karke safe bleaching kiya.`,
+          draft2: `Procedure comfortable tha aur sensitivity minimal rahi. Doctor ne post-whitening diet tips clearly explain kiye.`
+        }
+      ]
+    } else if (isAligner) {
+      templates = [
+        {
+          draft1: `Aligner/braces treatment yahan start kiya. Doctor ne digital scan se precise plan banaya aur clear milestones explain kiye.`,
+          draft2: `Follow-up appointments punctual hain. Doctor attentive hain aur har visit mein progress clearly review kiya.`
+        }
+      ]
+    } else {
+      // Generic dental procedure
+      templates = [
+        {
+          draft1: `${item} karwaya — completely painless procedure tha. Doctor ne sab clearly explain kiya aur clinic sterilized instruments use karti hai.`,
+          draft2: `${item} ke liye visit kiya. Zero waiting time tha, clinic hygienic aur doctor very professional aur gentle the.`
+        },
+        {
+          draft1: `${item} done here — doctor bahut gentle the aur chair pe bilkul comfortable feel hua throughout the procedure.`,
+          draft2: `Transparent pricing, no hidden charges. Doctor ne treatment clearly explain kiya aur follow-up schedule diya.`
+        }
+      ]
+    }
+
     const t = templates[Math.floor(Math.random() * templates.length)]
-    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3, engine_used: "tier3_fallback" }
   }
 
   // ── PIZZA RESTAURANT ─────────────────────────────────────────────────────────
@@ -880,7 +1107,7 @@ function getCategoryAwareItemDrafts(
       }
     ]
     const t = templates[Math.floor(Math.random() * templates.length)]
-    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3, engine_used: "tier3_fallback" }
   }
 
   // ── FAST FOOD / STREET SNACKS ─────────────────────────────────────────────────
@@ -900,7 +1127,7 @@ function getCategoryAwareItemDrafts(
       }
     ]
     const t = templates[Math.floor(Math.random() * templates.length)]
-    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3, engine_used: "tier3_fallback" }
   }
 
   // ── NON-VEG RESTAURANT ────────────────────────────────────────────────────────
@@ -919,7 +1146,7 @@ function getCategoryAwareItemDrafts(
       }
     ]
     const t = templates[Math.floor(Math.random() * templates.length)]
-    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3, engine_used: "tier3_fallback" }
   }
 
   // ── LADIES BEAUTY PARLOUR ─────────────────────────────────────────────────────
@@ -927,50 +1154,204 @@ function getCategoryAwareItemDrafts(
     c.includes("beauty") || c.includes("parlor") || c.includes("parlour") ||
     c.includes("makeup") || c.includes("bridal") || c.includes("ladies salon")
   ) {
-    const templates = [
-      {
-        draft1: `${item} karwaya — didi ke haath mein jadoo hai. Skin pe instant glow aa gaya, results better than expected!`,
-        draft2: `${item} ke liye appointment liya — parlour clean aur AC mein comfortable tha. Didi ne bohot ache se kiya.`
-      },
-      {
-        draft1: `Gayi thi ${item} ke liye — bohot relaxing experience tha. Products high quality aur no irritation on skin.`,
-        draft2: `${item} ke baad skin ekdum soft aur glowing lag rahi thi. Staff bahut friendly aur hygienic tha.`
-      }
-    ]
-    const t = templates[Math.floor(Math.random() * templates.length)]
-    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+    // Sub-typed: skin service vs hair service vs makeup service
+    const isSkinService = itemLower.includes("facial") || itemLower.includes("cleanup") || itemLower.includes("threading") || itemLower.includes("waxing") || itemLower.includes("bleach") || itemLower.includes("tan") || itemLower.includes("pedicure") || itemLower.includes("manicure") || itemLower.includes("hydra")
+    const isHairService = itemLower.includes("hair spa") || itemLower.includes("keratin") || itemLower.includes("smoothening") || itemLower.includes("rebonding") || itemLower.includes("hair color") || itemLower.includes("global color") || itemLower.includes("highlights") || itemLower.includes("hair treatment")
+    const isMakeupService = itemLower.includes("makeup") || itemLower.includes("bridal") || itemLower.includes("engagement look") || itemLower.includes("party makeup") || itemLower.includes("saree draping")
+
+    let templates: { draft1: string; draft2: string }[]
+
+    if (isHairService) {
+      // NEVER mention skin glow for hair services
+      templates = [
+        {
+          draft1: `${item} karwaya — hair texture smooth aur silky ho gaya. Shine natural aayi hai aur frizz completely band ho gaya!`,
+          draft2: `${item} ke liye appointment liya — treatment me step-by-step care tips samjhaye. Staff professional aur gentle tha.`
+        },
+        {
+          draft1: `Gayi thi ${item} ke liye — results amazing the! Hair much more manageable ho gaye aur texture bohot improved hai.`,
+          draft2: `Didi ne ${item} properly ache se kiya bina kisi rush ke. Parlour AC comfortable tha aur hygiene top class thi.`
+        },
+        {
+          draft1: `${item} yahan karwaya — branded products use kiye aur har step clearly explain kiya. Hair genuinely better feel ho rahe hain.`,
+          draft2: `Appointment on time mili. Staff ne aftercare tips clearly bataye — kab shampoo karna, kya avoid karna.`
+        }
+      ]
+    } else if (isMakeupService) {
+      templates = [
+        {
+          draft1: `${item} karwaya tha — makeup ekdum natural aur non-cakey tha. Daylight mein bhi perfectly set lag raha tha, function mein sab ne tareef ki!`,
+          draft2: `Ready hone mein time exact estimate ke according laga. Updo dance ke baad bhi perfect set raha, bohot impressed thi!`
+        },
+        {
+          draft1: `${item} se bilkul dreamy look mila — didi ne face shape ke hisab se makeup design kiya. Long-lasting aur flawless finish!`,
+          draft2: `Staff patient aur creative tha. Reference photo se bhi better nikla — genuinely skilled makeup artist didi!`
+        }
+      ]
+    } else {
+      // Skin services — NEVER mention hair shine
+      templates = [
+        {
+          draft1: `${item} karwaya — didi ke haath mein jadoo hai! Skin pe instant glow aur freshness aa gayi, results better than expected.`,
+          draft2: `${item} ke liye appointment liya — parlour clean aur AC mein comfortable tha. Treatment mein koi rush nahi kiya.`
+        },
+        {
+          draft1: `Gayi thi ${item} ke liye — bohot relaxing experience tha. Products high quality, no irritation on skin whatsoever!`,
+          draft2: `${item} ke baad skin ekdum soft, clean aur refreshed lag rahi thi. Didi bahut friendly aur hygienic tha.`
+        },
+        {
+          draft1: `Pehli baar ${item} try kiya is parlour mein — painless aur gentle care mili, bilkul hygienic tools use kiye.`,
+          draft2: `Saturday rush tha par treatment mein bilkul jaldi nahi ki. Disposable bedsheet aur sanitized tools use kiye the.`
+        },
+        {
+          draft1: `Branded products ke sath ${item} session bohot soothing tha. Face pe natural radiance clearly dikh raha hai.`,
+          draft2: `Female staff supportive aur polite tha, bina kisi extra product upselling ke genuine care mili.`
+        },
+        {
+          draft1: `Weekend mein ${item} ke liye visit ki thi — sanitized setup aur gentle female beautician se full comfort mila.`,
+          draft2: `Rates transparent hain aur appointment timing properly follow hui. Skin bilkul soft feel ho rahi hai.`
+        }
+      ]
+    }
+
+    const t = pickTemplate(templates)
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3, engine_used: "tier3_fallback" }
   }
 
   // ── MEN SALON / BARBER ────────────────────────────────────────────────────────
   if (c.includes("salon") || c.includes("barber") || c.includes("haircut") || c.includes("grooming") || c.includes("saloon")) {
-    const templates = [
-      {
-        draft1: `${item} karwaya — bhai ne zero mistake se kiya. Fresh clean look mila, bilkul jaisa bola tha waisa.`,
-        draft2: `${item} ke liye drop-in gaya — waiting time 10 min tha par result top class nikla. Fair pricing.`
-      },
-      {
-        draft1: `${item} done perfectly — steady scissors, clean razor finish aur attention to detail zabardast tha.`,
-        draft2: `Tried ${item} here for the first time — staff patient tha aur exactly jo chaha wo deliver kiya.`
-      }
-    ]
+    // Sub-typed: haircut vs facial/cleanup vs massage vs hair treatment
+    const isFacialOrCleanup = itemLower.includes("facial") || itemLower.includes("cleanup") || itemLower.includes("charcoal") || itemLower.includes("de-tan") || itemLower.includes("detan") || itemLower.includes("mask") || itemLower.includes("skin")
+    const isMassage = itemLower.includes("massage") || itemLower.includes("head massage") || itemLower.includes("scalp")
+    const isHairTreatment = itemLower.includes("hair treatment") || itemLower.includes("hair wash") || itemLower.includes("hair spa") || itemLower.includes("dandruff") || itemLower.includes("hair fall")
+    const isHaircut = itemLower.includes("haircut") || itemLower.includes("fade") || itemLower.includes("trim") || itemLower.includes("hair style") || itemLower.includes("beard") || itemLower.includes("shave") || itemLower.includes("contour")
+
+    let templates: { draft1: string; draft2: string }[]
+
+    if (isFacialOrCleanup) {
+      // NEVER mention scissors/razor for facial
+      templates = [
+        {
+          draft1: `${item} karwaya — instant freshness aur clean skin feel. Face pe glow aa gaya aur skin feel ekdum refreshed hai!`,
+          draft2: `${item} ke liye drop-in gaya — waiting time 10 min tha par result top class nikla. Fair pricing, clean AC salon.`
+        },
+        {
+          draft1: `De-tan ${item} done yahan — dark spots visibly reduced aur skin tone more even ho gaya. Very satisfied!`,
+          draft2: `Comfortable massage chair aur peaceful setup tha. Zero product upselling pressure — staff genuinely helpful tha.`
+        },
+        {
+          draft1: `Tried their ${item} — super relaxing. Products quality branded the aur professional application se result clearly visible tha.`,
+          draft2: `Staff patient tha aur skin type ke hisab se treatment customize kiya. Clean sanitized bed aur fresh towels use kiye.`
+        }
+      ]
+    } else if (isMassage) {
+      templates = [
+        {
+          draft1: `${item} karwaya — tension completely release ho gayi. Pressure points sahi jagah pe aur duration perfect tha, bohot refreshing!`,
+          draft2: `${item} ke baad ekdum fresh aur light feel hua. Comfortable reclining chair aur clean fresh towels use kiye.`
+        },
+        {
+          draft1: `Best ${item} in the area — experienced hands, right pressure and very relaxing. Completely de-stressed after session.`,
+          draft2: `Staff ne exactly jo bola tha wo type of massage deliver kiya. Zero rush aur very professional setup.`
+        }
+      ]
+    } else if (isHairTreatment) {
+      templates = [
+        {
+          draft1: `${item} karwaya — scalp feels much healthier aur hair fall visibly reduced. Genuine branded products use kiye.`,
+          draft2: `${item} ke baad staff ne aftercare tips clearly bataye — kab shampoo karna, kya products avoid karne. Very helpful!`
+        }
+      ]
+    } else {
+      // Haircut, fade, beard, shave — scissors/razor are correct here
+      templates = [
+        {
+          draft1: `${item} karwaya — bhai ne zero mistake se kiya. Fresh clean look mila, bilkul jaisa bola tha waisa. Very skilled!`,
+          draft2: `${item} ke liye drop-in gaya — waiting time 10 min tha par result top class nikla. Fair pricing aur AC setup.`
+        },
+        {
+          draft1: `${item} done here — precision cut, clean lines aur attention to detail zabardast tha. Exactly what I asked for!`,
+          draft2: `Tried ${item} here for the first time — staff patient tha aur exactly jo chaha wo deliver kiya. Definitely coming back.`
+        },
+        {
+          draft1: `${item} karwaya — steady scissor work, clean finish aur symmetric shape bilkul perfect nikli. Professional groomer!`,
+          draft2: `Sanitized tools use kiye. Fresh towel aur hygienic setup tha. Thoda rush tha par quality pe koi compromise nahi.`
+        }
+      ]
+    }
+
     const t = templates[Math.floor(Math.random() * templates.length)]
-    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3, engine_used: "tier3_fallback" }
   }
 
   // ── BAKERY / CAKE SHOP ────────────────────────────────────────────────────────
   if (c.includes("cake") || c.includes("bakery") || c.includes("pastry") || c.includes("dessert") || c.includes("sweet")) {
-    const templates = [
-      {
-        draft1: `${item} order kiya — super moist, perfectly sweet aur presentation photo se bhi zyada premium aayi!`,
-        draft2: `${item} ke liye evening mein gaye — counter pe thodi bheed thi par box 10 minute mein ready ho gayi.`
-      },
-      {
-        draft1: `Tried their ${item} — sponge ultra soft tha aur cream absolutely fresh. Made our celebration perfect!`,
-        draft2: `${item} customize kiya with name on top — unhone bina extra charge ke beautifully piping kar di.`
-      }
-    ]
+    // Sub-typed: chocolate vs fruit vs custom vs pastry/slice
+    const isFruitCake = itemLower.includes("fruit") || itemLower.includes("pineapple") || itemLower.includes("strawberry") || itemLower.includes("mango") || itemLower.includes("blueberry") || itemLower.includes("gateau") || itemLower.includes("fresh fruit")
+    const isChocolateCake = itemLower.includes("chocolate") || itemLower.includes("truffle") || itemLower.includes("dark choc") || itemLower.includes("choco")
+    const isCustomCake = itemLower.includes("custom") || itemLower.includes("fondant") || itemLower.includes("design") || itemLower.includes("personali")
+    const isPastrySlice = itemLower.includes("pastry") || itemLower.includes("slice") || itemLower.includes("brownie") || itemLower.includes("eclair") || itemLower.includes("cookie")
+    const isEgglessCake = itemLower.includes("eggless")
+
+    let templates: { draft1: string; draft2: string }[]
+
+    if (isFruitCake) {
+      // NEVER say "rich chocolate flavor" for fruit cake
+      templates = [
+        {
+          draft1: `${item} order kiya — super fresh fruit pieces, light sponge aur perfectly balanced sweetness. Not too heavy on stomach!`,
+          draft2: `${item} ke liye evening mein gaye — counter pe thodi bheed thi par box fresh packing ke sath ready ho gayi.`
+        },
+        {
+          draft1: `Tried their ${item} — juicy fresh fruits, light cream aur soft base. Kids aur elders dono ko pasand aaya!`,
+          draft2: `${item} customize kiya with extra fresh fruits on top — unhone bina extra charge ke beautifully arrange kar di.`
+        }
+      ]
+    } else if (isChocolateCake) {
+      templates = [
+        {
+          draft1: `${item} order kiya — rich cocoa flavor, dense moist sponge aur bittersweet chocolate ganache perfect tha. Celebration special ho gayi!`,
+          draft2: `${item} ke liye evening mein gaye — counter pe thodi bheed thi par box 10 minute mein fresh pack ho kar ready ho gayi.`
+        },
+        {
+          draft1: `Tried their ${item} — extra dark, rich chocolate intensity with ultra-moist texture. Best chocolate cake in the area!`,
+          draft2: `${item} customize kiya with name on top — unhone bina extra charge ke beautifully piping kar di. Presentation premium!`
+        }
+      ]
+    } else if (isCustomCake) {
+      templates = [
+        {
+          draft1: `${item} banwaya — design exactly jaisa reference picture bheja tha waisa hi banaya. Quality aur presentation dono first class!`,
+          draft2: `${item} customize kiya — staff patient tha aur har detail seriously liya. On-time delivery with safe secure packaging.`
+        },
+        {
+          draft1: `Ordered ${item} for a birthday — exact theme replica with beautiful topper. Everyone was amazed by the design!`,
+          draft2: `${item} ke liye advance order diya — timely ready tha aur delivery boy ne sab khud safe pakad ke diya. No damage!`
+        }
+      ]
+    } else if (isPastrySlice) {
+      templates = [
+        {
+          draft1: `${item} try kiya — perfectly fresh, light aur melt-in-mouth texture tha. Cream balanced aur not overly sweet!`,
+          draft2: `Counter pe thoda rush tha Sunday ko par service quick thi. Fresh daily-baked ${item} taste mein genuine aur hygienic.`
+        }
+      ]
+    } else {
+      // Generic / Eggless cake
+      templates = [
+        {
+          draft1: `${item} order kiya — super moist, perfectly sweet aur presentation photo se bhi zyada premium aayi!`,
+          draft2: `${item} ke liye evening mein gaye — counter pe thodi bheed thi par box 10 minute mein ready ho gayi.`
+        },
+        {
+          draft1: `Tried their ${item} — sponge ultra soft tha aur cream absolutely fresh. Made our celebration perfect!`,
+          draft2: `${item} customize kiya with name on top — unhone bina extra charge ke beautifully piping kar di.`
+        }
+      ]
+    }
+
     const t = templates[Math.floor(Math.random() * templates.length)]
-    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3, engine_used: "tier3_fallback" }
   }
 
   // ── CAFE / COFFEE SHOP ────────────────────────────────────────────────────────
@@ -986,7 +1367,7 @@ function getCategoryAwareItemDrafts(
       }
     ]
     const t = templates[Math.floor(Math.random() * templates.length)]
-    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3, engine_used: "tier3_fallback" }
   }
 
   // ── GENERAL RESTAURANT / FOOD ─────────────────────────────────────────────────
@@ -1003,31 +1384,117 @@ function getCategoryAwareItemDrafts(
       {
         draft1: `Best ${item} I've had in this area — generous portion, authentic spices aur piping hot served.`,
         draft2: `${item} ka taste lag raha tha jaise ghar pe kha rahe hoon. Staff friendly aur serving prompt tha.`
+      },
+      {
+        draft1: `Weekend dinner pe ${item} try kiya, aroma aur masala balance bilkul perfect tha bina extra oil ke.`,
+        draft2: `AC dining hall clean aur comfortable tha. Waiter ne bina delay ke fresh rotis aur sides serve kiye.`
+      },
+      {
+        draft1: `Friends ke sath lunch pe ${item} mangwaya — quantity kafi achi thi aur presentation neat mili.`,
+        draft2: `Billing fast thi aur table hygiene proper maintained thi. Family outings ke liye dependable spot hai.`
+      },
+      {
+        draft1: `Freshly prepared ${item} served within 15 minutes — rich flavors aur pocket-friendly rates dono mile!`,
+        draft2: `Counter aur table service dono smooth thi. Weekend crowd ke bawajood hospitality warm rahi.`
       }
     ]
-    const t = templates[Math.floor(Math.random() * templates.length)]
-    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+    const t = pickTemplate(templates)
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3, engine_used: "tier3_fallback" }
   }
 
   // ── CAR WASH / GARAGE ─────────────────────────────────────────────────────────
   if (c.includes("wash") || c.includes("car") || c.includes("detailing") || c.includes("auto") || c.includes("garage")) {
-    const templates = [
-      {
-        draft1: `${item} karwaya — car ekdum showroom jaisi shine mein aa gayi. Detailed cleaning without any scratch!`,
-        draft2: `${item} done in estimated time — staff professional tha aur every corner properly cleaned. Impressed!`
-      }
-    ]
+    // Sub-typed: exterior vs interior vs underbody vs ceramic
+    const isUnderbody = itemLower.includes("underbody") || itemLower.includes("chassis") || itemLower.includes("undercarriage")
+    const isInterior = itemLower.includes("interior") || itemLower.includes("vacuum") || itemLower.includes("dashboard") || itemLower.includes("seat") || itemLower.includes("boot") || itemLower.includes("cabin")
+    const isCeramic = itemLower.includes("ceramic") || itemLower.includes("coating") || itemLower.includes("ppf") || itemLower.includes("nano")
+    const isGlass = itemLower.includes("glass") || itemLower.includes("windshield") || itemLower.includes("windscreen")
+
+    let templates: { draft1: string; draft2: string }[]
+
+    if (isUnderbody) {
+      // "showroom shine" is WRONG for underbody
+      templates = [
+        {
+          draft1: `${item} karwaya — mud aur road grime completely blast ho gaya. Chassis visibly clean aur rust prevention ke liye bilkul ready!`,
+          draft2: `${item} done professionally — high-pressure equipment use kiya aur wheel arches ke andar se sab clean ho gaya. Thorough job!`
+        },
+        {
+          draft1: `Professional ${item} done here — undercarriage ekdum clean ho gaya, monsoon ka mud completely remove hua.`,
+          draft2: `Boys were detail-oriented, bina hidden charges ke sab clean kiya. Waiting lounge comfortable tha.`
+        }
+      ]
+    } else if (isInterior) {
+      templates = [
+        {
+          draft1: `${item} karwaya — car interior ekdum fresh aur clean ho gaya. Dashboard conditioning, mat cleaning sab properly kiya. Odor completely gone!`,
+          draft2: `${item} done professionally — boot space aur door pockets bhi thoroughly clean kiye. Transparent pricing bina hidden add-ons ke.`
+        }
+      ]
+    } else if (isCeramic) {
+      templates = [
+        {
+          draft1: `${item} lagwaya — paint protection excellent aur hydrophobic water beading effect zabardast hai. Car ekdum showroom shine mein dikh rahi hai!`,
+          draft2: `${item} application careful aur detailed tha. Staff professional tha aur har coat properly cure karne ke baad next lagaya.`
+        }
+      ]
+    } else if (isGlass) {
+      templates = [
+        {
+          draft1: `${item} treatment karwaya — visibility dramatically improved aur rain water properly beads off. Night driving much safer now!`,
+          draft2: `Quick professional job, no streaks, no smudges. ${item} done with quality solution.`
+        }
+      ]
+    } else {
+      // Exterior foam wash — "showroom shine" is correct here
+      templates = [
+        {
+          draft1: `${item} karwaya — car ekdum showroom jaisi shine mein aa gayi. Scratch-free foam wash aur sparkling glass finish!`,
+          draft2: `${item} done in estimated time — staff professional tha aur every corner properly cleaned. Impressed with the result!`
+        },
+        {
+          draft1: `Snow foam ${item} karwaya — paint safe, finish brilliant aur alloys ekdum clean. Great value detailing service!`,
+          draft2: `Thoda rush tha Sunday afternoon par waiting lounge me AC tha. Washing staff ne alloys ache se clean kiye.`
+        }
+      ]
+    }
+
     const t = templates[Math.floor(Math.random() * templates.length)]
-    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3, engine_used: "tier3_fallback" }
   }
 
   // ── SAAS / AGENCY ─────────────────────────────────────────────────────────────
   if (c.includes("saas") || c.includes("software") || c.includes("customerpilot") || c.includes("agency") || c.includes("tech")) {
-    return {
-      draft1: `${item} feature set up kiya — simple onboarding, zero technical hassle aur results immediately visible hue.`,
-      draft2: `${item} se hamare store ke Google reviews fast badh rahe hain. ROI clearly dikh raha hai dashboard mein.`,
-      draft3: poolEntry.draft3
+    // Sub-typed: match benefit to actual product
+    const isLoyaltyWallet = itemLower.includes("loyalty") || itemLower.includes("stamp") || itemLower.includes("wallet") || itemLower.includes("rewards")
+    const isReviewProduct = itemLower.includes("review") || itemLower.includes("google review") || itemLower.includes("qr review") || itemLower.includes("review standee")
+    const isBillingProduct = itemLower.includes("billing") || itemLower.includes("invoice") || itemLower.includes("pos") || itemLower.includes("payment")
+    const isWAProduct = itemLower.includes("whatsapp") || itemLower.includes("wa group") || itemLower.includes("wa booster") || itemLower.includes("campaign")
+    const isOnboarding = itemLower.includes("onboard") || itemLower.includes("setup") || itemLower.includes("implement") || itemLower.includes("install")
+
+    let d1: string, d2: string
+
+    if (isLoyaltyWallet) {
+      d1 = `${item} implement kiya — customers ab WhatsApp pe apne stamps track karte hain. Repeat footfall 30% badh gaya store ka!`
+      d2 = `${item} ka setup 5 minute mein hua bina kisi technical hassle ke. Dashboard simple aur live support fast hai.`
+    } else if (isReviewProduct) {
+      d1 = `${item} lagane ke baad Google reviews 3 mahine mein dramatically badh gaye. Counter standee pe customers khushi se scan karte hain!`
+      d2 = `${item} ka QR system extremely easy hai — customer scan kare aur seconds mein review ready. ROI clearly dikh raha hai.`
+    } else if (isBillingProduct) {
+      d1 = `${item} use karne ke baad billing faster ho gayi aur PDF invoices directly WhatsApp pe customers ko milti hain. Very professional!`
+      d2 = `${item} setup smooth tha. Team ne onboarding properly guide kiya aur sab features ache se samjhaye.`
+    } else if (isWAProduct) {
+      d1 = `${item} se weekly customer campaigns bhejne lage — repeat visits aur engagement dono badh gaya. Genuine ROI visible hai!`
+      d2 = `${item} interface clean hai aur schedule feature bohot useful hai. Support team responsive aur helpful hai.`
+    } else if (isOnboarding) {
+      d1 = `${item} 5 minute mein complete hua bina kisi technical knowledge ke. Team ne step-by-step guide kiya aur sab features properly set up kiye.`
+      d2 = `${item} experience seamless tha. Vadodara team very responsive hai aur onboarding ke baad bhi support available hai.`
+    } else {
+      d1 = `${item} implement kiya — results immediately visible hue. Best software for Indian retail merchants!`
+      d2 = `${item} se store ka Google Maps ranking aur customer retention dono improve hua. Genuinely worth the investment.`
     }
+
+    return { draft1: d1, draft2: d2, draft3: poolEntry.draft3, engine_used: "tier3_fallback" }
   }
 
   // ── GENERIC CLINIC / DOCTOR (Human medical — NOT pet) ────────────────────────
@@ -1039,14 +1506,15 @@ function getCategoryAwareItemDrafts(
       }
     ]
     const t = templates[Math.floor(Math.random() * templates.length)]
-    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3 }
+    return { draft1: t.draft1, draft2: t.draft2, draft3: poolEntry.draft3, engine_used: "tier3_fallback" }
   }
 
   // ── DEFAULT FALLBACK (completely generic) ─────────────────────────────────────
   return {
     draft1: `${item} liya — quality genuine thi, professional experience aur seamless transaction. Definitely coming back!`,
     draft2: `${item} ke liye visit kiya — counter pe thoda rush tha par staff courteous aur quick tha. Satisfied customer.`,
-    draft3: poolEntry.draft3
+    draft3: poolEntry.draft3,
+    engine_used: "tier3_fallback"
   }
 }
 
@@ -1202,16 +1670,12 @@ export async function generateDynamicReviewDraft(params: {
   const groqModel = process.env.AI_MODEL?.trim() || "openai/gpt-oss-120b"
 
   if (!geminiKey && !groqKey) {
-    return fallback
+    return { ...fallback, engine_used: "tier3_fallback" }
   }
 
-  // Common Banned Buzzwords
-  const bannedRegex = /\b(spot[- ]?on|top[- ]?notch|hidden gem|highly recommend|pristine|testament|delve|exceptional|outstanding|game changer|store special)\b/gi
-  const cleanText = (s: string) => s.replace(bannedRegex, "").replace(/["\\]/g, "").replace(/\s+/g, " ").trim()
-
-  // Post-generation Negative Blacklist Sanitizer
+  // Post-generation Negative Blacklist Sanitizer — uses universal NFKC + Unicode hyphen scrubber
   const sanitizeStrict = (text: string): string => {
-    let res = cleanText(text)
+    let res = scrubBannedBuzzwords(text)
     for (const banned of profile.strictlyNotAllowed) {
       if (banned.length >= 3) {
         const re = new RegExp(`\\b${banned.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi")
@@ -1425,7 +1889,8 @@ Return ONLY a valid parseable JSON object:
             return {
               draft1: sanitizeStrict(parsed.draft_1),
               draft2: sanitizeStrict(parsed.draft_2),
-              draft3: parsed.draft_3 ? sanitizeStrict(parsed.draft_3) : fallback.draft3
+              draft3: parsed.draft_3 ? sanitizeStrict(parsed.draft_3) : fallback.draft3,
+              engine_used: "gemini"
             }
           }
         }
@@ -1435,53 +1900,59 @@ Return ONLY a valid parseable JSON object:
     }
   }
 
-  // B. Try Groq / OpenAI compatible LLM
+  // B. Try Groq / OpenAI compatible LLM with multi-model failover on 429 / error
   if (groqKey) {
-    try {
-      const controller = new AbortController()
-      const timer = setTimeout(() => controller.abort(), 4000)
+    const groqCandidates = Array.from(
+      new Set([groqModel, "openai/gpt-oss-20b", "qwen/qwen3.8-27b"])
+    )
+    for (const candidateModel of groqCandidates) {
+      try {
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 4500)
 
-      const res = await fetch(groqUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${groqKey}`,
-          "User-Agent": "CustomerPilot/1.0"
-        },
-        body: JSON.stringify({
-          model: groqModel,
-          messages: [
-            { role: "system", content: "You generate authentic Indian Google reviews in strict JSON format. Strictly observe all banned keywords." },
-            { role: "user", content: systemPrompt }
-          ],
-          temperature: 0.90,
-          response_format: { type: "json_object" }
-        }),
-        signal: controller.signal
-      })
+        const res = await fetch(groqUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${groqKey}`,
+            "User-Agent": "CustomerPilot/1.0"
+          },
+          body: JSON.stringify({
+            model: candidateModel,
+            messages: [
+              { role: "system", content: "You generate authentic Indian Google reviews in strict JSON format. Strictly observe all banned keywords." },
+              { role: "user", content: systemPrompt }
+            ],
+            temperature: 0.90,
+            response_format: { type: "json_object" }
+          }),
+          signal: controller.signal
+        })
 
-      clearTimeout(timer)
-      if (res.ok) {
-        const data = await res.json()
-        const content = data.choices?.[0]?.message?.content?.trim()
-        if (content) {
-          const parsed = JSON.parse(content)
-          if (parsed.draft_1 && parsed.draft_2) {
-            return {
-              draft1: sanitizeStrict(parsed.draft_1),
-              draft2: sanitizeStrict(parsed.draft_2),
-              draft3: parsed.draft_3 ? sanitizeStrict(parsed.draft_3) : fallback.draft3
+        clearTimeout(timer)
+        if (res.ok) {
+          const data = await res.json()
+          const content = data.choices?.[0]?.message?.content?.trim()
+          if (content) {
+            const parsed = JSON.parse(content)
+            if (parsed.draft_1 && parsed.draft_2) {
+              return {
+                draft1: sanitizeStrict(parsed.draft_1),
+                draft2: sanitizeStrict(parsed.draft_2),
+                draft3: parsed.draft_3 ? sanitizeStrict(parsed.draft_3) : fallback.draft3,
+                engine_used: "groq"
+              }
             }
           }
+        } else {
+          const errText = await res.text().catch(() => "")
+          console.warn(`[DynamicReviewEngine] Groq (${candidateModel}) returned status ${res.status}: ${errText.slice(0, 150)}`)
         }
-      } else {
-        const errText = await res.text().catch(() => "")
-        console.warn(`[DynamicReviewEngine] Groq API returned status ${res.status}: ${errText.slice(0, 150)}`)
+      } catch (err: any) {
+        console.warn(`[DynamicReviewEngine] Groq (${candidateModel}) attempt failed:`, err?.message)
       }
-    } catch (err: any) {
-      console.warn("[DynamicReviewEngine] Groq attempt failed:", err?.message)
     }
   }
 
-  return fallback
+  return { ...fallback, engine_used: "tier3_fallback" }
 }

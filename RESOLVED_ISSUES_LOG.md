@@ -8021,3 +8021,19 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   4. Ran full automated smoke suite (`node scripts/run_smoke_tests.js`) — 10 total | 9 passed | 1 skipped (live guard) | 0 failed.
   5. Ran Master Adversarial Red-Team Guard (`node scripts/run_adversarial_guard.js`) with all 7 safety and mathematical boundary gates passing cleanly.
 - **Status**: ✅ Resolved and Verified.
+
+---
+## [26 Nov 2026] Issue: Google Neon AI Audit — Tier-3 Semantic Blunders, Unicode Buzzword Bypass, 82%+ Silent Fallback & 9-Category Test Gap
+- **Symptom**: Forensic audit of 50 generated review samples across 10 business categories revealed: (1) ~82-86% silent fallback to Tier-3 static templates due to invalid `GEMINI_API_KEY` in local `.env.local` (400 API_KEY_INVALID) and Groq `openai/gpt-oss-120b` HTTP 429 rate limits; (2) Blind `${item}` string interpolation in Tier-3 caused semantic blunders (e.g., "Puppy ka Cat skin allergy", "scissors/razor" for men's facial, "skin glow" for keratin hair spa, "chocolate flavor" for Fresh Fruit Gateau, "showroom shine" for underbody chassis wash, "teeth fresh" after consultation-only dental visit); (3) Unicode non-breaking hyphen (`spot‑on` U+2011) and Tier-3 templates bypassed the ASCII buzzword regex (`Top-notch`, `Highly recommended`, `game-changer`, `Outstanding`); (4) Automated unit tests only covered Optical Store (`optical-anti-repetition.test.ts`), leaving the other 9 categories unverified.
+- **Root Cause**:
+  1. `getCategoryAwareItemDrafts()` in `src/lib/dynamic-review-engine.ts` used generic category-level templates with blind `${item}` interpolation instead of sub-typed routing.
+  2. `sanitizeStrict()` only ran on Tier-1/2 LLM outputs and lacked `.normalize("NFKC")` + Unicode dash/hyphen normalization (`\u2010-\u2015\u2212`).
+  3. `ReviewDraftOptions` had no `engine_used` telemetry field, hiding silent Tier-3 fallbacks, and the Groq client tried only a single model (`openai/gpt-oss-120b`) without failing over to `llama-3.3-70b-versatile` or `llama-3.1-8b-instant` on HTTP 429.
+  4. `tests/unit/optical-anti-repetition.test.ts` covered only 1 of 10 categories.
+- **Resolution**:
+  1. **Sub-Typed Tier-3 Routing**: Replaced blind `${item}` interpolation in `getCategoryAwareItemDrafts()` with sub-typed routing across Pet Clinic, Beauty Parlour, Men's Salon, Dental Clinic, Bakery, Car Wash, and SaaS, plus expanded Saree Palace, Parlour Skin, and Restaurant templates to 5 distinct seed-indexed variations.
+  2. **Universal NFKC Unicode Buzzword Scrubber**: Added `normalizeUnicodeHyphens()` + `scrubBannedBuzzwords()` applied across ALL 3 tiers (Gemini, Groq, and Tier-3 fallback) and cleaned all static pool templates.
+  3. **Engine Telemetry & Groq Multi-Model Failover**: Added `engine_used: "gemini" | "groq" | "tier3_fallback"` to `ReviewDraftOptions` and added automatic Groq model failover (`[groqModel, "llama-3.3-70b-versatile", "llama-3.1-8b-instant"]`) on HTTP 429/error.
+  4. **Full 10-Category Automated Test Suite**: Created `tests/unit/all-categories-review-engine.test.ts` covering all 10 categories, trigram anti-repetition, NFKC Unicode buzzword guard, cross-subtype semantic checks, cross-category contamination, and `engine_used` telemetry.
+  5. **Verification**: All 46/46 Vitest unit tests (`all-categories-review-engine.test.ts` + `optical-anti-repetition.test.ts`) and all 7/7 Master Adversarial Red-Team Guard gates (`node scripts/run_adversarial_guard.js`) passed cleanly.
+- **Status**: ✅ Resolved and Verified locally.
