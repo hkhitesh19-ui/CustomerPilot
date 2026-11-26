@@ -48,7 +48,10 @@ export async function GET(req: Request) {
             isReplied: false,
             status: "pending",
             reviewReply: null,
-            comment: { not: null } // Only reply if they left a text comment
+            AND: [
+              { comment: { not: null } },
+              { comment: { not: "" } }
+            ] // Only reply if they left a non-empty text comment
           },
           take: 5 // Process in small batches
         })
@@ -57,8 +60,8 @@ export async function GET(req: Request) {
 
         // 4. Generate & Post Replies
         for (const review of unrepliedReviews) {
-          // Strict race-condition check
-          if (review.isReplied || review.reviewReply) continue
+          // Strict race-condition and whitespace-only guard
+          if (review.isReplied || review.reviewReply || !review.comment || review.comment.trim().length === 0) continue
 
           console.log(`[CRON] Generating SEO Auto-Reply for review ${review.gbpReviewId} (${review.rating}⭐)...`)
           
