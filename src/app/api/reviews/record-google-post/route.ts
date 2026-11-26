@@ -6,6 +6,10 @@ import { sendCentralWhatsAppMessage } from '@/lib/whatsapp-service';
 import { hasModule } from '@/lib/feature-gate';
 import { verifyCustomerGooglePhoto } from '@/lib/review-photo-verifier';
 
+// Customer's button click is only a claim. Stamps are given by staff
+// (Live Queue -> Manual Stamp Override). Set true only when real verification exists.
+const AUTO_REVIEW_STAMPS = false;
+
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
 
@@ -106,7 +110,7 @@ export async function POST(req: Request) {
     const alreadyHadPhoto = Boolean(existingReview && (existingReview.photoBonusStamps > 0 || existingReview.photoUrl));
 
     // 1. Base Review Bonus (awarded immediately if first time)
-    const reviewBonusToAward = alreadyHadReview ? 0 : configuredBonus;
+    const reviewBonusToAward = AUTO_REVIEW_STAMPS && !alreadyHadReview ? configuredBonus : 0;
 
     // 2. Automated Google Photo Verification Pipeline
     let photoBonusToAward = 0;
@@ -115,7 +119,7 @@ export async function POST(req: Request) {
     let matchedPhotoUri: string | null = body?.photoUrl || null;
     let matchConfidence: number | null = null;
 
-    if (!alreadyHadPhoto && configuredPhotoBonus > 0) {
+    if (AUTO_REVIEW_STAMPS && !alreadyHadPhoto && configuredPhotoBonus > 0) {
       // 1. Direct photo attachment check (user uploaded photo with review)
       if (photoAttached && (body?.photoUrl || matchedPhotoUri)) {
         photoBonusToAward = configuredPhotoBonus;
@@ -403,6 +407,7 @@ export async function POST(req: Request) {
     } else {
       customerMsg = `⭐ *Thank you ${customer.name || "VIP"}!* ❤️\n\n` +
         `Your review for *${merchant.name}* has been updated on Google Maps!\n\n` +
+        `🎁 *Bonus stamps:* Show your Google review at the counter and our team will add them.\n\n` +
         `📊 *Wallet:* ${finalStampsInWallet} / ${stampsRequired} Stamps\n` +
         `🎁 *Next Reward:* ${template?.rewardName || "FREE Reward"} (${remaining} more needed)\n\n` +
         `📱 *View Your Live Digital Stamp Card:*\n${walletUrl}`;
