@@ -91,7 +91,8 @@ export async function POST(req: Request) {
       }
     }
 
-    // Record ReviewClaim intent when AUTO_REVIEW_MATCH=true (no stamps awarded here)
+    // Record ReviewClaim intent when AUTO_REVIEW_MATCH=true (no stamps awarded here).
+    // Even for guest_ or empty names, create as "open" so the matcher routes it to "manual".
     if (process.env.AUTO_REVIEW_MATCH === "true" && customer) {
       const existingOpenClaim = await db.reviewClaim.findFirst({
         where: { merchantId: merchant.id, customerId: customer.id, status: "open" }

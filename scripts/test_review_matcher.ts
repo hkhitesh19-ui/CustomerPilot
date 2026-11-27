@@ -22,6 +22,10 @@ async function main() {
   assert.equal(nameMatch("Hitesh Kumar", "Hitesh Kumar 🎉"), true, "Emoji stripped should match");
   assert.equal(nameMatch("Priya Shah", "Priya Verma"), false, "Different last name should not match");
   assert.equal(nameMatch("Amit", "Sumit"), false, "No full token match should reject");
+  assert.equal(nameMatch("Rahul", "Rahul Patel"), false, "Single-token first-name-only must NOT match");
+  assert.equal(nameMatch("Rahul Patil", "Rahul Patel"), false, "Rahul Patil vs Rahul Patel must NOT auto-match");
+  assert.equal(nameMatch("guest_123", "guest_123"), false, "guest_ must NOT match");
+  assert.equal(nameMatch("", "Rahul Patel"), false, "Empty name must NOT match");
   console.log("✅ 0. nameMatch unit assertions passed");
 
   // Setup isolated test merchant & stampCard
@@ -213,8 +217,67 @@ async function main() {
   });
   console.log(`✅ 8. Cake Connection pending reviews in DB: ${cakePending}`);
 
+  // Test 9 (Diff 2.1): First-name-only customer -> routed to manual, 0 stamps
+  const cSingle = await db.customer.create({
+    data: { merchantId: merchant.id, name: "Vikram", phone: `9190000007${suffix.slice(-2)}` }
+  });
+  const claimSingle = await db.reviewClaim.create({
+    data: { merchantId: merchant.id, customerId: cSingle.id, clickedAt, expiresAt, status: "open" }
+  });
+  const matchSingle = await matchReviewsToClaims(merchant.id, [{
+    gbpReviewId: `gbp_test_single_${suffix}`,
+    reviewerName: "Vikram Desai",
+    rating: 5,
+    hasMedia: false,
+    createdAt: now
+  }]);
+  assert.equal(matchSingle.matched, 0);
+  assert.equal(matchSingle.manual, 1);
+  assert.equal((await db.reviewClaim.findUnique({ where: { id: claimSingle.id } }))?.status, "manual");
+  assert.equal((await db.customer.findUnique({ where: { id: cSingle.id } }))?.lifetimeStamps, 0);
+  console.log("✅ 9. First-name-only -> manual, 0 stamps");
+
+  // Test 10 (Diff 2.1): Guest customer -> routed to manual, 0 stamps
+  const cGuest = await db.customer.create({
+    data: { merchantId: merchant.id, name: "Counter Customer", phone: `guest_${merchant.id.slice(0, 8)}` }
+  });
+  const claimGuest = await db.reviewClaim.create({
+    data: { merchantId: merchant.id, customerId: cGuest.id, clickedAt, expiresAt, status: "open" }
+  });
+  const matchGuest = await matchReviewsToClaims(merchant.id, [{
+    gbpReviewId: `gbp_test_guest_${suffix}`,
+    reviewerName: "Any Reviewer",
+    rating: 5,
+    hasMedia: false,
+    createdAt: now
+  }]);
+  assert.equal(matchGuest.matched, 0);
+  assert.equal(matchGuest.manual, 1);
+  assert.equal((await db.reviewClaim.findUnique({ where: { id: claimGuest.id } }))?.status, "manual");
+  assert.equal((await db.customer.findUnique({ where: { id: cGuest.id } }))?.lifetimeStamps, 0);
+  console.log("✅ 10. Guest customer -> manual, 0 stamps");
+
+  // Test 11 (Diff 2.1): "Rahul Patil" customer vs "Rahul Patel" reviewer -> no auto
+  const cPatil = await db.customer.create({
+    data: { merchantId: merchant.id, name: "Vikash Patil", phone: `9190000008${suffix.slice(-2)}` }
+  });
+  const claimPatil = await db.reviewClaim.create({
+    data: { merchantId: merchant.id, customerId: cPatil.id, clickedAt, expiresAt, status: "open" }
+  });
+  const matchPatil = await matchReviewsToClaims(merchant.id, [{
+    gbpReviewId: `gbp_test_patel_${suffix}`,
+    reviewerName: "Vikash Patel",
+    rating: 5,
+    hasMedia: false,
+    createdAt: now
+  }]);
+  assert.equal(matchPatil.matched, 0, "Patil vs Patel must NOT auto-award");
+  assert.equal((await db.reviewClaim.findUnique({ where: { id: claimPatil.id } }))?.status, "open");
+  assert.equal((await db.customer.findUnique({ where: { id: cPatil.id } }))?.lifetimeStamps, 0);
+  console.log('✅ 11. "Patil" vs "Patel" -> no auto-award');
+
   await db.$disconnect();
-  console.log("\n🎯 ALL 8 ISOLATED REVIEW MATCHER TESTS PASSED!");
+  console.log("\n🎯 ALL 11 ISOLATED REVIEW MATCHER TESTS PASSED!");
 }
 
 main().catch((err) => {

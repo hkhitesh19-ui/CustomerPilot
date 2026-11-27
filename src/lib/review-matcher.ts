@@ -71,33 +71,50 @@ function levenshteinSimilarity(a: string, b: string): number {
   return 1 - dp[n] / Math.max(m, n);
 }
 
+function tokenMatch(cTok: string, rTok: string): boolean {
+  if (cTok === rTok) return true;
+  if (cTok.length <= 4 || rTok.length <= 4) return false;
+  // Strictly > 0.8 prevents 5-char 1-diff collisions like "patil" vs "patel" (0.80)
+  return levenshteinSimilarity(cTok, rTok) > 0.8;
+}
+
+/**
+ * Returns true if customer identity is too weak for auto-award
+ * (empty, guest_, Counter Customer, or single-token name).
+ */
+export function isWeakCustomerIdentity(customerName: string, customerPhone?: string | null): boolean {
+  const raw = (customerName || "").trim().toLowerCase();
+  if (!raw || raw.startsWith("guest_") || raw === "counter customer") return true;
+  if (customerPhone && customerPhone.trim().toLowerCase().startsWith("guest_")) return true;
+  const norm = normalizeReviewerName(customerName);
+  if (!norm) return true;
+  const tokens = norm.split(" ");
+  return tokens.length < 2;
+}
+
 /**
  * Matches customer name against Google displayName.
- * Requires at least one full token match AND (token subset overlap OR Levenshtein >= 0.8).
+ * Requires customer to have >= 2 tokens (first + last). Both first AND last
+ * customer tokens must match reviewer tokens (exact or Levenshtein > 0.8).
+ * Single-token, empty, or guest names never return true.
  */
 export function nameMatch(customerName: string, reviewerName: string): boolean {
+  if (isWeakCustomerIdentity(customerName)) return false;
+
   const normA = normalizeReviewerName(customerName);
   const normB = normalizeReviewerName(reviewerName);
   if (!normA || !normB) return false;
-  if (normA === normB) return true;
 
   const aTokens = normA.split(" ");
   const bTokens = normB.split(" ");
 
-  const hasFullTokenMatch = aTokens.some(
-    (t) => (t.length >= 2 || (aTokens.length === 1 && bTokens.length === 1)) && bTokens.includes(t)
-  );
-  if (!hasFullTokenMatch) return false;
+  const firstToken = aTokens[0];
+  const lastToken = aTokens[aTokens.length - 1];
 
-  // Subset token overlap: every token of the shorter name appears in the longer name
-  const shorter = aTokens.length <= bTokens.length ? aTokens : bTokens;
-  const longer = aTokens.length <= bTokens.length ? bTokens : aTokens;
-  const commonCount = shorter.filter((t) => longer.includes(t)).length;
+  const firstMatches = bTokens.some((bt) => tokenMatch(firstToken, bt));
+  const lastMatches = bTokens.some((bt) => tokenMatch(lastToken, bt));
 
-  if (commonCount === shorter.length) return true;
-  if (commonCount / shorter.length >= 0.8) return true;
-
-  return levenshteinSimilarity(normA, normB) >= 0.8;
+  return firstMatches && lastMatches;
 }
 
 async function creditStampsInTx(
@@ -358,7 +375,43 @@ export async function matchReviewsToClaims(
         include: { customer: true }
       });
 
-      const hits = candidates.filter((c) => nameMatch(c.customer.name, rv.reviewerName));
+      const normReviewerTokens = normalizeReviewerName(rv.reviewerName).split(" ").filter(Boolean);
+      const weakIdsToManual: string[] = [];
+      const strongCandidates: typeof candidates = [];
+
+      for (const c of candidates) {
+        const isGuestOrEmpty =
+          !c.customer.name?.trim() ||
+          c.customer.name.trim().toLowerCase().startsWith("guest_") ||
+          c.customer.name.trim().toLowerCase() === "counter customer" ||
+          c.customer.phone?.trim().toLowerCase().startsWith("guest_");
+
+        if (isGuestOrEmpty) {
+          weakIdsToManual.push(c.id);
+          continue;
+        }
+
+        const cTokens = normalizeReviewerName(c.customer.name).split(" ").filter(Boolean);
+        if (cTokens.length < 2) {
+          // Single-token customer name: route to manual if their token appears in reviewerName
+          if (cTokens.length === 1 && normReviewerTokens.some((rt) => tokenMatch(cTokens[0], rt))) {
+            weakIdsToManual.push(c.id);
+          }
+          continue;
+        }
+
+        strongCandidates.push(c);
+      }
+
+      if (weakIdsToManual.length > 0) {
+        await db.reviewClaim.updateMany({
+          where: { id: { in: weakIdsToManual }, status: "open" },
+          data: { status: "manual" }
+        });
+        manual += weakIdsToManual.length;
+      }
+
+      const hits = strongCandidates.filter((c) => nameMatch(c.customer.name, rv.reviewerName));
 
       if (hits.length === 1) {
         const ok = await awardMatchedClaim(hits[0], rv);
