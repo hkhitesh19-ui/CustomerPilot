@@ -254,7 +254,6 @@ export async function POST(req: Request) {
 
     const customerMsg = `⭐ *Thank you ${customer.name || "VIP"}!* ❤️\n\n` +
       `Thank you for sharing your feedback for *${merchant.name}*!\n\n` +
-      `🎁 *Bonus stamps:* Show your Google review at the counter and our team will add them after checking.\n\n` +
       `📊 *Wallet:* ${finalStampsInWallet} / ${stampsRequired} Stamps\n` +
       `🎁 *Next Reward:* ${template?.rewardName || "FREE Reward"} (${remaining} more needed)\n\n` +
       `📱 *View Your Live Digital Stamp Card:*\n${walletUrl}`;

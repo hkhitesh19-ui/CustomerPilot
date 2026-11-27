@@ -99,7 +99,7 @@ export const SYSTEM_DEFAULT_TEMPLATES: SystemTemplateDefinition[] = [
     language: "en",
     variables: ["reviewUrl"],
     messageBody:
-      "Awesome! 🌟 Here is your 1-Click Google Maps review link:\n{{reviewUrl}}\n\nTap to view, edit, or post your honest feedback with a photo.\n\n🎁 *Bonus Stamp* will be automatically added to your VIP Card right after posting!",
+      "Awesome! 🌟 Here is your 1-Click Google Maps review link:\n{{reviewUrl}}\n\nTap to view, edit, or post your honest feedback with a photo.",
   },
   {
     templateKey: "WINBACK_15_DAY",
