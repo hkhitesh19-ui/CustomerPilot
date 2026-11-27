@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { fetchGoogleReviews, syncGoogleReviewsToDb, postReviewReplyToGBP } from "@/lib/google-reviews-service"
 import { generateAIReviewReply, getCleanMerchantName } from "@/lib/ai-review-reply"
 import { processPendingReviewPhotoVerifications } from "@/lib/review-photo-verifier"
+import { matchReviewsToClaims, processLatePhotoBonuses } from "@/lib/review-matcher"
 
 // Vercel cron configuration (runs every 5 minutes in production)
 export const maxDuration = 300 // 5 minutes limit
@@ -30,6 +31,11 @@ export async function GET(req: Request) {
     console.log(`[CRON] Found ${connections.length} active GBP connections.`)
 
     let totalRepliesSent = 0
+    const autoReviewMatch = process.env.AUTO_REVIEW_MATCH === "true"
+    let matchedClaimsCount = 0
+    let manualClaimsCount = 0
+    let expiredClaimsCount = 0
+    let latePhotoBonusCount = 0
 
     // 2. Loop through each merchant
     for (const conn of connections) {
@@ -38,8 +44,17 @@ export async function GET(req: Request) {
         const latestReviews = await fetchGoogleReviews(conn.merchantId, 10)
         
         // Sync them to DB (only inserts new ones)
-        const newCount = await syncGoogleReviewsToDb(conn.merchantId, latestReviews)
+        const { count: newCount, created } = await syncGoogleReviewsToDb(conn.merchantId, latestReviews)
         console.log(`[CRON] Fetched ${newCount} NEW reviews for Merchant ${conn.merchantId}`)
+
+        if (autoReviewMatch) {
+          if (created.length > 0) {
+            const matchRes = await matchReviewsToClaims(conn.merchantId, created)
+            matchedClaimsCount += matchRes.matched
+            manualClaimsCount += matchRes.manual
+          }
+          latePhotoBonusCount += await processLatePhotoBonuses(conn.merchantId)
+        }
 
         // 3. Find unreplied reviews in our DB that need an auto-reply (Strictly exclude already replied reviews)
         const unrepliedReviews = await db.googleBusinessReview.findMany({
@@ -99,6 +114,14 @@ export async function GET(req: Request) {
       }
     }
 
+    if (autoReviewMatch) {
+      const expRes = await db.reviewClaim.updateMany({
+        where: { status: "open", expiresAt: { lt: new Date() } },
+        data: { status: "expired" }
+      }).catch(() => ({ count: 0 }))
+      expiredClaimsCount = expRes.count
+    }
+
     // 5. Process any pending review photo verifications
     const verifiedPhotosCount = await processPendingReviewPhotoVerifications()
     console.log(`[CRON] Processed ${verifiedPhotosCount} pending review photo verifications.`)
@@ -107,7 +130,13 @@ export async function GET(req: Request) {
       success: true,
       message: "Real-time Google Reviews Polling completed.",
       repliesSent: totalRepliesSent,
-      verifiedPhotosCount
+      verifiedPhotosCount,
+      ...(autoReviewMatch ? {
+        matchedClaimsCount,
+        manualClaimsCount,
+        expiredClaimsCount,
+        latePhotoBonusCount
+      } : {})
     })
 
   } catch (error: any) {

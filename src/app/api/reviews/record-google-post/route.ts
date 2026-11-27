@@ -91,6 +91,26 @@ export async function POST(req: Request) {
       }
     }
 
+    // Record ReviewClaim intent when AUTO_REVIEW_MATCH=true (no stamps awarded here)
+    if (process.env.AUTO_REVIEW_MATCH === "true" && customer) {
+      const existingOpenClaim = await db.reviewClaim.findFirst({
+        where: { merchantId: merchant.id, customerId: customer.id, status: "open" }
+      });
+      if (!existingOpenClaim) {
+        const now = new Date();
+        await db.reviewClaim.create({
+          data: {
+            merchantId: merchant.id,
+            customerId: customer.id,
+            clickedAt: now,
+            expiresAt: new Date(now.getTime() + 48 * 60 * 60 * 1000),
+            status: "open",
+            stampsAwarded: 0
+          }
+        }).catch(err => console.error("[ReviewClaim] Creation error:", err.message));
+      }
+    }
+
     const finalReviewText = reviewText || "The service and quality were fresh, beautiful, and absolutely delicious. Highly recommended!";
 
     // Fetch Merchant's Active Reward Card Config first

@@ -6,6 +6,7 @@ export interface MockReview {
   rating: number
   comment: string
   reviewReply?: string
+  hasMedia?: boolean
   submittedAt: Date
 }
 
@@ -198,6 +199,7 @@ export async function fetchGoogleReviews(merchantId: string, maxLimit: number = 
             rating: r.starRating === "FIVE" ? 5 : r.starRating === "FOUR" ? 4 : r.starRating === "THREE" ? 3 : r.starRating === "TWO" ? 2 : 1,
             comment: r.comment || "",
             reviewReply: r.reviewReply?.comment || undefined,
+            hasMedia: Array.isArray(r.reviewMediaItems) && r.reviewMediaItems.length > 0,
             submittedAt: r.createTime ? new Date(r.createTime) : new Date()
           }))
         }
@@ -260,6 +262,7 @@ export async function fetchGoogleReviews(merchantId: string, maxLimit: number = 
  */
 export async function syncGoogleReviewsToDb(merchantId: string, reviews: MockReview[]) {
   let newReviewsCount = 0
+  const created = []
 
   for (const review of reviews) {
     const existing = await db.googleBusinessReview.findUnique({
@@ -275,27 +278,34 @@ export async function syncGoogleReviewsToDb(merchantId: string, reviews: MockRev
       // STRICT OVERWRITE PROTECTION:
       // If review is already replied in DB or on Google, NEVER overwrite or reset it!
       // Only sync if existing was marked unreplied in DB but Google now has a live owner reply
-      if (!existing.isReplied && review.reviewReply) {
+      // Also persist hasMedia if Google now returns reviewMediaItems for an existing review
+      const shouldSetReplied = !existing.isReplied && Boolean(review.reviewReply)
+      const shouldSetMedia = !existing.hasMedia && Boolean(review.hasMedia)
+      if (shouldSetReplied || shouldSetMedia) {
         await db.googleBusinessReview.update({
           where: { id: existing.id },
           data: {
-            isReplied: true,
-            reviewReply: review.reviewReply,
-            status: "replied",
-            repliedAt: new Date()
+            ...(shouldSetReplied ? {
+              isReplied: true,
+              reviewReply: review.reviewReply,
+              status: "replied",
+              repliedAt: new Date()
+            } : {}),
+            ...(shouldSetMedia ? { hasMedia: true } : {})
           }
         })
       }
     } else {
       // New review being added to DB
       const hasGoogleReply = Boolean(review.reviewReply && review.reviewReply.trim().length > 0)
-      await db.googleBusinessReview.create({
+      const createdRow = await db.googleBusinessReview.create({
         data: {
           merchantId,
           gbpReviewId: review.gbpReviewId,
           reviewerName: review.reviewerName,
           rating: review.rating,
           comment: review.comment,
+          hasMedia: Boolean(review.hasMedia),
           // CRITICAL: If Google already has an owner reply, mark as replied immediately so auto-reply NEVER overwrites it!
           status: hasGoogleReply ? "replied" : "pending",
           isReplied: hasGoogleReply,
@@ -304,11 +314,12 @@ export async function syncGoogleReviewsToDb(merchantId: string, reviews: MockRev
           createdAt: review.submittedAt || new Date()
         }
       })
+      created.push(createdRow)
       newReviewsCount++
     }
   }
 
-  return newReviewsCount
+  return { count: newReviewsCount, created }
 }
 
 /**

@@ -121,6 +121,7 @@ model Merchant {
   referrals                 Referral[]
   reviews                   Review[]
   reviewBonusLogs           ReviewBonusLog[]
+  reviewClaims              ReviewClaim[]
   rewards                   Reward[]
   rewardWaitlists           RewardWaitlist[]
   staff                     Staff[]
@@ -221,6 +222,7 @@ model Customer {
   referrals           Referral[]          @relation("Referrer")
   reviews             Review[]
   reviewBonusLogs     ReviewBonusLog[]
+  reviewClaims        ReviewClaim[]
   stamps              Stamp[]
   waitingCustomers    WaitingCustomer[]
   whatsAppMessages    WhatsAppMessage[]
@@ -751,6 +753,7 @@ model GoogleBusinessReview {
   isReplied    Boolean   @default(false)
   repliedAt    DateTime?
   status       String    @default("pending")
+  hasMedia     Boolean   @default(false)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   merchant     Merchant  @relation(fields: [merchantId], references: [id])
@@ -908,6 +911,24 @@ model ReviewBonusLog {
 
   @@index([merchantId, customerId, createdAt])
   @@index([decision, recheckAt])
+}
+
+model ReviewClaim {
+  id                 String   @id @default(cuid())
+  merchantId         String
+  customerId         String
+  clickedAt          DateTime @default(now())
+  expiresAt          DateTime
+  status             String   @default("open") // open|matched|manual|expired
+  matchedGbpReviewId String?  @unique
+  stampsAwarded      Int      @default(0)
+  createdAt          DateTime @default(now())
+
+  merchant Merchant @relation(fields: [merchantId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@index([merchantId, status])
+  @@index([customerId])
 }
 
 model DigitalBusinessCard {
