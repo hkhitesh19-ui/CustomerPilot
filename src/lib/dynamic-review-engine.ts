@@ -2108,6 +2108,7 @@ ${randomAngle} (Focus product: ${focalItem})
 ${bannedSample}
 ${pastReviewStyleGuide}
 CRITICAL ANTI-HALLUCINATION RULES:
+- NEVER invent or hallucinate specific staff, stylist, barber, or doctor names (e.g., Rahul, Priya, Dr. Sharma) unless explicitly provided in input.
 - NEVER invent unverified store promises, AC, or freebies: NO "AC", "no hidden charges", "koi hidden charge nahi", "24/7", "24-hour", "X-ray", "zero waiting", "bina extra charge", "bina koi extra charge", "free delivery", "15+ frames", "15 minutes only", or "WhatsApp ping" (WhatsApp is allowed ONLY for SaaS/Software).
 - NEVER use clichés like "rush tha", "thoda rush", "thodi bheed", or awkward openers like "Suno,".
 - DO NOT use "Store Special" or banned buzzwords ("spot-on", "top-notch", "game-changer", "hidden gem", "delve", "exceptional", "outstanding", "highly recommended").

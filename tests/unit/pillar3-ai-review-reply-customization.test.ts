@@ -5,7 +5,6 @@ import {
   getRotatingSeoKeywords,
   buildPersonalizedRuleBasedDrafts,
   generateAIReviewReplyDrafts,
-  VADODARA_CAKE_SEO_KEYWORDS
 } from "@/lib/ai-review-reply"
 
 describe("Pillar 3 — AI Google Review Reply Personalization & Overwrite Protection", () => {
@@ -49,9 +48,9 @@ describe("Pillar 3 — AI Google Review Reply Personalization & Overwrite Protec
       expect(kw1).not.toBe(kw2)
       expect(kw2).not.toBe(kw3)
       expect(kw1).not.toBe(kw3)
-      expect(VADODARA_CAKE_SEO_KEYWORDS).toContain(kw1)
-      expect(VADODARA_CAKE_SEO_KEYWORDS).toContain(kw2)
-      expect(VADODARA_CAKE_SEO_KEYWORDS).toContain(kw3)
+      expect(kw1.length).toBeGreaterThan(5)
+      expect(kw2.length).toBeGreaterThan(5)
+      expect(kw3.length).toBeGreaterThan(5)
     })
   })
 

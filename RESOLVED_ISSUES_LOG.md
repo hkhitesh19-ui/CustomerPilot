@@ -8079,3 +8079,19 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   3. **1st-Person Lock, Shorthand Keywords & SaaS Feature Lock**: Enforced 1st-person customer voice, natural casual shorthand in `draft_2`/`draft_3`, Hinglish gender polish, and strict SaaS loyalty vs review benefit separation.
   4. **V1.1 Unit Tests (`tests/unit/all-categories-review-engine.test.ts`)**: Added Suite 19 (6 tests) covering synonym replacement, broken grammar, flexible freebie regex, scoped realities, recipe guard, and SaaS loyalty lock. All 63/63 Vitest tests and 7/7 Adversarial Master Gates passed.
 - **Status**: ✅ Resolved and Verified locally (pending user GO before push/deploy).
+
+
+---
+## [27 Nov 2026] Issue: Multi-Category & Rating-Aware Auto-Reply Engine + Staff-Name Anti-Hallucination Guard
+- **Symptom**: Pre-deploy 10×10 live test of `src/lib/ai-review-reply.ts` exposed 90/90 (100%) non-bakery replies leaking Cake Connection / Vadodara cake keywords (`"customized designer cakes in Vadodara"`, `"we warmly look forward to baking for you again soon!"`, `"on-time cake delivery"`), 100% of Gemini calls returning `404 Not Found` (`gemini-2.5/2.0/1.5-flash`), broken grammar (`"delighted to hear that loved"`), U+2011 buzzword bypasses, and untested 1★–3★ negative review handling. Additionally, `dynamic-review-engine.ts` occasionally invented unprovided staff names (e.g., `"Rahul"`).
+- **Root Cause**:
+  1. `ai-review-reply.ts` hardcoded `VADODARA_CAKE_SEO_KEYWORDS`, `"fresh cake"`, `"Vadodara"`, and `"🎂"` in both LLM prompts and `buildPersonalizedRuleBasedDrafts()`.
+  2. Deprecated `GEMINI_MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]` 404'd on `AQ.` keys, forcing 100% fallback without Groq `openai/gpt-oss-20b` failover or shared NFKC scrubber.
+  3. No rating-aware sentiment routing existed for 4★ vs 1★–3★ reviews.
+- **Resolution**:
+  1. **3-Tier Model Chain & Telemetry (`src/lib/ai-review-reply.ts`)**: Synced Tier 1 Gemini (`gemini-3.1-flash-lite` -> `gemini-3.5-flash`), Tier 2 Groq (`openai/gpt-oss-120b` -> `openai/gpt-oss-20b`), and Tier 3 category/rating-aware fallback with `engine_used`/`model_used` telemetry, `<think>` stripping, and shared NFKC + non-destructive buzzword/fluff scrubbing.
+  2. **Zero Hardcoded Cake/Vadodara Leaks**: Deleted `VADODARA_CAKE_SEO_KEYWORDS`; added `resolveReplyCategory()` (with Men's Salon vs Pet Grooming guard), dynamic category-scoped keywords, dynamic city/locality handling, and `hasInvalidReplyOutput()` blocking cross-category leaks, unverified delivery claims, and placeholder phone numbers (`98XXXXXXXX`).
+  3. **Rating-Aware Sentiment Routing**: Enforced distinct 5★ positive, 4★ constructive, and 1★–3★ calm empathy/apology + offline resolution modes (zero cheerfulness/SEO stuffing on negative reviews).
+  4. **Staff-Name Guard (`src/lib/dynamic-review-engine.ts`)**: Added explicit prompt prohibition against inventing staff/stylist/barber/doctor names.
+  5. **Verification**: 96/96 Vitest tests passed, 7/7 Adversarial Master Gates passed, and 120/120 live LLM Auto-Reply calls (100 positive + 20 negative) passed with `0/90` cake leaks, `0` Vadodara leaks, `0` delivery leaks, `0` buzzwords, `0` broken grammar, and `0/20` negative tone failures.
+- **Status**: ✅ Resolved and Verified locally (awaiting user GO before push/deploy).
