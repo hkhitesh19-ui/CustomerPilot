@@ -54,15 +54,143 @@ export function normalizeUnicodeHyphens(s: string): string {
 
 export const BANNED_BUZZWORD_REGEX = /\b(spot[- ]?on|top[- ]?notch|hidden gem|highly recommend(?:ed)?|pristine|testament|delve|exceptional|outstanding|game[- ]?changer|store special)\b/gi
 
+export const FREEBIE_HYPE_REGEX = /\b(bina\s+(?:kisi\s+|koi\s+)?extra\s+charges?|no\s+extra\s+charges?|extra\s+charges?|10x|5x|100%\s+guaranteed|instant\s+cure|symptoms\s+turant\s+kam|cleared\s+(?:up\s+)?(?:my\s+)?acne\s+marks\s+instantly)\b/gi
+
+/**
+ * Non-destructive NFKC + Unicode hyphen normalizer & neutral synonym replacement.
+ * Replaces banned AI buzzwords with natural neutral synonyms instead of blind deletion,
+ * preventing broken sentences like "The staff was very while...".
+ */
 export function scrubBannedBuzzwords(s: string): string {
-  return normalizeUnicodeHyphens(s)
-    .replace(BANNED_BUZZWORD_REGEX, "")
+  let out = normalizeUnicodeHyphens(s)
+    .replace(/\b(top[- ]?notch|exceptional|outstanding)\b/gi, "great")
+    .replace(/\bspot[- ]?on\b/gi, "accurate")
+    .replace(/\bgame[- ]?changer\b/gi, "very useful")
+    .replace(/\bhidden gem\b/gi, "great find")
+    .replace(/\bdelve\b/gi, "explore")
+    .replace(/\bhighly recommend(?:ed)?\b/gi, "worth visiting")
+    .replace(/\btestament\b/gi, "proof")
+    .replace(/\bpristine\b/gi, "clean")
+    .replace(/\bstore special\b/gi, "popular item")
+    .replace(FREEBIE_HYPE_REGEX, "")
     .replace(/["\\]/g, "")
     .replace(/\s+/g, " ")
     .replace(/\s+([.,!])/g, "$1")
     .replace(/([.,!])\s*([.,!])/g, "$1")
     .replace(/^[.,!\s]+/, "")
     .trim()
+  return out
+}
+
+/**
+ * Detects broken adjective/adverb gaps left after word stripping or bad LLM output.
+ */
+export function hasBrokenGrammar(text: string): boolean {
+  if (!text || text.trim().length < 8) return true
+  if (/\b(was|is|are|were|felt)\s+(very|really|quite|so|truly)\s+(while|and|for|to|in|at|with|because|that|who)\b/i.test(text)) {
+    return true
+  }
+  if (/\b(very|really|quite)\s*[.,!?]/i.test(text)) {
+    return true
+  }
+  return false
+}
+
+/**
+ * Detects imperative cooking-recipe or blog-advice tone instead of 1st-person customer review.
+ */
+export function hasRecipeOrAdviceTone(text: string): boolean {
+  return /\b(garam karo|nikaalo|use karo|avoid karo|enjoy karo)\b/i.test(text)
+}
+
+/**
+ * Category-scoped verifiable store realities (zero cross-category leaks like "packaging" in salons,
+ * zero "hidden charges" clichés in restaurants, zero unverified "AC" claims).
+ */
+export function getCategoryScopedRealities(categoryKey: string): string[] {
+  switch (categoryKey) {
+    case "bakery":
+      return [
+        "safe sealed cake box",
+        "clean display counter",
+        "polite counter staff",
+        "clear flavour guidance",
+        "freshly prepared order"
+      ]
+    case "salon_men":
+    case "beauty_parlour":
+      return [
+        "clean sanitized tools",
+        "fresh clean towels",
+        "neat tidy workstation",
+        "patient polite stylist",
+        "comfortable grooming setup"
+      ]
+    case "dental_clinic":
+      return [
+        "sterilized dental instruments",
+        "clean hygienic clinic",
+        "patient clear explanation by doctor",
+        "gentle careful handling",
+        "organized appointment flow"
+      ]
+    case "pet_clinic":
+      return [
+        "clean sanitized examination table",
+        "gentle pet-friendly handling",
+        "clear post-visit care guidance",
+        "polite caring clinic staff"
+      ]
+    case "restaurant":
+    case "pizza_restaurant":
+    case "fast_food":
+    case "non_veg_restaurant":
+    case "cafe":
+      return [
+        "clean hygienic dining area",
+        "warm polite table service",
+        "freshly cooked hot food",
+        "generous fresh portions",
+        "neat comfortable seating"
+      ]
+    case "optical_store":
+      return [
+        "patient frame selection guidance without pushiness",
+        "clean sanitized eye-testing room",
+        "sturdy hard protective case",
+        "snug nose pad and temple adjustment",
+        "brisk efficient billing and courteous team"
+      ]
+    case "saree_palace":
+    case "clothing":
+      return [
+        "patient staff showing multiple weave designs",
+        "neat folded saree presentation",
+        "comfortable spacious showroom",
+        "clear fabric and zari guidance"
+      ]
+    case "car_wash":
+      return [
+        "clean microfiber cloths to prevent scratches",
+        "thorough wheel arch and corner cleaning",
+        "organized washing bay",
+        "polite detailing crew"
+      ]
+    case "saas_agency":
+      return [
+        "simple 5-minute merchant onboarding",
+        "clean easy-to-use store dashboard",
+        "responsive local support team",
+        "clear transparent plan pricing"
+      ]
+    default:
+      return [
+        "clean well-organized counter",
+        "polite courteous staff",
+        "clear guidance on options",
+        "smooth billing experience"
+      ]
+  }
 }
 
 interface FallbackReviewItem {
@@ -124,7 +252,7 @@ const CAFE_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Iced caramel latte paired with grilled paneer sandwich. Fresh bread, good cheese pull and perfectly balanced coffee.",
     draft2: "Weekend evening me cafe lively tha, music volume decent tha aur order promptly aa gaya.",
-    draft3: "Great coffee aroma, chilled AC and comfortable seating. Total value for money."
+    draft3: "Great coffee aroma, comfortable seating and peaceful cafe vibe. Total value for money."
   },
   {
     draft1: "Peri peri french fries were super crispy and the chocolate frappe was thick and rich.",
@@ -156,14 +284,14 @@ const RESTAURANT_REVIEWS: FallbackReviewItem[] = [
   },
   {
     draft1: "Special unlimited thali me har sabzi ka taste unique tha. Sweets and hot rotis kept coming without asking.",
-    draft2: "Lunch time me serving staff polite aur attentive tha. AC cooling badiya thi.",
+    draft2: "Lunch time me serving staff polite aur attentive tha. Dining hall clean aur comfortable tha.",
     draft3: "Authentic homestyle meal, sparkling clean tables and warm hospitality."
   }
 ]
 
 const SALON_MEN_REVIEWS: FallbackReviewItem[] = [
   {
-    draft1: "Skin fade haircut bilkul photo jaisa diya. Rates genuine hain aur AC cooling badiya thi.",
+    draft1: "Skin fade haircut bilkul photo jaisa diya. Rates genuine hain aur salon setup clean hai.",
     draft2: "Beard trim fast aur clean kiya. Fresh towel aur hygiene ka proper dhyan rakha.",
     draft3: "Relaxing head massage and clean setup. Staff polite hai aur service super quick."
   },
@@ -179,7 +307,7 @@ const SALON_MEN_REVIEWS: FallbackReviewItem[] = [
   },
   {
     draft1: "Low fade haircut aur beard contour sharp diya. Finishing touch ekdum clean aur symmetric thi.",
-    draft2: "Evening me visit kiya, staff courteous tha aur comfortable AC lounge me seating mili.",
+    draft2: "Evening me visit kiya, staff courteous tha aur comfortable lounge me seating mili.",
     draft3: "Clean men's grooming and hygienic haircut tools. Worth visiting again!"
   }
 ]
@@ -198,7 +326,7 @@ const PARLOUR_LADIES_REVIEWS: FallbackReviewItem[] = [
   },
   {
     draft1: "Pedicure and manicure service bohot relaxing thi. Sanitized tools use kiye aur dead skin properly clean ki.",
-    draft2: "Staff gentle aur attentive tha. Ambiance calm tha aur AC cooling badiya thi, bina kisi product upselling ke.",
+    draft2: "Staff gentle aur attentive tha. Ambiance calm aur peaceful tha, bina kisi product upselling ke.",
     draft3: "Very neat, hygienic setup with attentive beauticians. Great place for women!"
   },
   {
@@ -234,7 +362,7 @@ const SOUTH_INDIAN_REVIEWS: FallbackReviewItem[] = [
 const CAR_WASH_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Complete snow foam wash aur underbody pressure wash karwaya. Wheel arches se sara mud clean ho gaya.",
-    draft2: "Sunday afternoon ko waiting lounge me AC tha. Washing staff ne alloys ache se clean kiye.",
+    draft2: "Sunday afternoon ko waiting lounge comfortable tha. Washing staff ne alloys ache se clean kiye.",
     draft3: "Scratch-free foam wash, sparkling glass finish and quick dependable vehicle care."
   },
   {
@@ -350,7 +478,7 @@ const PIZZA_REVIEWS: FallbackReviewItem[] = [
 const NON_VEG_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Chicken Dum Biryani aur Butter Chicken ka taste proper authentic Mughlai tha. Chicken pieces juicy aur tender the.",
-    draft2: "Family dinner ke liye AC dining hall comfortable tha. Garlic naan steaming hot aayi aur serving staff polite tha.",
+    draft2: "Family dinner ke liye dining hall comfortable tha. Garlic naan steaming hot aayi aur serving staff polite tha.",
     draft3: "Delicious aromatic biryani, rich creamy butter chicken and warm hospitality. Best non-veg restaurant in locality!"
   },
   {
@@ -460,7 +588,7 @@ const SAREE_CLOTHING_REVIEWS: FallbackReviewItem[] = [
   {
     draft1: "Rajwadi silk saree li function ke liye, sabne tareef ki. Fabric bohot comfortable aur premium lag raha tha. Thank you team!",
     draft2: "Traditional Patola aur Bandhani sarees ka exclusive collection yahan mila. Family ke sath shopping karne ka best experience.",
-    draft3: "Top-quality pure silk sarees, spacious AC showroom aur polite sales staff. 100% recommended for wedding shopping!"
+    draft3: "Pure silk sarees, spacious showroom aur polite sales staff. Great place for wedding shopping!"
   }
 ]
 
@@ -752,7 +880,7 @@ function getCategoryAwareItemDrafts(
       },
       {
         draft1: `Festive occasion ke liye ${item} select ki — color combination aur handloom detailing bilkul royal lag rahi thi.`,
-        draft2: `Bina kisi hurry ke sales team ne 20+ patterns khol kar dikhaye. Comfortable AC showroom aur genuine silk trust.`
+        draft2: `Bina kisi hurry ke sales team ne 20+ patterns khol kar dikhaye. Comfortable showroom aur genuine silk trust.`
       },
       {
         draft1: `Diwali get-together ke liye ${item} choose ki — itni comfortable aur breathable thi ki poora evening easily carry kar payi!`,
@@ -1120,7 +1248,7 @@ function getCategoryAwareItemDrafts(
         },
         {
           draft1: `Got composite filling done here. Procedure quick aur comfortable tha, aur natural tooth color se ekdum match kar raha hai.`,
-          draft2: `Transparent pricing mili — koi hidden charges nahi. Doctor ne filling material ke options clearly bataye.`,
+          draft2: `Clear pricing mili — doctor ne treatment options aur filling material clearly samjhaye.`,
           draft3: `Clean tooth filling, transparent pricing and comfortable care!`
         }
       ]
@@ -1150,7 +1278,7 @@ function getCategoryAwareItemDrafts(
         },
         {
           draft1: `${item} done here — doctor bahut gentle the aur chair pe bilkul comfortable feel hua throughout the procedure.`,
-          draft2: `Transparent pricing, no hidden charges. Doctor ne treatment clearly explain kiya aur follow-up schedule diya.`,
+          draft2: `Clear billing aur honest consultation. Doctor ne treatment clearly explain kiya aur follow-up schedule diya.`,
           draft3: `Comfortable dental visit and experienced dentist!`
         }
       ]
@@ -1243,7 +1371,7 @@ function getCategoryAwareItemDrafts(
         },
         {
           draft1: `Gayi thi ${item} ke liye — results amazing the! Hair much more manageable ho gaye aur texture bohot improved hai.`,
-          draft2: `Didi ne ${item} properly ache se kiya bina kisi hurry ke. Parlour AC comfortable tha aur hygiene top class thi.`,
+          draft2: `Didi ne ${item} properly ache se kiya bina kisi hurry ke. Parlour comfortable tha aur hygiene top class thi.`,
           draft3: `Soft manageable hair and relaxing ${item} session!`
         },
         {
@@ -1270,7 +1398,7 @@ function getCategoryAwareItemDrafts(
       templates = [
         {
           draft1: `${item} karwaya — didi ke haath mein jadoo hai! Skin pe instant glow aur freshness aa gayi, results better than expected.`,
-          draft2: `${item} ke liye appointment liya — parlour clean aur AC mein comfortable tha. Treatment mein koi hurry nahi ki.`,
+          draft2: `${item} ke liye appointment liya — parlour clean aur comfortable tha. Treatment mein koi hurry nahi ki.`,
           draft3: `Gentle ${item} and clean hygienic ladies parlour. Skin feels super fresh!`
         },
         {
@@ -1315,8 +1443,8 @@ function getCategoryAwareItemDrafts(
       templates = [
         {
           draft1: `${item} karwaya — instant freshness aur clean skin feel. Face pe natural glow aa gaya aur skin ekdum refreshed hai!`,
-          draft2: `${item} ke liye visit kiya — waiting time minimal tha aur result clean nikla. Fair pricing, clean AC salon.`,
-          draft3: `Fresh glowing skin after ${item}! Clean AC salon and gentle skin care.`
+          draft2: `${item} ke liye visit kiya — waiting time minimal tha aur result clean nikla. Fair pricing, clean salon.`,
+          draft3: `Fresh glowing skin after ${item}! Clean salon and gentle skin care.`
         },
         {
           draft1: `De-tan ${item} done yahan — dullness visibly kam hui aur skin tone even aur bright lag raha hai. Very satisfied!`,
@@ -1355,7 +1483,7 @@ function getCategoryAwareItemDrafts(
       templates = [
         {
           draft1: `${item} karwaya — bhai ne zero mistake se kiya. Fresh clean look mila, bilkul jaisa bola tha waisa. Very skilled!`,
-          draft2: `${item} ke liye walk-in gaya — clean result nikla. Fair pricing aur chilled AC setup.`,
+          draft2: `${item} ke liye walk-in gaya — clean result nikla. Fair pricing aur neat setup.`,
           draft3: `Sharp ${item} exactly as asked! Clean setup and fair pricing.`
         },
         {
@@ -1464,8 +1592,8 @@ function getCategoryAwareItemDrafts(
       },
       {
         draft1: `Tried their ${item} — fresh brewed, excellent balance of sweet and bitter. Instant mood booster!`,
-        draft2: `${item} served promptly with neat presentation. Comfortable seating aur AC properly chilled tha.`,
-        draft3: `Fresh ${item}, chilled AC and comfortable seating!`
+        draft2: `${item} served promptly with neat presentation. Comfortable seating aur calm vibe tha.`,
+        draft3: `Fresh ${item}, calm ambiance and comfortable seating!`
       }
     ]
     const t = pickTemplate(templates)
@@ -1491,8 +1619,8 @@ function getCategoryAwareItemDrafts(
       },
       {
         draft1: `Weekend dinner pe ${item} try kiya, aroma aur masala balance bilkul perfect, light aur non-oily tha.`,
-        draft2: `AC dining hall clean aur comfortable tha. Waiter ne bina delay ke fresh rotis aur sides serve kiye.`,
-        draft3: `Light non-oily ${item} in a clean AC family dining hall!`
+        draft2: `Dining hall clean aur comfortable tha. Waiter ne bina delay ke fresh rotis aur sides serve kiye.`,
+        draft3: `Light non-oily ${item} in a clean family dining hall!`
       },
       {
         draft1: `Friends ke sath lunch pe ${item} mangwaya — quantity kafi achi thi aur presentation neat mili.`,
@@ -1567,7 +1695,7 @@ function getCategoryAwareItemDrafts(
         },
         {
           draft1: `Snow foam ${item} karwaya — paint safe, finish brilliant aur alloys ekdum clean. Great value detailing service!`,
-          draft2: `Sunday afternoon ko waiting lounge me AC tha. Washing staff ne alloys ache se clean kiye.`,
+          draft2: `Sunday afternoon ko waiting lounge comfortable tha. Washing staff ne alloys ache se clean kiye.`,
           draft3: `Clean alloys, safe foam wash and polite crew for ${item}!`
         }
       ]
@@ -1747,16 +1875,8 @@ export async function generateDynamicReviewDraft(params: {
     }
   ]
 
-  const STORE_REALITIES = [
-    "clean sanitized setup and well-organized counter",
-    "patient consultation where staff explained options without any pushiness",
-    "transparent billing with clear pricing and zero hidden surprises",
-    "neat hygienic packaging and careful product handling",
-    "polite courteous staff and comfortable AC ambiance",
-    "clear guidance on care and usage instructions",
-    "attentive service with genuine respect for customer preferences",
-    "brisk efficient billing and courteous interaction"
-  ]
+  const categoryRealities = getCategoryScopedRealities(profile.categoryKey)
+  const assignedVibe = categoryRealities[Math.floor(Math.random() * categoryRealities.length)]
 
   let assignedArchetype = OPTICAL_ARCHETYPES[Math.floor(Math.random() * OPTICAL_ARCHETYPES.length)]
   const focalLower = focalItem.toLowerCase()
@@ -1780,7 +1900,7 @@ export async function generateDynamicReviewDraft(params: {
     assignedArchetype = OPTICAL_ARCHETYPES[7]
   }
 
-  const assignedVibe = STORE_REALITIES[Math.floor(Math.random() * STORE_REALITIES.length)]
+  // Removed old global STORE_REALITIES array in favor of categoryRealities above
 
   // 4. Prepare fallback immediately
   const fallback = getDynamicFallbackReview(profile.categoryKey || businessCategory, focalItem, seed || timestampSeed)
@@ -1795,8 +1915,8 @@ export async function generateDynamicReviewDraft(params: {
     return { ...fallback, engine_used: "tier3_fallback", model_used: "tier3_static" }
   }
 
-  // Post-generation Negative Blacklist Sanitizer — uses universal NFKC + Unicode hyphen scrubber
-  const sanitizeStrict = (text: string): string => {
+  // Post-generation Negative Blacklist + Grammar + Recipe Guard
+  const sanitizeStrict = (text: string, fallbackText: string): string => {
     let res = scrubBannedBuzzwords(text)
     for (const banned of profile.strictlyNotAllowed) {
       if (banned.length >= 3) {
@@ -1804,8 +1924,11 @@ export async function generateDynamicReviewDraft(params: {
         res = res.replace(re, "")
       }
     }
-    // Remove hanging punctuation or double spaces
-    return res.replace(/\s+/g, " ").replace(/\s+([.,!])/g, "$1").trim()
+    res = res.replace(/\s+/g, " ").replace(/\s+([.,!])/g, "$1").trim()
+    if (hasBrokenGrammar(res) || hasRecipeOrAdviceTone(res)) {
+      return fallbackText
+    }
+    return res
   }
 
   // 6. Audience Persona & Gender Grammar Directive
@@ -1825,7 +1948,9 @@ export async function generateDynamicReviewDraft(params: {
   } else if (profile.categoryKey === "saas_agency") {
     personaInstruction = `STRICT B2B MERCHANT PERSONA RULE:
 - The reviewer is an authentic local retail store owner / merchant / shop manager writing for CustomerPilot (SaaS platform).
-- Perspective: "Hamare store/bakery/salon ke liye CustomerPilot WhatsApp loyalty lagaya", "Google reviews 800% badh gaye", "Counter standee se customers khush hoke review dete hain", "1-click owner auto-reply se daily time bachta hai".
+- STRICT FEATURE-TO-BENEFIT LOCK:
+  * If the item is "WhatsApp loyalty wallet / digital stamps": praise ONLY repeat customer visits, digital stamp tracking, and customer retention — NEVER mention Google reviews!
+  * If the item is "Smart AI Google review QR / Auto-reply": praise ONLY genuine Google reviews, fast owner replies, and local visibility — NEVER use unrealistic multipliers like "10x" or "5x".
 - ABSOLUTELY NEVER mention ordering food, haircut, doctor visit, cakes, thali, or personal services.`
   } else if (profile.categoryKey === "pet_clinic") {
     personaInstruction = `STRICT PET OWNER PERSONA RULE (CRITICAL — READ CAREFULLY):
@@ -1946,16 +2071,25 @@ You are CustomerPilot's authentic Indian consumer review drafting engine.
 Generate 3 distinct, natural, human Google Maps reviews (12 to 20 words each) for "${profile.businessName}".
 ${categoryGuard}
 
-HARD FOCAL-ITEM LOCK (NON-NEGOTIABLE — APPLIES TO ALL 3 DRAFTS):
+HARD 1ST-PERSON CUSTOMER VOICE LOCK (NON-NEGOTIABLE):
+- ALL 3 drafts MUST be written strictly in 1st-person customer voice ("I", "My", "We", "Maine", "Mere/Meri", "Humne") describing an actual visit or purchase.
+- STRICTLY FORBIDDEN: cooking recipes, how-to tips, or post-care advice to readers ("mild shampoo use karo", "dhimi aanch par garam karo", "fridge mein rakho") OR 3rd-person narrator voice ("Bhai ne... bhai ka look").
+
+HARD FOCAL-ITEM LOCK & NATURAL KEYWORD SHORTHAND (NON-NEGOTIABLE):
 - Requested Focal Item: "${focalItem}"
 - ALL THREE drafts (draft_1, draft_2, AND draft_3) MUST stay 100% anchored ONLY to "${focalItem}" and its exact service/animal sub-type.
+- NATURAL SHORTHAND RULE (ANTI-STUFFING):
+  * draft_1: Use the exact requested item keyword "${focalItem}" naturally ONCE.
+  * draft_2 & draft_3: Use natural casual customer shorthand instead of repeating the full 4-5 word catalog title verbatim (e.g., "snow foam wash" instead of "complete snow foam exterior wash"; "root canal" instead of "painless single-sitting root canal"; "truffle cake" instead of "Dutch Chocolate Truffle Cake").
 - NEVER introduce a second or unrequested service in draft_2 or draft_3:
   * Pet Clinic: If item is about a cat or skin allergy -> NEVER mention dog, puppy, kutta, kutte, vaccination, or deworming.
   * Men's Salon: If item is a facial/cleanup -> NEVER mention haircut, fade, beard, scissors, razor, or head massage.
   * Beauty Parlour: If item is a hair treatment (keratin/spa) -> NEVER mention threading, waxing, facial, or skin glow.
   * Dental Clinic: If item is a consultation -> NEVER claim teeth feel clean, scaled, or filled.
   * Bakery: If item is a fruit cake -> NEVER mention chocolate flavor.
-- TONE & CADENCE: Write in natural Indian English or conversational Hinglish. NEVER use Western AI fluff ("sweet, fruity delight", "Great service!", "delightful treat") or false medical/cosmetic guarantees ("cleared acne marks instantly").
+- HINGLISH GRAMMAR & TONE:
+  * Write in natural Indian English or conversational Hinglish with correct gender/verb agreement: "Mere puppy ka" (not "Mera puppy ka"), "bill clear tha" (not "clear thi"), "box ready mila" (not "mili"), "vet doctor gentle the" (not "tha"), and end every sentence with proper punctuation.
+  * NEVER use Western AI fluff ("sweet, fruity delight", "Great service!") or unrealistic numeric/medical hype ("10x", "5x", "100% guaranteed", "instant relief", "symptoms turant kam", "cleared acne marks instantly").
 
 MERCHANT STRICT BOUNDARIES:
 1. Target Customer Persona:
@@ -1974,7 +2108,7 @@ ${randomAngle} (Focus product: ${focalItem})
 ${bannedSample}
 ${pastReviewStyleGuide}
 CRITICAL ANTI-HALLUCINATION RULES:
-- NEVER invent unverified store promises or freebies: NO "24/7", "24-hour", "X-ray", "zero waiting", "bina extra charge", "free delivery", "15+ frames", "15 minutes only", or "WhatsApp ping" (WhatsApp is allowed ONLY for SaaS/Software).
+- NEVER invent unverified store promises, AC, or freebies: NO "AC", "no hidden charges", "koi hidden charge nahi", "24/7", "24-hour", "X-ray", "zero waiting", "bina extra charge", "bina koi extra charge", "free delivery", "15+ frames", "15 minutes only", or "WhatsApp ping" (WhatsApp is allowed ONLY for SaaS/Software).
 - NEVER use clichés like "rush tha", "thoda rush", "thodi bheed", or awkward openers like "Suno,".
 - DO NOT use "Store Special" or banned buzzwords ("spot-on", "top-notch", "game-changer", "hidden gem", "delve", "exceptional", "outstanding", "highly recommended").
 - Every single draft MUST feel 100% human, casual, and authentic.
@@ -1982,9 +2116,9 @@ CRITICAL ANTI-HALLUCINATION RULES:
 [OUTPUT FORMAT]
 Return ONLY a valid parseable JSON object (NO <think> tags, NO markdown prose):
 {
-  "draft_1": "12 to 20 words natural Indian English or Hinglish strictly about ${focalItem}",
-  "draft_2": "12 to 20 words conversational Hinglish strictly about ${focalItem} reflecting '${assignedVibe}'",
-  "draft_3": "8 to 14 words punchy 1-liner strictly about ${focalItem}"
+  "draft_1": "12 to 20 words 1st-person customer review using ${focalItem}",
+  "draft_2": "12 to 20 words 1st-person conversational Hinglish using casual shorthand for ${focalItem} reflecting '${assignedVibe}'",
+  "draft_3": "8 to 14 words punchy 1st-person 1-liner using casual shorthand for ${focalItem}"
 }`
 
   // A. Try Gemini if configured
@@ -2018,9 +2152,9 @@ Return ONLY a valid parseable JSON object (NO <think> tags, NO markdown prose):
         const parsed = extractCleanJsonFromLlmResponse(geminiResult.text)
         if (parsed && parsed.draft_1 && parsed.draft_2) {
           return {
-            draft1: sanitizeStrict(String(parsed.draft_1)),
-            draft2: sanitizeStrict(String(parsed.draft_2)),
-            draft3: parsed.draft_3 ? sanitizeStrict(String(parsed.draft_3)) : fallback.draft3,
+            draft1: sanitizeStrict(String(parsed.draft_1), fallback.draft1),
+            draft2: sanitizeStrict(String(parsed.draft_2), fallback.draft2),
+            draft3: parsed.draft_3 ? sanitizeStrict(String(parsed.draft_3), fallback.draft3) : fallback.draft3,
             engine_used: "gemini",
             model_used: geminiResult.modelName
           }
@@ -2068,9 +2202,9 @@ Return ONLY a valid parseable JSON object (NO <think> tags, NO markdown prose):
             const parsed = extractCleanJsonFromLlmResponse(content)
             if (parsed && parsed.draft_1 && parsed.draft_2) {
               return {
-                draft1: sanitizeStrict(String(parsed.draft_1)),
-                draft2: sanitizeStrict(String(parsed.draft_2)),
-                draft3: parsed.draft_3 ? sanitizeStrict(String(parsed.draft_3)) : fallback.draft3,
+                draft1: sanitizeStrict(String(parsed.draft_1), fallback.draft1),
+                draft2: sanitizeStrict(String(parsed.draft_2), fallback.draft2),
+                draft3: parsed.draft_3 ? sanitizeStrict(String(parsed.draft_3), fallback.draft3) : fallback.draft3,
                 engine_used: "groq",
                 model_used: candidateModel
               }

@@ -18,6 +18,10 @@ import {
   getDynamicFallbackReview,
   generateDynamicReviewDraft,
   extractCleanJsonFromLlmResponse,
+  scrubBannedBuzzwords,
+  hasBrokenGrammar,
+  hasRecipeOrAdviceTone,
+  getCategoryScopedRealities,
   ReviewDraftOptions
 } from "@/lib/dynamic-review-engine"
 
@@ -861,3 +865,67 @@ describe("18. Zero-Leak Output Gate Across All Categories & Seeds", () => {
 function normalizeUnicode(s: string): string {
   return s.normalize("NFKC").replace(/[\u2010-\u2015\u2212\u2E3A\u2E3B\uFE58\uFE63\uFF0D]/g, "-")
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SUITE 19: V1.1 Quality, Grammar, Scoped Realities & Feature-Benefit Lock
+// ═══════════════════════════════════════════════════════════════════════════════
+describe("19. V1.1 Quality & Grammar Hardening", () => {
+  it("non-destructive synonym replacement prevents broken 'was very while' sentences", () => {
+    const scrubbed = scrubBannedBuzzwords("The staff was very exceptional while showing their Pure Kanjivaram Silk Saree collection.")
+    expect(scrubbed).toBe("The staff was very great while showing their Pure Kanjivaram Silk Saree collection.")
+    expect(hasBrokenGrammar(scrubbed)).toBe(false)
+
+    const unicodeSpotOn = scrubBannedBuzzwords("Lens fitting was spot\u2011on and frames were top\u2212notch.")
+    expect(unicodeSpotOn).toBe("Lens fitting was accurate and frames were great.")
+    expect(hasBrokenGrammar(unicodeSpotOn)).toBe(false)
+  })
+
+  it("hasBrokenGrammar() catches broken adjective deletion patterns", () => {
+    expect(hasBrokenGrammar("The staff was very while showing sarees.")).toBe(true)
+    expect(hasBrokenGrammar("The cake tasted really.")).toBe(true)
+    expect(hasBrokenGrammar("The staff was very patient while showing sarees.")).toBe(false)
+  })
+
+  it("flexible freebie & hype regex catches 'bina koi extra charge', 'bina kisi extra charges', 'no extra charge', '10x'", () => {
+    expect(scrubBannedBuzzwords("De-tan mask se skin glow, bina koi extra charge.")).not.toMatch(/extra\s+charge/i)
+    expect(scrubBannedBuzzwords("Piping done bina kisi extra charges ke.")).not.toMatch(/extra\s+charges?/i)
+    expect(scrubBannedBuzzwords("Service with no extra charge.")).not.toMatch(/extra\s+charge/i)
+    expect(scrubBannedBuzzwords("Reviews 10x badh gaye.")).not.toMatch(/\b10x\b/i)
+  })
+
+  it("category-scoped STORE_REALITIES prevents packaging in salon/dental, hidden charges in restaurant/bakery, and AC anywhere", () => {
+    for (const cat of ["salon_men", "beauty_parlour", "dental_clinic"]) {
+      const realities = getCategoryScopedRealities(cat).join(" ")
+      expect(realities, `${cat} realities must not mention packaging`).not.toMatch(/packaging|packing/i)
+      expect(realities, `${cat} realities must not mention AC`).not.toMatch(/\bAC\b/i)
+    }
+    for (const cat of ["restaurant", "bakery", "pet_clinic"]) {
+      const realities = getCategoryScopedRealities(cat).join(" ")
+      expect(realities, `${cat} realities must not mention hidden charges`).not.toMatch(/hidden/i)
+      expect(realities, `${cat} realities must not mention AC`).not.toMatch(/\bAC\b/i)
+    }
+    Object.keys(CATEGORY_ITEMS).forEach((cat) => {
+      CATEGORY_ITEMS[cat].forEach((item, i) => {
+        const r = getDynamicFallbackReview(cat, item, i)
+        const all = `${r.draft1} ${r.draft2} ${r.draft3}`
+        expect(all, `AC assumption leaked in ${cat}/${item}`).not.toMatch(/\bAC\b/)
+        expect(all, `hidden charge cliché leaked in ${cat}/${item}`).not.toMatch(/hidden\s+charge/i)
+      })
+    })
+  })
+
+  it("recipe/advice imperative guard catches 'dhimi aanch par garam karo' and 'mild shampoo use karo'", () => {
+    expect(hasRecipeOrAdviceTone("Dal Makhani ko dhimi aanch par garam karo, butter naan enjoy karo.")).toBe(true)
+    expect(hasRecipeOrAdviceTone("Keratin spa ke baad, roz thoda mild shampoo use karo, heat styling avoid karo.")).toBe(true)
+    expect(hasRecipeOrAdviceTone("Maine Dal Makhani aur butter naan order kiya, taste bahut accha tha.")).toBe(false)
+  })
+
+  it("SaaS loyalty wallet Tier-3 drafts NEVER claim Google reviews or '10x'", () => {
+    for (let s = 0; s < 5; s++) {
+      const r = getDynamicFallbackReview("saas_agency", "WhatsApp digital loyalty wallet system", s)
+      const all = `${r.draft1} ${r.draft2} ${r.draft3}`.toLowerCase()
+      expect(all).not.toMatch(/google review|10x|5x/)
+      expect(all).toMatch(/loyalty|stamp|repeat|footfall/)
+    }
+  })
+})

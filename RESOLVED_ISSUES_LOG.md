@@ -8065,3 +8065,17 @@ ext.config.ts Content Security Policy to eliminate browser console CSP warnings.
   3. **Mocked LLM + Zero-Leak + Trigram Tests (`tests/unit/all-categories-review-engine.test.ts`)**: Added Suites 14–18 testing mocked Tier-1 Gemini parser + NFKC scrubbing, `<think>` + fenced/malformed JSON recovery, failover telemetry chain, strict focal-item lock across all 3 drafts, and zero-leak output gate across all 10 categories × 5 seeds.
   4. **Verification**: All 57/57 Vitest unit tests and all 7/7 Master Adversarial Red-Team Guard gates passed cleanly. (Note: Live VPS `GEMINI_API_KEY` remains empty/403 and requires manual key update before VPS deploy).
 - **Status**: ✅ Resolved and Verified locally (awaiting user GO + valid VPS `GEMINI_API_KEY` before push/deploy).
+
+---
+## [27 Nov 2026] Issue: V1.1 Quality & Grammar Hardening — Non-Destructive Scrubber, Scoped Realities, 1st-Person Voice & Shorthand Keywords
+- **Symptom**: Forensic audit of 100 live LLM outputs (`06e697b`) uncovered: (1) Blind word deletion in `scrubBannedBuzzwords()` produced broken English (`"The staff was very while showing..."`); (2) Global `STORE_REALITIES` leaked `"neat hygienic packaging"` into Men's Salon & Dental, repeated `"no hidden charges"` in Restaurant/Pet/SaaS, and assumed `"AC"` without verification; (3) Groq `draft2` occasionally slipped into cooking recipes (`"Dal Makhani ko dhimi aanch par garam karo"`) or 3rd-person (`"Bhai ne... bhai ka look"`); (4) Gemini repeated 4–5 word catalog titles verbatim in all 3 drafts; (5) `"bina koi extra charge"` and SaaS `"10x"` / loyalty-to-reviews mismatch slipped through.
+- **Root Cause**:
+  1. `scrubBannedBuzzwords()` deleted banned adjectives instead of replacing with neutral synonyms and had no broken-grammar or recipe-imperative guard.
+  2. `STORE_REALITIES` was a single global array instead of category-scoped verifiable realities.
+  3. `systemPrompt` lacked a hard 1st-person customer voice lock, natural shorthand rules for `draft_2`/`draft_3`, and SaaS feature-to-benefit isolation.
+- **Resolution**:
+  1. **Non-Destructive Scrubber & Guards (`src/lib/dynamic-review-engine.ts`)**: Replaced blind deletion with neutral synonym mapping (`great`, `accurate`, `very useful`, `worth visiting`), added `hasBrokenGrammar()` and `hasRecipeOrAdviceTone()` guards on LLM outputs, and expanded `FREEBIE_HYPE_REGEX` (`bina (kisi|koi) extra charge`, `10x`, `5x`, `instant cure`, `symptoms turant kam`).
+  2. **Category-Scoped `STORE_REALITIES` & AC/Hidden-Charge Purge**: Added `getCategoryScopedRealities()` (zero `packaging` in salon/dental, zero `hidden charges` in food/bakery/pet, zero unverified `AC` claims anywhere).
+  3. **1st-Person Lock, Shorthand Keywords & SaaS Feature Lock**: Enforced 1st-person customer voice, natural casual shorthand in `draft_2`/`draft_3`, Hinglish gender polish, and strict SaaS loyalty vs review benefit separation.
+  4. **V1.1 Unit Tests (`tests/unit/all-categories-review-engine.test.ts`)**: Added Suite 19 (6 tests) covering synonym replacement, broken grammar, flexible freebie regex, scoped realities, recipe guard, and SaaS loyalty lock. All 63/63 Vitest tests and 7/7 Adversarial Master Gates passed.
+- **Status**: ✅ Resolved and Verified locally (pending user GO before push/deploy).
