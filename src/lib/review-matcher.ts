@@ -71,10 +71,15 @@ function levenshteinSimilarity(a: string, b: string): number {
   return 1 - dp[n] / Math.max(m, n);
 }
 
-function tokenMatch(cTok: string, rTok: string): boolean {
+const MAX_MANUAL_PER_REVIEW = 3;
+
+function firstTokenMatch(cTok: string, rTok: string): boolean {
+  return cTok === rTok;
+}
+
+function lastTokenMatch(cTok: string, rTok: string): boolean {
   if (cTok === rTok) return true;
-  if (cTok.length <= 4 || rTok.length <= 4) return false;
-  // Strictly > 0.8 prevents 5-char 1-diff collisions like "patil" vs "patel" (0.80)
+  if (cTok.length < 6 || rTok.length < 6) return false;
   return levenshteinSimilarity(cTok, rTok) > 0.8;
 }
 
@@ -94,9 +99,9 @@ export function isWeakCustomerIdentity(customerName: string, customerPhone?: str
 
 /**
  * Matches customer name against Google displayName.
- * Requires customer to have >= 2 tokens (first + last). Both first AND last
- * customer tokens must match reviewer tokens (exact or Levenshtein > 0.8).
- * Single-token, empty, or guest names never return true.
+ * Requires customer to have >= 2 tokens (first + last) and reviewer >= 2 tokens
+ * with non-initial last token. First token requires exact match; last token allows
+ * fuzzy > 0.8 only when both tokens have length >= 6.
  */
 export function nameMatch(customerName: string, reviewerName: string): boolean {
   if (isWeakCustomerIdentity(customerName)) return false;
@@ -108,11 +113,14 @@ export function nameMatch(customerName: string, reviewerName: string): boolean {
   const aTokens = normA.split(" ");
   const bTokens = normB.split(" ");
 
+  // Single-token reviewer ("Rahul") or initial last token ("Abhilasha S.") -> never auto-award
+  if (bTokens.length < 2 || bTokens[bTokens.length - 1].length < 2) return false;
+
   const firstToken = aTokens[0];
   const lastToken = aTokens[aTokens.length - 1];
 
-  const firstMatches = bTokens.some((bt) => tokenMatch(firstToken, bt));
-  const lastMatches = bTokens.some((bt) => tokenMatch(lastToken, bt));
+  const firstMatches = bTokens.some((bt) => firstTokenMatch(firstToken, bt));
+  const lastMatches = bTokens.some((bt) => lastTokenMatch(lastToken, bt));
 
   return firstMatches && lastMatches;
 }
@@ -376,7 +384,11 @@ export async function matchReviewsToClaims(
       });
 
       const normReviewerTokens = normalizeReviewerName(rv.reviewerName).split(" ").filter(Boolean);
-      const weakIdsToManual: string[] = [];
+      const isShortOrInitialReviewer =
+        normReviewerTokens.length === 1 ||
+        (normReviewerTokens.length >= 2 && normReviewerTokens[normReviewerTokens.length - 1].length === 1);
+
+      const manualIdsForReview: string[] = [];
       const strongCandidates: typeof candidates = [];
 
       for (const c of candidates) {
@@ -387,28 +399,27 @@ export async function matchReviewsToClaims(
           c.customer.phone?.trim().toLowerCase().startsWith("guest_");
 
         if (isGuestOrEmpty) {
-          weakIdsToManual.push(c.id);
+          // Only routed to manual because rv exists in [clickedAt, expiresAt]
+          manualIdsForReview.push(c.id);
           continue;
         }
 
         const cTokens = normalizeReviewerName(c.customer.name).split(" ").filter(Boolean);
         if (cTokens.length < 2) {
-          // Single-token customer name: route to manual if their token appears in reviewerName
-          if (cTokens.length === 1 && normReviewerTokens.some((rt) => tokenMatch(cTokens[0], rt))) {
-            weakIdsToManual.push(c.id);
+          // Single-token customer name: route to manual if their token exact-matches a reviewer token
+          if (cTokens.length === 1 && normReviewerTokens.some((rt) => firstTokenMatch(cTokens[0], rt))) {
+            manualIdsForReview.push(c.id);
           }
           continue;
         }
 
-        strongCandidates.push(c);
-      }
+        if (isShortOrInitialReviewer && normReviewerTokens.length >= 1 && firstTokenMatch(cTokens[0], normReviewerTokens[0])) {
+          // Reviewer is single-token ("Rahul") or last token is initial ("Abhilasha S.")
+          manualIdsForReview.push(c.id);
+          continue;
+        }
 
-      if (weakIdsToManual.length > 0) {
-        await db.reviewClaim.updateMany({
-          where: { id: { in: weakIdsToManual }, status: "open" },
-          data: { status: "manual" }
-        });
-        manual += weakIdsToManual.length;
+        strongCandidates.push(c);
       }
 
       const hits = strongCandidates.filter((c) => nameMatch(c.customer.name, rv.reviewerName));
@@ -417,14 +428,21 @@ export async function matchReviewsToClaims(
         const ok = await awardMatchedClaim(hits[0], rv);
         if (ok) matched++;
       } else if (hits.length > 1) {
-        await db.reviewClaim.updateMany({
-          where: { id: { in: hits.map((h) => h.id) }, status: "open" },
-          data: { status: "manual" }
-        });
+        for (const h of hits) {
+          manualIdsForReview.push(h.id);
+        }
         console.warn(
           `[ReviewMatcher] Ambiguous match (${hits.length} candidates) for "${rv.reviewerName}" (${rv.gbpReviewId}) -> marked manual`
         );
-        manual += hits.length;
+      }
+
+      const cappedManualIds = Array.from(new Set(manualIdsForReview)).slice(0, MAX_MANUAL_PER_REVIEW);
+      if (cappedManualIds.length > 0) {
+        const updManual = await db.reviewClaim.updateMany({
+          where: { id: { in: cappedManualIds }, status: "open" },
+          data: { status: "manual" }
+        });
+        manual += updManual.count;
       }
     }
   } catch (err: any) {
