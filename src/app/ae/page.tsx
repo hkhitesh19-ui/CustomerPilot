@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { AeLandingClient, AE_FAQS, AED_MONTHLY_PRICE } from "./AeLandingClient";
+import { AeLandingClient } from "./AeLandingClient";
+import { AE_FAQS, AED_MONTHLY_PRICE } from "./ae-constants";
 
 // Flip to false when ready for search indexing in UAE
 export const AE_TEST_NOINDEX = true;
