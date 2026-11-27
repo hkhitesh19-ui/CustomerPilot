@@ -19,7 +19,7 @@ export const SYSTEM_DEFAULT_TEMPLATES: SystemTemplateDefinition[] = [
     language: "en",
     variables: ["businessName", "rewardPoints", "requiredStamp", "rewardName", "detectedName"],
     messageBody:
-      "🎉 *You're invited to join the {{businessName}} VIP Club.*\n\nIt's completely FREE and takes less than 10 seconds. Thank you for visiting us! 🙏\n\n*How it works:*\n⭐ Every ₹{{rewardPoints}} purchase = 1 Stamp\n🎁 Collect {{requiredStamp}} Stamps → Claim *{{rewardName}}*\n🌟 Leave a Google Review → Earn Bonus Stamps!\n\nIs your name *{{detectedName}}*?\n\nReply *YES* to confirm, or type your name below:",
+      "🎉 *You're invited to join the {{businessName}} VIP Club.*\n\nIt's completely FREE and takes less than 10 seconds. Thank you for visiting us! 🙏\n\n*How it works:*\n⭐ Every ₹{{rewardPoints}} purchase = 1 Stamp\n🎁 Collect {{requiredStamp}} Stamps → Claim *{{rewardName}}*\n\nIs your name *{{detectedName}}*?\n\nReply *YES* to confirm, or type your name below:",
   },
   {
     templateKey: "QR_WELCOME_NEW_UNKNOWN",
@@ -29,7 +29,7 @@ export const SYSTEM_DEFAULT_TEMPLATES: SystemTemplateDefinition[] = [
     language: "en",
     variables: ["businessName", "rewardPoints", "requiredStamp", "rewardName"],
     messageBody:
-      "🎉 *You're invited to join the {{businessName}} VIP Club.*\n\nIt's completely FREE and takes less than 10 seconds. Thank you for visiting us! 🙏\n\n*How it works:*\n⭐ Every ₹{{rewardPoints}} purchase = 1 Stamp\n🎁 Collect {{requiredStamp}} Stamps → Claim *{{rewardName}}*\n🌟 Leave a Google Review → Earn Bonus Stamps!\n\nBefore we activate your FREE VIP Membership, *please share your name.*\n\nReply with your name (e.g. Rahul):",
+      "🎉 *You're invited to join the {{businessName}} VIP Club.*\n\nIt's completely FREE and takes less than 10 seconds. Thank you for visiting us! 🙏\n\n*How it works:*\n⭐ Every ₹{{rewardPoints}} purchase = 1 Stamp\n🎁 Collect {{requiredStamp}} Stamps → Claim *{{rewardName}}*\n\nBefore we activate your FREE VIP Membership, *please share your name.*\n\nReply with your name (e.g. Rahul):",
   },
   {
     templateKey: "QR_WELCOME_RETURNING",
@@ -89,7 +89,7 @@ export const SYSTEM_DEFAULT_TEMPLATES: SystemTemplateDefinition[] = [
     language: "en",
     variables: ["customerName", "merchantName"],
     messageBody:
-      "Hi {{customerName}} ❤️\n\nHope you loved your visit to *{{merchantName}}*! 😊\n\nShare your honest Google review with a photo to unlock a 🎁 *Bonus Loyalty Stamp* on your VIP Card! Reply *YES* to get your 1-Click link.\n\nOrder me koi dikkat thi? Yahan *HELP* likh kar reply karein taaki maalik aapse seedha baat kar sakein.",
+      "Hi {{customerName}} ❤️\n\nHope you loved your visit to *{{merchantName}}*! 😊\n\nShare your honest feedback on Google Maps! Reply *YES* to get your 1-Click link.\n\nOrder me koi dikkat thi? Yahan *HELP* likh kar reply karein taaki maalik aapse seedha baat kar sakein.",
   },
   {
     templateKey: "REVIEW_DRAFT",

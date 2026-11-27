@@ -21,7 +21,7 @@ function JoinContent() {
     rewardName: "FREE Special Welcome Treat",
     stampValue: 500,
     stampsRequired: 10,
-    googleReviewBonus: 1,
+    googleReviewBonus: 0,
   }
 
   const [stampCard, setStampCard] = useState<any>(defaultCard)

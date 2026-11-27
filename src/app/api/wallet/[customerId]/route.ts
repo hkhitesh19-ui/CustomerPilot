@@ -90,8 +90,8 @@ export async function GET(
         title: activeStampCardRule.name,
         stampsRequired,
         rewardName: activeStampCardRule.rewardName || "FREE Reward",
-        googleReviewBonus: activeStampCardRule.googleReviewBonus ?? 2,
-        photoBonus: activeStampCardRule.photoBonus ?? 2
+        googleReviewBonus: activeStampCardRule.googleReviewBonus ?? 0,
+        photoBonus: activeStampCardRule.photoBonus ?? 0
       },
       card: {
         id: activeCard?.id || unredeemedRewardCard?.id || null,

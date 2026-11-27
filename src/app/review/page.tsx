@@ -177,8 +177,8 @@ export default async function ReviewPage({
     where: { merchantId, active: true }
   })
   const isLoyaltyEnabled = hasModule(merchant, "LOYALTY") && !!stampCard?.active
-  const googleReviewBonus = stampCard?.googleReviewBonus ?? 1
-  const photoBonus = stampCard?.photoBonus ?? 2
+  const googleReviewBonus = stampCard?.googleReviewBonus ?? 0
+  const photoBonus = stampCard?.photoBonus ?? 0
   const existingReviewText = existingReview?.finalText || existingReview?.aiDraft || null
   const hasPreviousPhoto = !!(existingReview?.photoUrl)
 
