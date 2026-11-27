@@ -388,7 +388,8 @@ export async function matchReviewsToClaims(
         normReviewerTokens.length === 1 ||
         (normReviewerTokens.length >= 2 && normReviewerTokens[normReviewerTokens.length - 1].length === 1);
 
-      const manualIdsForReview: string[] = [];
+      const ambiguousManualIds: string[] = [];
+      const weakManualIds: string[] = [];
       const strongCandidates: typeof candidates = [];
 
       for (const c of candidates) {
@@ -400,7 +401,7 @@ export async function matchReviewsToClaims(
 
         if (isGuestOrEmpty) {
           // Only routed to manual because rv exists in [clickedAt, expiresAt]
-          manualIdsForReview.push(c.id);
+          weakManualIds.push(c.id);
           continue;
         }
 
@@ -408,14 +409,14 @@ export async function matchReviewsToClaims(
         if (cTokens.length < 2) {
           // Single-token customer name: route to manual if their token exact-matches a reviewer token
           if (cTokens.length === 1 && normReviewerTokens.some((rt) => firstTokenMatch(cTokens[0], rt))) {
-            manualIdsForReview.push(c.id);
+            weakManualIds.push(c.id);
           }
           continue;
         }
 
         if (isShortOrInitialReviewer && normReviewerTokens.length >= 1 && firstTokenMatch(cTokens[0], normReviewerTokens[0])) {
           // Reviewer is single-token ("Rahul") or last token is initial ("Abhilasha S.")
-          manualIdsForReview.push(c.id);
+          weakManualIds.push(c.id);
           continue;
         }
 
@@ -429,14 +430,15 @@ export async function matchReviewsToClaims(
         if (ok) matched++;
       } else if (hits.length > 1) {
         for (const h of hits) {
-          manualIdsForReview.push(h.id);
+          ambiguousManualIds.push(h.id);
         }
         console.warn(
           `[ReviewMatcher] Ambiguous match (${hits.length} candidates) for "${rv.reviewerName}" (${rv.gbpReviewId}) -> marked manual`
         );
       }
 
-      const cappedManualIds = Array.from(new Set(manualIdsForReview)).slice(0, MAX_MANUAL_PER_REVIEW);
+      // Ambiguous hits MUST come before guest/short claims when applying MAX_MANUAL_PER_REVIEW
+      const cappedManualIds = Array.from(new Set([...ambiguousManualIds, ...weakManualIds])).slice(0, MAX_MANUAL_PER_REVIEW);
       if (cappedManualIds.length > 0) {
         const updManual = await db.reviewClaim.updateMany({
           where: { id: { in: cappedManualIds }, status: "open" },

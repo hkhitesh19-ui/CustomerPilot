@@ -351,8 +351,51 @@ async function main() {
   assert.equal((await db.reviewClaim.findUnique({ where: { id: claimGuestNoRev.id } }))?.status, "open");
   console.log("✅ 15. Guest claim with no review -> stays open");
 
+  // Test 16 (Diff 2.1c): 3 guest claims + 2 same-name hits on one review -> both hits become manual (cap 3)
+  const capMerchant = await db.merchant.create({
+    data: { name: `Cap Test Bakery ${suffix}`, businessType: "Bakery", plan: "growth" }
+  });
+  const guestClaims = [];
+  for (let i = 1; i <= 3; i++) {
+    const cg = await db.customer.create({
+      data: { merchantId: capMerchant.id, name: "Counter Customer", phone: `guest_cap_${i}_${suffix}` }
+    });
+    guestClaims.push(await db.reviewClaim.create({
+      data: { merchantId: capMerchant.id, customerId: cg.id, clickedAt, expiresAt, status: "open" }
+    }));
+  }
+  const hitCust1 = await db.customer.create({
+    data: { merchantId: capMerchant.id, name: "Ankit Joshi", phone: `9190000021${suffix.slice(-2)}` }
+  });
+  const hitCust2 = await db.customer.create({
+    data: { merchantId: capMerchant.id, name: "Ankit Joshi", phone: `9190000022${suffix.slice(-2)}` }
+  });
+  const hitClaim1 = await db.reviewClaim.create({
+    data: { merchantId: capMerchant.id, customerId: hitCust1.id, clickedAt, expiresAt, status: "open" }
+  });
+  const hitClaim2 = await db.reviewClaim.create({
+    data: { merchantId: capMerchant.id, customerId: hitCust2.id, clickedAt, expiresAt, status: "open" }
+  });
+
+  const capMatch = await matchReviewsToClaims(capMerchant.id, [{
+    gbpReviewId: `gbp_test_cap_${suffix}`,
+    reviewerName: "Ankit Joshi",
+    rating: 5,
+    hasMedia: false,
+    createdAt: now
+  }]);
+  assert.equal(capMatch.matched, 0);
+  assert.equal(capMatch.manual, 3, "Cap 3 must apply");
+  assert.equal((await db.reviewClaim.findUnique({ where: { id: hitClaim1.id } }))?.status, "manual", "Ambiguous hit 1 must be manual");
+  assert.equal((await db.reviewClaim.findUnique({ where: { id: hitClaim2.id } }))?.status, "manual", "Ambiguous hit 2 must be manual");
+  const guestManualCount = (await db.reviewClaim.count({
+    where: { id: { in: guestClaims.map(g => g.id) }, status: "manual" }
+  }));
+  assert.equal(guestManualCount, 1, "Only 1 guest claim fills the 3rd slot");
+  console.log("✅ 16. 3 guest claims + 2 same-name hits -> both hits manual, capped at 3");
+
   await db.$disconnect();
-  console.log("\n🎯 ALL 15 ISOLATED REVIEW MATCHER TESTS PASSED!");
+  console.log("\n🎯 ALL 16 ISOLATED REVIEW MATCHER TESTS PASSED!");
 }
 
 main().catch((err) => {
