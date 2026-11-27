@@ -1992,7 +1992,7 @@ Return ONLY a valid parseable JSON object (NO <think> tags, NO markdown prose):
     try {
       const { GoogleGenerativeAI } = await import("@google/generative-ai")
       const genAI = new GoogleGenerativeAI(geminiKey)
-      const candidates = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+      const candidates = ["gemini-3.1-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash", "gemini-flash-latest"]
 
       const geminiPromise = (async (): Promise<{ text: string; modelName: string } | null> => {
         for (const modelName of candidates) {
@@ -2011,7 +2011,7 @@ Return ONLY a valid parseable JSON object (NO <think> tags, NO markdown prose):
         return null
       })()
 
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 3500))
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 6500))
       const geminiResult = await Promise.race([geminiPromise, timeoutPromise])
 
       if (geminiResult) {

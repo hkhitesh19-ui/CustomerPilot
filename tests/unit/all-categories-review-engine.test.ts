@@ -648,7 +648,7 @@ describe("14. generateDynamicReviewDraft — Tier-1 Gemini Parser & Scrubbing", 
     })
 
     expect(res.engine_used).toBe("gemini")
-    expect(res.model_used).toBe("gemini-2.5-flash")
+    expect(res.model_used).toBe("gemini-3.1-flash-lite")
     expect(hasBannedBuzzword(res.draft1)).toBeNull()
     expect(hasBannedBuzzword(res.draft2)).toBeNull()
     expect(hasBannedBuzzword(res.draft3)).toBeNull()
