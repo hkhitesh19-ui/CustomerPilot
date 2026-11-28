@@ -4,7 +4,12 @@ import {
   performWebCheckin,
   resolveMerchantForCheckin,
   buildWebCheckinWhatsappUrl,
+  validateCheckinPhone,
 } from "@/lib/web-checkin"
+import {
+  applyWebCheckinIpLimit,
+  applyWebCheckinPhoneLimit,
+} from "@/lib/rate-limiter"
 
 /**
  * GET /api/queue/web-checkin?m=<merchantId>&slug=<slug>
@@ -44,6 +49,10 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
+    // 1. Per-IP anti-flood guard before parsing/DB lookups
+    const ipLimited = await applyWebCheckinIpLimit(req)
+    if (ipLimited) return ipLimited
+
     const body = (await req.json().catch(() => null)) as {
       merchantId?: string
       slug?: string
@@ -63,9 +72,29 @@ export async function POST(req: NextRequest) {
       return err("phone is required", 400)
     }
 
-    const result = await performWebCheckin({
+    // 2. Validate phone format and resolve verified merchant before throttling per-phone
+    const phoneCheck = validateCheckinPhone(body.phone)
+    if (!phoneCheck.ok) {
+      return err(phoneCheck.error, 400)
+    }
+
+    const summary = await resolveMerchantForCheckin({
       merchantId: body.merchantId,
       slug: body.slug,
+    })
+    if (!summary) {
+      return err("Store loyalty program not found.", 404)
+    }
+    if (!summary.isActive) {
+      return err("Store loyalty check-in is temporarily paused.", 403)
+    }
+
+    // 3. Per-(merchantId, phone) throttling to prevent single-number spam & outbound WA abuse
+    const phoneLimited = await applyWebCheckinPhoneLimit(summary.merchantId, phoneCheck.last10)
+    if (phoneLimited) return phoneLimited
+
+    const result = await performWebCheckin({
+      merchantId: summary.merchantId,
       phone: body.phone,
       name: body.name,
       scanSource: body.scanSource,

@@ -3,6 +3,7 @@ import crypto from "crypto"
 import { db } from "@/lib/db"
 import { ok, err } from "@/lib/api"
 import { QR_WA_REDIRECT_ACTION, resolveMerchantForCheckin } from "@/lib/web-checkin"
+import { applyScanPingIpLimit } from "@/lib/rate-limiter"
 
 /**
  * POST /api/queue/web-checkin/scan-ping
@@ -27,6 +28,12 @@ export async function POST(req: NextRequest) {
     if (!summary) {
       return err("Store not found", 404)
     }
+    if (!summary.isActive) {
+      return err("Store loyalty check-in is temporarily paused.", 403)
+    }
+
+    const pingLimited = await applyScanPingIpLimit(req, summary.merchantId)
+    if (pingLimited) return pingLimited
 
     const scanId = `scan_${Date.now().toString(36)}_${crypto.randomBytes(3).toString("hex")}`
     const cleanSource = (body.source || "qr_counter").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40)

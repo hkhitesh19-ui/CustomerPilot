@@ -13,6 +13,12 @@ import {
   getIstHour,
   buildTargetedAlertMessage,
 } from "@/lib/whatsapp-monitor"
+import {
+  applyWebCheckinIpLimit,
+  applyWebCheckinPhoneLimit,
+  applyScanPingIpLimit,
+} from "@/lib/rate-limiter"
+import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
 
 describe("Hybrid Web Check-In & Zero-Drop LiveQueue Engine", () => {
@@ -342,5 +348,84 @@ describe("WhatsApp Monitor — Silent Inbound Stall Detection (Step A)", () => {
     expect(msg).toContain("Silent Inbound Stall")
     expect(msg).toContain("Cake Connection")
     expect(msg).toContain("Web Check-in link")
+  })
+})
+
+describe("Pending Scan Late WhatsApp Auto-Clear & Anti-Flood Rate Limiters", () => {
+  it("auto-clears a >60s drop_suspected amber alert as soon as the late WhatsApp trigger arrives", () => {
+    const scanAt = new Date("2026-11-28T13:30:00Z")
+    const after75s = new Date(scanAt.getTime() + 75_000)
+
+    // At +75s with zero inbound WA message -> flagged as drop_suspected
+    const beforeLateWa = computePendingScanAlerts({
+      now: after75s,
+      scanLogs: [
+        {
+          id: "log_late",
+          createdAt: scanAt,
+          metadata: JSON.stringify({ scanId: "scan_late_1", source: "counter" }),
+        },
+      ],
+      dismissLogs: [],
+      waitingEntries: [],
+      incomingMessages: [],
+    })
+    expect(beforeLateWa).toHaveLength(1)
+    expect(beforeLateWa[0].status).toBe("drop_suspected")
+
+    // At +80s late WhatsApp message finally decrypts & arrives -> auto-clears amber alert
+    const after80s = new Date(scanAt.getTime() + 80_000)
+    const afterLateWa = computePendingScanAlerts({
+      now: after80s,
+      scanLogs: [
+        {
+          id: "log_late",
+          createdAt: scanAt,
+          metadata: JSON.stringify({ scanId: "scan_late_1", source: "counter" }),
+        },
+      ],
+      dismissLogs: [],
+      waitingEntries: [],
+      incomingMessages: [
+        {
+          template: "INCOMING",
+          createdAt: after80s,
+          body: "Hi Cake Connection! Checking in for my VIP Club stamps",
+        },
+      ],
+    })
+    expect(afterLateWa).toEqual([])
+  })
+
+  it("enforces per-IP (15/min), per-phone (3/5m), and scan-ping (10/5m) rate limits with HTTP 429", async () => {
+    const ipReq = new NextRequest("http://localhost:3000/api/queue/web-checkin", {
+      method: "POST",
+      headers: { "x-forwarded-for": "203.0.113.77" },
+    })
+
+    for (let i = 0; i < 15; i++) {
+      expect(await applyWebCheckinIpLimit(ipReq)).toBeNull()
+    }
+    const ipBlocked = await applyWebCheckinIpLimit(ipReq)
+    expect(ipBlocked?.status).toBe(429)
+    expect(ipBlocked?.headers.get("Retry-After")).toBe("60")
+
+    for (let i = 0; i < 3; i++) {
+      expect(await applyWebCheckinPhoneLimit("m_test_rl", "9033304707")).toBeNull()
+    }
+    const phoneBlocked = await applyWebCheckinPhoneLimit("m_test_rl", "9033304707")
+    expect(phoneBlocked?.status).toBe(429)
+    expect(phoneBlocked?.headers.get("Retry-After")).toBe("300")
+
+    const pingReq = new NextRequest("http://localhost:3000/api/queue/web-checkin/scan-ping", {
+      method: "POST",
+      headers: { "x-forwarded-for": "203.0.113.88" },
+    })
+    for (let i = 0; i < 10; i++) {
+      expect(await applyScanPingIpLimit(pingReq, "m_test_rl")).toBeNull()
+    }
+    const pingBlocked = await applyScanPingIpLimit(pingReq, "m_test_rl")
+    expect(pingBlocked?.status).toBe(429)
+    expect(pingBlocked?.headers.get("Retry-After")).toBe("300")
   })
 })

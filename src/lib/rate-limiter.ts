@@ -31,6 +31,27 @@ const bulkAiLimiter = new RateLimiterMemory({
   blockDuration: 120 // block for 2 minutes
 })
 
+// Public Web Check-In: max 15 check-in submissions per IP per minute (shared shop Wi-Fi safe)
+const webCheckinIpLimiter = new RateLimiterMemory({
+  points: 15,        // 15 check-ins
+  duration: 60,      // per 60 seconds per IP
+  blockDuration: 60  // block for 60 seconds when flooded
+})
+
+// Public Web Check-In per phone per merchant: max 3 submissions per 5 minutes
+const webCheckinPhoneLimiter = new RateLimiterMemory({
+  points: 3,         // 3 check-in hits per mobile number per store
+  duration: 300,     // per 5 minutes
+  blockDuration: 300 // block for 5 minutes
+})
+
+// Anonymous scan-ping telemetry: max 10 pings per IP per store per 5 minutes
+const scanPingIpLimiter = new RateLimiterMemory({
+  points: 10,        // 10 scan pings
+  duration: 300,     // per 5 minutes
+  blockDuration: 300 // block for 5 minutes
+})
+
 function getClientIp(req: NextRequest): string {
   return (
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
@@ -114,6 +135,62 @@ export async function applyBulkAiRateLimit(merchantId: string): Promise<NextResp
       {
         status: 429,
         headers: { 'Retry-After': '120' }
+      }
+    )
+  }
+}
+
+/**
+ * Apply per-IP rate limiting on public POST /api/queue/web-checkin to prevent queue flooding.
+ */
+export async function applyWebCheckinIpLimit(req: NextRequest): Promise<NextResponse | null> {
+  const ip = getClientIp(req)
+  try {
+    await webCheckinIpLimiter.consume(ip)
+    return null
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: 'Too many check-in attempts from this network. Please wait 1 minute.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': '60' }
+      }
+    )
+  }
+}
+
+/**
+ * Apply per-merchant + per-phone throttling on POST /api/queue/web-checkin (3 per 5 min).
+ */
+export async function applyWebCheckinPhoneLimit(merchantId: string, phoneLast10: string): Promise<NextResponse | null> {
+  try {
+    await webCheckinPhoneLimiter.consume(`${merchantId}:${phoneLast10}`)
+    return null
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: 'You have already checked in recently. Please show your queue ticket at billing or try after 5 minutes.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': '300' }
+      }
+    )
+  }
+}
+
+/**
+ * Apply per-IP + per-merchant rate limiting on POST /api/queue/web-checkin/scan-ping.
+ */
+export async function applyScanPingIpLimit(req: NextRequest, merchantId: string): Promise<NextResponse | null> {
+  const ip = getClientIp(req)
+  try {
+    await scanPingIpLimiter.consume(`${ip}:${merchantId}`)
+    return null
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: 'Too many QR scan pings. Please wait a few minutes before retrying.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': '300' }
       }
     )
   }
