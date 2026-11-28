@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import Link from "next/link"
 import { BrandLogo } from "@/components/brand-logo"
 import { PricingStudio } from "@/components/pricing/pricing-studio"
+import { AllServicesPricingCards } from "@/components/pricing/all-services-pricing-cards"
 import {
   Lock, Users, Sparkles, ShieldCheck, Zap, ArrowRight,
   HelpCircle, ChevronDown, Check, Building2, Store, Clock, Award
@@ -66,6 +67,9 @@ export function PricingClient() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 md:py-10 space-y-12 flex-1 w-full">
         {/* Pricing Studio Configurator, Comparison & Standalone Grid */}
         <PricingStudio mode="public" theme="light" />
+
+        {/* All 12 Services Professional Card Pricing Table */}
+        <AllServicesPricingCards />
 
         {/* Enterprise & Multi-Location Retail Chain Callout */}
         <div className="p-8 rounded-3xl bg-white border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
