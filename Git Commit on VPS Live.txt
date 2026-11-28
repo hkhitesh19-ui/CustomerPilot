@@ -9,25 +9,27 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : e8cda36 (deployed over 41df9b6 / 9e7c0b4)
-Full SHA          : e8cda3651ee344628256cdc00cf98725dfd12698
-Branch Name       : feature/pricing-12-services-table
-Deployment Date   : 28 Nov 2026, 11:36 AM IST
+Active Git Commit : 97f84e4 (deployed over e8cda36 / 74961f0; Rollback target: e8cda36)
+Full SHA          : 97f84e4c122dbe341fac3009d4d98ed3df0150ac
+Branch Name       : fix/hybrid-web-checkin
+Deployment Date   : 28 Nov 2026, 10:08 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : feat(seo): add 4 missing service pages, optimize 8 pages SEO/AEO/GEO, update sitemap & llms.txt
+Commit Title      : security(queue): enforce per-IP & per-phone rate limits and active-store guard on web-checkin & scan-ping
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
-PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Stopped)
+PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online)
 Docker Containers : evolution-api (evoapicloud/evolution-api pinned @sha256:966625532d9076a2381e973a271307d107e6f070450de3abeeea8bd18be07252, Port 8080 Open in UFW, Online & Healthy)
+VPS Backup        : /var/backups/customerpilot/pre_97f84e4_20261128_220554/ (dev.db + .env + code_e8cda36_backup.tar.gz)
 
 Verified Endpoints on Live VPS:
 ----------------------------------------------------------
 1. https://customerpilot.in/                                      -> HTTP 200 (Live Domain Cloudflare Edge Verified)
-2. https://customerpilot.in/c/mawpaw                              -> HTTP 200 (Maw & Paw Dynamic Digital Business Card)
-3. https://customerpilot.in/c/cake-connection                     -> HTTP 200 (Cake Connection Dynamic Digital Business Card)
-4. https://customerpilot.in/api/qr/standee?m=cmwgac6hc0d9gkv94sz2b8bsr -> HTTP 200 (Maw & Paw Dynamic Standee Studio Artwork)
-5. https://customerpilot.in/api/qr/standee?m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (Cake Connection Dynamic Standee Studio Artwork)
-6. https://customerpilot.in/api/webhook/instagram                 -> HTTP 200 (Meta Challenge GET) & HTTP 401 (Unsigned POST Guard)
-7. https://customerpilot.in/api/instagram/proof-image/[id]       -> HTTP 401 (RBAC Merchant Session Required)
-8. https://customerpilot.in/api/webhook/evolution                -> HTTP 405/401 Guard (Evolution Webhook & Referral Intent Handler with Nginx URI Redaction)
-9. /opt/cp-watchdog/watchdog.js                                  -> v4.2 Stream-Guard Live under PM2 (PID: 610904, 75s auto-recovery window)
-10. http://187.127.170.36:8080                                   -> HTTP 200 (Evolution API v2.3.7)
+2. https://customerpilot.in/c/cake-connection                     -> HTTP 200 (Digital Business Card CTA routed to /checkin?m=cmtymavfx0002kx008lbfvp57)
+3. https://customerpilot.in/checkin?m=cmtymavfx0002kx008lbfvp57   -> HTTP 200 (Hybrid Zero-Drop Web Check-In Page)
+4. https://customerpilot.in/join?m=cmtymavfx0002kx008lbfvp57      -> HTTP 200 (Public Web Check-In Fallback Page)
+5. https://customerpilot.in/api/queue/web-checkin?m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (Cake Connection Store & Loyalty Card JSON)
+6. https://customerpilot.in/api/queue/web-checkin (invalid POST)  -> HTTP 404 (Verified merchantId + per-IP/per-phone rate limiter guard)
+7. https://customerpilot.in/api/qr/standee?m=cmwgac6hc0d9gkv94sz2b8bsr -> HTTP 200 (Maw & Paw Dynamic Standee Studio Artwork)
+8. https://customerpilot.in/api/qr/standee?m=cmtymavfx0002kx008lbfvp57 -> HTTP 200 (Cake Connection Dynamic Standee Studio Artwork)
+9. https://customerpilot.in/api/webhook/evolution                -> HTTP 405/401 Guard (Frozen Core Intact)
+10. /opt/cp-watchdog/watchdog.js                                  -> v4.3 Stream-Guard Online under PM2 (Evolution instance CP_M_cmtymavf_cmtymavf_mwri6pri restarted & verified OPEN)
+11. http://187.127.170.36:8080                                   -> HTTP 200 (Evolution API v2.3.7)
