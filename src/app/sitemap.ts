@@ -50,6 +50,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/guide/operations",
     // Official Live Smart Digital Business Cards
     ...DIGITAL_CARD_ROUTES,
+    // All 12 Services — dedicated SEO landing pages
+    "/services",
+    "/rankpilot",
+    "/google-business-profile-ranking",
+    "/whatsapp-group-booster",
+    "/whatsapp-chatbot",
+    "/digital-qr-menu",
+    "/whatsapp-pos-billing",
+    "/small-business-website-builder",
     // Tools & Business Pages
     "/roi-calculator",
     "/for-business",
@@ -87,7 +96,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
           route.startsWith("/features") ||
           route.endsWith("-loyalty")
         ? 0.9
-        : route.startsWith("/industry/") ||
+        : [
+            "/rankpilot",
+            "/google-business-profile-ranking",
+            "/services",
+            "/whatsapp-group-booster",
+            "/whatsapp-chatbot",
+            "/digital-qr-menu",
+            "/whatsapp-pos-billing",
+            "/small-business-website-builder",
+          ].includes(route) ||
+          route.startsWith("/industry/") ||
           route.startsWith("/alternatives/") ||
           route.startsWith("/guide/") ||
           route.startsWith("/c/") ||

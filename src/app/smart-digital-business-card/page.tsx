@@ -3,23 +3,26 @@ import { SmartDigitalBusinessCardClient } from "@/components/smart-digital-busin
 import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld"
 
 export const metadata: Metadata = {
-  title: "Smart Digital Business Card with QR Code & Instant Google Reviews",
-  description: "Create an interactive digital business card with QR code. Enable 1-tap contact saving, direct 5-star Google review submissions, WhatsApp connect, and digital catalog menus.",
+  title: "Smart Digital Business Card — NFC QR vCard for Indian Shops | CustomerPilot",
+  description: "Create a smart digital business card with NFC + QR code for your shop in India. 1-tap vCard save, WhatsApp connect, Google Reviews, and digital menu — all in one shareable link.",
   keywords: [
-    "Digital business card with QR code",
-    "Smart digital visiting card India",
-    "Bio link QR code generator",
-    "Contactless digital menu QR",
+    "nfc business card india",
+    "digital vcard qr india",
+    "digital business card with qr code india",
+    "smart digital visiting card india",
+    "bio link qr code generator",
+    "contactless digital business card",
     "smart digital business card software",
-    "Google review digital business card",
+    "google review digital business card",
     "Dukan ke liye digital visiting card",
+    "digital namecard whatsapp india",
   ],
   alternates: {
-    canonical: "/smart-digital-business-card",
+    canonical: "https://customerpilot.in/smart-digital-business-card",
   },
   openGraph: {
-    title: "Smart Digital Business Card with QR Code & Google Reviews — CustomerPilot",
-    description: "Replace paper visiting cards with modern, interactive digital cards. 1-tap vCard save, direct Google Reviews, WhatsApp chat, and online ordering in one QR code.",
+    title: "Smart Digital Business Card — NFC QR vCard India | CustomerPilot",
+    description: "NFC + QR Code digital visiting card for Indian shops. 1-tap contact save, WhatsApp chat, Google Reviews, and digital menu — all in one smart card.",
     url: "https://customerpilot.in/smart-digital-business-card",
     type: "website",
   },

@@ -2,18 +2,19 @@ import type { Metadata } from "next"
 import { RankPilotLandingClient } from "@/components/rankpilot/rankpilot-landing-client"
 
 export const metadata: Metadata = {
-  title: "RankPilot AI™ — Move from Page 10 to Google Maps Top 3 in 30 Days",
+  title: "RankPilot AI™ — Google Business Profile Optimization Service India | Top 3 Maps | CustomerPilot",
   description:
-    "RankPilot AI™ is India's premier autonomous Local SEO & Google Business Profile accelerator. Dominate Google's 3-Pack with 10 Products + 10 Services matrix, automated post scheduling, and geo-relevance ranking.",
+    "RankPilot AI™ is India's #1 Google Business Profile optimization service — move from Page 10 to Google Maps Top 3 in 30 days. Automated GBP posts, 10+10 product matrix, Local SEO for Indian retail shops.",
   keywords: [
+    "google business profile optimization service india",
     "RankPilot AI",
-    "Google Maps Top 3 Ranking",
-    "GBP Local SEO Software",
+    "Google Maps Top 3 Ranking india",
+    "GBP Local SEO Software india",
     "Google 3-Pack Domination",
-    "Local Business Rank Accelerator",
-    "Google Business Profile Automation",
-    "Bakery Local SEO",
-    "Salon SEO Vadodara",
+    "local seo service for small business india",
+    "google business profile ranking software",
+    "Local Business Rank Accelerator india",
+    "Google Business Profile Automation india",
     "CustomerPilot RankPilot"
   ],
   alternates: {

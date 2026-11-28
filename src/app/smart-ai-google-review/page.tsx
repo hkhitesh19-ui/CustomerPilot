@@ -3,28 +3,28 @@ import { AiGoogleReviewQrClient } from "@/components/ai-google-review-qr-client"
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld"
 
 export const metadata: Metadata = {
-  title: "Smart AI Google Review Software & Automation | CustomerPilot",
+  title: "Smart AI Google Review QR Code & Automation Software India | CustomerPilot",
   description:
-    "CustomerPilot's Smart AI Google Review software automates 5-star review generation using WhatsApp automation and generative AI. Zero customer typing — AI auto-writes keyword-rich reviews for local merchants.",
+    "CustomerPilot's AI Google Review QR Code and automation software auto-generates 5-star Google reviews via WhatsApp for Indian shops. Zero customer typing — AI writes the review, customer submits in 1 tap.",
   keywords: [
-    "AI Google review software",
-    "WhatsApp review automation",
+    "AI Google review QR code software",
+    "google review qr code generator",
+    "AI review link generator india",
+    "WhatsApp review automation india",
     "automated Google review writer",
     "generative AI review system India",
-    "AI auto review generation tool",
     "Smart AI Google review software",
     "QR scan review automation SaaS",
     "local business review automation WhatsApp",
-    "Scan karte hi Google review option dene wala software",
     "QR code scan karke review likhne wala AI tool"
   ],
   alternates: {
     canonical: "https://customerpilot.in/smart-ai-google-review"
   },
   openGraph: {
-    title: "Smart AI Google Review Software & Automation | CustomerPilot",
+    title: "Smart AI Google Review QR Code & Automation Software India | CustomerPilot",
     description:
-      "CustomerPilot's Smart AI Google Review software automates 5-star review generation using WhatsApp automation and generative AI. Zero customer typing — AI auto-writes keyword-rich reviews for local merchants.",
+      "AI-powered Google Review QR Code software — customers scan, AI writes the review, 1-tap submit. Automate 100+ Google reviews monthly for Indian retail shops.",
     url: "https://customerpilot.in/smart-ai-google-review"
   }
 }

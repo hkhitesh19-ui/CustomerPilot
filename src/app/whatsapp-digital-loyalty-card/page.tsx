@@ -3,23 +3,26 @@ import { WhatsAppDigitalLoyaltyClient } from "@/components/whatsapp-digital-loya
 import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld"
 
 export const metadata: Metadata = {
-  title: "WhatsApp Digital Loyalty Card & Rewards Software",
-  description: "Replace paper punch cards with CustomerPilot's automated WhatsApp loyalty program. Track digital stamps, send reward points, and increase retail walk-ins instantly.",
+  title: "WhatsApp Loyalty Program — Digital Stamp Card for Indian Shops | CustomerPilot",
+  description: "Replace paper punch cards with India's best WhatsApp digital loyalty card system. Automated WhatsApp stamp cards, reward points, and repeat customer drives for retail shops, cafes, and bakeries.",
   keywords: [
-    "WhatsApp loyalty program for retail",
-    "Digital loyalty stamp card app",
-    "Customer loyalty program software India",
-    "Automated customer rewards system",
+    "whatsapp loyalty program india",
+    "digital stamp card for shop india",
+    "whatsapp digital loyalty card",
+    "customer loyalty program software india",
+    "digital punch card india free",
+    "automated customer rewards whatsapp",
+    "loyalty program for cafe bakery salon india",
     "Digital punch card system kaise chalaye",
     "Shop ke liye digital loyalty card kaise banaye",
     "Grahak ko discount dene wala app",
   ],
   alternates: {
-    canonical: "/whatsapp-digital-loyalty-card",
+    canonical: "https://customerpilot.in/whatsapp-digital-loyalty-card",
   },
   openGraph: {
-    title: "WhatsApp Digital Loyalty Card & Rewards Software | CustomerPilot",
-    description: "Replace paper punch cards with CustomerPilot's automated WhatsApp loyalty program. Track digital stamps, send reward points, and increase retail walk-ins instantly.",
+    title: "WhatsApp Loyalty Program — Digital Stamp Card for Indian Shops | CustomerPilot",
+    description: "India's #1 WhatsApp digital loyalty program — replace paper punch cards with automated digital stamp cards. Track rewards, drive repeat visits for cafes, bakeries, and salons.",
     url: "https://customerpilot.in/whatsapp-digital-loyalty-card",
     type: "website",
   },

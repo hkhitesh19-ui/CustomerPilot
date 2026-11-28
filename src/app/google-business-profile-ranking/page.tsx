@@ -3,19 +3,19 @@ import { GbpRankingAuditClient } from "@/components/gbp-ranking-audit-client"
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld"
 
 export const metadata: Metadata = {
-  title: "Google Business Profile Top 3 Rank Accelerator & Free Audit | CustomerPilot",
+  title: "Free Google Business Profile Audit Tool + Top 3 Google Maps Ranking India | CustomerPilot",
   description:
-    "Free 100-Point Google Business Profile (GBP) audit tool and Top 3 Local Pack ranking accelerator for retail shops in India. 100% video verification, zero-ban sandbox velocity protection, and competitor spam redressal.",
+    "Free 100-point Google Business Profile (GBP) audit + Local SEO ranking service for Indian shops. Move from Page 10 to Google Maps Top 3 Local Pack in 30 days. Zero-ban sandbox protection.",
   keywords: [
-    "Google Business Profile audit",
+    "free google business profile audit tool",
+    "google business profile optimization india",
+    "Google Maps Top 3 Local Pack ranking",
     "GBP ranking software India",
-    "Top 3 Local Pack Google Maps",
-    "Google Maps rank accelerator",
-    "free GBP self audit tool",
-    "Google my business SEO Vadodara Gujarat India",
+    "Google Maps rank accelerator india",
+    "free GBP self audit",
+    "local seo service india",
+    "Google my business SEO india",
     "Google sandbox ban protection",
-    "video call verification pass Google Business",
-    "competitor spam redressal form",
     "local SEO WhatsApp review engine"
   ],
   alternates: {

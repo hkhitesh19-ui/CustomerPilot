@@ -3,28 +3,28 @@ import { AiReviewStandeeClient } from "@/components/ai-review-standee-client"
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld"
 
 export const metadata: Metadata = {
-  title: "Smart Ai Google Review QR | CustomerPilot",
+  title: "Google Review QR Code Generator for Shops India — AI 5-Star Reviews | CustomerPilot",
   description:
-    "Get India's best Smart Ai Google Review QR code system for your billing counter. Auto-generate 5-star Google reviews via WhatsApp in 1 tap. Perfect for retail, cafes and restaurants.",
+    "Free Google Review QR code generator for Indian shops, cafes, and restaurants. Customers scan your billing counter QR → AI auto-writes a 5-star review → 1-tap submit to Google Maps. Boost ratings fast.",
   keywords: [
-    "Smart Ai Google review QR",
+    "google review qr code generator india",
+    "qr code for google reviews",
+    "review link generator for shop",
+    "google review qr code for billing counter",
+    "ai google review generator free",
+    "5 star google review qr india",
     "Smart Ai Google Review System",
-    "Google review QR for retail",
-    "AI review QR code for cafe",
-    "restaurant review QR India",
-    "counter review QR code",
-    "QR code for billing counter",
+    "Google review QR for retail cafe restaurant",
     "automatic Google review system India",
-    "AI review QR display India",
-    "review QR code for shop counter"
+    "AI review QR display India"
   ],
   alternates: {
     canonical: "https://customerpilot.in/ai-google-review-qr-generator"
   },
   openGraph: {
-    title: "Smart Ai Google Review QR | CustomerPilot",
+    title: "Google Review QR Code Generator for Shops India | CustomerPilot",
     description:
-      "Get India's best Smart Ai Google Review QR code system for your billing counter. Auto-generate 5-star Google reviews via WhatsApp in 1 tap. Perfect for retail, cafes and restaurants.",
+      "Free Google Review QR code generator — customers scan, AI writes 5-star review, 1-tap submit. Best AI review tool for Indian retail, cafes & restaurants.",
     url: "https://customerpilot.in/ai-google-review-qr-generator"
   }
 }

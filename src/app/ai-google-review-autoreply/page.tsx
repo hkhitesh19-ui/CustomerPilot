@@ -3,22 +3,26 @@ import { AiGoogleReviewAutoReplyClient } from "@/components/ai-google-review-aut
 import { FAQPageJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld"
 
 export const metadata: Metadata = {
-  title: "1-Click AI Google Review AutoReply & Response Generator | CustomerPilot",
-  description: "Automate owner replies to 100% of Google Maps reviews in 1-Click. Gemini AI generates appreciative, context-aware responses to boost local SEO ranking by 42%.",
+  title: "AI Auto Reply Google Reviews — 1-Click Review Response Tool India | CustomerPilot",
+  description: "Auto reply to 100% of your Google Maps reviews in 1 click. CustomerPilot's AI review reply tool generates context-aware, professional owner responses instantly — boosts Local SEO ranking by 42%.",
   keywords: [
-    "AI Google review auto reply software",
+    "auto reply google reviews india",
+    "ai google review reply tool",
+    "google review response generator",
+    "automated google review owner reply software",
     "Google Business Profile review responder India",
-    "Automated owner response for Google Maps",
-    "Google review reply bot",
+    "google maps review auto reply",
+    "AI review reply bot india",
     "GBP AI auto reply tool",
+    "1 click google review response",
     "Local SEO review responder"
   ],
   alternates: {
-    canonical: "/ai-google-review-autoreply"
+    canonical: "https://customerpilot.in/ai-google-review-autoreply"
   },
   openGraph: {
-    title: "1-Click AI Google Review AutoReply — CustomerPilot",
-    description: "Publish personalized, appreciative owner responses to Google Maps reviews in 1 second with context-aware generative AI.",
+    title: "AI Auto Reply Google Reviews — 1-Click Review Response Tool India | CustomerPilot",
+    description: "Auto reply to all Google Maps reviews in 1 click. AI generates professional, context-aware owner responses — boosts Local SEO and builds customer trust.",
     url: "https://customerpilot.in/ai-google-review-autoreply"
   }
 }

@@ -62,6 +62,33 @@ const FREE_GENERATOR_SCHEMA = {
             "text":
               "Google's local search algorithm indexes words inside user reviews. When reviews mention specific products or services, Google Maps ranks your business higher for those local searches."
           }
+        },
+        {
+          "@type": "Question",
+          "name": "How is CustomerPilot better than SmartReviewer AI or ReviewPilot?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text":
+              "Unlike standalone review tools like SmartReviewer AI, CustomerPilot combines a free AI Google Review Generator, Smart Review QR Standee, 1-Click AI AutoReply, WhatsApp Digital Loyalty Cards, and POS WhatsApp Billing in one affordable Indian SaaS starting at ₹549 / 6 months."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can customers post the AI-generated Google review in 1 tap via QR code?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text":
+              "Yes! With CustomerPilot's Smart Google Review QR Code Generator, customers scan the counter QR, select or customize an AI-written 5-star review draft, and tap once to open Google Maps directly to submit it."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this work for bakeries, cafes, restaurants, salons, and clinics in India?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text":
+              "Yes, it is built specifically for Indian local businesses in Vadodara, Mumbai, Delhi, Pune, Ahmedabad, and Surat — supporting English and Hinglish review styles tailored to your exact business category."
+          }
         }
       ]
     }
