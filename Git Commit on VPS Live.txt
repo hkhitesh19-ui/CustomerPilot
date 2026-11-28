@@ -9,12 +9,12 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 97f84e4 (deployed over e8cda36 / 74961f0; Rollback target: e8cda36)
-Full SHA          : 97f84e4c122dbe341fac3009d4d98ed3df0150ac
+Active Git Commit : af54d77 (deployed over 97f84e4 / e8cda36; Rollback target: e8cda36)
+Full SHA          : af54d77a4581aadad03b8e4a130b714956df2789
 Branch Name       : fix/hybrid-web-checkin
-Deployment Date   : 28 Nov 2026, 10:08 PM IST
+Deployment Date   : 28 Nov 2026, 10:48 PM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : security(queue): enforce per-IP & per-phone rate limits and active-store guard on web-checkin & scan-ping
+Commit Title      : security(rate-limit): prioritize cf-connecting-ip and x-real-ip over x-forwarded-for to prevent IP spoofing
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Online)
 Docker Containers : evolution-api (evoapicloud/evolution-api pinned @sha256:966625532d9076a2381e973a271307d107e6f070450de3abeeea8bd18be07252, Port 8080 Open in UFW, Online & Healthy)
