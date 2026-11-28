@@ -107,6 +107,7 @@ export async function proxy(request: NextRequest) {
     '/api/reviews/',
     '/api/referrals/claim',
     '/api/queue/join',
+    '/api/queue/web-checkin',
     '/api/queue/claim',
     '/api/queue/reserve',
     '/api/queue/validate-amount',

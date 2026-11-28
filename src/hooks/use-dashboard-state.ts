@@ -31,6 +31,13 @@ export interface DashboardState {
   campaignDeliveryLogs: any[]
   ownerOverrideLogs: any[]
   waitingCustomers: any[]
+  pendingScanAlerts?: Array<{
+    scanId: string
+    scannedAt: string
+    source: string
+    status: "awaiting_wa" | "drop_suspected"
+    elapsedSeconds: number
+  }>
   merchantGoogleConnections: any[]
 }
 

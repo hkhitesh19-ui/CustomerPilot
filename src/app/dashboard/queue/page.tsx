@@ -2,7 +2,7 @@
 
 import { useDashboardState } from "@/hooks/use-dashboard-state"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Clock, Users, ArrowRight, UserCheck, Sparkles, Zap } from "lucide-react"
+import { Clock, Users, ArrowRight, UserCheck, Sparkles, Zap, AlertTriangle, X, Globe, MessageSquare } from "lucide-react"
 import { useState } from "react"
 import { RewardModal } from "@/components/dashboard/RewardModal"
 import { ManualStampModal } from "@/components/dashboard/ManualStampModal"
@@ -13,6 +13,23 @@ export default function QueuePage() {
   const [selectedWaitingCustomer, setSelectedWaitingCustomer] = useState<any>(null)
   const [isRewardModalOpen, setIsRewardModalOpen] = useState(false)
   const [isManualStampModalOpen, setIsManualStampModalOpen] = useState(false)
+  const [dismissingScanId, setDismissingScanId] = useState<string | null>(null)
+
+  const handleDismissPendingScan = async (scanId: string) => {
+    setDismissingScanId(scanId)
+    try {
+      await fetch("/api/queue/dismiss-scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scanId }),
+      })
+      await refetch()
+    } catch {
+      // Ignore network errors on dismiss
+    } finally {
+      setDismissingScanId(null)
+    }
+  }
 
   if (isLoading) {
     return <div className="p-8 text-slate-400 animate-pulse">Loading Live Queue...</div>
@@ -28,6 +45,7 @@ export default function QueuePage() {
   }
 
   const waitingCustomers = data.waitingCustomers || []
+  const pendingScanAlerts = data.pendingScanAlerts || []
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
@@ -63,7 +81,75 @@ export default function QueuePage() {
           </div>
         </CardHeader>
         
-        <CardContent className="pt-8 relative z-10">
+        <CardContent className="pt-8 relative z-10 space-y-6">
+          {pendingScanAlerts.length > 0 && (
+            <div className="space-y-2.5">
+              {pendingScanAlerts.map((scan) => {
+                const scanIst = new Date(scan.scannedAt).toLocaleTimeString("en-IN", {
+                  timeZone: "Asia/Kolkata",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+                const isDropSuspected = scan.status === "drop_suspected"
+                return (
+                  <div
+                    key={scan.scanId}
+                    className={`p-3.5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                      isDropSuspected
+                        ? "bg-amber-50/90 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700"
+                        : "bg-sky-50/90 dark:bg-sky-950/30 border-sky-200 dark:border-sky-800"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                          isDropSuspected
+                            ? "bg-amber-500 text-white"
+                            : "bg-sky-600 text-white"
+                        }`}
+                      >
+                        <AlertTriangle className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs font-extrabold text-slate-900 dark:text-slate-100">
+                            {isDropSuspected
+                              ? "Pending QR Scan (WhatsApp Message Not Received)"
+                              : "QR Scanned — Awaiting WhatsApp Message"}
+                          </span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                            {scanIst} IST ({scan.elapsedSeconds >= 60 ? `${Math.floor(scan.elapsedSeconds / 60)}m ago` : `${scan.elapsedSeconds}s ago`})
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                          Customer tapped WhatsApp without entering mobile number. Ask customer at counter or use Manual Stamp Override.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setIsManualStampModalOpen(true)}
+                        className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold whitespace-nowrap cursor-pointer"
+                      >
+                        Add Stamp
+                      </button>
+                      <button
+                        type="button"
+                        disabled={dismissingScanId === scan.scanId}
+                        onClick={() => void handleDismissPendingScan(scan.scanId)}
+                        aria-label="Dismiss pending scan alert"
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-white/80 dark:hover:bg-slate-800 cursor-pointer"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
           {waitingCustomers.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {waitingCustomers.map((wc: any) => {
@@ -101,11 +187,36 @@ export default function QueuePage() {
                       <span className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{phoneStr}</span>
                     </div>
                     <div className="flex flex-col items-end gap-1 shrink-0">
-                      <span className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full animate-pulse border border-emerald-500/30 shadow-[0_0_10px_0_rgba(16,185,129,0.2)]">
+                      <span className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full animate-pulse border border-emerald-500/30 shadow-[0_0_10px_0_rgba(16,185,129,0.2)] whitespace-nowrap">
                         WAITING
                       </span>
+                      {wc.scanSource?.startsWith("qr_web") && (
+                        <span
+                          className={`text-[9px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap inline-flex items-center gap-1 ${
+                            wc.waConfirmStatus === "wa_verified"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
+                              : wc.waConfirmStatus === "pending_wa"
+                              ? "bg-amber-50 text-amber-800 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-700"
+                              : "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800"
+                          }`}
+                        >
+                          {wc.waConfirmStatus === "wa_verified" ? (
+                            <>
+                              <MessageSquare className="w-2.5 h-2.5" /> Web + WA OK
+                            </>
+                          ) : wc.waConfirmStatus === "pending_wa" ? (
+                            <>
+                              <Globe className="w-2.5 h-2.5" /> Web (WA Pending)
+                            </>
+                          ) : (
+                            <>
+                              <Globe className="w-2.5 h-2.5" /> Web Check-In
+                            </>
+                          )}
+                        </span>
+                      )}
                       {referrer && (
-                        <span className="bg-amber-500 text-white text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1 animate-pulse">
+                        <span className="bg-amber-500 text-white text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1 animate-pulse whitespace-nowrap">
                           🤝 REFERRED
                         </span>
                       )}

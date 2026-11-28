@@ -9,12 +9,12 @@ Repository        : https://github.com/hkhitesh19-ui/CustomerPilot.git
 
 Current Live Commit Details:
 ----------------------------------------------------------
-Active Git Commit : 7e387e1 (Code: fe6585f)
-Full SHA          : 7e387e150517e679cf5e82887f7252f86f3ddc7c
-Branch Name       : deploy/pricing-update-20261102
-Deployment Date   : 26 Nov 2026, 11:55 PM IST
+Active Git Commit : e8cda36 (deployed over 41df9b6 / 9e7c0b4)
+Full SHA          : e8cda3651ee344628256cdc00cf98725dfd12698
+Branch Name       : feature/pricing-12-services-table
+Deployment Date   : 28 Nov 2026, 11:36 AM IST
 Server IP         : 187.127.170.36 (Hostinger KVM 1 Ubuntu 22.04 LTS)
-Commit Title      : fix(cron): guard empty/whitespace comments in Google Review auto-reply filter
+Commit Title      : feat(seo): add 4 missing service pages, optimize 8 pages SEO/AEO/GEO, update sitemap & llms.txt
 Status            : Active & Running Live on Hostinger VPS (187.127.170.36)
 PM2 Services      : customerpilot-web (Online, :3000), customerpilot-cron (Online), cakeconnection (Online, :3001), cp-watchdog (Stopped)
 Docker Containers : evolution-api (evoapicloud/evolution-api pinned @sha256:966625532d9076a2381e973a271307d107e6f070450de3abeeea8bd18be07252, Port 8080 Open in UFW, Online & Healthy)

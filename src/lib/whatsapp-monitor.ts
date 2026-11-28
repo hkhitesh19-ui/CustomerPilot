@@ -16,6 +16,7 @@ export type WhatsAppIssueType =
   | "ACCOUNT_RESTRICTED_403"
   | "INSTANCE_NOT_CONFIGURED"
   | "GATEWAY_UNREACHABLE"
+  | "SILENT_INBOUND_STALL"
 
 export type WhatsAppAlertAction =
   | "NONE_HEALTHY"
@@ -110,6 +111,18 @@ export function buildTargetedAlertMessage(params: {
         `Namaste *${storeName}*!\n\n` +
         `Aapke WhatsApp number par Meta authentication restriction (Code 403 Forbidden) detect hui hai.\n\n` +
         `Kripya turant CustomerPilot SuperAdmin helpline *+91 9033304707* par contact karein taaki hum aapke account ko securely recover kar sakein.`
+      )
+
+    case "SILENT_INBOUND_STALL":
+      return (
+        `⚠️ *CustomerPilot Health Warning: Silent Inbound Stall*\n\n` +
+        `Namaste *${storeName}*!\n\n` +
+        `Aapka WhatsApp status connected ("open") dikh raha hai, lekin pichle kai ghanto se koi inbound webhook message receive nahi hua ya QR scans drop hote dikhe hain.\n\n` +
+        `🔧 *Kya Karein:*\n` +
+        `1. Customers ko Web Check-in link ya VIP Card se check-in karwayein.\n` +
+        `2. Store WhatsApp session refresh karne ke liye Settings kholein:\n` +
+        `👉 ${reconnectUrl}\n\n` +
+        `Support Helpline: +91 9033304707`
       )
 
     case "INSTANCE_NOT_CONFIGURED":
@@ -378,6 +391,70 @@ export function evaluateInstanceStatus(
   }
 }
 
+export interface SilentStallCheckInput {
+  now?: Date
+  recentInbound7dCount: number
+  lastInboundAt: Date | null
+  pendingDropScanCount30m: number
+  silentHoursThreshold?: number
+}
+
+export interface SilentStallCheckResult {
+  stalled: boolean
+  reasonDetail: string | null
+}
+
+/**
+ * Pure helper: returns IST hour (0..23) for deterministic business-hours checking.
+ */
+export function getIstHour(date: Date = new Date()): number {
+  const istMs = date.getTime() + 5.5 * 60 * 60 * 1000
+  return new Date(istMs).getUTCHours()
+}
+
+/**
+ * Pure helper: flags an "open" instance exhibiting silent inbound webhook stalls during business hours
+ * or repeated unconfirmed QR->WhatsApp drop pings within 30 minutes.
+ */
+export function evaluateSilentInboundStall(input: SilentStallCheckInput): SilentStallCheckResult {
+  const now = input.now || new Date()
+  const silentHours = input.silentHoursThreshold ?? 4
+
+  // Signal 1: Immediate active scan drops (2+ QR->WA scans in last 30m with zero inbound recovery)
+  if (input.pendingDropScanCount30m >= 2) {
+    return {
+      stalled: true,
+      reasonDetail: `Instance shows open, but ${input.pendingDropScanCount30m} counter QR scans in the last 30 minutes had zero inbound WhatsApp confirmation.`
+    }
+  }
+
+  // Signal 2: High-activity merchant silent for >= silentHours during IST business hours (12:00..21:59 IST)
+  const istHour = getIstHour(now)
+  const inBusinessHours = istHour >= 12 && istHour <= 21
+  if (!inBusinessHours || input.recentInbound7dCount < 5) {
+    return { stalled: false, reasonDetail: null }
+  }
+
+  if (!input.lastInboundAt) {
+    return {
+      stalled: true,
+      reasonDetail: `Instance shows open during IST business hours (${istHour}:00), but has zero recorded inbound webhooks recently.`
+    }
+  }
+
+  const gapMs = now.getTime() - input.lastInboundAt.getTime()
+  const thresholdMs = silentHours * 60 * 60 * 1000
+  if (gapMs >= thresholdMs) {
+    const gapHours = (gapMs / (60 * 60 * 1000)).toFixed(1)
+    return {
+      stalled: true,
+      reasonDetail: `Instance shows open during IST business hours, but zero inbound webhooks arrived in the last ${gapHours}h (threshold: ${silentHours}h).`
+    }
+  }
+
+  return { stalled: false, reasonDetail: null }
+}
+
 /**
  * Fleet Diagnostic Engine:
  * Loops through all active merchants, fetches live state from Evolution API,
@@ -388,6 +465,7 @@ export async function runFleetWhatsAppMonitor(options: {
   forceSend?: boolean
   targetMerchantId?: string
   cooldownHours?: number
+  silentHoursThreshold?: number
   appBaseUrl?: string
 } = {}): Promise<FleetMonitorResult> {
   const {
@@ -395,6 +473,7 @@ export async function runFleetWhatsAppMonitor(options: {
     forceSend = false,
     targetMerchantId,
     cooldownHours = DEFAULT_COOLDOWN_HOURS,
+    silentHoursThreshold = 4,
     appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://customerpilot.in"
   } = options
 
@@ -447,7 +526,62 @@ export async function runFleetWhatsAppMonitor(options: {
 
   for (const merchant of merchants) {
     const instanceData = merchant.whatsappInstanceName ? instanceMap.get(merchant.whatsappInstanceName) || null : null
-    const evalResult = evaluateInstanceStatus(merchant, instanceData)
+    let evalResult = evaluateInstanceStatus(merchant, instanceData)
+
+    // When Evolution API reports "open", verify the instance is not silently dropping inbound webhooks
+    if (evalResult.status === "HEALTHY") {
+      try {
+        const now = new Date()
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        const thirtyMinsAgo = new Date(now.getTime() - 30 * 60 * 1000)
+
+        const [recentInbound7dCount, lastInbound, recentScans30m, recentWaiting30m] = await Promise.all([
+          typeof db.whatsAppMessage?.count === "function"
+            ? db.whatsAppMessage.count({
+                where: { merchantId: merchant.id, template: "INCOMING", createdAt: { gte: sevenDaysAgo } }
+              }).catch(() => 0)
+            : Promise.resolve(0),
+          typeof db.whatsAppMessage?.findFirst === "function"
+            ? db.whatsAppMessage.findFirst({
+                where: { merchantId: merchant.id, template: "INCOMING" },
+                orderBy: { createdAt: "desc" },
+                select: { createdAt: true }
+              }).catch(() => null)
+            : Promise.resolve(null),
+          typeof db.auditLog?.count === "function"
+            ? db.auditLog.count({
+                where: { merchantId: merchant.id, action: "QR_WA_REDIRECT_SCAN", createdAt: { gte: thirtyMinsAgo } }
+              }).catch(() => 0)
+            : Promise.resolve(0),
+          typeof db.waitingCustomer?.count === "function"
+            ? db.waitingCustomer.count({
+                where: { merchantId: merchant.id, scannedAt: { gte: thirtyMinsAgo } }
+              }).catch(() => 0)
+            : Promise.resolve(0),
+        ])
+
+        const unconfirmedScanDrops = Math.max(0, recentScans30m - recentWaiting30m)
+        const stallEval = evaluateSilentInboundStall({
+          now,
+          recentInbound7dCount,
+          lastInboundAt: lastInbound?.createdAt ? new Date(lastInbound.createdAt) : null,
+          pendingDropScanCount30m: unconfirmedScanDrops,
+          silentHoursThreshold,
+        })
+
+        if (stallEval.stalled && stallEval.reasonDetail) {
+          evalResult = {
+            status: "ISSUE_DETECTED",
+            issueType: "SILENT_INBOUND_STALL",
+            reasonDetail: stallEval.reasonDetail,
+            disconnectionCode: null,
+            disconnectionAt: null,
+          }
+        }
+      } catch {
+        // Keep standard HEALTHY status if auxiliary telemetry query fails
+      }
+    }
 
     const recipientPhone = merchant.whatsappPhone || ""
 

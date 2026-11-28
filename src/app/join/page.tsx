@@ -32,22 +32,28 @@ function JoinContent() {
   const [name, setName] = useState("")
   const [joinResult, setJoinResult] = useState<any>(null)
 
+  const [merchantPhone, setMerchantPhone] = useState<string>("")
+  const [fallbackWhatsappUrl, setFallbackWhatsappUrl] = useState<string | null>(null)
+
   useEffect(() => {
     let isMounted = true
 
     async function loadMerchantDetails() {
       if (!merchantId) return
       try {
-        const res = await fetch(`/api/cards/setup`, {
-          headers: { "x-merchant-id": merchantId }
-        })
+        const res = await fetch(`/api/queue/web-checkin?m=${encodeURIComponent(merchantId)}`)
         if (res.ok) {
           const json = await res.json()
-          if (json.card && isMounted) {
-            setStampCard({
-              ...json.card,
-              name: json.card.name || decodeURIComponent(merchantId),
-            })
+          const d = json.data
+          if (d && isMounted) {
+            if (d.stampCard) {
+              setStampCard({
+                ...d.stampCard,
+                name: d.shortName || d.stampCard.name || decodeURIComponent(merchantId),
+              })
+            }
+            if (d.whatsappPhone) setMerchantPhone(d.whatsappPhone)
+            if (d.fallbackWhatsappUrl) setFallbackWhatsappUrl(d.fallbackWhatsappUrl)
           }
         }
       } catch (e) {
@@ -68,10 +74,10 @@ function JoinContent() {
 
     setJoining(true)
     try {
-      const res = await fetch("/api/queue/join", {
+      const res = await fetch("/api/queue/web-checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, name, scanSource })
+        body: JSON.stringify({ merchantId, phone, name, scanSource })
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || "Failed to join queue")
@@ -148,18 +154,38 @@ function JoinContent() {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Primary 1-Click WhatsApp Deep Link Button */}
-              <Button
-                type="button"
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 text-base shadow-md gap-2"
-                onClick={() => {
-                  const phone = "919033304707"
-                  const bizName = stampCard?.name || "Store Team"
-                  const msg = `🎉 Hi ${bizName}! I want to join the VIP Club & collect my first loyalty stamp!`
-                  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank")
-                }}
-              >
-                <MessageSquare className="w-5 h-5 fill-white" /> Activate VIP Pass on WhatsApp 💬
-              </Button>
+              {fallbackWhatsappUrl && (
+                <Button
+                  type="button"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 text-base shadow-md gap-2"
+                  onClick={() => {
+                    try {
+                      void fetch("/api/queue/web-checkin/scan-ping", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ merchantId, source: scanSource }),
+                        keepalive: true,
+                      })
+                    } catch {}
+                    window.open(fallbackWhatsappUrl, "_blank")
+                  }}
+                >
+                  <MessageSquare className="w-5 h-5 fill-white" /> Activate VIP Pass on WhatsApp 💬
+                </Button>
+              )}
+              {!fallbackWhatsappUrl && merchantPhone && (
+                <Button
+                  type="button"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 text-base shadow-md gap-2"
+                  onClick={() => {
+                    const bizName = stampCard?.name || "Store Team"
+                    const msg = `🎉 Hi ${bizName}! I want to join the VIP Club & collect my first loyalty stamp!`
+                    window.open(`https://wa.me/${merchantPhone}?text=${encodeURIComponent(msg)}`, "_blank")
+                  }}
+                >
+                  <MessageSquare className="w-5 h-5 fill-white" /> Activate VIP Pass on WhatsApp 💬
+                </Button>
+              )}
 
               <div className="relative flex py-1 items-center">
                 <div className="flex-grow border-t border-slate-200"></div>

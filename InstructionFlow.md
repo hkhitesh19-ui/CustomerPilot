@@ -333,6 +333,9 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   ├── onboarding/            # 9-Step Onboarding Engine State APIs
 │   │   │   ├── webhook/               # Evolution API & WhatsApp Incoming Webhooks
 │   │   │   ├── queue/                 # Live Waitlist & Queue Management APIs
+│   │   │   │   ├── web-checkin/route.ts # Public Zero-Drop Web Check-In API (GET Store + POST LiveQueue)
+│   │   │   │   ├── web-checkin/scan-ping/route.ts # Hybrid QR-to-WhatsApp Anonymous Scan Drop Telemetry
+│   │   │   │   └── dismiss-scan/route.ts # Merchant-Authenticated Pending Scan Alert Dismiss API
 │   │   │   ├── menu/                  # Online Ordering Menu & Item CRUD APIs
 │   │   │   │   ├── [merchantId]/route.ts # Public Category & Available Items Fetcher
 │   │   │   │   └── items/route.ts     # Merchant Menu Items CRUD Management API
@@ -408,6 +411,7 @@ F:\CustomerPilot_ByGLM_July2026
 │   │   │   ├── operations/page.tsx         # Live Counter Operations Manual (Merchant & Customer Daily Journeys, Stepper & Matrix)
 │   │   │   └── 3-day-trial/page.tsx        # Legacy URL Permanent Redirect to /guide/5-minute-setup-guide
 │   │   ├── join/page.tsx              # Customer QR Scan & Digital Stamp Card Page
+│   │   ├── checkin/page.tsx           # Zero-Drop Hybrid Web Check-In Page (1-Tap Returning + WA Fallback)
 │   │   ├── onboarding/page.tsx        # 9-Step Interactive Onboarding Wizard
 │   │   ├── page.tsx                   # Master Homepage & Product Landing Page
 │   │   ├── pricing/page.tsx           # V3.0 Customer Capacity & Founding Merchant Pricing
@@ -474,8 +478,9 @@ F:\CustomerPilot_ByGLM_July2026
 │       ├── google-places-api.ts       # Google GBP API, Places API & Quota Handler
 │       ├── master-plans.ts            # Canonical Master Plans, Coupons & Self-Healing Auto-Seeder
 │       ├── queue-engine.ts            # WaitingCustomer & State Machine Processing
+│       ├── web-checkin.ts             # Hybrid Zero-Drop Web Check-In, WA Hygiene & Pending Scan Alert Engine
 │       ├── order-bot.ts               # WhatsApp Online Ordering Engine (Parser, Lifecycle, WA Auto-replies, Confirmation)
-│       ├── whatsapp-monitor.ts        # Fleet WhatsApp Disconnection Diagnosis & Targeted Alert Engine (SuperAdmin +91 9033304707)
+│       ├── whatsapp-monitor.ts        # Fleet WhatsApp Disconnection, Silent Inbound Stall & Targeted Alert Engine
 │       └── stamp-engine.ts            # Bill-to-Stamp Award & Redemption Logic
 │
 ├── .github/workflows/                 # CI/CD Automation Workflows

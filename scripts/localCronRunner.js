@@ -10,6 +10,7 @@
  * 4. Hourly 10:00-21:00 IST  -> /api/cron/gbp-posts?mode=publish (Auto-Publish Due Approved Posts to Google Maps)
  * 5. Every Sunday 11:00 IST  -> /api/cron/gbp-autopilot (Live 5x5 Geo-Grid & 30-Day Top-3 Checklist Sync)
  * 6. 1st of Month 09:15 IST  -> /api/cron/gbp-monthly-reports (Monthly 30-Day Audit Report)
+ * 7. Every 15 min 09-22 IST  -> /api/cron/whatsapp-health (Socket Disconnect & Silent Inbound Stall Monitor)
  */
 
 const { PrismaClient } = require('@prisma/client');
@@ -26,6 +27,7 @@ const lastRun = {
   hourlyPublishKey: null,   // "YYYY-MM-DD-HH"
   sundayAutopilotDate: null,// "YYYY-MM-DD"
   monthlyReportMonth: null, // "YYYY-MM"
+  waHealthSlotKey: null,    // "YYYY-MM-DD-HH-Q"
 };
 
 function getIstParts() {
@@ -134,6 +136,15 @@ function runTick() {
     lastRun.monthlyReportMonth = ist.monthStr;
     console.log(`[RankLocal Cron] 📊 Monthly 30-Day GBP Audit Reports (${ist.monthStr})...`);
     callLocalEndpoint('/api/cron/gbp-monthly-reports', 180000);
+  }
+
+  // 7. Every 15 minutes during 09:00-22:59 IST: Fleet WhatsApp Socket & Silent Stall Check
+  const quarter = Math.floor(ist.minute / 15);
+  const waSlotKey = `${hourKey}-${quarter}`;
+  if (ist.hour >= 9 && ist.hour <= 22 && lastRun.waHealthSlotKey !== waSlotKey) {
+    lastRun.waHealthSlotKey = waSlotKey;
+    console.log(`[RankLocal Cron] 🩺 15-min WhatsApp Health & Silent Stall Check (${waSlotKey} IST)...`);
+    callLocalEndpoint('/api/cron/whatsapp-health', 45000);
   }
 }
 

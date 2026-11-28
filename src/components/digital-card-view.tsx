@@ -796,11 +796,13 @@ export function DigitalCardView({ card, referralInfo }: { card: DigitalCardData;
           {/* ═══════════════════════════════════════════════════════════════ */}
           <div className="pt-1 font-sans">
             <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
-              {/* Button 1: Digital Loyalty Stamp (WhatsApp Emerald Theme) */}
+              {/* Button 1: Digital Loyalty Stamp (Hybrid Zero-Drop Web Check-In -> WhatsApp) */}
               <a
-                href={`https://wa.me/${(card.whatsappNumber || card.phoneNumber || "919033304707").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi ${card.displayName}! Checking in for my VIP Club stamps 🎁`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={
+                  card.merchantId
+                    ? `/checkin?m=${encodeURIComponent(card.merchantId)}&slug=${encodeURIComponent(card.slug)}&source=digital_card${referralInfo?.referralCode ? `&ref=${encodeURIComponent(referralInfo.referralCode)}` : ""}`
+                    : `https://wa.me/${(card.whatsappNumber || card.phoneNumber || "919033304707").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi ${card.displayName}! Checking in for my VIP Club stamps 🎁`)}`
+                }
                 className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/40 hover:from-emerald-100 hover:to-white text-slate-900 border-2 border-emerald-300 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group active:scale-[0.98]"
               >
                 <div className="flex items-center justify-between w-full mb-1">

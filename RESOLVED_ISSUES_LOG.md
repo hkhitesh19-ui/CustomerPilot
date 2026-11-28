@@ -4,6 +4,31 @@ This document serves as a historical record of all major bugs, configuration iss
 
 ---
 
+## [28 Nov 2026] Issue: Evolution API Per-Contact Signal Session Drop Missing Loyalty Check-In in LiveQueue + Silent Stall Monitoring
+- **Symptom**:
+  1. At 1:06 PM IST on 28 Nov 2026, customer (`+91 90333 04707`) scanned Cake Connection's Loyalty QR, sent `"Hi Cake Connection! Checking in for my VIP Club stamps"`, saw double ticks in WhatsApp, yet did not appear in LiveQueue (`/dashboard/queue`).
+  2. Other customers on the exact same instance (`CP_M_cmtymavf_cmtymavf_mwri6pri`) decrypted cleanly before and after 1:06 PM (`44` `WhatsAppMessage` rows today), and resending at 3:15:01 PM IST immediately succeeded (`WaitingCustomer` `cmx0852ux0betkv90vqr62tps`).
+  3. `/api/cron/whatsapp-health` only flagged disconnected instances (`connectionStatus !== "open"`), never silent inbound stalls, and `scripts/localCronRunner.js` did not invoke it.
+  4. `/join` (`src/app/join/page.tsx`) called `POST /api/queue/join` without a merchant session (401) and had a hardcoded phone number.
+- **Root Cause**:
+  1. Baileys (Evolution API) occasionally drops an individual contact's inbound message on Signal session key mismatch (`"Decrypted message with closed session"` / `"No session found to decrypt message"`), preventing `messages_upsert` webhooks from firing even while WhatsApp servers deliver the message (double tick).
+  2. Digital Card (`DigitalCardView`) routed the "Loyalty Stamps" CTA directly to `wa.me/...`, making LiveQueue 100% dependent on inbound Baileys decryption.
+- **Resolution**:
+  1. **Zero-Drop Hybrid Web Check-In (`src/lib/web-checkin.ts`, `src/app/checkin/page.tsx`, `src/app/api/queue/web-checkin/route.ts`)**:
+     - Created `/checkin` with 1-tap `localStorage` repeat check-in and 10-digit first-time check-in that writes directly to `WaitingCustomer` (`status: "waiting"`, `scanSource: "qr_web_hybrid"`) and fires non-blocking outbound WhatsApp confirmation without depending on inbound Baileys decryption.
+     - Added non-trigger `confirm_done` WhatsApp URL (`VIP Check-in Done ✅`) and `botState: "IDLE"` lock so optional WhatsApp confirmation logs `INCOMING` telemetry without triggering `QUEUE_DUPLICATE` or overwriting customer names.
+  2. **Hybrid Pending-Scan Drop Catcher (`src/app/api/queue/web-checkin/scan-ping/route.ts`, `src/app/api/queue/dismiss-scan/route.ts`, `src/app/api/state/route.ts`, `src/app/dashboard/queue/page.tsx`)**:
+     - Added anonymous scan ping before direct-WhatsApp skip fallback so unconfirmed scans trigger an amber `"Pending QR Scan"` alert card in LiveQueue after 60s instead of failing silently.
+  3. **Digital Card & `/join` Fixes (`src/components/digital-card-view.tsx`, `src/app/join/page.tsx`, `src/proxy.ts`)**:
+     - Routed Digital Card "Loyalty Stamps" CTA to `/checkin?m=...` and fixed `/join` to use public `/api/queue/web-checkin` with real merchant WhatsApp numbers.
+  4. **Silent Inbound Stall Health Monitor (`src/lib/whatsapp-monitor.ts`, `scripts/localCronRunner.js`)**:
+     - Added `SILENT_INBOUND_STALL` classification (`evaluateSilentInboundStall`) flagging active open instances with >=4h inbound silence during IST business hours (12:00–21:59) or >=2 unconfirmed QR->WA drops in 30 mins.
+     - Wired `/api/cron/whatsapp-health` every 15 mins (09:00–22:59 IST) in `scripts/localCronRunner.js`.
+  5. **Verification**: Verified 24/24 Vitest tests (`tests/whatsapp-monitor.test.ts` + `tests/unit/web-checkin-and-stall.test.ts`), ESLint (0 errors), TypeScript (`0` errors in changed files), all 7 Master Adversarial Guard gates (including Gate 7 frozen core SHA-256 integrity), `npm run build` (258/258), and Playwright hardened E2E (`e2e/web-checkin.spec.ts`, 0 console/network errors).
+- **Status**: ✅ Resolved & Verified Locally (Awaiting User Approval for Git Push & VPS Deployment + Step A Docker/Watchdog Hardening).
+
+---
+
 ## [26 Nov 2026] Issue: Google Reviews Cron Location ID Mismatch & Star-Only Empty Comment Filter Patch
 - **Symptom**: Reviews left by customers on Google Maps after 15 Nov (including Mayurvan Gosai, Rakesh Radadiya, Pradeep Parmar) were not syncing to Cake Connection's dashboard database, leaving them unrecorded.
 - **Root Cause**:

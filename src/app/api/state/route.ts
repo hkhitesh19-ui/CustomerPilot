@@ -2,6 +2,12 @@
 import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
 import { ok, err } from "@/lib/api"
+import {
+  QR_WA_DISMISS_ACTION,
+  QR_WA_REDIRECT_ACTION,
+  annotateQueueWaStatus,
+  computePendingScanAlerts,
+} from "@/lib/web-checkin"
 
 export async function GET(req: NextRequest) {
   try {
@@ -58,6 +64,10 @@ export async function GET(req: NextRequest) {
     waitingCustomers,
     merchantGoogleConnections,
     digitalBusinessCard,
+    recentScanLogs,
+    recentDismissLogs,
+    recentWaitingAnyStatus,
+    recentIncomingWa,
   ] = await Promise.all([
     db.staff.findMany({ where: { merchantId: merchant.id }, orderBy: { createdAt: "asc" }, take: 100 }),
     db.customer.findMany({ where: { merchantId: merchant.id, deletedAt: null }, orderBy: { createdAt: "desc" }, take: 500 }),
@@ -115,7 +125,51 @@ export async function GET(req: NextRequest) {
     }).catch(() => []),
     db.merchantGoogleConnection.findMany({ where: { merchantId: merchant.id } }).catch(() => []),
     db.digitalBusinessCard.findUnique({ where: { merchantId: merchant.id } }).catch(() => null),
+    db.auditLog.findMany({
+      where: {
+        merchantId: merchant.id,
+        action: QR_WA_REDIRECT_ACTION,
+        createdAt: { gte: new Date(Date.now() - 15 * 60 * 1000) },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 15,
+      select: { id: true, createdAt: true, metadata: true },
+    }).catch(() => []),
+    db.auditLog.findMany({
+      where: {
+        merchantId: merchant.id,
+        action: QR_WA_DISMISS_ACTION,
+        createdAt: { gte: new Date(Date.now() - 20 * 60 * 1000) },
+      },
+      select: { entityId: true, metadata: true },
+    }).catch(() => []),
+    db.waitingCustomer.findMany({
+      where: {
+        merchantId: merchant.id,
+        scannedAt: { gte: new Date(Date.now() - 20 * 60 * 1000) },
+      },
+      select: { scannedAt: true },
+    }).catch(() => []),
+    db.whatsAppMessage.findMany({
+      where: {
+        merchantId: merchant.id,
+        template: "INCOMING",
+        createdAt: { gte: new Date(Date.now() - 40 * 60 * 1000) },
+      },
+      select: { toPhone: true, createdAt: true, template: true, body: true },
+    }).catch(() => []),
   ])
+
+  const annotatedWaitingCustomers = annotateQueueWaStatus({
+    waitingEntries: waitingCustomers,
+    incomingMessages: recentIncomingWa,
+  })
+  const pendingScanAlerts = computePendingScanAlerts({
+    scanLogs: recentScanLogs,
+    dismissLogs: recentDismissLogs,
+    waitingEntries: recentWaitingAnyStatus,
+    incomingMessages: recentIncomingWa,
+  })
 
   return ok({
     merchant,
@@ -147,7 +201,8 @@ export async function GET(req: NextRequest) {
     cardRuleChangeLogs,
     campaignDeliveryLogs,
     ownerOverrideLogs,
-    waitingCustomers: waitingCustomers as any[],
+    waitingCustomers: annotatedWaitingCustomers as any[],
+    pendingScanAlerts,
     merchantGoogleConnections: merchantGoogleConnections as any[],
   })
   } catch (error: unknown) {
