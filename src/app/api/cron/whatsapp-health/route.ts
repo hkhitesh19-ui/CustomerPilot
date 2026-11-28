@@ -11,8 +11,10 @@ import { runFleetWhatsAppMonitor } from "@/lib/whatsapp-monitor"
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const dryRun = searchParams.get("dryRun") === "true"
-    const forceSend = searchParams.get("forceSend") === "true"
+    const dryRunParam = searchParams.get("dryRun")?.trim().toLowerCase()
+    const forceSendParam = searchParams.get("forceSend")?.trim().toLowerCase()
+    const dryRun = dryRunParam === "true" || dryRunParam === "1"
+    const forceSend = forceSendParam === "true" || forceSendParam === "1"
     const targetMerchantId = searchParams.get("merchantId") || undefined
 
     const report = await runFleetWhatsAppMonitor({

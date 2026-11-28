@@ -608,6 +608,24 @@ export async function runFleetWhatsAppMonitor(options: {
     // ISSUE DETECTED for this specific merchant
     issueCount++
     const issueType = evalResult.issueType!
+
+    // Unconfigured/demo merchants (never linked WhatsApp) stay dashboard-visible without outbound alert or incident spam
+    if (issueType === "INSTANCE_NOT_CONFIGURED") {
+      diagnoses.push({
+        merchantId: merchant.id,
+        merchantName: merchant.name,
+        merchantPhone: recipientPhone,
+        instanceName: merchant.whatsappInstanceName,
+        status: "ISSUE_DETECTED",
+        issueType,
+        reasonDetail: evalResult.reasonDetail,
+        disconnectionCode: evalResult.disconnectionCode,
+        disconnectionAt: evalResult.disconnectionAt,
+        alertAction: "NONE_HEALTHY",
+      })
+      continue
+    }
+
     const messageBody = buildTargetedAlertMessage({
       storeName: merchant.name,
       issueType,

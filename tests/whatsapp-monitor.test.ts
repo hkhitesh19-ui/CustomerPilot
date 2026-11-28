@@ -1,10 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
+import { NextRequest } from "next/server"
 import {
   evaluateInstanceStatus,
   buildTargetedAlertMessage,
   runFleetWhatsAppMonitor,
   WhatsAppIssueType
 } from "../src/lib/whatsapp-monitor"
+import { GET as getWhatsappHealthCron } from "../src/app/api/cron/whatsapp-health/route"
 import { db } from "../src/lib/db"
 
 describe("WhatsApp Fleet Monitor & Targeted Alert Engine", () => {
@@ -226,6 +228,113 @@ describe("WhatsApp Fleet Monitor & Targeted Alert Engine", () => {
       expect(brokenDiag?.issueType).toBe("SESSION_LOGGED_OUT_401")
       expect(brokenDiag?.messageBody).toContain("Broken Store")
       expect(brokenDiag?.messageBody).toContain("Meta Security Code 401")
+
+      global.fetch = originalFetch
+      vi.restoreAllMocks()
+    })
+
+    it("excludes INSTANCE_NOT_CONFIGURED from outbound WhatsApp alerts and Incident DB writes", async () => {
+      process.env.EVOLUTION_API_URL = "http://localhost:8080"
+      process.env.EVOLUTION_API_KEY = "test_key"
+
+      vi.spyOn(db.merchant, "findMany").mockResolvedValue([
+        {
+          id: "m_demo_unconfigured",
+          name: "Demo Unlinked Store",
+          whatsappPhone: "919000000099",
+          whatsappInstanceName: null
+        },
+        {
+          id: "m_disconnected_real",
+          name: "Real Disconnected Store",
+          whatsappPhone: "919000000088",
+          whatsappInstanceName: "CP_real_401"
+        }
+      ] as any)
+
+      vi.spyOn(db.incident, "findFirst").mockResolvedValue(null)
+      const incidentCreateSpy = vi.spyOn(db.incident, "create").mockResolvedValue({} as any)
+      const waMsgCreateSpy = vi.spyOn(db.whatsAppMessage, "create").mockResolvedValue({} as any)
+
+      const originalFetch = global.fetch
+      const sendCalls: string[] = []
+      global.fetch = vi.fn().mockImplementation(async (url: string) => {
+        if (url.includes("/instance/fetchInstances")) {
+          return {
+            ok: true,
+            json: async () => [
+              {
+                name: "CP_admin",
+                number: "919033304707",
+                connectionStatus: "open",
+                ownerJid: "919033304707@s.whatsapp.net"
+              },
+              {
+                name: "CP_real_401",
+                connectionStatus: "close",
+                disconnectionReasonCode: 401
+              }
+            ]
+          } as any
+        }
+        if (url.includes("/message/sendText/")) {
+          sendCalls.push(url)
+          return { ok: true, json: async () => ({ key: { id: "msg_123" } }) } as any
+        }
+        return { ok: true, json: async () => ({}) } as any
+      })
+
+      const report = await runFleetWhatsAppMonitor({ dryRun: false })
+
+      expect(report.issueCount).toBe(2)
+      expect(report.alertsSentCount).toBe(1)
+      expect(sendCalls).toHaveLength(1)
+      expect(incidentCreateSpy).toHaveBeenCalledTimes(1)
+      expect(waMsgCreateSpy).toHaveBeenCalledTimes(1)
+
+      const unconfDiag = report.diagnoses.find(d => d.merchantId === "m_demo_unconfigured")
+      expect(unconfDiag?.issueType).toBe("INSTANCE_NOT_CONFIGURED")
+      expect(unconfDiag?.alertAction).toBe("NONE_HEALTHY")
+
+      global.fetch = originalFetch
+      vi.restoreAllMocks()
+    })
+
+    it("honors dryRun=1 query parameter without writing incidents or sending alerts", async () => {
+      process.env.EVOLUTION_API_URL = "http://localhost:8080"
+      process.env.EVOLUTION_API_KEY = "test_key"
+
+      vi.spyOn(db.merchant, "findMany").mockResolvedValue([
+        {
+          id: "m_401_dry",
+          name: "DryRun Store",
+          whatsappPhone: "919000000077",
+          whatsappInstanceName: "CP_dry_401"
+        }
+      ] as any)
+      vi.spyOn(db.incident, "findFirst").mockResolvedValue(null)
+      const incidentCreateSpy = vi.spyOn(db.incident, "create").mockResolvedValue({} as any)
+
+      const originalFetch = global.fetch
+      global.fetch = vi.fn().mockImplementation(async (url: string) => {
+        if (url.includes("/instance/fetchInstances")) {
+          return {
+            ok: true,
+            json: async () => [{ name: "CP_dry_401", connectionStatus: "close", disconnectionReasonCode: 401 }]
+          } as any
+        }
+        throw new Error("Should not send outbound message in dryRun=1 mode")
+      })
+
+      const res = await getWhatsappHealthCron(
+        new NextRequest("http://localhost:3000/api/cron/whatsapp-health?dryRun=1")
+      )
+      const json = await res.json()
+
+      expect(res.status).toBe(200)
+      expect(json.ok).toBe(true)
+      expect(json.report.alertsSentCount).toBe(0)
+      expect(incidentCreateSpy).not.toHaveBeenCalled()
 
       global.fetch = originalFetch
       vi.restoreAllMocks()
