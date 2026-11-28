@@ -52,12 +52,26 @@ const scanPingIpLimiter = new RateLimiterMemory({
   blockDuration: 300 // block for 5 minutes
 })
 
-function getClientIp(req: NextRequest): string {
-  return (
-    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    req.headers.get('x-real-ip') ||
-    'unknown'
-  )
+/**
+ * Resolve client IP prioritizing Cloudflare (`cf-connecting-ip`) and Nginx TCP peer (`x-real-ip`)
+ * before falling back to the rightmost proxy-appended `x-forwarded-for` hop to prevent spoofing.
+ */
+export function getClientIp(req: NextRequest): string {
+  const cfIp = req.headers.get('cf-connecting-ip')?.trim()
+  if (cfIp) return cfIp
+
+  const realIp = req.headers.get('x-real-ip')?.trim()
+  if (realIp) return realIp
+
+  const xffParts = (req.headers.get('x-forwarded-for') || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+  if (xffParts.length > 0) {
+    return xffParts[xffParts.length - 1]
+  }
+
+  return 'unknown'
 }
 
 /**

@@ -14,6 +14,7 @@ import {
   buildTargetedAlertMessage,
 } from "@/lib/whatsapp-monitor"
 import {
+  getClientIp,
   applyWebCheckinIpLimit,
   applyWebCheckinPhoneLimit,
   applyScanPingIpLimit,
@@ -427,5 +428,31 @@ describe("Pending Scan Late WhatsApp Auto-Clear & Anti-Flood Rate Limiters", () 
     const pingBlocked = await applyScanPingIpLimit(pingReq, "m_test_rl")
     expect(pingBlocked?.status).toBe(429)
     expect(pingBlocked?.headers.get("Retry-After")).toBe("300")
+  })
+
+  it("prioritizes cf-connecting-ip then x-real-ip over spoofable leftmost x-forwarded-for", () => {
+    const cfReq = new NextRequest("http://localhost:3000/api/queue/web-checkin", {
+      headers: {
+        "x-forwarded-for": "1.2.3.4, 198.51.100.5",
+        "x-real-ip": "198.51.100.5",
+        "cf-connecting-ip": "198.51.100.9",
+      },
+    })
+    expect(getClientIp(cfReq)).toBe("198.51.100.9")
+
+    const nginxReq = new NextRequest("http://localhost:3000/api/queue/web-checkin", {
+      headers: {
+        "x-forwarded-for": "1.2.3.4, 203.0.113.10",
+        "x-real-ip": "203.0.113.10",
+      },
+    })
+    expect(getClientIp(nginxReq)).toBe("203.0.113.10")
+
+    const xffFallbackReq = new NextRequest("http://localhost:3000/api/queue/web-checkin", {
+      headers: {
+        "x-forwarded-for": "1.2.3.4, 203.0.113.20",
+      },
+    })
+    expect(getClientIp(xffFallbackReq)).toBe("203.0.113.20")
   })
 })
